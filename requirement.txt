@@ -30,6 +30,8 @@
 ### Admin
 
   - the users can add, edit, delete, or update products
+    - as many product images as they want (should I give a limit? 5?)
+    - set discount period (start date time and end date time) and its discount price.
   - the users can have admin page.
 
 ## Orders
