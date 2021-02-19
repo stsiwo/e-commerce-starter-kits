@@ -1,0 +1,43 @@
+## Users
+
+  - a user can be 'guest', 'member', 'admin'
+
+### Guest Users
+
+  - the users can sort products based on the price, the review points, or the name (asc, desc)
+  - the users can filter products based on the category, the review points
+  - the users can search products based on the name.
+  - the users can purchase products without sign up, but recommend to sign up
+  - the users can't use wish list unless sign up.
+  - the users can't review (comment + review points) unless sign up.
+  - the users can't browse their order history.
+  
+### Member Users
+
+  - the users can sort products based on the price, the review points, or the name (asc, desc)
+  - the users can filter products based on the category, the review points
+  - the users can search products based on the name.
+  - the users can use wish list to save products for future.
+  - the users can review (comment + review points) for products only they purchase.
+  - the users can browse their order history including completed and pending.
+
+### Membership 
+
+  - weekly newsletters (including new products / discounted products)
+  - reviewing
+  - browsing order history
+
+### Admin
+
+  - the users can add, edit, delete, or update products
+  - the users can have admin page.
+
+## Orders
+
+  - the users (guest and member) must follow the below procedure when purchase:
+    - fill out user info 
+      - if the user is logged in, insert the user info to the inputs
+      - if the user is not logged in, show prompt to login or sing up
+    - fill out payment info (use Stripe: need to check 
+      
+
