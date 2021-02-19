@@ -20,6 +20,7 @@
   - the users can use wish list to save products for future.
   - the users can review (comment + review points) for products only they purchase.
   - the users can browse their order history including completed and pending.
+  - the users can update their profile at their account page.
 
 ### Membership 
 
@@ -33,6 +34,7 @@
     - as many product images as they want (should I give a limit? 5?)
     - set discount period (start date time and end date time) and its discount price.
   - the users can have admin page.
+  - the users can update their profile at their account page.
 
 ## Orders
 
