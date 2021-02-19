@@ -38,6 +38,8 @@
     - fill out user info 
       - if the user is logged in, insert the user info to the inputs
       - if the user is not logged in, show prompt to login or sing up
-    - fill out payment info (use Stripe: need to check 
+    - confirmation with the product list, total cost and tax
+    - payment (use Stripe: need to check the doc)
+    - success/failed message.
       
 
