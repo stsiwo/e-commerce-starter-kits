@@ -36,6 +36,9 @@
   - the users can have admin page.
   - the users can update their profile at their account page.
   - the uesrs can access via mobile also.
+  - the users can update some of the information of orders
+  - the users can CRUD all customer information.
+  - the users must verify the review before publishing.
 
 ## Orders
 
