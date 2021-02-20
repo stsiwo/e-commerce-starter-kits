@@ -30,11 +30,12 @@
 
 ### Admin
 
-  - the users can add, edit, delete, or update products
+  - the users can add, edit, delete, or update products and categories
     - as many product images as they want (should I give a limit? 5?)
     - set discount period (start date time and end date time) and its discount price.
   - the users can have admin page.
   - the users can update their profile at their account page.
+  - the uesrs can access via mobile also.
 
 ## Orders
 
@@ -46,4 +47,7 @@
     - payment (use Stripe: need to check the doc)
     - success/failed message.
       
+## Next Versions
 
+  - multiple admin users
+  - statistic data on admin main page.
