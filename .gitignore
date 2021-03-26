@@ -1,3 +1,22 @@
+## Common
+
+# vim
+*.swp
+*.swo
+
+# env
+.env.*
+
+# credentials
+.credentials.txt
+
+
+## React
+# note_modules for any directory
+node_modules/
+
+
+## Java
 # Compiled class file
 *.class
 
