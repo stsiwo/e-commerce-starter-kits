@@ -6,20 +6,23 @@ import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { GlobalStyle } from 'ui/css/base';
-        
+import CssBaseline from '@material-ui/core/CssBaseline';
+
 const Index = (props: any) => {
 
   return (
-    <React.Fragment> 
-      <GlobalStyle />
-      <CssGlobalContext.Provider value={CssGlobalContextDefaultState}>
-        <Provider store={store}>
-          <Router>
-            <Content />
-          </Router>
-        </Provider>
-      </CssGlobalContext.Provider>
-    </React.Fragment> 
+    <React.Fragment>
+      <CssBaseline>
+        <GlobalStyle />
+        <CssGlobalContext.Provider value={CssGlobalContextDefaultState}>
+          <Provider store={store}>
+            <Router>
+              <Content />
+            </Router>
+          </Provider>
+        </CssGlobalContext.Provider>
+      </CssBaseline>
+    </React.Fragment>
   );
 };
 

@@ -61,7 +61,8 @@ export const initialState: StateType = {
   },
   app: {
     searchKeyword: "",
-    requestTracker: {}
+    requestTracker: {},
+    
   },
   domain: {
   },

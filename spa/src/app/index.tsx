@@ -20,3 +20,14 @@ export type RequestTrackerBaseType = {
 export declare type RequestTrackerType  = {
   [key: string]: RequestTrackerBaseType
 }
+
+// TODO: jwt + cookie HttpOnly implmenetation
+export enum UserTypeEnum {
+  GUEST = "GUEST",
+  MEMBER = "MEMBER",
+  ADMIN = "ADMIN",
+}
+
+export declare type Auth = {
+  userType: UserTypeEnum
+}
