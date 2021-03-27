@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { Button } from '@material-ui/core';
+import PageRoute from 'components/routes/PageRoute';
 
 const Content: React.FunctionComponent<{}> = (props) => {
 
   return (
     <div className="content-wrapper">
-      Happy Coding:)
-      <Button color="primary">Hello World</Button> 
+      <PageRoute />       
     </div>
   )
 }
