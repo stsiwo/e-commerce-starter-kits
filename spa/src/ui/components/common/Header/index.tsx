@@ -4,9 +4,13 @@ import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import SentimentSatisfiedOutlinedIcon from '@material-ui/icons/SentimentSatisfiedOutlined';
 import * as React from 'react';
+import { useSelector } from 'react-redux';
+import { AuthType, UserTypeEnum } from 'src/app';
+import { mSelector } from 'src/selectors/selector';
+import GuestHeaderMenuItems from './GuestHeaderMenuItem';
+import MemberHeaderMenuItems from './MemberHeaderMenuItems';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -22,6 +26,8 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const Header: React.FunctionComponent<{}> = (props) => {
+
+  const auth: AuthType = useSelector(mSelector.makeAuthSelector())
 
   const classes = useStyles();
 
@@ -40,16 +46,12 @@ const Header: React.FunctionComponent<{}> = (props) => {
               </IconButton>
             </Link>
           </Grid>
-          <Grid item>
-            <Typography >
-              <Link href="/login" color="inherit" className={classes.menuItem}>
-                Login
-              </Link>
-              <Link href="/signup" color="inherit" className={classes.menuItem}>
-                Signup
-              </Link>
-            </Typography>
-          </Grid>
+          {(auth.userType === UserTypeEnum.GUEST &&
+            <GuestHeaderMenuItems />
+          )}
+          {(auth.userType === UserTypeEnum.MEMBER &&
+            <MemberHeaderMenuItems />
+          )}
         </Grid>
       </Toolbar>
     </AppBar>

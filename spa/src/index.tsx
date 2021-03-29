@@ -7,6 +7,8 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core';
 import { theme } from 'ui/css/theme';
+import RoleSwitch from 'tests/debug/compoments/RoleSwitch';
+import { UserType } from './app';
 
 const Index = (props: any) => {
 
@@ -17,6 +19,9 @@ const Index = (props: any) => {
           <Provider store={store}>
             <Router>
               <Content />
+              {(NODE_ENV === "development" &&
+                <RoleSwitch />
+              )}
             </Router>
           </Provider>
         </CssBaseline>

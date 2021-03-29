@@ -54,7 +54,7 @@ module.exports = {
       reducers: path.resolve(__dirname, 'src/reducers/'),
       sideEffects: path.resolve(__dirname, 'src/sideEffects/'),
       src: path.resolve(__dirname, 'src/'),
-      static: path.resolve(__dirname, 'src/assets'),
+      static: path.resolve(__dirname, 'src/static'),
       tests: path.resolve(__dirname, 'tests/'),
     }
   },

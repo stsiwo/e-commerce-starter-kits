@@ -27,7 +27,7 @@
       "sideEffects/*": ["src/sideEffects/*"],
       "reducers/*": ["src/reducers/*"],
       "src/*": ["src/*"],
-      "static/*": ["src/assets/*"],   
+      "static/*": ["src/static/*"],   
       "tests/*": ["tests/*"],         
       "*": ["src/types/*"]
     }                  

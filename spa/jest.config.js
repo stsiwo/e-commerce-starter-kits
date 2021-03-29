@@ -19,6 +19,7 @@ module.exports = {
       "^reducers(.*)$": "<rootDir>/src/reducers$1", 
       "^sideEffects(.*)$": "<rootDir>/src/sideEffects$1", 
       "^configs(.*)$": "<rootDir>/src/configs$1", 
+      "^static(.*)$": "<rootDir>/src/static$1", 
       "^src(.*)$": "<rootDir>/src$1", 
       //
       // remove below because of this error: 
