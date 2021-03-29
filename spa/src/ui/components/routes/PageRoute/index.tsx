@@ -22,6 +22,15 @@ const PageRoute: React.FunctionComponent<{}> = (props) => {
     ...commonRoutesData
   ];
 
+  /**
+   * Not Found Page Logic
+   *
+   *  - the order matters.
+   *
+   *    - must make 'not found' page route at the last
+   *  
+   *  - other route must include 'exact'
+   **/
   return (
     <Switch location={location}>
       {allRoutesData.map((route: RouteDataType) => (

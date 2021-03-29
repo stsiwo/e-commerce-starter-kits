@@ -15,7 +15,7 @@ import MemberHeaderMenuItems from './MemberHeaderMenuItems';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     appBar: {
-      backgroundColor: theme.palette.background.paper,
+      background: "rgba(255, 255, 255, 1)",
       color: theme.palette.text.primary,
     },
     menuItem: {
@@ -33,7 +33,7 @@ const Header: React.FunctionComponent<{}> = (props) => {
 
   return (
     <AppBar position="sticky" className={classes.appBar}>
-      <Toolbar>
+      <Toolbar >
         <Grid
           justify="space-between"
           alignItems="center"

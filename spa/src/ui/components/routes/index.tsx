@@ -19,20 +19,22 @@ export declare type RoutesDataType = {
 
 export declare type CommonRoutesDataType = RouteDataType[] 
 
-// for guest and member
 export const routesData: RoutesDataType = {
+  // define guest only page
   [UserTypeEnum.GUEST]: [
     {
       url: "/guest",
       component: withBasePage(Guest),
     },
   ],
+  // define member only page
   [UserTypeEnum.MEMBER]: [
     {
       url: "/member",
       component: withBasePage(Member),
     },
   ],
+  // define admin only page
   [UserTypeEnum.ADMIN]: [
     {
       url: "/admin",
@@ -42,6 +44,7 @@ export const routesData: RoutesDataType = {
 }
 
 export const commonRoutesData: CommonRoutesDataType = [
+  // define common only page
   {
     url: '/',
     component: withBasePage(Home)
