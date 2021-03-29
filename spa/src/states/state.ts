@@ -1,4 +1,5 @@
 import { StateType } from "./types";
+import { UserTypeEnum } from "src/app";
 
 /**
  *
@@ -60,6 +61,10 @@ export const initialState: StateType = {
     searchModal: false,
   },
   app: {
+    auth: {
+      isLoggedIn: false,
+      userType: UserTypeEnum.GUEST,
+    },
     searchKeyword: "",
     requestTracker: {},
     

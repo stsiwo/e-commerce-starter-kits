@@ -66,7 +66,19 @@
 
         - alias: 'modify' => 'update' and 'delete', but this does not necessarily means that 'update' / 'delete' => 'modify'
 
- 
+## Material UI
+
+  ### Errors:
+  
+    - Failed prop type: The prop `children` is marked as required in `ForwardRef(Container)`, but its value is `undefined.
+
+      - you need to create child component of the target component
+
+      ```
+        <TargetComponent>
+          <h1>hey</h1> // <- need to put components
+        </TargetComponent>
+      ```
 
 ## Errors
 

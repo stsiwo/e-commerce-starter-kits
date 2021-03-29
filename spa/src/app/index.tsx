@@ -28,6 +28,15 @@ export enum UserTypeEnum {
   ADMIN = "ADMIN",
 }
 
-export declare type Auth = {
+export declare type UserType = {
+  firstName: string
+  lastName: string
+  email: string
+  avatarImagePath: string 
+}
+
+export declare type AuthType = {
+  isLoggedIn: boolean
   userType: UserTypeEnum
+  user?: UserType
 }

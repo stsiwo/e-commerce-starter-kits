@@ -23,6 +23,7 @@ export const rsSelector = {
   },
 
   app: {
+    getAuth: (state: StateType) => state.app.auth,
     getSearchKeyword: (state: StateType) => state.app.searchKeyword,
     getRequestTracker: (state: StateType) => state.app.requestTracker,
   },
@@ -76,6 +77,18 @@ export const mSelector = {
       ],
       (searchModal) => {
         return searchModal
+      },
+    )
+  },
+
+  // app.auth
+  makeAuthSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getAuth
+      ],
+      (auth) => {
+        return auth
       },
     )
   },

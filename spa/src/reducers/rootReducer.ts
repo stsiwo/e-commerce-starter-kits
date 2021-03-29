@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { requestTrackerSliceReducer, searchKeywordSliceReducer } from './slices/app';
+import { requestTrackerSliceReducer, searchKeywordSliceReducer, authSliceReducer } from './slices/app';
 import { leftNavMenuSliceReducer, rightNavMenuSliceReducer, searchModalSliceReducer } from './slices/ui';
 
 // ** REFACTOR to new approach **/
@@ -16,6 +16,7 @@ export const rootReducer = combineReducers({
   }),
 
   app: combineReducers({
+    auth: authSliceReducer,
     searchKeyword: searchKeywordSliceReducer,
     requestTracker: requestTrackerSliceReducer,
   }),

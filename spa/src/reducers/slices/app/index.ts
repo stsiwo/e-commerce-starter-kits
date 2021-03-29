@@ -1,5 +1,5 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RequestTrackerType } from "src/app";
+import { RequestTrackerType, AuthType, UserTypeEnum } from "src/app";
 
 /**
  * common reducer action type
@@ -9,6 +9,50 @@ import { RequestTrackerType } from "src/app";
 // cancel all sort & filter
 export const clearAllSortAndFilterActionCreator = createAction("/app/common/clearAllSortAndFilter")
 export const clearAllSortAndFilterActionTypeName = clearAllSortAndFilterActionCreator().type
+
+/**
+ * app.auth state Slice
+ **/
+export type authUpdateActionType = PayloadAction<AuthType>
+
+export const authSlice = createSlice({
+  name: "app/auth", // a name used in action type
+  initialState: {
+    isLoggedIn: false,
+    userType: UserTypeEnum.GUEST
+  } as AuthType,
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+    login: (state: AuthType, action: authUpdateActionType) => action.payload,
+    logout: (state: AuthType) => ({
+      isLoggedIn: false,
+      userType: UserTypeEnum.GUEST
+    }),
+
+  }
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   **/
+  //extraReducers: (builder) => {
+  //  builder.addCase(
+  //    clearAllSortAndFilterActionCreator,
+  //    (state: string) => ""
+  //  )
+  //}
+})
+
+export const authSliceReducer = authSlice.reducer
+export const authActions = authSlice.actions
 
 /**
  * app.searchKeyword state Slice
