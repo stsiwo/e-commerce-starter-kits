@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
       position: 'fixed',
       left: '0px',
       bottom: '0px',
+      backgroundColor: "#b3d9ff",
     },
   }),
 );

@@ -7,7 +7,6 @@ const Content: React.FunctionComponent<{}> = (props) => {
 
   return (
     <React.Fragment>
-      <Header />
       <PageRoute />       
     </React.Fragment>
   )

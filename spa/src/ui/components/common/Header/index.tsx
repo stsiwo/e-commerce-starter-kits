@@ -32,7 +32,7 @@ const Header: React.FunctionComponent<{}> = (props) => {
   const classes = useStyles();
 
   return (
-    <AppBar position="fixed" className={classes.appBar}>
+    <AppBar position="sticky" className={classes.appBar}>
       <Toolbar>
         <Grid
           justify="space-between"
