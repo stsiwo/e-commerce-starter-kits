@@ -1,15 +1,11 @@
-import * as React from 'react';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import Input from '@material-ui/core/Input';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import * as yup from 'yup';
-import { AnySchema } from 'yup/lib/schema';
+import * as React from 'react';
 import { asyncForEach } from 'src/utils';
+import { useValidation } from 'hooks/validation';
+import { userAccountSchema } from 'hooks/validation/rules';
 
 export declare type UserAccountDataType = {
   firstName: string
@@ -86,49 +82,14 @@ const UserAccountManagement: React.FunctionComponent<{}> = (props) => {
     password: "",
     confirm: "",
   });
-  const schema = yup.object().shape({
-    firstName: yup.string().required(),
-    lastName: yup.string().required(),
-    email: yup.string().required().email(),
-    password: yup.string().required(),
-    confirm: yup.string().oneOf([yup.ref('password'), null], "password must match")
+
+  const { updateValidationAt, updateAllValidation, isValidSync } = useValidation({
+    curDomain: curUserAccountState,
+    curValidationDomain: curUserAccountValidationState,
+    schema: userAccountSchema,
+    setValidationDomain: setUserAccountValidationState
   })
 
-  //React.useEffect(() => {
-
-  //  if (curUserAccountState) {
-  //    schema.validateAt("firstName", curUserAccountState).then((value: UserAccountDataType) => {
-  //      setValid(true) 
-  //    }).catch((error: any) => {
-  //      console.log(error)
-  //      setValid(false) 
-  //      setUserAccountValidationState(error);
-  //    })
-  //  }
-  //
-  //}, [
-  //  JSON.stringify(curUserAccountState)
-  //])
-
-  const updateValidationAt: (path: string, value: string) => void = (path, value) => {
-    schema.validateAt(path, {
-      ...curUserAccountState,
-      [path]: value
-    })
-      .then(() => {
-        console.log("passed finally")
-        setUserAccountValidationState((prev: UserAccountValidationDataType) => ({
-          ...prev,
-          [path]: ""
-        }))
-      }).catch((error: yup.ValidationError) => {
-        console.log("still error")
-        setUserAccountValidationState((prev: UserAccountValidationDataType) => ({
-          ...prev,
-          [path as keyof UserAccountValidationDataType]: error.errors[0]
-        }))
-      })
-  }
 
   // event handlers
   const handleFirstNameInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
@@ -178,32 +139,10 @@ const UserAccountManagement: React.FunctionComponent<{}> = (props) => {
   }
 
 
-  const getValidationData: () => Promise<UserAccountValidationDataType> = async () => {
-
-    const tempUserAccountValidationData: UserAccountValidationDataType = {}
-
-    const propList = Object.keys(curUserAccountState)
-
-    /**
-     * should use 'async/await' for 'yup' async validation
-     *
-     *  - ref: https://gist.github.com/Atinux/fd2bcce63e44a7d3addddc166ce93fb2
-     *
-     **/
-    await asyncForEach(propList, async (prop: string) => {
-      await schema.validateAt(prop, curUserAccountState).catch((error: yup.ValidationError) => {
-        tempUserAccountValidationData[prop as keyof UserAccountValidationDataType] = error.errors[0]
-      }) 
-    })
-
-    console.log(tempUserAccountValidationData)
-    return tempUserAccountValidationData
-  }
-
   // event handler to submit
   const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
 
-    const isValid: boolean = schema.isValidSync(curUserAccountState)
+    const isValid: boolean = isValidSync(curUserAccountState)
 
     console.log(isValid);
 
@@ -211,8 +150,7 @@ const UserAccountManagement: React.FunctionComponent<{}> = (props) => {
       // pass 
       console.log("passed")
     } else {
-      const validationData: UserAccountValidationDataType = await getValidationData()
-      setUserAccountValidationState(validationData);
+      updateAllValidation()
     }
   }
 

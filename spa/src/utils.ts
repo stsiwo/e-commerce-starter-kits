@@ -288,6 +288,12 @@ export const calcCurEllipsePosY: (elId: number, radiusWidth: number, radiusHeigh
  *
  * async for each
  *
+ *  - DON'T use normal forEach. it does not work.
+ *
+ *  - use this below.
+ *
+ *  - ref: https://gist.github.com/Atinux/fd2bcce63e44a7d3addddc166ce93fb2
+ *
  **/
 export const asyncForEach = async (array: any[], callback: (...args: any[]) => any) => {
   for (let index = 0; index < array.length; index++) {
