@@ -4,7 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import * as React from 'react';
-import ProductCard from '../ProductCard';
+import CategoryCard from '../CategoryCard';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -28,14 +28,14 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const BrandNewProduct: React.FunctionComponent<{}> = (props) => {
+const CategoryList: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
 
   return (
     <Box component="section" className={classes.section} >
       <Typography variant="h5" component="h5" align="center" className={classes.title} >
-        {"Brand New"}
+        {"Categories"}
       </Typography>
       <Grid 
         container
@@ -45,41 +45,69 @@ const BrandNewProduct: React.FunctionComponent<{}> = (props) => {
         <Grid
           item
           xs={12}
-          sm={6}
-          md={3}
+          md={6}
+          lg={4}
           className={classes.item} 
         >
-          <ProductCard />
+          <CategoryCard />
         </Grid>
         <Grid
           item
           xs={12}
-          sm={6}
-          md={3}
+          md={6}
+          lg={4}
           className={classes.item} 
         >
-          <ProductCard />
+          <CategoryCard />
         </Grid>
         <Grid
           item
           xs={12}
-          sm={6}
-          md={3}
+          md={6}
+          lg={4}
           className={classes.item} 
         >
-          <ProductCard />
+          <CategoryCard />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          md={6}
+          lg={4}
+          className={classes.item} 
+        >
+          <CategoryCard />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          md={6}
+          lg={4}
+          className={classes.item} 
+        >
+          <CategoryCard />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          md={6}
+          lg={4}
+          className={classes.item} 
+        >
+          <CategoryCard />
         </Grid>
       </Grid>
       <Box component="div" className={classes.moreBtnBox}>
         <Button>
-          More Brad New Products
+          More Categories 
         </Button>
       </Box>
     </Box>
   )
 }
 
-export default BrandNewProduct
+export default CategoryList
+
 
 
 
