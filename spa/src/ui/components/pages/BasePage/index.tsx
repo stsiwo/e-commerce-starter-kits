@@ -11,6 +11,7 @@ const BasePage: React.FunctionComponent<{}> = (props) => {
     >
       <Header />
       {props.children}
+      {/** footer **/}
     </Container>
   )
 }

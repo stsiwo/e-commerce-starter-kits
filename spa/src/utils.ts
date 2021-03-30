@@ -285,6 +285,18 @@ export const calcCurEllipsePosY: (elId: number, radiusWidth: number, radiusHeigh
 }
 
 /**
+ *
+ * async for each
+ *
+ **/
+export const asyncForEach = async (array: any[], callback: (...args: any[]) => any) => {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array)
+  }
+}
+
+
+/**
  * pagination
  **/
 //export const convertPageToOffset: (total: number, limit: number, page: number) => number = (total, limit, page) => {

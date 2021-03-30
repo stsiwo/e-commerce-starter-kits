@@ -76,8 +76,8 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
   const renderMenuItemListForSmallScreen: () => React.ReactNode = () => {
     return menuItemList.map((menuItem: MenuItemType) => {
       return (
-        <MenuItem onClick={handleDropDownMenuCloseClickEvent}>
-          <Link key={menuItem.url} href={menuItem.url} color="inherit" className={classes.menuItem}>
+        <MenuItem key={menuItem.url} onClick={handleDropDownMenuCloseClickEvent}>
+          <Link href={menuItem.url} color="inherit" className={classes.menuItem}>
             {menuItem.label}
           </Link>
         </MenuItem>

@@ -31,6 +31,10 @@ const Header: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
 
+  /**
+   * TODO: need to use <Link> from 'react-router-dom' with <Link> from 'mui'. otherwise, all state is refreshed all the time you click a link
+   **/
+
   return (
     <AppBar position="sticky" className={classes.appBar}>
       <Toolbar >

@@ -6,6 +6,7 @@ import Home from 'components/pages/Home';
 import { withBasePage } from 'ui/hoc/withBasePage';
 import { withAdminBasePage } from 'ui/hoc/withAdminBasePage';
 import Admin from 'components/pages/Admin';
+import Account from 'components/pages/Account';
 
 // route data
 export declare type RouteDataType = {
@@ -30,8 +31,8 @@ export const routesData: RoutesDataType = {
   // define member only page
   [UserTypeEnum.MEMBER]: [
     {
-      url: "/member",
-      component: withBasePage(Member),
+      url: "/account",
+      component: withBasePage(Account),
     },
   ],
   // define admin only page
