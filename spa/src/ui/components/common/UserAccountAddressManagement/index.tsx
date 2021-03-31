@@ -221,13 +221,13 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
         console.log("this one is to create new one")
         /**
          * TODO:
-         * POST /users/{userId}/phones to add new one
+         * POST /users/{userId}/addresses to add new one
          **/
       } else {
         console.log("this one is to update existing one")
         /**
          * TODO:
-         * PUT /users/{userId}/phones/{phoneId} to update one 
+         * PUT /users/{userId}/addresses/{addressId} to update one 
          **/
       }
     } else {
@@ -235,6 +235,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
     }
   }
 
+  // event handler for click 'add new one' button
   const handleAddNewAddressBtnClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
     setUserAccountAddressState(defaultUserAccountAddressData)
     setUserAccountAddressValidationState(defaultUserAccountValidationAddressData)

@@ -24,9 +24,19 @@ export declare type UserAccountPhoneDataType = {
   countryCode: string
 }
 
+const defaultUserAccountPhoneData: UserAccountPhoneDataType = {
+  phone: "",
+  countryCode: ""
+}
+
 export declare type UserAccountPhoneValidationDataType = {
   phone?: string
   countryCode?: string
+}
+
+const defaultUserAccountValidationPhoneData: UserAccountPhoneValidationDataType = {
+  phone: "",
+  countryCode: ""
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -95,16 +105,10 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
   const classes = useStyles();
 
   // temp user account state
-  const [curUserAccountPhoneState, setUserAccountPhoneState] = React.useState<UserAccountPhoneDataType>({
-    phone: "",
-    countryCode: "",
-  });
+  const [curUserAccountPhoneState, setUserAccountPhoneState] = React.useState<UserAccountPhoneDataType>(defaultUserAccountPhoneData);
 
   // validation logic (should move to hooks)
-  const [curUserAccountPhoneValidationState, setUserAccountPhoneValidationState] = React.useState<UserAccountPhoneValidationDataType>({
-    phone: "",
-    countryCode: "",
-  });
+  const [curUserAccountPhoneValidationState, setUserAccountPhoneValidationState] = React.useState<UserAccountPhoneValidationDataType>(defaultUserAccountValidationPhoneData);
 
   const { updateValidationAt, updateAllValidation, isValidSync } = useValidation({
     curDomain: curUserAccountPhoneState,
@@ -112,15 +116,6 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
     schema: userAccountPhoneSchema,
     setValidationDomain: setUserAccountPhoneValidationState
   })
-
-  // modal logic
-  const [curModalOpen, setModalOpen] = React.useState<boolean>(false);
-  const handleModalOpenClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    setModalOpen(true) 
-  }
-  const handleModalCancelClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    setModalOpen(false) 
-  }
 
   // event handlers
   const handlePhoneInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
@@ -153,13 +148,44 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
     if (isValid) {
       // pass 
       console.log("passed")
-      /**
-       * TODO:
-       * POST /users/{userId}/phones to add new one
-       **/
+      if (isNew) {
+        console.log("this one is to create new one")
+        /**
+         * TODO:
+         * POST /users/{userId}/phones to add new one
+         **/
+      } else {
+        console.log("this one is to update existing one")
+        /**
+         * TODO:
+         * PUT /users/{userId}/phones/{phoneId} to update one 
+         **/
+      }
     } else {
       updateAllValidation()
     }
+  }
+
+  // update/create logic for address
+  //  - true: create
+  //  - false: update
+  const [isNew, setNew] = React.useState<boolean>(true);
+
+  // modal logic
+  const [curModalOpen, setModalOpen] = React.useState<boolean>(false);
+  const handleModalOpenClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+    setModalOpen(true) 
+  }
+  const handleModalCancelClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+    setModalOpen(false) 
+  }
+
+  // event handler for click 'add new one' button
+  const handleAddNewPhoneBtnClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+    setUserAccountPhoneState(defaultUserAccountPhoneData)
+    setUserAccountPhoneValidationState(defaultUserAccountValidationPhoneData)
+    setNew(true);
+    setModalOpen(true);
   }
 
  // delete an existing phone number
@@ -168,6 +194,20 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
     /**
      * TODO: DELETE /users/{userId}/phones/{phoneId}
      **/
+  }
+
+  // event handler to click an phone list item to update phone
+  const handlePhoneItemClickEvent: React.EventHandler<React.MouseEvent<HTMLElement>> = (e) => {
+
+    const targetPhoneId: string = e.currentTarget.getAttribute("data-phone-id");
+    const targetPhone = testPhoneList.find((phone: UserPhoneType) => {
+      return phone.phoneId == targetPhoneId
+    })
+
+    setUserAccountPhoneState(targetPhone);
+    setUserAccountPhoneValidationState(defaultUserAccountValidationPhoneData)
+    setNew(false);
+    setModalOpen(true)
   }
 
   // render functions
@@ -180,7 +220,7 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
     //return phones.map((phone: UserPhoneType) => {
     return testPhoneList.map((phone: UserPhoneType) => {
       return (
-        <ListItem key={phone.phoneId} >
+        <ListItem key={phone.phoneId} data-phone-id={phone.phoneId} onClick={handlePhoneItemClickEvent}>
           <ListItemAvatar>
             <Avatar>
               <PhoneIphoneIcon />
@@ -216,7 +256,7 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
           </List>
         )}
         <Box component="div" className={classes.actionBox}>
-          <Button onClick={handleModalOpenClickEvent}>
+          <Button onClick={handleAddNewPhoneBtnClickEvent}>
             Add New Phone
         </Button>
         </Box>
