@@ -14,3 +14,12 @@ export const userAccountPhoneSchema = yup.object().shape({
   countryCode: yup.string().required(),
 })
 
+export const userAccountAddressSchema = yup.object().shape({
+  address1: yup.string().required(),
+  address2: yup.string().optional(),
+  city: yup.string().required(),
+  province: yup.string().required(),
+  country: yup.string().required(),
+  postalCode: yup.string().required(),
+})
+

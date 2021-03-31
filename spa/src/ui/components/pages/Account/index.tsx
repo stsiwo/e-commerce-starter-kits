@@ -3,6 +3,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import UserAccountBasicManagement from 'components/common/UserAccountBasicManagement';
 import UserAccountPhoneManagement from 'components/common/UserAccountPhoneManagement';
+import UserAccountAddressManagement from 'components/common/UserAccountAddressManagement';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -30,6 +31,7 @@ const Account: React.FunctionComponent<{}> = (props) => {
       </Typography>
       <UserAccountBasicManagement />
       <UserAccountPhoneManagement phones={[]}/>
+      <UserAccountAddressManagement addresses={[]}/>
     </React.Fragment>
   )
 }
