@@ -1,7 +1,8 @@
 import * as React from 'react';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import UserAccountManagement from 'components/common/UserAccountManagement';
+import UserAccountBasicManagement from 'components/common/UserAccountBasicManagement';
+import UserAccountPhoneManagement from 'components/common/UserAccountPhoneManagement';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -14,17 +15,21 @@ const useStyles = makeStyles((theme: Theme) =>
 
 /**
  * member account management page
+ *
+ * - it might be better place to fetch the user account info, then send it to child comonents (e.g., UserAccountBasicManagement)
  **/
 const Account: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
+
 
   return (
     <React.Fragment>
       <Typography variant="h5" component="h5" align="center" className={classes.title} >
         {"Account"}
       </Typography>
-      <UserAccountManagement />
+      <UserAccountBasicManagement />
+      <UserAccountPhoneManagement phones={[]}/>
     </React.Fragment>
   )
 }

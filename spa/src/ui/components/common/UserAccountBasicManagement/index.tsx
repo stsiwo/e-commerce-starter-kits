@@ -2,10 +2,9 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import * as React from 'react';
-import { asyncForEach } from 'src/utils';
 import { useValidation } from 'hooks/validation';
 import { userAccountSchema } from 'hooks/validation/rules';
+import * as React from 'react';
 
 export declare type UserAccountDataType = {
   firstName: string
@@ -60,7 +59,7 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  *    - 6. display result popup message
  **/
-const UserAccountManagement: React.FunctionComponent<{}> = (props) => {
+const UserAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
 
   // mui: makeStyles
   const classes = useStyles();
@@ -213,6 +212,6 @@ const UserAccountManagement: React.FunctionComponent<{}> = (props) => {
   )
 }
 
-export default UserAccountManagement
+export default UserAccountBasicManagement
 
 

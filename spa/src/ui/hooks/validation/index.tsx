@@ -1,7 +1,6 @@
-import * as React from 'react';
-import * as yup from 'yup';
-import { UseValidationInputType, UseValidationOutputType, DomainValidationType } from './types';
 import { asyncForEach } from 'src/utils';
+import * as yup from 'yup';
+import { DomainValidationType, UseValidationInputType, UseValidationOutputType } from './types';
  
 export const useValidation = <D extends Record<string, unknown>>(input: UseValidationInputType<D>): UseValidationOutputType<D> => {
 

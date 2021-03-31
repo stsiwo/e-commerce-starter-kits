@@ -7,3 +7,10 @@ export const userAccountSchema = yup.object().shape({
   password: yup.string().required(),
   confirm: yup.string().oneOf([yup.ref('password'), null], "password must match")
 })
+
+
+export const userAccountPhoneSchema = yup.object().shape({
+  phone: yup.string().required(),
+  countryCode: yup.string().required(),
+})
+
