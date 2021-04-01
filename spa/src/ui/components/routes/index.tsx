@@ -1,13 +1,13 @@
+import Account from 'components/pages/Account';
+import Admin from 'components/pages/Admin';
+import AdminLogin from 'components/pages/Admin/AdminLogin';
+import Guest from 'components/pages/Guest';
+import Home from 'components/pages/Home';
+import ProductSearch from 'components/pages/ProductSearch';
 import * as React from 'react';
 import { UserTypeEnum } from 'src/app';
-import Guest from 'components/pages/Guest';
-import Member from 'components/pages/Member';
-import Home from 'components/pages/Home';
-import { withBasePage } from 'ui/hoc/withBasePage';
 import { withAdminBasePage } from 'ui/hoc/withAdminBasePage';
-import Admin from 'components/pages/Admin';
-import Account from 'components/pages/Account';
-import ProductSearch from 'components/pages/ProductSearch';
+import { withBasePage } from 'ui/hoc/withBasePage';
 
 // route data
 export declare type RouteDataType = {
@@ -41,6 +41,10 @@ export const routesData: RoutesDataType = {
     {
       url: "/admin",
       component: withAdminBasePage(Admin),
+    },
+    {
+      url: "/admin/login",
+      component: withAdminBasePage(AdminLogin),
     },
   ],
 }

@@ -23,3 +23,8 @@ export const userAccountAddressSchema = yup.object().shape({
   postalCode: yup.string().required(),
 })
 
+export const adminLoginSchema = yup.object().shape({
+  email: yup.string().required().email(),
+  password: yup.string().required(),
+})
+

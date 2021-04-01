@@ -1,6 +1,4 @@
 import * as React from 'react';
-import Container from '@material-ui/core/Container';
-import Header from 'components/common/Header';
 
 const AdminBasePage: React.FunctionComponent<{}> = (props) => {
 
