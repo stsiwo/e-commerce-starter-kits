@@ -90,7 +90,7 @@ export const generateProductVariantList: (count?: number) => ProductVariantType[
 }
 
 
-export const generateProductList: (count: number) => ProductType[] = (count) => {
+export const generateProductList: (count?: number) => ProductType[] = (count = 1) => {
 
   const list = []
 

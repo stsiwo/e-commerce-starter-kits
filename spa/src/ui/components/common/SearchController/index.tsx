@@ -1,41 +1,17 @@
+import AppBar from '@material-ui/core/AppBar';
 import Box from '@material-ui/core/Box';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import * as React from 'react';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-
-interface TabPanelPropsType {
-  index: any
-  value: any
-}
-
-const TabPanel: React.FunctionComponent<TabPanelPropsType> = ({
-  index,
-  value,
-  children,
-  ...other
-}) => {
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`scrollable-auto-tabpanel-${index}`}
-      aria-labelledby={`scrollable-auto-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box p={3}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  )
-
-}
-
+import Tabs from '@material-ui/core/Tabs';
+import * as React from 'react';
+import TabPanel from './TabPanel';
+import CategoryFilterTabPanel from './TabPanel/CategoryFilterTabPanel';
+import PriceFilterTabPanel from './TabPanel/PriceFilterTabPanel';
+import ReviewFilterTabPanel from './TabPanel/ReviewFilterTabPanel';
+import DiscountFilterTabPanel from './TabPanel/DiscountFilterTabPanel';
+import ReleaseDateFilterTabPanel from './TabPanel/ReleaseDateFilterTabPanel';
+import SortTabPanel from './TabPanel/SortTabPanel';
+import { ProductSortEnum } from 'domain/product/types';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -45,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const SearchController: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
-  const [value, setValue] = React.useState(0);
+  const [curTabIndex, setTabIndex] = React.useState(-1);
 
   function a11yProps(index: any) {
     return {
@@ -55,14 +31,18 @@ const SearchController: React.FunctionComponent<{}> = (props) => {
   }
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-    setValue(newValue);
+
+    // toggle feature
+    const nextValue = (curTabIndex === newValue) ? -1 : newValue
+
+    setTabIndex(nextValue);
   };
 
   return (
     <Box component="div" >
       <AppBar position="static" color="default">
         <Tabs
-          value={value}
+          value={curTabIndex}
           onChange={handleChange}
           indicatorColor="primary"
           textColor="primary"
@@ -70,36 +50,44 @@ const SearchController: React.FunctionComponent<{}> = (props) => {
           scrollButtons="auto"
           aria-label="scrollable auto tabs example"
         >
-          <Tab label="Item One" {...a11yProps(0)} />
-          <Tab label="Item Two" {...a11yProps(1)} />
-          <Tab label="Item Three" {...a11yProps(2)} />
-          <Tab label="Item Four" {...a11yProps(3)} />
-          <Tab label="Item Five" {...a11yProps(4)} />
-          <Tab label="Item Six" {...a11yProps(5)} />
-          <Tab label="Item Seven" {...a11yProps(6)} />
+          <Tab label="Category" {...a11yProps(0)} />
+          <Tab label="Price" {...a11yProps(1)} />
+          <Tab label="Review" {...a11yProps(2)} />
+          <Tab label="Discount" {...a11yProps(3)} />
+          <Tab label="Release Date" {...a11yProps(4)} />
+          <Tab label="Sort" {...a11yProps(5)} />
         </Tabs>
       </AppBar>
-      <TabPanel value={value} index={0}>
-        Item One
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        Item Two
-      </TabPanel>
-      <TabPanel value={value} index={2}>
-        Item Three
-      </TabPanel>
-      <TabPanel value={value} index={3}>
-        Item Four
-      </TabPanel>
-      <TabPanel value={value} index={4}>
-        Item Five
-      </TabPanel>
-      <TabPanel value={value} index={5}>
-        Item Six
-      </TabPanel>
-      <TabPanel value={value} index={6}>
-        Item Seven
-      </TabPanel>
+      <TabPanel 
+        value={curTabIndex} 
+        index={0} 
+        render={() => <CategoryFilterTabPanel  curCategoryId={"1"}/>} 
+      />
+      <TabPanel 
+        value={curTabIndex} 
+        index={1} 
+        render={() => <PriceFilterTabPanel  curMinPrice={0} curMaxPrice={1000}/>} 
+      />
+      <TabPanel 
+        value={curTabIndex} 
+        index={2} 
+        render={() => <ReviewFilterTabPanel curReviewPoint={0}/>} 
+      />
+      <TabPanel 
+        value={curTabIndex} 
+        index={3} 
+        render={() => <DiscountFilterTabPanel curDiscountCheck={false}/>} 
+      />
+      <TabPanel 
+        value={curTabIndex} 
+        index={4} 
+        render={() => <ReleaseDateFilterTabPanel curStartDate={new Date()} curEndDate={new Date()}/>} 
+      />
+      <TabPanel 
+        value={curTabIndex} 
+        index={5} 
+        render={() => <SortTabPanel curSort={ProductSortEnum.DATE_DESC}/>} 
+      />
     </Box>
   )
 }

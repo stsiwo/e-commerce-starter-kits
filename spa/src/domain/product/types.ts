@@ -52,3 +52,12 @@ export declare type ProductType = {
   productImages: ProductImageType[]
   productVariants: ProductVariantType[]
 }
+
+export enum ProductSortEnum {
+  DATE_DESC = "DATE_DESC",
+  DATE_ASC = "DATE_ASC",
+  ALPHABETIC_ASC = "ALPHABETIC_ASC",
+  ALPHABETIC_DESC = "ALPHABETIC_DESC",
+  PRICE_ASC = "PRICE_ASC",
+  PRICE_DESC = "PRICE_DESC",
+}
