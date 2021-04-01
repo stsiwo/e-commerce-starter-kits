@@ -3,6 +3,18 @@ import SearchController from 'components/common/SearchController';
 import SearchResult from 'components/common/SearchResult';
 import { ProductType } from 'domain/product/types';
 import { generateProductList } from 'tests/data/product';
+import Pagination from '@material-ui/lab/Pagination';
+import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
+import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    pageBox: {
+      padding: theme.spacing(2),
+    }
+  }),
+);
 
 /**
  * "/search" endpoint: to search & display products
@@ -16,11 +28,13 @@ import { generateProductList } from 'tests/data/product';
  **/
 const ProductSearch: React.FunctionComponent<{}> = (props) => {
 
+  const classes = useStyles()
+
   //
   const [curProductList, setProductList] = React.useState<ProductType[]>(generateProductList(40))
 
   // filter/sort/pagination
-  
+
   // useEffect to send request every time its dependency updated
 
 
@@ -28,7 +42,22 @@ const ProductSearch: React.FunctionComponent<{}> = (props) => {
   return (
     <React.Fragment>
       <SearchController />
-      <SearchResult products={curProductList}/>
+      <SearchResult products={curProductList} />
+      <Grid 
+        container 
+        justify="center" 
+        alignItems="center"
+        className={classes.pageBox}
+      >
+        <Pagination
+          page={1}
+          count={10}
+          color="primary"
+          showFirstButton
+          showLastButton
+          size={"medium"}
+        />
+      </Grid>
     </React.Fragment>
   )
 }

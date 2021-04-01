@@ -15,6 +15,10 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+/**
+ *  TODO: use this one: https://material-ui.com/components/rating/
+ **/
+
 const ReviewFilterTabPanel: React.FunctionComponent<ReviewFilterTabPanelPropsType> = ({
   curReviewPoint
 }) => {
