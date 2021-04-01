@@ -1,14 +1,18 @@
+import loadable from '@loadable/component';
+import { ThemeProvider } from '@material-ui/core';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import Content from 'components/pages/Content';
 import { store } from 'configs/storeConfig';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import { ThemeProvider } from '@material-ui/core';
 import { theme } from 'ui/css/theme';
-import RoleSwitch from 'tests/debug/compoments/RoleSwitch';
-import { UserType } from './app';
+
+/**
+ * dev env only
+ **/
+const RoleSwitch = (NODE_ENV === "development") ? loadable(() => import("tests/debug/compoments/RoleSwitch")) : null
 
 const Index = (props: any) => {
 
@@ -19,7 +23,7 @@ const Index = (props: any) => {
           <Provider store={store}>
             <Router>
               <Content />
-              {(NODE_ENV === "development" &&
+              {(RoleSwitch &&
                 <RoleSwitch />
               )}
             </Router>

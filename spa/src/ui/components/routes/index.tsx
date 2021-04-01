@@ -7,6 +7,7 @@ import { withBasePage } from 'ui/hoc/withBasePage';
 import { withAdminBasePage } from 'ui/hoc/withAdminBasePage';
 import Admin from 'components/pages/Admin';
 import Account from 'components/pages/Account';
+import ProductSearch from 'components/pages/ProductSearch';
 
 // route data
 export declare type RouteDataType = {
@@ -49,5 +50,9 @@ export const commonRoutesData: CommonRoutesDataType = [
   {
     url: '/',
     component: withBasePage(Home)
+  },
+  {
+    url: '/search',
+    component: withBasePage(ProductSearch)
   },
 ]
