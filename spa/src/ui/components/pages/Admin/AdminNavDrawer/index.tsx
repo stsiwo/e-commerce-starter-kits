@@ -3,7 +3,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { createStyles, makeStyles, Theme, useTheme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import CategoryIcon from '@material-ui/icons/Category';
@@ -13,6 +13,10 @@ import ShopIcon from '@material-ui/icons/Shop';
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 import * as React from 'react';
 import DashboardIcon from '@material-ui/icons/Dashboard';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import AppsIcon from '@material-ui/icons/Apps';
+import Box from '@material-ui/core/Box';
+import IconButton from '@material-ui/core/IconButton';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -33,10 +37,19 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(1),
       fontWeight: theme.typography.fontWeightBold,
     },
+    toggleBtnBox: {
+      position: 'fixed',
+      bottom: '10px',
+      right: '10px',
+    },
   }),
 );
 
 const AdminNavDrawer: React.FunctionComponent<{}> = (props) => {
+
+  // used to switch 'permanent' or 'temporary' nav menu based on this screen size 
+  const theme = useTheme();
+  const isDownSm = useMediaQuery(theme.breakpoints.down('sm'));
 
 
   const navList = [
@@ -91,7 +104,21 @@ const AdminNavDrawer: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
 
-  const toggleDrawer: () => void = () => {
+  const toggleDrawer = (nextOpen: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
+
+    if (
+      event &&
+      event.type === 'keydown' &&
+      ((event as React.KeyboardEvent).key === 'Tab' ||
+        (event as React.KeyboardEvent).key === 'Shift')
+    ) {
+      return;
+    }
+
+    setAdminNavOpen(nextOpen);
+  }
+
+  const handleNavToggleClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
     setAdminNavOpen(!curAdminNavOpen);
   }
 
@@ -122,17 +149,33 @@ const AdminNavDrawer: React.FunctionComponent<{}> = (props) => {
   }
 
   return (
-    <Drawer
-      className={classes.drawer}
-      variant="permanent"
-      anchor="left"
-      classes={{
-        paper: classes.drawerPaper,
-      }}
-    >
-      <div className={classes.toolbar} />
-      {renderNavItems()}
-    </Drawer>
+    <React.Fragment>
+      <Drawer
+        className={classes.drawer}
+        variant={(isDownSm) ? 'temporary' : "permanent"}
+        anchor="left"
+        open={curAdminNavOpen}
+        onClose={toggleDrawer(false)}
+        classes={{
+          paper: classes.drawerPaper,
+        }}
+      >
+        {(!isDownSm &&
+          <div className={classes.toolbar} />
+        )}
+        {renderNavItems()}
+      </Drawer>
+      {(isDownSm &&
+        <Box
+          component="div"
+          className={classes.toggleBtnBox}
+        >
+          <IconButton onClick={handleNavToggleClickEvent}>
+            <AppsIcon />
+          </IconButton>
+        </Box>
+      )}
+    </React.Fragment>
   )
 }
 

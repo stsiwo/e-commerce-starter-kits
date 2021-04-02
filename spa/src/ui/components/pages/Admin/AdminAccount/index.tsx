@@ -16,11 +16,16 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(2)
     },
     gridContainer: {
-
       padding: theme.spacing(1),
+
+      /**[theme.breakpoints.down("md")]: {
+        flexDirection: 'column-reverse',
+      }**/
     },
     gridItem: {
-      //margin: theme.spacing(1) 
+      // setting margin breaks <Grid xs, md, lg > system
+      // so use 'padding' instead
+      padding: theme.spacing(1) 
     }
   }),
 );
@@ -46,18 +51,18 @@ const AdminAccount: React.FunctionComponent<{}> = (props) => {
         <Grid
           item
           xs={12}
-          md={8}
-          className={classes.gridItem}
-        >
-          <AdminAccountBasicManagement />
-        </Grid>
-        <Grid
-          item 
-          xs={12}
           md={4}
           className={classes.gridItem}
         >
           <AdminAccountAvatarManagement />
+        </Grid>
+        <Grid
+          item 
+          xs={12}
+          md={8}
+          className={classes.gridItem}
+        >
+          <AdminAccountBasicManagement />
         </Grid>
       </Grid>
     </Box>

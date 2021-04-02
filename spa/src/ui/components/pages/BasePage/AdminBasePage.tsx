@@ -6,8 +6,14 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    bodBox: {
-      
+    gridContainer: {
+      flexWrap: "nowrap", 
+
+      /**
+       * make 'navDrawer' toggleable
+       **/
+      [theme.breakpoints.down("sm")]: {
+      }
     },
   }),
 );
@@ -18,6 +24,7 @@ const AdminBasePage: React.FunctionComponent<{}> = (props) => {
   /**
    * TODO: add base component for admin pages
    **/
+  const classes = useStyles();
 
   return (
     <React.Fragment>
@@ -25,6 +32,7 @@ const AdminBasePage: React.FunctionComponent<{}> = (props) => {
       <Grid
         container
         justify="center"
+        className={classes.gridContainer}
       >
         <AdminNavDrawer />
         {props.children}
