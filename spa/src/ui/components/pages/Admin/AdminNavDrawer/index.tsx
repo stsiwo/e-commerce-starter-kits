@@ -24,6 +24,9 @@ const useStyles = makeStyles((theme: Theme) =>
       flexShrink: 0,
       zIndex: 0,
     },
+    drawerPaper: {
+      width: 240,
+    },
     toolbar: theme.mixins.toolbar,
     title: {
       textTransform: "uppercase",
@@ -123,6 +126,9 @@ const AdminNavDrawer: React.FunctionComponent<{}> = (props) => {
       className={classes.drawer}
       variant="permanent"
       anchor="left"
+      classes={{
+        paper: classes.drawerPaper,
+      }}
     >
       <div className={classes.toolbar} />
       {renderNavItems()}

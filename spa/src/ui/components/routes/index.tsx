@@ -8,6 +8,7 @@ import * as React from 'react';
 import { UserTypeEnum } from 'src/app';
 import { withAdminBasePage } from 'ui/hoc/withAdminBasePage';
 import { withBasePage } from 'ui/hoc/withBasePage';
+import AdminAccount from 'components/pages/Admin/AdminAccount';
 
 // route data
 export declare type RouteDataType = {
@@ -45,6 +46,10 @@ export const routesData: RoutesDataType = {
     {
       url: "/admin/login",
       component: AdminLogin,
+    },
+    {
+      url: "/admin/account",
+      component: withAdminBasePage(AdminAccount),
     },
   ],
 }
