@@ -44,7 +44,7 @@ export const routesData: RoutesDataType = {
     },
     {
       url: "/admin/login",
-      component: withAdminBasePage(AdminLogin),
+      component: AdminLogin,
     },
   ],
 }
