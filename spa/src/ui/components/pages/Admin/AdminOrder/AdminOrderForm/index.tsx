@@ -7,6 +7,7 @@ import { useValidation } from 'hooks/validation';
 import { categorySchema } from 'hooks/validation/rules';
 import * as React from 'react';
 import { generateCategoryList } from 'tests/data/product';
+import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -55,7 +56,7 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  *    - 6. display result popup message
  **/
-const AdminCategoryForm: React.FunctionComponent<{}> = (props) => {
+const AdminOrderForm: React.FunctionComponent<{}> = (props) => {
 
   // mui: makeStyles
   const classes = useStyles();
@@ -124,43 +125,44 @@ const AdminCategoryForm: React.FunctionComponent<{}> = (props) => {
   }
 
   return (
-    <form className={classes.form} noValidate autoComplete="off">
-      <TextField
-        id="category-name"
-        label="Category Name"
-        className={`${classes.txtFieldBase}`}
-        value={curCategoryState.categoryName}
-        onChange={handleCategoryNameInputChangeEvent}
-        helperText={curCategoryValidationState.categoryName}
-        error={curCategoryValidationState.categoryName !== ""}
-      />
-      <TextField
-        id="category-description"
-        label="Category Description"
-        multiline
-        rows={4}
-        className={`${classes.txtFieldBase} ${classes.descriptionInput}`}
-        value={curCategoryState.categoryDescription}
-        onChange={handleCategoryDescriptionInputChangeEvent}
-        helperText={curCategoryValidationState.categoryDescription}
-        error={curCategoryValidationState.categoryDescription !== ""}
-      />
-      <TextField
-        id="category-path"
-        label="Category Path"
-        className={`${classes.txtFieldBase}`}
-        value={curCategoryState.categoryPath}
-        onChange={handleCategoryPathInputChangeEvent}
-        helperText={curCategoryValidationState.categoryPath}
-        error={curCategoryValidationState.categoryPath !== ""}
-      />
-      <Box component="div" className={classes.actionBox}>
-        <Button onClick={handleProductSaveClickEvent}>
-          Save
-        </Button>
-      </Box>
-    </form>
+    <Grid 
+      container 
+    >
+      <Grid 
+        item
+        xs={12}
+      >
+        <AdminOrderDetail order={}/>
+      </Grid>
+      <Grid 
+        item
+        xs={12}
+        md={5}
+      >
+        <UserCard />
+      </Grid>
+      <Grid 
+        item
+        xs={12}
+        md={5}
+      >
+        <ProductSmallCard />
+      </Grid>
+      <Grid
+        item
+        xs={12}
+      >
+        <AdminOrderStatusForm />
+      </Grid>
+      <Grid
+        item
+        xs={12}
+      >
+        <AdminOrderTimeline />
+      </Grid>
+    </Grid>
   )
 }
 
-export default AdminCategoryForm
+export default AdminOrderForm
+
