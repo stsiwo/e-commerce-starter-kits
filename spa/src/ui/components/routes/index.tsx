@@ -11,6 +11,7 @@ import { withBasePage } from 'ui/hoc/withBasePage';
 import AdminAccount from 'components/pages/Admin/AdminAccount';
 import AdminProduct from 'components/pages/Admin/AdminProduct';
 import AdminProductVariant from 'components/pages/Admin/AdminProductVariant';
+import AdminCategory from 'components/pages/Admin/AdminCategory';
 
 // route data
 export declare type RouteDataType = {
@@ -60,6 +61,10 @@ export const routesData: RoutesDataType = {
     {
       url: "/admin/products/variants",
       component: withAdminBasePage(AdminProductVariant),
+    },
+    {
+      url: "/admin/categories",
+      component: withAdminBasePage(AdminCategory),
     },
   ],
 }

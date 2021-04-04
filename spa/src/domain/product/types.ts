@@ -203,4 +203,32 @@ export const defaultProductValidationData: ProductValidationDataType = {
   ]
 }
 
+// category state typ for form & input
+export declare type CategoryDataType = {
+  categoryId?: string
+  categoryName: string
+  categoryDescription: string
+  categoryPath: string
+}
+
+export const defaultCategoryData: CategoryDataType = {
+  categoryName: "",
+  categoryDescription: "",
+  categoryPath: ""
+}
+
+
+// category validation type for form & input
+export declare type CategoryValidationDataType = {
+  categoryId?: string
+  categoryName: string
+  categoryDescription: string
+  categoryPath: string
+}
+
+export const defaultCategoryValidationData: CategoryValidationDataType = {
+  categoryName: "",
+  categoryDescription: "",
+  categoryPath: ""
+}
 

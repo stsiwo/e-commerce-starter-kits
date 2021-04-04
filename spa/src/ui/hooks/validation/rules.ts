@@ -29,7 +29,6 @@ export const adminLoginSchema = yup.object().shape({
 })
 
 // products
-
 export const productVariantSchema = yup.object().shape({
   variantSize: yup.object().required(),
   variantColor: yup.string().required(),
@@ -58,3 +57,9 @@ export const productSchema = yup.object().shape({
   note: yup.string().optional(),
 })
 
+// categories
+export const categorySchema = yup.object().shape({
+  categoryName: yup.string().required(),
+  categoryDescription: yup.string().required(),
+  categoryPath: yup.string().required(),
+})
