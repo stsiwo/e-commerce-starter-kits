@@ -128,7 +128,7 @@ const AdminNavDrawer: React.FunctionComponent<{}> = (props) => {
   const renderNavItems: () => React.ReactNode = () => {
     return navList.map((navSection) => {
       return (
-        <React.Fragment>
+        <React.Fragment key={navSection.title}>
           <Typography variant="body1" component="p" align="left" className={classes.title} >
             {navSection.title}
           </Typography>

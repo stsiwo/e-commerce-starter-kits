@@ -5,7 +5,7 @@ export declare type UseValidationPropsType = {
 }
 
 export declare type DomainValidationType<D extends Record<string, unknown>> = {
-  [P in keyof D]?: string
+  [P in keyof D]?: any // string or nested validation object
 }
 
 export declare type UseValidationInputType<D extends Record<string, unknown>> = {

@@ -301,6 +301,26 @@ export const asyncForEach = async (array: any[], callback: (...args: any[]) => a
   }
 }
 
+/**
+ * empty a value of all properties of a nested object
+ *
+ **/
+export const emptyNestedObject: (obj: Record<string, any>) => Record<string, any> = (obj) => {
+  Object.keys(obj).forEach((key: string) => {
+    console.log(key)
+    if (
+      obj[key] &&  // prevent 'cannot convert undefined / null to object error
+      Object.prototype.toString.call(obj[key]) !== '[object Date]' && // check current value is date object 
+      typeof obj[key] === 'object' // for nested object
+    ) {
+      emptyNestedObject(obj[key])
+    } else {
+      obj[key] = ""
+    }
+  })
+
+  return obj
+}
 
 /**
  * pagination

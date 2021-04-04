@@ -68,6 +68,14 @@
 
 ## Material UI
 
+  ### TextField Format:
+
+    - need to use 3rd party library or implement its format on your own
+
+      - ref: https://material-ui.com/components/text-fields/#formatted-inputs
+
+      - ref: https://stackoverflow.com/questions/43134195/how-to-allow-only-numbers-in-textbox-and-format-as-us-mobile-number-format-in-re
+
   ### Errors:
   
     - Failed prop type: The prop `children` is marked as required in `ForwardRef(Container)`, but its value is `undefined.
@@ -79,6 +87,18 @@
           <h1>hey</h1> // <- need to put components
         </TargetComponent>
       ```
+
+## Data Grid library
+
+  ### Material UI
+
+    - community version: https://material-ui.com/components/data-grid/getting-started/ (e.g., DataGrid)
+
+    - paid version (e.g., XGrid)
+
+  ### React Virtualized
+
+    - https://github.com/bvaughn/react-virtualized (this one is really famouse, but I don't know why)
 
 ## Errors
 

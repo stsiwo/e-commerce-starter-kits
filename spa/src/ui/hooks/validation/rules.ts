@@ -28,3 +28,33 @@ export const adminLoginSchema = yup.object().shape({
   password: yup.string().required(),
 })
 
+// products
+
+export const productVariantSchema = yup.object().shape({
+  variantSize: yup.object().required(),
+  variantColor: yup.string().required(),
+  variantUnitPrice: yup.string().optional(),
+  variantDiscountPrice: yup.number().optional(),
+  variantDiscountStartDate: yup.string().optional(),
+  variantDiscountEndDate: yup.string().optional(),
+  variantStock: yup.number().required(),
+  isDiscount: yup.string().optional(),
+  note: yup.string().optional(),
+})
+
+export const productSchema = yup.object().shape({
+  productName: yup.string().required(),
+  productDescription: yup.string().required(),
+  productPath: yup.string().required(),
+  productBaseUnitPrice: yup.string().required(),
+  productBaseDiscountPrice: yup.string().required(),
+  productBaseDiscountStartDate: yup.string().required(),
+  productBaseDiscountEndDate: yup.string().required(),
+  isDiscount: yup.string().required(),
+  isPublic: yup.string().required(),
+  releaseDate: yup.string().optional(),
+  category: yup.object().required(),
+  productVariants: yup.array().of(productVariantSchema),
+  note: yup.string().optional(),
+})
+
