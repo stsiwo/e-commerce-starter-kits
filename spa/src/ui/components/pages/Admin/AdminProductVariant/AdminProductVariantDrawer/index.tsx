@@ -1,9 +1,9 @@
 import Drawer from '@material-ui/core/Drawer';
 import { createStyles, makeStyles, Theme, useTheme } from '@material-ui/core/styles';
 import * as React from 'react';
-import AdminProductForm from '../AdminProductForm';
+import AdminProductVariantForm from '../AdminProductVariantForm';
 
-declare type AdminProductFormDrawerPropsType = {
+declare type AdminProductVariantFormDrawerPropsType = {
   curFormOpen: boolean
   setFormOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const AdminProductFormDrawer: React.FunctionComponent<AdminProductFormDrawerPropsType> = (props) => {
+const AdminProductVariantFormDrawer: React.FunctionComponent<AdminProductVariantFormDrawerPropsType> = (props) => {
 
   // used to switch 'permanent' or 'temporary' nav menu based on this screen size 
   const theme = useTheme();
@@ -76,12 +76,13 @@ const AdminProductFormDrawer: React.FunctionComponent<AdminProductFormDrawerProp
           paper: classes.drawerPaper,
         }}
       >
-        <AdminProductForm />
+        <AdminProductVariantForm />
       </Drawer>
     </React.Fragment>
   )
 }
 
-export default AdminProductFormDrawer
+export default AdminProductVariantFormDrawer
+
 
 

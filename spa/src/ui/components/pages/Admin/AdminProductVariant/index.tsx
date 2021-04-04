@@ -2,10 +2,8 @@ import * as React from 'react';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
-import Grid from '@material-ui/core/Grid';
-import AdminProductGridView from './AdminProductGridView';
-import AdminProductFormDrawer from './AdminProductFormDrawer';
-import AdminProductNewCard from './AdminProductNewCard';
+import AdminProductVariantGridView from './AdminProductVariantGridView';
+import AdminProductVariantFormDrawer from './AdminProductVariantDrawer';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -36,19 +34,29 @@ const useStyles = makeStyles((theme: Theme) =>
  * admin account management page
  *
  **/
-const AdminProduct: React.FunctionComponent<{}> = (props) => {
+const AdminProductVariant: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
 
+  const [curFormOpen, setFormOpen] = React.useState<boolean>(false) 
 
   return (
     <Box component="div" className={classes.box}>
       <Typography variant="body2" component="p" align="left" className={classes.title} >
-        {"Products"}
+        {"Product Variants"}
       </Typography>
-      <AdminProductGridView />
+      <AdminProductVariantGridView 
+        curFormOpen={curFormOpen} 
+        setFormOpen={setFormOpen} 
+      />
+      <AdminProductVariantFormDrawer 
+        curFormOpen={curFormOpen} 
+        setFormOpen={setFormOpen} 
+      />
+      {/** <AdminProductVariantNewCard /> **/}
     </Box>
   )
 }
 
-export default AdminProduct
+export default AdminProductVariant
+

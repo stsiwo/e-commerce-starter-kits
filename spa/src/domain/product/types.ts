@@ -50,7 +50,7 @@ export declare type ProductType = {
   createdAt: Date
   updatedAt: Date
   productImages: ProductImageType[]
-  productVariants: ProductVariantType[]
+  productVariants?: ProductVariantType[]
 }
 
 export enum ProductSortEnum {
@@ -131,7 +131,7 @@ export declare type ProductDataType = {
   category: CategoryType
   releaseDate: Date
   note: string
-  productVariants: ProductVariantDataType[]
+  productVariants?: ProductVariantDataType[]
 }
 
 export const defaultProductData: ProductDataType = {
@@ -150,6 +150,21 @@ export const defaultProductData: ProductDataType = {
   productVariants: [
     defaultProductVariantData
   ],
+}
+
+export const defaultProductOnlyData: ProductDataType = {
+  productName: "",
+  productDescription: "",
+  productPath: "",
+  productBaseUnitPrice: 0,
+  productBaseDiscountPrice: 0,
+  productBaseDiscountStartDate: new Date(),
+  productBaseDiscountEndDate: new Date(),
+  isDiscount: false,
+  isPublic: false,
+  category: null,
+  releaseDate: new Date(),
+  note: "",
 }
 
 // product validation state type for form & input

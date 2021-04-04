@@ -11,9 +11,11 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     box: {
       position: 'fixed',
-      left: '0px',
-      bottom: '0px',
+      left: '50%',
+      bottom: '0',
+      transform: 'translateX(-50%)',
       backgroundColor: "#b3d9ff",
+      zIndex: 10,
     },
   }),
 );

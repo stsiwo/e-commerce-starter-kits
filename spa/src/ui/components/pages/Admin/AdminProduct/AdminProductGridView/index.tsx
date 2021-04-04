@@ -1,15 +1,18 @@
-import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
+import IconButton from '@material-ui/core/IconButton';
+import Link from '@material-ui/core/Link';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { DataGrid, GridCellParams, GridColDef, GridRowsProp } from '@material-ui/data-grid';
+import EditIcon from '@material-ui/icons/Edit';
+import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import * as React from 'react';
-import { DataGrid, GridRowsProp, GridColDef } from '@material-ui/data-grid';
+import AdminProductFormDrawer from '../AdminProductFormDrawer';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
 
 declare type AdminProductGridViewPropsType = {
-  curProductFormOpen: boolean
-  setProductFormOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 
@@ -29,14 +32,45 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const rows: GridRowsProp = [
-  { id: 1, col1: 'Hello', col2: 'World' },
-  { id: 2, col1: 'XGrid', col2: 'is Awesome' },
-  { id: 3, col1: 'Material-UI', col2: 'is Amazing' },
+  { id: 1, name: 'Hello Hello Hello Hello', path: 'World', unitPrice: "unit price", discount: "Discount", releaseDate: "r date", publish: "publish", variants: "3", actions: "actions" },
+  { id: 2, name: 'Hello', path: 'World', unitPrice: "unit price", discount: "Discount", releaseDate: "r date", publish: "publish", variants: "4", actions: "actions" },
+  { id: 3, name: 'Hello', path: 'World', unitPrice: "unit price", discount: "Discount", releaseDate: "r date", publish: "publish", variants: "2", actions: "actions" },
+  { id: 4, name: 'Hello', path: 'World', unitPrice: "unit price", discount: "Discount", releaseDate: "r date", publish: "publish", variants: "1", actions: "actions" },
 ];
 
 const columns: GridColDef[] = [
-  { field: 'col1', headerName: 'Column 1', width: 150 },
-  { field: 'col2', headerName: 'Column 2', width: 150 },
+  { field: 'name', headerName: 'Name', width: 150 },
+  { field: 'unitPrice', headerName: 'Unit Price', width: 150 },
+  { field: 'discount', headerName: 'Discount', width: 150 },
+  { field: 'releaseDate', headerName: 'Release Date', width: 150 },
+  { field: 'publish', headerName: 'Publish', width: 150 },
+  { 
+    field: 'variants', 
+    headerName: 'Variants', 
+    width: 150,
+    renderCell: (params: GridCellParams) => (
+      <React.Fragment>
+        <Link href="">
+          {params.value} 
+        </Link>
+      </React.Fragment>
+    ),
+  },
+  { 
+    field: 'actions', 
+    headerName: 'Actions', 
+    width: 150, 
+    renderCell: (params: GridCellParams) => (
+      <React.Fragment>
+        <IconButton>
+          <EditIcon />
+        </IconButton>
+        <IconButton>
+          <RemoveCircleIcon />
+        </IconButton>
+      </React.Fragment>
+    )
+  },
 ];
 
 /**
@@ -48,10 +82,15 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
   // mui: makeStyles
   const classes = useStyles();
 
+  const [curFormOpen, setFormOpen] = React.useState<boolean>(false);
+
+  const handleNewFormToggleBtnClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
+    setFormOpen(!curFormOpen)
+  }
+
   // event handler to submit
   const handleAddNewProductBtnClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
     console.log("passed")
-    props.setProductFormOpen(true)
   }
 
   return (
@@ -63,15 +102,28 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
         subheaderTypographyProps={{
           variant: 'body1'
         }}
-        title="Product List"
+        title="List"
+        action={
+          <IconButton aria-label="add" onClick={handleNewFormToggleBtnClickEvent}>
+            <AddCircleIcon />
+          </IconButton>
+        }
       />
       <CardContent
         className={classes.cardContentBox}
       >
-        <DataGrid rows={rows} columns={columns} />
+        <DataGrid 
+          autoHeight 
+          rows={rows} 
+          columns={columns} 
+      />
       </CardContent>
       <CardActions disableSpacing>
       </CardActions>
+      <AdminProductFormDrawer 
+        curFormOpen={curFormOpen}  
+        setFormOpen={setFormOpen}
+      />
     </Card>
   )
 }

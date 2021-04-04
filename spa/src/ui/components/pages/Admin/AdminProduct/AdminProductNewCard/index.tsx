@@ -7,8 +7,8 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import * as React from 'react';
 import IconButton from '@material-ui/core/IconButton';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
-import AdminProductForm from '../AdminProductFormDrawer/AdminProductForm';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import AdminProductAndVariantForm from '../AdminProductAndVariantForm';
 
 declare type AdminProductNewCardPropsType = {
 }
@@ -42,7 +42,6 @@ const AdminProductNewCard: React.FunctionComponent<AdminProductNewCardPropsType>
   const [curFormOpen, setFormOpen] = React.useState<boolean>(false)
 
   const handleNewProductFormToggleBtnClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
-
     setFormOpen(!curFormOpen)
   }
 
@@ -76,7 +75,7 @@ const AdminProductNewCard: React.FunctionComponent<AdminProductNewCardPropsType>
         className={classes.cardContentBox}
       >
         {(curFormOpen &&
-          <AdminProductForm />
+          <AdminProductAndVariantForm />
         )}
       </CardContent>
       <CardActions disableSpacing>
