@@ -1,40 +1,24 @@
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
+import { OrderType, OrderDetailType } from 'domain/order/types';
 import { CategoryDataType, CategoryValidationDataType, defaultCategoryData, defaultCategoryValidationData } from 'domain/product/types';
 import { useValidation } from 'hooks/validation';
 import { categorySchema } from 'hooks/validation/rules';
 import * as React from 'react';
+import { generateOrderList } from 'tests/data/order';
 import { generateCategoryList } from 'tests/data/product';
-import Grid from '@material-ui/core/Grid';
+import AdminOrderDetail from '../AdminOrderDetail';
+import UserCard from 'components/common/UserCard';
+import ProductHorizontalCard from 'components/common/ProductCard/ProductHorizontalCard';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    form: {
-      margin: theme.spacing(1),
+    orderDetailBox: {
+
     },
-    subtitle: {
-      margin: theme.spacing(1, 0),
-      fontWeight: theme.typography.fontWeightBold
-    },
-    txtFieldBase: {
-      width: "80%",
-      margin: theme.spacing(1, 0, 1, 0),
-    },
-    nameInput: {
-      minWidth: 300,
-      maxWidth: 600,
-    },
-    descriptionInput: {
-    },
-    pathInput: {
-      maxWidth: 600,
-      minWidth: 300,
-    },
-    productDateInput: {
-    },
-    actionBox: {
+    title: {
+      textAlign: "center",
     },
   }),
 );
@@ -124,41 +108,62 @@ const AdminOrderForm: React.FunctionComponent<{}> = (props) => {
     }
   }
 
+  /**
+   * test order date
+   **/
+  const testOrder: OrderType = generateOrderList(1)[0]
+
   return (
-    <Grid 
-      container 
+    <Grid
+      container
+
     >
-      <Grid 
+      <Grid
         item
         xs={12}
+        justify="center"
+        className={classes.orderDetailBox}
       >
-        <AdminOrderDetail order={}/>
+        <Typography variant="subtitle1" component="h6" className={classes.title}>
+          {"Basic Information"}
+        </Typography>
+        <AdminOrderDetail order={testOrder} />
       </Grid>
-      <Grid 
+      <Grid
         item
         xs={12}
-        md={5}
+        md={6}
       >
-        <UserCard />
+        <Typography variant="subtitle1" component="h6" className={classes.title}>
+          {"Customer"}
+        </Typography>
+        <UserCard user={testOrder.user} />
       </Grid>
-      <Grid 
+      <Grid
         item
         xs={12}
-        md={5}
+        md={6}
       >
-        <ProductSmallCard />
+        <Typography variant="subtitle1" component="h6" className={classes.title}>
+          {"Products"}
+        </Typography>
+        {
+          testOrder.orderDetails.map((orderDetail: OrderDetailType) => (
+            <ProductHorizontalCard orderDetail={orderDetail} />
+          ))
+        }
       </Grid>
       <Grid
         item
         xs={12}
       >
-        <AdminOrderStatusForm />
+        {/** <AdminOrderStatusForm />**/}
       </Grid>
       <Grid
         item
         xs={12}
       >
-        <AdminOrderTimeline />
+        {/** <AdminOrderTimeline />**/}
       </Grid>
     </Grid>
   )

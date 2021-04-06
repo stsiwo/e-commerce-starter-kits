@@ -33,6 +33,7 @@ export declare type UserType = {
   lastName: string
   email: string
   avatarImagePath: string 
+  userType?: UserTypeEnum
 }
 
 export declare type AuthType = {

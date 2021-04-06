@@ -14,12 +14,10 @@ const useStyles = makeStyles((theme: Theme) =>
      * parent component is div[display="flex"] to display Nav and Content horizontally.
      **/
     drawer: {
-      width: 240,
       flexShrink: 0,
       zIndex: 0,
     },
     drawerPaper: {
-      width: 240,
     },
     toolbar: theme.mixins.toolbar,
     title: {

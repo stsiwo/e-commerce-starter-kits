@@ -1,4 +1,5 @@
 import { UserType } from "src/app";
+import { ProductType } from "domain/product/types";
 
 export enum OrderStatusEnum {
   DRAFT = "DRAFT",
@@ -13,30 +14,35 @@ export enum OrderStatusEnum {
   CANCELED = "CANCELED",
 }
 
+export declare type OrderEventType = {
+  orderEventId: string
+  createdAt: Date
+  orderId: string
+  orderStatus: OrderStatusEnum
+  undoable: boolean
+  isUndo: boolean
+  user: UserType
+}
+
+export declare type OrderDetailType = {
+  orderDetailId: string,
+  productQuantity: number,
+  productUnitPrice: number,
+  productColor: string,
+  productSize: string,
+  productName: string
+  product?: ProductType // if still the product exist
+}
+
 export declare type OrderType = {
   orderId: string
   user: UserType
   orderNumber: string
-  orderDate?: Date
-  failedPaymentDate?: Date
-  paymentDate?: Date
-  receivedCancelRequestDate?: Date
-  canceledDate?: Date
-  shippedDate?: Date
-  receivedReturnRequestDate?: Date
-  returnedDate?: Date
-  isOrdered: boolean
-  isFailedPayment: boolean
-  isPaid: boolean
-  isReceivedCancelRequest: boolean
-  isCanceled: boolean
-  isShipped: boolean
-  isReceivedReturnRequest: boolean
-  isReturned: boolean
+  orderEvents: OrderEventType[]
+  orderDetails: OrderDetailType[]
   productCost: number
   taxCost: number
-  note: number
-  orderStatus: OrderStatusEnum
+  note: string
   createdAt: Date
   updatedAt: Date
 }
