@@ -11,6 +11,8 @@ import AdminOrderDetail from '../AdminOrderDetail';
 import UserCard from 'components/common/UserCard';
 import ProductHorizontalCard from 'components/common/ProductCard/ProductHorizontalCard';
 import Typography from '@material-ui/core/Typography';
+import OrderTimeline from 'components/common/OrderTimeline';
+import TimelineUpdateForm from 'components/common/TimelineUpdateForm';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -19,6 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     title: {
       textAlign: "center",
+      fontWeight: theme.typography.fontWeightBold
     },
   }),
 );
@@ -45,69 +48,6 @@ const AdminOrderForm: React.FunctionComponent<{}> = (props) => {
   // mui: makeStyles
   const classes = useStyles();
 
-  // temp user account state
-  const [curCategoryState, setCategoryState] = React.useState<CategoryDataType>(defaultCategoryData);
-
-  // validation logic (should move to hooks)
-  const [curCategoryValidationState, setCategoryValidationState] = React.useState<CategoryValidationDataType>(defaultCategoryValidationData);
-
-  const { updateValidationAt, updateAllValidation, isValidSync } = useValidation({
-    curDomain: curCategoryState,
-    curValidationDomain: curCategoryValidationState,
-    schema: categorySchema,
-    setValidationDomain: setCategoryValidationState
-  })
-
-  // test category list
-  // #TODO: replace with real one when you are ready
-  const testCategoryList = generateCategoryList(10)
-
-  // event handlers
-  const handleCategoryNameInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCategoryName = e.currentTarget.value
-    updateValidationAt("categoryName", e.currentTarget.value);
-    setCategoryState((prev: CategoryDataType) => ({
-      ...prev,
-      categoryName: nextCategoryName
-    }));
-  }
-
-  const handleCategoryDescriptionInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCategoryDescription = e.currentTarget.value
-    updateValidationAt("categoryDescription", e.currentTarget.value);
-    setCategoryState((prev: CategoryDataType) => ({
-      ...prev,
-      categoryDescription: nextCategoryDescription
-    }));
-  }
-
-  const handleCategoryPathInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCategoryPath = e.currentTarget.value
-    updateValidationAt("categoryPath", e.currentTarget.value);
-    setCategoryState((prev: CategoryDataType) => ({
-      ...prev,
-      categoryPath: nextCategoryPath
-    }));
-  }
-
-
-
-  // event handler to submit
-  const handleProductSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
-
-    const isValid: boolean = isValidSync(curCategoryState)
-
-    console.log(isValid);
-
-    if (isValid) {
-      // pass 
-      console.log("passed")
-    } else {
-      console.log("failed")
-      updateAllValidation()
-    }
-  }
-
   /**
    * test order date
    **/
@@ -116,7 +56,7 @@ const AdminOrderForm: React.FunctionComponent<{}> = (props) => {
   return (
     <Grid
       container
-
+      justify="center"
     >
       <Grid
         item
@@ -148,8 +88,8 @@ const AdminOrderForm: React.FunctionComponent<{}> = (props) => {
           {"Products"}
         </Typography>
         {
-          testOrder.orderDetails.map((orderDetail: OrderDetailType) => (
-            <ProductHorizontalCard orderDetail={orderDetail} />
+          testOrder.orderDetails.map((orderDetail: OrderDetailType, index: number) => (
+            <ProductHorizontalCard orderDetail={orderDetail} key={index}/>
           ))
         }
       </Grid>
@@ -157,13 +97,16 @@ const AdminOrderForm: React.FunctionComponent<{}> = (props) => {
         item
         xs={12}
       >
-        {/** <AdminOrderStatusForm />**/}
+        <Typography variant="subtitle1" component="h6" className={classes.title}>
+          {"Status"}
+        </Typography>
+        <OrderTimeline orderEvents={testOrder.orderEvents} /> 
       </Grid>
       <Grid
         item
         xs={12}
       >
-        {/** <AdminOrderTimeline />**/}
+        <TimelineUpdateForm orderEvents={testOrder.orderEvents} /> 
       </Grid>
     </Grid>
   )

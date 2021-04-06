@@ -2,6 +2,9 @@ import Drawer from '@material-ui/core/Drawer';
 import { createStyles, makeStyles, Theme, useTheme } from '@material-ui/core/styles';
 import * as React from 'react';
 import AdminOrderForm from '../AdminOrderForm';
+import Box from '@material-ui/core/Box';
+import IconButton from '@material-ui/core/IconButton';
+import GetAppIcon from '@material-ui/icons/GetApp';
 
 declare type AdminOrderFormDrawerPropsType = {
   curFormOpen: boolean
@@ -30,6 +33,11 @@ const useStyles = makeStyles((theme: Theme) =>
       bottom: '10px',
       right: '10px',
     },
+    closeFormBox: {
+      position: "sticky", // not working
+      width: "100%",
+      textAlign: "center",
+    }
   }),
 );
 
@@ -59,6 +67,10 @@ const AdminOrderFormDrawer: React.FunctionComponent<AdminOrderFormDrawerPropsTyp
     props.setFormOpen(!props.curFormOpen);
   }
 
+  const handleCloseEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+    props.setFormOpen(false);
+  }
+
   // render function
 
   // render nav items
@@ -74,6 +86,11 @@ const AdminOrderFormDrawer: React.FunctionComponent<AdminOrderFormDrawerPropsTyp
           paper: classes.drawerPaper,
         }}
       >
+        <Box component="div" className={classes.closeFormBox}>
+          <IconButton onClick={handleCloseEvent}>
+            <GetAppIcon />            
+          </IconButton>
+        </Box>
         <AdminOrderForm />
       </Drawer>
     </React.Fragment>

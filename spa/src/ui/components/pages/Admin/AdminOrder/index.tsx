@@ -32,6 +32,10 @@ const useStyles = makeStyles((theme: Theme) =>
 /**
  * admin account management page
  *
+ *  - TODO: implement grid row click to display its detail.
+ *
+ *    - currently, (+) button opens the detaul drawer. fix this.
+ *
  **/
 const AdminOrder: React.FunctionComponent<{}> = (props) => {
 

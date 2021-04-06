@@ -4,7 +4,7 @@ import { testGuestUser } from "../user";
 import { generateProductList } from "../product";
 
 
-export const testOrderEventList: OrderEventType[] = [
+export const testOrderEventListAfterCompleted: OrderEventType[] = [
   {
     orderEventId: `order-event-id1`,
     orderId: `order-id1`,
@@ -13,6 +13,7 @@ export const testOrderEventList: OrderEventType[] = [
     undoable: false,
     orderStatus: OrderStatusEnum.DRAFT,
     user: testGuestUser,
+    note: "",
   },
   {
     orderEventId: `order-event-id2`,
@@ -22,6 +23,7 @@ export const testOrderEventList: OrderEventType[] = [
     undoable: false,
     orderStatus: OrderStatusEnum.PAID,
     user: testGuestUser,
+    note: "",
   },
   {
     orderEventId: `order-event-id3`,
@@ -31,6 +33,7 @@ export const testOrderEventList: OrderEventType[] = [
     undoable: false,
     orderStatus: OrderStatusEnum.ORDERED,
     user: testGuestUser,
+    note: "",
   },
   {
     orderEventId: `order-event-id4`,
@@ -40,6 +43,7 @@ export const testOrderEventList: OrderEventType[] = [
     undoable: false,
     orderStatus: OrderStatusEnum.SHIPPED,
     user: testGuestUser,
+    note: "",
   },
   {
     orderEventId: `order-event-id5`,
@@ -49,9 +53,42 @@ export const testOrderEventList: OrderEventType[] = [
     undoable: false,
     orderStatus: OrderStatusEnum.COMPLETED,
     user: testGuestUser,
+    note: "",
   },
 ]
 
+export const testOrderEventListAfterOrdered: OrderEventType[] = [
+  {
+    orderEventId: `order-event-id1`,
+    orderId: `order-id1`,
+    createdAt: faker.date.past(),
+    isUndo: false,
+    undoable: false,
+    orderStatus: OrderStatusEnum.DRAFT,
+    user: testGuestUser,
+    note: "",
+  },
+  {
+    orderEventId: `order-event-id2`,
+    orderId: `order-id2`,
+    createdAt: faker.date.past(),
+    isUndo: false,
+    undoable: false,
+    orderStatus: OrderStatusEnum.PAID,
+    user: testGuestUser,
+    note: "",
+  },
+  {
+    orderEventId: `order-event-id3`,
+    orderId: `order-id3`,
+    createdAt: faker.date.past(),
+    isUndo: false,
+    undoable: false,
+    orderStatus: OrderStatusEnum.ORDERED,
+    user: testGuestUser,
+    note: "",
+  },
+]
 export const generateOrderDetailList: (count?: number) => OrderDetailType[] = (count = 1) => {
   const list = []
 
@@ -83,7 +120,7 @@ export const generateOrderList: (count?: number) => OrderType[] = (count = 1) =>
       productCost: parseFloat(faker.commerce.price()),
       taxCost: parseFloat(faker.commerce.price()),
       updatedAt: faker.date.past(),
-      orderEvents: testOrderEventList,
+      orderEvents: testOrderEventListAfterPaid,
       orderDetails: generateOrderDetailList(3),
       user: testGuestUser,
     } as OrderType)
