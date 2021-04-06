@@ -6,7 +6,7 @@ import set from 'lodash/set';
 
 export const useValidation = <D extends Record<string, unknown>>(input: UseValidationInputType<D>): UseValidationOutputType<D> => {
 
-  const updateValidationAt: (path: string, value: string) => void = (path, value) => {
+  const updateValidationAt: (path: string, value: string | boolean) => void = (path, value) => {
 
     const tempValidationData: DomainValidationType<D> = cloneDeep(input.curValidationDomain)
 

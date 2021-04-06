@@ -120,7 +120,7 @@ export const generateOrderList: (count?: number) => OrderType[] = (count = 1) =>
       productCost: parseFloat(faker.commerce.price()),
       taxCost: parseFloat(faker.commerce.price()),
       updatedAt: faker.date.past(),
-      orderEvents: testOrderEventListAfterPaid,
+      orderEvents: testOrderEventListAfterOrdered,
       orderDetails: generateOrderDetailList(3),
       user: testGuestUser,
     } as OrderType)

@@ -16,7 +16,7 @@ export declare type UseValidationInputType<D extends Record<string, unknown>> = 
 }
 
 export declare type UseValidationOutputType<D extends Record<string, unknown>> = {
-  updateValidationAt: (path: string, value: string) => void
+  updateValidationAt: (path: string, value: string | boolean) => void
   updateAllValidation: () => void,
   isValidSync: (curDomain: D) => boolean
 }

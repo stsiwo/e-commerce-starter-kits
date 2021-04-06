@@ -1,18 +1,14 @@
 import Grid from '@material-ui/core/Grid';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { OrderType, OrderDetailType } from 'domain/order/types';
-import { CategoryDataType, CategoryValidationDataType, defaultCategoryData, defaultCategoryValidationData } from 'domain/product/types';
-import { useValidation } from 'hooks/validation';
-import { categorySchema } from 'hooks/validation/rules';
-import * as React from 'react';
-import { generateOrderList } from 'tests/data/order';
-import { generateCategoryList } from 'tests/data/product';
-import AdminOrderDetail from '../AdminOrderDetail';
-import UserCard from 'components/common/UserCard';
-import ProductHorizontalCard from 'components/common/ProductCard/ProductHorizontalCard';
 import Typography from '@material-ui/core/Typography';
 import OrderTimeline from 'components/common/OrderTimeline';
+import ProductHorizontalCard from 'components/common/ProductCard/ProductHorizontalCard';
 import TimelineUpdateForm from 'components/common/TimelineUpdateForm';
+import UserCard from 'components/common/UserCard';
+import { OrderDetailType, OrderType } from 'domain/order/types';
+import * as React from 'react';
+import { generateOrderList } from 'tests/data/order';
+import AdminOrderDetail from '../AdminOrderDetail';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

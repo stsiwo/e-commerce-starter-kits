@@ -63,3 +63,12 @@ export const categorySchema = yup.object().shape({
   categoryDescription: yup.string().required(),
   categoryPath: yup.string().required(),
 })
+
+// reviews
+export const reviewSchema = yup.object().shape({
+  reviewPoint: yup.number().required(),
+  reviewTitle: yup.string().required(),
+  reviewDescription: yup.string().required(),
+  isVerified: yup.bool().required(),
+  note: yup.string().optional(),
+})
