@@ -17,6 +17,8 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import AppsIcon from '@material-ui/icons/Apps';
 import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
+import { Link as RRLink } from "react-router-dom";
+
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -136,7 +138,7 @@ const AdminNavDrawer: React.FunctionComponent<{}> = (props) => {
             {navSection.items.map((navItem, index) => {
               const NavIcon = navItem.Icon;
               return (
-                <ListItem button key={navItem.link}>
+                <ListItem button key={navItem.link} component={props => <RRLink {...props} to={navItem.link} />}>
                   <ListItemIcon><NavIcon /></ListItemIcon>
                   <ListItemText primary={navItem.label} />
                 </ListItem>

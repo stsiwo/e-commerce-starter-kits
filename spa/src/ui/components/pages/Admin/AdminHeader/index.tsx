@@ -10,6 +10,7 @@ import Avatar from '@material-ui/core/Avatar';
 import SampleSelfImage from 'static/self.jpeg';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import NotificationsIcon from '@material-ui/icons/Notifications';
+import { Link as RRLink } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -42,24 +43,26 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
           container
         >
           <Grid item>
-            <Link href="/" color="inherit">
+            <Link href="/" color="inherit" component={props => <RRLink {...props} to="/" />}>
               <IconButton edge="start"  color="inherit" aria-label="admin-logo">
                 <SentimentSatisfiedOutlinedIcon />
               </IconButton>
             </Link>
           </Grid>
           <Grid item className={classes.gridItemRight}>
-            <Link href="/" color="inherit">
+            <Link color="inherit" component={props => <RRLink {...props} to="/" />}>
               <IconButton edge="start"  color="inherit" aria-label="admin-menu-search">
                 <NotificationsIcon />
               </IconButton>
             </Link>
-            <Link href="/" color="inherit">
+            <Link color="inherit" component={props => <RRLink {...props} to="/" />}>
               <IconButton edge="start"  color="inherit" aria-label="admin-menu-search">
                 <SearchOutlinedIcon />
               </IconButton>
             </Link>
-            <Avatar alt="Satoshi Iwao" src={SampleSelfImage}/>
+            <Link color="inherit" component={props => <RRLink {...props} to="/admin/account" />}>
+              <Avatar alt="Satoshi Iwao" src={SampleSelfImage}/>
+            </Link>
           </Grid>
         </Grid>
       </Toolbar>

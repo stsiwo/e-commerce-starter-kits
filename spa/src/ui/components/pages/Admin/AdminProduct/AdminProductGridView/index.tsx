@@ -11,6 +11,7 @@ import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import * as React from 'react';
 import AdminProductFormDrawer from '../AdminProductFormDrawer';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
+import { Link as RRLink } from "react-router-dom";
 
 declare type AdminProductGridViewPropsType = {
 }
@@ -50,7 +51,7 @@ const columns: GridColDef[] = [
     width: 150,
     renderCell: (params: GridCellParams) => (
       <React.Fragment>
-        <Link href="">
+        <Link href="" component={props => <RRLink {...props} to="/" />}>
           {params.value} 
         </Link>
       </React.Fragment>

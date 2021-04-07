@@ -76,6 +76,12 @@
 
       - ref: https://stackoverflow.com/questions/43134195/how-to-allow-only-numbers-in-textbox-and-format-as-us-mobile-number-format-in-re
 
+  ### React Router Integration
+
+    - how to integrate <Link> (react-router-dom) with <Link> (material ui) to take both benefits (make link work in spa and use layout/design of material ui)
+
+      - solution: https://github.com/mui-org/material-ui/issues/9106
+
   ### Errors:
   
     - Failed prop type: The prop `children` is marked as required in `ForwardRef(Container)`, but its value is `undefined.

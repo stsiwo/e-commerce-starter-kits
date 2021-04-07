@@ -7,6 +7,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import { Link as RRLink } from "react-router-dom";
 
 declare interface MenuItemType {
   url: string
@@ -66,7 +67,7 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
   const renderMenuItemListForLargeScreen: () => React.ReactNode = () => {
     return menuItemList.map((menuItem: MenuItemType) => {
       return (
-        <Link key={menuItem.url} href={menuItem.url} color="inherit" className={classes.menuItem}>
+        <Link key={menuItem.url} href={menuItem.url} color="inherit" className={classes.menuItem} component={props => <RRLink {...props} to={menuItem.url} />}>
           {menuItem.label}
         </Link>
       )
@@ -77,7 +78,7 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
     return menuItemList.map((menuItem: MenuItemType) => {
       return (
         <MenuItem key={menuItem.url} onClick={handleDropDownMenuCloseClickEvent}>
-          <Link href={menuItem.url} color="inherit" className={classes.menuItem}>
+          <Link href={menuItem.url} color="inherit" className={classes.menuItem} component={props => <RRLink {...props} to={menuItem.url} />}>
             {menuItem.label}
           </Link>
         </MenuItem>
@@ -113,7 +114,3 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
 }
 
 export default MemberHeaderMenuItems
-
-
-
-

@@ -10,6 +10,7 @@ import { useValidation } from 'hooks/validation';
 import { adminLoginSchema } from 'hooks/validation/rules';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
+import { Link as RRLink } from "react-router-dom";
 
 
 export declare type AdminLoginDataType = {
@@ -154,7 +155,7 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
         />
         <Box component="div" className={classes.forgetPasswordBox} >
           <Typography variant="body2" component="p">
-            <Link href="/admin/forget-password" >
+            <Link href="/admin/forget-password" component={props => <RRLink {...props} to="/" />}>
               forget your password?
             </Link>
           </Typography>

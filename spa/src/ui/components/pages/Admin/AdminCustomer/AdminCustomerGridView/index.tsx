@@ -11,6 +11,8 @@ import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import * as React from 'react';
 import AdminCustomerFormDrawer from '../AdminCustomerFormDrawer';
 import Link from '@material-ui/core/Link';
+import { Link as RRLink } from "react-router-dom";
+
 
 declare type AdminCustomerGridViewPropsType = {
 }
@@ -54,7 +56,7 @@ const columns: GridColDef[] = [
     headerName: 'Orders', 
     width: 150,
     renderCell: (params: GridCellParams) => (
-      <Link href="">
+      <Link href="" component={props => <RRLink {...props} to="/" />}>
       {params.value}
       </Link >
     )
@@ -64,7 +66,7 @@ const columns: GridColDef[] = [
     headerName: 'Reviews', 
     width: 150,
     renderCell: (params: GridCellParams) => (
-      <Link href="">
+      <Link href="" component={props => <RRLink {...props} to="/" />}>
         {params.value}
       </Link >
     )
@@ -139,10 +141,3 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
 }
 
 export default AdminCustomerGridView
-
-
-
-
-
-
-
