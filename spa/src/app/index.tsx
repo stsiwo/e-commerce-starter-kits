@@ -1,3 +1,4 @@
+import { UserType } from "domain/user/types";
 import { DomainPaginationType } from "states/types";
 
 export enum FetchStatusEnum {
@@ -26,14 +27,6 @@ export enum UserTypeEnum {
   GUEST = "GUEST",
   MEMBER = "MEMBER",
   ADMIN = "ADMIN",
-}
-
-export declare type UserType = {
-  firstName: string
-  lastName: string
-  email: string
-  avatarImagePath: string 
-  userType?: UserTypeEnum
 }
 
 export declare type AuthType = {

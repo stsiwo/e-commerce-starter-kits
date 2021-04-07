@@ -5,22 +5,7 @@ import TextField from '@material-ui/core/TextField';
 import { useValidation } from 'hooks/validation';
 import { userAccountSchema } from 'hooks/validation/rules';
 import * as React from 'react';
-
-export declare type UserAccountDataType = {
-  firstName: string
-  lastName: string
-  email: string
-  password: string
-  confirm: string
-}
-
-export declare type UserAccountValidationDataType = {
-  firstName?: string
-  lastName?: string
-  email?: string
-  password?: string
-  confirm?: string
-}
+import { UserType, UserBasicAccountDataType, defaultUserBasicAccountData, UserBasicAccountValidationDataType, defaultUserBasicAccountValidationData } from 'domain/user/types';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -42,6 +27,10 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+declare type UserAccountBasicManagementPropsType = {
+  user?: UserType
+}
+
 /**
  * member or admin account management component
  *
@@ -59,28 +48,30 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  *    - 6. display result popup message
  **/
-const UserAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
+const UserAccountBasicManagement: React.FunctionComponent<UserAccountBasicManagementPropsType> = (props) => {
 
   // mui: makeStyles
   const classes = useStyles();
 
   // temp user account state
-  const [curUserAccountState, setUserAccountState] = React.useState<UserAccountDataType>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirm: "",
-  });
+  const [curUserAccountState, setUserAccountState] = React.useState<UserBasicAccountDataType>(defaultUserBasicAccountData)
+
+  // use effect to update user state if exists after render jsx
+  React.useEffect(() => {
+    
+    if (props.user) {
+      setUserAccountState((prev: UserBasicAccountDataType) => ({
+        ...prev,
+        firstName: props.user.firstName,
+        lastName: props.user.lastName,
+        email: props.user.email,
+      }))
+    }
+
+  }, [])
 
   // validation logic (should move to hooks)
-  const [curUserAccountValidationState, setUserAccountValidationState] = React.useState<UserAccountValidationDataType>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirm: "",
-  });
+  const [curUserAccountValidationState, setUserAccountValidationState] = React.useState<UserBasicAccountValidationDataType>(defaultUserBasicAccountValidationData);
 
   const { updateValidationAt, updateAllValidation, isValidSync } = useValidation({
     curDomain: curUserAccountState,
@@ -89,22 +80,20 @@ const UserAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
     setValidationDomain: setUserAccountValidationState
   })
 
-
   // event handlers
   const handleFirstNameInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextFirstName = e.currentTarget.value
     updateValidationAt("firstName", e.currentTarget.value);
-    setUserAccountState((prev: UserAccountDataType) => ({
+    setUserAccountState((prev: UserBasicAccountDataType) => ({
       ...prev,
       firstName: nextFirstName
     }));
-
   }
 
   const handleLastNameInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextLastName = e.currentTarget.value
     updateValidationAt("lastName", e.currentTarget.value);
-    setUserAccountState((prev: UserAccountDataType) => ({
+    setUserAccountState((prev: UserBasicAccountDataType) => ({
       ...prev,
       lastName: nextLastName
     }));
@@ -113,7 +102,7 @@ const UserAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
   const handleEmailInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextEmail = e.currentTarget.value
     updateValidationAt("email", e.currentTarget.value);
-    setUserAccountState((prev: UserAccountDataType) => ({
+    setUserAccountState((prev: UserBasicAccountDataType) => ({
       ...prev,
       email: nextEmail
     }));
@@ -122,7 +111,7 @@ const UserAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
   const handlePasswordInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextPassword = e.currentTarget.value
     updateValidationAt("password", e.currentTarget.value);
-    setUserAccountState((prev: UserAccountDataType) => ({
+    setUserAccountState((prev: UserBasicAccountDataType) => ({
       ...prev,
       password: nextPassword
     }));
@@ -131,7 +120,7 @@ const UserAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
   const handleConfirmInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextConfirm = e.currentTarget.value
     updateValidationAt("confirm", e.currentTarget.value);
-    setUserAccountState((prev: UserAccountDataType) => ({
+    setUserAccountState((prev: UserBasicAccountDataType) => ({
       ...prev,
       confirm: nextConfirm
     }));
@@ -142,7 +131,6 @@ const UserAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
   const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
 
     const isValid: boolean = isValidSync(curUserAccountState)
-
     console.log(isValid);
 
     if (isValid) {

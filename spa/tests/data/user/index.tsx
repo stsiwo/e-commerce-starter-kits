@@ -1,30 +1,5 @@
-import { UserPhoneType, UserAddressType } from "domain/user/types";
-import { UserType, UserTypeEnum } from "src/app";
-
-export const testGuestUser: UserType = {
-  firstName: "Satoshi",
-  lastName: "Iwao",
-  avatarImagePath: "",
-  email: "",
-  userType: UserTypeEnum.GUEST
-}
-
-export const testMemberUser: UserType = {
-  firstName: "Satoshi",
-  lastName: "Iwao",
-  avatarImagePath: "",
-  email: "satoshi@gmail.com",
-  userType: UserTypeEnum.MEMBER
-}
-
-export const testAdminUser: UserType = {
-  firstName: "Satoshi",
-  lastName: "Iwao",
-  avatarImagePath: "",
-  email: "",
-  userType: UserTypeEnum.ADMIN
-}
-
+import { UserAddressType, UserPhoneType, UserType } from "domain/user/types";
+import { UserTypeEnum } from "src/app";
 
 
 export const testPhoneList: UserPhoneType[] = [
@@ -74,3 +49,31 @@ export const testAddressList: UserAddressType[] = [
     postalCode: "v5r 2c2",
   },
 ]
+
+export const testGuestUser: UserType = {
+  firstName: "Satoshi",
+  lastName: "Iwao",
+  avatarImagePath: "",
+  email: "",
+  userType: UserTypeEnum.GUEST
+}
+
+export const testMemberUser: UserType = {
+  firstName: "Satoshi",
+  lastName: "Iwao",
+  avatarImagePath: "",
+  email: "satoshi@gmail.com",
+  userType: UserTypeEnum.MEMBER,
+  addresses: testAddressList,
+  phones: testPhoneList,
+}
+
+export const testAdminUser: UserType = {
+  firstName: "Satoshi",
+  lastName: "Iwao",
+  avatarImagePath: "",
+  email: "",
+  userType: UserTypeEnum.ADMIN
+}
+
+

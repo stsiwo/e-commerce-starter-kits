@@ -4,8 +4,9 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import { useDispatch } from 'react-redux';
 import TestAvatarImg from 'static/self.jpeg';
-import { UserType, UserTypeEnum, AuthType } from 'src/app';
+import { UserTypeEnum, AuthType } from 'src/app';
 import { authActions } from 'reducers/slices/app';
+import { UserType } from 'domain/user/types';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

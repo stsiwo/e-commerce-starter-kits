@@ -1,4 +1,4 @@
-import { UserType, UserTypeEnum } from "src/app";
+import { UserTypeEnum } from "src/app";
 import { ProductType } from "domain/product/types";
 import DraftsIcon from '@material-ui/icons/Drafts';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
@@ -11,6 +11,7 @@ import ErrorIcon from '@material-ui/icons/Error';
 import { theme } from "ui/css/theme";
 import { OverridableComponent } from "@material-ui/core/OverridableComponent";
 import { SvgIconTypeMap } from "@material-ui/core/SvgIcon";
+import { UserType } from "domain/user/types";
 
 export enum OrderStatusEnum {
   DRAFT = "DRAFT",

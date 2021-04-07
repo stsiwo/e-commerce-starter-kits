@@ -1,5 +1,5 @@
-import { UserType } from "src/app";
 import { ProductType } from "domain/product/types";
+import { UserType } from "domain/user/types";
 
 // type def
 export declare type ReviewType = {

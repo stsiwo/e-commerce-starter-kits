@@ -5,8 +5,8 @@ import IconButton from '@material-ui/core/IconButton';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import * as React from 'react';
-import { UserType } from 'src/app';
 import SampleSelfImage from 'static/self.jpeg';
+import { UserType } from 'domain/user/types';
 
 interface UserCardPropsType {
   user: UserType

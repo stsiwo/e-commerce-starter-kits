@@ -164,6 +164,7 @@ const AdminReviewForm: React.FunctionComponent<{}> = (props) => {
           {"Review Form"}
         </Typography>
         <form className={classes.form} noValidate autoComplete="off">
+          <Typography component="legend">click/touch stars to rate this product.</Typography>
           <Rating
             name="review-point"
             precision={0.1}
