@@ -15,6 +15,7 @@ import AdminCategory from 'components/pages/Admin/AdminCategory';
 import AdminOrder from 'components/pages/Admin/AdminOrder';
 import AdminReview from 'components/pages/Admin/AdminReview';
 import AdminCustomer from 'components/pages/Admin/AdminCustomer';
+import Cart from 'components/pages/Cart';
 
 // route data
 export declare type RouteDataType = {
@@ -35,12 +36,20 @@ export const routesData: RoutesDataType = {
       url: "/guest",
       component: withBasePage(Guest),
     },
+    {
+      url: "/cart",
+      component: withBasePage(Cart),
+    },
   ],
   // define member only page
   [UserTypeEnum.MEMBER]: [
     {
       url: "/account",
       component: withBasePage(Account),
+    },
+    {
+      url: "/cart",
+      component: withBasePage(Cart),
     },
   ],
   // define admin only page
