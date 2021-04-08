@@ -16,6 +16,7 @@ import AdminOrder from 'components/pages/Admin/AdminOrder';
 import AdminReview from 'components/pages/Admin/AdminReview';
 import AdminCustomer from 'components/pages/Admin/AdminCustomer';
 import Cart from 'components/pages/Cart';
+import WishList from 'components/pages/WishList';
 
 // route data
 export declare type RouteDataType = {
@@ -50,6 +51,10 @@ export const routesData: RoutesDataType = {
     {
       url: "/cart",
       component: withBasePage(Cart),
+    },
+    {
+      url: "/wishlist",
+      component: withBasePage(WishList),
     },
   ],
   // define admin only page

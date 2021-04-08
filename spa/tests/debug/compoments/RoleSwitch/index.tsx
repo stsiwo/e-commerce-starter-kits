@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     box: {
       position: 'fixed',
-      left: '50%',
+      left: '75%',
       bottom: '0',
       transform: 'translateX(-50%)',
       backgroundColor: "#b3d9ff",
