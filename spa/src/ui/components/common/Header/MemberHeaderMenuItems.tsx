@@ -67,7 +67,7 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
   const renderMenuItemListForLargeScreen: () => React.ReactNode = () => {
     return menuItemList.map((menuItem: MenuItemType) => {
       return (
-        <Link key={menuItem.url} href={menuItem.url} color="inherit" className={classes.menuItem} component={props => <RRLink {...props} to={menuItem.url} />}>
+        <Link key={menuItem.url} color="inherit" className={classes.menuItem} component={props => <RRLink {...props} to={menuItem.url} />}>
           {menuItem.label}
         </Link>
       )
@@ -78,7 +78,7 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
     return menuItemList.map((menuItem: MenuItemType) => {
       return (
         <MenuItem key={menuItem.url} onClick={handleDropDownMenuCloseClickEvent}>
-          <Link href={menuItem.url} color="inherit" className={classes.menuItem} component={props => <RRLink {...props} to={menuItem.url} />}>
+          <Link color="inherit" className={classes.menuItem} component={props => <RRLink {...props} to={menuItem.url} />}>
             {menuItem.label}
           </Link>
         </MenuItem>
@@ -88,27 +88,25 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
 
   return (
     <Grid item>
-      <Typography >
-        {(isMdUp &&
-          renderMenuItemListForLargeScreen()
-        )}
-        {(!isMdUp &&
-          <React.Fragment>
-            <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleDropDownMenuOpenClickEvent}>
-              Open Menu
+      {(isMdUp &&
+        renderMenuItemListForLargeScreen()
+      )}
+      {(!isMdUp &&
+        <React.Fragment>
+          <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleDropDownMenuOpenClickEvent}>
+            Open Menu
             </Button>
-            <Menu
-              id="simple-menu"
-              anchorEl={anchorEl}
-              keepMounted
-              open={Boolean(anchorEl)}
-              onClose={handleDropDownMenuCloseClickEvent}
-            >
-              {renderMenuItemListForSmallScreen()}
-            </Menu>
-          </React.Fragment>
-        )}
-      </Typography>
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleDropDownMenuCloseClickEvent}
+          >
+            {renderMenuItemListForSmallScreen()}
+          </Menu>
+        </React.Fragment>
+      )}
     </Grid>
   )
 }

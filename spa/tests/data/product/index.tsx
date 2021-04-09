@@ -57,6 +57,11 @@ export const testProductVariantSizeObj = {
   },
 }
 
+// n = 5, last = 4
+const productSizeArray = [
+  "xs", "s", "m", "l", "xl"
+]
+
 export const getRandomBoolean: () => boolean = () => {
   return Math.random() < 0.5
 }
@@ -77,7 +82,7 @@ export const generateProductVariantList: (count?: number) => ProductVariantType[
       note: faker.random.words(200),
       soldCount: faker.random.number(20),
       variantColor: faker.commerce.color(),
-      variantSize: testProductVariantSizeObj.m,
+      variantSize: testProductVariantSizeObj[productSizeArray[faker.random.number(4)] as keyof typeof testProductVariantSizeObj], 
       variantStock: faker.random.number(3),
       variantUnitPrice: parseFloat(faker.commerce.price()),
       ...(isDiscount && { variantDiscountPrice: parseFloat(faker.commerce.price()) }),

@@ -10,6 +10,12 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { theme } from 'ui/css/theme';
 
 /**
+ * slick-carousel css
+ **/
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
+/**
  * dev env only
  **/
 const RoleSwitch = (NODE_ENV === "development") ? loadable(() => import("tests/debug/compoments/RoleSwitch")) : null

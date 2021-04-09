@@ -30,21 +30,19 @@ const GuestHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
 
   return (
     <Grid item>
-      <Typography >
-        <Link href="/login" color="inherit" className={classes.menuItem} component={props => <RRLink {...props} to="/login" />}>
-          Log In
+      <Link color="inherit" className={classes.menuItem} component={props => <RRLink {...props} to="/login" />}>
+        Log In
         </Link>
-        <Link href="/signup" color="inherit" className={classes.menuItem} component={props => <RRLink {...props} to="/signup" />}>
-          Sign Up
+      <Link color="inherit" className={classes.menuItem} component={props => <RRLink {...props} to="/signup" />}>
+        Sign Up
         </Link>
-        <Link href="/cart" color="inherit" className={classes.menuItem} component={props => <RRLink {...props} to="/cart" />}>
-          <IconButton>
-            <Badge badgeContent={4} color="error">
-              <ShoppingCartIcon />
-            </Badge>
-          </IconButton>
-        </Link>
-      </Typography>
+      <Link color="inherit" className={classes.menuItem} component={props => <RRLink {...props} to="/cart" />}>
+        <IconButton>
+          <Badge badgeContent={4} color="error">
+            <ShoppingCartIcon />
+          </Badge>
+        </IconButton>
+      </Link>
     </Grid>
   )
 }
