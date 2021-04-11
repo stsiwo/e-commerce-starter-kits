@@ -1,11 +1,13 @@
 import { UserTypeEnum } from "src/app";
 import { ReviewType } from "domain/review/type";
 import { OrderType } from "domain/order/types";
+import { CartItemType } from "domain/cart/types";
 
 export declare type UserPhoneType = {
   phoneId: string
   phone: string
   countryCode: string
+  isSelected: boolean
 }
 
 export declare type UserAddressType = {
@@ -16,6 +18,8 @@ export declare type UserAddressType = {
   province: string
   country: string
   postalCode: string
+  isBillingAddress: boolean
+  isShippingAddress: boolean
 }
 
 export declare type UserType = {
@@ -23,11 +27,12 @@ export declare type UserType = {
   lastName: string
   email: string
   avatarImagePath: string 
-  addresses?: UserAddressType[]
-  phones?: UserPhoneType[]
-  userType?: UserTypeEnum
-  reviews?: ReviewType[]
-  orders?: OrderType[]
+  addresses: UserAddressType[]
+  phones: UserPhoneType[]
+  userType: UserTypeEnum
+  reviews: ReviewType[]
+  orders: OrderType[]
+  cartItems: CartItemType[]
 }
 
 // empty
@@ -42,6 +47,8 @@ export const defaultUser: UserType = {
   phones: [],
   reviews: [], 
   orders: [],
+  cartItems: [],
+  userType: UserTypeEnum.GUEST
 }
 
 // form & input 

@@ -9,6 +9,7 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import CartItem from 'components/common/CartItem';
 import ProductTotal from 'components/common/CartItemTotal';
+import { calcSubTotalProductNumbers, calcSubTotalPriceAmount } from 'domain/cart';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -63,34 +64,12 @@ const Cart: React.FunctionComponent<{}> = (props) => {
 
   // implement later
   //const curCartItemList = useSelector(mSelector.makeCartItemListSelector())
-  const testCartItems = generateCartItemList(4)
-
-  // on select change
-  const handleSelectCartItemChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    /**
-     * dispatch select update action (see above)
-     **/
-  }
-
-  const calcSubTotalPriceAmount: () => number = () => {
-    return testCartItems.reduce((acc: number, cartItem: CartItemType) => {
-      const unitPrice = cartItem.variant.variantUnitPrice ? cartItem.variant.variantUnitPrice : cartItem.product.productBaseUnitPrice
-      acc +=  (unitPrice * cartItem.quantity)
-      return acc
-    }, 0)
-  }
-
-  const calcSubTotalProductNumbers: () => number = () => {
-    return testCartItems.reduce((acc: number, cartItem: CartItemType) => {
-      acc +=  cartItem.quantity 
-      return acc
-    }, 0)
-  }
+  const testCartItems = React.useMemo(() => generateCartItemList(4), [])
 
   const renderCartItems: () => React.ReactNode = () => {
     return testCartItems.map((cartItem: CartItemType) => {
       return (
-        <CartItem value={cartItem} onChange={handleSelectCartItemChange} key={cartItem.cartId} />
+        <CartItem value={cartItem} key={cartItem.cartId} />
       )
     })
   }
@@ -120,7 +99,7 @@ const Cart: React.FunctionComponent<{}> = (props) => {
           {renderCartItems()}
           <Box component="div" className={classes.subtotalBox}>
             <Typography variant="subtitle1" component="h3" align="right" >
-               Subtotal (<b>{calcSubTotalProductNumbers()}</b>  items): $<b>{calcSubTotalPriceAmount()}</b>
+               Subtotal (<b>{calcSubTotalProductNumbers(testCartItems)}</b>  items): $<b>{calcSubTotalPriceAmount(testCartItems)}</b>
             </Typography>
           </Box>
           <Box component="div" className={classes.controllerBox}>

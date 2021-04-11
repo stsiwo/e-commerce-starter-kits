@@ -12,6 +12,8 @@ import CustomerBasicForm from 'components/common/Checkout/CustomerBasicForm';
 import { mSelector } from 'src/selectors/selector';
 import { UserTypeEnum } from 'src/app';
 import CustomerContactForm from 'components/common/Checkout/CustomerContactForm';
+import OrderItemForm from 'components/common/Checkout/OrderItemForm';
+import Payment from 'components/common/Checkout/Payment';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -93,11 +95,31 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
             </Button>
           </StepContent>
         </Step>
-        {/** product information **/}
+        {/** order items: disabled for now. don't need this. 
         <Step >
-          <StepLabel>{"Product Information"}</StepLabel>
+          <StepLabel>{"Order Items"}</StepLabel>
           <StepContent>
-            <CustomerBasicForm onNextStepClick={handleNextStepClick} onPrevStepClick={handlePrevStepClick} user={auth.user} />
+            <OrderItemForm onNextStepClick={handleNextStepClick} onPrevStepClick={handlePrevStepClick} user={auth.user}/>
+            <Button
+              disabled={activeStep === 0}
+              onClick={handlePrevStepClick}
+            >
+              Back
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleNextStepClick}
+            >
+              {activeStep === checkoutSteps.length - 1 ? 'Finish' : 'Next'}
+            </Button>
+          </StepContent>
+        </Step>
+        **/}
+        <Step >
+          <StepLabel>{"Payment"}</StepLabel>
+          <StepContent>
+            <Payment onNextStepClick={handleNextStepClick} onPrevStepClick={handlePrevStepClick} user={auth.user}/>
             <Button
               disabled={activeStep === 0}
               onClick={handlePrevStepClick}

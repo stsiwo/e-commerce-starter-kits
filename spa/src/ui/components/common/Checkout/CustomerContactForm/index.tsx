@@ -74,12 +74,16 @@ const CustomerContactForm: React.FunctionComponent<CustomerContactFormPropsType>
   // event handler to validate phone & addresses
   const handleValidateClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
     
+    // validation failed.
     if (!curPhone ||
       !curShippingAddress ||
       !curBillingAddress) {
         enqueueSnackbar("Please select phone, shipping address, billing address", {
           variant: 'error', 
         })
+    // validation passed
+    } else {
+      props.onNextStepClick(e)
     }
   }
 

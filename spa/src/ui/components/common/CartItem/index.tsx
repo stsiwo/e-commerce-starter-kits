@@ -24,7 +24,7 @@ import SizeCell from '../GridData/SizeCell';
  **/
 interface CartItemPropsType {
   value: CartItemType
-  onChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>>
+  onChange?: React.EventHandler<React.ChangeEvent<HTMLInputElement>>
 }
 
 
@@ -65,6 +65,37 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value, onChange 
   // mui: makeStyles
   const classes = useStyles();
 
+  // event handlers
+  
+  /// qty change
+  const handleQtyIncrement: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+    
+    if (value.quantity < value.variant.variantStock) {
+      /**
+       * update request to redux and redux-saga
+       *
+       **/
+    }
+  }
+
+  const handleQtyDecrement: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+
+    if (value.quantity > 1) {
+      /**
+       * update request to redux and redux-saga
+       *
+       **/
+    }
+  }
+
+  /// selection change
+  const handleSelectionChange: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+    /**
+     * update selection  to redux and redux-saga
+     **/
+  }
+  
+
   return (
     <Card className={`${classes.card} ${classes.root}`}>
       <CardHeader
@@ -85,11 +116,17 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value, onChange 
           </Box>
           <Box component="div" className={classes.actionBox}>
             <ButtonGroup size="small" aria-label="small outlined button group">
-              <IconButton>
+              <IconButton 
+                onClick={handleQtyIncrement}  
+                disabled={value.quantity === value.variant.variantStock}
+              >
                 <AddCircleIcon />
               </IconButton>
-              <Button disabled>3</Button>
-              <IconButton>
+              <Button disabled>{value.quantity}</Button>
+              <IconButton 
+                onClick={handleQtyDecrement}
+                disabled={value.quantity === 1}
+              >
                 <RemoveCircleIcon />
               </IconButton>
             </ButtonGroup>
