@@ -1,12 +1,12 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import * as React from 'react';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { UserType, defaultUser } from 'domain/user/types';
+import * as React from 'react';
 import { useDispatch } from 'react-redux';
-import TestAvatarImg from 'static/self.jpeg';
-import { UserTypeEnum, AuthType } from 'src/app';
 import { authActions } from 'reducers/slices/app';
-import { UserType } from 'domain/user/types';
+import { AuthType, UserTypeEnum } from 'src/app';
+import { testAdminUser, testMemberUser } from 'tests/data/user';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -31,27 +31,20 @@ const mockUserGenerator: (userType: UserTypeEnum, user?: UserType) => AuthType =
 
 const RoleSwitch: React.FunctionComponent<{}> = (props) => {
 
-  const testUserData: UserType = React.useMemo(() => ({
-    firstName: "satoshi", 
-    lastName: "iwao",
-    email: "satoshi@test.com",
-    avatarImagePath: TestAvatarImg 
-  }), [])
-
   const dispatch = useDispatch()
 
   const classes = useStyles();
 
   const handleGuestRoleClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    dispatch(authActions.login(mockUserGenerator(UserTypeEnum.GUEST)))
+    dispatch(authActions.login(mockUserGenerator(UserTypeEnum.GUEST, defaultUser)))
   }
 
   const handleMemberRoleClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    dispatch(authActions.login(mockUserGenerator(UserTypeEnum.MEMBER, testUserData)))
+    dispatch(authActions.login(mockUserGenerator(UserTypeEnum.MEMBER, testMemberUser )))
   }
   
   const handleAdminRoleClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    dispatch(authActions.login(mockUserGenerator(UserTypeEnum.ADMIN, testUserData)))
+    dispatch(authActions.login(mockUserGenerator(UserTypeEnum.ADMIN, testAdminUser)))
   }
 
   return (

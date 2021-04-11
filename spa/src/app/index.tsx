@@ -32,5 +32,5 @@ export enum UserTypeEnum {
 export declare type AuthType = {
   isLoggedIn: boolean
   userType: UserTypeEnum
-  user?: UserType
+  user: UserType
 }

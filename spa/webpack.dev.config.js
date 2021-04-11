@@ -9,9 +9,10 @@ module.exports = merge(common, {
   // dev server outputs bundled file in contentBase directory, but where you define in output property
   devServer: {
     contentBase: __dirname,
+    open: 'firefox',
     hot: true,
     historyApiFallback: true,
-    port: 3000 
+    port: 3000,
   },
   output: {
     filename: '[name].bundle.js',

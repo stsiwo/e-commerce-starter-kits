@@ -1,28 +1,25 @@
+import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import MenuItem from '@material-ui/core/MenuItem';
+import RadioGroup from '@material-ui/core/RadioGroup';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import Rating from '@material-ui/lab/Rating/Rating';
+import Carousel from 'components/common/Carousel';
+import ColorRadio from 'components/common/ColorRadio';
+import { ProductVariantSizeType, ProductVariantType } from 'domain/product/types';
+import uniq from 'lodash/uniq';
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
-import { generateProductList } from 'tests/data/product';
 import { useParams } from 'react-router';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import Carousel from 'components/common/Carousel';
-import { ProductType, ProductVariantType, ProductVariantSizeType } from 'domain/product/types';
-import uniq from 'lodash/uniq';
-import ColorCell from 'components/common/GridData/ColorCell';
-import Box from '@material-ui/core/Box';
-import SizeCell from 'components/common/GridData/SizeCell';
-import TextField from '@material-ui/core/TextField';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import ColorRadio from 'components/common/ColorRadio';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import IconButton from '@material-ui/core/IconButton';
-import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import Button from '@material-ui/core/Button';
-import Rating from '@material-ui/lab/Rating/Rating';
+import { generateProductList } from 'tests/data/product';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

@@ -1,5 +1,6 @@
 import { StateType } from "./types";
 import { UserTypeEnum } from "src/app";
+import { defaultUser } from "domain/user/types";
 
 /**
  *
@@ -64,6 +65,7 @@ export const initialState: StateType = {
     auth: {
       isLoggedIn: false,
       userType: UserTypeEnum.GUEST,
+      user: defaultUser,
     },
     searchKeyword: "",
     requestTracker: {},

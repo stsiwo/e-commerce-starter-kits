@@ -1,26 +1,22 @@
 import Avatar from '@material-ui/core/Avatar';
+import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
 import CardHeader from '@material-ui/core/CardHeader';
+import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { ProductType, ProductVariantType } from 'domain/product/types';
+import Switch from '@material-ui/core/Switch';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import { CartItemType } from 'domain/cart/types';
 import * as React from 'react';
 import SampleSelfImage from 'static/self.jpeg';
-import { OrderDetailType } from 'domain/order/types';
 import ColorCell from '../GridData/ColorCell';
 import SizeCell from '../GridData/SizeCell';
-import Box from '@material-ui/core/Box';
-import { CartItemType } from 'domain/cart/types';
-import CardActions from '@material-ui/core/CardActions';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import Switch from '@material-ui/core/Switch';
-import CardContent from '@material-ui/core/CardContent';
-import Grid from '@material-ui/core/Grid';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import Button from '@material-ui/core/Button';
 
 /**
  * need 'orderDetail' or 'product/variant'

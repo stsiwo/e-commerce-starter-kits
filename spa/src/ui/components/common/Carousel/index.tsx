@@ -36,7 +36,11 @@ interface CarouselPropsType {
  *
  *  - dependency: mui only
  *
- *  - deprecated
+ *  - currently using 'react-slick' but use 'Stepper' in material ui
+ *
+ *  ref: https://material-ui.com/components/steppers/#text-with-carousel-effect
+ *
+ *  - or fix layout issue of 'react-slick' when iamge is full wide at small screen size
  *
  **/
 const Carousel: React.FunctionComponent<CarouselPropsType> = ({ items }) => {

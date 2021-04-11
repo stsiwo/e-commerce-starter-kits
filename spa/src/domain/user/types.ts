@@ -30,6 +30,20 @@ export declare type UserType = {
   orders?: OrderType[]
 }
 
+// empty
+
+// state 
+export const defaultUser: UserType = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  avatarImagePath:"",
+  addresses: [],
+  phones: [],
+  reviews: [], 
+  orders: [],
+}
+
 // form & input 
 export declare type UserBasicAccountDataType = {
   firstName: string

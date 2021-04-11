@@ -1,5 +1,6 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RequestTrackerType, AuthType, UserTypeEnum } from "src/app";
+import { defaultUser } from "domain/user/types";
 
 /**
  * common reducer action type
@@ -34,7 +35,8 @@ export const authSlice = createSlice({
     login: (state: AuthType, action: authUpdateActionType) => action.payload,
     logout: (state: AuthType) => ({
       isLoggedIn: false,
-      userType: UserTypeEnum.GUEST
+      userType: UserTypeEnum.GUEST,
+      user: defaultUser
     }),
 
   }

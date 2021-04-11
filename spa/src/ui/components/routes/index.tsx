@@ -18,6 +18,7 @@ import AdminCustomer from 'components/pages/Admin/AdminCustomer';
 import Cart from 'components/pages/Cart';
 import WishList from 'components/pages/WishList';
 import Product from 'components/pages/Product';
+import Checkout from 'components/pages/Checkout';
 
 // route data
 export declare type RouteDataType = {
@@ -112,5 +113,9 @@ export const commonRoutesData: CommonRoutesDataType = [
   {
     url: '/products/:productPath',
     component: withBasePage(Product)
+  },
+  {
+    url: '/checkout',
+    component: withBasePage(Checkout)
   },
 ]

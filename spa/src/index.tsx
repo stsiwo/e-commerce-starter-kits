@@ -8,6 +8,7 @@ import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { theme } from 'ui/css/theme';
+import { SnackbarProvider } from 'notistack';
 
 /**
  * slick-carousel css
@@ -25,16 +26,19 @@ const Index = (props: any) => {
   return (
     <React.Fragment>
       <ThemeProvider theme={theme}>
-        <CssBaseline>
-          <Provider store={store}>
-            <Router>
-              <Content />
-              {(RoleSwitch &&
-                <RoleSwitch />
-              )}
-            </Router>
-          </Provider>
-        </CssBaseline>
+        {/** SnackbarProvider must be a child of ThemeProvider **/}
+        <SnackbarProvider maxSnack={3}>
+          <CssBaseline>
+            <Provider store={store}>
+              <Router>
+                <Content />
+                {(RoleSwitch &&
+                  <RoleSwitch />
+                )}
+              </Router>
+            </Provider>
+          </CssBaseline>
+        </SnackbarProvider>
       </ThemeProvider>
     </React.Fragment>
   );
