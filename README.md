@@ -23,10 +23,6 @@ e-commerce web app with React + Java + Spring + Docker
   - Docker
   - Docker Compose
 
-## Java libraries
-
-  - [Lombok](https://projectlombok.org/)
-
 ## NOTE
 
   - How to prevent a user from accessing other user's data.
