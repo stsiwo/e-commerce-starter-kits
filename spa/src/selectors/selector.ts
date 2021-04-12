@@ -1,5 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { StateType } from "states/types";
+import { denormalize } from "normalizr";
+import { categorySchemaArray } from "states/state";
 
 export const rsSelector = {
   /**
@@ -29,6 +31,7 @@ export const rsSelector = {
   },
 
   domain: {
+    getCategory: (state: StateType) => state.domain.categories
   }
 }
 
@@ -118,4 +121,36 @@ export const mSelector = {
     )
   },
 
+  // domain.categories
+  makeCategorySelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getCategory
+      ],
+      (normalizedCategories) => {
+
+        /**
+         * return empty array before fetch
+         **/
+        if (Object.keys(normalizedCategories).length === 0) {
+          return []
+        }
+
+        /**
+         * denormalize
+         *
+         * this return { 'domain-name': [{ domain1 }, { domain2 }] in the format
+         **/
+        const denormalizedEntities = denormalize(
+          Object.keys(normalizedCategories), // ex, [0, 1, 2, 3, 4] ('result' prop of normalized data)
+          categorySchemaArray,
+          {
+            categories: normalizedCategories
+          }, // entities prop of normalized data (ex, { animes: { "1": { ... }, "2": { ... }, ... }})
+        )
+
+        return denormalizedEntities
+      },
+    )
+  },
 }

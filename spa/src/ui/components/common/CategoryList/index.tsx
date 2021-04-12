@@ -32,6 +32,11 @@ const CategoryList: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
 
+  /**
+   * TODO: replace test category with real one 
+   *
+   **/
+
   return (
     <Box component="section" className={classes.section} >
       <Typography variant="h5" component="h5" align="center" className={classes.title} >
