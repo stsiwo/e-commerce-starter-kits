@@ -1,3 +1,3 @@
-export declare type NormalizedDomainType<D extends object> = {
+export declare type NormalizedDomainType<D> = {
   [key: string]: D
 }

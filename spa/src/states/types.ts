@@ -1,4 +1,5 @@
-import { RequestTrackerType, AuthType } from "src/app/";
+import { NormalizedCategoryType } from "domain/product/types";
+import { AuthType, RequestTrackerType, FetchStatusEnum } from "src/app/";
 
 //import { NormalizedBlogType } from "domain/blog";
 //import { NormalizedCategoryType } from "domain/category";
@@ -14,6 +15,7 @@ export declare type AppStateType = {
   auth: AuthType 
   searchKeyword: string
   requestTracker: RequestTrackerType
+  categoryFetchStatus: FetchStatusEnum
 }
 
 export declare type DomainPaginationType = {
@@ -31,6 +33,7 @@ export declare type DomainStateSubType<D extends Record<string, any>> = {
 export declare type DomainStateType = {
   //animes: DomainStateSubType<NormalizedAnimeType> 
   //categories: CategoryType[]  // we don't store any unnecessary data so don't normalize
+  categories: NormalizedCategoryType 
 }
 
 export declare type StateType = {

@@ -1,5 +1,5 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RequestTrackerType, AuthType, UserTypeEnum } from "src/app";
+import { RequestTrackerType, AuthType, UserTypeEnum, FetchStatusEnum } from "src/app";
 import { defaultUser } from "domain/user/types";
 
 /**
@@ -125,3 +125,35 @@ export const requestTrackerSlice = createSlice({
 
 export const requestTrackerSliceReducer = requestTrackerSlice.reducer
 export const requestTrackerActions = requestTrackerSlice.actions
+
+
+/**
+ * app.categoryFetchStatus state Slice
+ **/
+export type categoryFetchStatusActionType = PayloadAction<FetchStatusEnum>
+
+export const categoryFetchStatusSlice = createSlice({
+  name: "app/categoryFetchStatus", // a name used in action type
+  initialState: {},
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+    update: (state: FetchStatusEnum, action: categoryFetchStatusActionType) => action.payload,
+    clear: (state: FetchStatusEnum) => FetchStatusEnum.INITIAL
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   **/
+})
+
+export const categoryFetchStatusSliceReducer = categoryFetchStatusSlice.reducer
+export const categoryFetchStatusActions = categoryFetchStatusSlice.actions

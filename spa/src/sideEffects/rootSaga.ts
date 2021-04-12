@@ -1,5 +1,5 @@
 import { all, call, spawn } from 'redux-saga/effects';
-import { leftNavMenuWatcher } from './watchers';
+import { leftNavMenuWatcher, categoryFetchWatcher } from './watchers';
 
 export function* rootSaga() {
 
@@ -10,6 +10,7 @@ export function* rootSaga() {
    **/
   const sagas: any[] = [
     leftNavMenuWatcher,
+    categoryFetchWatcher,
   ];
 
   /**

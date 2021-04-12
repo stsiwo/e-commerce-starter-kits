@@ -1,8 +1,12 @@
+import { NormalizedDomainType } from "domain/types";
+
 export declare type CategoryType = {
   categoryId: string
   categoryName: string
   categoryDescription: string
 }
+
+export declare type NormalizedCategoryType = NormalizedDomainType<CategoryType>
 
 export declare type ProductImageType = {
   productImageId: string

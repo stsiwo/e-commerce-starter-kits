@@ -1,6 +1,7 @@
 import { StateType } from "./types";
-import { UserTypeEnum } from "src/app";
+import { UserTypeEnum, FetchStatusEnum } from "src/app";
 import { defaultUser } from "domain/user/types";
+import { normalize, schema } from 'normalizr';
 
 /**
  *
@@ -9,24 +10,13 @@ import { defaultUser } from "domain/user/types";
  **/
 
 // category
-//const categorySchemaEntity = new schema.Entity(
-//  "categories",
-//  {},
-//  {
-//    // need to override default value ('id')
-//    idAttribute: "path",
-//  }
-//)
-//
-//// tags
-//const tagSchemaEntity = new schema.Entity(
-//  "tags",
-//  {},
-//  {
-//    idAttribute: "name",
-//  }
-//)
-//
+const categorySchemaEntity = new schema.Entity(
+  "categories",
+  {},
+)
+
+export const categorySchemaArray = new schema.Array(categorySchemaEntity);
+
 //export const tagSchemaArray = new schema.Array(tagSchemaEntity)
 
 // anime 
@@ -69,8 +59,9 @@ export const initialState: StateType = {
     },
     searchKeyword: "",
     requestTracker: {},
-    
+    categoryFetchStatus: FetchStatusEnum.INITIAL
   },
   domain: {
+    categories: {}, 
   },
 }

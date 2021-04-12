@@ -5,6 +5,6 @@ declare type appConfigType = {
 }
 
 export const appConfig: appConfigType = {
-  baseUrl: "https://kitsu.io/api/edge",
+  baseUrl: "https://ec.stsdevweb.com/v1",
   debounceTime: 500,
 }
