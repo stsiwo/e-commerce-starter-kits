@@ -1,22 +1,24 @@
-import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import CartItem from 'components/common/CartItem';
+import CartItemTotal from 'components/common/CartItemTotal';
 import { CheckoutStepComponentPropsType } from 'components/pages/Checkout/checkoutSteps';
 import { CartItemType } from 'domain/cart/types';
 import { UserType } from 'domain/user/types';
-import * as React from 'react';
-import CartItemTotal from 'components/common/CartItemTotal';
-import { generateCartItemList } from 'tests/data/cart';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
 import { useSnackbar } from 'notistack';
+import * as React from 'react';
+import { generateCartItemList } from 'tests/data/cart';
+import CartItemConfirmCard from './CartItemConfirmCard';
 import CustomerBasicConfirm from './CustomerBasicConfirm';
 import CustomerContactConfirm from './CustomerContactConfirm';
-import CartItemConfirmCard from './CartItemConfirmCard';
+import StripePaymentForm from './StripePaymentForm';
+import { stripePromise } from 'configs/stripeConfig';
+import { Elements } from '@stripe/react-stripe-js';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    totalCost: {
+      alignSelf: "end",
+    }
   }),
 );
 
@@ -41,7 +43,6 @@ const Payment: React.FunctionComponent<PaymentPropsType> = (props) => {
 
 
   // snakbar stuff when no phone & addresses are selected
-  const [isOpenErrorSnackbar, setOpenErrorSnackbar] = React.useState<boolean>(false)
   const { enqueueSnackbar } = useSnackbar();
 
   // get cur cart items from redux store
@@ -66,6 +67,7 @@ const Payment: React.FunctionComponent<PaymentPropsType> = (props) => {
         return (
           <CartItemConfirmCard
             value={cartItem}
+            key={cartItem.cartId}
           />
         )
       })
@@ -99,15 +101,12 @@ const Payment: React.FunctionComponent<PaymentPropsType> = (props) => {
         item
         xs={12}
         md={6}
+        className={classes.totalCost}
       >
-      </Grid>
-      <Grid
-        item
-        xs={12}
-      >
-        <Button onClick={handleValidateClick}>
-          {"Confirm"}
-        </Button>
+        <CartItemTotal />
+        <Elements stripe={stripePromise}>
+          <StripePaymentForm />
+        </Elements>
       </Grid>
     </Grid>
   )

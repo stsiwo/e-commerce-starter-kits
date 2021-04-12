@@ -9,6 +9,7 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import { generateCartItemList } from 'tests/data/cart';
 import { calcSubTotalPriceAmount, calcSubTotalProductNumbers } from 'domain/cart';
+import Divider from '@material-ui/core/Divider';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -47,6 +48,16 @@ const CartItemTotal: React.FunctionComponent<CartItemTotalPropsType> = (props) =
       <div>
         <Typography variant="subtitle1" component="h3" align="right" >
           Subtotal (<b>{calcSubTotalProductNumbers(testCartItems)}</b>  items): $<b>{calcSubTotalPriceAmount(testCartItems)}</b>
+        </Typography>
+        <Typography variant="subtitle1" component="h3" align="right" >
+          Tax: $<b>{"30.00"}</b>
+        </Typography>
+        <Typography variant="subtitle1" component="h3" align="right" >
+          Shipping Cost: $<b>{"10.00"}</b>
+        </Typography>
+        <Divider variant="middle"/>
+        <Typography variant="h6" component="h3" align="right" >
+          Total: $<b>{"500.00"}</b>
         </Typography>
       </div>
     </Box>

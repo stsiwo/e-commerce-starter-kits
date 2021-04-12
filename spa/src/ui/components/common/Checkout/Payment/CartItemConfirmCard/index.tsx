@@ -81,7 +81,6 @@ const CartItemConfirmCard: React.FunctionComponent<CartItemConfirmCardPropsType>
             </Typography>
           </Box>
         }
-       
       >
       </CardHeader>
     </Card>
