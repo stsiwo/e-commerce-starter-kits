@@ -1,0 +1,7 @@
+endpoint change:
+
+  - /categories (GET)
+    - don't need to include products which are belonged to the category.
+    
+  - /carts
+    (GET): get current cart items
