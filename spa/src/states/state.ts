@@ -13,9 +13,23 @@ import { normalize, schema } from 'normalizr';
 const categorySchemaEntity = new schema.Entity(
   "categories",
   {},
+  {
+    idAttribute: "categoryId", 
+  }
 )
 
 export const categorySchemaArray = new schema.Array(categorySchemaEntity);
+
+// product
+const productSchemaEntity = new schema.Entity(
+  "products",
+  {},
+  {
+    idAttribute: "productId",
+  }
+)
+
+export const productSchemaArray = new schema.Array(productSchemaEntity);
 
 //export const tagSchemaArray = new schema.Array(tagSchemaEntity)
 
@@ -60,6 +74,13 @@ export const initialState: StateType = {
     searchKeyword: "",
     requestTracker: {},
     fetchStatus: {
+      products: {
+        get: FetchStatusEnum.INITIAL,
+        getSingle: FetchStatusEnum.INITIAL,
+        post: FetchStatusEnum.INITIAL,
+        put: FetchStatusEnum.INITIAL,
+        deleteSingle: FetchStatusEnum.INITIAL,
+      },
       orders: {
         get: FetchStatusEnum.INITIAL,
         getSingle: FetchStatusEnum.INITIAL,
@@ -102,5 +123,6 @@ export const initialState: StateType = {
     wishlistItems: [],
     users: [],
     orders: [],
+    products: {},
   },
 }

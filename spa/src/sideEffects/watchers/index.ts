@@ -1,5 +1,8 @@
 import { deleteCartItemActionTypeName, deleteSingleCartItemActionTypeName, fetchCartItemActionTypeName, postCartItemActionTypeName, putCartItemActionTypeName } from 'reducers/slices/domain/cartItem';
-import { fetchCategoryActionTypeName, postCategoryActionTypeName, putCategoryActionTypeName, deleteSingleCategoryActionTypeName } from 'reducers/slices/domain/category';
+import { deleteSingleCategoryActionTypeName, fetchCategoryActionTypeName, postCategoryActionTypeName, putCategoryActionTypeName } from 'reducers/slices/domain/category';
+import { fetchOrderActionTypeName, fetchSingleOrderActionTypeName, postOrderActionTypeName, putOrderActionTypeName } from 'reducers/slices/domain/order';
+import { deleteSingleProductActionTypeName, fetchProductActionTypeName, fetchSingleProductActionTypeName, postProductActionTypeName, putProductActionTypeName } from 'reducers/slices/domain/product';
+import { deleteSingleUserActionTypeName, fetchSingleUserActionTypeName, fetchUserActionTypeName, putUserActionTypeName } from 'reducers/slices/domain/user';
 import { deleteSingleWishlistItemActionTypeName, deleteWishlistItemActionTypeName, fetchWishlistItemActionTypeName, postWishlistItemActionTypeName } from 'reducers/slices/domain/wishlistItem';
 import { toggleLeftNavMenuActionTypeName } from 'reducers/slices/ui';
 import { takeEvery, takeLatest } from 'redux-saga/effects';
@@ -8,26 +11,28 @@ import { deleteSingleCartItemWorker } from 'sideEffects/workers/cartItem/deleteS
 import { fetchCartItemWorker } from 'sideEffects/workers/cartItem/fetchCartItemWorker';
 import { postCartItemWorker } from 'sideEffects/workers/cartItem/postCartItemWorker';
 import { putCartItemWorker } from 'sideEffects/workers/cartItem/putCartItemWorker';
-import { fetchCategoryWithCacheWorker } from 'sideEffects/workers/fetchCategoryWorker';
+import { deleteSingleCategoryWorker } from 'sideEffects/workers/category/deleteSingleCategoryWorker';
+import { fetchCategoryWorker } from 'sideEffects/workers/category/fetchCategoryWorker';
+import { postCategoryWorker } from 'sideEffects/workers/category/postCategoryWorker';
+import { putCategoryWorker } from 'sideEffects/workers/category/putCategoryWorker';
 import { leftNavMenuWorkerWorker } from 'sideEffects/workers/leftNavMenuWorker';
+import { fetchOrderWorker } from 'sideEffects/workers/order/fetchOrderWorker';
+import { fetchSingleOrderWorker } from 'sideEffects/workers/order/fetchSingleOrderWorker';
+import { postOrderWorker } from 'sideEffects/workers/order/postOrderWorker';
+import { putOrderWorker } from 'sideEffects/workers/order/putOrderWorker';
+import { deleteSingleProductWorker } from 'sideEffects/workers/product/deleteSingleProductWorker';
+import { fetchProductWorker } from 'sideEffects/workers/product/fetchProductWorker';
+import { fetchSingleProductWorker } from 'sideEffects/workers/product/fetchSingleProductWorker';
+import { postProductWorker } from 'sideEffects/workers/product/postProductWorker';
+import { putProductWorker } from 'sideEffects/workers/product/putProductWorker';
+import { deleteSingleUserWorker } from 'sideEffects/workers/user/deleteSingleUserWorker';
+import { fetchSingleUserWorker } from 'sideEffects/workers/user/fetchSingleUserWorker';
+import { fetchUserWorker } from 'sideEffects/workers/user/fetchUserWorker';
+import { putUserWorker } from 'sideEffects/workers/user/putUserWorker';
 import { deleteSingleWishlistItemWorker } from 'sideEffects/workers/wishlistItems/deleteSingleWishlistItemWorker';
 import { deleteWishlistItemWorker } from 'sideEffects/workers/wishlistItems/deleteWishlistItemWorker';
 import { fetchWishlistItemWorker } from 'sideEffects/workers/wishlistItems/fetchWishlistItemWorker';
 import { postWishlistItemWorker } from 'sideEffects/workers/wishlistItems/postWishlistItemWorker';
-import { fetchCategoryWorker } from 'sideEffects/workers/category/fetchCategoryWorker';
-import { postCategoryWorker } from 'sideEffects/workers/category/postCategoryWorker';
-import { putCategoryWorker } from 'sideEffects/workers/category/putCategoryWorker';
-import { deleteSingleCategoryWorker } from 'sideEffects/workers/category/deleteSingleCategoryWorker';
-import { fetchUserActionTypeName, fetchSingleUserActionTypeName, postUserActionTypeName, putUserActionTypeName, deleteSingleUserActionTypeName, deleteUserActionTypeName } from 'reducers/slices/domain/user';
-import { fetchUserWorker } from 'sideEffects/workers/user/fetchUserWorker';
-import { putUserWorker } from 'sideEffects/workers/user/putUserWorker';
-import { deleteSingleUserWorker } from 'sideEffects/workers/user/deleteSingleUserWorker';
-import { fetchSingleUserWorker } from 'sideEffects/workers/user/fetchSingleUserWorker';
-import { fetchOrderActionTypeName, fetchSingleOrderActionTypeName, putOrderActionTypeName, postOrderActionTypeName } from 'reducers/slices/domain/order';
-import { fetchOrderWorker } from 'sideEffects/workers/order/fetchOrderWorker';
-import { fetchSingleOrderWorker } from 'sideEffects/workers/order/fetchSingleOrderWorker';
-import { putOrderWorker } from 'sideEffects/workers/order/putOrderWorker';
-import { postOrderWorker } from 'sideEffects/workers/order/postOrderWorker';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -193,6 +198,42 @@ export function* putOrderWatcher() {
   yield takeLatest(
     putOrderActionTypeName,
     putOrderWorker,
+  )
+}
+
+// product
+export function* fetchProductWatcher() {
+  yield takeLatest(
+    fetchProductActionTypeName,
+    fetchProductWorker,
+  )
+}
+
+export function* fetchSingleProductWatcher() {
+  yield takeLatest(
+    fetchSingleProductActionTypeName,
+    fetchSingleProductWorker,
+  )
+}
+
+export function* postProductWatcher() {
+  yield takeLatest(
+    postProductActionTypeName,
+    postProductWorker,
+  )
+}
+
+export function* putProductWatcher() {
+  yield takeLatest(
+    putProductActionTypeName,
+    putProductWorker,
+  )
+}
+
+export function* deleteSingleProductWatcher() {
+  yield takeLatest(
+    deleteSingleProductActionTypeName,
+    deleteSingleProductWorker,
   )
 }
 

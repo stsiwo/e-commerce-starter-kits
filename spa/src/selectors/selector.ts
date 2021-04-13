@@ -37,6 +37,7 @@ export const rsSelector = {
     getWishlistItem: (state: StateType) => state.domain.wishlistItems,
     getUser: (state: StateType) => state.domain.users,
     getOrder: (state: StateType) => state.domain.orders,
+    getProduct: (state: StateType) => state.domain.orders 
   }
 }
 
@@ -239,4 +240,36 @@ export const mSelector = {
     )
   },
   
+  // domain.products
+  makeProductSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getCategory
+      ],
+      (normalizedProducts) => {
+
+        /**
+         * return empty array before fetch
+         **/
+        if (Object.keys(normalizedProducts).length === 0) {
+          return []
+        }
+
+        /**
+         * denormalize
+         *
+         * this return { 'domain-name': [{ domain1 }, { domain2 }] in the format
+         **/
+        const denormalizedEntities = denormalize(
+          Object.keys(normalizedProducts), // ex, [0, 1, 2, 3, 4] ('result' prop of normalized data)
+          categorySchemaArray,
+          {
+            products: normalizedProducts
+          }, // entities prop of normalized data (ex, { animes: { "1": { ... }, "2": { ... }, ... }})
+        )
+
+        return denormalizedEntities
+      },
+    )
+  },
 }

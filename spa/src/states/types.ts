@@ -1,4 +1,4 @@
-import { NormalizedCategoryType } from "domain/product/types";
+import { NormalizedCategoryType, NormalizedProductType } from "domain/product/types";
 import { AuthType, RequestTrackerType, FetchStatusEnum } from "src/app/";
 import { CartItemType } from "domain/cart/types";
 import { WishlistItemType } from "domain/wishlist/types";
@@ -20,6 +20,13 @@ export declare type AppStateType = {
   searchKeyword: string
   requestTracker: RequestTrackerType
   fetchStatus: {
+    products: {
+      get: FetchStatusEnum
+      getSingle: FetchStatusEnum
+      post: FetchStatusEnum
+      put: FetchStatusEnum
+      deleteSingle: FetchStatusEnum
+    },
     orders: {
       get: FetchStatusEnum
       getSingle: FetchStatusEnum
@@ -75,6 +82,7 @@ export declare type DomainStateType = {
   wishlistItems: WishlistItemType[] // don't need to normalized
   users: UserType[] // don't need to normalized
   orders: OrderType[] // don't need to normalized 
+  products: NormalizedProductType 
 }
 
 export declare type StateType = {

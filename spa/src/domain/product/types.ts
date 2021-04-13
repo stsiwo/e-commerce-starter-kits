@@ -57,6 +57,8 @@ export declare type ProductType = {
   productVariants?: ProductVariantType[]
 }
 
+export declare type NormalizedProductType = NormalizedDomainType<ProductType>
+
 export enum ProductSortEnum {
   DATE_DESC = "DATE_DESC",
   DATE_ASC = "DATE_ASC",

@@ -11,6 +11,8 @@ import { getUserFetchStatusSliceReducer, postUserFetchStatusSliceReducer, putUse
 import { userSliceReducer } from './slices/domain/user';
 import { getOrderFetchStatusSliceReducer, getSingleOrderFetchStatusSliceReducer, postOrderFetchStatusSliceReducer, putOrderFetchStatusSliceReducer, deleteSingleOrderFetchStatusSliceReducer } from './slices/app/fetchStatus/order';
 import { orderSliceReducer } from './slices/domain/order';
+import { getProductFetchStatusSliceReducer, getSingleProductFetchStatusSliceReducer, postProductFetchStatusSliceReducer, putProductFetchStatusSliceReducer, deleteSingleProductFetchStatusSliceReducer } from './slices/app/fetchStatus/product';
+import { productSliceReducer } from './slices/domain/product';
 
 // ** REFACTOR to new approach **/
 
@@ -30,6 +32,13 @@ export const rootReducer = combineReducers({
     searchKeyword: searchKeywordSliceReducer,
     requestTracker: requestTrackerSliceReducer,
     fetchStatus: combineReducers({
+      products: combineReducers({
+        get: getProductFetchStatusSliceReducer, 
+        getSingle: getSingleProductFetchStatusSliceReducer, 
+        post: postProductFetchStatusSliceReducer, 
+        put: putProductFetchStatusSliceReducer, 
+        deleteSingle: deleteSingleProductFetchStatusSliceReducer, 
+      }),
       orders: combineReducers({
         get: getOrderFetchStatusSliceReducer, 
         getSingle: getSingleOrderFetchStatusSliceReducer, 
@@ -72,5 +81,6 @@ export const rootReducer = combineReducers({
     wishlistItems: wishlistItemSliceReducer,
     users: userSliceReducer,
     orders: orderSliceReducer,
+    products: productSliceReducer,
   })
 })
