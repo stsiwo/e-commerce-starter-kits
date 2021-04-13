@@ -1,7 +1,7 @@
 endpoint change:
 
   - /categories (GET)
-    - don't need to include products which are belonged to the category.
+    - don't need to include products which are belonged to the category. but need total count of products.
     
   - /users/{userId}/carts => /users/{userId}/cartItems 
     - to avoid confusion.
@@ -14,6 +14,10 @@ endpoint change:
         
   - /users/{userId}/wishlist => /users/{userId}/wishlistItems
     - to avoid confusion.
-      - a user has only one cart and this endpoint is to manage cart items (not cart itself)
+      - a user has only one wishlist and this endpoint is to manage wishlist items (not wishlist itself)
       
     - don't need to implement PUT/PATCH because of its context
+    
+  - /users
+  
+    - implement that only update property which has value (not null)
