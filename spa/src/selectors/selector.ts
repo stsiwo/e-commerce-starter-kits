@@ -36,6 +36,7 @@ export const rsSelector = {
     getCartItem: (state: StateType) => state.domain.cartItems,
     getWishlistItem: (state: StateType) => state.domain.wishlistItems,
     getUser: (state: StateType) => state.domain.users,
+    getOrder: (state: StateType) => state.domain.orders,
   }
 }
 
@@ -219,4 +220,23 @@ export const mSelector = {
       },
     )
   },
+  
+  // domain.orders
+  makeOrderSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getOrder
+      ],
+      (order) => {
+
+        /**
+         * TODO: Pagination & Sort & Filter
+         **/
+
+        // this is array of cart item
+        return order
+      },
+    )
+  },
+  
 }

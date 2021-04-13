@@ -1,5 +1,5 @@
 import { all, call, spawn } from 'redux-saga/effects';
-import { deleteCartItemWatcher, deleteSingleCartItemWatcher, fetchCartItemWatcher, leftNavMenuWatcher, postCartItemWatcher, putCartItemWatcher, fetchWishlistItemWatcher, postWishlistItemWatcher, deleteSingleWishlistItemWatcher, deleteWishlistItemWatcher, fetchCategoryWatcher, postCategoryWatcher, putCategoryWatcher, deleteSingleCategoryWatcher } from './watchers';
+import { deleteCartItemWatcher, deleteSingleCartItemWatcher, fetchCartItemWatcher, leftNavMenuWatcher, postCartItemWatcher, putCartItemWatcher, fetchWishlistItemWatcher, postWishlistItemWatcher, deleteSingleWishlistItemWatcher, deleteWishlistItemWatcher, fetchCategoryWatcher, postCategoryWatcher, putCategoryWatcher, deleteSingleCategoryWatcher, fetchUserWatcher, fetchSingleUserWatcher, putUserWatcher, deleteSingleUserWatcher, fetchOrderWatcher, fetchSingleOrderWatcher, postOrderWatcher, putOrderWatcher } from './watchers';
 
 export function* rootSaga() {
 
@@ -35,7 +35,18 @@ export function* rootSaga() {
     postCategoryWatcher,
     putCategoryWatcher,
     deleteSingleCategoryWatcher,
-    
+
+    /// user
+    fetchUserWatcher,
+    fetchSingleUserWatcher,
+    putUserWatcher,
+    deleteSingleUserWatcher,
+
+    /// order
+    fetchOrderWatcher,
+    fetchSingleOrderWatcher,
+    postOrderWatcher,
+    putOrderWatcher,
   ]
 
   /**

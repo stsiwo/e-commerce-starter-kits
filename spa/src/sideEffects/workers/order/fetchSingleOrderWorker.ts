@@ -1,8 +1,8 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { appConfig } from "configs/appConfig";
-import { getUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
-import { userActions } from "reducers/slices/domain/user";
+import { getOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
+import { orderActions } from "reducers/slices/domain/order";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
@@ -10,15 +10,15 @@ import { rsSelector } from "src/selectors/selector";
 /**
  * a worker (generator)    
  *
- *  - fetch single user items of current user 
+ *  - fetch this single domain 
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
- *  - (UserType)
+ *  - (OrderType)
  *
- *      - (Guest): N/A (permission denied) 
- *      - (Member): N/A (permission denied) 
- *      - (Admin): send fetch request and receive data and save it  to redux store
+ *      - (Guest): N/A  
+ *      - (Member): N/A 
+ *      - (Admin): send get request and receive this single domain and save it to redux store 
  *
  *  - steps:
  *
@@ -29,7 +29,7 @@ import { rsSelector } from "src/selectors/selector";
  *        a2. receive the response and save it to redux store
  *  
  **/
-export function* fetchSingleUserWorker(action: PayloadAction<{ userId: string }>) {
+export function* fetchSingleOrderWorker(action: PayloadAction<{ orderId: string }>) {
 
   /**
    * get cur user type
@@ -44,13 +44,13 @@ export function* fetchSingleUserWorker(action: PayloadAction<{ userId: string }>
      * update status for anime data
      **/
     yield put(
-      getUserFetchStatusActions.update(FetchStatusEnum.FETCHING)
+      getOrderFetchStatusActions.update(FetchStatusEnum.FETCHING)
     )
 
     /**
-     * grab single domain
+     * grab all domain
      **/
-    const apiUrl = `${appConfig.baseUrl}/users/${action.payload.userId}`
+    const apiUrl = `${appConfig.baseUrl}/orders/${action.payload.orderId}`
 
     /**
      * fetch data
@@ -66,18 +66,18 @@ export function* fetchSingleUserWorker(action: PayloadAction<{ userId: string }>
       })
 
       /**
-       * update user domain in state
+       * update order domain in state
        *
        **/
       yield put(
-        userActions.merge(response.data.data)
+        orderActions.merge(response.data.data)
       )
 
       /**
        * update fetch status sucess
        **/
       yield put(
-        getUserFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+        getOrderFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
     } catch (error) {
@@ -88,13 +88,14 @@ export function* fetchSingleUserWorker(action: PayloadAction<{ userId: string }>
        * update fetch status failed
        **/
       yield put(
-        getUserFetchStatusActions.update(FetchStatusEnum.FAILED)
+        getOrderFetchStatusActions.update(FetchStatusEnum.FAILED)
       )
     }
   } else {
-    console.log("permission denied. your user type: " + curAuth.userType)
+    console.log("permission denied. your order type: " + curAuth.userType)
   }
 }
+
 
 
 

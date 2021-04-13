@@ -1,8 +1,9 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { appConfig } from "configs/appConfig";
-import { getUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
-import { userActions } from "reducers/slices/domain/user";
+import { OrderType } from "domain/order/types";
+import { putOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
+import { orderActions } from "reducers/slices/domain/order";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
@@ -10,47 +11,54 @@ import { rsSelector } from "src/selectors/selector";
 /**
  * a worker (generator)    
  *
- *  - fetch single user items of current user 
+ *  - put this domain to replace
  *
- *  - NOT gonna use caching since it might be stale soon and the user can update any time.
+ *  - NOT gonna use caching since it might be stale soon and the order can update any time.
  *
  *  - (UserType)
  *
  *      - (Guest): N/A (permission denied) 
  *      - (Member): N/A (permission denied) 
- *      - (Admin): send fetch request and receive data and save it  to redux store
+ *      - (Admin): OK 
  *
  *  - steps:
  *
  *      (Admin): 
  *
- *        a1. send fetch request to api to grab data
+ *        a1. send put request to api to put a new data 
  *
  *        a2. receive the response and save it to redux store
- *  
+ *
+ *  - note:
+ *
+ *    - keep the same id since it is replacement 
+ *
  **/
-export function* fetchSingleUserWorker(action: PayloadAction<{ userId: string }>) {
+export function* putOrderWorker(action: PayloadAction<OrderType>) {
 
   /**
    * get cur user type
-   *
    **/
   const curAuth: AuthType = yield select(rsSelector.app.getAuth)
 
-
+  /**
+   *
+   * Admin User Type
+   *
+   **/
   if (curAuth.userType === UserTypeEnum.ADMIN) {
 
     /**
-     * update status for anime data
+     * update status for put order data
      **/
     yield put(
-      getUserFetchStatusActions.update(FetchStatusEnum.FETCHING)
+      putOrderFetchStatusActions.update(FetchStatusEnum.FETCHING)
     )
 
     /**
-     * grab single domain
+     * grab this  domain
      **/
-    const apiUrl = `${appConfig.baseUrl}/users/${action.payload.userId}`
+    const apiUrl = `${appConfig.baseUrl}/orders/${action.payload.orderId}`
 
     /**
      * fetch data
@@ -61,23 +69,24 @@ export function* fetchSingleUserWorker(action: PayloadAction<{ userId: string }>
 
       // start fetching
       const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
-        method: "GET",
+        method: "PUT",
         url: apiUrl,
+        data: action.payload
       })
 
       /**
-       * update user domain in state
+       * update this domain in state
        *
        **/
       yield put(
-        userActions.merge(response.data.data)
+        orderActions.merge(response.data.data)
       )
 
       /**
        * update fetch status sucess
        **/
       yield put(
-        getUserFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+        putOrderFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
     } catch (error) {
@@ -88,13 +97,12 @@ export function* fetchSingleUserWorker(action: PayloadAction<{ userId: string }>
        * update fetch status failed
        **/
       yield put(
-        getUserFetchStatusActions.update(FetchStatusEnum.FAILED)
+        putOrderFetchStatusActions.update(FetchStatusEnum.FAILED)
       )
     }
-  } else {
-    console.log("permission denied. your user type: " + curAuth.userType)
-  }
+  } 
 }
+
 
 
 

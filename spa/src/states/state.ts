@@ -60,8 +60,16 @@ export const initialState: StateType = {
     searchKeyword: "",
     requestTracker: {},
     fetchStatus: {
+      orders: {
+        get: FetchStatusEnum.INITIAL,
+        getSingle: FetchStatusEnum.INITIAL,
+        post: FetchStatusEnum.INITIAL,
+        put: FetchStatusEnum.INITIAL,
+        deleteSingle: FetchStatusEnum.INITIAL,
+      },
       users: {
         get: FetchStatusEnum.INITIAL,
+        getSingle: FetchStatusEnum.INITIAL,
         post: FetchStatusEnum.INITIAL,
         put: FetchStatusEnum.INITIAL,
         patch: FetchStatusEnum.INITIAL, 
@@ -93,5 +101,6 @@ export const initialState: StateType = {
     cartItems: [],
     wishlistItems: [],
     users: [],
+    orders: [],
   },
 }

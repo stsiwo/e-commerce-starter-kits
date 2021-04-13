@@ -18,6 +18,16 @@ import { fetchCategoryWorker } from 'sideEffects/workers/category/fetchCategoryW
 import { postCategoryWorker } from 'sideEffects/workers/category/postCategoryWorker';
 import { putCategoryWorker } from 'sideEffects/workers/category/putCategoryWorker';
 import { deleteSingleCategoryWorker } from 'sideEffects/workers/category/deleteSingleCategoryWorker';
+import { fetchUserActionTypeName, fetchSingleUserActionTypeName, postUserActionTypeName, putUserActionTypeName, deleteSingleUserActionTypeName, deleteUserActionTypeName } from 'reducers/slices/domain/user';
+import { fetchUserWorker } from 'sideEffects/workers/user/fetchUserWorker';
+import { putUserWorker } from 'sideEffects/workers/user/putUserWorker';
+import { deleteSingleUserWorker } from 'sideEffects/workers/user/deleteSingleUserWorker';
+import { fetchSingleUserWorker } from 'sideEffects/workers/user/fetchSingleUserWorker';
+import { fetchOrderActionTypeName, fetchSingleOrderActionTypeName, putOrderActionTypeName, postOrderActionTypeName } from 'reducers/slices/domain/order';
+import { fetchOrderWorker } from 'sideEffects/workers/order/fetchOrderWorker';
+import { fetchSingleOrderWorker } from 'sideEffects/workers/order/fetchSingleOrderWorker';
+import { putOrderWorker } from 'sideEffects/workers/order/putOrderWorker';
+import { postOrderWorker } from 'sideEffects/workers/order/postOrderWorker';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -128,3 +138,61 @@ export function* deleteSingleCategoryWatcher() {
 }
 
 // user
+export function* fetchUserWatcher() {
+  yield takeLatest(
+    fetchUserActionTypeName,
+    fetchUserWorker,
+  )
+}
+
+export function* fetchSingleUserWatcher() {
+  yield takeLatest(
+    fetchSingleUserActionTypeName,
+    fetchSingleUserWorker,
+  )
+}
+
+export function* putUserWatcher() {
+  yield takeLatest(
+    putUserActionTypeName,
+    putUserWorker,
+  )
+}
+
+export function* deleteSingleUserWatcher() {
+  yield takeLatest(
+    deleteSingleUserActionTypeName,
+    deleteSingleUserWorker,
+  )
+}
+
+
+// order
+export function* fetchOrderWatcher() {
+  yield takeLatest(
+    fetchOrderActionTypeName,
+    fetchOrderWorker,
+  )
+}
+
+export function* fetchSingleOrderWatcher() {
+  yield takeLatest(
+    fetchSingleOrderActionTypeName,
+    fetchSingleOrderWorker,
+  )
+}
+
+export function* postOrderWatcher() {
+  yield takeLatest(
+    postOrderActionTypeName,
+    postOrderWorker,
+  )
+}
+
+export function* putOrderWatcher() {
+  yield takeLatest(
+    putOrderActionTypeName,
+    putOrderWorker,
+  )
+}
+
