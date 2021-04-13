@@ -1,28 +1,7 @@
-//import { QueryStringType } from "requests/types";
-const uuidv4 = require('uuid/v4')
-//import { PageLinkType } from 'components/common/Pagination/types';
+import { v4 as uuidv4 } from 'uuid';
 
 
 export const dateFormatOption = { year: 'numeric', month: 'long', day: 'numeric' }
-
-//export const buildQueryString = (queryStringObject: QueryStringType = {}): string => {
-//
-//  if (isEmpty(queryStringObject)) return ''
-//
-//  return '?' + Object.keys(queryStringObject)
-//    .filter(key => queryStringObject[key] !== null && queryStringObject[key] !== undefined && queryStringObject[key].lenth != 0 && queryStringObject[key] != '')
-//    .map(key => {
-//      if (queryStringObject[key] instanceof Date) 
-//        return key + '=' + (queryStringObject[key] as Date).toISOString()
-//      if (key === 'category') {
-//        if (queryStringObject[key] instanceof Object) // if category value if object (CategoryType)
-//          return key + '=' + queryStringObject[key].name
-//      }
-//
-//      return key + '=' + queryStringObject[key]
-//    })
-//    .join('&')
-//}
 
 export function getCookie(name: string): string {
   const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));

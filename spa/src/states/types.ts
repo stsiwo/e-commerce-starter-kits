@@ -1,5 +1,6 @@
 import { NormalizedCategoryType } from "domain/product/types";
 import { AuthType, RequestTrackerType, FetchStatusEnum } from "src/app/";
+import { CartItemType } from "domain/cart/types";
 
 //import { NormalizedBlogType } from "domain/blog";
 //import { NormalizedCategoryType } from "domain/category";
@@ -16,6 +17,15 @@ export declare type AppStateType = {
   searchKeyword: string
   requestTracker: RequestTrackerType
   categoryFetchStatus: FetchStatusEnum
+  fetchStatus: {
+    cartItems: {
+      get: FetchStatusEnum
+      post: FetchStatusEnum
+      put: FetchStatusEnum
+      deleteSingle: FetchStatusEnum
+      delete: FetchStatusEnum
+    }
+  }
 }
 
 export declare type DomainPaginationType = {
@@ -31,9 +41,8 @@ export declare type DomainStateSubType<D extends Record<string, any>> = {
 }
 
 export declare type DomainStateType = {
-  //animes: DomainStateSubType<NormalizedAnimeType> 
-  //categories: CategoryType[]  // we don't store any unnecessary data so don't normalize
   categories: NormalizedCategoryType 
+  cartItems: CartItemType[] // don't need to normalized
 }
 
 export declare type StateType = {

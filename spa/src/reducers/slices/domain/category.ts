@@ -1,6 +1,6 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { NormalizedCategoryType } from "domain/product/types";
-import { merge } from "lodash";
+import merge from "lodash/merge";
 
 /**
  * redux-sage actions

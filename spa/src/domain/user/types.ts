@@ -23,6 +23,7 @@ export declare type UserAddressType = {
 }
 
 export declare type UserType = {
+  userId?: string
   firstName: string
   lastName: string
   email: string

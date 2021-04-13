@@ -6,12 +6,15 @@ import { mSelector } from "src/selectors/selector";
  *
  * request url check worker. 
  *
- * This worker is a nested worker. called by 'requestDomainWorker' and 'DomainFilterWorker'.
+ *  - This worker is a nested worker. called by 'requestDomainWorker' and 'DomainFilterWorker'.
  *
  * 
- * check the request url has requested in the past
- * if so, don't need to do anything since data exists in store 
- * if no, prep for request to backend api
+ *  - check the request url has requested in the past
+ *    - if so, don't need to do anything since data exists in store 
+ *    - if no, prep for request to backend api
+ *
+ *  - should be used only for fetching (e.g., GET request), but not for any update (e.g., POST, PATCH, PUT, DELETE)
+ *
  *
  * Issues:
  *

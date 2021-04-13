@@ -31,7 +31,8 @@ export const rsSelector = {
   },
 
   domain: {
-    getCategory: (state: StateType) => state.domain.categories
+    getCategory: (state: StateType) => state.domain.categories,
+    getCartItem: (state: StateType) => state.domain.cartItems
   }
 }
 
@@ -150,6 +151,19 @@ export const mSelector = {
         )
 
         return denormalizedEntities
+      },
+    )
+  },
+  //
+  // domain.cartItem
+  makeCartItemSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getCartItem
+      ],
+      (cartItem) => {
+        // this is array of cart item
+        return cartItem
       },
     )
   },
