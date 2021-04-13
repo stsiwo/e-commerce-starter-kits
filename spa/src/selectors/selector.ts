@@ -2,6 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { StateType } from "states/types";
 import { denormalize } from "normalizr";
 import { categorySchemaArray } from "states/state";
+import { UserType } from "domain/user/types";
 
 export const rsSelector = {
   /**
@@ -34,6 +35,7 @@ export const rsSelector = {
     getCategory: (state: StateType) => state.domain.categories,
     getCartItem: (state: StateType) => state.domain.cartItems,
     getWishlistItem: (state: StateType) => state.domain.wishlistItems,
+    getUser: (state: StateType) => state.domain.users,
   }
 }
 
@@ -178,6 +180,42 @@ export const mSelector = {
       (wishlistItem) => {
         // this is array of cart item
         return wishlistItem
+      },
+    )
+  },
+
+  // domain.users
+  makeUserSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getUser
+      ],
+      (user) => {
+
+        /**
+         * TODO: Pagination & Sort & Filter
+         **/
+
+        // this is array of cart item
+        return user
+      },
+    )
+  },
+  
+  // domain.users
+  makeUserByIdSelector: (userId: string) => {
+    return createSelector(
+      [
+        rsSelector.domain.getUser
+      ],
+      (user) => {
+
+        /**
+         * TODO: Pagination & Sort & Filter
+         **/
+
+        // this is array of cart item
+        return user.find((user: UserType) => user.userId === userId)
       },
     )
   },

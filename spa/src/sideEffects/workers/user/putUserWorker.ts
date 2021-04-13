@@ -1,55 +1,64 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { appConfig } from "configs/appConfig";
-import { cartItemActions } from "reducers/slices/domain/cartItem";
+import { UserType } from "domain/user/types";
+import { putUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
+import { userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { getCartItemFetchStatusActions } from "reducers/slices/app/fetchStatus/cartItem";
 
 /**
  * a worker (generator)    
  *
- *  - fetch cart items of current user 
+ *  - put user item to replace
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
  *  - (UserType)
  *
- *      - (Guest): N/A 
- *      - (Member): send api request to grab data
- *      - (Admin): N/A
+ *      - (Guest): N/A (permission denied) 
+ *      - (Member): N/A (permission denied) 
+ *      - (Admin): OK 
  *
  *  - steps:
  *
- *      (Member): 
+ *      (Admin): 
  *
- *        m1. send fetch request to api to grab data
+ *        a1. send put request to api to put a new data 
  *
- *        m2. receive the response and save it to redux store
- *  
+ *        a2. receive the response and save it to redux store
+ *
+ *  - note:
+ *
+ *    - keep the same id since it is replacement 
+ *
  **/
-export function* fetchCartItemWorker(action: PayloadAction<{}>) {
+export function* putUserWorker(action: PayloadAction<UserType>) {
 
   /**
    * get cur user type
    **/
   const curAuth: AuthType = yield select(rsSelector.app.getAuth)
 
-
-  if (curAuth.userType === UserTypeEnum.MEMBER) {
+  /**
+   *
+   * Admin User Type
+   *
+   **/
+  if (curAuth.userType === UserTypeEnum.ADMIN) {
 
     /**
-     * update status for anime data
+     * update status for put user data
      **/
     yield put(
-      getCartItemFetchStatusActions.update(FetchStatusEnum.FETCHING)
+      putUserFetchStatusActions.update(FetchStatusEnum.FETCHING)
     )
 
     /**
-     * grab all domain
+     * grab this  domain
      **/
-    const apiUrl = `${appConfig.baseUrl}/users/${curAuth.user.userId}/cartItems`
+    const apiUrl = `${appConfig.baseUrl}/users/${action.payload.userId}`
 
     /**
      * fetch data
@@ -60,23 +69,24 @@ export function* fetchCartItemWorker(action: PayloadAction<{}>) {
 
       // start fetching
       const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
-        method: "GET",
+        method: "PUT",
         url: apiUrl,
+        data: action.payload
       })
 
       /**
-       * update cartItem domain in state
+       * update this domain in state
        *
        **/
       yield put(
-        cartItemActions.update(response.data.data)
+        userActions.merge(response.data.data)
       )
 
       /**
        * update fetch status sucess
        **/
       yield put(
-        getCartItemFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+        putUserFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
     } catch (error) {
@@ -87,9 +97,12 @@ export function* fetchCartItemWorker(action: PayloadAction<{}>) {
        * update fetch status failed
        **/
       yield put(
-        getCartItemFetchStatusActions.update(FetchStatusEnum.FAILED)
+        putUserFetchStatusActions.update(FetchStatusEnum.FAILED)
       )
     }
-  }
+  } 
 }
+
+
+
 

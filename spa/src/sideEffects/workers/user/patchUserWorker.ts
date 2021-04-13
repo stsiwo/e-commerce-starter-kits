@@ -1,19 +1,19 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { appConfig } from "configs/appConfig";
-import { CategoryType, NormalizedCategoryType } from "domain/product/types";
-import { normalize } from "normalizr";
-import { postCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
-import { categoryActions } from "reducers/slices/domain/category";
+import { UserType } from "domain/user/types";
+import { patchUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
+import { userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { categorySchemaArray } from "states/state";
 
 /**
  * a worker (generator)    
  *
- *  - post category of current user 
+ *  - patch (temporarly delete) this domain 
+ *
+ *    - only update 'isDeleted' property to true in user table
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
@@ -27,16 +27,15 @@ import { categorySchemaArray } from "states/state";
  *
  *      (Admin): 
  *
- *        a1. send post request to api to post a new data 
+ *        a1. send patch request to api to delete it temporary 
  *
- *        a2. receive the response and save it to redux store
+ *        a2. receive the response and delete it from redux store 
  *
  *  - note:
  *
- *    - payload (e.g., CategoryType) does not have any id yet.
- *  
+ *
  **/
-export function* postCategoryWorker(action: PayloadAction<CategoryType>) {
+export function* patchUserWorker(action: PayloadAction<UserType>) {
 
   /**
    * get cur user type
@@ -54,13 +53,13 @@ export function* postCategoryWorker(action: PayloadAction<CategoryType>) {
      * update status for anime data
      **/
     yield put(
-      postCategoryFetchStatusActions.update(FetchStatusEnum.FETCHING)
+      patchUserFetchStatusActions.update(FetchStatusEnum.FETCHING)
     )
 
     /**
      * grab all domain
      **/
-    const apiUrl = `${appConfig.baseUrl}/categories`
+    const apiUrl = `${appConfig.baseUrl}/users/${action.payload.userId}`
 
     /**
      * fetch data
@@ -71,44 +70,44 @@ export function* postCategoryWorker(action: PayloadAction<CategoryType>) {
 
       // start fetching
       const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
-        method: "POST",
+        method: "PATCH",
         url: apiUrl,
-        data: action.payload
+        // TODO: make sure backend
+        data: { 
+          isDeleted: true,
+          deletedAccountDate: new Date().toString(),
+        }
       })
-
-      /**
-       * normalize response data
-       *
-       *  - TODO: make sure response structure with remote api
-       **/
-      const normalizedData = normalize(response.data.data, categorySchemaArray)
 
       /**
        * update categories domain in state
        *
        **/
       yield put(
-        categoryActions.merge(normalizedData.entities as NormalizedCategoryType)
+        userActions.delete(action.payload)
       )
 
       /**
        * update fetch status sucess
        **/
       yield put(
-        postCategoryFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+        patchUserFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
     } catch (error) {
 
       console.log(error)
+
       /**
        * update fetch status failed
        **/
       yield put(
-        postCategoryFetchStatusActions.update(FetchStatusEnum.FAILED)
+        patchUserFetchStatusActions.update(FetchStatusEnum.FAILED)
       )
     }
   } 
 }
+
+
 
 

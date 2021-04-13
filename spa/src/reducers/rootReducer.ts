@@ -7,6 +7,8 @@ import { wishlistItemSliceReducer } from './slices/domain/wishlistItem';
 import { leftNavMenuSliceReducer, rightNavMenuSliceReducer, searchModalSliceReducer } from './slices/ui';
 import { getCartItemFetchStatusSliceReducer, postCartItemFetchStatusSliceReducer, putCartItemFetchStatusSliceReducer, deleteSingleCartItemFetchStatusSliceReducer, deleteCartItemFetchStatusSliceReducer } from './slices/app/fetchStatus/cartItem';
 import { getWishlistItemFetchStatusSliceReducer, postWishlistItemFetchStatusSliceReducer, deleteSingleWishlistItemFetchStatusSliceReducer, deleteWishlistItemFetchStatusSliceReducer } from './slices/app/fetchStatus/wishlistItem';
+import { getUserFetchStatusSliceReducer, postUserFetchStatusSliceReducer, putUserFetchStatusSliceReducer, deleteSingleUserFetchStatusSliceReducer, patchUserFetchStatusSliceReducer, getSingleUserFetchStatusSliceReducer } from './slices/app/fetchStatus/user';
+import { userSliceReducer } from './slices/domain/user';
 
 // ** REFACTOR to new approach **/
 
@@ -26,6 +28,14 @@ export const rootReducer = combineReducers({
     searchKeyword: searchKeywordSliceReducer,
     requestTracker: requestTrackerSliceReducer,
     fetchStatus: combineReducers({
+      users: combineReducers({
+        get: getUserFetchStatusSliceReducer, 
+        getSingle: getSingleUserFetchStatusSliceReducer, 
+        post: postUserFetchStatusSliceReducer, 
+        put: putUserFetchStatusSliceReducer, 
+        deleteSingle: deleteSingleUserFetchStatusSliceReducer, 
+        patch: patchUserFetchStatusSliceReducer, 
+      }),
       categories: combineReducers({
         get: getCategoryFetchStatusSliceReducer, 
         post: postCategoryFetchStatusSliceReducer, 
@@ -51,5 +61,5 @@ export const rootReducer = combineReducers({
     categories: categorySliceReducer,
     cartItems: cartItemSliceReducer,
     wishlistItems: wishlistItemSliceReducer,
+    users: userSliceReducer,
   })
-})

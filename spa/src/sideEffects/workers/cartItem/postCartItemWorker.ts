@@ -2,12 +2,12 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { appConfig } from "configs/appConfig";
 import { CartItemType } from "domain/cart/types";
-import { postCartItemFetchStatusActions } from "reducers/slices/app";
 import { cartItemActions } from "reducers/slices/domain/cartItem";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getUuidv4 } from "src/utils";
+import { postCartItemFetchStatusActions } from "reducers/slices/app/fetchStatus/cartItem";
 
 /**
  * a worker (generator)    

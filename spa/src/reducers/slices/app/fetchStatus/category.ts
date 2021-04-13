@@ -2,12 +2,12 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { FetchStatusEnum } from "src/app";
 
 /**
- * app.fetchStatus.cartItems.get state Slice
+ * app.fetchStatus.category.get state Slice
  **/
 export type getCategoryFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const getCategoryFetchStatusSlice = createSlice({
-  name: "app/fetchStatus/cartItem/get", // a name used in action type
+  name: "app/fetchStatus/category/get", // a name used in action type
   initialState: {},
   reducers: {
     /**
@@ -33,12 +33,12 @@ export const getCategoryFetchStatusSliceReducer = getCategoryFetchStatusSlice.re
 export const getCategoryFetchStatusActions = getCategoryFetchStatusSlice.actions
 
 /**
- * app.fetchStatus.cartItems.post state Slice
+ * app.fetchStatus.category.post state Slice
  **/
 export type postCategoryFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const postCategoryFetchStatusSlice = createSlice({
-  name: "app/fetchStatus/cartItem/post", // a name used in action type
+  name: "app/fetchStatus/category/post", // a name used in action type
   initialState: {},
   reducers: {
     /**
@@ -64,12 +64,12 @@ export const postCategoryFetchStatusSliceReducer = postCategoryFetchStatusSlice.
 export const postCategoryFetchStatusActions = postCategoryFetchStatusSlice.actions
 
 /**
- * app.fetchStatus.cartItems.put state Slice
+ * app.fetchStatus.category.put state Slice
  **/
 export type putCategoryFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const putCategoryFetchStatusSlice = createSlice({
-  name: "app/fetchStatus/cartItem/put", // a name used in action type
+  name: "app/fetchStatus/category/put", // a name used in action type
   initialState: {},
   reducers: {
     /**
@@ -95,12 +95,12 @@ export const putCategoryFetchStatusSliceReducer = putCategoryFetchStatusSlice.re
 export const putCategoryFetchStatusActions = putCategoryFetchStatusSlice.actions
 
 /**
- * app.fetchStatus.cartItems.deleteSingle state Slice
+ * app.fetchStatus.category.deleteSingle state Slice
  **/
 export type deleteSingleCategoryFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const deleteSingleCategoryFetchStatusSlice = createSlice({
-  name: "app/fetchStatus/cartItem/deleteSingle", // a name used in action type
+  name: "app/fetchStatus/category/deleteSingle", // a name used in action type
   initialState: {},
   reducers: {
     /**
@@ -126,12 +126,12 @@ export const deleteSingleCategoryFetchStatusSliceReducer = deleteSingleCategoryF
 export const deleteSingleCategoryFetchStatusActions = deleteSingleCategoryFetchStatusSlice.actions
 
 /**
- * app.fetchStatus.cartItems.delete state Slice
+ * app.fetchStatus.category.delete state Slice
  **/
 export type deleteCategoryFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const deleteCategoryFetchStatusSlice = createSlice({
-  name: "app/fetchStatus/cartItem/delete", // a name used in action type
+  name: "app/fetchStatus/category/delete", // a name used in action type
   initialState: {},
   reducers: {
     /**

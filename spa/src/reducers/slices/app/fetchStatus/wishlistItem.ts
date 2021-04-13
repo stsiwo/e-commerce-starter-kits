@@ -2,7 +2,7 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { FetchStatusEnum } from "src/app";
 
 /**
- * app.fetchStatus.wishlistItems.get state Slice
+ * app.fetchStatus.wishlistItem.get state Slice
  **/
 export type getWishlistItemFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
@@ -33,7 +33,7 @@ export const getWishlistItemFetchStatusSliceReducer = getWishlistItemFetchStatus
 export const getWishlistItemFetchStatusActions = getWishlistItemFetchStatusSlice.actions
 
 /**
- * app.fetchStatus.wishlistItems.post state Slice
+ * app.fetchStatus.wishlistItem.post state Slice
  **/
 export type postWishlistItemFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
@@ -64,7 +64,7 @@ export const postWishlistItemFetchStatusSliceReducer = postWishlistItemFetchStat
 export const postWishlistItemFetchStatusActions = postWishlistItemFetchStatusSlice.actions
 
 /**
- * app.fetchStatus.wishlistItems.deleteSingle state Slice
+ * app.fetchStatus.wishlistItem.deleteSingle state Slice
  **/
 export type deleteSingleWishlistItemFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
@@ -95,7 +95,7 @@ export const deleteSingleWishlistItemFetchStatusSliceReducer = deleteSingleWishl
 export const deleteSingleWishlistItemFetchStatusActions = deleteSingleWishlistItemFetchStatusSlice.actions
 
 /**
- * app.fetchStatus.wishlistItems.delete state Slice
+ * app.fetchStatus.wishlistItem.delete state Slice
  **/
 export type deleteWishlistItemFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
