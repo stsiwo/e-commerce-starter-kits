@@ -16,9 +16,9 @@ import AdminOrder from 'components/pages/Admin/AdminOrder';
 import AdminReview from 'components/pages/Admin/AdminReview';
 import AdminCustomer from 'components/pages/Admin/AdminCustomer';
 import Cart from 'components/pages/Cart';
-import Wishlist from 'components/pages/Wishlist';
 import Product from 'components/pages/Product';
 import Checkout from 'components/pages/Checkout';
+import Wishlist from 'components/pages/Wishlist';
 
 // route data
 export declare type RouteDataType = {

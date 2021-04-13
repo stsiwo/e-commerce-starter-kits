@@ -2,11 +2,11 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { appConfig } from "configs/appConfig";
 import { WishlistItemType } from "domain/wishlist/types";
-import { deleteSingleWishlistItemFetchStatusActions, deleteWishlistItemFetchStatusActions } from "reducers/slices/app";
 import { wishlistItemActions } from "reducers/slices/domain/wishlistItem";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
+import { deleteWishlistItemFetchStatusActions } from "reducers/slices/app/fetchStatus/wishlistItem";
 
 /**
  * a worker (generator)    

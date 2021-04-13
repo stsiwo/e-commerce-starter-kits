@@ -1,9 +1,9 @@
-import { WishListItemType } from "domain/wishlist/types";
 import { testGuestUser } from "../user";
 import faker from "../faker";
 import { generateProductList, generateProductVariantList } from "../product";
+import { WishlistItemType } from "domain/wishlist/types";
 
-export const generateWishListItemList: (count?: number) => WishListItemType[] = (count = 1) => {
+export const generateWishlistItemList: (count?: number) => WishlistItemType[] = (count = 1) => {
   const list = []
 
   for (let i = 0; i < count; i++) {
@@ -14,7 +14,7 @@ export const generateWishListItemList: (count?: number) => WishListItemType[] = 
       variant: generateProductVariantList(1)[0],
       createdAt: new Date(faker.date.past()),
       updatedAt: new Date(faker.date.past()),
-    } as WishListItemType)
+    } as WishlistItemType)
   }
 
   return list
