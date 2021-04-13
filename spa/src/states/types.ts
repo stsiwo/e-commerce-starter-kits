@@ -17,8 +17,13 @@ export declare type AppStateType = {
   auth: AuthType 
   searchKeyword: string
   requestTracker: RequestTrackerType
-  categoryFetchStatus: FetchStatusEnum
   fetchStatus: {
+    categories: {
+      get: FetchStatusEnum
+      post: FetchStatusEnum
+      put: FetchStatusEnum
+      deleteSingle: FetchStatusEnum
+    },
     cartItems: {
       get: FetchStatusEnum
       post: FetchStatusEnum

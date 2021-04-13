@@ -19,15 +19,15 @@ export const postCartItemActionCreator = createAction<CartItemType>("saga/domain
 export const postCartItemActionTypeName = postCartItemActionCreator().type
 
 // for PUT (replace) request
-export const putCartItemActionCreator = createAction("saga/domain/cartItem/put")
+export const putCartItemActionCreator = createAction<CartItemType>("saga/domain/cartItem/put")
 export const putCartItemActionTypeName = putCartItemActionCreator().type
 
 // for DELETE (delete single cart item) request
-export const deleteSingleCartItemActionCreator = createAction("saga/domain/cartItem/deleteSingle")
+export const deleteSingleCartItemActionCreator = createAction<CartItemType>("saga/domain/cartItem/deleteSingle")
 export const deleteSingleCartItemActionTypeName = deleteSingleCartItemActionCreator().type
 
 // for DELETE (delete all of cart items) request
-export const deleteCartItemActionCreator = createAction("saga/domain/cartItem/delete")
+export const deleteCartItemActionCreator = createAction<CartItemType>("saga/domain/cartItem/delete")
 export const deleteCartItemActionTypeName = deleteCartItemActionCreator().type
 
 /**

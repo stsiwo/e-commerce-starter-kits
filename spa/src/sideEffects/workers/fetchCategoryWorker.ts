@@ -3,27 +3,30 @@ import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { appConfig } from "configs/appConfig";
 import { NormalizedCategoryType } from "domain/product/types";
 import { normalize } from "normalizr";
-import { categoryFetchStatusActions } from "reducers/slices/app";
 import { categoryActions } from "reducers/slices/domain/category";
 import { call, put } from "redux-saga/effects";
 import { FetchStatusEnum, RequestTrackerBaseType } from "src/app";
 import { categorySchemaArray } from "states/state";
 import { requestUrlCheckWorker } from "./common/requestUrlCheckWorker";
+import { getCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
 
 /**
  * a worker (generator)    
  *
  *  - only run this once to get all categories and store it in the store.
+ *
+ *  - should be used by only member/guest. don't use this with admin user since it is easily get stale.
+ *
  *  
  **/
-export function* fetchCategoryWorker(action: PayloadAction<{}>) {
+export function* fetchCategoryWithCacheWorker(action: PayloadAction<{}>) {
 
 
   /**
    * update status for anime data
    **/
   yield put(
-    categoryFetchStatusActions.update(FetchStatusEnum.FETCHING)
+   getCategoryFetchStatusActions.update(FetchStatusEnum.FETCHING)
   )
 
   /**
@@ -74,7 +77,7 @@ export function* fetchCategoryWorker(action: PayloadAction<{}>) {
        * update fetch status sucess
        **/
       yield put(
-        categoryFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+       getCategoryFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
     } catch (error) {
@@ -85,7 +88,7 @@ export function* fetchCategoryWorker(action: PayloadAction<{}>) {
        * update fetch status failed
        **/
       yield put(
-        categoryFetchStatusActions.update(FetchStatusEnum.FAILED)
+        getCategoryFetchStatusActions.update(FetchStatusEnum.FAILED)
       )
     }
 

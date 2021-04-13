@@ -1,44 +1,43 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { appConfig } from "configs/appConfig";
-import { CartItemType } from "domain/cart/types";
 import { cartItemActions } from "reducers/slices/domain/cartItem";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { putCartItemFetchStatusActions } from "reducers/slices/app/fetchStatus/cartItem";
+import { CategoryType, NormalizedCategoryType } from "domain/product/types";
+import { putCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
+import { normalize } from "normalizr";
+import { categorySchemaArray } from "states/state";
+import { categoryActions } from "reducers/slices/domain/category";
 
 /**
  * a worker (generator)    
  *
- *  - put cart items of current user 
+ *  - put category items of current user 
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
  *  - (UserType)
  *
- *      - (Guest): replace a existing entity with a new one
- *      - (Member): send api request to put a new data and assign response data to the redux saga
- *      - (Admin): N/A
+ *      - (Guest): N/A (permission denied) 
+ *      - (Member): N/A (permission denied) 
+ *      - (Admin): OK 
  *
  *  - steps:
  *
- *      (Guest):
- *        
- *        g1. update the new data to redux store
+ *      (Admin): 
  *
- *      (Member): 
+ *        a1. send put request to api to put a new data 
  *
- *        m1. send put request to api to put a new data 
- *
- *        m2. receive the response and save it to redux store
+ *        a2. receive the response and save it to redux store
  *
  *  - note:
  *
  *    - keep the same id since it is replacement 
  *
  **/
-export function* putCartItemWorker(action: PayloadAction<CartItemType>) {
+export function* putCategoryWorker(action: PayloadAction<CategoryType>) {
 
   /**
    * get cur user type
@@ -50,19 +49,19 @@ export function* putCartItemWorker(action: PayloadAction<CartItemType>) {
    * Member User Type
    *
    **/
-  if (curAuth.userType === UserTypeEnum.MEMBER) {
+  if (curAuth.userType === UserTypeEnum.ADMIN) {
 
     /**
      * update status for anime data
      **/
     yield put(
-      putCartItemFetchStatusActions.update(FetchStatusEnum.FETCHING)
+      putCategoryFetchStatusActions.update(FetchStatusEnum.FETCHING)
     )
 
     /**
      * grab all domain
      **/
-    const apiUrl = `${appConfig.baseUrl}/users/${curAuth.user.userId}/cartItems`
+    const apiUrl = `${appConfig.baseUrl}/categories/${action.payload.categoryId}`
 
     /**
      * fetch data
@@ -79,20 +78,25 @@ export function* putCartItemWorker(action: PayloadAction<CartItemType>) {
       })
 
       /**
-       * update categories domain in state
+       * normalize response data
        *
-       *  - receive the updated data as response data
+       *  - TODO: make sure response structure with remote api
+       **/
+      const normalizedData = normalize(response.data.data, categorySchemaArray)
+
+      /**
+       * update categories domain in state
        *
        **/
       yield put(
-        cartItemActions.merge(response.data.data)
+        categoryActions.update(normalizedData.entities as NormalizedCategoryType)
       )
 
       /**
        * update fetch status sucess
        **/
       yield put(
-        putCartItemFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+        putCategoryFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
     } catch (error) {
@@ -103,27 +107,11 @@ export function* putCartItemWorker(action: PayloadAction<CartItemType>) {
        * update fetch status failed
        **/
       yield put(
-        putCartItemFetchStatusActions.update(FetchStatusEnum.FAILED)
+        putCategoryFetchStatusActions.update(FetchStatusEnum.FAILED)
       )
     }
-
-
-  } else if (curAuth.userType === UserTypeEnum.GUEST) {
-
-    /**
-     * Guest User Type
-     **/
-
-    /**
-     * update categories domain in state
-     *
-     *  - receive the newly added data as response data
-     *
-     **/
-    yield put(
-      cartItemActions.merge([action.payload])
-    )
-  }
+  } 
 }
+
 
 

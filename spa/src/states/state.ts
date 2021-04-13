@@ -59,8 +59,13 @@ export const initialState: StateType = {
     },
     searchKeyword: "",
     requestTracker: {},
-    categoryFetchStatus: FetchStatusEnum.INITIAL,
     fetchStatus: {
+      categories: {
+        get: FetchStatusEnum.INITIAL,
+        post: FetchStatusEnum.INITIAL,
+        put: FetchStatusEnum.INITIAL,
+        deleteSingle: FetchStatusEnum.INITIAL,
+      },
       cartItems: {
         get: FetchStatusEnum.INITIAL,
         post: FetchStatusEnum.INITIAL,

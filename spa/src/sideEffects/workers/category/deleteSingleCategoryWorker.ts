@@ -1,55 +1,62 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { appConfig } from "configs/appConfig";
-import { cartItemActions } from "reducers/slices/domain/cartItem";
+import { CategoryType } from "domain/product/types";
+import { deleteSingleCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
+import { categoryActions } from "reducers/slices/domain/category";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { getCartItemFetchStatusActions } from "reducers/slices/app/fetchStatus/cartItem";
 
 /**
  * a worker (generator)    
  *
- *  - fetch cart items of current user 
+ *  - delete single category items 
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
  *  - (UserType)
  *
- *      - (Guest): N/A 
- *      - (Member): send api request to grab data
- *      - (Admin): N/A
+ *      - (Guest): N/A (permission denied) 
+ *      - (Member): N/A (permission denied) 
+ *      - (Admin): OK
  *
  *  - steps:
  *
- *      (Member): 
+ *      (Admin): 
  *
- *        m1. send fetch request to api to grab data
+ *        a1. send delete request to api to delete the target entity 
  *
- *        m2. receive the response and save it to redux store
- *  
+ *        a2. receive the response and delete it from redux store if success
+ *
+ *  - note:
+ *
  **/
-export function* fetchCartItemWorker(action: PayloadAction<{}>) {
+export function* deleteSingleCategoryWorker(action: PayloadAction<CategoryType>) {
 
   /**
    * get cur user type
    **/
   const curAuth: AuthType = yield select(rsSelector.app.getAuth)
 
-
-  if (curAuth.userType === UserTypeEnum.MEMBER) {
+  /**
+   *
+   * Member User Type
+   *
+   **/
+  if (curAuth.userType === UserTypeEnum.ADMIN) {
 
     /**
      * update status for anime data
      **/
     yield put(
-      getCartItemFetchStatusActions.update(FetchStatusEnum.FETCHING)
+      deleteSingleCategoryFetchStatusActions.update(FetchStatusEnum.FETCHING)
     )
 
     /**
      * grab all domain
      **/
-    const apiUrl = `${appConfig.baseUrl}/users/${curAuth.user.userId}/cartItems`
+    const apiUrl = `${appConfig.baseUrl}/categories/${action.payload.categoryId}`
 
     /**
      * fetch data
@@ -60,7 +67,7 @@ export function* fetchCartItemWorker(action: PayloadAction<{}>) {
 
       // start fetching
       const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
-        method: "GET",
+        method: "DELETE",
         url: apiUrl,
       })
 
@@ -69,14 +76,14 @@ export function* fetchCartItemWorker(action: PayloadAction<{}>) {
        *
        **/
       yield put(
-        cartItemActions.update(response.data.data)
+        categoryActions.delete(action.payload)
       )
 
       /**
        * update fetch status sucess
        **/
       yield put(
-        getCartItemFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+        deleteSingleCategoryFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
     } catch (error) {
@@ -87,9 +94,12 @@ export function* fetchCartItemWorker(action: PayloadAction<{}>) {
        * update fetch status failed
        **/
       yield put(
-        getCartItemFetchStatusActions.update(FetchStatusEnum.FAILED)
+        deleteSingleCategoryFetchStatusActions.update(FetchStatusEnum.FAILED)
       )
     }
   }
 }
+
+
+
 

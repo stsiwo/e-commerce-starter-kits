@@ -1,5 +1,5 @@
 import { all, call, spawn } from 'redux-saga/effects';
-import { leftNavMenuWatcher, categoryFetchWatcher, fetchCartItemWatcher, postCartItemWatcher, putCartItemWatcher, deleteSingleCartItemWatcher, deleteCartItemWatcher } from './watchers';
+import { deleteCartItemWatcher, deleteSingleCartItemWatcher, fetchCartItemWatcher, leftNavMenuWatcher, postCartItemWatcher, putCartItemWatcher, fetchWishlistItemWatcher, postWishlistItemWatcher, deleteSingleWishlistItemWatcher, deleteWishlistItemWatcher, fetchCategoryWatcher, postCategoryWatcher, putCategoryWatcher, deleteSingleCategoryWatcher } from './watchers';
 
 export function* rootSaga() {
 
@@ -9,14 +9,34 @@ export function* rootSaga() {
    *
    **/
   const sagas: any[] = [
+    // app
     leftNavMenuWatcher,
-    categoryFetchWatcher,
+
+    // ui
+    
+
+    // domain
+    
+    /// cartItem
     fetchCartItemWatcher,
     postCartItemWatcher,
     putCartItemWatcher,
     deleteSingleCartItemWatcher,
     deleteCartItemWatcher,
-  ];
+    
+    /// wishlistItem
+    fetchWishlistItemWatcher,
+    postWishlistItemWatcher,
+    deleteSingleWishlistItemWatcher,
+    deleteWishlistItemWatcher,
+    
+    /// category
+    fetchCategoryWatcher,
+    postCategoryWatcher,
+    putCategoryWatcher,
+    deleteSingleCategoryWatcher,
+    
+  ]
 
   /**
    * keep everything (e.g., child tasks) alive 

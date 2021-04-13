@@ -1,8 +1,12 @@
 import { combineReducers } from 'redux';
-import { requestTrackerSliceReducer, searchKeywordSliceReducer, authSliceReducer, categoryFetchStatusSliceReducer, getCartItemFetchStatusSliceReducer, postCartItemFetchStatusSliceReducer, putCartItemFetchStatusSliceReducer, deleteSingleCartItemFetchStatusSliceReducer, deleteCartItemFetchStatusSliceReducer, getWishlistItemFetchStatusSliceReducer, postWishlistItemFetchStatusSliceReducer, deleteSingleWishlistItemFetchStatusSliceReducer, deleteWishlistItemFetchStatusSliceReducer } from './slices/app';
-import { leftNavMenuSliceReducer, rightNavMenuSliceReducer, searchModalSliceReducer } from './slices/ui';
-import { categorySliceReducer } from './slices/domain/category';
+import { authSliceReducer, requestTrackerSliceReducer, searchKeywordSliceReducer } from './slices/app';
+import { deleteSingleCategoryFetchStatusSliceReducer, getCategoryFetchStatusSliceReducer, postCategoryFetchStatusSliceReducer, putCategoryFetchStatusSliceReducer } from './slices/app/fetchStatus/category';
 import { cartItemSliceReducer } from './slices/domain/cartItem';
+import { categorySliceReducer } from './slices/domain/category';
+import { wishlistItemSliceReducer } from './slices/domain/wishlistItem';
+import { leftNavMenuSliceReducer, rightNavMenuSliceReducer, searchModalSliceReducer } from './slices/ui';
+import { getCartItemFetchStatusSliceReducer, postCartItemFetchStatusSliceReducer, putCartItemFetchStatusSliceReducer, deleteSingleCartItemFetchStatusSliceReducer, deleteCartItemFetchStatusSliceReducer } from './slices/app/fetchStatus/cartItem';
+import { getWishlistItemFetchStatusSliceReducer, postWishlistItemFetchStatusSliceReducer, deleteSingleWishlistItemFetchStatusSliceReducer, deleteWishlistItemFetchStatusSliceReducer } from './slices/app/fetchStatus/wishlistItem';
 
 // ** REFACTOR to new approach **/
 
@@ -21,8 +25,13 @@ export const rootReducer = combineReducers({
     auth: authSliceReducer,
     searchKeyword: searchKeywordSliceReducer,
     requestTracker: requestTrackerSliceReducer,
-    categoryFetchStatus: categoryFetchStatusSliceReducer,
     fetchStatus: combineReducers({
+      categories: combineReducers({
+        get: getCategoryFetchStatusSliceReducer, 
+        post: postCategoryFetchStatusSliceReducer, 
+        put: putCategoryFetchStatusSliceReducer, 
+        deleteSingle: deleteSingleCategoryFetchStatusSliceReducer, 
+      }),
       cartItems: combineReducers({
         get: getCartItemFetchStatusSliceReducer, 
         post: postCartItemFetchStatusSliceReducer, 
@@ -38,7 +47,6 @@ export const rootReducer = combineReducers({
       })
     })
   }),
-
   domain: combineReducers({
     categories: categorySliceReducer,
     cartItems: cartItemSliceReducer,
