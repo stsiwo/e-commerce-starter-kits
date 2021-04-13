@@ -9,6 +9,11 @@ import { postCartItemWorker } from 'sideEffects/workers/cartItem/postCartItemWor
 import { putCartItemWorker } from 'sideEffects/workers/cartItem/putCartItemWorker';
 import { deleteSingleCartItemWorker } from 'sideEffects/workers/cartItem/deleteSingleCartItemWorker';
 import { deleteCartItemWorker } from 'sideEffects/workers/cartItem/deleteCartItemWorker';
+import { fetchWishlistItemActionTypeName, postWishlistItemActionTypeName, deleteSingleWishlistItemActionTypeName, deleteWishlistItemActionTypeName } from 'reducers/slices/domain/wishlistItem';
+import { fetchWishlistItemWorker } from 'sideEffects/workers/wishlistItems/fetchWishlistItemWorker';
+import { postWishlistItemWorker } from 'sideEffects/workers/wishlistItems/postWishlistItemWorker';
+import { deleteSingleWishlistItemWorker } from 'sideEffects/workers/wishlistItems/deleteSingleWishlistItemWorker';
+import { deleteWishlistItemWorker } from 'sideEffects/workers/wishlistItems/deleteWishlistItemWorker';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -65,5 +70,34 @@ export function* deleteCartItemWatcher() {
   yield takeLatest(
     deleteCartItemActionTypeName,
     deleteCartItemWorker,
+  )
+}
+
+// wishlist
+export function* fetchWishlistItemWatcher() {
+  yield takeLatest(
+    fetchWishlistItemActionTypeName,
+    fetchWishlistItemWorker,
+  )
+}
+
+export function* postWishlistItemWatcher() {
+  yield takeLatest(
+    postWishlistItemActionTypeName,
+    postWishlistItemWorker,
+  )
+}
+
+export function* deleteSingleWishlistItemWatcher() {
+  yield takeLatest(
+    deleteSingleWishlistItemActionTypeName,
+    deleteSingleWishlistItemWorker,
+  )
+}
+
+export function* deleteWishlistItemWatcher() {
+  yield takeLatest(
+    deleteWishlistItemActionTypeName,
+    deleteWishlistItemWorker,
   )
 }

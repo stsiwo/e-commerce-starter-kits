@@ -1,13 +1,13 @@
 import * as React from 'react';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import { generateWishListItemList } from 'tests/data/wishlist';
-import { WishListItemType } from 'domain/wishlist/types';
+import { generateWishlistItemList } from 'tests/data/wishlist';
+import { WishlistItemType } from 'domain/wishlist/types';
 import { useDispatch, useSelector } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
-import WishListItem from 'components/common/WishListItem';
+import WishlistItem from 'components/common/WishlistItem';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme: Theme) =>
  *      
  *
  **/
-const WishList: React.FunctionComponent<{}> = (props) => {
+const Wishlist: React.FunctionComponent<{}> = (props) => {
 
 
   const classes = useStyles();
@@ -53,20 +53,20 @@ const WishList: React.FunctionComponent<{}> = (props) => {
   const dispatch = useDispatch()
 
   // implement later
-  //const curWishListItemList = useSelector(mSelector.makeWishListItemListSelector())
-  const testWishListItems = generateWishListItemList(4)
+  //const curWishlistItemList = useSelector(mSelector.makeWishlistItemListSelector())
+  const testWishlistItems = generateWishlistItemList(4)
 
   // on select change
-  const handleSelectWishListItemChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+  const handleSelectWishlistItemChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     /**
      * dispatch select update action (see above)
      **/
   }
 
-  const renderWishListItems: () => React.ReactNode = () => {
-    return testWishListItems.map((wishlistItem: WishListItemType) => {
+  const renderWishlistItems: () => React.ReactNode = () => {
+    return testWishlistItems.map((wishlistItem: WishlistItemType) => {
       return (
-        <WishListItem value={wishlistItem} onChange={handleSelectWishListItemChange} key={wishlistItem.wishlistId} />
+        <WishlistItem value={wishlistItem} onChange={handleSelectWishlistItemChange} key={wishlistItem.wishlistId} />
       )
     })
   }
@@ -76,7 +76,7 @@ const WishList: React.FunctionComponent<{}> = (props) => {
       <Typography variant="h5" component="h5" align="center" className={classes.title} >
         {"Wish List"}
       </Typography>
-      {(testWishListItems.length === 0 &&
+      {(testWishlistItems.length === 0 &&
         <React.Fragment>
         <Typography variant="body1" component="p" align="center">
           {"Oops, you don't have any item in your wishlist."}
@@ -91,9 +91,9 @@ const WishList: React.FunctionComponent<{}> = (props) => {
         </Box>
         </React.Fragment>
       )}
-      {(testWishListItems.length > 0 &&
+      {(testWishlistItems.length > 0 &&
         <React.Fragment>
-          {renderWishListItems()}
+          {renderWishlistItems()}
           <Box component="div" className={classes.controllerBox}>
             <Button>
               {"Go to cart"}
@@ -105,6 +105,6 @@ const WishList: React.FunctionComponent<{}> = (props) => {
   )
 }
 
-export default WishList
+export default Wishlist
 
 

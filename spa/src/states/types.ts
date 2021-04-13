@@ -1,6 +1,7 @@
 import { NormalizedCategoryType } from "domain/product/types";
 import { AuthType, RequestTrackerType, FetchStatusEnum } from "src/app/";
 import { CartItemType } from "domain/cart/types";
+import { WishlistItemType } from "domain/wishlist/types";
 
 //import { NormalizedBlogType } from "domain/blog";
 //import { NormalizedCategoryType } from "domain/category";
@@ -24,6 +25,12 @@ export declare type AppStateType = {
       put: FetchStatusEnum
       deleteSingle: FetchStatusEnum
       delete: FetchStatusEnum
+    },
+    wishlistItems: {
+      get: FetchStatusEnum
+      post: FetchStatusEnum
+      deleteSingle: FetchStatusEnum
+      delete: FetchStatusEnum
     }
   }
 }
@@ -43,6 +50,7 @@ export declare type DomainStateSubType<D extends Record<string, any>> = {
 export declare type DomainStateType = {
   categories: NormalizedCategoryType 
   cartItems: CartItemType[] // don't need to normalized
+  wishlistItems: WishlistItemType[] // don't need to normalized
 }
 
 export declare type StateType = {

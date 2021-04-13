@@ -32,7 +32,8 @@ export const rsSelector = {
 
   domain: {
     getCategory: (state: StateType) => state.domain.categories,
-    getCartItem: (state: StateType) => state.domain.cartItems
+    getCartItem: (state: StateType) => state.domain.cartItems,
+    getWishlistItem: (state: StateType) => state.domain.wishlistItems,
   }
 }
 
@@ -154,7 +155,7 @@ export const mSelector = {
       },
     )
   },
-  //
+
   // domain.cartItem
   makeCartItemSelector: () => {
     return createSelector(
@@ -164,6 +165,19 @@ export const mSelector = {
       (cartItem) => {
         // this is array of cart item
         return cartItem
+      },
+    )
+  },
+  
+  // domain.wishlistItem
+  makeWishlistItemSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getWishlistItem
+      ],
+      (wishlistItem) => {
+        // this is array of cart item
+        return wishlistItem
       },
     )
   },

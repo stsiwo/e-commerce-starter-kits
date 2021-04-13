@@ -16,7 +16,7 @@ import AdminOrder from 'components/pages/Admin/AdminOrder';
 import AdminReview from 'components/pages/Admin/AdminReview';
 import AdminCustomer from 'components/pages/Admin/AdminCustomer';
 import Cart from 'components/pages/Cart';
-import WishList from 'components/pages/WishList';
+import Wishlist from 'components/pages/Wishlist';
 import Product from 'components/pages/Product';
 import Checkout from 'components/pages/Checkout';
 
@@ -56,7 +56,7 @@ export const routesData: RoutesDataType = {
     },
     {
       url: "/wishlist",
-      component: withBasePage(WishList),
+      component: withBasePage(Wishlist),
     },
   ],
   // define admin only page

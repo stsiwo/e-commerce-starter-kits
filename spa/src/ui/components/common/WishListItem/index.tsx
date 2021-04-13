@@ -8,7 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import { WishListItemType } from 'domain/wishlist/types';
+import { WishlistItemType } from 'domain/wishlist/types';
 import * as React from 'react';
 import SampleSelfImage from 'static/self.jpeg';
 import ColorCell from '../GridData/ColorCell';
@@ -19,8 +19,8 @@ import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
  * need 'orderDetail' or 'product/variant'
  *
  **/
-interface WishListItemPropsType {
-  value: WishListItemType
+interface WishlistItemPropsType {
+  value: WishlistItemType
   onChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>>
 }
 
@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme: Theme) =>
 /**
  * member or admin account management component
  **/
-const WishListItem: React.FunctionComponent<WishListItemPropsType> = ({ value, onChange }) => {
+const WishlistItem: React.FunctionComponent<WishlistItemPropsType> = ({ value, onChange }) => {
 
   // mui: makeStyles
   const classes = useStyles();
@@ -97,6 +97,6 @@ const WishListItem: React.FunctionComponent<WishListItemPropsType> = ({ value, o
   )
 }
 
-export default WishListItem
+export default WishlistItem
 
 

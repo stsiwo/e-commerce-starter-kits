@@ -1,7 +1,7 @@
 import { ProductType, ProductVariantType } from "domain/product/types";
 import { UserType } from "domain/user/types";
 
-export declare type WishListItemType = {
+export declare type WishlistItemType = {
   wishlistId?: string
   user: UserType
   /**

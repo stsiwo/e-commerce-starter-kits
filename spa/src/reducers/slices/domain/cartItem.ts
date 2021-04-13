@@ -39,7 +39,7 @@ export const deleteCartItemActionTypeName = deleteCartItemActionCreator().type
 export type CartItemActionType = PayloadAction<CartItemType[]> 
 
 export const cartItemSlice = createSlice({ 
-  name: "domain/categories", // a name used in action type
+  name: "domain/cartItem", // a name used in action type
   initialState: {},        
   reducers: {              
     /**

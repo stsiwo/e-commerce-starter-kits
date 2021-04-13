@@ -67,11 +67,18 @@ export const initialState: StateType = {
         put: FetchStatusEnum.INITIAL,
         delete: FetchStatusEnum.INITIAL,
         deleteSingle: FetchStatusEnum.INITIAL,
+      },
+      wishlistItems: {
+        get: FetchStatusEnum.INITIAL,
+        post: FetchStatusEnum.INITIAL,
+        delete: FetchStatusEnum.INITIAL,
+        deleteSingle: FetchStatusEnum.INITIAL,
       }
     }
   },
   domain: {
     categories: {}, 
     cartItems: [],
+    wishlistItems: [],
   },
 }

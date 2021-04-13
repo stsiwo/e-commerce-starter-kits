@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { requestTrackerSliceReducer, searchKeywordSliceReducer, authSliceReducer, categoryFetchStatusSliceReducer, getCartItemFetchStatusSliceReducer, postCartItemFetchStatusSliceReducer, putCartItemFetchStatusSliceReducer, deleteSingleCartItemFetchStatusSliceReducer, deleteCartItemFetchStatusSliceReducer } from './slices/app';
+import { requestTrackerSliceReducer, searchKeywordSliceReducer, authSliceReducer, categoryFetchStatusSliceReducer, getCartItemFetchStatusSliceReducer, postCartItemFetchStatusSliceReducer, putCartItemFetchStatusSliceReducer, deleteSingleCartItemFetchStatusSliceReducer, deleteCartItemFetchStatusSliceReducer, getWishlistItemFetchStatusSliceReducer, postWishlistItemFetchStatusSliceReducer, deleteSingleWishlistItemFetchStatusSliceReducer, deleteWishlistItemFetchStatusSliceReducer } from './slices/app';
 import { leftNavMenuSliceReducer, rightNavMenuSliceReducer, searchModalSliceReducer } from './slices/ui';
 import { categorySliceReducer } from './slices/domain/category';
 import { cartItemSliceReducer } from './slices/domain/cartItem';
@@ -29,6 +29,12 @@ export const rootReducer = combineReducers({
         put: putCartItemFetchStatusSliceReducer, 
         deleteSingle: deleteSingleCartItemFetchStatusSliceReducer, 
         delete: deleteCartItemFetchStatusSliceReducer, 
+      }),
+      wishlistItems: combineReducers({
+        get: getWishlistItemFetchStatusSliceReducer, 
+        post: postWishlistItemFetchStatusSliceReducer, 
+        deleteSingle: deleteSingleWishlistItemFetchStatusSliceReducer, 
+        delete: deleteWishlistItemFetchStatusSliceReducer, 
       })
     })
   }),
@@ -36,5 +42,6 @@ export const rootReducer = combineReducers({
   domain: combineReducers({
     categories: categorySliceReducer,
     cartItems: cartItemSliceReducer,
+    wishlistItems: wishlistItemSliceReducer,
   })
 })
