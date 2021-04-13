@@ -21,3 +21,15 @@ endpoint change:
   - /users
   
     - implement that only update property which has value (not null)
+    
+  - /orders
+  
+    - (GET): all orders
+    - (GET BY ID): a specific order
+    - (POST): create a new order
+    - (PUT): replace with the same id
+    
+  - /products
+  
+    
+    
