@@ -31,5 +31,29 @@ endpoint change:
     
   - /products
   
+## Stripe
+
+  ### Refunds workflows
+  
+    1) you can program this for automation, or 
     
+      - desc: provide UI to the customer so that they can click a button to refunds and process the request when we received.
+      
+      - concerns: 
+        - maybe we need to create refounds policy otherwise, the customer can refunds any time and that would have loss of our business.
+    
+    2) handle manutally.
+    
+      - desc: create contact form and ask them to send us refunds request.
+      
+      - concerns:
+        in either way, i need to create refunds policy and contact form.
+        
+  ### Notification 
+  
+    - after payment transaction complemeted regardless of success/failure, we need to let the customer know via email.
+    
+    - use 'webhooks' provided by Stripe. (ref: https://stripe.com/docs/payments/checkout/fulfill-orders)
+    
+  ### Shipping Cost and Available Countries
     
