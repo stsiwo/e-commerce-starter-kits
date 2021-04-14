@@ -56,4 +56,24 @@ endpoint change:
     - use 'webhooks' provided by Stripe. (ref: https://stripe.com/docs/payments/checkout/fulfill-orders)
     
   ### Shipping Cost and Available Countries
+  
+    - need to decide how to handle it
+    
+  ### Tax
+  
+    - there is threshold for GST stuff for government => $30,000
+    - there is threshold for PST stuff for province (BC) => $10,000
+    
+      - so don't need to think about it yet.
+    
+    - ref: https://jessicamoorhouse.com/sales-tax-in-canada-hst-gst-pst-self-employed/
+    - ref: https://help.shopify.com/en/manual/taxes/canada/canada-tax-setup
+    
+  ### Business Regiatration
+  
+    - Do I need to register as a business when I want to start selling goods online?
+    
+      ref: https://www.thebalancesmb.com/as-a-non-canadian-how-can-i-open-a-business-in-canada-2948586
+  
+  
     
