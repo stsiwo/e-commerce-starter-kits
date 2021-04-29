@@ -1,6 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { appConfig } from "configs/appConfig";
 import { NormalizedCategoryType } from "domain/product/types";
 import { normalize } from "normalizr";
 import { categoryActions } from "reducers/slices/domain/category";
@@ -33,7 +32,7 @@ export function* fetchCategoryWithCacheWorker(action: PayloadAction<{}>) {
    * grab all categories
    *  - might be better way to do this category filtering #PERFORMANCE
    **/
-  const apiUrl = `${appConfig.baseUrl}/categories`
+  const apiUrl = `${API1_URL}/categories`
 
   // return empty object if does not exist
   const targetRequestTrackerBase: RequestTrackerBaseType = yield call(requestUrlCheckWorker, apiUrl)

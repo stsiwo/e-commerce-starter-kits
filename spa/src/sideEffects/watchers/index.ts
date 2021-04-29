@@ -33,6 +33,8 @@ import { deleteSingleWishlistItemWorker } from 'sideEffects/workers/wishlistItem
 import { deleteWishlistItemWorker } from 'sideEffects/workers/wishlistItems/deleteWishlistItemWorker';
 import { fetchWishlistItemWorker } from 'sideEffects/workers/wishlistItems/fetchWishlistItemWorker';
 import { postWishlistItemWorker } from 'sideEffects/workers/wishlistItems/postWishlistItemWorker';
+import { requestStripeClientSecretActionTypeName } from 'reducers/slices/app/private/stripeClientSecret';
+import { requestStripeClientSecretWorker } from 'sideEffects/workers/private/stripeClientSecret';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -234,6 +236,14 @@ export function* deleteSingleProductWatcher() {
   yield takeLatest(
     deleteSingleProductActionTypeName,
     deleteSingleProductWorker,
+  )
+}
+
+// stripeClientSecret request
+export function* requestStripeClientSecretWatcher() {
+  yield takeLatest(
+    requestStripeClientSecretActionTypeName,
+    requestStripeClientSecretWorker,
   )
 }
 

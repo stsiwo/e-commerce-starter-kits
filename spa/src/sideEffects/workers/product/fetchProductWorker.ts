@@ -1,6 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { appConfig } from "configs/appConfig";
 import { getProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
 import { productActions } from "reducers/slices/domain/product";
 import { call, put, select } from "redux-saga/effects";
@@ -55,7 +54,7 @@ export function* fetchProductWorker(action: PayloadAction<{}>) {
     /**
      * grab all domain
      **/
-    const apiUrl = `${appConfig.baseUrl}/products`
+    const apiUrl = `${API1_URL}/products`
 
     /**
      * fetch data

@@ -74,6 +74,7 @@ export const initialState: StateType = {
     searchKeyword: "",
     requestTracker: {},
     fetchStatus: {
+      stripeClientSecret: FetchStatusEnum.INITIAL,
       products: {
         get: FetchStatusEnum.INITIAL,
         getSingle: FetchStatusEnum.INITIAL,
@@ -115,6 +116,9 @@ export const initialState: StateType = {
         delete: FetchStatusEnum.INITIAL,
         deleteSingle: FetchStatusEnum.INITIAL,
       }
+    },
+    private: {
+      stripeClientSecret: ""
     }
   },
   domain: {

@@ -1,6 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { appConfig } from "configs/appConfig";
 import { CartItemType } from "domain/cart/types";
 import { cartItemActions } from "reducers/slices/domain/cartItem";
 import { call, put, select } from "redux-saga/effects";
@@ -60,7 +59,7 @@ export function* deleteSingleCartItemWorker(action: PayloadAction<CartItemType>)
     /**
      * grab all domain
      **/
-    const apiUrl = `${appConfig.baseUrl}/users/${curAuth.user.userId}/cartItems/${action.payload.cartId}`
+    const apiUrl = `${API1_URL}/users/${curAuth.user.userId}/cartItems/${action.payload.cartId}`
 
     /**
      * fetch data

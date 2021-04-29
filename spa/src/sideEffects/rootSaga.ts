@@ -1,5 +1,5 @@
 import { all, call, spawn } from 'redux-saga/effects';
-import { deleteCartItemWatcher, deleteSingleCartItemWatcher, fetchCartItemWatcher, leftNavMenuWatcher, postCartItemWatcher, putCartItemWatcher, fetchWishlistItemWatcher, postWishlistItemWatcher, deleteSingleWishlistItemWatcher, deleteWishlistItemWatcher, fetchCategoryWatcher, postCategoryWatcher, putCategoryWatcher, deleteSingleCategoryWatcher, fetchUserWatcher, fetchSingleUserWatcher, putUserWatcher, deleteSingleUserWatcher, fetchOrderWatcher, fetchSingleOrderWatcher, postOrderWatcher, putOrderWatcher, fetchProductWatcher, fetchSingleProductWatcher, postProductWatcher, putProductWatcher, deleteSingleProductWatcher } from './watchers';
+import { deleteCartItemWatcher, deleteSingleCartItemWatcher, fetchCartItemWatcher, leftNavMenuWatcher, postCartItemWatcher, putCartItemWatcher, fetchWishlistItemWatcher, postWishlistItemWatcher, deleteSingleWishlistItemWatcher, deleteWishlistItemWatcher, fetchCategoryWatcher, postCategoryWatcher, putCategoryWatcher, deleteSingleCategoryWatcher, fetchUserWatcher, fetchSingleUserWatcher, putUserWatcher, deleteSingleUserWatcher, fetchOrderWatcher, fetchSingleOrderWatcher, postOrderWatcher, putOrderWatcher, fetchProductWatcher, fetchSingleProductWatcher, postProductWatcher, putProductWatcher, deleteSingleProductWatcher, requestStripeClientSecretWatcher } from './watchers';
 
 export function* rootSaga() {
 
@@ -11,6 +11,9 @@ export function* rootSaga() {
   const sagas: any[] = [
     // app
     leftNavMenuWatcher,
+
+    /// private - clientSecret
+    requestStripeClientSecretWatcher,
 
     // ui
     
@@ -54,6 +57,8 @@ export function* rootSaga() {
     postProductWatcher,
     putProductWatcher,
     deleteSingleProductWatcher,
+
+   
   ]
 
   /**

@@ -1,6 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { appConfig } from "configs/appConfig";
 import { getUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 import { userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
@@ -50,7 +49,7 @@ export function* fetchUserWorker(action: PayloadAction<{}>) {
     /**
      * grab all domain
      **/
-    const apiUrl = `${appConfig.baseUrl}/users`
+    const apiUrl = `${API1_URL}/users`
 
     /**
      * fetch data

@@ -1,6 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { appConfig } from "configs/appConfig";
 import { cartItemActions } from "reducers/slices/domain/cartItem";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
@@ -61,7 +60,7 @@ export function* putCategoryWorker(action: PayloadAction<CategoryType>) {
     /**
      * grab all domain
      **/
-    const apiUrl = `${appConfig.baseUrl}/categories/${action.payload.categoryId}`
+    const apiUrl = `${API1_URL}/categories/${action.payload.categoryId}`
 
     /**
      * fetch data

@@ -13,6 +13,8 @@ import { getOrderFetchStatusSliceReducer, getSingleOrderFetchStatusSliceReducer,
 import { orderSliceReducer } from './slices/domain/order';
 import { getProductFetchStatusSliceReducer, getSingleProductFetchStatusSliceReducer, postProductFetchStatusSliceReducer, putProductFetchStatusSliceReducer, deleteSingleProductFetchStatusSliceReducer } from './slices/app/fetchStatus/product';
 import { productSliceReducer } from './slices/domain/product';
+import { stripeClientSecretSliceReducer } from './slices/app/private/stripeClientSecret';
+import { stripeClientSecretFetchStatusSliceReducer } from './slices/app/fetchStatus/stripeClientSecret';
 
 // ** REFACTOR to new approach **/
 
@@ -32,6 +34,7 @@ export const rootReducer = combineReducers({
     searchKeyword: searchKeywordSliceReducer,
     requestTracker: requestTrackerSliceReducer,
     fetchStatus: combineReducers({
+      stripeClientSecret: stripeClientSecretFetchStatusSliceReducer,
       products: combineReducers({
         get: getProductFetchStatusSliceReducer, 
         getSingle: getSingleProductFetchStatusSliceReducer, 
@@ -73,6 +76,9 @@ export const rootReducer = combineReducers({
         deleteSingle: deleteSingleWishlistItemFetchStatusSliceReducer, 
         delete: deleteWishlistItemFetchStatusSliceReducer, 
       })
+    }),
+    private: combineReducers({
+      stripeClientSecret: stripeClientSecretSliceReducer, 
     })
   }),
   domain: combineReducers({

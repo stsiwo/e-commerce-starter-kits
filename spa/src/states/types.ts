@@ -20,6 +20,7 @@ export declare type AppStateType = {
   searchKeyword: string
   requestTracker: RequestTrackerType
   fetchStatus: {
+    stripeClientSecret: FetchStatusEnum,
     products: {
       get: FetchStatusEnum
       getSingle: FetchStatusEnum
@@ -61,6 +62,10 @@ export declare type AppStateType = {
       deleteSingle: FetchStatusEnum
       delete: FetchStatusEnum
     }
+  },
+  // NEVER EVER STORE THIS ON LOCAL STORAGE/SESSION STORAGE. just for only in-memory
+  private: {
+    stripeClientSecret: string
   }
 }
 

@@ -1,6 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { appConfig } from "configs/appConfig";
 import { CategoryType } from "domain/product/types";
 import { deleteSingleCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
 import { categoryActions } from "reducers/slices/domain/category";
@@ -56,7 +55,7 @@ export function* deleteSingleCategoryWorker(action: PayloadAction<CategoryType>)
     /**
      * grab all domain
      **/
-    const apiUrl = `${appConfig.baseUrl}/categories/${action.payload.categoryId}`
+    const apiUrl = `${API1_URL}/categories/${action.payload.categoryId}`
 
     /**
      * fetch data

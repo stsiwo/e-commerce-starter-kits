@@ -1,6 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { appConfig } from "configs/appConfig";
 import { wishlistItemActions } from "reducers/slices/domain/wishlistItem";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
@@ -49,7 +48,7 @@ export function* fetchWishlistItemWorker(action: PayloadAction<{}>) {
     /**
      * grab all domain
      **/
-    const apiUrl = `${appConfig.baseUrl}/users/${curAuth.user.userId}/wishlistItems`
+    const apiUrl = `${API1_URL}/users/${curAuth.user.userId}/wishlistItems`
 
     /**
      * fetch data

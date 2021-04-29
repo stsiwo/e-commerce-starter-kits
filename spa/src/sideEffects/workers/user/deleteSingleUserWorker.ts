@@ -1,6 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { appConfig } from "configs/appConfig";
 import { deleteSingleUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 import { userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
@@ -56,7 +55,7 @@ export function* deleteSingleUserWorker(action: PayloadAction<UserType>) {
     /**
      * grab all domain
      **/
-    const apiUrl = `${appConfig.baseUrl}/categories/${action.payload.userId}`
+    const apiUrl = `${API1_URL}/categories/${action.payload.userId}`
 
     /**
      * fetch data

@@ -1,6 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { appConfig } from "configs/appConfig";
 import { UserType } from "domain/user/types";
 import { putUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 import { userActions } from "reducers/slices/domain/user";
@@ -58,7 +57,7 @@ export function* putUserWorker(action: PayloadAction<UserType>) {
     /**
      * grab this  domain
      **/
-    const apiUrl = `${appConfig.baseUrl}/users/${action.payload.userId}`
+    const apiUrl = `${API1_URL}/users/${action.payload.userId}`
 
     /**
      * fetch data

@@ -1,6 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { appConfig } from "configs/appConfig";
 import { NormalizedCategoryType } from "domain/product/types";
 import { normalize } from "normalizr";
 import { getCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
@@ -55,7 +54,7 @@ export function* fetchCategoryWorker(action: PayloadAction<{}>) {
   /**
    * grab all domain
    **/
-  const apiUrl = `${appConfig.baseUrl}/categories`
+  const apiUrl = `${API1_URL}/categories`
 
   /**
    * fetch data

@@ -1,6 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { appConfig } from "configs/appConfig";
 import { WishlistItemType } from "domain/wishlist/types";
 import { wishlistItemActions } from "reducers/slices/domain/wishlistItem";
 import { call, put, select } from "redux-saga/effects";
@@ -60,7 +59,7 @@ export function* deleteWishlistItemWorker(action: PayloadAction<WishlistItemType
     /**
      * grab all domain
      **/
-    const apiUrl = `${appConfig.baseUrl}/users/${curAuth.user.userId}/wishlistItems`
+    const apiUrl = `${API1_URL}/users/${curAuth.user.userId}/wishlistItems`
 
     /**
      * fetch data

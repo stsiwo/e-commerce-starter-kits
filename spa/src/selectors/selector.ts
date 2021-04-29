@@ -27,6 +27,7 @@ export const rsSelector = {
 
   app: {
     getAuth: (state: StateType) => state.app.auth,
+    getStripeClientSecret: (state: StateType) => state.app.private.stripeClientSecret,
     getSearchKeyword: (state: StateType) => state.app.searchKeyword,
     getRequestTracker: (state: StateType) => state.app.requestTracker,
   },
@@ -98,6 +99,18 @@ export const mSelector = {
       ],
       (auth) => {
         return auth
+      },
+    )
+  },
+
+  // app.private.stripeClientSecret
+  makeStipeClientSecretSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getStripeClientSecret
+      ],
+      (stripeClientSecret) => {
+        return stripeClientSecret
       },
     )
   },

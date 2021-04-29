@@ -1,6 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { appConfig } from "configs/appConfig";
 import { OrderType } from "domain/order/types";
 import { putOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
 import { orderActions } from "reducers/slices/domain/order";
@@ -58,7 +57,7 @@ export function* putOrderWorker(action: PayloadAction<OrderType>) {
     /**
      * grab this  domain
      **/
-    const apiUrl = `${appConfig.baseUrl}/orders/${action.payload.orderId}`
+    const apiUrl = `${API1_URL}/orders/${action.payload.orderId}`
 
     /**
      * fetch data

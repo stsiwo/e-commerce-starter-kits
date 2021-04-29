@@ -1,6 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { appConfig } from "configs/appConfig";
 import { ProductType } from "domain/product/types";
 import { deleteSingleProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
 import { productActions } from "reducers/slices/domain/product";
@@ -56,7 +55,7 @@ export function* deleteSingleProductWorker(action: PayloadAction<ProductType>) {
     /**
      * grab all domain
      **/
-    const apiUrl = `${appConfig.baseUrl}/products/${action.payload.productId}`
+    const apiUrl = `${API1_URL}/products/${action.payload.productId}`
 
     /**
      * fetch data

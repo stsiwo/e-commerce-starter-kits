@@ -4,6 +4,10 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
+import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { requestStripeClientSecretActionCreator } from 'reducers/slices/app/private/stripeClientSecret';
+import { mSelector } from 'src/selectors/selector';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -27,6 +31,12 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
   // mui: makeStyles
   const classes = useStyles();
 
+  // dispatch
+  const dispatch = useDispatch()
+
+  // client_secret state (redux store)
+  const stripeClientSecret = useSelector(mSelector.makeStipeClientSecretSelector())
+
   // snakbar stuff when no phone & addresses are selected
   const { enqueueSnackbar } = useSnackbar();
 
@@ -44,7 +54,7 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
     }
 
     // call stripe.confirmCardPayment method with client_secret and card info
-    const result = await stripe.confirmCardPayment('{CLIENT_SECRET}', {
+    const result = await stripe.confirmCardPayment(stripeClientSecret, {
       payment_method: {
         card: elements.getElement(CardElement),
         billing_details: {
@@ -70,12 +80,22 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
     }
   }
 
+  // event handler on 'final confirm' button
+  const handleFinalConfirmClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
+    dispatch(requestStripeClientSecretActionCreator())
+  }
+
   return (
     <Box component="div" className={classes.root}>
       <label>
         Card Details
         <CardElement />
       </label>
+      <Button
+        onClick={handleFinalConfirmClick}
+      >
+        {"Final Confirm"}
+      </Button>
       <Button
         disabled={!stripe}
         onClick={handleMakePaymentClick}
