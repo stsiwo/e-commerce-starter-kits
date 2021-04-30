@@ -1,6 +1,7 @@
 import Header from 'components/common/Header';
 import * as React from 'react';
 import Container from '@material-ui/core/Container';
+import Footer from '../Footer';
 
 const BasePage: React.FunctionComponent<{}> = (props) => {
 
@@ -13,7 +14,7 @@ const BasePage: React.FunctionComponent<{}> = (props) => {
       >
         {props.children}
       </Container>
-      {/** footer **/}
+      <Footer />
     </React.Fragment>
   )
 }
