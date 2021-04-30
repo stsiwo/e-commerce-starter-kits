@@ -20,6 +20,7 @@ import Product from 'components/pages/Product';
 import Checkout from 'components/pages/Checkout';
 import Wishlist from 'components/pages/Wishlist';
 import Login from 'components/pages/Login';
+import Signup from 'components/pages/Signup';
 
 // route data
 export declare type RouteDataType = {
@@ -43,6 +44,10 @@ export const routesData: RoutesDataType = {
     {
       url: "/login",
       component: withBasePage(Login),
+    },
+    {
+      url: "/signup",
+      component: withBasePage(Signup),
     },
     {
       url: "/cart",

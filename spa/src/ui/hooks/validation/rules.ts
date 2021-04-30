@@ -28,6 +28,14 @@ export const adminLoginSchema = yup.object().shape({
   password: yup.string().required(),
 })
 
+export const memberSignupSchema = yup.object().shape({
+  firstName: yup.string().required(),
+  lastName: yup.string().required(),
+  email: yup.string().required().email(),
+  password: yup.string().required(),
+  confirm: yup.string().required().oneOf([yup.ref('password'), null], "password must match")
+})
+
 export const memberLoginSchema = yup.object().shape({
   email: yup.string().required().email(),
   password: yup.string().required(),
