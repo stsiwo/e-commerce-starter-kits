@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: theme.palette.secondary.main,
       color: "#FFF",
       textAlign: "center",
+      marginTop: theme.spacing(5),
     },
     gridBox: {
       display: "flex",
