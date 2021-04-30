@@ -28,6 +28,11 @@ export const adminLoginSchema = yup.object().shape({
   password: yup.string().required(),
 })
 
+export const memberLoginSchema = yup.object().shape({
+  email: yup.string().required().email(),
+  password: yup.string().required(),
+})
+
 // products
 export const productVariantSchema = yup.object().shape({
   variantSize: yup.object().required(),
