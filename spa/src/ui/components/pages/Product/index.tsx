@@ -27,6 +27,10 @@ const useStyles = makeStyles((theme: Theme) =>
       textTransform: "uppercase",
       margin: theme.spacing(6)
     },
+    subtitle: {
+      fontWeight: theme.typography.fontWeightBold,
+      margin: `${theme.spacing(1)}px 0`,
+    },
     subtotalBox: {
       padding: theme.spacing(1),
     },
@@ -34,6 +38,9 @@ const useStyles = makeStyles((theme: Theme) =>
       textAlign: "center"
     },
     productName: {
+      fontWeight: theme.typography.fontWeightBold,
+    },
+    productDescTitle: {
       fontWeight: theme.typography.fontWeightBold,
     },
     productDesc: {
@@ -223,6 +230,9 @@ const Product: React.FunctionComponent<{}> = (props) => {
           md={6}
           className={classes.gridItem}
         >
+          <Typography variant="body1" component="p" className={classes.subtitle}>
+            Description
+          </Typography>
           <Typography variant="body1" component="p" className={classes.productDesc}>
             {testProduct.productDescription}
           </Typography>
@@ -310,7 +320,7 @@ const Product: React.FunctionComponent<{}> = (props) => {
           xs={12}
           className={classes.detailNoteBox}
         >
-          <Typography variant="h6" component="h6" className={classes.detailNoteTitle}>
+          <Typography variant="body1" component="h6" className={classes.subtitle}>
             Detail Note 
           </Typography>
           <Typography variant="body1" component="p">

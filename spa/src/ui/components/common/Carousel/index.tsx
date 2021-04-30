@@ -1,31 +1,26 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { createStyles, makeStyles, Theme, useTheme } from '@material-ui/core/styles';
 import * as React from 'react';
 import Slide from '@material-ui/core/Slide';
 import Paper from '@material-ui/core/Paper';
 import { ProductImageType } from 'domain/product/types';
-import Slider from "react-slick";
+import SwipeableViews from 'react-swipeable-views';
+import { autoPlay } from 'react-swipeable-views-utils';
+import MobileStepper from '@material-ui/core/MobileStepper';
+import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import Button from '@material-ui/core/Button';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    title: {
-      textTransform: "uppercase",
-      margin: theme.spacing(6)
-    },
-    subtotalBox: {
-      padding: theme.spacing(1),
-    },
-    controllerBox: {
-      textAlign: "center"
-    },
-    paper: {
-      width: 400,
-      height: 400,
+    root: {
     },
     img: {
       width: "100%",
     }
   }),
 );
+
+const AutoPlaySwipeableViews = autoPlay(SwipeableViews);
 
 interface CarouselPropsType {
   items: ProductImageType[]
@@ -48,32 +43,63 @@ const Carousel: React.FunctionComponent<CarouselPropsType> = ({ items }) => {
   const classes = useStyles();
 
   const length = items.length
+  const [curCheckBox, setCheckBox] = React.useState<number>(0)
 
-  const [curCheckBox, setCheckBox] = React.useState<boolean[]>(new Array(length).fill(true))
+  const theme = useTheme();
+
+  const handleNext = () => {
+    setCheckBox((prevActiveStep) => prevActiveStep + 1);
+  };
+
+  const handleBack = () => {
+    setCheckBox((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleStepChange = (step: number) => {
+    setCheckBox(step);
+  };
 
   const renderItems: () => React.ReactNode = () => {
     return items.map((item: ProductImageType, index: number) => {
       return (
-        <div className={classes.paper} key={item.productImageId}>
-          <img
-            src={item.productImagePath}
-            className={classes.img}
-          />
+        <div key={item.productImageId}>
+            {Math.abs(curCheckBox - index) <= 2 ? (
+              <img className={classes.img} src={item.productImagePath} />
+            ) : null}
         </div>
       )
     })
   }
 
   return (
-    <Slider
-      dots
-      infinite
-      speed={500}
-      slidesToShow={1}
-      slidesToScroll={1}
-    >
-      {renderItems()}
-    </Slider>
+    <div className={classes.root}>
+      <AutoPlaySwipeableViews
+        axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+        index={curCheckBox}
+        onChangeIndex={handleStepChange}
+        enableMouseEvents
+      >
+        {renderItems()}
+      </AutoPlaySwipeableViews>
+      <MobileStepper
+        steps={length}
+        position="static"
+        variant="text"
+        activeStep={curCheckBox}
+        nextButton={
+          <Button size="small" onClick={handleNext} disabled={curCheckBox === length - 1}>
+            Next
+            {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+          </Button>
+        }
+        backButton={
+          <Button size="small" onClick={handleBack} disabled={curCheckBox === 0}>
+            {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+            Back
+          </Button>
+        }
+      />
+    </div>
   )
 }
 

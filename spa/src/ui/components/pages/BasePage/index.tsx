@@ -5,14 +5,16 @@ import Container from '@material-ui/core/Container';
 const BasePage: React.FunctionComponent<{}> = (props) => {
 
   return (
-    <Container 
-      maxWidth={false}
-      disableGutters={true}
-    >
+    <React.Fragment>
       <Header />
-      {props.children}
+      <Container
+        maxWidth={'lg'}
+        disableGutters={true}
+      >
+        {props.children}
+      </Container>
       {/** footer **/}
-    </Container>
+    </React.Fragment>
   )
 }
 
