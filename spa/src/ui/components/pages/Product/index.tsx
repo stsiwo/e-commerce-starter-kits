@@ -44,6 +44,8 @@ const useStyles = makeStyles((theme: Theme) =>
     productColorBox: {
       display: "flex",
       alignItems: "center",
+      justifyContent: "center",
+
     },
     colorRadioGroup: {
       display: "flex",
@@ -56,8 +58,19 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(0, 1, 0, 1),
     },
     gridItem: {
-      padding: theme.spacing(1)
+      padding: theme.spacing(1),
+      textAlign: "center",
+
+      "& > *": {
+        margin: `${theme.spacing(2)}px 0`,
+      },
     },
+    detailNoteBox: {
+      textAlign: "center",
+    },
+    detailNoteTitle: {
+      fontWeight: theme.typography.fontWeightBold,
+    }
   }),
 );
 
@@ -210,11 +223,11 @@ const Product: React.FunctionComponent<{}> = (props) => {
           md={6}
           className={classes.gridItem}
         >
-          <Typography variant="body1" component="p" align="left" className={classes.productDesc}>
+          <Typography variant="body1" component="p" className={classes.productDesc}>
             {testProduct.productDescription}
           </Typography>
           <Box component="div" className={classes.productColorBox}>
-            <Typography variant="body1" component="p" align="left" className={classes.productColorTitle}>
+            <Typography variant="body1" component="p" className={classes.productColorTitle}>
               Color:
             </Typography>
             <RadioGroup
@@ -228,7 +241,7 @@ const Product: React.FunctionComponent<{}> = (props) => {
             </RadioGroup>
           </Box>
           <Box component="div" className={classes.productColorBox}>
-            <Typography variant="body1" component="p" align="left" className={classes.productColorTitle}>
+            <Typography variant="body1" component="p" className={classes.productColorTitle}>
               Size:
             </Typography>
             <TextField
@@ -247,7 +260,7 @@ const Product: React.FunctionComponent<{}> = (props) => {
             </TextField>
           </Box>
           <Box component="div" className={classes.productColorBox}>
-            <Typography variant="body1" component="p" align="left" className={classes.productColorTitle}>
+            <Typography variant="body1" component="p" className={classes.productColorTitle}>
               Qty:
             </Typography>
             <ButtonGroup size="small" aria-label="small outlined button group">
@@ -261,7 +274,7 @@ const Product: React.FunctionComponent<{}> = (props) => {
             </ButtonGroup>
           </Box>
           <Box component="div" className={classes.productColorBox}>
-            <Typography variant="body1" component="p" align="left" className={classes.productColorTitle}>
+            <Typography variant="body1" component="p" className={classes.productColorTitle}>
               Review Point:
             </Typography>
             <Rating
@@ -273,13 +286,36 @@ const Product: React.FunctionComponent<{}> = (props) => {
             /><br />
           </Box>
           <Box component="div" >
-            <Typography variant="body1" component="p" align="left" className={classes.productColorTitle}>
+            <Typography variant="body1" component="p" className={classes.productColorTitle}>
               Price: <b>$ {`${curVariant.variantUnitPrice ? curVariant.variantUnitPrice * curQty : testProduct.productBaseUnitPrice * curQty}`}</b>
             </Typography>
-            <Typography variant="body2" component="p" align="left" color="textSecondary">
+            <Typography variant="body2" component="p" color="textSecondary">
               * this does not include tax and shipping fee
             </Typography>
           </Box>
+          <Box component="div" className={classes.controllerBox}>
+            <Button>
+              {"Add to Cart"}
+            </Button>
+            <Button>
+              {"save to Wishlist"}
+            </Button>
+            <Button>
+              {"buy now"}
+            </Button>
+          </Box>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          className={classes.detailNoteBox}
+        >
+          <Typography variant="h6" component="h6" className={classes.detailNoteTitle}>
+            Detail Note 
+          </Typography>
+          <Typography variant="body1" component="p">
+            {testProduct.note}
+          </Typography>
           <Box component="div" className={classes.controllerBox}>
             <Button>
               {"Add to Cart"}
