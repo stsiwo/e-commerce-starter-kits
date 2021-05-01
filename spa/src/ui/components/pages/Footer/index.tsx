@@ -163,13 +163,13 @@ const Footer: React.FunctionComponent<{}> = (props) => {
       </Grid>
       <Box className={classes.bottom}>
         <Box className={classes.policyLinkBox}>
-          <Link className={classes.policyLink} component={props => <RRLink {...props} to="/return-policy" />}>
+          <Link className={classes.policyLink} component={RRLink} to="/return-policy">
             {"Return Policy"}
           </Link>
-          <Link className={classes.policyLink} component={props => <RRLink {...props} to="/privacy-policy" />}>
+          <Link className={classes.policyLink} component={RRLink} to="/privacy-policy">
             {"Privacy Policy"}
           </Link>
-          <Link className={classes.policyLink} component={props => <RRLink {...props} to="/terms-and-conditions" />}>
+          <Link className={classes.policyLink} component={RRLink} to="/terms-and-conditions">
             {"Terms and Conditions"}
           </Link>
         </Box>

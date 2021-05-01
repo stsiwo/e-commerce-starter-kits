@@ -93,10 +93,18 @@
           <h1>hey</h1> // <- need to put components
         </TargetComponent>
       ```
+  
+    - don't use "GroupButton" with "IconButton". this is not supported.
+
+      - read this: https://github.com/mui-org/material-ui/issues/16156
+
+      - use "Button" instead with Icon.
 
   ### Integration Link (material-ui) with React-Router-Dom Library
 
     - read this: https://material-ui.com/guides/composition/#link
+
+
 
 ## Data Grid library
 
@@ -110,7 +118,7 @@
 
     - https://github.com/bvaughn/react-virtualized (this one is really famouse, but I don't know why)
 
-## Errors
+## General Errors
 
   -  Subsequent property declarations must have the same type.  Property 'picture' must be of type ... at react related library
 

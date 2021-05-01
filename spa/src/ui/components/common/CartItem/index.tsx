@@ -116,19 +116,19 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value, onChange 
           </Box>
           <Box component="div" className={classes.actionBox}>
             <ButtonGroup size="small" aria-label="small outlined button group">
-              <IconButton 
+              <Button 
                 onClick={handleQtyIncrement}  
                 disabled={value.quantity === value.variant.variantStock}
               >
                 <AddCircleIcon />
-              </IconButton>
+              </Button>
               <Button disabled>{value.quantity}</Button>
-              <IconButton 
+              <Button 
                 onClick={handleQtyDecrement}
                 disabled={value.quantity === 1}
               >
                 <RemoveCircleIcon />
-              </IconButton>
+              </Button>
             </ButtonGroup>
             <Switch
               edge="end"
