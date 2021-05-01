@@ -9,4 +9,6 @@ WORKDIR /
 # copy external config to this image
 COPY ./my.cnf /etc/mysql/my.cnf
 # copy initial sql script to the directory in this image
-COPY ./ec-db-script.sql /docker-entrypoint-initdb.d/ec-db-script.sql
+# NOTE: the scripts under the directory are executed in the alphabetic order!!!
+COPY ./ec-db-script.sql /docker-entrypoint-initdb.d/a.sql
+COPY ./integ-test-data.sql /docker-entrypoint-initdb.d/b.sql
