@@ -1,7 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { StateType } from "states/types";
 import { denormalize } from "normalizr";
-import { categorySchemaArray } from "states/state";
+import { categorySchemaArray, productSchemaArray } from "states/state";
 import { UserType } from "domain/user/types";
 
 export const rsSelector = {
@@ -39,7 +39,7 @@ export const rsSelector = {
     getWishlistItem: (state: StateType) => state.domain.wishlistItems,
     getUser: (state: StateType) => state.domain.users,
     getOrder: (state: StateType) => state.domain.orders,
-    getProduct: (state: StateType) => state.domain.orders 
+    getProduct: (state: StateType) => state.domain.products 
   }
 }
 
@@ -270,7 +270,7 @@ export const mSelector = {
   makeProductSelector: () => {
     return createSelector(
       [
-        rsSelector.domain.getCategory
+        rsSelector.domain.getProduct
       ],
       (normalizedProducts) => {
 
@@ -288,11 +288,13 @@ export const mSelector = {
          **/
         const denormalizedEntities = denormalize(
           Object.keys(normalizedProducts), // ex, [0, 1, 2, 3, 4] ('result' prop of normalized data)
-          categorySchemaArray,
+          productSchemaArray,
           {
             products: normalizedProducts
           }, // entities prop of normalized data (ex, { animes: { "1": { ... }, "2": { ... }, ... }})
         )
+
+        console.log(denormalizedEntities)
 
         return denormalizedEntities
       },

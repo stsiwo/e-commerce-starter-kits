@@ -36,9 +36,6 @@ const ProductSearch: React.FunctionComponent<{}> = (props) => {
   // filter/sort/pagination
 
   // useEffect to send request every time its dependency updated
-
-
-
   return (
     <React.Fragment>
       <SearchController />

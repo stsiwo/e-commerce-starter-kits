@@ -9,6 +9,10 @@ import merge from "lodash/merge";
  *
  **/
 
+// for GET request with cache
+export const fetchCategoryWithCacheActionCreator = createAction("saga/domain/category/fetch/cache")
+export const fetchCategoryWithCacheActionTypeName = fetchCategoryWithCacheActionCreator().type
+
 // for GET request
 export const fetchCategoryActionCreator = createAction("saga/domain/category/fetch")
 export const fetchCategoryActionTypeName = fetchCategoryActionCreator().type

@@ -9,6 +9,7 @@ const Home: React.FunctionComponent<{}> = (props) => {
     <React.Fragment>
      <Hero />
      <BrandNewProduct />
+     {/** re-design this since category does not have its image **/}
      <CategoryList />
      {/** one more section like contact or aboutus **/}
     </React.Fragment>

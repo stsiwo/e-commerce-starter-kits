@@ -10,6 +10,10 @@ import { ProductType, NormalizedProductType } from "domain/product/types";
  *
  **/
 
+// for GET request with cache
+export const fetchProductWithCacheActionCreator = createAction("saga/domain/product/fetch/cache")
+export const fetchProductWithCacheActionTypeName = fetchProductWithCacheActionCreator().type
+
 // for GET request
 export const fetchProductActionCreator = createAction("saga/domain/product/fetch")
 export const fetchProductActionTypeName = fetchProductActionCreator().type

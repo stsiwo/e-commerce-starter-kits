@@ -1,7 +1,7 @@
 import { deleteCartItemActionTypeName, deleteSingleCartItemActionTypeName, fetchCartItemActionTypeName, postCartItemActionTypeName, putCartItemActionTypeName } from 'reducers/slices/domain/cartItem';
-import { deleteSingleCategoryActionTypeName, fetchCategoryActionTypeName, postCategoryActionTypeName, putCategoryActionTypeName } from 'reducers/slices/domain/category';
+import { deleteSingleCategoryActionTypeName, fetchCategoryActionTypeName, postCategoryActionTypeName, putCategoryActionTypeName, fetchCategoryWithCacheActionTypeName } from 'reducers/slices/domain/category';
 import { fetchOrderActionTypeName, fetchSingleOrderActionTypeName, postOrderActionTypeName, putOrderActionTypeName } from 'reducers/slices/domain/order';
-import { deleteSingleProductActionTypeName, fetchProductActionTypeName, fetchSingleProductActionTypeName, postProductActionTypeName, putProductActionTypeName } from 'reducers/slices/domain/product';
+import { deleteSingleProductActionTypeName, fetchProductActionTypeName, fetchSingleProductActionTypeName, postProductActionTypeName, putProductActionTypeName, fetchProductWithCacheActionTypeName } from 'reducers/slices/domain/product';
 import { deleteSingleUserActionTypeName, fetchSingleUserActionTypeName, fetchUserActionTypeName, putUserActionTypeName } from 'reducers/slices/domain/user';
 import { deleteSingleWishlistItemActionTypeName, deleteWishlistItemActionTypeName, fetchWishlistItemActionTypeName, postWishlistItemActionTypeName } from 'reducers/slices/domain/wishlistItem';
 import { toggleLeftNavMenuActionTypeName } from 'reducers/slices/ui';
@@ -35,6 +35,8 @@ import { fetchWishlistItemWorker } from 'sideEffects/workers/wishlistItems/fetch
 import { postWishlistItemWorker } from 'sideEffects/workers/wishlistItems/postWishlistItemWorker';
 import { requestStripeClientSecretActionTypeName } from 'reducers/slices/app/private/stripeClientSecret';
 import { requestStripeClientSecretWorker } from 'sideEffects/workers/private/stripeClientSecret';
+import { fetchProductWithCacheWorker } from 'sideEffects/workers/fetchProductWithCacheWorker';
+import { fetchCategoryWithCacheWorker } from 'sideEffects/workers/fetchCategoryWithCacheWorker';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -236,6 +238,21 @@ export function* deleteSingleProductWatcher() {
   yield takeLatest(
     deleteSingleProductActionTypeName,
     deleteSingleProductWorker,
+  )
+}
+
+// cache
+export function* fetchProductWithCacheWatcher() {
+  yield takeLatest(
+    fetchProductWithCacheActionTypeName,
+    fetchProductWithCacheWorker,
+  )
+}
+
+export function* fetchCategoryWithCacheWatcher() {
+  yield takeLatest(
+    fetchCategoryWithCacheActionTypeName,
+    fetchCategoryWithCacheWorker,
   )
 }
 

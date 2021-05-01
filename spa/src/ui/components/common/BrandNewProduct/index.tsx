@@ -3,7 +3,11 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import { ProductType } from 'domain/product/types';
 import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProductWithCacheActionCreator } from 'reducers/slices/domain/product';
+import { mSelector } from 'src/selectors/selector';
 import ProductCard from '../ProductCard';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -32,43 +36,48 @@ const BrandNewProduct: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
 
+  const dispatch = useDispatch();
+
+  const curDomains = useSelector(mSelector.makeProductSelector())
+
+  // fetch new blogs only once
+  React.useEffect(() => {
+    dispatch(fetchProductWithCacheActionCreator())
+  }, [])
+
+  const renderDomains: () => React.ReactNode = () => {
+    return curDomains.map((product: ProductType) => {
+      return (
+        <Grid
+          item
+          xs={12}
+          sm={6}
+          md={3}
+          className={classes.item}
+          key={product.productId}
+        >
+          <ProductCard product={product} />
+        </Grid>
+      )
+    });
+  }
+
   return (
     <Box component="section" className={classes.section} >
       <Typography variant="h5" component="h5" align="center" className={classes.title} >
         {"Brand New"}
       </Typography>
-      <Grid 
+      <Grid
         container
         spacing={2}
         justify="center"
       >
-        <Grid
-          item
-          xs={12}
-          sm={6}
-          md={3}
-          className={classes.item} 
-        >
-          <ProductCard />
-        </Grid>
-        <Grid
-          item
-          xs={12}
-          sm={6}
-          md={3}
-          className={classes.item} 
-        >
-          <ProductCard />
-        </Grid>
-        <Grid
-          item
-          xs={12}
-          sm={6}
-          md={3}
-          className={classes.item} 
-        >
-          <ProductCard />
-        </Grid>
+        {(curDomains.length === 0 &&
+          <Typography variant="body1" component="p" align="center" >
+            {"No Available Products For Now."}
+          </Typography>
+        )}
+        {renderDomains()}
       </Grid>
       <Box component="div" className={classes.moreBtnBox}>
         <Button>

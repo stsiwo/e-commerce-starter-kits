@@ -8,6 +8,7 @@ import { FetchStatusEnum, RequestTrackerBaseType } from "src/app";
 import { categorySchemaArray } from "states/state";
 import { requestUrlCheckWorker } from "./common/requestUrlCheckWorker";
 import { getCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
+import { requestTrackerActions } from "reducers/slices/app";
 
 /**
  * a worker (generator)    
@@ -62,14 +63,14 @@ export function* fetchCategoryWithCacheWorker(action: PayloadAction<{}>) {
        *
        *  - TODO: make sure response structure with remote api
        **/
-      const normalizedData = normalize(response.data.data, categorySchemaArray)
+      const normalizedData = normalize(response.data.content, categorySchemaArray)
 
       /**
        * update categories domain in state
        *
        **/
       yield put(
-        categoryActions.update(normalizedData.entities as NormalizedCategoryType)
+        categoryActions.update(normalizedData.entities.categories as NormalizedCategoryType)
       )
 
       /**
@@ -77,6 +78,18 @@ export function* fetchCategoryWithCacheWorker(action: PayloadAction<{}>) {
        **/
       yield put(
        getCategoryFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+      )
+
+      /**
+       * add the url to requestUrlTracker state
+       **/
+      yield put(
+        requestTrackerActions.update({
+          [apiUrl]: {
+            ids: normalizedData.result,
+            //pagination: ...
+          }
+        }) 
       )
 
     } catch (error) {

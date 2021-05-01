@@ -302,64 +302,13 @@ export const emptyNestedObject: (obj: Record<string, any>) => Record<string, any
 }
 
 /**
- * pagination
+ * formatter
  **/
-//export const convertPageToOffset: (total: number, limit: number, page: number) => number = (total, limit, page) => {
-//  return (page - 1) * limit;
-//}
-//
-//export const convertOffsetToPage: (total: number, limit: number, offset: number) => number = (total, limit, offset) => {
-//  return (offset / limit) + 1;
-//}
-//
-//export const calculateMaxPageNumber: (total: number, limit: number) => number = (total, limit) => {
-//  return Math.ceil(total / limit)
-//}
-//
-//export const generatePageLinkSlice: (begin: number, end: number) => PageLinkType[] = (begin, end) => {
-//  const pageLinks: PageLinkType[] = []
-//
-//  for (let i = begin; i < end; i++) {
-//    pageLinks.push({ num: i })
-//  }
-//
-//  return pageLinks
-//}
-//
-//export const generatePaginationLink: (total: number, limit: number, curPage: number, btnNum: number) => PageLinkType[] = (total, limit, curPage, btnNum) => {
-//
-//  const leftNum = Math.floor(btnNum/2);
-//  const rightNum = Math.floor(btnNum/2);
-//  const maxPageNum = calculateMaxPageNumber(total, limit);
-//
-//  if (total <= limit) {
-//    return [];
-//  }
-//
-//  if (curPage <= leftNum + 1) {
-//    let upperPageNum
-//    if (maxPageNum - btnNum > 0) {
-//      upperPageNum = btnNum
-//    } else {
-//      upperPageNum = maxPageNum
-//    }
-//
-//    return generatePageLinkSlice(1, upperPageNum+1)
-//  } else if (maxPageNum - curPage < rightNum + 1) {
-//    return generatePageLinkSlice(maxPageNum - (btnNum - 1), maxPageNum + 1)
-//  } else {
-//    let lowerPageNum; 
-//    if (curPage - leftNum < 0) {
-//      lowerPageNum = 1;
-//    } else {
-//      lowerPageNum = curPage - leftNum
-//    }
-//    let upperPageNum 
-//    if (curPage + rightNum > maxPageNum) {
-//      upperPageNum = maxPageNum
-//    } else {
-//      upperPageNum = curPage + rightNum
-//    }
-//    return generatePageLinkSlice(lowerPageNum, upperPageNum + 1)
-//  }
-//}
+
+// price (currency)
+export const cadCurrencyFormat: (amount: number) => string = (amount) => {
+  return amount.toLocaleString("ca-CA", {
+    style: 'currency',
+    currency: "CAD",
+  });
+}

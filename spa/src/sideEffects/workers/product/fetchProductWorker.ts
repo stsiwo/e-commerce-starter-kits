@@ -74,14 +74,15 @@ export function* fetchProductWorker(action: PayloadAction<{}>) {
        *
        *  - TODO: make sure response structure with remote api
        **/
-      const normalizedData = normalize(response.data.data, productSchemaArray)
+      console.log(response) // pageable response
+      const normalizedData = normalize(response.data.content, productSchemaArray)
 
       /**
        * update product domain in state
        *
        **/
       yield put(
-        productActions.merge(normalizedData.entities as NormalizedProductType)
+        productActions.merge(normalizedData.entities.products as NormalizedProductType)
       )
 
       /**

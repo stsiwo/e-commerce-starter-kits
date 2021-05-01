@@ -74,14 +74,15 @@ export function* fetchCategoryWorker(action: PayloadAction<{}>) {
      *
      *  - TODO: make sure response structure with remote api
      **/
-    const normalizedData = normalize(response.data.data, categorySchemaArray)
+    console.log(response) // pageable response
+    const normalizedData = normalize(response.data.content, categorySchemaArray)
 
     /**
      * update categories domain in state
      *
      **/
     yield put(
-      categoryActions.update(normalizedData.entities as NormalizedCategoryType)
+      categoryActions.update(normalizedData.entities.categories as NormalizedCategoryType)
     )
 
     /**
