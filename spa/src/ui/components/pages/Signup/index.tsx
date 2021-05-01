@@ -230,7 +230,7 @@ const Signup: React.FunctionComponent<{}> = (props) => {
         />
         <Box component="div" className={classes.forgetPasswordBox} >
           <Typography variant="body2" component="p">
-            <Link component={props => <RRLink {...props} to="/login" />}>
+            <Link component={RRLink} to="/login">
               already have an account?
             </Link>
           </Typography>

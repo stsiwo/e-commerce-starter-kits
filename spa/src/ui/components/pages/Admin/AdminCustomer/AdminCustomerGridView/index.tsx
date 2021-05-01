@@ -56,7 +56,7 @@ const columns: GridColDef[] = [
     headerName: 'Orders', 
     width: 150,
     renderCell: (params: GridCellParams) => (
-      <Link href="" component={props => <RRLink {...props} to="/" />}>
+      <Link component={RRLink} to="/">
       {params.value}
       </Link >
     )
@@ -66,7 +66,7 @@ const columns: GridColDef[] = [
     headerName: 'Reviews', 
     width: 150,
     renderCell: (params: GridCellParams) => (
-      <Link href="" component={props => <RRLink {...props} to="/" />}>
+      <Link component={RRLink} to="/">
         {params.value}
       </Link >
     )

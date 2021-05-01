@@ -2,6 +2,7 @@ import Header from 'components/common/Header';
 import * as React from 'react';
 import Container from '@material-ui/core/Container';
 import Footer from '../Footer';
+import CartDrawer from 'components/common/CartDrawer';
 
 const BasePage: React.FunctionComponent<{}> = (props) => {
 
@@ -15,6 +16,7 @@ const BasePage: React.FunctionComponent<{}> = (props) => {
         {props.children}
       </Container>
       <Footer />
+      <CartDrawer />
     </React.Fragment>
   )
 }

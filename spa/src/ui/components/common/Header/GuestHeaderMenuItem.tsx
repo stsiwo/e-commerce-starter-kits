@@ -7,6 +7,9 @@ import { Link as RRLink } from "react-router-dom";
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
+import { useDispatch } from 'react-redux';
+import { cartModalActions } from 'reducers/slices/ui';
+import { constructLinkWrapper } from 'src/componentUtils';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -28,21 +31,25 @@ const GuestHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
    *
    **/
 
+  const dispatch = useDispatch();
+
+  const handleCartModalOpenClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+    dispatch(cartModalActions.toggle());
+  }
+
   return (
     <Grid item>
-      <Link color="inherit" className={classes.menuItem} component={props => <RRLink {...props} to="/login" />}>
+      <Link color="inherit" className={classes.menuItem} component={RRLink} to="/login">
         Log In
-        </Link>
-      <Link color="inherit" className={classes.menuItem} component={props => <RRLink {...props} to="/signup" />}>
-        Sign Up
-        </Link>
-      <Link color="inherit" className={classes.menuItem} component={props => <RRLink {...props} to="/cart" />}>
-        <IconButton>
-          <Badge badgeContent={4} color="error">
-            <ShoppingCartIcon />
-          </Badge>
-        </IconButton>
       </Link>
+      <Link color="inherit" className={classes.menuItem} component={RRLink} to="/signup">
+        Sign Up
+      </Link>
+      <IconButton onClick={handleCartModalOpenClick}>
+        <Badge badgeContent={4} color="error">
+          <ShoppingCartIcon />
+        </Badge>
+      </IconButton>
     </Grid>
   )
 }

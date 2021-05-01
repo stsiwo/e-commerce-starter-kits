@@ -43,24 +43,24 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
           container
         >
           <Grid item>
-            <Link color="inherit" component={props => <RRLink {...props} to="/" />}>
+            <Link color="inherit" component={RRLink} to="/">
               <IconButton edge="start"  color="inherit" aria-label="admin-logo">
                 <SentimentSatisfiedOutlinedIcon />
               </IconButton>
             </Link>
           </Grid>
           <Grid item className={classes.gridItemRight}>
-            <Link color="inherit" component={props => <RRLink {...props} to="/" />}>
+            <Link color="inherit" component={RRLink} to="/">
               <IconButton edge="start"  color="inherit" aria-label="admin-menu-search">
                 <NotificationsIcon />
               </IconButton>
             </Link>
-            <Link color="inherit" component={props => <RRLink {...props} to="/" />}>
+            <Link color="inherit" component={RRLink} to="/">
               <IconButton edge="start"  color="inherit" aria-label="admin-menu-search">
                 <SearchOutlinedIcon />
               </IconButton>
             </Link>
-            <Link color="inherit" component={props => <RRLink {...props} to="/admin/account" />}>
+            <Link color="inherit"  component={RRLink} to="/admin/account">
               <Avatar alt="Satoshi Iwao" src={SampleSelfImage}/>
             </Link>
           </Grid>

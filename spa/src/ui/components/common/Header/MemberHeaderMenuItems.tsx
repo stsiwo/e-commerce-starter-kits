@@ -67,7 +67,12 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
   const renderMenuItemListForLargeScreen: () => React.ReactNode = () => {
     return menuItemList.map((menuItem: MenuItemType) => {
       return (
-        <Link key={menuItem.url} color="inherit" className={classes.menuItem} component={props => <RRLink {...props} to={menuItem.url} />}>
+        <Link key={menuItem.url}
+          color="inherit"
+          className={classes.menuItem}
+          component={RRLink}
+          to={menuItem.url}
+        >
           {menuItem.label}
         </Link>
       )
@@ -78,7 +83,12 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
     return menuItemList.map((menuItem: MenuItemType) => {
       return (
         <MenuItem key={menuItem.url} onClick={handleDropDownMenuCloseClickEvent}>
-          <Link color="inherit" className={classes.menuItem} component={props => <RRLink {...props} to={menuItem.url} />}>
+          <Link
+            color="inherit"
+            className={classes.menuItem}
+            component={RRLink}
+            to={menuItem.url}
+          >
             {menuItem.label}
           </Link>
         </MenuItem>

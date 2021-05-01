@@ -4,7 +4,7 @@ import { deleteSingleCategoryFetchStatusSliceReducer, getCategoryFetchStatusSlic
 import { cartItemSliceReducer } from './slices/domain/cartItem';
 import { categorySliceReducer } from './slices/domain/category';
 import { wishlistItemSliceReducer } from './slices/domain/wishlistItem';
-import { leftNavMenuSliceReducer, rightNavMenuSliceReducer, searchModalSliceReducer } from './slices/ui';
+import { leftNavMenuSliceReducer, rightNavMenuSliceReducer, searchModalSliceReducer, cartModalSliceReducer } from './slices/ui';
 import { getCartItemFetchStatusSliceReducer, postCartItemFetchStatusSliceReducer, putCartItemFetchStatusSliceReducer, deleteSingleCartItemFetchStatusSliceReducer, deleteCartItemFetchStatusSliceReducer } from './slices/app/fetchStatus/cartItem';
 import { getWishlistItemFetchStatusSliceReducer, postWishlistItemFetchStatusSliceReducer, deleteSingleWishlistItemFetchStatusSliceReducer, deleteWishlistItemFetchStatusSliceReducer } from './slices/app/fetchStatus/wishlistItem';
 import { getUserFetchStatusSliceReducer, postUserFetchStatusSliceReducer, putUserFetchStatusSliceReducer, deleteSingleUserFetchStatusSliceReducer, patchUserFetchStatusSliceReducer, getSingleUserFetchStatusSliceReducer } from './slices/app/fetchStatus/user';
@@ -27,6 +27,7 @@ export const rootReducer = combineReducers({
     leftNavMenu: leftNavMenuSliceReducer,
     rightNavMenu: rightNavMenuSliceReducer,
     searchModal: searchModalSliceReducer,
+    cartModal: cartModalSliceReducer,
   }),
 
   app: combineReducers({

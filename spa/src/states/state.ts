@@ -64,6 +64,7 @@ export const initialState: StateType = {
     leftNavMenu: false,
     rightNavMenu: false,
     searchModal: false,
+    cartModal: false,
   },
   app: {
     auth: {

@@ -155,7 +155,7 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
         />
         <Box component="div" className={classes.forgetPasswordBox} >
           <Typography variant="body2" component="p">
-            <Link href="/admin/forget-password" component={props => <RRLink {...props} to="/" />}>
+            <Link component={RRLink} to="/admin/forget-password">
               forget your password?
             </Link>
           </Typography>

@@ -13,6 +13,7 @@ export declare type UiStateType = {
   leftNavMenu?: boolean
   rightNavMenu?: boolean
   searchModal?: boolean
+  cartModal?: boolean
 }
 
 export declare type AppStateType = {

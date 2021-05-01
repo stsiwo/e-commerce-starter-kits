@@ -94,6 +94,10 @@
         </TargetComponent>
       ```
 
+  ### Integration Link (material-ui) with React-Router-Dom Library
+
+    - read this: https://material-ui.com/guides/composition/#link
+
 ## Data Grid library
 
   ### Material UI

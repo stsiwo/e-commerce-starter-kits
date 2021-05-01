@@ -104,3 +104,34 @@ export const searchModalSlice = createSlice({
 
 export const searchModalSliceReducer = searchModalSlice.reducer
 export const searchModalActions = searchModalSlice.actions
+
+/**
+ * ui.cartModal state Slice
+ **/
+export const cartModalSlice = createSlice({ 
+  name: "ui/cartModal", // a name used in action type
+  initialState: false, 
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+    open: (state: boolean) => true,
+    close: (state: boolean) => false,
+    update: (state: boolean, action: PayloadAction<boolean>) => action.payload,
+    toggle: (state: boolean) => !state,
+  }
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   **/
+}) 
+
+export const cartModalSliceReducer = cartModalSlice.reducer
+export const cartModalActions = cartModalSlice.actions

@@ -23,6 +23,7 @@ export const rsSelector = {
     getLeftNavMenu: (state: StateType) => state.ui.leftNavMenu,
     getRightNavMenu: (state: StateType) => state.ui.rightNavMenu,
     getSearchModal: (state: StateType) => state.ui.searchModal,
+    getCartModal: (state: StateType) => state.ui.cartModal,
   },
 
   app: {
@@ -87,6 +88,18 @@ export const mSelector = {
       ],
       (searchModal) => {
         return searchModal
+      },
+    )
+  },
+
+  // ui.cartModal
+  makeCartModalSelector: () => {
+    return createSelector(
+      [
+        rsSelector.ui.getCartModal
+      ],
+      (cartModal) => {
+        return cartModal
       },
     )
   },

@@ -99,7 +99,7 @@ const Footer: React.FunctionComponent<{}> = (props) => {
             <Link href="https://google.com" target="_blank">
               <YouTubeIcon fontSize="large" />
             </Link>
-            <Link component={props => <RRLink {...props} to="/contact" />}>
+            <Link component={RRLink} to="/contact">
               <AlternateEmailIcon fontSize="large" />
             </Link>
           </Box>
@@ -114,25 +114,31 @@ const Footer: React.FunctionComponent<{}> = (props) => {
             {"Links"}
           </Typography>
           <List>
-            <ListItem button component={props => <RRLink {...props} to="/" />}>
+            <ListItem button component={RRLink} to="/">
               <ListItemIcon>
                 <HomeIcon />
               </ListItemIcon>
               <ListItemText primary="Home" />
             </ListItem>
-            <ListItem button component={props => <RRLink {...props} to="/" />}>
+            <ListItem button component={RRLink} to="/">
               <ListItemIcon>
                 <HomeIcon />
               </ListItemIcon>
               <ListItemText primary="Home" />
             </ListItem>
-            <ListItem button component={props => <RRLink {...props} to="/" />}>
+            <ListItem button component={RRLink} to="/">
               <ListItemIcon>
                 <HomeIcon />
               </ListItemIcon>
               <ListItemText primary="Home" />
             </ListItem>
-            <ListItem button component={props => <RRLink {...props} to="/" />}>
+            <ListItem button component={RRLink} to="/">
+              <ListItemIcon>
+                <HomeIcon />
+              </ListItemIcon>
+              <ListItemText primary="Home" />
+            </ListItem>
+            <ListItem button component={RRLink} to="/">
               <ListItemIcon>
                 <HomeIcon />
               </ListItemIcon>

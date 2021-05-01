@@ -1,26 +1,25 @@
 import Account from 'components/pages/Account';
 import Admin from 'components/pages/Admin';
+import AdminAccount from 'components/pages/Admin/AdminAccount';
+import AdminCategory from 'components/pages/Admin/AdminCategory';
+import AdminCustomer from 'components/pages/Admin/AdminCustomer';
 import AdminLogin from 'components/pages/Admin/AdminLogin';
+import AdminOrder from 'components/pages/Admin/AdminOrder';
+import AdminProduct from 'components/pages/Admin/AdminProduct';
+import AdminProductVariant from 'components/pages/Admin/AdminProductVariant';
+import AdminReview from 'components/pages/Admin/AdminReview';
+import Checkout from 'components/pages/Checkout';
 import Guest from 'components/pages/Guest';
 import Home from 'components/pages/Home';
+import Login from 'components/pages/Login';
+import Product from 'components/pages/Product';
 import ProductSearch from 'components/pages/ProductSearch';
+import Signup from 'components/pages/Signup';
+import Wishlist from 'components/pages/Wishlist';
 import * as React from 'react';
 import { UserTypeEnum } from 'src/app';
 import { withAdminBasePage } from 'ui/hoc/withAdminBasePage';
 import { withBasePage } from 'ui/hoc/withBasePage';
-import AdminAccount from 'components/pages/Admin/AdminAccount';
-import AdminProduct from 'components/pages/Admin/AdminProduct';
-import AdminProductVariant from 'components/pages/Admin/AdminProductVariant';
-import AdminCategory from 'components/pages/Admin/AdminCategory';
-import AdminOrder from 'components/pages/Admin/AdminOrder';
-import AdminReview from 'components/pages/Admin/AdminReview';
-import AdminCustomer from 'components/pages/Admin/AdminCustomer';
-import Cart from 'components/pages/Cart';
-import Product from 'components/pages/Product';
-import Checkout from 'components/pages/Checkout';
-import Wishlist from 'components/pages/Wishlist';
-import Login from 'components/pages/Login';
-import Signup from 'components/pages/Signup';
 
 // route data
 export declare type RouteDataType = {
@@ -49,20 +48,12 @@ export const routesData: RoutesDataType = {
       url: "/signup",
       component: withBasePage(Signup),
     },
-    {
-      url: "/cart",
-      component: withBasePage(Cart),
-    },
   ],
   // define member only page
   [UserTypeEnum.MEMBER]: [
     {
       url: "/account",
       component: withBasePage(Account),
-    },
-    {
-      url: "/cart",
-      component: withBasePage(Cart),
     },
     {
       url: "/wishlist",

@@ -51,7 +51,7 @@ const columns: GridColDef[] = [
     width: 150,
     renderCell: (params: GridCellParams) => (
       <React.Fragment>
-        <Link href="" component={props => <RRLink {...props} to="/" />}>
+        <Link component={RRLink} to="/">
           {params.value} 
         </Link>
       </React.Fragment>

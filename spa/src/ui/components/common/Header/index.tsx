@@ -45,7 +45,7 @@ const Header: React.FunctionComponent<{}> = (props) => {
           container
         >
           <Grid item>
-            <Link color="inherit" component={props => <RRLink {...props} to="/" />}>
+            <Link color="inherit" component={RRLink} to="/">
               <IconButton edge="start"  color="inherit" aria-label="menu">
                 <SentimentSatisfiedOutlinedIcon />
               </IconButton>
