@@ -18,7 +18,7 @@ endpoint change:
   
     - implement that only update property which has value (not null)
     
-    - implement user phone managment endpoint (like addresses)
+    - (/users/{userId}/phones) implement user phone managment endpoint (like addresses)
     
       - do i need customers have multiple phone numbers??
       
@@ -27,6 +27,14 @@ endpoint change:
           - you can identify the target phone id by path in request url.
       
       - should return updated user entity (not only phones/address). should return aggregate.
+    
+    - (/users/{userId}/addresses) 
+    
+      - (PATCH) for both shipping/billing selection update 
+      
+        - requestBody: { isBilling: true } or { isShipping: true }
+        
+      - should return updated user aggregate (not only phones/address).
     
   - /orders
   
