@@ -17,7 +17,15 @@ import { UserAddressType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { userAccountAddressSchema } from 'hooks/validation/rules';
 import * as React from 'react';
-import { testAddressList } from 'tests/data/user';
+import { useDispatch, useSelector } from 'react-redux';
+import { mSelector } from 'src/selectors/selector';
+import { useSnackbar } from 'notistack';
+import { authActions } from 'reducers/slices/app';
+import axios, { AxiosError } from 'axios';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Radio from '@material-ui/core/Radio';
+import EditIcon from '@material-ui/icons/Edit';
+import { getBillingAddressId, getShippingAddressId } from 'domain/user';
 
 export declare type UserAccountAddressDataType = {
   addressId?: string
@@ -122,6 +130,16 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   // mui: makeStyles
   const classes = useStyles();
 
+  // dispatch
+  const dispatch = useDispatch();
+
+  // auth
+  const auth = useSelector(mSelector.makeAuthSelector())
+
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
   // temp user account state
   const [curUserAccountAddressState, setUserAccountAddressState] = React.useState<UserAccountAddressDataType>(defaultUserAccountAddressData);
 
@@ -216,19 +234,49 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
 
     if (isValid) {
       // pass 
+
+
       console.log("passed")
       if (isNew) {
         console.log("this one is to create new one")
-        /**
-         * TODO:
-         * POST /users/{userId}/addresses to add new one
-         **/
+        // request
+        axios.request({
+          method: 'POST',
+          url: API1_URL + `/users/${auth.user.userId}/addresses`,
+          data: JSON.stringify(curUserAccountAddressState),
+        }).then((data) => {
+          /**
+           * update auth
+           **/
+          const updatedUser = data.data;
+          dispatch(authActions.update({
+            ...auth,
+            user: updatedUser,
+          }))
+          enqueueSnackbar("added successfully.", { variant: "success" })
+        }).catch((error: AxiosError) => {
+          enqueueSnackbar(error.message, { variant: "error" })
+        })
       } else {
         console.log("this one is to update existing one")
-        /**
-         * TODO:
-         * PUT /users/{userId}/addresses/{addressId} to update one 
-         **/
+        // request
+        axios.request({
+          method: 'PUT',
+          url: API1_URL + `/users/${auth.user.userId}/addresses/${curUserAccountAddressState.addressId}`,
+          data: JSON.stringify(curUserAccountAddressState),
+        }).then((data) => {
+          /**
+           * update auth
+           **/
+          const updatedUser = data.data;
+          dispatch(authActions.update({
+            ...auth,
+            user: updatedUser,
+          }))
+          enqueueSnackbar("updated successfully.", { variant: "success" })
+        }).catch((error: AxiosError) => {
+          enqueueSnackbar(error.message, { variant: "error" })
+        })
       }
     } else {
       updateAllValidation()
@@ -246,16 +294,34 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   // delete an existing phone number
   const handleDeleteAddressClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
     console.log("delete an existing address event triggered")
-    /**
-     * TODO: DELETE /users/{userId}/addresses/{phoneId}
-     **/
+
+    const addressId = e.currentTarget.getAttribute("data-address-id")
+    // request
+    axios.request({
+      method: 'DELETE',
+      url: API1_URL + `/users/${auth.user.userId}/addresses/${addressId}`
+    }).then((data) => {
+
+      /**
+       * update auth
+       **/
+      const updatedUser = data.data;
+      dispatch(authActions.update({
+        ...auth,
+        user: updatedUser,
+      }))
+
+      enqueueSnackbar("deleted successfully.", { variant: "success" })
+    }).catch((error: AxiosError) => {
+      enqueueSnackbar(error.message, { variant: "error" })
+    })
   }
 
   // event handler to click an address list item to update address
   const handleAddressItemClickEvent: React.EventHandler<React.MouseEvent<HTMLElement>> = (e) => {
 
     const targetAddressId: string = e.currentTarget.getAttribute("data-address-id");
-    const targetAddress = testAddressList.find((address: UserAddressType) => {
+    const targetAddress = auth.user.addresses.find((address: UserAddressType) => {
       return address.addressId == targetAddressId
     })
 
@@ -265,20 +331,76 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
     setModalOpen(true)
   }
 
+  // shipping & billing address selection stuff
+  const [curShippingId, setShippingId] = React.useState<string>(getShippingAddressId(auth.user.addresses));
+  const [curBillingId, setBillingId] = React.useState<string>(getBillingAddressId(auth.user.addresses));
+
+  const handleBillingAddressChange: React.EventHandler<React.MouseEvent<HTMLLabelElement>> = (e) => {
+
+    const nextBillingAddress = e.currentTarget.getAttribute("data-billing-address-id")
+
+    setBillingId(nextBillingAddress)
+
+    // request
+    axios.request({
+      method: 'PATCH',
+      url: API1_URL + `/users/${auth.user.userId}/addresses/${nextBillingAddress}`,
+      data: JSON.stringify({ isBilling: true })
+    }).then((data) => {
+
+      /**
+       * update auth
+       **/
+      const updatedUser = data.data;
+      dispatch(authActions.update({
+        ...auth,
+        user: updatedUser,
+      }))
+
+      enqueueSnackbar("updated successfully.", { variant: "success" })
+    }).catch((error: AxiosError) => {
+      enqueueSnackbar(error.message, { variant: "error" })
+    })
+
+  }
+
+  const handleShippingAddressChange: React.EventHandler<React.MouseEvent<HTMLLabelElement>> = (e) => {
+
+    const nextShippingAddress = e.currentTarget.getAttribute("data-shipping-address-id")
+
+    setShippingId(nextShippingAddress)
+
+    // request
+    axios.request({
+      method: 'PATCH',
+      url: API1_URL + `/users/${auth.user.userId}/addresses/${nextShippingAddress}`,
+      data: JSON.stringify({ isShipping: true })
+    }).then((data) => {
+
+      /**
+       * update auth
+       **/
+      const updatedUser = data.data;
+      dispatch(authActions.update({
+        ...auth,
+        user: updatedUser,
+      }))
+
+      enqueueSnackbar("updated successfully.", { variant: "success" })
+    }).catch((error: AxiosError) => {
+      enqueueSnackbar(error.message, { variant: "error" })
+    })
+
+  }
   // render functions
 
   // display current phone number list
   const renderCurAddressListComponent: () => React.ReactNode = () => {
-    /**
-     * TODO: replace with real one and remove test data
-     **/
-    //return phones.map((phone: UserAddressType) => {
 
-
-    return testAddressList.map((address: UserAddressType) => {
+    return auth.user.addresses.map((address: UserAddressType) => {
       const addressString = Object.values(address).join(" ");
       return (
-        <ListItem key={address.addressId} data-address-id={address.addressId} onClick={handleAddressItemClickEvent} >
+        <ListItem key={address.addressId} >
           <ListItemAvatar>
             <Avatar>
               <HomeIcon />
@@ -286,12 +408,43 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
           </ListItemAvatar>
           <ListItemText
             primary={addressString}
-            secondary={""}
+            secondary={
+              <React.Fragment>
+                {/**
+                * not use usual radio button group because of two different radio group with the same list item
+                *
+                *   - ref: https://stackoverflow.com/questions/37150254/radiobuttongroup-within-nested-list 
+                **/}
+                <FormControlLabel
+                  value={address.addressId}
+                  data-billing-address-id={address.addressId}
+                  checked={curShippingId === address.addressId}
+                  control={<Radio />}
+                  labelPlacement="bottom"
+                  label={curShippingId === address.addressId ? "shipping" : ""}
+                  name="user-billing-address"
+                  onClick={handleShippingAddressChange}
+                />
+                <FormControlLabel
+                  value={address.addressId}
+                  data-shipping-address-id={address.addressId}
+                  checked={curBillingId === address.addressId}
+                  control={<Radio />}
+                  labelPlacement="bottom"
+                  label={curBillingId === address.addressId ? "billing" : ""}
+                  name="user-shipping-address"
+                  onClick={handleBillingAddressChange}
+                />
+                <IconButton edge="end" aria-label="delete" data-address-id={address.addressId} onClick={handleDeleteAddressClickEvent}>
+                  <DeleteIcon />
+                </IconButton>
+                <IconButton edge="end" aria-label="edit" data-address-id={address.addressId} onClick={handleAddressItemClickEvent}>
+                  <EditIcon />
+                </IconButton>
+              </React.Fragment>
+            }
           />
           <ListItemSecondaryAction>
-            <IconButton edge="end" aria-label="delete" onClick={handleDeleteAddressClickEvent}>
-              <DeleteIcon />
-            </IconButton>
           </ListItemSecondaryAction>
         </ListItem>
       )
@@ -303,12 +456,12 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   return (
     <React.Fragment>
       <Box component="div">
-        {(testAddressList.length === 0 &&
+        {(auth.user.addresses.length === 0 &&
           <Typography variant="body2" component="p" align="center" >
             {"Oops. You Haven't Registered Any Address Yet."}
           </Typography>
         )}
-        {(testAddressList.length > 0 &&
+        {(auth.user.addresses.length > 0 &&
           <List className={classes.listBox}>
             {renderCurAddressListComponent()}
           </List>

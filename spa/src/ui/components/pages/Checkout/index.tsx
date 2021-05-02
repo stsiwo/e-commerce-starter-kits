@@ -1,19 +1,17 @@
+import Button from '@material-ui/core/Button';
+import Step from '@material-ui/core/Step';
+import StepContent from '@material-ui/core/StepContent';
+import StepLabel from '@material-ui/core/StepLabel';
+import Stepper from '@material-ui/core/Stepper';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import CustomerBasicForm from 'components/common/Checkout/CustomerBasicForm';
+import CustomerContactForm from 'components/common/Checkout/CustomerContactForm';
+import Payment from 'components/common/Checkout/Payment';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Stepper from '@material-ui/core/Stepper';
-import { checkoutSteps, CheckoutStepType } from './checkoutSteps';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
-import StepContent from '@material-ui/core/StepContent';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import CustomerBasicForm from 'components/common/Checkout/CustomerBasicForm';
 import { mSelector } from 'src/selectors/selector';
-import { UserTypeEnum } from 'src/app';
-import CustomerContactForm from 'components/common/Checkout/CustomerContactForm';
-import OrderItemForm from 'components/common/Checkout/OrderItemForm';
-import Payment from 'components/common/Checkout/Payment';
+import { checkoutSteps } from './checkoutSteps';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

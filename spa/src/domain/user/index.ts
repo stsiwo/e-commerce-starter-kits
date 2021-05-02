@@ -1,4 +1,4 @@
-import { UserPhoneType } from "./types";
+import { UserPhoneType, UserAddressType } from "./types";
 
 /**
  * user domain behaviors
@@ -14,3 +14,21 @@ export function getPrimaryPhoneId(phones: UserPhoneType[]): string {
 
   return primary.phoneId;
 }
+
+export function getShippingAddressId(addresses: UserAddressType[]): string {
+  const primary = addresses.find((address: UserAddressType) => address.isShippingAddress)
+
+  if (!primary) return null
+
+  return primary.addressId;
+}
+
+export function getBillingAddressId(addresses: UserAddressType[]): string {
+  const primary = addresses.find((address: UserAddressType) => address.isBillingAddress)
+
+  if (!primary) return null
+
+  return primary.addressId;
+}
+
+

@@ -1,6 +1,7 @@
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -8,24 +9,23 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Modal from '@material-ui/core/Modal';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
 import PhoneIphoneIcon from '@material-ui/icons/PhoneIphone';
+import axios, { AxiosError } from 'axios';
+import { getPrimaryPhoneId } from 'domain/user';
 import { UserPhoneType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { userAccountPhoneSchema } from 'hooks/validation/rules';
-import * as React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { mSelector } from 'src/selectors/selector';
-import axios, { AxiosError } from 'axios';
 import { useSnackbar } from 'notistack';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Radio from '@material-ui/core/Radio';
-import { getPrimaryPhone, getPrimaryPhoneId } from 'domain/user';
+import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { authActions } from 'reducers/slices/app';
+import { mSelector } from 'src/selectors/selector';
 
 export declare type UserAccountPhoneDataType = {
   phoneId?: string
