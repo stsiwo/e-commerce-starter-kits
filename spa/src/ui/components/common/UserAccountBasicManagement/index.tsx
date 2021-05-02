@@ -11,9 +11,14 @@ import { mSelector } from 'src/selectors/selector';
 import { useSnackbar } from 'notistack';
 import { authActions } from 'reducers/slices/app';
 import axios, { AxiosError } from 'axios';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    title: {
+      textTransform: "uppercase",
+      margin: theme.spacing(2)
+    },
     form: {
       margin: theme.spacing(1),
       textAlign: "center",
@@ -186,61 +191,66 @@ const UserAccountBasicManagement: React.FunctionComponent<UserAccountBasicManage
   }
 
   return (
-    <form className={classes.form} noValidate autoComplete="off">
-      <TextField
-        id="first-name"
-        label="First Name"
-        className={classes.formControl}
-        value={curUserAccountState.firstName}
-        onChange={handleFirstNameInputChangeEvent}
-        helperText={curUserAccountValidationState.firstName}
-        error={curUserAccountValidationState.firstName !== ""}
+    <React.Fragment>
+      <Typography variant="h6" component="h6" align="center" className={classes.title} >
+        {"Basic"}
+      </Typography>
+      <form className={classes.form} noValidate autoComplete="off">
+        <TextField
+          id="first-name"
+          label="First Name"
+          className={classes.formControl}
+          value={curUserAccountState.firstName}
+          onChange={handleFirstNameInputChangeEvent}
+          helperText={curUserAccountValidationState.firstName}
+          error={curUserAccountValidationState.firstName !== ""}
 
-      />
-      <TextField
-        id="last-name"
-        label="Last Name"
-        className={classes.formControl}
-        value={curUserAccountState.lastName}
-        onChange={handleLastNameInputChangeEvent}
-        helperText={curUserAccountValidationState.lastName}
-        error={curUserAccountValidationState.lastName !== ""}
-      />
-      <TextField
-        id="email"
-        label="Email"
-        className={classes.formControl}
-        value={curUserAccountState.email}
-        onChange={handleEmailInputChangeEvent}
-        helperText={curUserAccountValidationState.email}
-        error={curUserAccountValidationState.email !== ""}
-      />
-      <TextField
-        id="password"
-        label="Password"
-        type="password"
-        className={classes.formControl}
-        value={curUserAccountState.password}
-        onChange={handlePasswordInputChangeEvent}
-        helperText={curUserAccountValidationState.password}
-        error={curUserAccountValidationState.password !== ""}
-      />
-      <TextField
-        id="confirm"
-        label="Confirm"
-        type="password"
-        className={classes.formControl}
-        value={curUserAccountState.confirm}
-        onChange={handleConfirmInputChangeEvent}
-        helperText={curUserAccountValidationState.confirm}
-        error={curUserAccountValidationState.confirm !== ""}
-      />
-      <Box component="div" className={classes.actionBox}>
-        <Button onClick={handleUserAccountSaveClickEvent}>
-          Save
+        />
+        <TextField
+          id="last-name"
+          label="Last Name"
+          className={classes.formControl}
+          value={curUserAccountState.lastName}
+          onChange={handleLastNameInputChangeEvent}
+          helperText={curUserAccountValidationState.lastName}
+          error={curUserAccountValidationState.lastName !== ""}
+        />
+        <TextField
+          id="email"
+          label="Email"
+          className={classes.formControl}
+          value={curUserAccountState.email}
+          onChange={handleEmailInputChangeEvent}
+          helperText={curUserAccountValidationState.email}
+          error={curUserAccountValidationState.email !== ""}
+        />
+        <TextField
+          id="password"
+          label="Password"
+          type="password"
+          className={classes.formControl}
+          value={curUserAccountState.password}
+          onChange={handlePasswordInputChangeEvent}
+          helperText={curUserAccountValidationState.password}
+          error={curUserAccountValidationState.password !== ""}
+        />
+        <TextField
+          id="confirm"
+          label="Confirm"
+          type="password"
+          className={classes.formControl}
+          value={curUserAccountState.confirm}
+          onChange={handleConfirmInputChangeEvent}
+          helperText={curUserAccountValidationState.confirm}
+          error={curUserAccountValidationState.confirm !== ""}
+        />
+        <Box component="div" className={classes.actionBox}>
+          <Button onClick={handleUserAccountSaveClickEvent}>
+            Save
         </Button>
-      </Box>
-    </form>
+        </Box>
+      </form>
+    </React.Fragment>
   )
 }
 

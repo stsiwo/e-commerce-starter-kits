@@ -67,6 +67,10 @@ const defaultUserAccountValidationAddressData: UserAccountAddressValidationDataT
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    title: {
+      textTransform: "uppercase",
+      margin: theme.spacing(2)
+    },
     form: {
       margin: theme.spacing(1),
       textAlign: "center",
@@ -455,6 +459,9 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
 
   return (
     <React.Fragment>
+      <Typography variant="h6" component="h6" align="center" className={classes.title} >
+        {"Addresses"}
+      </Typography>
       <Box component="div">
         {(auth.user.addresses.length === 0 &&
           <Typography variant="body2" component="p" align="center" >
