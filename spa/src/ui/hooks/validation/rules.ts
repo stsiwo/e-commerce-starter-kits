@@ -4,8 +4,19 @@ export const userAccountSchema = yup.object().shape({
   firstName: yup.string().required(),
   lastName: yup.string().required(),
   email: yup.string().required().email(),
-  password: yup.string().required(),
-  confirm: yup.string().oneOf([yup.ref('password'), null], "password must match")
+  /**
+   * conditional required password and confirm: if password/confirm is null, it is optional
+   **/
+  password: yup.lazy((value) => value ? yup.string().min(4, "password must be at least 4 characters").required("password is required") : yup.string().notRequired()), 
+  confirm: yup.lazy((cf) => {
+      return yup.string().when('password', {
+        is: (pw: string) => pw || (!pw && cf),
+        then: yup.string().oneOf([yup.ref('password'), null], 'confirm must match with password'),
+        otherwise: yup.string().notRequired()
+      })
+    })
+  
+  //yup.string().oneOf([yup.ref('password'), null], "password must match")
 })
 
 

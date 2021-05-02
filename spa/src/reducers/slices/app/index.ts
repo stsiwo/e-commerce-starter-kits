@@ -33,6 +33,7 @@ export const authSlice = createSlice({
      *
      **/
     login: (state: AuthType, action: authUpdateActionType) => action.payload,
+    update: (state: AuthType, action: authUpdateActionType) => action.payload,
     logout: (state: AuthType) => ({
       isLoggedIn: false,
       userType: UserTypeEnum.GUEST,

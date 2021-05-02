@@ -6,6 +6,11 @@ import { useValidation } from 'hooks/validation';
 import { userAccountSchema } from 'hooks/validation/rules';
 import * as React from 'react';
 import { UserType, UserBasicAccountDataType, defaultUserBasicAccountData, UserBasicAccountValidationDataType, defaultUserBasicAccountValidationData } from 'domain/user/types';
+import { useSelector, useDispatch } from 'react-redux';
+import { mSelector } from 'src/selectors/selector';
+import { useSnackbar } from 'notistack';
+import { authActions } from 'reducers/slices/app';
+import axios, { AxiosError } from 'axios';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -53,12 +58,21 @@ const UserAccountBasicManagement: React.FunctionComponent<UserAccountBasicManage
   // mui: makeStyles
   const classes = useStyles();
 
+  // auth
+  const auth = useSelector(mSelector.makeAuthSelector())
+
+  const dispatch = useDispatch();
+
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
   // temp user account state
   const [curUserAccountState, setUserAccountState] = React.useState<UserBasicAccountDataType>(defaultUserBasicAccountData)
 
   // use effect to update user state if exists after render jsx
   React.useEffect(() => {
-    
+
     if (props.user) {
       setUserAccountState((prev: UserBasicAccountDataType) => ({
         ...prev,
@@ -136,6 +150,34 @@ const UserAccountBasicManagement: React.FunctionComponent<UserAccountBasicManage
     if (isValid) {
       // pass 
       console.log("passed")
+
+      // pre request body
+      const bodyFormData = new FormData();
+      bodyFormData.append("firstName", curUserAccountState.firstName);
+      bodyFormData.append("lastName", curUserAccountState.lastName);
+      bodyFormData.append("email", curUserAccountState.email);
+      bodyFormData.append("password", curUserAccountState.password);
+
+      // request
+      axios.request({
+        method: 'POST',
+        url: API1_URL + `/users/${auth.user.userId}`,
+        data: bodyFormData,
+      }).then((data) => {
+
+        const updatedUser = data.data;
+
+        dispatch(authActions.update({
+          ...auth,
+          user: updatedUser,
+        }));
+
+        enqueueSnackbar("updated successfully.", { variant: "success" })
+      }).catch((error: AxiosError) => {
+        enqueueSnackbar(error.message, { variant: "error" })
+      })
+
+
     } else {
       updateAllValidation()
     }
