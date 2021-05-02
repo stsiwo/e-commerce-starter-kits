@@ -63,7 +63,7 @@ const SortTabPanel: React.FunctionComponent<SortTabPanelPropsType> = ({
   const renderCategoryRadioInputs: () => React.ReactNode = () => {
     return productSortList.map((sort) => {
       return (
-        <FormControlLabel value={sort.value} control={<Radio />} label={sort.label} />
+        <FormControlLabel value={sort.value} control={<Radio />} label={sort.label} key={sort.value} />
       )
     })
   }
@@ -81,5 +81,3 @@ const SortTabPanel: React.FunctionComponent<SortTabPanelPropsType> = ({
 }
 
 export default SortTabPanel
-
-

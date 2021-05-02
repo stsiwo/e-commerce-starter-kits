@@ -35,7 +35,7 @@ const SearchController: React.FunctionComponent<{}> = (props) => {
   /**
    * tab components stuff
    **/
-  const [curTabIndex, setTabIndex] = React.useState(-1);
+  const [curTabIndex, setTabIndex] = React.useState(0);
   function a11yProps(index: any) {
     return {
       id: `scrollable-auto-tab-${index}`,
@@ -45,7 +45,7 @@ const SearchController: React.FunctionComponent<{}> = (props) => {
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
 
     // toggle feature
-    const nextValue = (curTabIndex === newValue) ? -1 : newValue
+    const nextValue = (curTabIndex === newValue) ? 0 : newValue
 
     setTabIndex(nextValue);
   };
@@ -67,47 +67,53 @@ const SearchController: React.FunctionComponent<{}> = (props) => {
           scrollButtons="auto"
           aria-label="scrollable auto tabs example"
         >
-          <Tab label="Category" {...a11yProps(0)} />
-          <Tab label="Price" {...a11yProps(1)} />
-          <Tab label="Review" {...a11yProps(2)} />
-          <Tab label="Discount" {...a11yProps(3)} />
-          <Tab label="Release Date" {...a11yProps(4)} />
-          <Tab label="Sort" {...a11yProps(5)} />
+          <Tab label="Result" {...a11yProps(0)} />
+          <Tab label="Category" {...a11yProps(1)} />
+          <Tab label="Price" {...a11yProps(2)} />
+          <Tab label="Review" {...a11yProps(3)} />
+          <Tab label="Discount" {...a11yProps(4)} />
+          <Tab label="Release Date" {...a11yProps(5)} />
+          <Tab label="Sort" {...a11yProps(6)} />
         </Tabs>
       </AppBar>
       <TabPanel 
         value={curTabIndex} 
         index={0} 
-        className={classes.tabPanel}
-        render={() => <CategoryFilterTabPanel  curCategoryId={curQuery.categoryId}/>} 
+        render={() => <React.Fragment></React.Fragment>}
       />
       <TabPanel 
         value={curTabIndex} 
         index={1} 
         className={classes.tabPanel}
-        render={() => <PriceFilterTabPanel  curMinPrice={curQuery.minPrice} curMaxPrice={curQuery.maxPrice}/>} 
+        render={() => <CategoryFilterTabPanel  curCategoryId={curQuery.categoryId}/>} 
       />
       <TabPanel 
         value={curTabIndex} 
         index={2} 
         className={classes.tabPanel}
-        render={() => <ReviewFilterTabPanel curReviewPoint={curQuery.reviewPoint}/>} 
+        render={() => <PriceFilterTabPanel  curMinPrice={curQuery.minPrice} curMaxPrice={curQuery.maxPrice}/>} 
       />
       <TabPanel 
         value={curTabIndex} 
         index={3} 
         className={classes.tabPanel}
-        render={() => <DiscountFilterTabPanel curDiscountCheck={curQuery.isDiscount}/>} 
+        render={() => <ReviewFilterTabPanel curReviewPoint={curQuery.reviewPoint}/>} 
       />
       <TabPanel 
         value={curTabIndex} 
         index={4} 
         className={classes.tabPanel}
-        render={() => <ReleaseDateFilterTabPanel curStartDate={curQuery.startDate} curEndDate={curQuery.endDate}/>} 
+        render={() => <DiscountFilterTabPanel curDiscountCheck={curQuery.isDiscount}/>} 
       />
       <TabPanel 
         value={curTabIndex} 
         index={5} 
+        className={classes.tabPanel}
+        render={() => <ReleaseDateFilterTabPanel curStartDate={curQuery.startDate} curEndDate={curQuery.endDate}/>} 
+      />
+      <TabPanel 
+        value={curTabIndex} 
+        index={6} 
         className={classes.tabPanel}
         render={() => <SortTabPanel curSort={ProductSortEnum.DATE_DESC}/>} 
       />

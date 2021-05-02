@@ -8,6 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import { ProductType } from 'domain/product/types';
 import * as React from 'react';
 import { cadCurrencyFormat } from 'src/utils';
+import SampleProduct1_1Image from 'static/sample-product-1-1.jpg';
 
 declare type ProductCardV2PropsType = {
   product: ProductType
@@ -57,7 +58,7 @@ const ProductCardV2: React.FunctionComponent<ProductCardV2PropsType> = ({ produc
     <Card className={classes.card}>
       <CardMedia
         className={classes.media}
-        image={(product.productImages.length > 0) ? product.productImages[0].productImagePath : ""}
+        image={(product.productImages.length > 0) ? product.productImages[0].productImagePath : SampleProduct1_1Image }
       />
       <CardContent>
         <Typography variant="body2" color="textSecondary" component="p">
