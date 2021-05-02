@@ -23,6 +23,8 @@ endpoint change:
       - do i need customers have multiple phone numbers??
       
       - implement 'isSelected' (PATCH) endpoint to switch the primary phone numbers (need to make the previous primary phone flase if there is a new primary)
+      
+      - should return updated user entity (not only phones/address). should return aggregate.
     
   - /orders
   
