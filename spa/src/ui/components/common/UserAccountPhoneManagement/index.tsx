@@ -17,24 +17,36 @@ import { UserPhoneType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { userAccountPhoneSchema } from 'hooks/validation/rules';
 import * as React from 'react';
-import { testPhoneList } from 'tests/data/user';
+import { useSelector, useDispatch } from 'react-redux';
+import { mSelector } from 'src/selectors/selector';
+import axios, { AxiosError } from 'axios';
+import { useSnackbar } from 'notistack';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Radio from '@material-ui/core/Radio';
+import { getPrimaryPhone, getPrimaryPhoneId } from 'domain/user';
+import { authActions } from 'reducers/slices/app';
 
 export declare type UserAccountPhoneDataType = {
+  phoneId?: string
   phone: string
   countryCode: string
 }
 
 const defaultUserAccountPhoneData: UserAccountPhoneDataType = {
+  phoneId: "",
   phone: "",
   countryCode: ""
 }
 
 export declare type UserAccountPhoneValidationDataType = {
+  phoneId?: string,
   phone?: string
   countryCode?: string
 }
 
 const defaultUserAccountValidationPhoneData: UserAccountPhoneValidationDataType = {
+  phoneId: "",
   phone: "",
   countryCode: ""
 }
@@ -104,6 +116,16 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
   // mui: makeStyles
   const classes = useStyles();
 
+  // dispatch
+  const dispatch = useDispatch();
+
+  // auth
+  const auth = useSelector(mSelector.makeAuthSelector())
+
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
   // temp user account state
   const [curUserAccountPhoneState, setUserAccountPhoneState] = React.useState<UserAccountPhoneDataType>(defaultUserAccountPhoneData);
 
@@ -148,18 +170,53 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
     if (isValid) {
       // pass 
       console.log("passed")
+
+      const bodyFormData = new FormData();
+      bodyFormData.append("phoneNumber", curUserAccountPhoneState.phone);
+      bodyFormData.append("countryCode", curUserAccountPhoneState.countryCode);
+
       if (isNew) {
         console.log("this one is to create new one")
-        /**
-         * TODO:
-         * POST /users/{userId}/phones to add new one
-         **/
+
+        // request
+        axios.request({
+          method: 'POST',
+          url: API1_URL + `/users/${auth.user.userId}/phones`,
+          data: bodyFormData,
+        }).then((data) => {
+          /**
+           * update auth
+           **/
+          const updatedUser = data.data;
+          dispatch(authActions.update({
+            ...auth,
+            user: updatedUser,
+          }))
+          enqueueSnackbar("added successfully.", { variant: "success" })
+        }).catch((error: AxiosError) => {
+          enqueueSnackbar(error.message, { variant: "error" })
+        })
+
       } else {
         console.log("this one is to update existing one")
-        /**
-         * TODO:
-         * PUT /users/{userId}/phones/{phoneId} to update one 
-         **/
+        // request
+        axios.request({
+          method: 'PUT',
+          url: API1_URL + `/users/${auth.user.userId}/phones/${curUserAccountPhoneState.phoneId}`,
+          data: bodyFormData,
+        }).then((data) => {
+          /**
+           * update auth
+           **/
+          const updatedUser = data.data;
+          dispatch(authActions.update({
+            ...auth,
+            user: updatedUser,
+          }))
+          enqueueSnackbar("updated successfully.", { variant: "success" })
+        }).catch((error: AxiosError) => {
+          enqueueSnackbar(error.message, { variant: "error" })
+        })
       }
     } else {
       updateAllValidation()
@@ -174,10 +231,10 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
   // modal logic
   const [curModalOpen, setModalOpen] = React.useState<boolean>(false);
   const handleModalOpenClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    setModalOpen(true) 
+    setModalOpen(true)
   }
   const handleModalCancelClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    setModalOpen(false) 
+    setModalOpen(false)
   }
 
   // event handler for click 'add new one' button
@@ -188,19 +245,38 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
     setModalOpen(true);
   }
 
- // delete an existing phone number
+  // delete an existing phone number
   const handleDeletePhoneClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
     console.log("delete an existing phone number event triggered")
-    /**
-     * TODO: DELETE /users/{userId}/phones/{phoneId}
-     **/
+
+    const phoneId = e.currentTarget.getAttribute("data-phone-id")
+
+    // request
+    axios.request({
+      method: 'DELETE',
+      url: API1_URL + `/users/${auth.user.userId}/phones/${phoneId}`
+    }).then((data) => {
+
+      /**
+       * update auth
+       **/
+      const updatedUser = data.data;
+      dispatch(authActions.update({
+        ...auth,
+        user: updatedUser,
+      }))
+
+      enqueueSnackbar("deleted successfully.", { variant: "success" })
+    }).catch((error: AxiosError) => {
+      enqueueSnackbar(error.message, { variant: "error" })
+    })
   }
 
   // event handler to click an phone list item to update phone
   const handlePhoneItemClickEvent: React.EventHandler<React.MouseEvent<HTMLElement>> = (e) => {
 
     const targetPhoneId: string = e.currentTarget.getAttribute("data-phone-id");
-    const targetPhone = testPhoneList.find((phone: UserPhoneType) => {
+    const targetPhone = auth.user.phones.find((phone: UserPhoneType) => {
       return phone.phoneId == targetPhoneId
     })
 
@@ -210,15 +286,40 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
     setModalOpen(true)
   }
 
+  // update primary phone stuff
+  const [curPrimary, setPrimary] = React.useState<string>(getPrimaryPhoneId(auth.user.phones));
+
+  const handlePhonePrimaryChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+
+    const nextPrimePhoneId = e.currentTarget.value;
+    setPrimary(nextPrimePhoneId);
+
+    // request
+    axios.request({
+      method: 'PATCH',
+      url: API1_URL + `/users/${auth.user.userId}/phones/${nextPrimePhoneId}`,
+    }).then((data) => {
+
+      /**
+       * update auth
+       **/
+      const updatedUser = data.data;
+      dispatch(authActions.update({
+        ...auth,
+        user: updatedUser,
+      }))
+
+      enqueueSnackbar("updated successfully.", { variant: "success" })
+    }).catch((error: AxiosError) => {
+      enqueueSnackbar(error.message, { variant: "error" })
+    })
+  }
+
   // render functions
 
   // display current phone number list
   const renderCurPhoneListComponent: () => React.ReactNode = () => {
-    /**
-     * TODO: replace with real one and remove test data
-     **/
-    //return phones.map((phone: UserPhoneType) => {
-    return testPhoneList.map((phone: UserPhoneType) => {
+    return auth.user.phones.map((phone: UserPhoneType) => {
       return (
         <ListItem key={phone.phoneId} data-phone-id={phone.phoneId} onClick={handlePhoneItemClickEvent}>
           <ListItemAvatar>
@@ -231,7 +332,12 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
             secondary={phone.countryCode}
           />
           <ListItemSecondaryAction>
-            <IconButton edge="end" aria-label="delete" onClick={handleDeletePhoneClickEvent}>
+            <FormControlLabel 
+              value={phone.phoneId} 
+              control={<Radio />} 
+              label={(curPrimary == phone.phoneId) ? "primary" : ""} 
+            />
+            <IconButton edge="end" aria-label="delete" data-phone-id={phone.phoneId} onClick={handleDeletePhoneClickEvent}>
               <DeleteIcon />
             </IconButton>
           </ListItemSecondaryAction>
@@ -245,15 +351,22 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
   return (
     <React.Fragment>
       <Box component="div">
-        {(testPhoneList.length === 0 &&
+        {(auth.user.phones.length === 0 &&
           <Typography variant="body2" component="p" align="center" >
             {"Oops. You Haven't Registered Any Phone Yet."}
           </Typography>
         )}
-        {(testPhoneList.length > 0 &&
-          <List className={classes.listBox}>
-            {renderCurPhoneListComponent()}
-          </List>
+        {(auth.user.phones.length > 0 &&
+          <RadioGroup 
+            defaultValue={curPrimary} 
+            aria-label="phone" 
+            name="user-phone-radio" 
+            onChange={handlePhonePrimaryChange}
+          >
+            <List className={classes.listBox}>
+              {renderCurPhoneListComponent()}
+            </List>
+          </RadioGroup>
         )}
         <Box component="div" className={classes.actionBox}>
           <Button onClick={handleAddNewPhoneBtnClickEvent}>

@@ -165,8 +165,10 @@ const UserAccountBasicManagement: React.FunctionComponent<UserAccountBasicManage
         data: bodyFormData,
       }).then((data) => {
 
+        /**
+         * update auth state 
+         **/
         const updatedUser = data.data;
-
         dispatch(authActions.update({
           ...auth,
           user: updatedUser,
