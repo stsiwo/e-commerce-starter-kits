@@ -4,23 +4,23 @@ endpoint change:
     - don't need to include products which are belonged to the category. but need total count of products.
     
   - /users/{userId}/carts => /users/{userId}/cartItems 
-    - ~~to avoid confusion.~~
-      - ~~a user has only one cart and this endpoint is to manage cart items (not cart itself)~~
-
+    
     - add below endpoints
       - (PUT): replace existing one with new one
         - to update quantity/is_selected and other stuff.
         - return only updated one.
         
   - /users/{userId}/wishlist => /users/{userId}/wishlistItems
-    - to avoid confusion.
-      - a user has only one wishlist and this endpoint is to manage wishlist items (not wishlist itself)
       
     - don't need to implement PUT/PATCH because of its context
     
   - /users
   
     - implement that only update property which has value (not null)
+    
+    - implement user phone managment endpoint (like addresses)
+    
+      - do i need customers have multiple phone numbers??
     
   - /orders
   
