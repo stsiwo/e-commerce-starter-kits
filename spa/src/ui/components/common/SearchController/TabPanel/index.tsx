@@ -5,6 +5,7 @@ interface TabPanelPropsType {
   index: number
   value: number
   render: () => React.ReactNode
+  className?: string
 }
 
 const useStyles = makeStyles((theme: Theme) =>

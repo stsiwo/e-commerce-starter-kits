@@ -5,6 +5,8 @@ import Typography from '@material-ui/core/Typography';
 import * as React from 'react';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
+import { useDispatch } from 'react-redux';
+import { productQueryIsDiscountActions } from 'reducers/slices/domain/product';
 
 interface DiscountFilterTabPanelPropsType {
   curDiscountCheck: boolean
@@ -23,10 +25,9 @@ const DiscountFilterTabPanel: React.FunctionComponent<DiscountFilterTabPanelProp
 
   const classes = useStyles();
 
-  const [curTempDiscountCheck, setTempDiscountCheck] = React.useState<boolean>(false);
-
+  const dispatch = useDispatch();
   const handleDiscountCheckChangeEvent = (event: any, newValue: boolean) => {
-    setTempDiscountCheck(newValue);
+    dispatch(productQueryIsDiscountActions.update(newValue))
   };
 
   return (
@@ -37,7 +38,7 @@ const DiscountFilterTabPanel: React.FunctionComponent<DiscountFilterTabPanelProp
       <FormControlLabel
         control={
           <Checkbox
-            checked={curTempDiscountCheck}
+            checked={curDiscountCheck}
             onChange={handleDiscountCheckChangeEvent}
             name="checkedB"
             color="primary"

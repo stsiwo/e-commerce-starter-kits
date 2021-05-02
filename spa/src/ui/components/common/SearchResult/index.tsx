@@ -20,6 +20,7 @@ const useStyles = makeStyles((theme: Theme) =>
       overflow: "hidden",
       padding: theme.spacing(0, 1, 0, 1),
       margin: theme.spacing(3, 0, 3, 0),
+      minHeight: "100vh",
     },
     gridItem: {
       maxWidth: 200,

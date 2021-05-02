@@ -3,6 +3,7 @@ import { StateType } from "states/types";
 import { denormalize } from "normalizr";
 import { categorySchemaArray, productSchemaArray } from "states/state";
 import { UserType } from "domain/user/types";
+import merge from 'lodash/merge';
 
 export const rsSelector = {
   /**
@@ -39,7 +40,10 @@ export const rsSelector = {
     getWishlistItem: (state: StateType) => state.domain.wishlistItems,
     getUser: (state: StateType) => state.domain.users,
     getOrder: (state: StateType) => state.domain.orders,
-    getProduct: (state: StateType) => state.domain.products 
+    getProduct: (state: StateType) => state.domain.products.data,
+    getProductQuery: (state: StateType) => state.domain.products.query,
+    getProductPagination: (state: StateType) => state.domain.products.pagination,
+    getProductCurItems: (state: StateType) => state.domain.products.curItems,
   }
 }
 
@@ -270,9 +274,13 @@ export const mSelector = {
   makeProductSelector: () => {
     return createSelector(
       [
-        rsSelector.domain.getProduct
+        rsSelector.domain.getProduct,
+        rsSelector.domain.getProductPagination,
+        rsSelector.domain.getProductCurItems,
       ],
-      (normalizedProducts) => {
+      (normalizedProducts, pagination, curItems) => {
+
+        // need pagination??
 
         /**
          * return empty array before fetch
@@ -287,7 +295,7 @@ export const mSelector = {
          * this return { 'domain-name': [{ domain1 }, { domain2 }] in the format
          **/
         const denormalizedEntities = denormalize(
-          Object.keys(normalizedProducts), // ex, [0, 1, 2, 3, 4] ('result' prop of normalized data)
+          curItems, // ex, [0, 1, 2, 3, 4] ('result' prop of normalized data)
           productSchemaArray,
           {
             products: normalizedProducts
@@ -297,6 +305,49 @@ export const mSelector = {
         console.log(denormalizedEntities)
 
         return denormalizedEntities
+      },
+    )
+  },
+
+  // domain.products.query
+  makeProductQuerySelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getProductQuery
+      ],
+      (query) => {
+
+        console.log(query)
+
+        return query
+      },
+    )
+  },
+
+  // domain.products.pagination
+  makeProductPaginationSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getProductPagination
+      ],
+      (pagination) => {
+
+        return pagination
+      },
+    )
+  },
+
+
+  // domain.products query string (query + pagination)
+  makeProductQueryStringSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getProductQuery,
+        rsSelector.domain.getProductPagination
+      ],
+      (query, pagination) => {
+        // react state should be immutable so put empty object first
+        return merge({}, query, { page: pagination.page, limit: pagination.limit }) 
       },
     )
   },

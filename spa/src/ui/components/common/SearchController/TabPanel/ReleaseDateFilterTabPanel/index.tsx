@@ -5,6 +5,8 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import * as React from 'react';
+import { useDispatch } from 'react-redux';
+import { productQueryStartDateActions, productQueryEndDateActions } from 'reducers/slices/domain/product';
 
 interface ReleaseDateFilterTabPanelPropsType {
   curStartDate: Date
@@ -39,15 +41,14 @@ const ReleaseDateFilterTabPanel: React.FunctionComponent<ReleaseDateFilterTabPan
 
   const classes = useStyles();
 
-  const [curTempStartDate, setTempStartDate] = React.useState<Date>()
-  const [curTempEndDate, setTempEndDate] = React.useState<Date>()
+  const dispatch = useDispatch();
 
   const handleStartDateChange = (date: Date | null) => {
-    setTempStartDate(date);
+    dispatch(productQueryStartDateActions.update(date));
   };
 
   const handleEndDateChange = (date: Date | null) => {
-    setTempEndDate(date);
+    dispatch(productQueryEndDateActions.update(date));
   };
 
   return (
@@ -62,7 +63,7 @@ const ReleaseDateFilterTabPanel: React.FunctionComponent<ReleaseDateFilterTabPan
             id="date-picker-dialog"
             label="Start Date"
             format="MM/dd/yyyy"
-            value={curTempStartDate}
+            value={curStartDate}
             onChange={handleStartDateChange}
             KeyboardButtonProps={{
               'aria-label': 'change date',
@@ -73,7 +74,7 @@ const ReleaseDateFilterTabPanel: React.FunctionComponent<ReleaseDateFilterTabPan
             id="date-picker-dialog"
             label="End Date"
             format="MM/dd/yyyy"
-            value={curTempEndDate}
+            value={curEndDate}
             onChange={handleEndDateChange}
             KeyboardButtonProps={{
               'aria-label': 'change date',

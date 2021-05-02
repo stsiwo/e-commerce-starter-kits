@@ -7,7 +7,10 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { CategoryType } from 'domain/product/types';
 import * as React from 'react';
-import { generateCategoryList } from 'tests/data/product';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchCategoryWithCacheActionCreator } from 'reducers/slices/domain/category';
+import { productQueryCategoryIdActions } from 'reducers/slices/domain/product';
+import { mSelector } from 'src/selectors/selector';
 
 interface CategoryFilterTabPanelPropsType {
   curCategoryId: string
@@ -24,27 +27,46 @@ const CategoryFilterTabPanel: React.FunctionComponent<CategoryFilterTabPanelProp
   curCategoryId
 }) => {
 
-  const testCategoryList = generateCategoryList(6);
-
   const classes = useStyles();
 
+  const dispatch = useDispatch();
+
+  // categories option
+  const curCategoryList = useSelector(mSelector.makeCategorySelector())
+
+  // fetch categories if not fetched before
+  React.useEffect(() => {
+    dispatch(fetchCategoryWithCacheActionCreator())  
+  }, [])
+
+  // event handler change
   const handleCategoryInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    return
+    dispatch(productQueryCategoryIdActions.update(e.currentTarget.value));
   }
 
   const renderCategoryRadioInputs: () => React.ReactNode = () => {
-    return testCategoryList.map((category: CategoryType) => {
+    return curCategoryList.map((category: CategoryType) => {
       return (
-        <FormControlLabel value={category.categoryId} control={<Radio />} label={category.categoryName} />
+        <FormControlLabel value={category.categoryId} control={<Radio />} label={category.categoryName} key={category.categoryId}/>
       )
     })
   }
 
+  /**
+   * TODO: RadioButton label is not checked. (internally it is working)
+   *
+   * fix this.
+   *
+   * bug?: https://stackoverflow.com/questions/58952742/how-can-i-control-a-radiogroup-from-material-ui
+   *
+   *  - 'value' should not be null/undefined at RadioGroup otherwise, it won't check even if you clicked.
+   *
+   **/
   return (
     <Box p={3}>
       <FormControl component="fieldset">
         <FormLabel component="legend">Select Category</FormLabel>
-        <RadioGroup aria-label="gender" name="gender1" value={curCategoryId} onChange={handleCategoryInputChangeEvent}>
+        <RadioGroup aria-label="product-category" name="product-category-filter" value={curCategoryId} onChange={handleCategoryInputChangeEvent}>
           {renderCategoryRadioInputs()}
         </RadioGroup>
       </FormControl>

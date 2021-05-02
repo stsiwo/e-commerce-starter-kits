@@ -1,5 +1,13 @@
 # Front End
 
+## General Note:
+
+  - pagination.page (redux state)
+
+    - starts from 0, (not 1) and when display, we increment by 1 to display the page number correctly.
+
+    - this is because of Spring Boot framework.
+
 ## Role Management Library: Casl
 
   ### Terms:

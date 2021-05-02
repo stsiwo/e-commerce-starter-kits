@@ -15,6 +15,8 @@ export declare type SortType = {
 
 export type RequestTrackerBaseType = {
   ids: string[]
+  // this is necessary for keep track of the pagination info about this request
+  // ?? do I really need this one??
   pagination?: DomainPaginationType
 }
 

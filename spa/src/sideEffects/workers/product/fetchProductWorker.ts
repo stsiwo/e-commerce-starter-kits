@@ -1,13 +1,14 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { getProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
-import { productActions } from "reducers/slices/domain/product";
-import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
-import { rsSelector } from "src/selectors/selector";
-import { normalize } from "normalizr";
-import { productSchemaArray } from "states/state";
 import { NormalizedProductType } from "domain/product/types";
+import { normalize } from "normalizr";
+import { getProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
+import { productActions, productPaginationPageActions, productPaginationTotalPagesActions } from "reducers/slices/domain/product";
+import { all, call, put, select } from "redux-saga/effects";
+import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
+import { mSelector, rsSelector } from "src/selectors/selector";
+import { generateQueryString } from "src/utils";
+import { productSchemaArray } from "states/state";
 
 /**
  * a worker (generator)    
@@ -52,9 +53,18 @@ export function* fetchProductWorker(action: PayloadAction<{}>) {
     )
 
     /**
+     * prep query string
+     **/
+    const curQueryString = yield select(mSelector.makeProductQueryStringSelector())
+
+    console.log(curQueryString)
+    console.log(generateQueryString(curQueryString));
+
+
+    /**
      * grab all domain
      **/
-    const apiUrl = `${API1_URL}/products`
+    const apiUrl = `${API1_URL}/products${generateQueryString(curQueryString)}`
 
     /**
      * fetch data
@@ -91,6 +101,54 @@ export function* fetchProductWorker(action: PayloadAction<{}>) {
       yield put(
         getProductFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
+
+      /**
+       * update pagination.
+       *
+       * sample response data:
+       * 
+       * <PageImpl>
+       *  <content>
+       *    ... actual content
+       *  </content>
+       *  <pageable>
+       *   <sort>
+       *   <sorted>true</sorted>
+       *   <unsorted>false</unsorted>
+       *   <empty>false</empty>
+       *   </sort>
+       *   <pageNumber>1</pageNumber>
+       *   <pageSize>20</pageSize>
+       *   <offset>20</offset>
+       *   <paged>true</paged>
+       *   <unpaged>false</unpaged>
+       *  </pageable>
+       *  <totalPages>2</totalPages>
+       *  <totalElements>25</totalElements>
+       *  <last>true</last>
+       *  <sort>
+       *   <sorted>true</sorted>
+       *   <unsorted>false</unsorted>
+       *   <empty>false</empty>
+       *  </sort>
+       *  <first>false</first>
+       *  <number>1</number>
+       *  <numberOfElements>5</numberOfElements>
+       *  <size>20</size>
+       *  <empty>false</empty>
+       * </PageImpl>
+       **/
+
+
+      console.log(response.data.pageable)
+
+      console.log("total pages")
+      console.log(response.data.totalPages)
+
+      yield all([
+        put(productPaginationPageActions.update(response.data.pageable.pageNumber)),
+        put(productPaginationTotalPagesActions.update(response.data.totalPages)),
+      ])
 
     } catch (error) {
 

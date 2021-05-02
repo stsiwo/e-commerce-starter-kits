@@ -2,6 +2,7 @@ import { StateType } from "./types";
 import { UserTypeEnum, FetchStatusEnum } from "src/app";
 import { defaultUser } from "domain/user/types";
 import { normalize, schema } from 'normalizr';
+import { ProductSortEnum } from "domain/product/types";
 
 /**
  *
@@ -128,6 +129,25 @@ export const initialState: StateType = {
     wishlistItems: [],
     users: [],
     orders: [],
-    products: {},
+    products: {
+      data: {},
+      query: {
+        searchQuery: "",
+        categoryId: "",
+        minPrice: null,
+        maxPrice: null,
+        isDiscount: null,
+        reviewPoint: null,
+        startDate: null,
+        endDate: null,
+        sort: ProductSortEnum.DATE_DESC,
+      },
+      pagination: {
+        page: 0, // start from 0 (not 1)
+        limit: 20,
+        totalPages: 1,
+      },
+      curItems: [],
+    }
   },
 }

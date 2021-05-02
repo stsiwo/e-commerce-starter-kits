@@ -7,6 +7,9 @@ import Pagination from '@material-ui/lab/Pagination';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+import { useSelector, useDispatch } from 'react-redux';
+import { mSelector } from 'src/selectors/selector';
+import { fetchProductWithCacheActionCreator, productPaginationPageActions } from 'reducers/slices/domain/product';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -30,16 +33,37 @@ const ProductSearch: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles()
 
-  //
-  const [curProductList, setProductList] = React.useState<ProductType[]>(generateProductList(40))
+  const dispatch = useDispatch()
 
   // filter/sort/pagination
+  const curDomains = useSelector(mSelector.makeProductSelector()); 
+
+  const curQuery = useSelector(mSelector.makeProductQuerySelector())
+
+  // pagination
+  const curPagination = useSelector(mSelector.makeProductPaginationSelector())
+  const handlePaginationChange = (event: React.ChangeEvent<unknown>, value: number) => {
+
+    // need to decrement since we incremented when display
+    const nextPage = value - 1;
+
+    dispatch(productPaginationPageActions.update(nextPage))
+  };
+
+  // api request every time query/page changes
+  React.useEffect(() => {
+    dispatch(fetchProductWithCacheActionCreator())
+  }, [
+    JSON.stringify(curQuery),
+    curPagination.page,
+  ])
+
 
   // useEffect to send request every time its dependency updated
   return (
     <React.Fragment>
       <SearchController />
-      <SearchResult products={curProductList} />
+      <SearchResult products={curDomains} />
       <Grid 
         container 
         justify="center" 
@@ -47,12 +71,13 @@ const ProductSearch: React.FunctionComponent<{}> = (props) => {
         className={classes.pageBox}
       >
         <Pagination
-          page={1}
-          count={10}
+          page={curPagination.page + 1} // don't forget to increment when display
+          count={curPagination.totalPages}
           color="primary"
           showFirstButton
           showLastButton
           size={"medium"}
+          onChange={handlePaginationChange}
         />
       </Grid>
     </React.Fragment>

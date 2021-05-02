@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductWithCacheActionCreator } from 'reducers/slices/domain/product';
 import { mSelector } from 'src/selectors/selector';
 import ProductCard from '../ProductCard';
+import { Link as RRLink } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -80,7 +81,7 @@ const BrandNewProduct: React.FunctionComponent<{}> = (props) => {
         {renderDomains()}
       </Grid>
       <Box component="div" className={classes.moreBtnBox}>
-        <Button>
+        <Button component={RRLink} to={`/search`}>
           More Brad New Products
         </Button>
       </Box>

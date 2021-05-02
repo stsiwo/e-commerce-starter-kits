@@ -1,4 +1,4 @@
-import { NormalizedCategoryType, NormalizedProductType } from "domain/product/types";
+import { NormalizedCategoryType, NormalizedProductType, ProductSortEnum } from "domain/product/types";
 import { AuthType, RequestTrackerType, FetchStatusEnum } from "src/app/";
 import { CartItemType } from "domain/cart/types";
 import { WishlistItemType } from "domain/wishlist/types";
@@ -71,15 +71,14 @@ export declare type AppStateType = {
 }
 
 export declare type DomainPaginationType = {
+  page: number
   limit: number
-  offset: number
-  total: number
+  totalPages: number
 }
 
 export declare type DomainStateSubType<D extends Record<string, any>> = {
   data: D
   pagination: DomainPaginationType
-  curItems: string[]
 }
 
 export declare type DomainStateType = {
@@ -88,7 +87,22 @@ export declare type DomainStateType = {
   wishlistItems: WishlistItemType[] // don't need to normalized
   users: UserType[] // don't need to normalized
   orders: OrderType[] // don't need to normalized 
-  products: NormalizedProductType 
+  products: {
+    data: NormalizedProductType 
+    query: {
+      searchQuery: string,
+      categoryId: string,
+      minPrice: number,
+      maxPrice: number,
+      reviewPoint: number,
+      isDiscount: boolean,
+      startDate: Date,
+      endDate: Date,
+      sort: ProductSortEnum,
+    },
+    pagination: DomainPaginationType,
+    curItems: string[],
+  }
 }
 
 export declare type StateType = {

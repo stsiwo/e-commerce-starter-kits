@@ -9,13 +9,14 @@ import CardActions from '@material-ui/core/CardActions';
 import Button from '@material-ui/core/Button';
 import { ProductType } from 'domain/product/types';
 import { cadCurrencyFormat } from 'src/utils';
+import { Link as RRLink } from "react-router-dom";
 
 interface ProductCardPropsType {
   product: ProductType
 }
 
 /**
- * TODO: make card actions align bottom to look nice esp when each card height is different.
+ * make card actions align bottom to look nice esp when each card height is different.
  *
  * - ref: https://stackoverflow.com/questions/52669681/align-card-buttons-on-bottom-material-ui
  *
@@ -58,25 +59,16 @@ const ProductCard: React.FunctionComponent<ProductCardPropsType> = ({ product })
 
   return (
     <Card className={classes.card}>
-      {(product.productImages.length == 0 &&
-        <CardMedia
-          className={classes.media}
-          // should display default image
-          image={""}
-        />
-      )}
-      {(product.productImages && product.productImages.length > 0 &&
         <CardMedia
           className={classes.media}
           // the first product image is the main one
-          image={product.productImages[0].productImagePath}
+          image={(product.productImages.length > 0) ? product.productImages[0].productImagePath : ""}
         />
-      )}
       <CardContent className={classes.cardContent}>
         <Typography variant="body2" color="textSecondary" component="p">
           {product.category.categoryName}
         </Typography>
-        <Typography gutterBottom variant="h5" component="h2">
+        <Typography gutterBottom variant="h6" component="h2">
           {product.productName}
         </Typography>
         <Typography variant="h6" align="right" color="primary" component="p">
@@ -88,7 +80,7 @@ const ProductCard: React.FunctionComponent<ProductCardPropsType> = ({ product })
         </Typography>
       </CardContent>
       <CardActions className={classes.actions}>
-        <Button>
+        <Button component={RRLink} to={`/products/${product.productPath}`}>
           Read More
         </Button>
       </CardActions>

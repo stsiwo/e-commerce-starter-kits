@@ -58,10 +58,20 @@ export function generateQueryString(target: { [key: string]: any }): string {
   const keys = Object.keys(target)
   let queryString = "?"
   keys.forEach((key: string) => {
-    queryString += key + "=" + target[key] + "&"
+    if (target[key]) {
+      if (isDateObject(target[key])) {
+        queryString += key + "=" + (target[key] as Date).toISOString() + "&"
+      } else {
+        queryString += key + "=" + target[key] + "&"
+      }
+    }
   })
   queryString = queryString.substring(0, queryString.length - 1)
   return queryString
+}
+
+export function isDateObject(variable: any): boolean {
+  return Object.prototype.toString.call(variable) === '[object Date]'
 }
 
 export function toStringToDateToString(dateStr: string): string {
@@ -161,9 +171,9 @@ export const calcScale: (deg: number, targetZeroDeg?: number) => number = (deg, 
   //const degModAbs = Math.abs(deg % 360)
   //const scaleRangeAbs = Math.abs((degModAbs - targetZeroDeg) / 180)
   //return scaleRangeAbs
-  
-  const scale = 1/2 * Math.cos(convertDegToRadian(deg + targetZeroDeg)) + 1/2
-  if (scale < 1/4) return 1/4
+
+  const scale = 1 / 2 * Math.cos(convertDegToRadian(deg + targetZeroDeg)) + 1 / 2
+  if (scale < 1 / 4) return 1 / 4
   return scale
 }
 
@@ -249,7 +259,7 @@ export const calcRadiusHeight: (maxHeight: number) => number = (maxHeight) => {
  **/
 export const calcCurEllipsePosX: (elId: number, radiusWidth: number, radiusHeight: number, unitDegree: number, alphaDeg?: number) => number = (elId, radiusWidth, radiusHeight, unitDegree, alphaDeg) => {
   // need to separate for + and -
-  
+
   const curDeg = (unitDegree * elId) + alphaDeg
   const curY = radiusHeight * Math.sin(convertDegToRadian(curDeg)) // y = b * sin(theta)
   return radiusWidth * Math.cos(convertDegToRadian(curDeg))

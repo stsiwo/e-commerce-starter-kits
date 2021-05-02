@@ -5,9 +5,10 @@ import FormLabel from '@material-ui/core/FormLabel';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { CategoryType, ProductSortEnum } from 'domain/product/types';
+import { ProductSortEnum } from 'domain/product/types';
 import * as React from 'react';
-import { generateCategoryList } from 'tests/data/product';
+import { useDispatch } from 'react-redux';
+import { productQuerySortActions } from 'reducers/slices/domain/product';
 
 interface SortTabPanelPropsType {
   curSort: ProductSortEnum
@@ -53,8 +54,10 @@ const SortTabPanel: React.FunctionComponent<SortTabPanelPropsType> = ({
 
   const classes = useStyles();
 
+  const dispatch = useDispatch();
+
   const handleProductSortInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    return
+    dispatch(productQuerySortActions.update(e.currentTarget.value as ProductSortEnum))
   }
 
   const renderCategoryRadioInputs: () => React.ReactNode = () => {
