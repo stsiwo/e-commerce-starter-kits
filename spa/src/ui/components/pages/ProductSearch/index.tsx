@@ -1,15 +1,12 @@
-import * as React from 'react';
+import Grid from '@material-ui/core/Grid';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import Pagination from '@material-ui/lab/Pagination';
 import SearchController from 'components/common/SearchController';
 import SearchResult from 'components/common/SearchResult';
-import { ProductType } from 'domain/product/types';
-import { generateProductList } from 'tests/data/product';
-import Pagination from '@material-ui/lab/Pagination';
-import Box from '@material-ui/core/Box';
-import Grid from '@material-ui/core/Grid';
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import { useSelector, useDispatch } from 'react-redux';
-import { mSelector } from 'src/selectors/selector';
+import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductWithCacheActionCreator, productPaginationPageActions } from 'reducers/slices/domain/product';
+import { mSelector } from 'src/selectors/selector';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

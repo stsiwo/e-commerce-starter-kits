@@ -34,6 +34,10 @@ export const deleteSingleUserActionTypeName = deleteSingleUserActionCreator().ty
 export const deleteUserActionCreator = createAction<UserType>("saga/domain/user/delete")
 export const deleteUserActionTypeName = deleteUserActionCreator().type
 
+// for POST (upload new avatar image) /users/avatar-image request
+//export const postUserAvatarActionCreator = createAction<UserType>("saga/domain/user/post/avatar-image")
+//export const postUserAvatarActionTypeName = postUserAvatarActionCreator().type
+
 /**
  *
  * domain.users state Slice (no side effects)

@@ -138,7 +138,7 @@ const AdminNavDrawer: React.FunctionComponent<{}> = (props) => {
             {navSection.items.map((navItem, index) => {
               const NavIcon = navItem.Icon;
               return (
-                <ListItem button key={navItem.link} component={RRLink} to="/">
+                <ListItem button key={navItem.link} component={RRLink} to={navItem.link}>
                   <ListItemIcon><NavIcon /></ListItemIcon>
                   <ListItemText primary={navItem.label} />
                 </ListItem>

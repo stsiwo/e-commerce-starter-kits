@@ -7,6 +7,16 @@ declare const NODE_ENV: string
 
 declare const OWNER_BUCKET_NAME: string
 
+declare const TEST_ADMIN_USER_ID: string
+
+declare const TEST_ADMIN_EMAIL: string
+
+declare const TEST_MEMBER_USER_ID: string
+
+declare const TEST_MEMBER_EMAIL: string
+
+declare const TEST_USER_PASSWORD: string
+
 /**
  * typeScript Error: 
  *  - create below module declaration.

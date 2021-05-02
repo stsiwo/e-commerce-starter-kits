@@ -322,3 +322,10 @@ export const cadCurrencyFormat: (amount: number) => string = (amount) => {
     currency: "CAD",
   });
 }
+
+/**
+ * request
+ **/
+export const isSuccessCode: (code: number) => boolean = (code) => {
+  return (code >= 200 || code <= 299)
+}

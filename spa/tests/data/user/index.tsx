@@ -73,10 +73,11 @@ export const testGuestUser: UserType = {
 }
 
 export const testMemberUser: UserType = {
+  userId: TEST_MEMBER_USER_ID,
   firstName: "Satoshi",
   lastName: "Iwao",
   avatarImagePath: "",
-  email: "satoshi@gmail.com",
+  email: TEST_MEMBER_EMAIL , 
   userType: UserTypeEnum.MEMBER,
   addresses: testAddressList,
   phones: testPhoneList,
@@ -86,10 +87,11 @@ export const testMemberUser: UserType = {
 }
 
 export const testAdminUser: UserType = {
+  userId: TEST_ADMIN_USER_ID,
   firstName: "Satoshi",
   lastName: "Iwao",
   avatarImagePath: "",
-  email: "",
+  email: TEST_ADMIN_EMAIL,
   userType: UserTypeEnum.ADMIN,
   addresses: [],
   phones: [],

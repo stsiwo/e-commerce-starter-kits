@@ -23,6 +23,11 @@ module.exports = merge(common, {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.DefinePlugin({
       NODE_ENV: JSON.stringify("development"),
+      TEST_ADMIN_USER_ID: JSON.stringify("e95bf632-1518-4bf2-8ba9-cd8b7587530b"),
+      TEST_ADMIN_EMAIL: JSON.stringify("test_admin@test.com"),
+      TEST_MEMBER_USER_ID: JSON.stringify("c7081519-16e5-4f92-ac50-1834001f12b9"),
+      TEST_MEMBER_EMAIL: JSON.stringify("test_member@test.com"),
+      TEST_USER_PASSWORD: JSON.stringify("test_password"),
       OWNER_BUCKET_NAME: JSON.stringify("bactivityhair.com-dev-bucket"),
       API1_URL: JSON.stringify("http://localhost:8080"),
       PUBLIC_IMAGE_PATH: JSON.stringify("/images/"),
