@@ -126,7 +126,14 @@ export const initialState: StateType = {
   domain: {
     categories: {}, 
     cartItems: [],
-    wishlistItems: [],
+    wishlistItems: {
+      data: [],
+      pagination: {
+        page: 0, // start from 0 (not 1)
+        limit: 10,
+        totalPages: 1,
+      }
+    },
     users: [],
     orders: [],
     products: {

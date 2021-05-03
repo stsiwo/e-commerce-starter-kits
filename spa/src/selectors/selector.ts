@@ -37,7 +37,8 @@ export const rsSelector = {
   domain: {
     getCategory: (state: StateType) => state.domain.categories,
     getCartItem: (state: StateType) => state.domain.cartItems,
-    getWishlistItem: (state: StateType) => state.domain.wishlistItems,
+    getWishlistItem: (state: StateType) => state.domain.wishlistItems.data,
+    getWishlistItemPagination: (state: StateType) => state.domain.wishlistItems.pagination,
     getUser: (state: StateType) => state.domain.users,
     getOrder: (state: StateType) => state.domain.orders,
     getProduct: (state: StateType) => state.domain.products.data,
@@ -212,6 +213,32 @@ export const mSelector = {
       (wishlistItem) => {
         // this is array of cart item
         return wishlistItem
+      },
+    )
+  },
+
+  // domain.wishlistItem.pagination
+  makeWishlistItemPaginationSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getWishlistItemPagination
+      ],
+      (pagination) => {
+        // this is array of cart item
+        return pagination
+      },
+    )
+  },
+
+  // domain.wishlistItems query string (query + pagination)
+  makeWishlistItemQueryStringSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getWishlistItemPagination
+      ],
+      (pagination) => {
+        // react state should be immutable so put empty object first
+        return merge({}, { page: pagination.page, limit: pagination.limit }) 
       },
     )
   },

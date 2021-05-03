@@ -84,7 +84,11 @@ export declare type DomainStateSubType<D extends Record<string, any>> = {
 export declare type DomainStateType = {
   categories: NormalizedCategoryType 
   cartItems: CartItemType[] // don't need to normalized
-  wishlistItems: WishlistItemType[] // don't need to normalized
+  wishlistItems: {
+    data: WishlistItemType[] // don't need to normalized
+    pagination: DomainPaginationType,
+    // no cache so don't need curItems
+  },
   users: UserType[] // don't need to normalized
   orders: OrderType[] // don't need to normalized 
   products: {

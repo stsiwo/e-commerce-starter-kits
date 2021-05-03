@@ -8,10 +8,11 @@ import { mSelector } from 'src/selectors/selector';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import WishlistItem from 'components/common/WishlistItem';
-import { fetchWishlistItemActionCreator, wishlistItemActions } from 'reducers/slices/domain/wishlistItem';
+import { fetchWishlistItemActionCreator, wishlistItemActions, wishlistItemPaginationPageActions } from 'reducers/slices/domain/wishlistItem';
 import { UserTypeEnum } from 'src/app';
 import axios, { AxiosError } from 'axios';
 import { useSnackbar } from 'notistack';
+import Pagination from '@material-ui/lab/Pagination/Pagination';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -59,6 +60,8 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
 
   const curWishlistItems = useSelector(mSelector.makeWishlistItemSelector())
 
+  const pagination = useSelector(mSelector.makeWishlistItemPaginationSelector())
+
   // snackbar notification
   // usage: 'enqueueSnackbar("message", { variant: "error" };
   const { enqueueSnackbar } = useSnackbar();
@@ -67,7 +70,7 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
   React.useEffect(() => {
     dispatch(fetchWishlistItemActionCreator())
   }, [
-
+    pagination.page
     ])
 
   const handleMoveToCartClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
@@ -87,7 +90,6 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
     }).catch((error: AxiosError) => {
       enqueueSnackbar(error.message, { variant: "error" })
     })
-
   }
 
   const handleDeleteClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
@@ -117,6 +119,14 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
     })
   }
 
+  // pagination stuff
+  const handlePaginationChange = (event: React.ChangeEvent<unknown>, value: number) => {
+
+    // need to decrement since we incremented when display
+    const nextPage = value - 1;
+
+    dispatch(wishlistItemPaginationPageActions.update(nextPage))
+  };
   return (
     <React.Fragment>
       <Typography variant="h5" component="h5" align="center" className={classes.title} >
@@ -145,6 +155,15 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
               {"Go to cart"}
             </Button>
           </Box>
+          <Pagination
+            page={pagination.page + 1} // don't forget to increment when display
+            count={pagination.totalPages}
+            color="primary"
+            showFirstButton
+            showLastButton
+            size={"medium"}
+            onChange={handlePaginationChange}
+          />
         </React.Fragment>
       )}
     </React.Fragment>
