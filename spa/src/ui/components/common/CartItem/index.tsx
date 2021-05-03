@@ -17,6 +17,13 @@ import * as React from 'react';
 import SampleSelfImage from 'static/self.jpeg';
 import ColorCell from '../GridData/ColorCell';
 import SizeCell from '../GridData/SizeCell';
+import { useSelector, useDispatch } from 'react-redux';
+import { mSelector } from 'src/selectors/selector';
+import axios, { AxiosError } from 'axios';
+import merge from 'lodash/merge';
+import { UserTypeEnum } from 'src/app';
+import { useSnackbar } from 'notistack';
+import { cartItemActions } from 'reducers/slices/domain/cartItem';
 
 /**
  * need 'orderDetail' or 'product/variant'
@@ -24,7 +31,6 @@ import SizeCell from '../GridData/SizeCell';
  **/
 interface CartItemPropsType {
   value: CartItemType
-  onChange?: React.EventHandler<React.ChangeEvent<HTMLInputElement>>
 }
 
 
@@ -60,41 +66,137 @@ const useStyles = makeStyles((theme: Theme) =>
 /**
  * member or admin account management component
  **/
-const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value, onChange }) => {
+const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
 
   // mui: makeStyles
   const classes = useStyles();
 
+  // auth
+  const auth = useSelector(mSelector.makeAuthSelector())
+
+  const dispatch = useDispatch()
   // event handlers
-  
+
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
   /// qty change
   const handleQtyIncrement: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    
+
     if (value.quantity < value.variant.variantStock) {
-      /**
-       * update request to redux and redux-saga
-       *
-       **/
+
+      const nextCartItem = merge({}, value, { quantity: value.quantity + 1 })
+
+      if (auth.userType === UserTypeEnum.MEMBER) {
+        // put to replace the whole cart item 
+        axios.request({
+          method: 'PUT',
+          url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartId}`,
+          data: JSON.stringify(nextCartItem)
+        }).then((data) => {
+
+          const updatedCartItem = data.data;
+
+          // update cart item in redux store 
+          dispatch(cartItemActions.merge([updatedCartItem]))
+
+          enqueueSnackbar("updated successfully.", { variant: "success" })
+        }).catch((error: AxiosError) => {
+          enqueueSnackbar(error.message, { variant: "error" })
+        })
+      } else {
+        // update cart item in redux store 
+        dispatch(cartItemActions.merge([nextCartItem]))
+      }
+
     }
   }
 
   const handleQtyDecrement: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
 
     if (value.quantity > 1) {
-      /**
-       * update request to redux and redux-saga
-       *
-       **/
+
+      const nextCartItem = merge({}, value, { quantity: value.quantity - 1 })
+
+      if (auth.userType === UserTypeEnum.MEMBER) {
+        // put to replace the whole cart item 
+        axios.request({
+          method: 'PUT',
+          url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartId}`,
+          data: JSON.stringify(nextCartItem)
+        }).then((data) => {
+
+          const updatedCartItem = data.data;
+
+          // update cart item in redux store 
+          dispatch(cartItemActions.merge([updatedCartItem]))
+
+          enqueueSnackbar("updated successfully.", { variant: "success" })
+        }).catch((error: AxiosError) => {
+          enqueueSnackbar(error.message, { variant: "error" })
+        })
+      } else {
+        // update cart item in redux store 
+        dispatch(cartItemActions.merge([nextCartItem]))
+      }
     }
   }
 
   /// selection change
-  const handleSelectionChange: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+  const handleSelectionChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     /**
      * update selection  to redux and redux-saga
      **/
+    const nextCartItem = merge({}, value, { isSelected: e.currentTarget.checked })
+
+    if (auth.userType === UserTypeEnum.MEMBER) {
+      // put to replace the whole cart item 
+      axios.request({
+        method: 'PUT',
+        url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartId}`,
+        data: JSON.stringify(nextCartItem)
+      }).then((data) => {
+
+        const updatedCartItem = data.data;
+
+        // update cart item in redux store 
+        dispatch(cartItemActions.merge([updatedCartItem]))
+
+        enqueueSnackbar("updated successfully.", { variant: "success" })
+      }).catch((error: AxiosError) => {
+        enqueueSnackbar(error.message, { variant: "error" })
+      })
+    } else {
+      // update cart item in redux store 
+      dispatch(cartItemActions.merge([nextCartItem]))
+    }
   }
-  
+
+  /// selection change
+  const handleDeleteClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+    /**
+     * update selection  to redux and redux-saga
+     **/
+    if (auth.userType === UserTypeEnum.MEMBER) {
+      // put to replace the whole cart item 
+      axios.request({
+        method: 'DELETE',
+        url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartId}`,
+      }).then((data) => {
+
+        // update cart item in redux store 
+        dispatch(cartItemActions.delete(value))
+
+        enqueueSnackbar("updated successfully.", { variant: "success" })
+      }).catch((error: AxiosError) => {
+        enqueueSnackbar(error.message, { variant: "error" })
+      })
+    } else {
+      // update cart item in redux store 
+      dispatch(cartItemActions.delete(value))
+    }
+  }
 
   return (
     <Card className={`${classes.card} ${classes.root}`}>
@@ -116,14 +218,14 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value, onChange 
           </Box>
           <Box component="div" className={classes.actionBox}>
             <ButtonGroup size="small" aria-label="small outlined button group">
-              <Button 
-                onClick={handleQtyIncrement}  
+              <Button
+                onClick={handleQtyIncrement}
                 disabled={value.quantity === value.variant.variantStock}
               >
                 <AddCircleIcon />
               </Button>
               <Button disabled>{value.quantity}</Button>
-              <Button 
+              <Button
                 onClick={handleQtyDecrement}
                 disabled={value.quantity === 1}
               >
@@ -132,11 +234,11 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value, onChange 
             </ButtonGroup>
             <Switch
               edge="end"
-              onChange={onChange}
+              onChange={handleSelectionChange}
               checked={value.isSelected}
               inputProps={{ 'aria-labelledby': 'switch-list-label-selected-cart-item' }}
             />
-            <IconButton>
+            <IconButton onClick={handleDeleteClick}>
               <DeleteForeverIcon />
             </IconButton>
           </Box>

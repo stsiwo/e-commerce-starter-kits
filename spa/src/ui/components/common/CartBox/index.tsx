@@ -6,7 +6,11 @@ import CartItem from 'components/common/CartItem';
 import { calcSubTotalPriceAmount, calcSubTotalProductNumbers } from 'domain/cart';
 import { CartItemType } from 'domain/cart/types';
 import * as React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link as RRLink } from "react-router-dom";
+import { fetchCartItemActionCreator } from 'reducers/slices/domain/cartItem';
+import { UserTypeEnum } from 'src/app';
+import { mSelector } from 'src/selectors/selector';
 import { generateCartItemList } from 'tests/data/cart';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -24,28 +28,43 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+/**
+ * member & guest
+ *
+ **/
 const CartBox: React.FunctionComponent<{}> = (props) => {
 
 
   const classes = useStyles();
 
+  const auth = useSelector(mSelector.makeAuthSelector());
+
   const dispatch = useDispatch()
 
-  // implement later
-  //const curCartItemList = useSelector(mSelector.makeCartItemListSelector())
-  const testCartItems = React.useMemo(() => generateCartItemList(4), [])
+  const curCartItems = useSelector(mSelector.makeCartItemSelector())
+
+  // fetch cart item from api (member only)
+  React.useEffect(() => {
+    if (auth.userType === UserTypeEnum.MEMBER) {
+      dispatch(fetchCartItemActionCreator());
+    }
+  }, [
+  ])
 
   const renderCartItems: () => React.ReactNode = () => {
-    return testCartItems.map((cartItem: CartItemType) => {
+    return curCartItems.map((cartItem: CartItemType) => {
       return (
-        <CartItem value={cartItem} key={cartItem.cartId} />
+        <CartItem 
+          value={cartItem} 
+          key={cartItem.cartId} 
+        />
       )
     })
   }
 
   return (
     <React.Fragment>
-      {(testCartItems.length === 0 &&
+      {(curCartItems.length === 0 &&
         <React.Fragment>
         <Typography variant="body1" component="p" align="center">
           {"Oops, you don't have any item in your cart."}
@@ -60,16 +79,16 @@ const CartBox: React.FunctionComponent<{}> = (props) => {
         </Box>
         </React.Fragment>
       )}
-      {(testCartItems.length > 0 &&
+      {(curCartItems.length > 0 &&
         <React.Fragment>
           {renderCartItems()}
           <Box component="div" className={classes.subtotalBox}>
             <Typography variant="subtitle1" component="h3" align="right" >
-               Subtotal (<b>{calcSubTotalProductNumbers(testCartItems)}</b>  items): $<b>{calcSubTotalPriceAmount(testCartItems)}</b>
+               Subtotal (<b>{calcSubTotalProductNumbers(curCartItems)}</b>  items): $<b>{calcSubTotalPriceAmount(curCartItems)}</b>
             </Typography>
           </Box>
           <Box component="div" className={classes.controllerBox}>
-            <Button>
+            <Button component={RRLink} to="/checkout">
               {"Checkout"}
             </Button>
           </Box>
