@@ -1,16 +1,39 @@
-import Button from '@material-ui/core/Button';
+import Avatar from '@material-ui/core/Avatar';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
-import CardMedia from '@material-ui/core/CardMedia';
+import IconButton from '@material-ui/core/IconButton';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import BackupIcon from '@material-ui/icons/Backup';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import ImageIcon from '@material-ui/icons/Image';
+import axios, { AxiosError } from 'axios';
+import merge from 'lodash/merge';
+import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import SampleSelfImage from 'static/self.jpeg';
+import { useDispatch, useSelector } from 'react-redux';
+import { authActions } from 'reducers/slices/app';
+import { mSelector } from 'src/selectors/selector';
 
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    title: {
+      textTransform: "uppercase",
+      margin: theme.spacing(2)
+    },
+    avatarBox: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      margin: `${theme.spacing(1)}px 0`,
+    },
+    avatar: {
+      width: 100,
+      height: 100,
+      boxShadow: theme.shadows[5],
+    },
     root: {
       maxWidth: 200,
       margin: "0 auto",
@@ -60,11 +83,91 @@ const AdminAccountAvatarManagement: React.FunctionComponent<{}> = (props) => {
 
   // mui: makeStyles
   const classes = useStyles();
+  
+  // auth
+  const auth = useSelector(mSelector.makeAuthSelector())
 
-  // event handler to submit
-  const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
+  const dispatch = useDispatch()
 
-    console.log("passed")
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
+  /**
+   * file uploading stuff
+   **/
+  const [curFile, setFile] = React.useState<File>(null);
+  const [curFilePath, setFilePath] = React.useState<string>(null);
+  const imageInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleTriggerClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+    if (imageInputRef.current) {
+      imageInputRef.current.click();
+    }
+  }
+
+  const handleFileChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    setFile(e.currentTarget.files[0])
+    const path = URL.createObjectURL(e.currentTarget.files[0])
+    setFilePath(path);
+  }
+
+
+  const handleUploadClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+    if (!curFile) {
+      enqueueSnackbar("Please choose an image before uploading.", { variant: "error" });
+      return false;
+    }
+
+    // request body prep
+    const bodyFormData = new FormData();
+    bodyFormData.append("avatarImage", curFile);
+
+    // request
+    axios.request({
+      method: 'POST',
+      url: API1_URL + `/users/${auth.user.userId}/avatar-image`,
+      data: bodyFormData,
+      headers: { "Content-Type": "multipart/form-data" },
+    }).then((data) => {
+
+      /**
+       * update state
+       **/
+      dispatch(authActions.update(merge({}, auth, {
+        user: {
+          avatarImagePath: data.data.avatarImagePath,
+        }
+      })));
+
+      enqueueSnackbar("uploaded successfully.", { variant: "success"})
+    }).catch((error: AxiosError) => {
+      enqueueSnackbar(error.message, { variant: "error"})
+    })
+  }
+
+
+  const handleDeleteClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+
+    // request
+    axios.request({
+      method: 'DELETE',
+      url: API1_URL + `/users/${auth.user.userId}/avatar-image`
+    }).then((data) => {
+
+      /**
+       * remove it from state
+       **/
+      dispatch(authActions.update(merge({}, auth, {
+        user: {
+          avatarImagePath: "",
+        }
+      })));
+
+      enqueueSnackbar("deleted successfully.", { variant: "success"})
+    }).catch((error: AxiosError) => {
+      enqueueSnackbar(error.message, { variant: "error"})
+    })
   }
 
   return (
@@ -78,18 +181,36 @@ const AdminAccountAvatarManagement: React.FunctionComponent<{}> = (props) => {
         }}
         title="Avatar"
       />
-      <CardMedia
-        className={classes.media}
-        image={SampleSelfImage}
-        title="Avatar Image"
-      />
+      <CardContent className={classes.avatarBox}>
+        <Avatar
+          src={curFilePath}
+          classes={{
+            root: classes.avatar,
+          }}
+        />
+      </CardContent>
       <CardActions disableSpacing>
-        <Button onClick={handleUserAccountSaveClickEvent}>
-          Remove
-        </Button>
-        <Button onClick={handleUserAccountSaveClickEvent}>
-          Upload
-        </Button>
+        <IconButton onClick={handleDeleteClick}>
+          <DeleteForeverIcon />
+        </IconButton>
+        <input
+          accept="image/*"
+          className={null}
+          id="contained-button-file"
+          multiple
+          hidden
+          type="file"
+          ref={imageInputRef}
+          onChange={handleFileChange}
+        />
+        <label htmlFor="contained-button-file">
+          <IconButton onClick={handleTriggerClick}>
+            <ImageIcon />
+          </IconButton>
+        </label>
+        <IconButton onClick={handleUploadClick}>
+          <BackupIcon />
+        </IconButton>
       </CardActions>
     </Card>
   )

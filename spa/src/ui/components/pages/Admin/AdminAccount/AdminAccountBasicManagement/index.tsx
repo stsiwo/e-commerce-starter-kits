@@ -1,14 +1,18 @@
-import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import CardHeader from '@material-ui/core/CardHeader';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import axios, { AxiosError } from 'axios';
 import { useValidation } from 'hooks/validation';
 import { userAccountSchema } from 'hooks/validation/rules';
+import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
+import { useDispatch, useSelector } from 'react-redux';
+import { authActions } from 'reducers/slices/app';
+import { mSelector } from 'src/selectors/selector';
 
 export declare type UserAccountDataType = {
   firstName: string
@@ -70,6 +74,15 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
 
   // mui: makeStyles
   const classes = useStyles();
+
+  // auth
+  const auth = useSelector(mSelector.makeAuthSelector())
+
+  const dispatch = useDispatch()
+
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
 
   // temp user account state
   const [curUserAccountState, setUserAccountState] = React.useState<UserAccountDataType>({
@@ -155,6 +168,27 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
     if (isValid) {
       // pass 
       console.log("passed")
+      
+      // request
+      axios.request({
+        method: 'POST',
+        url: API1_URL + `/users/${auth.user.userId}`,
+        data: JSON.stringify(curUserAccountState),
+      }).then((data) => {
+
+        /**
+         * update auth state 
+         **/
+        const updatedUser = data.data;
+        dispatch(authActions.update({
+          ...auth,
+          user: updatedUser,
+        }));
+
+        enqueueSnackbar("updated successfully.", { variant: "success" })
+      }).catch((error: AxiosError) => {
+        enqueueSnackbar(error.message, { variant: "error" })
+      })
     } else {
       updateAllValidation()
     }

@@ -10,8 +10,10 @@ import axios, { AxiosError } from 'axios';
 import { UserType } from 'domain/user/types';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
+import merge from 'lodash/merge';
+import { authActions } from 'reducers/slices/app';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -71,6 +73,7 @@ const UserAccountAvatarManagement: React.FunctionComponent<UserAccountAvatarMana
   // usage: 'enqueueSnackbar("message", { variant: "error" };
   const { enqueueSnackbar } = useSnackbar();
 
+  const dispatch = useDispatch()
   /**
    * file uploading stuff
    **/
@@ -108,9 +111,17 @@ const UserAccountAvatarManagement: React.FunctionComponent<UserAccountAvatarMana
       data: bodyFormData,
       headers: { "Content-Type": "multipart/form-data" },
     }).then((data) => {
-      enqueueSnackbar("uploaded successfully.", { variant: "success"})
+      /**
+       * update state
+       **/
+      dispatch(authActions.update(merge({}, auth, {
+        user: {
+          avatarImagePath: data.data.avatarImagePath,
+        }
+      })));
+      enqueueSnackbar("uploaded successfully.", { variant: "success" })
     }).catch((error: AxiosError) => {
-      enqueueSnackbar(error.message, { variant: "error"})
+      enqueueSnackbar(error.message, { variant: "error" })
     })
   }
 
@@ -122,9 +133,17 @@ const UserAccountAvatarManagement: React.FunctionComponent<UserAccountAvatarMana
       method: 'DELETE',
       url: API1_URL + `/users/${auth.user.userId}/avatar-image`
     }).then((data) => {
-      enqueueSnackbar("deleted successfully.", { variant: "success"})
+      /**
+       * remove it from state
+       **/
+      dispatch(authActions.update(merge({}, auth, {
+        user: {
+          avatarImagePath: "",
+        }
+      })));
+      enqueueSnackbar("deleted successfully.", { variant: "success" })
     }).catch((error: AxiosError) => {
-      enqueueSnackbar(error.message, { variant: "error"})
+      enqueueSnackbar(error.message, { variant: "error" })
     })
 
   }
