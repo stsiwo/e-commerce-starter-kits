@@ -40,6 +40,11 @@ endpoint change:
         
       - should return updated user aggregate (not only phones/address).
     
+    - (/users/{userId}/avatar-image) 
+    
+      - should return 
+    
+    
   - /orders
   
     - (GET): all orders
