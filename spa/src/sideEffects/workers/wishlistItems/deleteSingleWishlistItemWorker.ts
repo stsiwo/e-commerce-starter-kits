@@ -81,7 +81,7 @@ export function* deleteSingleWishlistItemWorker(action: PayloadAction<WishlistIt
        *
        **/
       yield put(
-        wishlistItemActions.delete(action.payload)
+        wishlistItemActions.delete(action.payload.wishlistId)
       )
 
       /**
@@ -114,7 +114,7 @@ export function* deleteSingleWishlistItemWorker(action: PayloadAction<WishlistIt
      * delete the target entity from redux store
      **/
     yield put(
-      wishlistItemActions.delete(action.payload)
+      wishlistItemActions.delete(action.payload.wishlistId)
     )
   }
 }

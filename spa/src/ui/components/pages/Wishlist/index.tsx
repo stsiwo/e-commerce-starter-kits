@@ -8,6 +8,10 @@ import { mSelector } from 'src/selectors/selector';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import WishlistItem from 'components/common/WishlistItem';
+import { fetchWishlistItemActionCreator, wishlistItemActions } from 'reducers/slices/domain/wishlistItem';
+import { UserTypeEnum } from 'src/app';
+import axios, { AxiosError } from 'axios';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -47,26 +51,68 @@ const useStyles = makeStyles((theme: Theme) =>
  **/
 const Wishlist: React.FunctionComponent<{}> = (props) => {
 
-
   const classes = useStyles();
+
+  const auth = useSelector(mSelector.makeAuthSelector());
 
   const dispatch = useDispatch()
 
-  // implement later
-  //const curWishlistItemList = useSelector(mSelector.makeWishlistItemListSelector())
-  const testWishlistItems = generateWishlistItemList(4)
+  const curWishlistItems = useSelector(mSelector.makeWishlistItemSelector())
 
-  // on select change
-  const handleSelectWishlistItemChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    /**
-     * dispatch select update action (see above)
-     **/
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
+  // fetch wishlistItems
+  React.useEffect(() => {
+    dispatch(fetchWishlistItemActionCreator())
+  }, [
+
+    ])
+
+  const handleMoveToCartClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+
+    const wishlistId = e.currentTarget.getAttribute("data-wishlist-id")
+
+    // patch to 'move-to-cart' request
+    axios.request({
+      method: 'PATCH',
+      url: API1_URL + `/users/${auth.user.userId}/wishlists/${wishlistId}`,
+    }).then((data) => {
+
+      // remove from the wishlist
+      dispatch(wishlistItemActions.delete(wishlistId))
+
+      enqueueSnackbar("added successfully.", { variant: "success" })
+    }).catch((error: AxiosError) => {
+      enqueueSnackbar(error.message, { variant: "error" })
+    })
+
+  }
+
+  const handleDeleteClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+
+    const wishlistId = e.currentTarget.getAttribute("data-wishlist-id")
+
+    // patch to 'move-to-cart' request
+    axios.request({
+      method: 'DELETE',
+      url: API1_URL + `/users/${auth.user.userId}/wishlists/${wishlistId}`,
+    }).then((data) => {
+
+      // remove from the wishlist
+      dispatch(wishlistItemActions.delete(wishlistId))
+
+      enqueueSnackbar("added successfully.", { variant: "success" })
+    }).catch((error: AxiosError) => {
+      enqueueSnackbar(error.message, { variant: "error" })
+    })
   }
 
   const renderWishlistItems: () => React.ReactNode = () => {
-    return testWishlistItems.map((wishlistItem: WishlistItemType) => {
+    return curWishlistItems.map((wishlistItem: WishlistItemType) => {
       return (
-        <WishlistItem value={wishlistItem} onChange={handleSelectWishlistItemChange} key={wishlistItem.wishlistId} />
+        <WishlistItem value={wishlistItem} onMoveToCartClick={handleMoveToCartClick} onDelete={handleDeleteClick} key={wishlistItem.wishlistId} />
       )
     })
   }
@@ -74,24 +120,24 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
   return (
     <React.Fragment>
       <Typography variant="h5" component="h5" align="center" className={classes.title} >
-        {"Wish List"}
+        {"Wishlist"}
       </Typography>
-      {(testWishlistItems.length === 0 &&
+      {(curWishlistItems.length === 0 &&
         <React.Fragment>
-        <Typography variant="body1" component="p" align="center">
-          {"Oops, you don't have any item in your wishlist."}
-        </Typography>
-        <Box component="div">
-          <Button>  
-            {"log in"}
-          </Button>
-          <Button>  
-            {"search"}
-          </Button>
-        </Box>
+          <Typography variant="body1" component="p" align="center">
+            {"Oops, you don't have any item in your wishlist."}
+          </Typography>
+          <Box component="div">
+            <Button>
+              {"log in"}
+            </Button>
+            <Button>
+              {"search"}
+            </Button>
+          </Box>
         </React.Fragment>
       )}
-      {(testWishlistItems.length > 0 &&
+      {(curWishlistItems.length > 0 &&
         <React.Fragment>
           {renderWishlistItems()}
           <Box component="div" className={classes.controllerBox}>

@@ -21,7 +21,8 @@ import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
  **/
 interface WishlistItemPropsType {
   value: WishlistItemType
-  onChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>>
+  onMoveToCartClick?: React.EventHandler<React.MouseEvent<HTMLButtonElement>> 
+  onDelete?: React.EventHandler<React.MouseEvent<HTMLButtonElement>> 
 }
 
 
@@ -57,7 +58,7 @@ const useStyles = makeStyles((theme: Theme) =>
 /**
  * member or admin account management component
  **/
-const WishlistItem: React.FunctionComponent<WishlistItemPropsType> = ({ value, onChange }) => {
+const WishlistItem: React.FunctionComponent<WishlistItemPropsType> = ({ value, onMoveToCartClick, onDelete }) => {
 
   // mui: makeStyles
   const classes = useStyles();
@@ -84,10 +85,15 @@ const WishlistItem: React.FunctionComponent<WishlistItemPropsType> = ({ value, o
             <Button
               variant="contained"
               startIcon={<AddShoppingCartIcon />}
+              onClick={onMoveToCartClick}
+              data-wishlist-id={value.wishlistId}
             >
               Move To Cart
             </Button>
-            <IconButton>
+            <IconButton 
+              onClick={onDelete}
+              data-wishlist-id={value.wishlistId}
+            >
               <DeleteForeverIcon />
             </IconButton>
           </Box>

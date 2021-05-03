@@ -55,7 +55,7 @@ export const wishlistItemSlice = createSlice({
     update: (state: WishlistItemType[], action: WishlistItemActionType) => action.payload,
 
     // use when you want to remove a single entity
-    delete: (state: WishlistItemType[], action: PayloadAction<WishlistItemType>) => remove(state, (wishlistItem: WishlistItemType) => wishlistItem.wishlistId == action.payload.wishlistId),
+    delete: (state: WishlistItemType[], action: PayloadAction<string>) => remove(state, (wishlistItem: WishlistItemType) => wishlistItem.wishlistId == action.payload),
 
     clear: (state: WishlistItemType[]) => [],
   },
