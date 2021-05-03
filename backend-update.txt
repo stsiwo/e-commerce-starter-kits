@@ -3,16 +3,20 @@ endpoint change:
   - /categories (GET)
     - don't need to include products which are belonged to the category. but need total count of products.
     
-  - /users/{userId}/carts => /users/{userId}/cartItems 
+  - /cartItems 
     
     - add below endpoints
       - (PUT): replace existing one with new one
         - to update quantity/is_selected and other stuff.
         - return only updated one.
         
-  - /users/{userId}/wishlist => /users/{userId}/wishlistItems
+    - (GET) remove Pagination.
+        
+        
+  - /wishlistItems
       
-    - don't need to implement PUT/PATCH because of its context
+    - (PATCH) move to cart: 
+      - remove the item from wishlist and trigger domain event to raise the event then add the item to the cart
     
   - /users
   
