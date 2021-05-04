@@ -329,3 +329,19 @@ export const cadCurrencyFormat: (amount: number) => string = (amount) => {
 export const isSuccessCode: (code: number) => boolean = (code) => {
   return (code >= 200 || code <= 299)
 }
+
+/**
+ * 
+ **/
+export function iterateObjectRecursively(obj: Record<string, any>, callback: (key: string, value: any) => any) {
+
+  Object.keys(obj).forEach(key => {
+
+    if (obj[key] && typeof obj[key] === 'object') {
+      iterateObjectRecursively(obj[key], callback)
+    }
+
+    obj[key] = callback(key, obj[key]);
+  })
+
+}

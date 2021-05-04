@@ -1,6 +1,7 @@
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -8,24 +9,24 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Modal from '@material-ui/core/Modal';
+import Radio from '@material-ui/core/Radio';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
 import HomeIcon from '@material-ui/icons/Home';
+import { AxiosError } from 'axios';
+import { api } from 'configs/axiosConfig';
+import { getBillingAddressId, getShippingAddressId } from 'domain/user';
 import { UserAddressType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { userAccountAddressSchema } from 'hooks/validation/rules';
+import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { mSelector } from 'src/selectors/selector';
-import { useSnackbar } from 'notistack';
 import { authActions } from 'reducers/slices/app';
-import axios, { AxiosError } from 'axios';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Radio from '@material-ui/core/Radio';
-import EditIcon from '@material-ui/icons/Edit';
-import { getBillingAddressId, getShippingAddressId } from 'domain/user';
+import { mSelector } from 'src/selectors/selector';
 
 export declare type UserAccountAddressDataType = {
   addressId?: string
@@ -244,7 +245,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
       if (isNew) {
         console.log("this one is to create new one")
         // request
-        axios.request({
+        api.request({
           method: 'POST',
           url: API1_URL + `/users/${auth.user.userId}/addresses`,
           data: JSON.stringify(curUserAccountAddressState),
@@ -264,7 +265,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
       } else {
         console.log("this one is to update existing one")
         // request
-        axios.request({
+        api.request({
           method: 'PUT',
           url: API1_URL + `/users/${auth.user.userId}/addresses/${curUserAccountAddressState.addressId}`,
           data: JSON.stringify(curUserAccountAddressState),
@@ -301,7 +302,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
 
     const addressId = e.currentTarget.getAttribute("data-address-id")
     // request
-    axios.request({
+    api.request({
       method: 'DELETE',
       url: API1_URL + `/users/${auth.user.userId}/addresses/${addressId}`
     }).then((data) => {
@@ -346,7 +347,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
     setBillingId(nextBillingAddress)
 
     // request
-    axios.request({
+    api.request({
       method: 'PATCH',
       url: API1_URL + `/users/${auth.user.userId}/addresses/${nextBillingAddress}`,
       data: JSON.stringify({ isBilling: true })
@@ -375,7 +376,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
     setShippingId(nextShippingAddress)
 
     // request
-    axios.request({
+    api.request({
       method: 'PATCH',
       url: API1_URL + `/users/${auth.user.userId}/addresses/${nextShippingAddress}`,
       data: JSON.stringify({ isShipping: true })

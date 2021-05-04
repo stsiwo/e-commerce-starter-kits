@@ -1,14 +1,15 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { api } from "configs/axiosConfig";
 import { NormalizedCategoryType } from "domain/product/types";
 import { normalize } from "normalizr";
+import { requestTrackerActions } from "reducers/slices/app";
+import { getCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
 import { categoryActions } from "reducers/slices/domain/category";
 import { call, put } from "redux-saga/effects";
 import { FetchStatusEnum, RequestTrackerBaseType } from "src/app";
 import { categorySchemaArray } from "states/state";
 import { requestUrlCheckWorker } from "./common/requestUrlCheckWorker";
-import { getCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
-import { requestTrackerActions } from "reducers/slices/app";
 
 /**
  * a worker (generator)    
@@ -53,7 +54,7 @@ export function* fetchCategoryWithCacheWorker(action: PayloadAction<{}>) {
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
+      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "get",
         url: apiUrl,
       })

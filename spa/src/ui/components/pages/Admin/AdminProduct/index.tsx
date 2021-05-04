@@ -37,7 +37,6 @@ const AdminProduct: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
 
-
   return (
     <Box component="div" className={classes.box}>
       <Typography variant="body2" component="p" align="left" className={classes.title} >

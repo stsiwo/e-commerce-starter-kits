@@ -1,18 +1,17 @@
-import * as React from 'react';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import { generateWishlistItemList } from 'tests/data/wishlist';
-import { WishlistItemType } from 'domain/wishlist/types';
-import { useDispatch, useSelector } from 'react-redux';
-import { mSelector } from 'src/selectors/selector';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
-import WishlistItem from 'components/common/WishlistItem';
-import { fetchWishlistItemActionCreator, wishlistItemActions, wishlistItemPaginationPageActions } from 'reducers/slices/domain/wishlistItem';
-import { UserTypeEnum } from 'src/app';
-import axios, { AxiosError } from 'axios';
-import { useSnackbar } from 'notistack';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
 import Pagination from '@material-ui/lab/Pagination/Pagination';
+import { AxiosError } from 'axios';
+import WishlistItem from 'components/common/WishlistItem';
+import { api } from 'configs/axiosConfig';
+import { WishlistItemType } from 'domain/wishlist/types';
+import { useSnackbar } from 'notistack';
+import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchWishlistItemActionCreator, wishlistItemActions, wishlistItemPaginationPageActions } from 'reducers/slices/domain/wishlistItem';
+import { mSelector } from 'src/selectors/selector';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -78,7 +77,7 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
     const wishlistId = e.currentTarget.getAttribute("data-wishlist-id")
 
     // patch to 'move-to-cart' request
-    axios.request({
+    api.request({
       method: 'PATCH',
       url: API1_URL + `/users/${auth.user.userId}/wishlists/${wishlistId}`,
     }).then((data) => {
@@ -97,7 +96,7 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
     const wishlistId = e.currentTarget.getAttribute("data-wishlist-id")
 
     // patch to 'move-to-cart' request
-    axios.request({
+    api.request({
       method: 'DELETE',
       url: API1_URL + `/users/${auth.user.userId}/wishlists/${wishlistId}`,
     }).then((data) => {

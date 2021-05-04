@@ -1,11 +1,12 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { api } from "configs/axiosConfig";
 import { WishlistItemType } from "domain/wishlist/types";
+import { deleteSingleWishlistItemFetchStatusActions } from "reducers/slices/app/fetchStatus/wishlistItem";
 import { wishlistItemActions } from "reducers/slices/domain/wishlistItem";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { deleteSingleWishlistItemFetchStatusActions } from "reducers/slices/app/fetchStatus/wishlistItem";
 
 /**
  * a worker (generator)    
@@ -69,7 +70,7 @@ export function* deleteSingleWishlistItemWorker(action: PayloadAction<WishlistIt
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
+      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "DELETE",
         url: apiUrl,
       })

@@ -1,10 +1,11 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { api } from "configs/axiosConfig";
 import { NormalizedProductType } from "domain/product/types";
 import { normalize } from "normalizr";
 import { requestTrackerActions } from "reducers/slices/app";
 import { getProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
-import { productActions, productPaginationPageActions, productPaginationTotalPagesActions, productCurItemsActions, productPaginationLimitActions } from "reducers/slices/domain/product";
+import { productActions, productCurItemsActions, productPaginationLimitActions, productPaginationPageActions, productPaginationTotalPagesActions } from "reducers/slices/domain/product";
 import { all, call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, RequestTrackerBaseType, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
@@ -100,7 +101,7 @@ export function* fetchProductWithCacheWorker(action: PayloadAction<{}>) {
         // prep keyword if necessary
 
         // start fetching
-        const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
+        const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
           method: "GET",
           url: apiUrl,
         })

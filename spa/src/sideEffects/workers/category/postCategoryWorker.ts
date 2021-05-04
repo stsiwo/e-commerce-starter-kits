@@ -1,5 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { api } from "configs/axiosConfig";
 import { CategoryType, NormalizedCategoryType } from "domain/product/types";
 import { normalize } from "normalizr";
 import { postCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
@@ -69,7 +70,7 @@ export function* postCategoryWorker(action: PayloadAction<CategoryType>) {
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
+      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "POST",
         url: apiUrl,
         data: action.payload

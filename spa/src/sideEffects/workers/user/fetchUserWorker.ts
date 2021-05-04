@@ -1,5 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { api } from "configs/axiosConfig";
 import { getUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 import { userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
@@ -59,7 +60,7 @@ export function* fetchUserWorker(action: PayloadAction<{}>) {
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
+      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "GET",
         url: apiUrl,
       })

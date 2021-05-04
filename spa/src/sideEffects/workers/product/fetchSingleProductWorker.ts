@@ -1,12 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { api } from "configs/axiosConfig";
+import { NormalizedProductType } from "domain/product/types";
+import { normalize } from "normalizr";
 import { getProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
 import { productActions } from "reducers/slices/domain/product";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { normalize } from "normalizr";
-import { NormalizedProductType } from "domain/product/types";
 import { productSchemaArray } from "states/state";
 
 /**
@@ -62,7 +63,7 @@ export function* fetchSingleProductWorker(action: PayloadAction<{ productId: str
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
+      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "GET",
         url: apiUrl,
       })

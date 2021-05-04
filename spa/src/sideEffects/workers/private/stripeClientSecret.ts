@@ -1,10 +1,10 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { leftNavMenuActions } from "reducers/slices/ui";
-import { put, call } from "redux-saga/effects";
+import { AxiosPromise, AxiosRequestConfig } from "axios";
+import { api } from "configs/axiosConfig";
 import { stripeClientSecretFetchStatusActions } from "reducers/slices/app/fetchStatus/stripeClientSecret";
-import { FetchStatusEnum } from "src/app";
-import axios, { AxiosRequestConfig, AxiosPromise } from "axios";
 import { stripeClientSecretActions } from "reducers/slices/app/private/stripeClientSecret";
+import { call, put } from "redux-saga/effects";
+import { FetchStatusEnum } from "src/app";
 
 /**
  * a worker (generator)    
@@ -50,7 +50,7 @@ export function* requestStripeClientSecretWorker(action: PayloadAction<{}>) {
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
+    const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
       method: "POST",
       url: apiUrl,
       data: action.payload

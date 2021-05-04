@@ -54,7 +54,7 @@ export declare type ProductType = {
   createdAt: Date
   updatedAt: Date
   productImages: ProductImageType[]
-  productVariants?: ProductVariantType[]
+  variants?: ProductVariantType[]
 }
 
 export declare type NormalizedProductType = NormalizedDomainType<ProductType>

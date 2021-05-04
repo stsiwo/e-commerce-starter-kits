@@ -1,5 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { api } from "configs/axiosConfig";
 import { NormalizedCategoryType } from "domain/product/types";
 import { normalize } from "normalizr";
 import { getCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
@@ -64,7 +65,7 @@ export function* fetchCategoryWorker(action: PayloadAction<{}>) {
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
+    const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
       method: "GET",
       url: apiUrl,
     })

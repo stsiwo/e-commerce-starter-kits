@@ -1,5 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { api } from "configs/axiosConfig";
 import { CategoryType } from "domain/product/types";
 import { deleteSingleCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
 import { categoryActions } from "reducers/slices/domain/category";
@@ -65,7 +66,7 @@ export function* deleteSingleCategoryWorker(action: PayloadAction<CategoryType>)
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
+      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "DELETE",
         url: apiUrl,
       })

@@ -1,12 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { api } from "configs/axiosConfig";
 import { WishlistItemType } from "domain/wishlist/types";
+import { postWishlistItemFetchStatusActions } from "reducers/slices/app/fetchStatus/wishlistItem";
 import { wishlistItemActions } from "reducers/slices/domain/wishlistItem";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getUuidv4 } from "src/utils";
-import { postWishlistItemFetchStatusActions } from "reducers/slices/app/fetchStatus/wishlistItem";
 
 /**
  * a worker (generator)    
@@ -80,7 +81,7 @@ export function* postWishlistItemWorker(action: PayloadAction<WishlistItemType>)
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
+      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "POST",
         url: apiUrl,
         data: action.payload

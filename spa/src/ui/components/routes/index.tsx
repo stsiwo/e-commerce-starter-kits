@@ -79,7 +79,7 @@ export const routesData: RoutesDataType = {
       component: withAdminBasePage(AdminProduct),
     },
     {
-      url: "/admin/products/variants",
+      url: "/admin/product-variants",
       component: withAdminBasePage(AdminProductVariant),
     },
     {

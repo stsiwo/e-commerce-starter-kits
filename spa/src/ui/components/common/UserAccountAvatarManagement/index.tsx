@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import BackupIcon from '@material-ui/icons/Backup';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import ImageIcon from '@material-ui/icons/Image';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { UserType } from 'domain/user/types';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
@@ -14,6 +14,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
 import merge from 'lodash/merge';
 import { authActions } from 'reducers/slices/app';
+import { api } from 'configs/axiosConfig';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -105,7 +106,7 @@ const UserAccountAvatarManagement: React.FunctionComponent<UserAccountAvatarMana
     bodyFormData.append("avatarImage", curFile);
 
     // request
-    axios.request({
+    api.request({
       method: 'POST',
       url: API1_URL + `/users/${auth.user.userId}/avatar-image`,
       data: bodyFormData,
@@ -129,7 +130,7 @@ const UserAccountAvatarManagement: React.FunctionComponent<UserAccountAvatarMana
   const handleDeleteClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
 
     // request
-    axios.request({
+    api.request({
       method: 'DELETE',
       url: API1_URL + `/users/${auth.user.userId}/avatar-image`
     }).then((data) => {

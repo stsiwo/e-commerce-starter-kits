@@ -8,6 +8,7 @@ import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { normalize } from "normalizr";
 import { productSchemaArray } from "states/state";
+import { api } from "configs/axiosConfig";
 
 /**
  * a worker (generator)    
@@ -69,7 +70,7 @@ export function* putProductWorker(action: PayloadAction<ProductType>) {
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
+      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "PUT",
         url: apiUrl,
         data: action.payload

@@ -16,7 +16,8 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
 import PhoneIphoneIcon from '@material-ui/icons/PhoneIphone';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
+import { api } from 'configs/axiosConfig';
 import { getPrimaryPhoneId } from 'domain/user';
 import { UserPhoneType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
@@ -183,7 +184,7 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
         console.log("this one is to create new one")
 
         // request
-        axios.request({
+        api.request({
           method: 'POST',
           url: API1_URL + `/users/${auth.user.userId}/phones`,
           data: bodyFormData,
@@ -204,7 +205,7 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
       } else {
         console.log("this one is to update existing one")
         // request
-        axios.request({
+        api.request({
           method: 'PUT',
           url: API1_URL + `/users/${auth.user.userId}/phones/${curUserAccountPhoneState.phoneId}`,
           data: bodyFormData,
@@ -256,7 +257,7 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
     const phoneId = e.currentTarget.getAttribute("data-phone-id")
 
     // request
-    axios.request({
+    api.request({
       method: 'DELETE',
       url: API1_URL + `/users/${auth.user.userId}/phones/${phoneId}`
     }).then((data) => {
@@ -299,7 +300,7 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
     setPrimary(nextPrimePhoneId);
 
     // request
-    axios.request({
+    api.request({
       method: 'PATCH',
       url: API1_URL + `/users/${auth.user.userId}/phones/${nextPrimePhoneId}`,
     }).then((data) => {

@@ -298,6 +298,44 @@ export const mSelector = {
   },
   
   // domain.products
+  makeProductWithoutCacheSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getProduct,
+        rsSelector.domain.getProductPagination,
+      ],
+      (normalizedProducts, pagination) => {
+
+        // need pagination??
+
+        /**
+         * return empty array before fetch
+         **/
+        if (Object.keys(normalizedProducts).length === 0) {
+          return []
+        }
+
+        /**
+         * denormalize
+         *
+         * this return { 'domain-name': [{ domain1 }, { domain2 }] in the format
+         **/
+        const denormalizedEntities = denormalize(
+          Object.keys(normalizedProducts), // ex, [0, 1, 2, 3, 4] ('result' prop of normalized data)
+          productSchemaArray,
+          {
+            products: normalizedProducts
+          }, // entities prop of normalized data (ex, { animes: { "1": { ... }, "2": { ... }, ... }})
+        )
+
+        console.log(denormalizedEntities)
+
+        return denormalizedEntities
+      },
+    )
+  },
+
+  // domain.products
   makeProductSelector: () => {
     return createSelector(
       [

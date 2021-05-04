@@ -1,14 +1,14 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { cartItemActions } from "reducers/slices/domain/cartItem";
+import { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { api } from "configs/axiosConfig";
+import { CategoryType, NormalizedCategoryType } from "domain/product/types";
+import { normalize } from "normalizr";
+import { putCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
+import { categoryActions } from "reducers/slices/domain/category";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { CategoryType, NormalizedCategoryType } from "domain/product/types";
-import { putCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
-import { normalize } from "normalizr";
 import { categorySchemaArray } from "states/state";
-import { categoryActions } from "reducers/slices/domain/category";
 
 /**
  * a worker (generator)    
@@ -70,7 +70,7 @@ export function* putCategoryWorker(action: PayloadAction<CategoryType>) {
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
+      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "PUT",
         url: apiUrl,
         data: action.payload

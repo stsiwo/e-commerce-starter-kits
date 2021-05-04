@@ -1,5 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { api } from "configs/axiosConfig";
 import { NormalizedProductType } from "domain/product/types";
 import { normalize } from "normalizr";
 import { getProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
@@ -74,7 +75,7 @@ export function* fetchProductWorker(action: PayloadAction<{}>) {
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
+      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "GET",
         url: apiUrl,
       })
@@ -90,9 +91,11 @@ export function* fetchProductWorker(action: PayloadAction<{}>) {
       /**
        * update product domain in state
        *
+       * - use 'update' instead of 'merge' since no cache
+       *
        **/
       yield put(
-        productActions.merge(normalizedData.entities.products as NormalizedProductType)
+        productActions.update(normalizedData.entities.products as NormalizedProductType)
       )
 
       /**

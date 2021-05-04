@@ -5,7 +5,8 @@ import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
+import { api } from 'configs/axiosConfig';
 import { useValidation } from 'hooks/validation';
 import { userAccountSchema } from 'hooks/validation/rules';
 import { useSnackbar } from 'notistack';
@@ -170,7 +171,7 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
       console.log("passed")
       
       // request
-      axios.request({
+      api.request({
         method: 'POST',
         url: API1_URL + `/users/${auth.user.userId}`,
         data: JSON.stringify(curUserAccountState),

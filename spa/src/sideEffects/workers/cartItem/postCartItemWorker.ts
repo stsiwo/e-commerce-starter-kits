@@ -1,12 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { api } from "configs/axiosConfig";
 import { CartItemType } from "domain/cart/types";
+import { postCartItemFetchStatusActions } from "reducers/slices/app/fetchStatus/cartItem";
 import { cartItemActions } from "reducers/slices/domain/cartItem";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getUuidv4 } from "src/utils";
-import { postCartItemFetchStatusActions } from "reducers/slices/app/fetchStatus/cartItem";
 
 /**
  * a worker (generator)    
@@ -80,7 +81,7 @@ export function* postCartItemWorker(action: PayloadAction<CartItemType>) {
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
+      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "POST",
         url: apiUrl,
         data: action.payload

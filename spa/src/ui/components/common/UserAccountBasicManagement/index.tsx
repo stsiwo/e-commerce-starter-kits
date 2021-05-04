@@ -10,8 +10,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
 import { useSnackbar } from 'notistack';
 import { authActions } from 'reducers/slices/app';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import Typography from '@material-ui/core/Typography';
+import { api } from 'configs/axiosConfig';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -164,7 +165,7 @@ const UserAccountBasicManagement: React.FunctionComponent<UserAccountBasicManage
       bodyFormData.append("password", curUserAccountState.password);
 
       // request
-      axios.request({
+      api.request({
         method: 'POST',
         url: API1_URL + `/users/${auth.user.userId}`,
         data: bodyFormData,

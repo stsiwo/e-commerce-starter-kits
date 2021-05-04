@@ -153,7 +153,7 @@ const AdminReviewForm: React.FunctionComponent<{}> = (props) => {
         <Typography variant="subtitle1" component="h6" className={classes.title}>
           {"Reviewed Product"}
         </Typography>
-        <ProductHorizontalCard product={testProduct} variant={testProduct.productVariants[0]} />
+        <ProductHorizontalCard product={testProduct} variant={testProduct.variants[0]} />
       </Grid>
       <Grid
         item

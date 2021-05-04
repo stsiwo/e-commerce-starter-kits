@@ -1,10 +1,11 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { api } from "configs/axiosConfig";
+import { getCartItemFetchStatusActions } from "reducers/slices/app/fetchStatus/cartItem";
 import { cartItemActions } from "reducers/slices/domain/cartItem";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { getCartItemFetchStatusActions } from "reducers/slices/app/fetchStatus/cartItem";
 
 /**
  * a worker (generator)    
@@ -58,7 +59,7 @@ export function* fetchCartItemWorker(action: PayloadAction<{}>) {
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
+      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "GET",
         url: apiUrl,
       })

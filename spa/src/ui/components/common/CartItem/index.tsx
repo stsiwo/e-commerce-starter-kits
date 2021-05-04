@@ -12,18 +12,19 @@ import Switch from '@material-ui/core/Switch';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import { AxiosError } from 'axios';
+import { api } from 'configs/axiosConfig';
 import { CartItemType } from 'domain/cart/types';
+import merge from 'lodash/merge';
+import { useSnackbar } from 'notistack';
 import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { cartItemActions } from 'reducers/slices/domain/cartItem';
+import { UserTypeEnum } from 'src/app';
+import { mSelector } from 'src/selectors/selector';
 import SampleSelfImage from 'static/self.jpeg';
 import ColorCell from '../GridData/ColorCell';
 import SizeCell from '../GridData/SizeCell';
-import { useSelector, useDispatch } from 'react-redux';
-import { mSelector } from 'src/selectors/selector';
-import axios, { AxiosError } from 'axios';
-import merge from 'lodash/merge';
-import { UserTypeEnum } from 'src/app';
-import { useSnackbar } from 'notistack';
-import { cartItemActions } from 'reducers/slices/domain/cartItem';
 
 /**
  * need 'orderDetail' or 'product/variant'
@@ -90,7 +91,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
 
       if (auth.userType === UserTypeEnum.MEMBER) {
         // put to replace the whole cart item 
-        axios.request({
+        api.request({
           method: 'PUT',
           url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartId}`,
           data: JSON.stringify(nextCartItem)
@@ -121,7 +122,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
 
       if (auth.userType === UserTypeEnum.MEMBER) {
         // put to replace the whole cart item 
-        axios.request({
+        api.request({
           method: 'PUT',
           url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartId}`,
           data: JSON.stringify(nextCartItem)
@@ -152,7 +153,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
 
     if (auth.userType === UserTypeEnum.MEMBER) {
       // put to replace the whole cart item 
-      axios.request({
+      api.request({
         method: 'PUT',
         url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartId}`,
         data: JSON.stringify(nextCartItem)
@@ -180,7 +181,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
      **/
     if (auth.userType === UserTypeEnum.MEMBER) {
       // put to replace the whole cart item 
-      axios.request({
+      api.request({
         method: 'DELETE',
         url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartId}`,
       }).then((data) => {

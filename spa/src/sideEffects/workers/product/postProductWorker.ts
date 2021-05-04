@@ -1,12 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { ProductType, NormalizedProductType } from "domain/product/types";
+import { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { api } from "configs/axiosConfig";
+import { NormalizedProductType, ProductType } from "domain/product/types";
+import { normalize } from "normalizr";
 import { postProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
 import { productActions } from "reducers/slices/domain/product";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { normalize } from "normalizr";
 import { productSchemaArray } from "states/state";
 
 /**
@@ -69,7 +70,7 @@ export function* postProductWorker(action: PayloadAction<ProductType>) {
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(axios, {
+      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "POST",
         url: apiUrl,
         data: action.payload

@@ -62,7 +62,7 @@ export const productVariantSchema = yup.object().shape({
   variantDiscountEndDate: yup.string().optional(),
   variantStock: yup.number().required(),
   isDiscount: yup.string().optional(),
-  note: yup.string().optional(),
+  note: yup.string().optional().nullable(),
 })
 
 export const productSchema = yup.object().shape({
@@ -78,7 +78,7 @@ export const productSchema = yup.object().shape({
   releaseDate: yup.string().optional(),
   category: yup.object().required(),
   productVariants: yup.array().of(productVariantSchema),
-  note: yup.string().optional(),
+  note: yup.string().optional().nullable(),
 })
 
 // categories

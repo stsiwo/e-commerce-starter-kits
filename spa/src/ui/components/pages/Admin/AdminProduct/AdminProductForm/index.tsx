@@ -3,19 +3,27 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormLabel from '@material-ui/core/FormLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import MenuItem from '@material-ui/core/MenuItem';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { CategoryType, defaultProductData, defaultProductValidationData, ProductDataType, ProductValidationDataType, ProductVariantSizeType, defaultProductOnlyData } from 'domain/product/types';
+import { AxiosError } from 'axios';
+import { api } from 'configs/axiosConfig';
+import { CategoryType, defaultProductOnlyData, defaultProductValidationData, ProductDataType, ProductType, ProductValidationDataType } from 'domain/product/types';
 import { useValidation } from 'hooks/validation';
 import { productSchema } from 'hooks/validation/rules';
+import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import { ChromePicker, ColorResult } from 'react-color';
-import { generateCategoryList, testProductVariantSizeObj } from 'tests/data/product';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchCategoryActionCreator } from 'reducers/slices/domain/category';
+import { fetchProductActionCreator } from 'reducers/slices/domain/product';
+import { mSelector } from 'src/selectors/selector';
+
+interface AdminProductFormPropsType {
+  product: ProductType
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -77,13 +85,28 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  *    - 6. display result popup message
  **/
-const AdminProductForm: React.FunctionComponent<{}> = (props) => {
+const AdminProductForm: React.FunctionComponent<AdminProductFormPropsType> = (props) => {
 
   // mui: makeStyles
   const classes = useStyles();
+  
+  // auth
+  const auth = useSelector(mSelector.makeAuthSelector())
+
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
+  const dispatch = useDispatch()
 
   // temp user account state
-  const [curProductState, setProductState] = React.useState<ProductDataType>(defaultProductOnlyData);
+  const [curProductState, setProductState] = React.useState<ProductDataType>(props.product ? props.product : defaultProductOnlyData);
+
+  // update/create logic for product
+  //  - true: create
+  //  - false: update
+  // if props.product exists, it updates, otherwise, new
+  const [isNew, setNew] = React.useState<boolean>(props.product ? true : false);
 
   // validation logic (should move to hooks)
   const [curProductValidationState, setProductValidationState] = React.useState<ProductValidationDataType>(defaultProductValidationData);
@@ -96,8 +119,12 @@ const AdminProductForm: React.FunctionComponent<{}> = (props) => {
   })
 
   // test category list
-  // #TODO: replace with real one when you are ready
-  const testCategoryList = generateCategoryList(10)
+  const categoryList = useSelector(mSelector.makeCategorySelector())
+
+  // category if not store in redux store
+  React.useEffect(() => {
+    dispatch(fetchCategoryActionCreator()); 
+  }, [])
 
   // event handlers
   const handleProductNameInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
@@ -128,7 +155,7 @@ const AdminProductForm: React.FunctionComponent<{}> = (props) => {
   }
 
   const handleProductCategoryInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCategory = testCategoryList.find((category: CategoryType) => e.currentTarget.value === category.categoryId)
+    const nextCategory = categoryList.find((category: CategoryType) => e.currentTarget.value === category.categoryId)
     // must not be null
     updateValidationAt("category", e.currentTarget.value);
     setProductState((prev: ProductDataType) => ({
@@ -179,6 +206,16 @@ const AdminProductForm: React.FunctionComponent<{}> = (props) => {
     }));
   };
 
+  const handleProductNoteInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    const nextProductNote = e.currentTarget.value
+    updateValidationAt("note", e.currentTarget.value);
+    setProductState((prev: ProductDataType) => ({
+      ...prev,
+      note: nextProductNote
+    }));
+  }
+
+
   // event handler to submit
   const handleProductSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
 
@@ -187,8 +224,43 @@ const AdminProductForm: React.FunctionComponent<{}> = (props) => {
     console.log(isValid);
 
     if (isValid) {
+
       // pass 
       console.log("passed")
+      if (isNew) {
+        console.log("new product creation")
+        // request
+        api.request({
+          method: 'POST',
+          url: API1_URL + `/products`,
+          data: JSON.stringify(curProductState),
+        }).then((data) => {
+
+          // fetch again
+          dispatch(fetchProductActionCreator())
+
+          enqueueSnackbar("updated successfully.", { variant: "success" })
+        }).catch((error: AxiosError) => {
+          enqueueSnackbar(error.message, { variant: "error" })
+        })
+
+      } else {
+        console.log("new product creation")
+        // request
+        api.request({
+          method: 'PUT',
+          url: API1_URL + `/products/${curProductState.productId}`,
+          data: JSON.stringify(curProductState),
+        }).then((data) => {
+
+          // fetch again
+          dispatch(fetchProductActionCreator())
+
+          enqueueSnackbar("updated successfully.", { variant: "success" })
+        }).catch((error: AxiosError) => {
+          enqueueSnackbar(error.message, { variant: "error" })
+        })
+      }
     } else {
       console.log("failed")
       updateAllValidation()
@@ -236,7 +308,7 @@ const AdminProductForm: React.FunctionComponent<{}> = (props) => {
         helperText={curProductValidationState.category}
         error={curProductValidationState.category !== ""}
       >
-        {testCategoryList.map((category: CategoryType) => (
+        {categoryList.map((category: CategoryType) => (
           <MenuItem key={category.categoryId} value={category.categoryId}>
             {category.categoryName}
           </MenuItem>
@@ -314,6 +386,17 @@ const AdminProductForm: React.FunctionComponent<{}> = (props) => {
           className={classes.productDateInput}
         />
       </MuiPickersUtilsProvider>
+      <TextField
+        id="product-note"
+        label="Product Note"
+        multiline
+        rows={4}
+        className={`${classes.txtFieldBase}`}
+        value={curProductState.note}
+        onChange={handleProductNoteInputChangeEvent}
+        helperText={curProductValidationState.note}
+        error={curProductValidationState.note !== ""}
+      />
       <Box component="div" className={classes.actionBox}>
         <Button onClick={handleProductSaveClickEvent}>
           Save
