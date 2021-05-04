@@ -1,3 +1,14 @@
+-- users
+
+-- test admin user
+INSERT INTO `users` (`user_id`, `first_name`, `last_name`, `email`, `password`, `user_type_id`) 
+VALUES ( 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', 'Admin', 'Test', 'test_admin@test.com', '$2y$10$bqu9h3ffWjQKjp5p3cB9iudPB75agR2smLd0dme7edCwti7mAznNy', '1');
+
+-- test member user
+INSERT INTO `users` (`user_id`, `first_name`, `last_name`, `email`, `password`, `user_type_id`) 
+VALUES ( 'c7081519-16e5-4f92-ac50-1834001f12b9', 'Member', 'Test', 'test_member@test.com', '$2y$10$bqu9h3ffWjQKjp5p3cB9iudPB75agR2smLd0dme7edCwti7mAznNy', '2');
+
+
 -- categories
 INSERT INTO `categories` (`category_id`, `category_name`, `category_description`, `category_path`)
 VALUES ('1', 'Test Category 1', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using Content here, content here, making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for lorem ipsum will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).', 'test-category-1'); 
