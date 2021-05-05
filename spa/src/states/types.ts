@@ -96,7 +96,10 @@ export declare type DomainStateType = {
     pagination: DomainPaginationType,
     // no cache so don't need curItems
   },
-  users: UserType[] // don't need to normalized
+  users: {
+    data: UserType[] // don't need to normalized
+    pagination: DomainPaginationType,
+  },
   orders: OrderType[] // don't need to normalized 
   reviews: {  
     data: ReviewType[],

@@ -144,7 +144,14 @@ export const initialState: StateType = {
         totalPages: 1,
       }
     },
-    users: [],
+    users: {
+      data: [],
+      pagination: {
+        page: 0, // start from 0 (not 1)
+        limit: 10,
+        totalPages: 1,
+      },
+    },
     orders: [],
     reviews: {
       data: [],

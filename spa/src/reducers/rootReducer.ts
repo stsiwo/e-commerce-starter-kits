@@ -12,7 +12,7 @@ import { cartItemSliceReducer } from './slices/domain/cartItem';
 import { categoryPaginationLimitSliceReducer, categoryPaginationPageSliceReducer, categoryPaginationTotalPagesSliceReducer, categorySliceReducer } from './slices/domain/category';
 import { orderSliceReducer } from './slices/domain/order';
 import { productCurItemsSliceReducer, productPaginationLimitSliceReducer, productPaginationPageSliceReducer, productPaginationTotalPagesSliceReducer, productQueryCategoryIdSliceReducer, productQueryEndDateSliceReducer, productQueryIsDiscountSliceReducer, productQueryMaxPriceSliceReducer, productQueryMinPriceSliceReducer, productQueryReviewPointSliceReducer, productQuerySearchQuerySliceReducer, productQuerySortSliceReducer, productQueryStartDateSliceReducer, productSliceReducer } from './slices/domain/product';
-import { userSliceReducer } from './slices/domain/user';
+import { userSliceReducer, userPaginationPageSliceReducer, userPaginationTotalPagesSliceReducer, userPaginationLimitSliceReducer } from './slices/domain/user';
 import { wishlistItemPaginationLimitSliceReducer, wishlistItemPaginationPageSliceReducer, wishlistItemPaginationTotalPagesSliceReducer, wishlistItemSliceReducer } from './slices/domain/wishlistItem';
 import { cartModalSliceReducer, leftNavMenuSliceReducer, rightNavMenuSliceReducer, searchModalSliceReducer } from './slices/ui';
 import { reviewSliceReducer, reviewPaginationPageSliceReducer, reviewPaginationLimitSliceReducer, reviewPaginationTotalPagesSliceReducer } from './slices/domain/review';
@@ -105,7 +105,14 @@ export const rootReducer = combineReducers({
         totalPages: wishlistItemPaginationTotalPagesSliceReducer,
       }),
     }),
-    users: userSliceReducer,
+    users: combineReducers({
+      data: userSliceReducer,
+      pagination: combineReducers({
+        page: userPaginationPageSliceReducer,
+        limit: userPaginationLimitSliceReducer,
+        totalPages: userPaginationTotalPagesSliceReducer,
+      }),
+    }),
     orders: orderSliceReducer,
     reviews: combineReducers({
       data: reviewSliceReducer,

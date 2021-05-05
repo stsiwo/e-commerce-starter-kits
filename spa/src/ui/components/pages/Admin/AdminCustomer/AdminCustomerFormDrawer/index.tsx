@@ -6,10 +6,12 @@ import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import Divider from '@material-ui/core/Divider';
+import { UserType } from 'domain/user/types';
 
 declare type AdminCustomerFormDrawerPropsType = {
   curFormOpen: boolean
   setFormOpen: React.Dispatch<React.SetStateAction<boolean>>
+  user: UserType
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -46,7 +48,6 @@ const AdminCustomerFormDrawer: React.FunctionComponent<AdminCustomerFormDrawerPr
 
   // used to switch 'permanent' or 'temporary' nav menu based on this screen size 
   const theme = useTheme();
-
 
   const classes = useStyles();
 
@@ -93,7 +94,7 @@ const AdminCustomerFormDrawer: React.FunctionComponent<AdminCustomerFormDrawerPr
           </IconButton>
         </Box>
         <Divider variant="middle" />
-        <AdminCustomerForm />
+        <AdminCustomerForm user={props.user} />
       </Drawer>
     </React.Fragment>
   )

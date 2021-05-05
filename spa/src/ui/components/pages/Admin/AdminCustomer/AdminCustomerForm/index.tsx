@@ -13,6 +13,11 @@ import { testMemberUser } from 'tests/data/user';
 import UserAccountBasicManagement from 'components/common/UserAccountBasicManagement';
 import UserAccountPhoneManagement from 'components/common/UserAccountPhoneManagement';
 import UserAccountAddressManagement from 'components/common/UserAccountAddressManagement';
+import { UserType } from 'domain/user/types';
+
+interface AdminCustomerFormPropsType {
+  user: UserType
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -43,7 +48,7 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  *    - 6. display result popup message
  **/
-const AdminCustomerForm: React.FunctionComponent<{}> = (props) => {
+const AdminCustomerForm: React.FunctionComponent<AdminCustomerFormPropsType> = (props) => {
 
   // mui: makeStyles
   const classes = useStyles();
@@ -63,9 +68,9 @@ const AdminCustomerForm: React.FunctionComponent<{}> = (props) => {
         className={classes.orderDetailBox}
       >
         <Typography variant="subtitle1" component="h6" className={classes.title}>
-          {"Basic Information"}
+          {"Basic"}
         </Typography>
-        <UserAccountBasicManagement user={testMemberUser}/>
+        <UserAccountBasicManagement user={props.user}/>
       </Grid>
       <Grid
         item
@@ -75,7 +80,7 @@ const AdminCustomerForm: React.FunctionComponent<{}> = (props) => {
         <Typography variant="subtitle1" component="h6" className={classes.title}>
           {"Phones"}
         </Typography>
-        <UserAccountPhoneManagement phones={testMemberUser.phones} />
+        <UserAccountPhoneManagement phones={props.user.phones} />
       </Grid>
       <Grid
         item
@@ -85,7 +90,7 @@ const AdminCustomerForm: React.FunctionComponent<{}> = (props) => {
         <Typography variant="subtitle1" component="h6" className={classes.title}>
           {"Addresses"}
         </Typography>
-        <UserAccountAddressManagement addresses={testMemberUser.addresses} />
+        <UserAccountAddressManagement addresses={props.user.addresses} />
       </Grid>
     </Grid>
   )
