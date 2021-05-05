@@ -53,6 +53,10 @@ endpoint change:
     - (PUT): replace with the same id
     
   - /products
+  
+  - /products/{productId}/variants/
+  
+    - create this endpoint and its corresponding method controller.
 
   - domain calculated values:
     - e.g., cheapest price of the product, avg review points and so on
