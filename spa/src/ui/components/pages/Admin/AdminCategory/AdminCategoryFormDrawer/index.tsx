@@ -2,10 +2,12 @@ import Drawer from '@material-ui/core/Drawer';
 import { createStyles, makeStyles, Theme, useTheme } from '@material-ui/core/styles';
 import * as React from 'react';
 import AdminCategoryForm from '../AdminCategoryForm';
+import { CategoryType } from 'domain/product/types';
 
 declare type AdminCategoryFormDrawerPropsType = {
   curFormOpen: boolean
   setFormOpen: React.Dispatch<React.SetStateAction<boolean>>
+  category: CategoryType
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -76,7 +78,7 @@ const AdminCategoryFormDrawer: React.FunctionComponent<AdminCategoryFormDrawerPr
           paper: classes.drawerPaper,
         }}
       >
-        <AdminCategoryForm />
+        <AdminCategoryForm category={props.category} />
       </Drawer>
     </React.Fragment>
   )

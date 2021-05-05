@@ -3,7 +3,9 @@ import { NormalizedDomainType } from "domain/types";
 export declare type CategoryType = {
   categoryId: string
   categoryName: string
+  categoryPath: string
   categoryDescription: string
+  totalProductCount?: number
 }
 
 export declare type NormalizedCategoryType = NormalizedDomainType<CategoryType>

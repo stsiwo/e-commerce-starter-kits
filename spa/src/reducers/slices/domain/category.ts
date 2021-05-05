@@ -53,7 +53,6 @@ export const categorySlice = createSlice({
      *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
      *
      **/
-
     merge: (state: NormalizedCategoryType, action: CategoryActionType) => merge(state, action.payload),
 
     update: (state: NormalizedCategoryType, action: CategoryActionType) => action.payload,
@@ -76,3 +75,116 @@ export const categorySlice = createSlice({
 
 export const categorySliceReducer = categorySlice.reducer
 export const categoryActions = categorySlice.actions
+
+/**
+ *
+ * domain.categories.pagination.page state Slice (no side effects)
+ *
+ **/
+// action type             
+export type CategoryPaginationPageActionType = PayloadAction<number> 
+
+export const categoryPaginationPageSlice = createSlice({ 
+  name: "domain/categories/pagination/page", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: CategoryPaginationPageActionType) => action.payload,
+    clear: (state: string) => 0, // start from 0, (not 1)
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const categoryPaginationPageSliceReducer = categoryPaginationPageSlice.reducer
+export const categoryPaginationPageActions = categoryPaginationPageSlice.actions
+
+
+/**
+ *
+ * domain.categories.pagination.limit state Slice (no side effects)
+ *
+ **/
+// action type             
+export type CategoryPaginationLimitActionType = PayloadAction<number> 
+
+export const categoryPaginationLimitSlice = createSlice({ 
+  name: "domain/categories/pagination/limit", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: CategoryPaginationLimitActionType) => action.payload,
+    clear: (state: string) => 20,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const categoryPaginationLimitSliceReducer = categoryPaginationLimitSlice.reducer
+export const categoryPaginationLimitActions = categoryPaginationLimitSlice.actions
+
+
+/**
+ *
+ * domain.categories.pagination.totalPages state Slice (no side effects)
+ *
+ **/
+// action type             
+export type CategoryPaginationTotalPagesActionType = PayloadAction<number> 
+
+export const categoryPaginationTotalPagesSlice = createSlice({ 
+  name: "domain/categories/pagination/totalPages", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: CategoryPaginationTotalPagesActionType) => action.payload,
+    clear: (state: string) => 1,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const categoryPaginationTotalPagesSliceReducer = categoryPaginationTotalPagesSlice.reducer
+export const categoryPaginationTotalPagesActions = categoryPaginationTotalPagesSlice.actions

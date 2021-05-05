@@ -9,7 +9,7 @@ import { deleteSingleUserFetchStatusSliceReducer, getSingleUserFetchStatusSliceR
 import { deleteSingleWishlistItemFetchStatusSliceReducer, deleteWishlistItemFetchStatusSliceReducer, getWishlistItemFetchStatusSliceReducer, postWishlistItemFetchStatusSliceReducer } from './slices/app/fetchStatus/wishlistItem';
 import { stripeClientSecretSliceReducer } from './slices/app/private/stripeClientSecret';
 import { cartItemSliceReducer } from './slices/domain/cartItem';
-import { categorySliceReducer } from './slices/domain/category';
+import { categorySliceReducer, categoryPaginationPageSliceReducer, categoryPaginationLimitSliceReducer, categoryPaginationTotalPagesSliceReducer } from './slices/domain/category';
 import { orderSliceReducer } from './slices/domain/order';
 import { productCurItemsSliceReducer, productPaginationLimitSliceReducer, productPaginationPageSliceReducer, productPaginationTotalPagesSliceReducer, productQueryCategoryIdSliceReducer, productQueryEndDateSliceReducer, productQueryIsDiscountSliceReducer, productQueryMaxPriceSliceReducer, productQueryMinPriceSliceReducer, productQueryReviewPointSliceReducer, productQuerySearchQuerySliceReducer, productQuerySortSliceReducer, productQueryStartDateSliceReducer, productSliceReducer } from './slices/domain/product';
 import { userSliceReducer } from './slices/domain/user';
@@ -83,7 +83,14 @@ export const rootReducer = combineReducers({
     })
   }),
   domain: combineReducers({
-    categories: categorySliceReducer,
+    categories: combineReducers({
+      data: categorySliceReducer,
+      pagination: combineReducers({
+        page: categoryPaginationPageSliceReducer,
+        limit: categoryPaginationLimitSliceReducer,
+        totalPages: categoryPaginationTotalPagesSliceReducer,
+      })
+    }),
     cartItems: cartItemSliceReducer,
     wishlistItems: combineReducers({
       data: wishlistItemSliceReducer,

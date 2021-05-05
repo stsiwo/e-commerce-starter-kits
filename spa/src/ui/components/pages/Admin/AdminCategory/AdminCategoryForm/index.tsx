@@ -2,11 +2,20 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { CategoryDataType, CategoryValidationDataType, defaultCategoryData, defaultCategoryValidationData } from 'domain/product/types';
+import { AxiosError } from 'axios';
+import { api } from 'configs/axiosConfig';
+import { CategoryDataType, CategoryType, CategoryValidationDataType, defaultCategoryData, defaultCategoryValidationData } from 'domain/product/types';
 import { useValidation } from 'hooks/validation';
 import { categorySchema } from 'hooks/validation/rules';
+import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import { generateCategoryList } from 'tests/data/product';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchCategoryActionCreator } from 'reducers/slices/domain/category';
+import { mSelector } from 'src/selectors/selector';
+
+interface AdminCategoryFormPropsType {
+  category: CategoryType
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -55,13 +64,28 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  *    - 6. display result popup message
  **/
-const AdminCategoryForm: React.FunctionComponent<{}> = (props) => {
+const AdminCategoryForm: React.FunctionComponent<AdminCategoryFormPropsType> = (props) => {
 
   // mui: makeStyles
   const classes = useStyles();
+  
+  // auth
+  const auth = useSelector(mSelector.makeAuthSelector())
+
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
+  const dispatch = useDispatch()
 
   // temp user account state
-  const [curCategoryState, setCategoryState] = React.useState<CategoryDataType>(defaultCategoryData);
+  const [curCategoryState, setCategoryState] = React.useState<CategoryDataType>(props.category ? props.category : defaultCategoryData);
+
+  // update/create logic for product
+  //  - true: create
+  //  - false: update
+  // if props.product exists, it updates, otherwise, new
+  const [isNew, setNew] = React.useState<boolean>(props.category ? true : false);
 
   // validation logic (should move to hooks)
   const [curCategoryValidationState, setCategoryValidationState] = React.useState<CategoryValidationDataType>(defaultCategoryValidationData);
@@ -72,10 +96,6 @@ const AdminCategoryForm: React.FunctionComponent<{}> = (props) => {
     schema: categorySchema,
     setValidationDomain: setCategoryValidationState
   })
-
-  // test category list
-  // #TODO: replace with real one when you are ready
-  const testCategoryList = generateCategoryList(10)
 
   // event handlers
   const handleCategoryNameInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
@@ -117,6 +137,40 @@ const AdminCategoryForm: React.FunctionComponent<{}> = (props) => {
     if (isValid) {
       // pass 
       console.log("passed")
+      if (isNew) {
+        console.log("new category creation")
+        // request
+        api.request({
+          method: 'POST',
+          url: API1_URL + `/categories`,
+          data: JSON.stringify(curCategoryState),
+        }).then((data) => {
+
+          // fetch again
+          dispatch(fetchCategoryActionCreator())
+
+          enqueueSnackbar("updated successfully.", { variant: "success" })
+        }).catch((error: AxiosError) => {
+          enqueueSnackbar(error.message, { variant: "error" })
+        })
+
+      } else {
+        console.log("update category")
+        // request
+        api.request({
+          method: 'PUT',
+          url: API1_URL + `/categories/${curCategoryState.categoryId}`,
+          data: JSON.stringify(curCategoryState),
+        }).then((data) => {
+
+          // fetch again
+          dispatch(fetchCategoryActionCreator())
+
+          enqueueSnackbar("updated successfully.", { variant: "success" })
+        }).catch((error: AxiosError) => {
+          enqueueSnackbar(error.message, { variant: "error" })
+        })
+      }
     } else {
       console.log("failed")
       updateAllValidation()

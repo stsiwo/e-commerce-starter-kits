@@ -35,7 +35,8 @@ export const rsSelector = {
   },
 
   domain: {
-    getCategory: (state: StateType) => state.domain.categories,
+    getCategory: (state: StateType) => state.domain.categories.data,
+    getCategoryPagination: (state: StateType) => state.domain.categories.pagination,
     getCartItem: (state: StateType) => state.domain.cartItems,
     getWishlistItem: (state: StateType) => state.domain.wishlistItems.data,
     getWishlistItemPagination: (state: StateType) => state.domain.wishlistItems.pagination,
@@ -187,6 +188,57 @@ export const mSelector = {
         )
 
         return denormalizedEntities
+      },
+    )
+  },
+
+  // domain.categories
+  makeCategoryWithoutCacheSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getCategory,
+        rsSelector.domain.getCategoryPagination,
+      ],
+      (normalizedCategories, pagination) => {
+
+        // need pagination??
+
+        /**
+         * return empty array before fetch
+         **/
+        if (Object.keys(normalizedCategories).length === 0) {
+          return []
+        }
+
+        /**
+         * denormalize
+         *
+         * this return { 'domain-name': [{ domain1 }, { domain2 }] in the format
+         **/
+        const denormalizedEntities = denormalize(
+          Object.keys(normalizedCategories), // ex, [0, 1, 2, 3, 4] ('result' prop of normalized data)
+          categorySchemaArray,
+          {
+            categories: normalizedCategories
+          }, // entities prop of normalized data (ex, { animes: { "1": { ... }, "2": { ... }, ... }})
+        )
+
+        console.log(denormalizedEntities)
+
+        return denormalizedEntities
+      },
+    )
+  },
+
+  // domain.categories.pagination
+  makeCategoryPaginationSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getCategoryPagination
+      ],
+      (pagination) => {
+
+        return pagination
       },
     )
   },
