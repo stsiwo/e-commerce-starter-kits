@@ -44,6 +44,9 @@ endpoint change:
     
       - should return 
     
+    - create user status column
+      
+      - handle temporary signup (e.g., without verification of email), normal user (e.g., after verfication of email), and blacklist (e.g., the admin disable user account)
     
   - /orders
   
