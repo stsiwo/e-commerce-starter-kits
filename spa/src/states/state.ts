@@ -105,6 +105,9 @@ export const initialState: StateType = {
         put: FetchStatusEnum.INITIAL,
         deleteSingle: FetchStatusEnum.INITIAL,
       },
+      reviews: {
+        get: FetchStatusEnum.INITIAL,
+      },
       cartItems: {
         get: FetchStatusEnum.INITIAL,
         post: FetchStatusEnum.INITIAL,
@@ -143,6 +146,14 @@ export const initialState: StateType = {
     },
     users: [],
     orders: [],
+    reviews: {
+      data: [],
+      pagination: {
+        page: 0, // start from 0 (not 1)
+        limit: 10,
+        totalPages: 1,
+      },
+    },
     products: {
       data: {},
       query: {

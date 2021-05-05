@@ -4,9 +4,11 @@ import { api } from "configs/axiosConfig";
 import { NormalizedCategoryType } from "domain/product/types";
 import { normalize } from "normalizr";
 import { getCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
-import { categoryActions } from "reducers/slices/domain/category";
-import { call, put } from "redux-saga/effects";
+import { categoryActions, categoryPaginationPageActions, categoryPaginationTotalPagesActions } from "reducers/slices/domain/category";
+import { all, call, put, select } from "redux-saga/effects";
 import { FetchStatusEnum } from "src/app";
+import { mSelector } from "src/selectors/selector";
+import { generateQueryString } from "src/utils";
 import { categorySchemaArray } from "states/state";
 
 /**
@@ -53,9 +55,17 @@ export function* fetchCategoryWorker(action: PayloadAction<{}>) {
   )
 
   /**
+   * prep query string
+   **/
+  const curQueryString = yield select(mSelector.makeCategoryQueryStringSelector())
+
+  console.log(curQueryString)
+  console.log(generateQueryString(curQueryString));
+
+  /**
    * grab all domain
    **/
-  const apiUrl = `${API1_URL}/categories`
+  const apiUrl = `${API1_URL}/categories${generateQueryString(curQueryString)}`
 
   /**
    * fetch data
@@ -92,6 +102,54 @@ export function* fetchCategoryWorker(action: PayloadAction<{}>) {
     yield put(
       getCategoryFetchStatusActions.update(FetchStatusEnum.SUCCESS)
     )
+
+    /**
+     * update pagination.
+     *
+     * sample response data:
+     * 
+     * <PageImpl>
+     *  <content>
+     *    ... actual content
+     *  </content>
+     *  <pageable>
+     *   <sort>
+     *   <sorted>true</sorted>
+     *   <unsorted>false</unsorted>
+     *   <empty>false</empty>
+     *   </sort>
+     *   <pageNumber>1</pageNumber>
+     *   <pageSize>20</pageSize>
+     *   <offset>20</offset>
+     *   <paged>true</paged>
+     *   <unpaged>false</unpaged>
+     *  </pageable>
+     *  <totalPages>2</totalPages>
+     *  <totalElements>25</totalElements>
+     *  <last>true</last>
+     *  <sort>
+     *   <sorted>true</sorted>
+     *   <unsorted>false</unsorted>
+     *   <empty>false</empty>
+     *  </sort>
+     *  <first>false</first>
+     *  <number>1</number>
+     *  <numberOfElements>5</numberOfElements>
+     *  <size>20</size>
+     *  <empty>false</empty>
+     * </PageImpl>
+     **/
+
+
+    console.log(response.data.pageable)
+
+    console.log("total pages")
+    console.log(response.data.totalPages)
+
+    yield all([
+      put(categoryPaginationPageActions.update(response.data.pageable.pageNumber)),
+      put(categoryPaginationTotalPagesActions.update(response.data.totalPages)),
+    ])
 
   } catch (error) {
 

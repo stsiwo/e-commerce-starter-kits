@@ -5,10 +5,12 @@ import AdminReviewForm from '../AdminReviewForm';
 import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import { ReviewType } from 'domain/review/type';
 
 declare type AdminReviewFormDrawerPropsType = {
   curFormOpen: boolean
   setFormOpen: React.Dispatch<React.SetStateAction<boolean>>
+  review: ReviewType
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -91,7 +93,7 @@ const AdminReviewFormDrawer: React.FunctionComponent<AdminReviewFormDrawerPropsT
             <GetAppIcon />            
           </IconButton>
         </Box>
-        <AdminReviewForm />
+        <AdminReviewForm review={props.review} />
       </Drawer>
     </React.Fragment>
   )

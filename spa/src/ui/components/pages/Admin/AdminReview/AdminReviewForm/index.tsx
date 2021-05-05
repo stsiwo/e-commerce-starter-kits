@@ -6,7 +6,7 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import * as React from 'react';
-import { defaultReviewData, ReviewDataType, ReviewValidationDataType, defaultReviewValidationData } from 'domain/review/type';
+import { defaultReviewData, ReviewDataType, ReviewValidationDataType, defaultReviewValidationData, ReviewType } from 'domain/review/type';
 import { useValidation } from 'hooks/validation';
 import { reviewSchema } from 'hooks/validation/rules';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -15,6 +15,16 @@ import UserCard from 'components/common/UserCard';
 import { testMemberUser } from 'tests/data/user';
 import ProductHorizontalCard from 'components/common/ProductCard/ProductHorizontalCard';
 import { generateProductList } from 'tests/data/product';
+import { useSelector, useDispatch } from 'react-redux';
+import { mSelector } from 'src/selectors/selector';
+import { useSnackbar } from 'notistack';
+import { api } from 'configs/axiosConfig';
+import { AxiosError } from 'axios';
+import { fetchReviewActionCreator } from 'reducers/slices/domain/review';
+
+interface AdminReviewFormPropsType {
+  review: ReviewType
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -56,13 +66,22 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  *    - 6. display result popup message
  **/
-const AdminReviewForm: React.FunctionComponent<{}> = (props) => {
+const AdminReviewForm: React.FunctionComponent<AdminReviewFormPropsType> = (props) => {
 
   // mui: makeStyles
   const classes = useStyles();
 
+  // auth
+  const auth = useSelector(mSelector.makeAuthSelector())
+
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
+  const dispatch = useDispatch()
+
   // temp user account state
-  const [curReviewState, setReviewState] = React.useState<ReviewDataType>(defaultReviewData);
+  const [curReviewState, setReviewState] = React.useState<ReviewDataType>(props.review);
 
   // validation logic (should move to hooks)
   const [curReviewValidationState, setReviewValidationState] = React.useState<ReviewValidationDataType>(defaultReviewValidationData);
@@ -107,7 +126,7 @@ const AdminReviewForm: React.FunctionComponent<{}> = (props) => {
     updateValidationAt("isVerified", e.currentTarget.checked);
     setReviewState((prev: ReviewDataType) => ({
       ...prev,
-      isVerified: nextReviewIsVerified 
+      isVerified: nextReviewIsVerified
     }));
   }
 
@@ -121,6 +140,21 @@ const AdminReviewForm: React.FunctionComponent<{}> = (props) => {
     if (isValid) {
       // pass 
       console.log("passed")
+      console.log("update review")
+      // request
+      api.request({
+        method: 'PUT',
+        url: API1_URL + `/reviews/${curReviewState.reviewId}`,
+        data: JSON.stringify(curReviewState),
+      }).then((data) => {
+
+        // fetch again
+        dispatch(fetchReviewActionCreator())
+
+        enqueueSnackbar("updated successfully.", { variant: "success" })
+      }).catch((error: AxiosError) => {
+        enqueueSnackbar(error.message, { variant: "error" })
+      })
     } else {
       console.log("failed")
       updateAllValidation()
@@ -195,9 +229,9 @@ const AdminReviewForm: React.FunctionComponent<{}> = (props) => {
           /><br />
           <FormControlLabel
             control={
-              <Switch 
-                checked={curReviewState.isVerified} 
-                onChange={handleReviewIsVerifiedInputChangeEvent} 
+              <Switch
+                checked={curReviewState.isVerified}
+                onChange={handleReviewIsVerifiedInputChangeEvent}
                 name="review-is-verified" />
             }
             className={`${classes.txtFieldBase}`}

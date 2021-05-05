@@ -37,6 +37,8 @@ export const rsSelector = {
   domain: {
     getCategory: (state: StateType) => state.domain.categories.data,
     getCategoryPagination: (state: StateType) => state.domain.categories.pagination,
+    getReview: (state: StateType) => state.domain.reviews.data,
+    getReviewPagination: (state: StateType) => state.domain.reviews.pagination,
     getCartItem: (state: StateType) => state.domain.cartItems,
     getWishlistItem: (state: StateType) => state.domain.wishlistItems.data,
     getWishlistItemPagination: (state: StateType) => state.domain.wishlistItems.pagination,
@@ -237,8 +239,59 @@ export const mSelector = {
         rsSelector.domain.getCategoryPagination
       ],
       (pagination) => {
+        return pagination
+      },
+    )
+  },
+  
+  // domain.categories query string (query + pagination)
+  makeCategoryQueryStringSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getCategoryPagination
+      ],
+      (pagination) => {
+        // react state should be immutable so put empty object first
+        return merge({}, { page: pagination.page, limit: pagination.limit }) 
+      },
+    )
+  },
+
+  // domain.reviews
+  makeReviewSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getReview,
+      ],
+      (reviews) => {
+
+        return reviews
+      },
+    )
+  },
+
+  // domain.reviews.pagination
+  makeReviewPaginationSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getReviewPagination
+      ],
+      (pagination) => {
 
         return pagination
+      },
+    )
+  },
+
+  // domain.reviews query string (query + pagination)
+  makeReviewQueryStringSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getReviewPagination
+      ],
+      (pagination) => {
+        // react state should be immutable so put empty object first
+        return merge({}, { page: pagination.page, limit: pagination.limit }) 
       },
     )
   },

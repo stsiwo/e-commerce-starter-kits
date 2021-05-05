@@ -4,6 +4,7 @@ import { CartItemType } from "domain/cart/types";
 import { WishlistItemType } from "domain/wishlist/types";
 import { UserType } from "domain/user/types";
 import { OrderType } from "domain/order/types";
+import { ReviewType } from "domain/review/type";
 
 //import { NormalizedBlogType } from "domain/blog";
 //import { NormalizedCategoryType } from "domain/category";
@@ -50,6 +51,9 @@ export declare type AppStateType = {
       put: FetchStatusEnum
       deleteSingle: FetchStatusEnum
     },
+    reviews: {
+      get: FetchStatusEnum
+    },
     cartItems: {
       get: FetchStatusEnum
       post: FetchStatusEnum
@@ -94,6 +98,10 @@ export declare type DomainStateType = {
   },
   users: UserType[] // don't need to normalized
   orders: OrderType[] // don't need to normalized 
+  reviews: {  
+    data: ReviewType[],
+    pagination: DomainPaginationType,
+  },
   products: {
     data: NormalizedProductType 
     query: {

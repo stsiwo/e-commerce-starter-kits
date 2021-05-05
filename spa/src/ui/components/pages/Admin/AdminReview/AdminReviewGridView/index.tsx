@@ -7,12 +7,19 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { DataGrid, GridCellParams, GridColDef, GridRowsProp } from '@material-ui/data-grid';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import EditIcon from '@material-ui/icons/Edit';
-import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import Pagination from '@material-ui/lab/Pagination/Pagination';
+import { getStatus } from 'domain/review';
+import { useSnackbar } from 'notistack';
 import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchReviewActionCreator, reviewPaginationPageActions } from 'reducers/slices/domain/review';
+import { mSelector } from 'src/selectors/selector';
 import AdminReviewFormDrawer from '../AdminReviewFormDrawer';
+import { ReviewType } from 'domain/review/type';
 
 declare type AdminReviewGridViewPropsType = {
 }
+
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -30,38 +37,44 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const rows: GridRowsProp = [
-  { id: 1, number: '12343', user: 'World', product: 'World', reviewPoint: "1", status: "pending", ations: "actions" },
-  { id: 2, number: '12343', user: 'World', product: 'World', reviewPoint: "1", status: "pending", ations: "actions" },
-  { id: 3, number: '12343', user: 'World', product: 'World', reviewPoint: "1", status: "pending", ations: "actions" },
-  { id: 4, number: '12343', user: 'World', product: 'World', reviewPoint: "1", status: "pending", ations: "actions" },
-  { id: 5, number: '12343', user: 'World', product: 'World', reviewPoint: "1", status: "pending", ations: "actions" },
-  { id: 6, number: '12343', user: 'World', product: 'World', reviewPoint: "1", status: "pending", ations: "actions" },
-  { id: 7, number: '12343', user: 'World', product: 'World', reviewPoint: "1", status: "pending", ations: "actions" },
-  { id: 8, number: '12343', user: 'World', product: 'World', reviewPoint: "1", status: "pending", ations: "actions" },
-  { id: 9, number: '12343', user: 'World', product: 'World', reviewPoint: "1", status: "pending", ations: "actions" },
-];
+const generateRows: (domains: ReviewType[]) => GridRowsProp = (domains) => {
+  return domains.map((domain: ReviewType) => {
+    return {
+      id: domain.reviewId,
+      title: domain.reviewTitle,
+      date: domain.createdAt,
+      user: domain.user.firstName + " " + domain.user.lastName,
+      product: domain.product.productName,
+      reviewPoint: domain.reviewPoint,
+      status: getStatus(domain.isVerified),
+      actions: domain.reviewId,
+    }
+  })
+}
 
-const columns: GridColDef[] = [
-  { field: 'number', headerName: '#', width: 150 },
-  { field: 'user', headerName: 'User', width: 150 },
-  { field: 'product', headerName: 'Product', width: 150 },
-  { field: 'reviewPoint', headerName: 'Review Point', width: 150 },
-  { field: 'status', headerName: 'Status', width: 150 },
-  { field: 'actions', headerName: 'Actions', width: 150 },
-  { 
-    field: 'actions', 
-    headerName: 'Actions', 
-    width: 150, 
-    renderCell: (params: GridCellParams) => (
-      <React.Fragment>
-        <IconButton>
-          <EditIcon />
-        </IconButton>
-      </React.Fragment>
-    )
-  },
-];
+const generateColumns: (onEdit: React.EventHandler<React.MouseEvent<HTMLButtonElement>>) => GridColDef[] = (onEdit) => {
+  return [
+    { field: 'id', headerName: 'ID', width: 150 },
+    { field: 'title', headerName: 'Title', width: 150 },
+    { field: 'date', headerName: 'Date', width: 150 },
+    { field: 'user', headerName: 'User', width: 150 },
+    { field: 'product', headerName: 'Product', width: 150 },
+    { field: 'reviewPoint', headerName: 'Review Point', width: 150 },
+    { field: 'status', headerName: 'Status', width: 150 },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 150,
+      renderCell: (params: GridCellParams) => (
+        <React.Fragment>
+          <IconButton data-review-id={params.value} onClick={onEdit}>
+            <EditIcon />
+          </IconButton>
+        </React.Fragment>
+      )
+    },
+  ];
+}
 
 /**
  * admin product management component
@@ -71,17 +84,60 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
 
   // mui: makeStyles
   const classes = useStyles();
+  
+  // auth
+  const auth = useSelector(mSelector.makeAuthSelector())
+
+  const dispatch = useDispatch()
+
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
+  // domain cur item
+  const curReviewList = useSelector(mSelector.makeReviewSelector())
+
+  // cur selected review item
+  const [curReview, setReview] = React.useState<ReviewType>(null);
+
+  const pagination = useSelector(mSelector.makeProductPaginationSelector())
+
+  // fetch review
+  React.useEffect(() => {
+    dispatch(fetchReviewActionCreator())
+  }, [
+    pagination.page 
+  ])
+
 
   const [curFormOpen, setFormOpen] = React.useState<boolean>(false);
 
-  const handleNewFormToggleBtnClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
-    setFormOpen(!curFormOpen)
+  // grid event handler stuff
+  const handleEditClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+
+    const reviewId = e.currentTarget.getAttribute("data-review-id")
+
+    const targetReview = curReviewList.find((review: ReviewType) => review.reviewId == reviewId)
+
+    setReview(targetReview);
+
+    setFormOpen(true);
+
   }
 
-  // event handler to submit
-  const handleAddNewProductBtnClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
-    console.log("passed")
-  }
+  // pagination event handler
+  
+  /**
+   * TODO: make sure pagiantion working when you have more data.
+   *
+   **/
+  const handlePaginationChange = (event: React.ChangeEvent<unknown>, value: number) => {
+
+    // need to decrement since we incremented when display
+    const nextPage = value - 1;
+
+    dispatch(reviewPaginationPageActions.update(nextPage))
+  };
 
   return (
     <Card className={classes.root}>
@@ -93,26 +149,34 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
           variant: 'body1'
         }}
         title="List"
-        action={
-          <IconButton aria-label="add" onClick={handleNewFormToggleBtnClickEvent}>
-            <AddCircleIcon />
-          </IconButton>
-        }
       />
       <CardContent
         className={classes.cardContentBox}
       >
-        <DataGrid 
-          autoHeight 
-          rows={rows} 
-          columns={columns} 
-      />
+        <DataGrid
+          autoHeight
+          rows={generateRows(curReviewList)}
+          columns={generateColumns(handleEditClick)}
+          pageSize={pagination.limit}
+          rowCount={pagination.limit}
+        />
+        <Pagination
+          page={pagination.page + 1} // don't forget to increment when display
+          count={pagination.totalPages}
+          color="primary"
+          showFirstButton
+          showLastButton
+          size={"medium"}
+          onChange={handlePaginationChange}
+        />
       </CardContent>
       <CardActions disableSpacing>
       </CardActions>
-      <AdminReviewFormDrawer 
-        curFormOpen={curFormOpen}  
+      {/** update/create review (without its variants) **/}
+      <AdminReviewFormDrawer
+        curFormOpen={curFormOpen}
         setFormOpen={setFormOpen}
+        review={curReview}
       />
     </Card>
   )

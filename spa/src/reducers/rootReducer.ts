@@ -9,12 +9,14 @@ import { deleteSingleUserFetchStatusSliceReducer, getSingleUserFetchStatusSliceR
 import { deleteSingleWishlistItemFetchStatusSliceReducer, deleteWishlistItemFetchStatusSliceReducer, getWishlistItemFetchStatusSliceReducer, postWishlistItemFetchStatusSliceReducer } from './slices/app/fetchStatus/wishlistItem';
 import { stripeClientSecretSliceReducer } from './slices/app/private/stripeClientSecret';
 import { cartItemSliceReducer } from './slices/domain/cartItem';
-import { categorySliceReducer, categoryPaginationPageSliceReducer, categoryPaginationLimitSliceReducer, categoryPaginationTotalPagesSliceReducer } from './slices/domain/category';
+import { categoryPaginationLimitSliceReducer, categoryPaginationPageSliceReducer, categoryPaginationTotalPagesSliceReducer, categorySliceReducer } from './slices/domain/category';
 import { orderSliceReducer } from './slices/domain/order';
 import { productCurItemsSliceReducer, productPaginationLimitSliceReducer, productPaginationPageSliceReducer, productPaginationTotalPagesSliceReducer, productQueryCategoryIdSliceReducer, productQueryEndDateSliceReducer, productQueryIsDiscountSliceReducer, productQueryMaxPriceSliceReducer, productQueryMinPriceSliceReducer, productQueryReviewPointSliceReducer, productQuerySearchQuerySliceReducer, productQuerySortSliceReducer, productQueryStartDateSliceReducer, productSliceReducer } from './slices/domain/product';
 import { userSliceReducer } from './slices/domain/user';
-import { wishlistItemSliceReducer, wishlistItemPaginationPageSliceReducer, wishlistItemPaginationLimitSliceReducer, wishlistItemPaginationTotalPagesSliceReducer } from './slices/domain/wishlistItem';
+import { wishlistItemPaginationLimitSliceReducer, wishlistItemPaginationPageSliceReducer, wishlistItemPaginationTotalPagesSliceReducer, wishlistItemSliceReducer } from './slices/domain/wishlistItem';
 import { cartModalSliceReducer, leftNavMenuSliceReducer, rightNavMenuSliceReducer, searchModalSliceReducer } from './slices/ui';
+import { reviewSliceReducer, reviewPaginationPageSliceReducer, reviewPaginationLimitSliceReducer, reviewPaginationTotalPagesSliceReducer } from './slices/domain/review';
+import { getReviewFetchStatusSliceReducer } from './slices/app/fetchStatus/review';
 
 // ** REFACTOR to new approach **/
 
@@ -64,6 +66,9 @@ export const rootReducer = combineReducers({
         put: putCategoryFetchStatusSliceReducer,
         deleteSingle: deleteSingleCategoryFetchStatusSliceReducer,
       }),
+      reviews: combineReducers({
+        get: getReviewFetchStatusSliceReducer,
+      }),
       cartItems: combineReducers({
         get: getCartItemFetchStatusSliceReducer,
         post: postCartItemFetchStatusSliceReducer,
@@ -102,6 +107,14 @@ export const rootReducer = combineReducers({
     }),
     users: userSliceReducer,
     orders: orderSliceReducer,
+    reviews: combineReducers({
+      data: reviewSliceReducer,
+      pagination: combineReducers({
+        page: reviewPaginationPageSliceReducer,
+        limit: reviewPaginationLimitSliceReducer,
+        totalPages: reviewPaginationTotalPagesSliceReducer,
+      }),
+    }),
     products: combineReducers({
       data: productSliceReducer,
       query: combineReducers({
