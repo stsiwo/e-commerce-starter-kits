@@ -13,3 +13,7 @@
   - esp when the guest user purchases.
   
 - verification email flow.
+
+- admin company management page
+
+  - form inputs: company name, addresses, phones, email esp for shipping
