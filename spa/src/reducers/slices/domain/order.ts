@@ -1,7 +1,7 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import merge from "lodash/merge";
 import remove from 'lodash/remove';
-import { OrderType } from "domain/order/types";
+import { OrderType, OrderEventType } from "domain/order/types";
 
 /**
  * redux-sage actions (side effects)
@@ -65,6 +65,44 @@ export const orderSlice = createSlice({
     // use when you want to remove a single entity
     delete: (state: OrderType[], action: PayloadAction<OrderType>) => remove(state, (order: OrderType) => order.orderId == action.payload.orderId),
 
+    appendEvent: (state: OrderType[], action: PayloadAction<{ orderId: string, event: OrderEventType }>) => {
+
+      for (let i = 0; i < state.length; i++) {
+        if (state[i].orderId == action.payload.orderId) {
+          state[i].orderEvents.push(action.payload.event)
+        }
+      }
+
+      return state
+    },
+
+    deleteEvent: (state: OrderType[], action: PayloadAction<{ orderId: string, eventId: string }>) => {
+
+      for (let i = 0; i < state.length; i++) {
+        if (state[i].orderId == action.payload.orderId) {
+          state[i].orderEvents = state[i].orderEvents.filter((orderEvent: OrderEventType) => orderEvent.orderId != action.payload.eventId) 
+        }
+      }
+
+      return state
+    },
+
+    updateEvent: (state: OrderType[], action: PayloadAction<{ orderId: string, event: OrderEventType }>) => {
+
+      for (let i = 0; i < state.length; i++) {
+        if (state[i].orderId == action.payload.orderId) {
+          state[i].orderEvents = state[i].orderEvents.map((orderEvent: OrderEventType) => {
+            if (orderEvent.orderId == action.payload.event.orderEventId) {
+              return action.payload.event 
+            }
+            return orderEvent
+          })
+        }
+      }
+
+      return state
+    },
+
     clear: (state: OrderType[]) => [],
   },
   /**
@@ -77,4 +115,117 @@ export const orderSlice = createSlice({
 
 export const orderSliceReducer = orderSlice.reducer
 export const orderActions = orderSlice.actions
+
+/**
+ *
+ * domain.orders.pagination.page state Slice (no side effects)
+ *
+ **/
+// action type             
+export type OrderPaginationPageActionType = PayloadAction<number> 
+
+export const orderPaginationPageSlice = createSlice({ 
+  name: "domain/orders/pagination/page", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: OrderPaginationPageActionType) => action.payload,
+    clear: (state: string) => 0, // start from 0, (not 1)
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const orderPaginationPageSliceReducer = orderPaginationPageSlice.reducer
+export const orderPaginationPageActions = orderPaginationPageSlice.actions
+
+
+/**
+ *
+ * domain.orders.pagination.limit state Slice (no side effects)
+ *
+ **/
+// action type             
+export type OrderPaginationLimitActionType = PayloadAction<number> 
+
+export const orderPaginationLimitSlice = createSlice({ 
+  name: "domain/orders/pagination/limit", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: OrderPaginationLimitActionType) => action.payload,
+    clear: (state: string) => 20,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const orderPaginationLimitSliceReducer = orderPaginationLimitSlice.reducer
+export const orderPaginationLimitActions = orderPaginationLimitSlice.actions
+
+
+/**
+ *
+ * domain.orders.pagination.totalPages state Slice (no side effects)
+ *
+ **/
+// action type             
+export type OrderPaginationTotalPagesActionType = PayloadAction<number> 
+
+export const orderPaginationTotalPagesSlice = createSlice({ 
+  name: "domain/orders/pagination/totalPages", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: OrderPaginationTotalPagesActionType) => action.payload,
+    clear: (state: string) => 1,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const orderPaginationTotalPagesSliceReducer = orderPaginationTotalPagesSlice.reducer
+export const orderPaginationTotalPagesActions = orderPaginationTotalPagesSlice.actions
 

@@ -100,7 +100,10 @@ export declare type DomainStateType = {
     data: UserType[] // don't need to normalized
     pagination: DomainPaginationType,
   },
-  orders: OrderType[] // don't need to normalized 
+  orders: {
+    data: OrderType[] // don't need to normalized 
+    pagination: DomainPaginationType,
+  },
   reviews: {  
     data: ReviewType[],
     pagination: DomainPaginationType,

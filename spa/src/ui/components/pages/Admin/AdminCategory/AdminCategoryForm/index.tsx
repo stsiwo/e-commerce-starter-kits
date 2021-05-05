@@ -85,7 +85,7 @@ const AdminCategoryForm: React.FunctionComponent<AdminCategoryFormPropsType> = (
   //  - true: create
   //  - false: update
   // if props.product exists, it updates, otherwise, new
-  const [isNew, setNew] = React.useState<boolean>(props.category ? true : false);
+  const [isNew, setNew] = React.useState<boolean>(props.category ? false : true);
 
   // validation logic (should move to hooks)
   const [curCategoryValidationState, setCategoryValidationState] = React.useState<CategoryValidationDataType>(defaultCategoryValidationData);

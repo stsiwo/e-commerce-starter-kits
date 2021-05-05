@@ -106,7 +106,7 @@ const AdminProductForm: React.FunctionComponent<AdminProductFormPropsType> = (pr
   //  - true: create
   //  - false: update
   // if props.product exists, it updates, otherwise, new
-  const [isNew, setNew] = React.useState<boolean>(props.product ? true : false);
+  const [isNew, setNew] = React.useState<boolean>(props.product ? false : true);
 
   // validation logic (should move to hooks)
   const [curProductValidationState, setProductValidationState] = React.useState<ProductValidationDataType>(defaultProductValidationData);

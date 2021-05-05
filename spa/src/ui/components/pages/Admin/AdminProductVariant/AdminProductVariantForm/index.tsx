@@ -115,7 +115,7 @@ const AdminProductVariantForm: React.FunctionComponent<AdminProductVariantFormPr
   //  - true: create
   //  - false: update
   // if props.product exists, it updates, otherwise, new
-  const [isNew, setNew] = React.useState<boolean>(props.productVariant ? true : false);
+  const [isNew, setNew] = React.useState<boolean>(props.productVariant ? false : true);
 
   // temp user account state
   const [curProductVariantState, setProductVariantState] = React.useState<ProductVariantDataType>(props.productVariant ? props.productVariant : defaultProductVariantData);

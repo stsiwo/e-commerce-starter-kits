@@ -5,10 +5,12 @@ import AdminOrderForm from '../AdminOrderForm';
 import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import { OrderType } from 'domain/order/types';
 
 declare type AdminOrderFormDrawerPropsType = {
   curFormOpen: boolean
   setFormOpen: React.Dispatch<React.SetStateAction<boolean>>
+  order: OrderType
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -45,7 +47,6 @@ const AdminOrderFormDrawer: React.FunctionComponent<AdminOrderFormDrawerPropsTyp
 
   // used to switch 'permanent' or 'temporary' nav menu based on this screen size 
   const theme = useTheme();
-
 
   const classes = useStyles();
 
@@ -91,7 +92,7 @@ const AdminOrderFormDrawer: React.FunctionComponent<AdminOrderFormDrawerPropsTyp
             <GetAppIcon />            
           </IconButton>
         </Box>
-        <AdminOrderForm />
+        <AdminOrderForm order={props.order} />
       </Drawer>
     </React.Fragment>
   )

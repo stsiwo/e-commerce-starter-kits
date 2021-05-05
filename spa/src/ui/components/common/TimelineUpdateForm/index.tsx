@@ -1,22 +1,27 @@
+import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { OrderEventType, defaultOrderEventData, orderStatusBagList, OrderStatusEnum, OrderStatusBagType, hasNextOrderOptions } from 'domain/order/types';
-import * as React from 'react';
-import TextField from '@material-ui/core/TextField';
-import { AuthType, UserTypeEnum } from 'src/app';
-import { mSelector } from 'src/selectors/selector';
-import { useSelector } from 'react-redux';
 import MenuItem from '@material-ui/core/MenuItem';
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { defaultOrderEventData, hasNextOrderOptions, OrderEventType, orderStatusBagList, OrderStatusEnum } from 'domain/order/types';
+import * as React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { AuthType } from 'src/app';
+import { mSelector } from 'src/selectors/selector';
+import { api } from 'configs/axiosConfig';
+import { fetchCategoryActionCreator } from 'reducers/slices/domain/category';
+import { useSnackbar } from 'notistack';
+import { AxiosError } from 'axios';
+import { orderActions } from 'reducers/slices/domain/order';
 
 interface TimelineUpdateFormPropsType {
+  orderId: string
   orderEvents: OrderEventType[]
 }
 
@@ -54,14 +59,20 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  *  - TODO: need a solution for how to deal with 'undo' event
  **/
-const TimelineUpdateForm: React.FunctionComponent<TimelineUpdateFormPropsType> = ({ orderEvents }) => {
+const TimelineUpdateForm: React.FunctionComponent<TimelineUpdateFormPropsType> = ({ orderId, orderEvents }) => {
 
   // mui: makeStyles
   const classes = useStyles();
 
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
   // order bag item
   const lastOrderEvent = orderEvents.length > 0 ? orderEvents[orderEvents.length - 1] : null
   const lastOrderStatusBag = orderStatusBagList[lastOrderEvent.orderStatus]
+
+  const dispatch = useDispatch()
 
   // drop down 
   const [expanded, setExpanded] = React.useState(false);
@@ -103,6 +114,24 @@ const TimelineUpdateForm: React.FunctionComponent<TimelineUpdateFormPropsType> =
      * #TODO:
      * validate input & send POST request to /orders/{orderId}/events
      **/
+
+    // request
+    api.request({
+      method: 'POST',
+      url: API1_URL + `/orders/${orderId}/events`,
+      data: JSON.stringify(curOrderEventState),
+    }).then((data) => {
+
+      const newOrderEvent = data.data; 
+
+      // fetch again
+      dispatch(orderActions.appendEvent(newOrderEvent))
+
+      enqueueSnackbar("updated successfully.", { variant: "success" })
+    }).catch((error: AxiosError) => {
+      enqueueSnackbar(error.message, { variant: "error" })
+    })
+
   }
 
 

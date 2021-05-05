@@ -10,7 +10,7 @@ import { deleteSingleWishlistItemFetchStatusSliceReducer, deleteWishlistItemFetc
 import { stripeClientSecretSliceReducer } from './slices/app/private/stripeClientSecret';
 import { cartItemSliceReducer } from './slices/domain/cartItem';
 import { categoryPaginationLimitSliceReducer, categoryPaginationPageSliceReducer, categoryPaginationTotalPagesSliceReducer, categorySliceReducer } from './slices/domain/category';
-import { orderSliceReducer } from './slices/domain/order';
+import { orderSliceReducer, orderPaginationLimitSliceReducer, orderPaginationTotalPagesSliceReducer, orderPaginationPageSliceReducer } from './slices/domain/order';
 import { productCurItemsSliceReducer, productPaginationLimitSliceReducer, productPaginationPageSliceReducer, productPaginationTotalPagesSliceReducer, productQueryCategoryIdSliceReducer, productQueryEndDateSliceReducer, productQueryIsDiscountSliceReducer, productQueryMaxPriceSliceReducer, productQueryMinPriceSliceReducer, productQueryReviewPointSliceReducer, productQuerySearchQuerySliceReducer, productQuerySortSliceReducer, productQueryStartDateSliceReducer, productSliceReducer } from './slices/domain/product';
 import { userSliceReducer, userPaginationPageSliceReducer, userPaginationTotalPagesSliceReducer, userPaginationLimitSliceReducer } from './slices/domain/user';
 import { wishlistItemPaginationLimitSliceReducer, wishlistItemPaginationPageSliceReducer, wishlistItemPaginationTotalPagesSliceReducer, wishlistItemSliceReducer } from './slices/domain/wishlistItem';
@@ -113,7 +113,14 @@ export const rootReducer = combineReducers({
         totalPages: userPaginationTotalPagesSliceReducer,
       }),
     }),
-    orders: orderSliceReducer,
+    orders: combineReducers({
+      data: orderSliceReducer,
+      pagination: combineReducers({
+        page: orderPaginationPageSliceReducer,
+        limit: orderPaginationLimitSliceReducer,
+        totalPages: orderPaginationTotalPagesSliceReducer,
+      }),
+    }),
     reviews: combineReducers({
       data: reviewSliceReducer,
       pagination: combineReducers({

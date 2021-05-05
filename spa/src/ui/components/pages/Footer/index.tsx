@@ -163,6 +163,7 @@ const Footer: React.FunctionComponent<{}> = (props) => {
       </Grid>
       <Box className={classes.bottom}>
         <Box className={classes.policyLinkBox}>
+          {/** might use this dialog rather than page **/}
           <Link className={classes.policyLink} component={RRLink} to="/return-policy">
             {"Return Policy"}
           </Link>

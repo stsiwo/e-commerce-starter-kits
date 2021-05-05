@@ -10,6 +10,10 @@ import * as React from 'react';
 import { generateOrderList } from 'tests/data/order';
 import AdminOrderDetail from '../AdminOrderDetail';
 
+interface AdminOrderFormPropsType {
+  order: OrderType
+}
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     orderDetailBox: {
@@ -39,15 +43,10 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  *    - 6. display result popup message
  **/
-const AdminOrderForm: React.FunctionComponent<{}> = (props) => {
+const AdminOrderForm: React.FunctionComponent<AdminOrderFormPropsType> = (props) => {
 
   // mui: makeStyles
   const classes = useStyles();
-
-  /**
-   * test order date
-   **/
-  const testOrder: OrderType = generateOrderList(1)[0]
 
   return (
     <Grid
@@ -63,7 +62,7 @@ const AdminOrderForm: React.FunctionComponent<{}> = (props) => {
         <Typography variant="subtitle1" component="h6" className={classes.title}>
           {"Basic Information"}
         </Typography>
-        <AdminOrderDetail order={testOrder} />
+        <AdminOrderDetail order={props.order} />
       </Grid>
       <Grid
         item
@@ -73,7 +72,7 @@ const AdminOrderForm: React.FunctionComponent<{}> = (props) => {
         <Typography variant="subtitle1" component="h6" className={classes.title}>
           {"Customer"}
         </Typography>
-        <UserCard user={testOrder.user} />
+        <UserCard user={props.order.user} />
       </Grid>
       <Grid
         item
@@ -84,7 +83,7 @@ const AdminOrderForm: React.FunctionComponent<{}> = (props) => {
           {"Products"}
         </Typography>
         {
-          testOrder.orderDetails.map((orderDetail: OrderDetailType, index: number) => (
+          props.order.orderDetails.map((orderDetail: OrderDetailType, index: number) => (
             <ProductHorizontalCard orderDetail={orderDetail} key={index}/>
           ))
         }
@@ -96,13 +95,7 @@ const AdminOrderForm: React.FunctionComponent<{}> = (props) => {
         <Typography variant="subtitle1" component="h6" className={classes.title}>
           {"Status"}
         </Typography>
-        <OrderTimeline orderEvents={testOrder.orderEvents} /> 
-      </Grid>
-      <Grid
-        item
-        xs={12}
-      >
-        <TimelineUpdateForm orderEvents={testOrder.orderEvents} /> 
+        <OrderTimeline orderEvents={props.order.orderEvents} orderId={props.order.orderId} /> 
       </Grid>
     </Grid>
   )
