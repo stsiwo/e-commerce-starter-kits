@@ -21,7 +21,7 @@ export declare type ProductVariantSizeType = {
 
 export declare type ProductVariantType = {
   variantId: string
-  variantSize: ProductVariantSizeType
+  productSize: ProductVariantSizeType
   variantColor: string
   variantUnitPrice?: number
   variantDiscountPrice?: number
@@ -70,7 +70,8 @@ export enum ProductSortEnum {
 
 // product variant state type for form & input
 export declare type ProductVariantDataType = {
-  variantSize: ProductVariantSizeType
+  variantId?: string 
+  productSize: ProductVariantSizeType
   variantColor: string
   variantUnitPrice?: number
   variantDiscountPrice?: number
@@ -83,7 +84,7 @@ export declare type ProductVariantDataType = {
 }
 
 export const defaultProductVariantData: ProductVariantDataType = {
-  variantSize: null,
+  productSize: null,
   variantColor: "#fff",
   variantUnitPrice: 0,
   variantDiscountPrice: 0,
@@ -97,7 +98,7 @@ export const defaultProductVariantData: ProductVariantDataType = {
 
 // product variant state type for form & input
 export declare type ProductVariantValidationDataType = {
-  variantSize: string, 
+  productSize: string, 
   variantColor: string,
   variantUnitPrice: string,
   variantDiscountPrice: string,
@@ -110,7 +111,7 @@ export declare type ProductVariantValidationDataType = {
 }
 
 export const defaultProductVariantValidationData: ProductVariantValidationDataType = {
-  variantSize: "", 
+  productSize: "", 
   variantColor: "",
   variantUnitPrice: "",
   variantDiscountPrice: "",

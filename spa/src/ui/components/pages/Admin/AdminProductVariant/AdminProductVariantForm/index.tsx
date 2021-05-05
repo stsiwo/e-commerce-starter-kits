@@ -8,13 +8,24 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { defaultProductVariantData, defaultProductVariantValidationData, ProductVariantDataType, ProductVariantSizeType, ProductVariantValidationDataType } from 'domain/product/types';
+import { defaultProductVariantData, defaultProductVariantValidationData, ProductVariantDataType, ProductVariantSizeType, ProductVariantValidationDataType, ProductVariantType } from 'domain/product/types';
 import { useValidation } from 'hooks/validation';
 import { productVariantSchema } from 'hooks/validation/rules';
 import * as React from 'react';
 import { ChromePicker, ColorResult } from 'react-color';
 import { generateCategoryList, testProductVariantSizeObj } from 'tests/data/product';
 import FormLabel from '@material-ui/core/FormLabel';
+import { useSelector, useDispatch } from 'react-redux';
+import { mSelector } from 'src/selectors/selector';
+import { useSnackbar } from 'notistack';
+import { api } from 'configs/axiosConfig';
+import { fetchProductActionCreator, productActions } from 'reducers/slices/domain/product';
+import { AxiosError } from 'axios';
+import { useLocation } from 'react-router';
+
+interface AdminProductVariantFormPropsType {
+  productVariant: ProductVariantType
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -59,6 +70,12 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+// A custom hook that builds on useLocation to parse
+// the query string for you.
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
+
 /**
  * admin product variant management component
  *
@@ -76,13 +93,32 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  *    - 6. display result popup message
  **/
-const AdminProductVariantForm: React.FunctionComponent<{}> = (props) => {
+const AdminProductVariantForm: React.FunctionComponent<AdminProductVariantFormPropsType> = (props) => {
 
   // mui: makeStyles
   const classes = useStyles();
 
+  // query params
+  const query = useQuery();
+  const targetProductId = query.get("productId")
+
+  // auth
+  const auth = useSelector(mSelector.makeAuthSelector())
+
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
+  const dispatch = useDispatch()
+
+  // update/create logic for product
+  //  - true: create
+  //  - false: update
+  // if props.product exists, it updates, otherwise, new
+  const [isNew, setNew] = React.useState<boolean>(props.productVariant ? true : false);
+
   // temp user account state
-  const [curProductVariantState, setProductVariantState] = React.useState<ProductVariantDataType>(defaultProductVariantData);
+  const [curProductVariantState, setProductVariantState] = React.useState<ProductVariantDataType>(props.productVariant ? props.productVariant : defaultProductVariantData);
 
   // validation logic (should move to hooks)
   const [curProductVariantValidationState, setProductVariantValidationState] = React.useState<ProductVariantValidationDataType>(defaultProductVariantValidationData);
@@ -94,10 +130,6 @@ const AdminProductVariantForm: React.FunctionComponent<{}> = (props) => {
     setValidationDomain: setProductVariantValidationState
   })
 
-  // test category list
-  // #TODO: replace with real one when you are ready
-  const testCategoryList = generateCategoryList(10)
-
   // test product variant size list
   // #TODO: replace with real one when you are ready
   const testProductVariantSizeList = Object.values(testProductVariantSizeObj)
@@ -106,10 +138,10 @@ const AdminProductVariantForm: React.FunctionComponent<{}> = (props) => {
   const handleProductVariantSizeInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextVariantSize = testProductVariantSizeList.find((size: ProductVariantSizeType) => e.currentTarget.value === size.productSizeId)
     // must not be null
-    updateValidationAt("variantSize", e.currentTarget.value);
+    updateValidationAt("productSize", e.currentTarget.value);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
-      variantSize: nextVariantSize
+      productSize: nextVariantSize
     }));
   }
 
@@ -174,6 +206,45 @@ const AdminProductVariantForm: React.FunctionComponent<{}> = (props) => {
     if (isValid) {
       // pass 
       console.log("passed")
+
+      if (isNew) {
+        console.log("new product creation")
+        // request
+        api.request({
+          method: 'POST',
+          url: API1_URL + `/products/${targetProductId}/variants`,
+          data: JSON.stringify(curProductVariantState),
+        }).then((data) => {
+
+          const newVariant = data.data;
+
+          // add this new one to redux store
+          dispatch(productActions.appendVariant(newVariant))
+
+          enqueueSnackbar("updated successfully.", { variant: "success" })
+        }).catch((error: AxiosError) => {
+          enqueueSnackbar(error.message, { variant: "error" })
+        })
+
+      } else {
+        console.log("new product creation")
+        // request
+        api.request({
+          method: 'PUT',
+          url: API1_URL + `/products/${targetProductId}/variants/${curProductVariantState.variantId}`,
+          data: JSON.stringify(curProductVariantState),
+        }).then((data) => {
+
+          const updatedVariant = data.data;
+
+          // fetch again
+          dispatch(productActions.updateVariant(updatedVariant))
+
+          enqueueSnackbar("updated successfully.", { variant: "success" })
+        }).catch((error: AxiosError) => {
+          enqueueSnackbar(error.message, { variant: "error" })
+        })
+      }
     } else {
       console.log("failed")
       updateAllValidation()
@@ -194,10 +265,10 @@ const AdminProductVariantForm: React.FunctionComponent<{}> = (props) => {
         label="Variant Size"
         className={`${classes.txtFieldBase} ${classes.productSizeInput}`}
         select
-        value={curProductVariantState.variantSize ? curProductVariantState.variantSize.productSizeId : "1"}
+        value={curProductVariantState.productSize ? curProductVariantState.productSize.productSizeId : "1"}
         onChange={handleProductVariantSizeInputChangeEvent}
-        helperText={curProductVariantValidationState.variantSize}
-        error={curProductVariantValidationState.variantSize !== ""}
+        helperText={curProductVariantValidationState.productSize}
+        error={curProductVariantValidationState.productSize !== ""}
       >
         {testProductVariantSizeList.map((size: ProductVariantSizeType) => (
           <MenuItem key={size.productSizeId} value={size.productSizeId}>

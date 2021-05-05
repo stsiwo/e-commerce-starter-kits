@@ -79,7 +79,7 @@ const WishlistItem: React.FunctionComponent<WishlistItemPropsType> = ({ value, o
         >
           <Box component="div" className={classes.actionBox}>
             <ColorCell value={value.variant.variantColor} />
-            <SizeCell value={value.variant.variantSize.productSizeName} />
+            <SizeCell value={value.variant.productSize.productSizeName} />
           </Box>
           <Box component="div" className={classes.actionBox}>
             <Button

@@ -1,7 +1,7 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import merge from "lodash/merge";
 import remove from 'lodash/remove';
-import { ProductType, NormalizedProductType, ProductSortEnum } from "domain/product/types";
+import { ProductType, NormalizedProductType, ProductSortEnum, ProductVariantType } from "domain/product/types";
 import { DomainPaginationType } from "states/types";
 
 /**
@@ -70,6 +70,26 @@ export const productSlice = createSlice({
     // use when you want to remove a single entity
     delete: (state: NormalizedProductType, action: PayloadAction<ProductType>) =>  {
       delete state[action.payload.productId]
+      return state
+    },
+
+    appendVariant: (state: NormalizedProductType, action: PayloadAction<{ productId: string, variant: ProductVariantType }>) => {
+      state[action.payload.productId].variants.push(action.payload.variant)
+      return state
+    },
+
+    updateVariant: (state: NormalizedProductType, action: PayloadAction<{ productId: string, targetVariant: ProductVariantType }>) => {
+      state[action.payload.productId].variants = state[action.payload.productId].variants.map((variant: ProductVariantType) => {
+        if (variant.variantId == action.payload.targetVariant.variantId) {
+          return action.payload.targetVariant
+        }
+        return variant
+      })
+      return state
+    },
+
+    deleteVariant: (state: NormalizedProductType, action: PayloadAction<{ productId: string, variantId: string }>) => {
+      state[action.payload.productId].variants = state[action.payload.productId].variants.filter((variant: ProductVariantType) => variant.variantId != action.payload.variantId)
       return state
     },
 

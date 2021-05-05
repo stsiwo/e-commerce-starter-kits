@@ -82,7 +82,7 @@ export const generateProductVariantList: (count?: number) => ProductVariantType[
       note: faker.random.words(200),
       soldCount: faker.random.number(20),
       variantColor: faker.commerce.color(),
-      variantSize: testProductVariantSizeObj[productSizeArray[faker.random.number(4)] as keyof typeof testProductVariantSizeObj], 
+      productSize: testProductVariantSizeObj[productSizeArray[faker.random.number(4)] as keyof typeof testProductVariantSizeObj], 
       variantStock: faker.random.number(3),
       variantUnitPrice: parseFloat(faker.commerce.price()),
       ...(isDiscount && { variantDiscountPrice: parseFloat(faker.commerce.price()) }),

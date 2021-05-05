@@ -49,10 +49,6 @@ const AdminProductVariant: React.FunctionComponent<{}> = (props) => {
         curFormOpen={curFormOpen} 
         setFormOpen={setFormOpen} 
       />
-      <AdminProductVariantFormDrawer 
-        curFormOpen={curFormOpen} 
-        setFormOpen={setFormOpen} 
-      />
       {/** <AdminProductVariantNewCard /> **/}
     </Box>
   )

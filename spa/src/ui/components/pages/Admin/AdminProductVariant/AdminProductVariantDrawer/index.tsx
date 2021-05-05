@@ -2,10 +2,12 @@ import Drawer from '@material-ui/core/Drawer';
 import { createStyles, makeStyles, Theme, useTheme } from '@material-ui/core/styles';
 import * as React from 'react';
 import AdminProductVariantForm from '../AdminProductVariantForm';
+import { ProductVariantType } from 'domain/product/types';
 
 declare type AdminProductVariantFormDrawerPropsType = {
   curFormOpen: boolean
   setFormOpen: React.Dispatch<React.SetStateAction<boolean>>
+  productVariant: ProductVariantType
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -76,7 +78,7 @@ const AdminProductVariantFormDrawer: React.FunctionComponent<AdminProductVariant
           paper: classes.drawerPaper,
         }}
       >
-        <AdminProductVariantForm />
+        <AdminProductVariantForm productVariant={props.productVariant}/>
       </Drawer>
     </React.Fragment>
   )

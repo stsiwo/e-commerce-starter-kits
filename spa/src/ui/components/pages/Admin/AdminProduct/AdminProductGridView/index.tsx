@@ -146,11 +146,6 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
     setFormOpen(!curFormOpen)
   }
 
-  // event handler to submit
-  const handleAddNewProductBtnClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
-    console.log("passed")
-  }
-
   // deletion dialog stuff
   const [curDeleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(false);
 

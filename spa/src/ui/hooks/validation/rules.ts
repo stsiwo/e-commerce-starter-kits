@@ -1,5 +1,12 @@
 import * as yup from 'yup';
 
+/**
+ * note:
+ *
+ *  - if props are optional and might have null value, use 'nullable()'
+ *
+ **/
+
 export const userAccountSchema = yup.object().shape({
   firstName: yup.string().required(),
   lastName: yup.string().required(),
@@ -27,7 +34,7 @@ export const userAccountPhoneSchema = yup.object().shape({
 
 export const userAccountAddressSchema = yup.object().shape({
   address1: yup.string().required(),
-  address2: yup.string().optional(),
+  address2: yup.string().optional().nullable(),
   city: yup.string().required(),
   province: yup.string().required(),
   country: yup.string().required(),
@@ -54,14 +61,14 @@ export const memberLoginSchema = yup.object().shape({
 
 // products
 export const productVariantSchema = yup.object().shape({
-  variantSize: yup.object().required(),
+  productSize: yup.object().required(),
   variantColor: yup.string().required(),
-  variantUnitPrice: yup.string().optional(),
-  variantDiscountPrice: yup.number().optional(),
-  variantDiscountStartDate: yup.string().optional(),
-  variantDiscountEndDate: yup.string().optional(),
+  variantUnitPrice: yup.string().optional().nullable(),
+  variantDiscountPrice: yup.number().optional().nullable(),
+  variantDiscountStartDate: yup.string().optional().nullable(),
+  variantDiscountEndDate: yup.string().optional().nullable(),
   variantStock: yup.number().required(),
-  isDiscount: yup.string().optional(),
+  isDiscount: yup.string().optional().nullable(),
   note: yup.string().optional().nullable(),
 })
 
@@ -75,7 +82,7 @@ export const productSchema = yup.object().shape({
   productBaseDiscountEndDate: yup.string().required(),
   isDiscount: yup.string().required(),
   isPublic: yup.string().required(),
-  releaseDate: yup.string().optional(),
+  releaseDate: yup.string().optional().nullable(),
   category: yup.object().required(),
   productVariants: yup.array().of(productVariantSchema),
   note: yup.string().optional().nullable(),
@@ -94,5 +101,5 @@ export const reviewSchema = yup.object().shape({
   reviewTitle: yup.string().required(),
   reviewDescription: yup.string().required(),
   isVerified: yup.bool().required(),
-  note: yup.string().optional(),
+  note: yup.string().optional().nullable(),
 })

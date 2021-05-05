@@ -186,13 +186,13 @@ const AdminProductAndVariantForm: React.FunctionComponent<{}> = (props) => {
   const handleProductVariantSizeInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextVariantSize = testProductVariantSizeList.find((size: ProductVariantSizeType) => e.currentTarget.value === size.productSizeId)
     // must not be null
-    updateValidationAt("productVariants[].variantSize", e.currentTarget.value);
+    updateValidationAt("productVariants[].productSize", e.currentTarget.value);
     setProductState((prev: ProductDataType) => ({
       ...prev,
       productVariants: [
         {
           ...prev.productVariants[0],
-          variantSize: nextVariantSize
+          productSize: nextVariantSize
         },
       ]
     }));
@@ -430,10 +430,10 @@ const AdminProductAndVariantForm: React.FunctionComponent<{}> = (props) => {
         label="Variant Size"
         className={`${classes.txtFieldBase} ${classes.productSizeInput}`}
         select
-        value={curProductState.productVariants[0].variantSize ? curProductState.productVariants[0].variantSize.productSizeId : "1"}
+        value={curProductState.productVariants[0].productSize ? curProductState.productVariants[0].productSize.productSizeId : "1"}
         onChange={handleProductVariantSizeInputChangeEvent}
-        helperText={curProductValidationState.productVariants[0].variantSize}
-        error={curProductValidationState.productVariants[0].variantSize !== ""}
+        helperText={curProductValidationState.productVariants[0].productSize}
+        error={curProductValidationState.productVariants[0].productSize !== ""}
       >
         {testProductVariantSizeList.map((size: ProductVariantSizeType) => (
           <MenuItem key={size.productSizeId} value={size.productSizeId}>

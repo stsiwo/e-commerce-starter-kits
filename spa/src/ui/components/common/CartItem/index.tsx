@@ -215,7 +215,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
         >
           <Box component="div" className={classes.actionBox}>
             <ColorCell value={value.variant.variantColor} />
-            <SizeCell value={value.variant.variantSize.productSizeName} />
+            <SizeCell value={value.variant.productSize.productSizeName} />
           </Box>
           <Box component="div" className={classes.actionBox}>
             <ButtonGroup size="small" aria-label="small outlined button group">

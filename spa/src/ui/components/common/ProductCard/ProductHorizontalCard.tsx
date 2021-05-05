@@ -65,7 +65,7 @@ const ProductHorizontalCard: React.FunctionComponent<ProductHorizontalCardPropsT
   const productName = (product) ? product.productName : orderDetail.productName
   const productBaseUnitPrice = (product) ? product.productBaseUnitPrice : orderDetail.productUnitPrice
   const productColor = (variant) ? variant.variantColor : orderDetail.productColor
-  const productSize = (variant) ? variant.variantSize.productSizeName : orderDetail.productSize
+  const productSize = (variant) ? variant.productSize.productSizeName : orderDetail.productSize
 
 
   return (

@@ -63,7 +63,7 @@ const ProductVariantCell: React.FunctionComponent<ProductVariantCellPropsType> =
       <Avatar 
         className={classes.sizeBox}
       >
-        {props.variant.variantSize.productSizeName}
+        {props.variant.productSize.productSizeName}
       </Avatar>
       <IconButton>
         <RemoveCircleIcon />

@@ -123,7 +123,7 @@ const Product: React.FunctionComponent<{}> = (props) => {
 
   // state for color & size & quantity
   const [curSelectedColor, setSelectedColor] = React.useState<string>(testProduct.variants[0].variantColor)
-  const [curSelectedSize, setSelectedSize] = React.useState<ProductVariantSizeType>(testProduct.variants[0].variantSize)
+  const [curSelectedSize, setSelectedSize] = React.useState<ProductVariantSizeType>(testProduct.variants[0].productSize)
 
   const [curVariant, setVariant] = React.useState<ProductVariantType>(testProduct.variants[0]);
 
@@ -138,7 +138,7 @@ const Product: React.FunctionComponent<{}> = (props) => {
 
   const [curAvailableSizes, setAvailableSizes] = React.useState<ProductVariantSizeType[]>(
     uniq(testProduct.variants.map((variant: ProductVariantType) => {
-      return variant.variantSize
+      return variant.productSize
     }))
   )
 
@@ -158,7 +158,7 @@ const Product: React.FunctionComponent<{}> = (props) => {
   //  - if a user change the color, need to display only available sizes based on the change
   React.useEffect(() => {
     const nextAvailableVariants = testProduct.variants.filter((variant: ProductVariantType) => variant.variantColor == curSelectedColor);
-    const nextAvailableSizes = uniq(nextAvailableVariants.map((variant: ProductVariantType) => variant.variantSize))
+    const nextAvailableSizes = uniq(nextAvailableVariants.map((variant: ProductVariantType) => variant.productSize))
 
     // if there is no cur size in the next available sizes, need to change it to the one in the available sizes
     if (!nextAvailableSizes.find((size: ProductVariantSizeType) => size.productSizeId == curSelectedSize.productSizeId)) {
@@ -171,11 +171,11 @@ const Product: React.FunctionComponent<{}> = (props) => {
       // -- curVariant --
 
       // update curVariant based on the change of this
-      const nextVariant = testProduct.variants.find((variant: ProductVariantType) => variant.variantColor == curSelectedColor && variant.variantSize.productSizeId == nextSize.productSizeId)
+      const nextVariant = testProduct.variants.find((variant: ProductVariantType) => variant.variantColor == curSelectedColor && variant.productSize.productSizeId == nextSize.productSizeId)
       setVariant(nextVariant)
     } else {
       // -- curVariant --
-      const nextVariant = testProduct.variants.find((variant: ProductVariantType) => variant.variantColor == curSelectedColor && variant.variantSize.productSizeId == curSelectedSize.productSizeId)
+      const nextVariant = testProduct.variants.find((variant: ProductVariantType) => variant.variantColor == curSelectedColor && variant.productSize.productSizeId == curSelectedSize.productSizeId)
       setVariant(nextVariant)
     }
 
@@ -189,7 +189,7 @@ const Product: React.FunctionComponent<{}> = (props) => {
   React.useEffect(() => {
 
     // update curVariant based on the change of this
-    const nextVariant = testProduct.variants.find((variant: ProductVariantType) => variant.variantColor == curSelectedColor && variant.variantSize.productSizeId == curSelectedSize.productSizeId)
+    const nextVariant = testProduct.variants.find((variant: ProductVariantType) => variant.variantColor == curSelectedColor && variant.productSize.productSizeId == curSelectedSize.productSizeId)
     setVariant(nextVariant)
   }, [
       curSelectedSize.productSizeId

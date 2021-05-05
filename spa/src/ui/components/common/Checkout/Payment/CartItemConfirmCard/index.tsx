@@ -75,7 +75,7 @@ const CartItemConfirmCard: React.FunctionComponent<CartItemConfirmCardPropsType>
         action={
           <Box component="div" className={classes.actionBox}>
             <ColorCell value={value.variant.variantColor} />
-            <SizeCell value={value.variant.variantSize.productSizeName} />
+            <SizeCell value={value.variant.productSize.productSizeName} />
             <Typography variant="subtitle1" component="p">
               {`x${value.quantity}`}
             </Typography>

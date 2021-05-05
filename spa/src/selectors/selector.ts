@@ -374,6 +374,42 @@ export const mSelector = {
     )
   },
 
+  /**
+   * get a list of product variant by product id
+   **/
+  makeProductVariantByProductIdSelector: (productId: string) => {
+    return createSelector(
+      [
+        rsSelector.domain.getProduct
+      ], 
+      (normalizedProducts) => {
+        /**
+         * return empty array before fetch
+         **/
+        if (Object.keys(normalizedProducts).length === 0) {
+          return null 
+        }
+
+        /**
+         * denormalize
+         *
+         * this return { 'domain-name': [{ domain1 }, { domain2 }] in the format
+         **/
+        const denormalizedEntities = denormalize(
+          [productId], // ex, [0, 1, 2, 3, 4] ('result' prop of normalized data)
+          productSchemaArray,
+          {
+            products: normalizedProducts
+          }, // entities prop of normalized data (ex, { animes: { "1": { ... }, "2": { ... }, ... }})
+        )
+
+        console.log(denormalizedEntities)
+
+        return denormalizedEntities[0]
+      },
+    )
+  },
+
   // domain.products.query
   makeProductQuerySelector: () => {
     return createSelector(
