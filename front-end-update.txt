@@ -7,3 +7,9 @@
 
   - member can view their order history
   - can request "cancel"/"return" if it is under the return policy
+  
+- popup for signup 
+
+  - esp when the guest user purchases.
+  
+- verification email flow.
