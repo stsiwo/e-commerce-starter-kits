@@ -55,6 +55,14 @@ endpoint change:
     - (POST): create a new order
     - (PUT): replace with the same id
     
+  - /orders/{orderId}/events
+  
+    - create this endpoint (POST, DELETE)
+      
+      - (POST): the admin/customer add an order event
+      
+      - (DELETE): the admin delete a specific order event (only the last event)
+    
   - /products
   
   - /products/{productId}/variants/
