@@ -11,3 +11,5 @@
   - esp when the guest user purchases.
   
 - verification email flow.
+
+- admin endpoints request testing (products, orders, categories, customers, and so on)
