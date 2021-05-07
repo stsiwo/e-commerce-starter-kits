@@ -20,6 +20,7 @@ import * as React from 'react';
 import { UserTypeEnum } from 'src/app';
 import { withAdminBasePage } from 'ui/hoc/withAdminBasePage';
 import { withBasePage } from 'ui/hoc/withBasePage';
+import Contact from 'components/pages/Contact';
 
 // route data
 export declare type RouteDataType = {
@@ -118,5 +119,9 @@ export const commonRoutesData: CommonRoutesDataType = [
   {
     url: '/checkout',
     component: withBasePage(Checkout)
+  },
+  {
+    url: '/contact',
+    component: withBasePage(Contact)
   },
 ]

@@ -103,3 +103,12 @@ export const reviewSchema = yup.object().shape({
   isVerified: yup.bool().required(),
   note: yup.string().optional().nullable(),
 })
+
+// contact 
+export const contactSchema = yup.object().shape({
+  firstName: yup.string().required(),
+  lastName: yup.string().required(),
+  email: yup.string().required().email(),
+  title: yup.string().required(),
+  description: yup.string().required(),
+})

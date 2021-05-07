@@ -162,3 +162,38 @@ export const defaultUserAccountValidationAddressData: CustomerAddressesFormValid
   country: "",
   postalCode: "",
 }
+
+// contact form
+export declare type ContactFormDataType = {
+  firstName: string
+  lastName: string
+  email: string
+  title: string
+  description: string
+}
+
+export const generateDefaultContactFormData: () => ContactFormDataType = () => {
+  return {
+    firstName: "",
+    lastName: "",
+    email: "",
+    title: "",
+    description: "",
+  }
+}
+
+export declare type ContactFormValidationDataType = {
+  firstName: string,
+  lastName: string,
+  email: string,
+  title: string,
+  description: string,
+}
+
+export const defaultContactFormValidationData: ContactFormValidationDataType = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  title: "",
+  description: "",
+}
