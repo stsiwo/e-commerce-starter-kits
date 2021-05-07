@@ -1,21 +1,18 @@
 import Avatar from '@material-ui/core/Avatar';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardHeader from '@material-ui/core/CardHeader';
+import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import BackupIcon from '@material-ui/icons/Backup';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import ImageIcon from '@material-ui/icons/Image';
 import { AxiosError } from 'axios';
+import { api } from 'configs/axiosConfig';
 import merge from 'lodash/merge';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { authActions } from 'reducers/slices/app';
 import { mSelector } from 'src/selectors/selector';
-import { api } from 'configs/axiosConfig';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -172,25 +169,16 @@ const AdminAccountAvatarManagement: React.FunctionComponent<{}> = (props) => {
   }
 
   return (
-    <Card className={classes.root}>
-      <CardHeader
-        titleTypographyProps={{
-          variant: 'h6', 
-        }}
-        subheaderTypographyProps={{
-          variant: 'body1' 
-        }}
-        title="Avatar"
-      />
-      <CardContent className={classes.avatarBox}>
+    <React.Fragment>
+      <Box className={classes.avatarBox}>
         <Avatar
           src={curFilePath}
           classes={{
             root: classes.avatar,
           }}
         />
-      </CardContent>
-      <CardActions disableSpacing>
+      </Box>
+      <Box className={classes.actionBox}>
         <IconButton onClick={handleDeleteClick}>
           <DeleteForeverIcon />
         </IconButton>
@@ -212,8 +200,8 @@ const AdminAccountAvatarManagement: React.FunctionComponent<{}> = (props) => {
         <IconButton onClick={handleUploadClick}>
           <BackupIcon />
         </IconButton>
-      </CardActions>
-    </Card>
+      </Box>
+    </React.Fragment>
   )
 }
 

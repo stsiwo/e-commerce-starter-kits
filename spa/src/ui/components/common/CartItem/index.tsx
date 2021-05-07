@@ -65,7 +65,9 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 /**
- * member or admin account management component
+ *  cart item component
+ *
+ *  - value (cart item) should contain a single variant of a specific product.
  **/
 const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
 
@@ -85,7 +87,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
   /// qty change
   const handleQtyIncrement: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
 
-    if (value.quantity < value.variant.variantStock) {
+    if (value.quantity < value.product.variants[0].variantStock) {
 
       const nextCartItem = merge({}, value, { quantity: value.quantity + 1 })
 
@@ -214,14 +216,14 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
           justify="space-between"
         >
           <Box component="div" className={classes.actionBox}>
-            <ColorCell value={value.variant.variantColor} />
-            <SizeCell value={value.variant.productSize.productSizeName} />
+            <ColorCell value={value.product.variants[0].variantColor} />
+            <SizeCell value={value.product.variants[0].productSize.productSizeName} />
           </Box>
           <Box component="div" className={classes.actionBox}>
             <ButtonGroup size="small" aria-label="small outlined button group">
               <Button
                 onClick={handleQtyIncrement}
-                disabled={value.quantity === value.variant.variantStock}
+                disabled={value.quantity === value.product.variants[0].variantStock}
               >
                 <AddCircleIcon />
               </Button>

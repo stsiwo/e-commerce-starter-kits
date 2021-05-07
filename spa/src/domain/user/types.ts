@@ -197,3 +197,62 @@ export const defaultContactFormValidationData: ContactFormValidationDataType = {
   title: "",
   description: "",
 }
+
+// admin company form
+export declare type AdminCompanyFormDataType = {
+  companyName: string
+  description: string
+  email: string
+  phone: string
+  countryCode: string
+  address1: string
+  address2: string
+  city: string
+  province: string
+  country: string
+  postalCode: string
+}
+
+export const generateDefaultAdminCompanyFormData: () => AdminCompanyFormDataType = () => {
+  return {
+    companyName: "",
+    description: "",
+    email: "",
+    phone: "",
+    countryCode: "",
+    address1: "",
+    address2: "",
+    city: "",
+    province: "",
+    country: "",
+    postalCode: "",
+  }
+}
+
+export declare type AdminCompanyFormValidationDataType = {
+  companyName: string,
+  description: string,
+  email: string,
+  phone: string,
+  countryCode: string,
+  address1: string,
+  address2: string,
+  city: string,
+  province: string,
+  country: string,
+  postalCode: string,
+}
+
+export const defaultAdminCompanyFormValidationData: AdminCompanyFormValidationDataType = {
+  companyName: "",
+  description: "",
+  email: "",
+  phone: "",
+  countryCode: "",
+  address1: "",
+  address2: "",
+  city: "",
+  province: "",
+  country: "",
+  postalCode: "",
+}

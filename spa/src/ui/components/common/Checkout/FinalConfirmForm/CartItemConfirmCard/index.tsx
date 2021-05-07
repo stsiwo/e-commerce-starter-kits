@@ -74,8 +74,8 @@ const CartItemConfirmCard: React.FunctionComponent<CartItemConfirmCardPropsType>
         subheader={`$${value.product.productBaseUnitPrice} NEED TO FIX`}
         action={
           <Box component="div" className={classes.actionBox}>
-            <ColorCell value={value.variant.variantColor} />
-            <SizeCell value={value.variant.productSize.productSizeName} />
+            <ColorCell value={value.product.variants[0].variantColor} />
+            <SizeCell value={value.product.variants[0].productSize.productSizeName} />
             <Typography variant="subtitle1" component="p">
               {`x${value.quantity}`}
             </Typography>

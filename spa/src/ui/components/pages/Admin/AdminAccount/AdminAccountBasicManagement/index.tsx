@@ -1,8 +1,4 @@
 import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardHeader from '@material-ui/core/CardHeader';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { AxiosError } from 'axios';
@@ -169,7 +165,7 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
     if (isValid) {
       // pass 
       console.log("passed")
-      
+
       // request
       api.request({
         method: 'POST',
@@ -196,17 +192,6 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
   }
 
   return (
-    <Card className={classes.root}>
-      <CardHeader
-        titleTypographyProps={{
-          variant: 'h6', 
-        }}
-        subheaderTypographyProps={{
-          variant: 'body1' 
-        }}
-        title="Basic Info"
-      />
-      <CardContent>
     <form className={classes.form} noValidate autoComplete="off">
       <TextField
         id="first-name"
@@ -256,14 +241,10 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
         helperText={curUserAccountValidationState.confirm}
         error={curUserAccountValidationState.confirm !== ""}
       />
-      </form>
-      </CardContent>
-      <CardActions disableSpacing>
-        <Button onClick={handleUserAccountSaveClickEvent}>
-          Save
-        </Button>
-      </CardActions>
-    </Card>
+      <Button onClick={handleUserAccountSaveClickEvent}>
+        Save
+      </Button>
+    </form>
   )
 }
 
