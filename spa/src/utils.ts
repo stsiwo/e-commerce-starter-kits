@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { nanoid } from 'nanoid'
 
 
 export const dateFormatOption = { year: 'numeric', month: 'long', day: 'numeric' }
@@ -345,3 +346,16 @@ export function iterateObjectRecursively(obj: Record<string, any>, callback: (ke
   })
 
 }
+
+/**
+ * temp id generate (only used in front-end and don't send it to backend)
+ *
+ * - or refactor to use this nanoid (https://www.npmjs.com/package/nanoid) and set id at the front-end and send it to backend and save it in db.
+ *
+ * - nanoid: smaller (21 symbols), faster (60% faster than UUID) and almost same safeer than UUID (36 symobols).
+ *
+ **/
+export function getNanoId(): string {
+ return nanoid();
+}
+

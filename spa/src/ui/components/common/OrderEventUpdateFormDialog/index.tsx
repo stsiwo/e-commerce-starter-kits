@@ -167,6 +167,7 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
               )))}
           </TextField>
           {/** TODO: validation: prevent the admin input past date. **/}
+          {/** https://material-ui.com/components/pickers/ **/}
           <TextField
             id="order-event-created-at"
             label="Date"

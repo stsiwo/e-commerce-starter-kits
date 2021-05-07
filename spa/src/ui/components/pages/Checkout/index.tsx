@@ -1,4 +1,3 @@
-import Button from '@material-ui/core/Button';
 import Step from '@material-ui/core/Step';
 import StepContent from '@material-ui/core/StepContent';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -11,7 +10,17 @@ import Payment from 'components/common/Checkout/Payment';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
-import { checkoutSteps } from './checkoutSteps';
+import FinalConfirmForm from 'components/common/Checkout/FinalConfirmForm';
+import Button from '@material-ui/core/Button';
+import OrderItemForm from 'components/common/Checkout/OrderItemForm';
+
+export enum CheckoutStepEnum {
+  CUSTOMER_BASIC_INFORMATION = 0,
+  CUSTOMER_CONTACT_INFORMATION = 1,
+  ORDER_ITEMS = 2,
+  FINAL_CONFIRM = 3,
+  PAYMENT = 4,
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -33,16 +42,28 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
 
   const auth = useSelector(mSelector.makeAuthSelector())
 
-  // step state
-  const [activeStep, setActiveStep] = React.useState<number>(0);
+  
+  /**
+   * steps:
+   *  0: customer basic information
+   *  1: customer contact information
+   *  2: final confirmation
+   *  3: payment
+   **/
+  const [activeStep, setActiveStep] = React.useState<CheckoutStepEnum>(CheckoutStepEnum.CUSTOMER_BASIC_INFORMATION);
 
   // step event handlers
-  const handleNextStepClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    setActiveStep((prev: number) => prev + 1)
+  
+  const goToStep: (step: CheckoutStepEnum) => void = (step) => {
+    setActiveStep(step);
   }
 
-  const handlePrevStepClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    setActiveStep((prev: number) => prev - 1)
+  const goToNextStep: () => void = () => {
+    setActiveStep((prev: CheckoutStepEnum) => (prev.valueOf() + 1 as CheckoutStepEnum))
+  }
+
+  const goToPrevStep: () => void = () => {
+    setActiveStep((prev: CheckoutStepEnum) => (prev.valueOf() - 1 as CheckoutStepEnum))
   }
 
   const dispatch = useDispatch()
@@ -57,80 +78,60 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
         <Step >
           <StepLabel>{"Customer Basic Information"}</StepLabel>
           <StepContent>
-            <CustomerBasicForm onNextStepClick={handleNextStepClick} onPrevStepClick={handlePrevStepClick} user={auth.user} />
-            <Button
-              disabled={activeStep === 0}
-              onClick={handlePrevStepClick}
-            >
-              Back
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleNextStepClick}
-            >
-              {activeStep === checkoutSteps.length - 1 ? 'Finish' : 'Next'}
-            </Button>
+            <CustomerBasicForm 
+              goToNextStep={goToNextStep} 
+              goToPrevStep={goToPrevStep} 
+              goToStep={goToStep} 
+              user={auth.user} 
+            />
+            <Button onClick={(e) => goToStep(CheckoutStepEnum.FINAL_CONFIRM)}>Final Conform</Button>
+            <Button onClick={(e) => goToStep(CheckoutStepEnum.ORDER_ITEMS)}>Order Items</Button>
+            <Button onClick={(e) => goToStep(CheckoutStepEnum.PAYMENT)}>Payment</Button>
           </StepContent>
         </Step>
         {/** customer contact info **/}
         <Step >
           <StepLabel>{"Customer Contact Information"}</StepLabel>
           <StepContent>
-            <CustomerContactForm onNextStepClick={handleNextStepClick} onPrevStepClick={handlePrevStepClick} user={auth.user} />
-            <Button
-              disabled={activeStep === 0}
-              onClick={handlePrevStepClick}
-            >
-              Back
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleNextStepClick}
-            >
-              {activeStep === checkoutSteps.length - 1 ? 'Finish' : 'Next'}
-            </Button>
+            <CustomerContactForm 
+              goToNextStep={goToNextStep} 
+              goToPrevStep={goToPrevStep} 
+              goToStep={goToStep} 
+              user={auth.user} 
+            />
           </StepContent>
         </Step>
-        {/** order items: disabled for now. don't need this. 
         <Step >
           <StepLabel>{"Order Items"}</StepLabel>
           <StepContent>
-            <OrderItemForm onNextStepClick={handleNextStepClick} onPrevStepClick={handlePrevStepClick} user={auth.user}/>
-            <Button
-              disabled={activeStep === 0}
-              onClick={handlePrevStepClick}
-            >
-              Back
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleNextStepClick}
-            >
-              {activeStep === checkoutSteps.length - 1 ? 'Finish' : 'Next'}
-            </Button>
+            <OrderItemForm 
+              goToNextStep={goToNextStep} 
+              goToPrevStep={goToPrevStep} 
+              goToStep={goToStep} 
+              user={auth.user}
+            />
           </StepContent>
         </Step>
-        **/}
+        <Step >
+          <StepLabel>{"Final Confirm"}</StepLabel>
+          <StepContent>
+            <FinalConfirmForm 
+              goToNextStep={goToNextStep} 
+              goToPrevStep={goToPrevStep} 
+              goToStep={goToStep} 
+              user={auth.user}
+            />
+          </StepContent>
+        </Step>
         <Step >
           <StepLabel>{"Payment"}</StepLabel>
           <StepContent>
-            <Payment onNextStepClick={handleNextStepClick} onPrevStepClick={handlePrevStepClick} user={auth.user}/>
-            <Button
-              disabled={activeStep === 0}
-              onClick={handlePrevStepClick}
-            >
-              Back
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleNextStepClick}
-            >
-              {activeStep === checkoutSteps.length - 1 ? 'Finish' : 'Next'}
-            </Button>
+            <Payment 
+              goToNextStep={goToNextStep} 
+              goToPrevStep={goToPrevStep} 
+              goToStep={goToStep} 
+              user={auth.user}
+            />
           </StepContent>
         </Step>
       </Stepper>

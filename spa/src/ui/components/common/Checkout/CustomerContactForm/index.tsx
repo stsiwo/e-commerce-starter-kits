@@ -3,13 +3,19 @@ import Grid from '@material-ui/core/Grid';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { CheckoutStepComponentPropsType } from 'components/pages/Checkout/checkoutSteps';
 import { UserAddressType, UserPhoneType, UserType } from 'domain/user/types';
-import { useSnackbar, VariantType  } from 'notistack';
+import { useSnackbar, VariantType } from 'notistack';
 import * as React from 'react';
 import CustomerAddressesForm from './CustomerAddressesForm';
 import CustomerPhonesForm from './CustomerPhonesForm';
+import { useSelector } from 'react-redux';
+import { mSelector } from 'src/selectors/selector';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    actionBox: {
+      textAlign: "right",
+      margin: `${theme.spacing(2)}px 0`,
+    },
   }),
 );
 
@@ -37,58 +43,29 @@ const CustomerContactForm: React.FunctionComponent<CustomerContactFormPropsType>
   const classes = useStyles();
 
   // snakbar stuff when no phone & addresses are selected
-  const [isOpenErrorSnackbar, setOpenErrorSnackbar] = React.useState<boolean>(false)
   const { enqueueSnackbar } = useSnackbar();
 
-
-  // selected phone & addresses (shipping & billing)
-  const [curPhone, setPhone] = React.useState<UserPhoneType>(
-    props.user.phones.length > 0 ? props.user.phones[0] : null 
-  );
-
-  const [curShippingAddress, setShippingAddress] = React.useState<UserAddressType>(
-    props.user.addresses.length > 0 ? props.user.addresses[0] : null 
-  )
-
-  const [curBillingAddress, setBillingAddress] = React.useState<UserAddressType>(
-    props.user.addresses.length > 0 ? props.user.addresses[0] : null 
-  )
-
-  const handlePhoneChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextPhone = props.user.phones.find((phone: UserPhoneType) => phone.phoneId === e.currentTarget.value)
-    setPhone(nextPhone)
-  }
-
-  const handleShippingAddressChange: React.EventHandler<React.MouseEvent<HTMLLabelElement>> = (e) => {
-    const nextAddressId = e.currentTarget.getAttribute("data-shipping-address-id")
-    const nextShippingAddress = props.user.addresses.find((address: UserAddressType) =>  address.addressId === nextAddressId)
-    setShippingAddress(nextShippingAddress)
-  }
-
-  const handleBillingAddressChange: React.EventHandler<React.MouseEvent<HTMLLabelElement>> = (e) => {
-    const nextAddressId = e.currentTarget.getAttribute("data-billing-address-id")
-    const nextBillingAddress = props.user.addresses.find((address: UserAddressType) =>  address.addressId === nextAddressId)
-    setBillingAddress(nextBillingAddress)
-  }
+  const curPrimaryPhone = useSelector(mSelector.makeAuthSelectedPhoneSelector())
+  const curBillingAddress = useSelector(mSelector.makeAuthBillingAddressSelector())
+  const curShippingAddress = useSelector(mSelector.makeAuthShippingAddressSelector())
 
   // event handler to validate phone & addresses
   const handleValidateClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    
-    // validation failed.
-    if (!curPhone ||
-      !curShippingAddress ||
-      !curBillingAddress) {
-        enqueueSnackbar("Please select phone, shipping address, billing address", {
-          variant: 'error', 
-        })
-    // validation passed
+
+    //  - check each phone and addresses whether it sets the isSelected, isBillingAddress, isShippingAddress
+    if (curPrimaryPhone && curBillingAddress && curShippingAddress) {
+      // validation passed
+      props.goToNextStep()
     } else {
-      props.onNextStepClick(e)
+      // validation failed.
+      enqueueSnackbar("Please select phone, shipping address, and billing address", {
+        variant: 'error',
+      })
     }
   }
 
   return (
-    <Grid 
+    <Grid
       container
       justify="center"
     >
@@ -97,10 +74,8 @@ const CustomerContactForm: React.FunctionComponent<CustomerContactFormPropsType>
         xs={12}
         md={6}
       >
-        <CustomerPhonesForm 
-          phones={props.user.phones} 
-          curPhone={curPhone}
-          onPhoneChange={handlePhoneChange}
+        <CustomerPhonesForm
+          phones={props.user.phones}
         />
       </Grid>
       <Grid
@@ -108,19 +83,18 @@ const CustomerContactForm: React.FunctionComponent<CustomerContactFormPropsType>
         xs={12}
         md={6}
       >
-        <CustomerAddressesForm 
+        <CustomerAddressesForm
           addresses={props.user.addresses}
-          curShippingAddress={curShippingAddress}
-          onShippingAddressChange={handleShippingAddressChange}
-          curBillingAddress={curBillingAddress}
-          onBillingAddressChange={handleBillingAddressChange}
         />
       </Grid>
       <Grid
         item
         xs={12}
       >
-        <Button onClick={handleValidateClick}>
+        <Button onClick={(e) => props.goToPrevStep()} className={classes.actionBox}>
+          {"Previous"}
+        </Button>
+        <Button onClick={handleValidateClick} className={classes.actionBox}>
           {"Confirm"}
         </Button>
       </Grid>

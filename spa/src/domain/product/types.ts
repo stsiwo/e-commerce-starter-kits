@@ -35,6 +35,10 @@ export declare type ProductVariantType = {
   note: string
   createdAt: Date
   updateAt: Date
+  weight?: number
+  height?: number
+  width?: number
+  length?: number
 }
 
 
@@ -83,6 +87,10 @@ export declare type ProductVariantDataType = {
   isDiscount: boolean
   soldCount: number
   note: string
+  weight?: number
+  height?: number
+  width?: number
+  length?: number
 }
 
 export const defaultProductVariantData: ProductVariantDataType = {
@@ -95,7 +103,11 @@ export const defaultProductVariantData: ProductVariantDataType = {
   variantStock: 0,
   isDiscount: false,
   soldCount: 0,
-  note: ""
+  note: "",
+  weight: 1,
+  height: 1,
+  width: 1,
+  length: 1,
 }
 
 // product variant state type for form & input
@@ -110,6 +122,10 @@ export declare type ProductVariantValidationDataType = {
   isDiscount: string,
   soldCount: string,
   note: string,
+  weight: string,
+  height: string,
+  width: string,
+  length: string,
 }
 
 export const defaultProductVariantValidationData: ProductVariantValidationDataType = {
@@ -123,6 +139,10 @@ export const defaultProductVariantValidationData: ProductVariantValidationDataTy
   isDiscount: "",
   soldCount: "",
   note: "",
+  weight: "",
+  height: "",
+  width: "",
+  length: "",
 }
 
 // product state type for form & input

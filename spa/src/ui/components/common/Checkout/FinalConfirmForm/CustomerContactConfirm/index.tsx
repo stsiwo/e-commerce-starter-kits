@@ -11,6 +11,8 @@ import { testMemberUser } from 'tests/data/user';
 import AddressConfirmCard from '../AddressConfirmCard';
 import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import ReceiptIcon from '@material-ui/icons/Receipt';
+import { CheckoutStepEnum } from 'components/pages/Checkout';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -31,6 +33,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 declare type CustomerContactConfirmPropsType = {
+  goToStep?: (step: CheckoutStepEnum) => void
 }
 
 /**
@@ -50,11 +53,9 @@ const CustomerContactConfirm: React.FunctionComponent<CustomerContactConfirmProp
   // mui: makeStyles
   const classes = useStyles();
 
-  // get cur auth user from redux store and display 
-  const auth = useSelector(mSelector.makeAuthSelector())
-
-  // test user
-  const testUser = testMemberUser
+  const selectedPhone = useSelector(mSelector.makeAuthSelectedPhoneSelector())
+  const shippingAddress = useSelector(mSelector.makeAuthShippingAddressSelector())
+  const billingAddress = useSelector(mSelector.makeAuthBillingAddressSelector())
 
   return (
     <Box component="div">
@@ -68,7 +69,7 @@ const CustomerContactConfirm: React.FunctionComponent<CustomerContactConfirmProp
           md={4}
 
         >
-          <PhoneConfirmCard phone={testUser.phones[0]} />
+          <PhoneConfirmCard phone={selectedPhone} goToStep={props.goToStep} />
         </Grid>
         <Grid
           item
@@ -76,9 +77,10 @@ const CustomerContactConfirm: React.FunctionComponent<CustomerContactConfirmProp
           md={4}
         >
           <AddressConfirmCard
-            address={testUser.addresses[0]}
+            address={shippingAddress}
             headerIcon={<LocalShippingIcon />}
             title={"Shipping Address"}
+            goToStep={props.goToStep}
           />
         </Grid>
         <Grid
@@ -87,9 +89,10 @@ const CustomerContactConfirm: React.FunctionComponent<CustomerContactConfirmProp
           md={4}
         >
           <AddressConfirmCard
-            address={testUser.addresses[0]}
+            address={billingAddress}
             headerIcon={<ReceiptIcon />}
             title={"Billing Address"}
+            goToStep={props.goToStep}
           />
         </Grid>
       </Grid>

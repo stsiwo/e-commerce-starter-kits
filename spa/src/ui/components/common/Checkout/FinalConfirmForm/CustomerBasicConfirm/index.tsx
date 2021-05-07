@@ -5,12 +5,12 @@ import TextField from '@material-ui/core/TextField';
 import * as React from 'react';
 import { useSelector } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
+import { CheckoutStepEnum } from 'components/pages/Checkout';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     form: {
       margin: theme.spacing(1),
-      textAlign: "center",
     },
     formControl: {
       // need to be 'flex', otherwise, default animation (e.g., when click the input, the placeholder goes up to the left top) collapses.
@@ -18,13 +18,17 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: "5px 5px",
       
     },
+    disabled: {
+      color: theme.palette.text.primary
+    },
     actionBox: {
-      textAlign: "center"
+      margin: `${theme.spacing(1)}px 0`,
     },
   }),
 );
 
 declare type CustomerBasicConfirmPropsType = {
+  goToStep?: (step: CheckoutStepEnum) => void
 }
 
 /**
@@ -47,6 +51,11 @@ const CustomerBasicConfirm: React.FunctionComponent<CustomerBasicConfirmPropsTyp
   // get cur auth user from redux store and display 
   const auth = useSelector(mSelector.makeAuthSelector())
 
+  /**
+   * TODO: change the color of disabled textfield. it is really hard to see if it is default style
+   *
+   **/
+
   return (
     <form className={classes.form} noValidate autoComplete="off">
       <TextField
@@ -55,6 +64,7 @@ const CustomerBasicConfirm: React.FunctionComponent<CustomerBasicConfirmPropsTyp
         className={classes.formControl}
         value={auth.user.firstName}
         disabled
+        color={'primary'}
       />
       <TextField
         id="last-name"
@@ -71,7 +81,7 @@ const CustomerBasicConfirm: React.FunctionComponent<CustomerBasicConfirmPropsTyp
         disabled
       />
       <Box component="div" className={classes.actionBox}>
-        <Button>
+        <Button onClick={(e) => props.goToStep(CheckoutStepEnum.CUSTOMER_BASIC_INFORMATION)}>
           Edit
         </Button>
       </Box>

@@ -1,6 +1,6 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RequestTrackerType, AuthType, UserTypeEnum, FetchStatusEnum } from "src/app";
-import { defaultUser } from "domain/user/types";
+import { defaultUser, UserPhoneType, UserAddressType } from "domain/user/types";
 
 /**
  * common reducer action type
@@ -40,6 +40,82 @@ export const authSlice = createSlice({
       user: defaultUser
     }),
 
+    switchPrimaryPhone: (state: AuthType, action: PayloadAction<UserPhoneType>) => {
+      state.user.phones = state.user.phones.map((phone: UserPhoneType) => {
+        if (phone.phoneId == action.payload.phoneId) {
+          phone.isSelected = true
+        } else {
+          phone.isSelected = false
+        }
+        return phone
+      })
+      return state
+    },
+
+
+    appendPhone: (state: AuthType, action: PayloadAction<UserPhoneType>) => {
+      state.user.phones.push(action.payload)
+      return state
+    },
+
+    updatePhone: (state: AuthType, action: PayloadAction<UserPhoneType>) => {
+      state.user.phones = state.user.phones.map((phone: UserPhoneType) => {
+        if (phone.phoneId == action.payload.phoneId) {
+          return action.payload
+        }
+        return phone
+      })
+      return state
+    },
+
+    deletePhone: (state: AuthType, action: PayloadAction<{ phoneId: string }>) => {
+      state.user.phones = state.user.phones.filter((phone: UserPhoneType) => phone.phoneId != action.payload.phoneId)
+      return state
+    },
+
+    switchShippingAddress: (state: AuthType, action: PayloadAction<UserAddressType>) => {
+      state.user.addresses = state.user.addresses.map((address: UserAddressType) => {
+        if (address.addressId == action.payload.addressId) {
+          address.isShippingAddress = true
+        } else {
+          address.isShippingAddress = false
+        }
+        return address
+      })
+      return state
+    },
+
+    switchBillingAddress: (state: AuthType, action: PayloadAction<UserAddressType>) => {
+      state.user.addresses = state.user.addresses.map((address: UserAddressType) => {
+        if (address.addressId == action.payload.addressId) {
+          address.isBillingAddress = true
+        } else {
+          address.isBillingAddress = false
+        }
+        return address
+      })
+      return state
+    },
+
+    appendAddress: (state: AuthType, action: PayloadAction<UserAddressType>) => {
+      state.user.addresses.push(action.payload)
+      return state
+    },
+
+    updateAddress: (state: AuthType, action: PayloadAction<UserAddressType>) => {
+      state.user.addresses = state.user.addresses.map((address: UserAddressType) => {
+        if (address.addressId == action.payload.addressId) {
+          return action.payload
+        }
+        return address
+      })
+      return state
+    },
+
+    deleteAddress: (state: AuthType, action: PayloadAction<{ addressId: string }>) => {
+      state.user.addresses = state.user.addresses.filter((address: UserAddressType) => address.addressId != action.payload.addressId)
+      return state
+    },
   }
   /**
    * extraReducers property

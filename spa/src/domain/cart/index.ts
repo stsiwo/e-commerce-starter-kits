@@ -15,3 +15,12 @@ export const calcSubTotalProductNumbers: (cartItems: CartItemType[]) => number =
     }, 0)
   }
 
+export const calcTotalWeight: (cartItems: CartItemType[]) => number = (cartItems) => {
+    return cartItems.reduce((acc: number, cartItem: CartItemType) => {
+      acc +=  cartItem.variant.weight 
+      return acc
+    }, 0)
+}
+
+
+

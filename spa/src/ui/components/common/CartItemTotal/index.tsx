@@ -8,8 +8,14 @@ import * as React from 'react';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import { generateCartItemList } from 'tests/data/cart';
-import { calcSubTotalPriceAmount, calcSubTotalProductNumbers } from 'domain/cart';
+import { calcSubTotalPriceAmount, calcSubTotalProductNumbers, calcTotalWeight } from 'domain/cart';
 import Divider from '@material-ui/core/Divider';
+import { useSelector } from 'react-redux';
+import { mSelector } from 'src/selectors/selector';
+import { api } from 'configs/axiosConfig';
+import { AxiosError } from 'axios';
+import { useSnackbar } from 'notistack';
+import { cadCurrencyFormat, generateQueryString } from 'src/utils';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -34,30 +40,49 @@ const CartItemTotal: React.FunctionComponent<CartItemTotalPropsType> = (props) =
 
   // mui: makeStyles
   const classes = useStyles();
+  
+  // snakbar stuff when no phone & addresses are selected
+  const { enqueueSnackbar } = useSnackbar();
 
-  // get cur cart items from redux store
-  const testCartItems = React.useMemo(() => generateCartItemList(4), [])
+  // selected cart Items
+  const selectedCartItems = useSelector(mSelector.makeSelectedCartItemSelector())
 
-  // event handler to validate phone & addresses
-  const handleValidateClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+  // shipping cost state
+  const [curShippingCost, setShippingCost] = React.useState<number>(0);
 
-  }
+  // request to get appropriate shipping cost
+  React.useEffect(() => {
+
+    api.request({
+      method: 'GET',
+      url: API1_URL + `/shipping/rating?weight=${calcTotalWeight(selectedCartItems)}`,
+    }).then((data) => {
+
+      setShippingCost(data.data.shippingCost);
+
+      enqueueSnackbar("updated successfully.", { variant: "success" })
+    }).catch((error: AxiosError) => {
+      enqueueSnackbar(error.message, { variant: "error" })
+    })
+  }, [
+  
+  ])
 
   return (
     <Box component="div">
       <div>
-        <Typography variant="subtitle1" component="h3" align="right" >
-          Subtotal (<b>{calcSubTotalProductNumbers(testCartItems)}</b>  items): $<b>{calcSubTotalPriceAmount(testCartItems)}</b>
+        <Typography variant="subtitle1" component="h3" align="right" gutterBottom>
+          Subtotal (<b>{calcSubTotalProductNumbers(selectedCartItems)}</b>  items): $<b>{cadCurrencyFormat(calcSubTotalPriceAmount(selectedCartItems))}</b>
         </Typography>
-        <Typography variant="subtitle1" component="h3" align="right" >
-          Tax: $<b>{"30.00"}</b>
+        <Typography variant="subtitle1" component="h3" align="right" gutterBottom>
+          Tax: $<b>{cadCurrencyFormat(0)}</b>
         </Typography>
-        <Typography variant="subtitle1" component="h3" align="right" >
-          Shipping Cost: $<b>{"10.00"}</b>
+        <Typography variant="subtitle1" component="h3" align="right" gutterBottom>
+          Shipping Cost: $<b>{cadCurrencyFormat(curShippingCost)}</b>
         </Typography>
-        <Divider variant="middle"/>
-        <Typography variant="h6" component="h3" align="right" >
-          Total: $<b>{"500.00"}</b>
+        <Divider />
+        <Typography variant="h6" component="h3" align="right" gutterBottom>
+          Total: $<b>{cadCurrencyFormat(calcSubTotalPriceAmount(selectedCartItems) + 0 + curShippingCost)}</b>
         </Typography>
       </div>
     </Box>

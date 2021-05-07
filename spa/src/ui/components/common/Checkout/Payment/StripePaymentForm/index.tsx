@@ -2,17 +2,29 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import { calcSubTotalPriceAmount } from 'domain/cart';
+import { toFullNameString, toPhoneString } from 'domain/user';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { requestStripeClientSecretActionCreator } from 'reducers/slices/app/private/stripeClientSecret';
 import { mSelector } from 'src/selectors/selector';
+import { cadCurrencyFormat } from 'src/utils';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       textAlign: "center",
+
+    },
+    cartInputBox: {
+      margin: `${theme.spacing(1)}px auto`,
+      maxWidth: 300,
+    },
+    btnBox: {
+      margin: `${theme.spacing(1)}px 0`,
+      textAlign: "right",
+    },
+    btn: {
     }
   }),
 );
@@ -33,6 +45,20 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
 
   // dispatch
   const dispatch = useDispatch()
+
+  // auth (customer)
+  const auth = useSelector(mSelector.makeAuthSelector());
+
+  // selected phone
+  const selectedPhone = useSelector(mSelector.makeAuthSelectedPhoneSelector())
+
+  // shipping & billing address
+  const shippingAddress = useSelector(mSelector.makeAuthShippingAddressSelector())
+  const billingAddress = useSelector(mSelector.makeAuthBillingAddressSelector())
+
+  // selected cart items
+  const selectedCartItems = useSelector(mSelector.makeSelectedCartItemSelector())
+
 
   // client_secret state (redux store)
   const stripeClientSecret = useSelector(mSelector.makeStipeClientSecretSelector())
@@ -58,7 +84,17 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
       payment_method: {
         card: elements.getElement(CardElement),
         billing_details: {
-          name: 'Jenny Rosen',
+          name: toFullNameString(auth.user),
+          address: {
+            line1: billingAddress.address1,
+            line2: billingAddress.address2,
+            city: billingAddress.city,
+            state: billingAddress.province,
+            country: billingAddress.country,
+            postal_code: billingAddress.postalCode,
+          },
+          email: auth.user.email,
+          phone: toPhoneString(selectedPhone),
         },
       }
     });
@@ -80,28 +116,20 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
     }
   }
 
-  // event handler on 'final confirm' button
-  const handleFinalConfirmClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
-    dispatch(requestStripeClientSecretActionCreator())
-  }
-
   return (
     <Box component="div" className={classes.root}>
-      <label>
-        Card Details
+      <Box className={classes.cartInputBox}>
         <CardElement />
-      </label>
-      <Button
-        onClick={handleFinalConfirmClick}
-      >
-        {"Final Confirm"}
-      </Button>
-      <Button
-        disabled={!stripe}
-        onClick={handleMakePaymentClick}
-      >
-        {"Make Payment"}
-      </Button>
+      </Box>
+      <Box className={classes.btnBox}>
+        <Button
+          disabled={!stripe}
+          onClick={handleMakePaymentClick}
+          className={classes.btn}
+        >
+          Make Payment (<b>$ {cadCurrencyFormat(calcSubTotalPriceAmount(selectedCartItems))} </b>)
+        </Button>
+      </Box>
     </Box>
   )
 }

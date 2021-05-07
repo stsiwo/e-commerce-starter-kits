@@ -7,23 +7,28 @@ import { userAccountSchema } from 'hooks/validation/rules';
 import * as React from 'react';
 import { UserType, UserBasicAccountDataType, defaultUserBasicAccountData, UserBasicAccountValidationDataType, defaultUserBasicAccountValidationData } from 'domain/user/types';
 import { CheckoutStepComponentPropsType } from 'components/pages/Checkout/checkoutSteps';
+import { api } from 'configs/axiosConfig';
+import { useSelector, useDispatch } from 'react-redux';
+import { mSelector } from 'src/selectors/selector';
+import { UserTypeEnum } from 'src/app';
+import { useSnackbar } from 'notistack';
+import { authActions } from 'reducers/slices/app';
+import { AxiosError } from 'axios';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     form: {
       margin: theme.spacing(1),
-      textAlign: "center",
     },
     formControl: {
       // need to be 'flex', otherwise, default animation (e.g., when click the input, the placeholder goes up to the left top) collapses.
-      display: "flex",
-      maxWidth: 400,
-      width: "80%",
-      margin: "5px auto",
-
+      display: "inline-block",
+      maxWidth: 300,
+      marginRight: theme.spacing(2),
     },
     actionBox: {
-      textAlign: "center"
+      textAlign: "right",
+      margin: `${theme.spacing(2)}px 0`,
     },
   }),
 );
@@ -54,12 +59,21 @@ const CustomerBasicForm: React.FunctionComponent<CustomerBasicFormPropsType> = (
   // mui: makeStyles
   const classes = useStyles();
 
+  // auth
+  const auth = useSelector(mSelector.makeAuthSelector());
+
+  const dispatch = useDispatch();
+
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
   // temp user account state
   const [curUserAccountState, setUserAccountState] = React.useState<UserBasicAccountDataType>(defaultUserBasicAccountData)
 
   // use effect to update user state if exists after render jsx
   React.useEffect(() => {
-    
+
     if (props.user) {
       setUserAccountState((prev: UserBasicAccountDataType) => ({
         ...prev,
@@ -118,6 +132,47 @@ const CustomerBasicForm: React.FunctionComponent<CustomerBasicFormPropsType> = (
     if (isValid) {
       // pass 
       console.log("passed")
+
+      if (auth.userType === UserTypeEnum.MEMBER) {
+        // request
+        api.request({
+          method: 'POST',
+          url: API1_URL + `/users/${auth.user.userId}`,
+          data: JSON.stringify(curUserAccountState),
+        }).then((data) => {
+
+          /**
+           * update auth state 
+           **/
+          const updatedUser = data.data;
+          dispatch(authActions.update({
+            ...auth,
+            user: updatedUser,
+          }));
+
+          enqueueSnackbar("updated successfully.", { variant: "success" })
+
+          props.goToNextStep()
+
+        }).catch((error: AxiosError) => {
+          enqueueSnackbar(error.message, { variant: "error" })
+        })
+      } else if (auth.userType === UserTypeEnum.GUEST) {
+
+        // if guest user, only update redux store for future reference.
+        dispatch(authActions.update({
+          ...auth,
+          user: {
+            ...auth.user,
+            firstName: curUserAccountState.firstName,
+            lastName: curUserAccountState.lastName,
+            email: curUserAccountState.email,
+          },
+        }));
+
+        props.goToNextStep()
+      }
+
     } else {
       updateAllValidation()
     }

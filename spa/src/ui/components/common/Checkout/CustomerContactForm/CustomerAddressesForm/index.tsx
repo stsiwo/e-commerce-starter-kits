@@ -13,49 +13,23 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import HomeIcon from '@material-ui/icons/Home';
-import { UserAddressType } from 'domain/user/types';
+import { UserAddressType, CustomerAddressesFormDataType, generateDefaultCustomerAddressesFormData, CustomerAddressesFormValidationDataType, defaultUserAccountValidationAddressData } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { userAccountAddressSchema } from 'hooks/validation/rules';
 import * as React from 'react';
-import { testAddressList } from 'tests/data/user';
+import { useSelector, useDispatch } from 'react-redux';
+import { mSelector } from 'src/selectors/selector';
+import { useSnackbar } from 'notistack';
+import { UserTypeEnum } from 'src/app';
+import { api } from 'configs/axiosConfig';
+import omit from 'lodash/omit';
+import { authActions } from 'reducers/slices/app';
+import { AxiosError } from 'axios';
+import { toAddressString } from 'domain/user';
+import IconButton from '@material-ui/core/IconButton';
+import EditIcon from '@material-ui/icons/Edit';
+import merge from 'lodash/merge';
 
-export declare type CustomerAddressesFormDataType = {
-  addressId?: string
-  address1: string
-  address2: string
-  city: string
-  province: string
-  country: string
-  postalCode: string
-}
-
-const defaultCustomerAddressesFormData: CustomerAddressesFormDataType = {
-  address1: "",
-  address2: "",
-  city: "",
-  province: "",
-  country: "",
-  postalCode: "",
-}
-
-export declare type CustomerAddressesFormValidationDataType = {
-  addressId?: string
-  address1?: string
-  address2?: string
-  city?: string
-  province?: string
-  country?: string
-  postalCode?: string
-}
-
-const defaultUserAccountValidationAddressData: CustomerAddressesFormValidationDataType = {
-  address1: "",
-  address2: "",
-  city: "",
-  province: "",
-  country: "",
-  postalCode: "",
-}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -98,10 +72,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export declare type CustomerAddressesFormPropsType = {
   addresses: UserAddressType[]
-  curShippingAddress: UserAddressType
-  curBillingAddress: UserAddressType
-  onShippingAddressChange: React.EventHandler<React.MouseEvent<HTMLLabelElement>>
-  onBillingAddressChange: React.EventHandler<React.MouseEvent<HTMLLabelElement>>
 }
 
 /**
@@ -126,8 +96,23 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
   // mui: makeStyles
   const classes = useStyles();
 
+  // auth
+  const auth = useSelector(mSelector.makeAuthSelector())
+
+  // cur shipping/billing phone
+  const curShippingAddress = useSelector(mSelector.makeAuthShippingAddressSelector());
+  const curBillingAddress = useSelector(mSelector.makeAuthBillingAddressSelector());
+
+  // dispatch
+  const dispatch = useDispatch();
+
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
+
   // temp user account state
-  const [curCustomerAddressesFormState, setCustomerAddressesFormState] = React.useState<CustomerAddressesFormDataType>(defaultCustomerAddressesFormData);
+  const [curCustomerAddressesFormState, setCustomerAddressesFormState] = React.useState<CustomerAddressesFormDataType>(generateDefaultCustomerAddressesFormData());
 
   // validation logic (should move to hooks)
   const [curCustomerAddressesFormValidationState, setCustomerAddressesFormValidationState] = React.useState<CustomerAddressesFormValidationDataType>(defaultUserAccountValidationAddressData);
@@ -223,16 +208,84 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
       console.log("passed")
       if (isNew) {
         console.log("this one is to create new one")
-        /**
-         * TODO:
-         * POST /users/{userId}/addresses to add new one
-         **/
+
+        if (auth.userType === UserTypeEnum.MEMBER) {
+
+          /**
+           * remove temp id from phone state
+           *
+           *  - temp id is necessary for manipulating new phones at front-end.
+           **/
+
+          console.log("member")
+          // request
+          api.request({
+            method: 'POST',
+            url: API1_URL + `/users/${auth.user.userId}/addresses`,
+            data: JSON.stringify(omit(curCustomerAddressesFormState, 'addressId')), // DON'T FORGET to remove 'phoneId' for new.
+          }).then((data) => {
+            /**
+             * update auth
+             **/
+            const newAddress = data.data;
+            dispatch(authActions.appendAddress(newAddress))
+
+            // close modal
+            setModalOpen(false);
+
+            enqueueSnackbar("added successfully.", { variant: "success" })
+          }).catch((error: AxiosError) => {
+            enqueueSnackbar(error.message, { variant: "error" })
+          })
+
+        } else if (auth.userType === UserTypeEnum.GUEST) {
+
+          console.log("guest")
+          /**
+           * update auth only redux store
+           **/
+          dispatch(authActions.appendAddress(curCustomerAddressesFormState))
+
+          // close modal
+          setModalOpen(false);
+        }
       } else {
         console.log("this one is to update existing one")
         /**
          * TODO:
          * PUT /users/{userId}/addresses/{addressId} to update one 
          **/
+        if (auth.userType === UserTypeEnum.MEMBER) {
+
+          // request
+          api.request({
+            method: 'PUT',
+            url: API1_URL + `/users/${auth.user.userId}/addresses/${curCustomerAddressesFormState.addressId}`,
+            data: JSON.stringify(curCustomerAddressesFormState),
+          }).then((data) => {
+            /**
+             * update auth
+             **/
+            const updatedAddress = data.data;
+            dispatch(authActions.updateAddress(updatedAddress))
+
+            // close modal
+            setModalOpen(false);
+
+            enqueueSnackbar("added successfully.", { variant: "success" })
+          }).catch((error: AxiosError) => {
+            enqueueSnackbar(error.message, { variant: "error" })
+          })
+
+        } else if (auth.userType === UserTypeEnum.GUEST) {
+          /**
+           * update auth only redux store
+           **/
+          dispatch(authActions.updateAddress(curCustomerAddressesFormState))
+
+          // close modal
+          setModalOpen(false);
+        }
       }
     } else {
       updateAllValidation()
@@ -241,7 +294,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
 
   // event handler for click 'add new one' button
   const handleAddNewAddressBtnClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    setCustomerAddressesFormState(defaultCustomerAddressesFormData)
+    setCustomerAddressesFormState(generateDefaultCustomerAddressesFormData)
     setCustomerAddressesFormValidationState(defaultUserAccountValidationAddressData)
     setNew(true);
     setModalOpen(true);
@@ -259,7 +312,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
   const handleAddressItemClickEvent: React.EventHandler<React.MouseEvent<HTMLElement>> = (e) => {
 
     const targetAddressId: string = e.currentTarget.getAttribute("data-address-id");
-    const targetAddress = testAddressList.find((address: UserAddressType) => {
+    const targetAddress = props.addresses.find((address: UserAddressType) => {
       return address.addressId == targetAddressId
     })
 
@@ -269,55 +322,142 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
     setModalOpen(true)
   }
 
+  // shipping address change event handler
+  const onShippingAddressClick: React.EventHandler<React.MouseEvent<HTMLLabelElement>> = (e) => {
+
+    const targetAddressId: string = e.currentTarget.getAttribute("data-shipping-address-id");
+    const targetAddress = props.addresses.find((address: UserAddressType) => {
+      return address.addressId == targetAddressId
+    })
+
+    console.log("this one is to update shipping address")
+    /**
+     * TODO:
+     * PUT /users/{userId}/addresses/{addressId} to update one 
+     **/
+    if (auth.userType === UserTypeEnum.MEMBER) {
+
+      // request
+      api.request({
+        method: 'PUT',
+        url: API1_URL + `/users/${auth.user.userId}/addresses/${targetAddressId}`,
+        data: JSON.stringify(merge({}, targetAddress, { isShippingAddress: true })), // 
+      }).then((data) => {
+        /**
+         * update auth
+         **/
+        const updatedAddress = data.data;
+        dispatch(authActions.switchShippingAddress(updatedAddress))
+
+        enqueueSnackbar("added successfully.", { variant: "success" })
+      }).catch((error: AxiosError) => {
+        enqueueSnackbar(error.message, { variant: "error" })
+      })
+
+    } else if (auth.userType === UserTypeEnum.GUEST) {
+      /**
+       * update auth only redux store
+       **/
+      dispatch(authActions.switchShippingAddress(targetAddress))
+
+    }
+  }
+
+  // billing address change event handler
+  const onBillingAddressClick: React.EventHandler<React.MouseEvent<HTMLLabelElement>> = (e) => {
+
+    const targetAddressId: string = e.currentTarget.getAttribute("data-billing-address-id");
+    const targetAddress = props.addresses.find((address: UserAddressType) => {
+      return address.addressId == targetAddressId
+    })
+
+    console.log("this one is to update billing address")
+    /**
+     * TODO:
+     * PUT /users/{userId}/addresses/{addressId} to update one 
+     **/
+    if (auth.userType === UserTypeEnum.MEMBER) {
+
+      // request
+      api.request({
+        method: 'PUT',
+        url: API1_URL + `/users/${auth.user.userId}/addresses/${targetAddressId}`,
+        data: JSON.stringify(merge({}, targetAddress, { isBillingAddress: true })), // 
+      }).then((data) => {
+        /**
+         * update auth
+         **/
+        const updatedAddress = data.data;
+        dispatch(authActions.switchBillingAddress(updatedAddress))
+
+        enqueueSnackbar("added successfully.", { variant: "success" })
+      }).catch((error: AxiosError) => {
+        enqueueSnackbar(error.message, { variant: "error" })
+      })
+
+    } else if (auth.userType === UserTypeEnum.GUEST) {
+      /**
+       * update auth only redux store
+       **/
+      dispatch(authActions.switchBillingAddress(targetAddress))
+    }
+  }
+
   // render functions
 
   // display current phone number list
   const renderCurAddressListComponent: () => React.ReactNode = () => {
-    /**
-     * TODO: replace with real one and remove test data
-     **/
-    //return phones.map((phone: UserAddressType) => {
-
-
-    return testAddressList.map((address: UserAddressType) => {
-      const addressString = Object.values(address).join(" ");
+    return props.addresses.map((address: UserAddressType) => {
+      console.log("billing")
+      console.log(curBillingAddress && curBillingAddress.addressId === address.addressId)
+      console.log("shipping")
+      console.log(curShippingAddress && curShippingAddress.addressId === address.addressId)
       return (
-        <ListItem key={address.addressId} data-address-id={address.addressId} onClick={handleAddressItemClickEvent} >
+        <ListItem key={address.addressId}>
           <ListItemAvatar>
             <Avatar>
               <HomeIcon />
             </Avatar>
           </ListItemAvatar>
           <ListItemText
-            primary={addressString}
-            secondary={""}
-          />
-          <ListItemSecondaryAction>
-            {/**
+            primary={toAddressString(address)}
+            secondary={
+              <React.Fragment>
+                {/**
               * not use usual radio button group because of two different radio group with the same list item
               *
               *   - ref: https://stackoverflow.com/questions/37150254/radiobuttongroup-within-nested-list 
+              *
+              *   - TODO:
+              *   - this aaporach complains 'A component is changing the uncontrolled checked state of SwitchBase to be controlled.'. find better approach!!
               **/}
-            <FormControlLabel 
-              value={address.addressId} 
-              data-billing-address-id={address.addressId}
-              checked={props.curBillingAddress.addressId === address.addressId} 
-              control={<Radio />} 
-              labelPlacement="bottom"
-              label={props.curBillingAddress.addressId === address.addressId ? "shipping" : ""} 
-              name="user-billing-address" 
-              onClick={props.onBillingAddressChange}
-            />
-            <FormControlLabel 
-              value={address.addressId} 
-              data-shipping-address-id={address.addressId}
-              checked={props.curShippingAddress.addressId === address.addressId} 
-              control={<Radio />} 
-              labelPlacement="bottom"
-              label={props.curShippingAddress.addressId === address.addressId ? "billing" : ""} 
-              name="user-shipping-address" 
-              onClick={props.onShippingAddressChange}
-            />
+                <FormControlLabel
+                  value={address.addressId}
+                  data-billing-address-id={address.addressId}
+                  checked={curBillingAddress && curBillingAddress.addressId === address.addressId}
+                  control={<Radio />}
+                  labelPlacement="bottom"
+                  label={curBillingAddress && curBillingAddress.addressId === address.addressId ? "billing" : ""}
+                  name="user-billing-address"
+                  onClick={onBillingAddressClick}
+                />
+                <FormControlLabel
+                  value={address.addressId}
+                  data-shipping-address-id={address.addressId}
+                  checked={curShippingAddress && curShippingAddress.addressId === address.addressId}
+                  control={<Radio />}
+                  labelPlacement="bottom"
+                  label={curShippingAddress && curShippingAddress.addressId === address.addressId ? "shipping" : ""}
+                  name="user-shipping-address"
+                  onClick={onShippingAddressClick}
+                />
+                <IconButton edge="end" aria-label="edit" data-address-id={address.addressId} onClick={handleAddressItemClickEvent}>
+                  <EditIcon />
+                </IconButton>
+              </React.Fragment>
+            }
+          />
+          <ListItemSecondaryAction>
           </ListItemSecondaryAction>
         </ListItem>
       )
@@ -335,9 +475,9 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
           </Typography>
         )}
         {(props.addresses.length > 0 &&
-              <List className={classes.listBox}>
-                {renderCurAddressListComponent()}
-              </List>
+          <List className={classes.listBox}>
+            {renderCurAddressListComponent()}
+          </List>
         )}
         <Box component="div" className={classes.actionBox}>
           <Button onClick={handleAddNewAddressBtnClickEvent}>

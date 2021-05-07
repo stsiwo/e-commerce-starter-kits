@@ -2,8 +2,10 @@ import { createSelector } from "@reduxjs/toolkit";
 import { StateType } from "states/types";
 import { denormalize } from "normalizr";
 import { categorySchemaArray, productSchemaArray } from "states/state";
-import { UserType } from "domain/user/types";
+import { UserType, UserPhoneType, UserAddressType } from "domain/user/types";
 import merge from 'lodash/merge';
+import CartItem from "components/common/CartItem";
+import { CartItemType } from "domain/cart/types";
 
 export const rsSelector = {
   /**
@@ -122,6 +124,90 @@ export const mSelector = {
       ],
       (auth) => {
         return auth
+      },
+    )
+  },
+
+  // app.auth.user.phones with isSelected
+  makeAuthSelectedPhoneSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getAuth
+      ],
+      (auth) => {
+        return auth.user.phones.find((phone: UserPhoneType) => phone.isSelected)
+      },
+    )
+  },
+
+  // app.auth.user.addresses with isBillingAddress
+  makeAuthBillingAddressSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getAuth
+      ],
+      (auth) => {
+        return auth.user.addresses.find((address: UserAddressType) => address.isBillingAddress)
+      },
+    )
+  },
+
+  // app.auth.user.addresses with isShippingAddress
+  makeAuthShippingAddressSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getAuth
+      ],
+      (auth) => {
+        return auth.user.addresses.find((address: UserAddressType) => address.isShippingAddress)
+      },
+    )
+  },
+
+  // app.auth.user to validate customer basic info
+  makeAuthValidateCustomerBasicInfoSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getAuth
+      ],
+      (auth) => {
+        return auth.user.firstName && auth.user.lastName && auth.user.email
+      },
+    )
+  },
+
+  // app.auth.user to validate customer phone info
+  makeAuthValidateCustomerPhoneSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getAuth
+      ],
+      (auth) => {
+        return auth.user.phones.find((phone: UserPhoneType) => phone.isSelected) 
+      },
+    )
+  },
+
+  // app.auth.user to validate customer phone info
+  makeAuthValidateCustomerShippingAddressSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getAuth
+      ],
+      (auth) => {
+        return auth.user.addresses.find((address: UserAddressType) => address.isShippingAddress) 
+      },
+    )
+  },
+
+  // app.auth.user to validate customer phone info
+  makeAuthValidateCustomerBillingAddressSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getAuth
+      ],
+      (auth) => {
+        return auth.user.addresses.find((address: UserAddressType) => address.isBillingAddress) 
       },
     )
   },
@@ -307,6 +393,19 @@ export const mSelector = {
       (cartItem) => {
         // this is array of cart item
         return cartItem
+      },
+    )
+  },
+  
+  // domain.cartItem with selected
+  makeSelectedCartItemSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getCartItem
+      ],
+      (cartItem) => {
+        // this is array of cart item
+        return cartItem.filter((cart: CartItemType) => cart.isSelected)
       },
     )
   },

@@ -1,46 +1,32 @@
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Modal from '@material-ui/core/Modal';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import DeleteIcon from '@material-ui/icons/Delete';
 import PhoneIphoneIcon from '@material-ui/icons/PhoneIphone';
-import { UserPhoneType } from 'domain/user/types';
+import { AxiosError } from 'axios';
+import { api } from 'configs/axiosConfig';
+import { UserPhoneType, CustomerPhonesFormDataType, CustomerPhonesFormValidationDataType, defaultUserAccountValidationPhoneData, generateDefaultCustomerPhonesFormData } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { userAccountPhoneSchema } from 'hooks/validation/rules';
+import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import { testPhoneList } from 'tests/data/user';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Radio from '@material-ui/core/Radio';
-
-export declare type CustomerPhonesFormDataType = {
-  phone: string
-  countryCode: string
-}
-
-const defaultCustomerPhonesFormData: CustomerPhonesFormDataType = {
-  phone: "",
-  countryCode: ""
-}
-
-export declare type CustomerPhonesFormValidationDataType = {
-  phone?: string
-  countryCode?: string
-}
-
-const defaultUserAccountValidationPhoneData: CustomerPhonesFormValidationDataType = {
-  phone: "",
-  countryCode: ""
-}
+import { useDispatch, useSelector } from 'react-redux';
+import { authActions } from 'reducers/slices/app';
+import { UserTypeEnum } from 'src/app';
+import { mSelector } from 'src/selectors/selector';
+import omit from 'lodash/omit';
+import merge from 'lodash/merge';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -83,8 +69,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export declare type CustomerPhonesFormPropsType = {
   phones: UserPhoneType[]
-  curPhone: UserPhoneType
-  onPhoneChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>>
 }
 
 /**
@@ -109,8 +93,26 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
   // mui: makeStyles
   const classes = useStyles();
 
+  // auth
+  const auth = useSelector(mSelector.makeAuthSelector())
+
+  // cur selected phone
+  const curPrimaryPhone = useSelector(mSelector.makeAuthSelectedPhoneSelector());
+
+  // dispatch
+  const dispatch = useDispatch();
+
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
   // temp user account state
-  const [curCustomerPhonesFormState, setCustomerPhonesFormState] = React.useState<CustomerPhonesFormDataType>(defaultCustomerPhonesFormData);
+  const [curCustomerPhonesFormState, setCustomerPhonesFormState] = React.useState<CustomerPhonesFormDataType>(generateDefaultCustomerPhonesFormData());
+
+  // update/create logic for address
+  //  - true: create
+  //  - false: update
+  const [isNew, setNew] = React.useState<boolean>(true);
 
   // validation logic (should move to hooks)
   const [curCustomerPhonesFormValidationState, setCustomerPhonesFormValidationState] = React.useState<CustomerPhonesFormValidationDataType>(defaultUserAccountValidationPhoneData);
@@ -130,7 +132,6 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
       ...prev,
       phone: nextPhone
     }));
-
   }
 
   const handleCountryCodeInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
@@ -154,27 +155,86 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
       // pass 
       console.log("passed")
       if (isNew) {
+
         console.log("this one is to create new one")
-        /**
-         * TODO:
-         * POST /users/{userId}/phones to add new one
-         **/
+        if (auth.userType === UserTypeEnum.MEMBER) {
+
+          /**
+           * remove temp id from phone state
+           *
+           *  - temp id is necessary for manipulating new phones at front-end.
+           **/
+
+          console.log("member")
+          // request
+          api.request({
+            method: 'POST',
+            url: API1_URL + `/users/${auth.user.userId}/phones`,
+            data: JSON.stringify(omit(curCustomerPhonesFormState, 'phoneId')), // DON'T FORGET to remove 'phoneId' for new.
+          }).then((data) => {
+            /**
+             * update auth
+             **/
+            const newPhone = data.data;
+            dispatch(authActions.appendPhone(newPhone))
+
+            // close modal
+            setModalOpen(false);
+
+            enqueueSnackbar("added successfully.", { variant: "success" })
+          }).catch((error: AxiosError) => {
+            enqueueSnackbar(error.message, { variant: "error" })
+          })
+
+        } else if (auth.userType === UserTypeEnum.GUEST) {
+
+          console.log("guest")
+          /**
+           * update auth only redux store
+           **/
+          dispatch(authActions.appendPhone(curCustomerPhonesFormState))
+
+          // close modal
+          setModalOpen(false);
+        }
       } else {
-        console.log("this one is to update existing one")
-        /**
-         * TODO:
-         * PUT /users/{userId}/phones/{phoneId} to update one 
-         **/
+        console.log("this one is to update one")
+        if (auth.userType === UserTypeEnum.MEMBER) {
+
+          // request
+          api.request({
+            method: 'PUT',
+            url: API1_URL + `/users/${auth.user.userId}/phones/${curCustomerPhonesFormState.phoneId}`,
+            data: JSON.stringify(curCustomerPhonesFormState),
+          }).then((data) => {
+            /**
+             * update auth
+             **/
+            const updatedPhone = data.data;
+            dispatch(authActions.updatePhone(updatedPhone))
+
+            // close modal
+            setModalOpen(false);
+
+            enqueueSnackbar("added successfully.", { variant: "success" })
+          }).catch((error: AxiosError) => {
+            enqueueSnackbar(error.message, { variant: "error" })
+          })
+
+        } else if (auth.userType === UserTypeEnum.GUEST) {
+          /**
+           * update auth only redux store
+           **/
+          dispatch(authActions.updatePhone(curCustomerPhonesFormState))
+
+          // close modal
+          setModalOpen(false);
+        }
       }
     } else {
       updateAllValidation()
     }
   }
-
-  // update/create logic for address
-  //  - true: create
-  //  - false: update
-  const [isNew, setNew] = React.useState<boolean>(true);
 
   // modal logic
   const [curModalOpen, setModalOpen] = React.useState<boolean>(false);
@@ -187,8 +247,9 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
 
   // event handler for click 'add new one' button
   const handleAddNewPhoneBtnClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    setCustomerPhonesFormState(defaultCustomerPhonesFormData)
+    setCustomerPhonesFormState(generateDefaultCustomerPhonesFormData())
     setCustomerPhonesFormValidationState(defaultUserAccountValidationPhoneData)
+
     setNew(true);
     setModalOpen(true);
   }
@@ -199,13 +260,40 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
     /**
      * TODO: DELETE /users/{userId}/phones/{phoneId}
      **/
+    if (auth.userType === UserTypeEnum.MEMBER) {
+
+      // request
+      api.request({
+        method: 'DELETE',
+        url: API1_URL + `/users/${auth.user.userId}/phones/${curCustomerPhonesFormState.phoneId}`,
+      }).then((data) => {
+        /**
+         * update auth
+         **/
+        dispatch(authActions.deletePhone({
+          phoneId: curCustomerPhonesFormState.phoneId
+        }))
+
+        enqueueSnackbar("added successfully.", { variant: "success" })
+      }).catch((error: AxiosError) => {
+        enqueueSnackbar(error.message, { variant: "error" })
+      })
+
+    } else if (auth.userType === UserTypeEnum.GUEST) {
+      /**
+       * update auth only redux store
+       **/
+      dispatch(authActions.deletePhone({
+        phoneId: curCustomerPhonesFormState.phoneId
+      }))
+    }
   }
 
   // event handler to click an phone list item to update phone
   const handlePhoneItemClickEvent: React.EventHandler<React.MouseEvent<HTMLElement>> = (e) => {
 
     const targetPhoneId: string = e.currentTarget.getAttribute("data-phone-id");
-    const targetPhone = testPhoneList.find((phone: UserPhoneType) => {
+    const targetPhone = props.phones.find((phone: UserPhoneType) => {
       return phone.phoneId == targetPhoneId
     })
 
@@ -215,17 +303,50 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
     setModalOpen(true)
   }
 
+  // primary phone change event handler (radio)
+  const onPrimaryPhoneChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+
+    const targetPhoneId: string = e.currentTarget.value
+    const targetPhone = props.phones.find((phone: UserPhoneType) => {
+      return phone.phoneId == targetPhoneId
+    })
+
+    console.log("this one is to update isSelected")
+    if (auth.userType === UserTypeEnum.MEMBER) {
+
+      // request
+      api.request({
+        method: 'PUT',
+        url: API1_URL + `/users/${auth.user.userId}/phones/${targetPhoneId}`,
+        data: JSON.stringify(merge({}, targetPhone, { isSelected: true })), // 
+      }).then((data) => {
+        /**
+         * update auth
+         **/
+        const updatedPhone = data.data;
+        dispatch(authActions.switchPrimaryPhone(updatedPhone))
+
+        enqueueSnackbar("updated successfully.", { variant: "success" })
+      }).catch((error: AxiosError) => {
+        enqueueSnackbar(error.message, { variant: "error" })
+      })
+
+    } else if (auth.userType === UserTypeEnum.GUEST) {
+      /**
+       * update auth only redux store
+       **/
+      dispatch(authActions.switchPrimaryPhone(targetPhone))
+    }
+  }
+
   // render functions
 
   // display current phone number list
-  const renderCurPhoneListComponent: () => React.ReactNode = () => {
-    /**
-     * TODO: replace with real one and remove test data
-     **/
-    //return phones.map((phone: UserPhoneType) => {
-    return testPhoneList.map((phone: UserPhoneType) => {
+  const renderCurPrimaryPhoneListComponent: () => React.ReactNode = () => {
+    return props.phones.map((phone: UserPhoneType) => {
       return (
         <ListItem key={phone.phoneId} data-phone-id={phone.phoneId} onClick={handlePhoneItemClickEvent}>
+          {/** using phoneId as key does not work since new phone does not have phoneId. it is assigned at backend. **/}
           <ListItemAvatar>
             <Avatar>
               <PhoneIphoneIcon />
@@ -254,9 +375,9 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
           </Typography>
         )}
         {(props.phones.length > 0 &&
-          <RadioGroup defaultValue={props.curPhone.phoneId} aria-label="phone" name="user-phone-radio">
+          <RadioGroup value={curPrimaryPhone ? curPrimaryPhone.phoneId : null} aria-label="phone" name="user-phone-radio" onChange={onPrimaryPhoneChange}>
             <List className={classes.listBox}>
-              {renderCurPhoneListComponent()}
+              {renderCurPrimaryPhoneListComponent()}
             </List>
           </RadioGroup>
         )}

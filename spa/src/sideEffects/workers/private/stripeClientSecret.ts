@@ -65,6 +65,8 @@ export function* requestStripeClientSecretWorker(action: PayloadAction<{}>) {
      *
      *    - e.g., Object { clientSecret: "pi_1IgLtGGsn7HlXlcZ3GZxa2II_secret_aTp0z92Ltv2r5CtgRz9odg5pL" }
      *
+     *  - this is sensitive data, so NEVER EVER persist this data.
+     *
      **/
     yield put(
       stripeClientSecretActions.update(response.data.clientSecret)
