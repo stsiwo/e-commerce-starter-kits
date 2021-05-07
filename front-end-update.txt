@@ -1,8 +1,7 @@
 - add contact page
   
-  - input form (first name, last name, email, description)
-  - integrate with email.
-
+  - recapcha for security
+  
 - add member order management page
 
   - member can view their order history
