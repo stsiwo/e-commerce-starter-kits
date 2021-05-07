@@ -1,15 +1,17 @@
-- add contact page
+- (IMPL) add contact page
   
   - recapcha for security
   
-- order page:
+- (IMPL) order page:
 
   - make sure how to handle 'return/cancel' for purchase.
   
-- popup for signup 
+- (IMPL) popup for signup 
 
   - esp when the guest user purchases.
   
-- verification email flow.
+- (IMPL) verification email flow.
 
-- admin endpoints request testing (products, orders, categories, customers, and so on)
+- (testing) admin endpoints request testing (products, orders, categories, customers, and so on)
+
+- (implementation) add product variant to cart request
