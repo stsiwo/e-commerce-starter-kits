@@ -2,17 +2,12 @@
   
   - recapcha for security
   
-- add member order management page
+- order page:
 
-  - member can view their order history
-  - can request "cancel"/"return" if it is under the return policy
+  - make sure how to handle 'return/cancel' for purchase.
   
 - popup for signup 
 
   - esp when the guest user purchases.
   
 - verification email flow.
-
-- admin company management page
-
-  - form inputs: company name, addresses, phones, email esp for shipping
