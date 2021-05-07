@@ -1,7 +1,4 @@
 endpoint change:
-
-  - /categories (GET)
-    - don't need to include products which are belonged to the category. but need total count of products.
     
   - /cartItems 
     
