@@ -78,7 +78,9 @@ endpoint change:
     
     - create a property of DTO for each domain calculated values so that you don't need to calculate this at front-end again.
 
-
+  - users/{userId}/companies endpoint
+  
+    - (PUT) replace company info. how to deal with switching (POST) and (PUT). should I prepare the default value so that nevery happen POST
 
 ## Stripe
 
