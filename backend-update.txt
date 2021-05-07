@@ -1,11 +1,4 @@
 endpoint change:
-    
-  - /cartItems 
-    
-    - add below endpoints
-      - (PUT): replace existing one with new one
-        - to update quantity/is_selected and other stuff.
-        - return only updated one.
         
   - /wishlistItems
       
