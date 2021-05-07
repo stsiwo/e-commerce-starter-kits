@@ -7,9 +7,6 @@ endpoint change:
         - to update quantity/is_selected and other stuff.
         - return only updated one.
         
-    - (GET) remove Pagination.
-        
-        
   - /wishlistItems
       
     - (PATCH) move to cart: 
