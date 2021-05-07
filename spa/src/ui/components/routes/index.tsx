@@ -21,6 +21,7 @@ import { UserTypeEnum } from 'src/app';
 import { withAdminBasePage } from 'ui/hoc/withAdminBasePage';
 import { withBasePage } from 'ui/hoc/withBasePage';
 import Contact from 'components/pages/Contact';
+import Order from 'components/pages/Order';
 
 // route data
 export declare type RouteDataType = {
@@ -59,6 +60,10 @@ export const routesData: RoutesDataType = {
     {
       url: "/wishlist",
       component: withBasePage(Wishlist),
+    },
+    {
+      url: "/orders",
+      component: withBasePage(Order),
     },
   ],
   // define admin only page

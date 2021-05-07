@@ -230,6 +230,7 @@ export declare type OrderType = {
   orderDetails: OrderDetailType[]
   productCost: number
   taxCost: number
+  shippingCost: number
   note: string
   createdAt: Date
   updatedAt: Date

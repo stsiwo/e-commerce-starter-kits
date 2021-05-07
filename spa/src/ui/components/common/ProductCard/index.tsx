@@ -59,11 +59,11 @@ const ProductCard: React.FunctionComponent<ProductCardPropsType> = ({ product })
 
   return (
     <Card className={classes.card}>
-        <CardMedia
-          className={classes.media}
-          // the first product image is the main one
-          image={(product.productImages.length > 0) ? product.productImages[0].productImagePath : ""}
-        />
+      <CardMedia
+        className={classes.media}
+        // the first product image is the main one
+        image={(product.productImages.length > 0) ? product.productImages[0].productImagePath : ""}
+      />
       <CardContent className={classes.cardContent}>
         <Typography variant="body2" color="textSecondary" component="p">
           {product.category.categoryName}

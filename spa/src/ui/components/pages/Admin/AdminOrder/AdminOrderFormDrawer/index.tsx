@@ -43,6 +43,10 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+/**
+ * reuse this for member order management too.
+ *
+ **/
 const AdminOrderFormDrawer: React.FunctionComponent<AdminOrderFormDrawerPropsType> = (props) => {
 
   // used to switch 'permanent' or 'temporary' nav menu based on this screen size 
