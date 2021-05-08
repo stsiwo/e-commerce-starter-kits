@@ -1,8 +1,6 @@
 endpoint change:
             
   - /users
-  
-    - implement that only update property which has value (not null)
     
     - (/users/{userId}/phones) implement user phone managment endpoint (like addresses)
     
