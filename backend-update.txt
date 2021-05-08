@@ -1,10 +1,5 @@
 endpoint change:
-        
-  - /wishlistItems
-      
-    - (PATCH) move to cart: 
-      - remove the item from wishlist and trigger domain event to raise the event then add the item to the cart
-    
+            
   - /users
   
     - implement that only update property which has value (not null)
