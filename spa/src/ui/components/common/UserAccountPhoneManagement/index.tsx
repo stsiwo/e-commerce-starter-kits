@@ -30,25 +30,25 @@ import { mSelector } from 'src/selectors/selector';
 
 export declare type UserAccountPhoneDataType = {
   phoneId?: string
-  phone: string
+  phoneNumber: string
   countryCode: string
 }
 
 const defaultUserAccountPhoneData: UserAccountPhoneDataType = {
   phoneId: "",
-  phone: "",
+  phoneNumber: "",
   countryCode: ""
 }
 
 export declare type UserAccountPhoneValidationDataType = {
   phoneId?: string,
-  phone?: string
+  phoneNumber?: string
   countryCode?: string
 }
 
 const defaultUserAccountValidationPhoneData: UserAccountPhoneValidationDataType = {
   phoneId: "",
-  phone: "",
+  phoneNumber: "",
   countryCode: ""
 }
 
@@ -177,7 +177,7 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
       console.log("passed")
 
       const bodyFormData = new FormData();
-      bodyFormData.append("phoneNumber", curUserAccountPhoneState.phone);
+      bodyFormData.append("phoneNumber", curUserAccountPhoneState.phoneNumber);
       bodyFormData.append("countryCode", curUserAccountPhoneState.countryCode);
 
       if (isNew) {
@@ -333,7 +333,7 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
             </Avatar>
           </ListItemAvatar>
           <ListItemText
-            primary={phone.phone}
+            primary={phone.phoneNumber}
             secondary={phone.countryCode}
           />
           <ListItemSecondaryAction>
@@ -393,10 +393,10 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
             id="phone"
             label="Phone"
             className={classes.formControl}
-            value={curUserAccountPhoneState.phone}
+            value={curUserAccountPhoneState.phoneNumber}
             onChange={handlePhoneInputChangeEvent}
-            helperText={curUserAccountPhoneValidationState.phone}
-            error={curUserAccountPhoneValidationState.phone !== ""}
+            helperText={curUserAccountPhoneValidationState.phoneNumber}
+            error={curUserAccountPhoneValidationState.phoneNumber !== ""}
 
           />
           <TextField

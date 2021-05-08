@@ -121,12 +121,12 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
   }
 
 
-  const handlePhoneInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextPhone = e.currentTarget.value
-    updateValidationAt("phone", e.currentTarget.value);
+  const handlePhoneNumberInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    const nextPhoneNumber = e.currentTarget.value
+    updateValidationAt("phoneNumber", e.currentTarget.value);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      phone: nextPhone
+      phoneNumber: nextPhoneNumber
     }));
 
   }
@@ -304,10 +304,10 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
                 id="phone"
                 label="phone"
                 className={classes.formControl}
-                value={curAdminCompanyFormState.phone}
-                onChange={handlePhoneInputChangeEvent}
-                helperText={curAdminCompanyFormValidationState.phone}
-                error={curAdminCompanyFormValidationState.phone !== ""}
+                value={curAdminCompanyFormState.phoneNumber}
+                onChange={handlePhoneNumberInputChangeEvent}
+                helperText={curAdminCompanyFormValidationState.phoneNumber}
+                error={curAdminCompanyFormValidationState.phoneNumber !== ""}
               />
               <TextField
                 id="country-code"

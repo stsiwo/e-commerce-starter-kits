@@ -125,12 +125,12 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
   })
 
   // event handlers
-  const handlePhoneInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextPhone = e.currentTarget.value
-    updateValidationAt("phone", e.currentTarget.value);
+  const handlePhoneNumberInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    const nextPhoneNumber = e.currentTarget.value
+    updateValidationAt("phoneNumber", e.currentTarget.value);
     setCustomerPhonesFormState((prev: CustomerPhonesFormDataType) => ({
       ...prev,
-      phone: nextPhone
+      phoneNumber: nextPhoneNumber
     }));
   }
 
@@ -353,7 +353,7 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
             </Avatar>
           </ListItemAvatar>
           <ListItemText
-            primary={phone.phone}
+            primary={phone.phoneNumber}
             secondary={phone.countryCode}
           />
           <ListItemSecondaryAction>
@@ -398,10 +398,10 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
             id="phone"
             label="Phone"
             className={classes.formControl}
-            value={curCustomerPhonesFormState.phone}
-            onChange={handlePhoneInputChangeEvent}
-            helperText={curCustomerPhonesFormValidationState.phone}
-            error={curCustomerPhonesFormValidationState.phone !== ""}
+            value={curCustomerPhonesFormState.phoneNumber}
+            onChange={handlePhoneNumberInputChangeEvent}
+            helperText={curCustomerPhonesFormValidationState.phoneNumber}
+            error={curCustomerPhonesFormValidationState.phoneNumber !== ""}
 
           />
           <TextField

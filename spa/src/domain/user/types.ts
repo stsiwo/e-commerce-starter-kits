@@ -6,7 +6,7 @@ import { getNanoId } from "src/utils";
 
 export declare type UserPhoneType = {
   phoneId?: string
-  phone: string
+  phoneNumber: string
   countryCode: string
   isSelected: boolean
 }
@@ -89,7 +89,7 @@ export const defaultUserBasicAccountValidationData = {
 // customer phone
 export declare type CustomerPhonesFormDataType = {
   phoneId?: string
-  phone: string
+  phoneNumber: string
   countryCode: string
   isSelected: boolean
 }
@@ -97,7 +97,7 @@ export declare type CustomerPhonesFormDataType = {
 export const generateDefaultCustomerPhonesFormData: () => CustomerPhonesFormDataType = () => {
   return {
     phoneId: getNanoId(),
-    phone: "",
+    phoneNumber: "",
     countryCode: "",
     isSelected: false,
   }
@@ -105,14 +105,14 @@ export const generateDefaultCustomerPhonesFormData: () => CustomerPhonesFormData
 
 export declare type CustomerPhonesFormValidationDataType = {
   phoneId?: string
-  phone?: string
+  phoneNumber?: string
   countryCode?: string
   isSelected?: string
 }
 
 export const defaultUserAccountValidationPhoneData: CustomerPhonesFormValidationDataType = {
   phoneId: "",
-  phone: "",
+  phoneNumber: "",
   countryCode: "",
   isSelected: "",
 }
@@ -203,7 +203,7 @@ export declare type AdminCompanyFormDataType = {
   companyName: string
   description: string
   email: string
-  phone: string
+  phoneNumber: string
   countryCode: string
   address1: string
   address2: string
@@ -218,7 +218,7 @@ export const generateDefaultAdminCompanyFormData: () => AdminCompanyFormDataType
     companyName: "",
     description: "",
     email: "",
-    phone: "",
+    phoneNumber: "",
     countryCode: "",
     address1: "",
     address2: "",
@@ -233,7 +233,7 @@ export declare type AdminCompanyFormValidationDataType = {
   companyName: string,
   description: string,
   email: string,
-  phone: string,
+  phoneNumber: string,
   countryCode: string,
   address1: string,
   address2: string,
@@ -247,7 +247,7 @@ export const defaultAdminCompanyFormValidationData: AdminCompanyFormValidationDa
   companyName: "",
   description: "",
   email: "",
-  phone: "",
+  phoneNumber: "",
   countryCode: "",
   address1: "",
   address2: "",

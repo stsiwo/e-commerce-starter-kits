@@ -36,7 +36,7 @@ export function toAddressString(address: UserAddressType): string {
 }
 
 export function toPhoneString(phone: UserPhoneType): string {
-  return `${phone.countryCode} ${phone.phone}`
+  return `${phone.countryCode} ${phone.phoneNumber}`
 }
 
 export function toFullNameString(user: UserType): string {

@@ -65,7 +65,7 @@ const PhoneConfirmCard: React.FunctionComponent<PhoneConfirmCardPropsType> = (pr
         }
         {props.phone &&
           <Typography variant="body1" component="p">
-            {`${props.phone.countryCode} ${props.phone.phone}`}
+            {`${props.phone.countryCode} ${props.phone.phoneNumber}`}
           </Typography>
         }
       </CardContent>
