@@ -2,17 +2,9 @@ endpoint change:
             
   - /users
     
-    - (/users/{userId}/addresses) 
-    
-      - (PATCH) for both shipping/billing selection update 
-      
-        - requestBody: { isBilling: true } or { isShipping: true }
-        
-      - should return updated user aggregate (not only phones/address).
-    
     - (/users/{userId}/avatar-image) 
     
-      - should return 
+      - should return public path for the image.
     
     - create user status column
       
