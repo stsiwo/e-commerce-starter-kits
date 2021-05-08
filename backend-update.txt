@@ -10,7 +10,7 @@ endpoint change:
       
           - you can identify the target phone id by path in request url.
       
-      - should return updated user entity (not only phones/address). should return aggregate.
+      - return only updated phone (not user aggregate)
     
     - (/users/{userId}/addresses) 
     
