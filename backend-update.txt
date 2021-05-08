@@ -2,16 +2,6 @@ endpoint change:
             
   - /users
     
-    - (/users/{userId}/phones) implement user phone managment endpoint (like addresses)
-    
-      - do i need customers have multiple phone numbers??
-      
-      - implement 'isSelected' (PATCH) endpoint (wihtout any request body) to switch the primary phone numbers (need to make the previous primary phone flase if there is a new primary)
-      
-          - you can identify the target phone id by path in request url.
-      
-      - return only updated phone (not user aggregate)
-    
     - (/users/{userId}/addresses) 
     
       - (PATCH) for both shipping/billing selection update 
