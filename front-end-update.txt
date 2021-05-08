@@ -15,3 +15,5 @@
 - (testing) admin endpoints request testing (products, orders, categories, customers, and so on)
 
 - (implementation) add product variant to cart request
+
+- (fix) phone and address endpoint return its entity itself (not aggregate so fix this)
