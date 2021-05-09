@@ -307,6 +307,8 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
 
       /**
        * update auth
+       *
+       *  - should return all phones since isSelected prop is updated for each phone
        **/
       const updatedUser = data.data;
       dispatch(authActions.update({

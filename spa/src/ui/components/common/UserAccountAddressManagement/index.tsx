@@ -350,7 +350,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
     api.request({
       method: 'PATCH',
       url: API1_URL + `/users/${auth.user.userId}/addresses/${nextBillingAddress}`,
-      data: JSON.stringify({ isBilling: true })
+      data: JSON.stringify({ type: "billing" })
     }).then((data) => {
 
       /**
@@ -379,7 +379,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
     api.request({
       method: 'PATCH',
       url: API1_URL + `/users/${auth.user.userId}/addresses/${nextShippingAddress}`,
-      data: JSON.stringify({ isShipping: true })
+      data: JSON.stringify({ type: "shipping" })
     }).then((data) => {
 
       /**

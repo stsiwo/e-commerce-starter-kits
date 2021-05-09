@@ -23,6 +23,21 @@ export declare type UserAddressType = {
   isShippingAddress: boolean
 }
 
+export declare type AdminCompanyType = {
+  companyId: string
+  companyName: string
+  description: string
+  email: string
+  phoneNumber: string
+  countryCode: string
+  address1: string
+  address2: string
+  city: string
+  province: string
+  country: string
+  postalCode: string
+}
+
 export declare type UserType = {
   userId?: string
   firstName: string
@@ -35,6 +50,7 @@ export declare type UserType = {
   reviews: ReviewType[]
   orders: OrderType[]
   cartItems: CartItemType[]
+  companies?: AdminCompanyType[]
 }
 
 // empty
