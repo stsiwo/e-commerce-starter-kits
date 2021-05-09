@@ -21,11 +21,6 @@ endpoint change:
       
       - (DELETE): the admin delete a specific order event (only the last event)
     
-
-  - /contacts
-  
-    - create contact form endpoint
-
   - domain calculated values:
     - e.g., cheapest price of the product, avg review points and so on
     
