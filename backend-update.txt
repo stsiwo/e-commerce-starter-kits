@@ -6,21 +6,6 @@ endpoint change:
       
       - handle temporary signup (e.g., without verification of email), normal user (e.g., after verfication of email), and blacklist (e.g., the admin disable user account)
     
-  - /orders
-  
-    - (GET): all orders
-    - (GET BY ID): a specific order
-    - (POST): create a new order
-    - (PUT): replace with the same id
-    
-  - /orders/{orderId}/events
-  
-    - create this endpoint (POST, DELETE)
-      
-      - (POST): the admin/customer add an order event
-      
-      - (DELETE): the admin delete a specific order event (only the last event)
-    
   - domain calculated values:
     - e.g., cheapest price of the product, avg review points and so on
     
