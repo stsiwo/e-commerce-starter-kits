@@ -19,6 +19,11 @@ FROM init as integ
 WORKDIR /
 # copy initial sql script to the directory in this image
 # NOTE: the scripts under the directory are executed in the alphabetic order!!!
-COPY ./integ-test-data.sql /docker-entrypoint-initdb.d/b.sql
+COPY ./integ-test-user-data.sql /docker-entrypoint-initdb.d/b.sql
+COPY ./integ-test-category-data.sql /docker-entrypoint-initdb.d/c.sql
+COPY ./integ-test-product-data.sql /docker-entrypoint-initdb.d/d.sql
+COPY ./integ-test-cart-item-data.sql /docker-entrypoint-initdb.d/e.sql
+COPY ./integ-test-wishlist-item-data.sql /docker-entrypoint-initdb.d/f.sql
+COPY ./integ-test-order-data.sql /docker-entrypoint-initdb.d/g.sql
 
 
