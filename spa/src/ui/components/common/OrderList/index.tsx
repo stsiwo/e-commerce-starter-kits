@@ -116,6 +116,12 @@ const OrderList: React.FunctionComponent<{}> = (props) => {
     dispatch(orderPaginationPageActions.update(nextPage))
   };
 
+  /**
+   * TODO: only get this member's order list (not all orders)
+   *
+   *  - fix this.
+   *
+   **/
   // api request every time query/page changes
   React.useEffect(() => {
     dispatch(fetchOrderActionCreator())
