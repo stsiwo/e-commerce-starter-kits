@@ -1,5 +1,5 @@
 endpoint change:
-            
+  
   - /users
     
     - create user status column
@@ -11,11 +11,15 @@ endpoint change:
     
     - create a property of DTO for each domain calculated values so that you don't need to calculate this at front-end again.
     
-  - customer review logic review & flow checking
-   
-  - create test data for integration & staging
+  - /reviews
   
-  - forget password flow implementation
+    - customer review logic review & flow checking
+   
+  - (TEST) create test data for integration & staging
+  
+  - /forget-password 
+  
+    forget password flow implementation
   
     - impl endpoint
     - create mail template
