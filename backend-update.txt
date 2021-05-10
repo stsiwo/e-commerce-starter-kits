@@ -22,6 +22,10 @@ endpoint change:
     - temp access url 
  
   - (minor) orderSpecification: status filter.
+  
+  - email verification flow implementation 
+  
+    - need to verify its email.
 
 ## Stripe
 
