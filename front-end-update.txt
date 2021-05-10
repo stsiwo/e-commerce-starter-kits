@@ -14,6 +14,24 @@
 
 - (testing) admin endpoints request testing (products, orders, categories, customers, and so on)
 
-- (implementation) add product variant to cart request
+- (implementation) add product variant to cart request ??? what is it?
 
 - (fix) phone and address endpoint return its entity itself (not aggregate so fix this)
+
+- (fix) product/variant/category admin form update
+
+  - better to use dialog rather than drawer.
+  
+    - product: 
+    
+      - add multiple images upload form
+      
+    - variant: 
+    
+      - make it beautiful
+      
+    - category:
+    
+      - make it beautiful.
+
+ - (implementation) login page (member/admin) login request and add response to redux store.
