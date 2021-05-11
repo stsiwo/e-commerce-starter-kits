@@ -2,7 +2,6 @@ import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import MenuItem from '@material-ui/core/MenuItem';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -144,10 +143,6 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
     <Dialog open={props.open} onClose={props.onClose} aria-labelledby="order-event-update-dialog">
       <DialogTitle id="order-event-update-dialog-title">Subscribe</DialogTitle>
       <DialogContent>
-        <DialogContentText>
-          To subscribe to this website, please enter your email address here. We will send updates
-          occasionally.
-        </DialogContentText>
         <form className={classes.form} noValidate autoComplete="off">
           <TextField
             id="order-event-order-status"

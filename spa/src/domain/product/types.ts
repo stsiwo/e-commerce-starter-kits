@@ -11,7 +11,7 @@ export declare type CategoryType = {
 export declare type NormalizedCategoryType = NormalizedDomainType<CategoryType>
 
 export declare type ProductImageType = {
-  productImageId: string
+  productImageId?: string
   productImagePath: string
 }
 
@@ -59,7 +59,8 @@ export declare type ProductType = {
   note: string
   createdAt: Date
   updatedAt: Date
-  productImages: ProductImageType[]
+  productImageFiles?: File[] // to upload file in product form
+  productImages?: ProductImageType[] // to display teh image at client side
   variants?: ProductVariantType[]
 }
 
@@ -160,6 +161,8 @@ export declare type ProductDataType = {
   category: CategoryType
   releaseDate: Date
   note: string
+  productImageFiles?: File[]
+  productImages?: ProductImageType[]
   productVariants?: ProductVariantDataType[]
 }
 
@@ -167,6 +170,8 @@ export const defaultProductData: ProductDataType = {
   productName: "",
   productDescription: "",
   productPath: "",
+  productImageFiles: Array(5).fill(null),
+  productImages: Array(5).fill(null),
   productBaseUnitPrice: 0,
   productBaseDiscountPrice: 0,
   productBaseDiscountStartDate: new Date(),
@@ -185,6 +190,8 @@ export const defaultProductOnlyData: ProductDataType = {
   productName: "",
   productDescription: "",
   productPath: "",
+  productImageFiles: Array(5).fill(null),
+  productImages: Array(5).fill(null),
   productBaseUnitPrice: 0,
   productBaseDiscountPrice: 0,
   productBaseDiscountStartDate: new Date(),

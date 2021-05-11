@@ -15,6 +15,7 @@ import { DataGrid, GridCellParams, GridColDef, GridRowsProp } from '@material-ui
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import EditIcon from '@material-ui/icons/Edit';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import Pagination from '@material-ui/lab/Pagination/Pagination';
 import { AxiosError } from 'axios';
 import { api } from 'configs/axiosConfig';
 import { ProductType } from 'domain/product/types';
@@ -24,8 +25,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link as RRLink } from "react-router-dom";
 import { fetchProductActionCreator, productPaginationPageActions } from 'reducers/slices/domain/product';
 import { mSelector } from 'src/selectors/selector';
-import AdminProductFormDrawer from '../AdminProductFormDrawer';
-import Pagination from '@material-ui/lab/Pagination/Pagination';
+import AdminProductFormDialog from '../AdminProductFormDialog';
 
 declare type AdminProductGridViewPropsType = {
 }
@@ -245,7 +245,7 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
       <CardActions disableSpacing>
       </CardActions>
       {/** update/create product (without its variants) **/}
-      <AdminProductFormDrawer
+      <AdminProductFormDialog
         curFormOpen={curFormOpen}
         setFormOpen={setFormOpen}
         curProduct={curProduct}

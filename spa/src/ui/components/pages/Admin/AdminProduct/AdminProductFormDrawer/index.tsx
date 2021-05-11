@@ -59,10 +59,6 @@ const AdminProductFormDrawer: React.FunctionComponent<AdminProductFormDrawerProp
     props.setFormOpen(nextOpen);
   }
 
-  const handleNavToggleClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    props.setFormOpen(!props.curFormOpen);
-  }
-
   // render function
 
   // render nav items

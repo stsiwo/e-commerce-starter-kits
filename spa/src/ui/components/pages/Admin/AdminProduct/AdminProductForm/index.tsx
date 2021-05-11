@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchCategoryActionCreator } from 'reducers/slices/domain/category';
 import { fetchProductActionCreator } from 'reducers/slices/domain/product';
 import { mSelector } from 'src/selectors/selector';
+import ProductImagesForm from './ProductImagesForm';
 
 interface AdminProductFormPropsType {
   product: ProductType
@@ -85,11 +86,11 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  *    - 6. display result popup message
  **/
-const AdminProductForm: React.FunctionComponent<AdminProductFormPropsType> = (props) => {
+const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props, ref) => {
 
   // mui: makeStyles
   const classes = useStyles();
-  
+
   // auth
   const auth = useSelector(mSelector.makeAuthSelector())
 
@@ -123,7 +124,7 @@ const AdminProductForm: React.FunctionComponent<AdminProductFormPropsType> = (pr
 
   // category if not store in redux store
   React.useEffect(() => {
-    dispatch(fetchCategoryActionCreator()); 
+    dispatch(fetchCategoryActionCreator());
   }, [])
 
   // event handlers
@@ -215,57 +216,92 @@ const AdminProductForm: React.FunctionComponent<AdminProductFormPropsType> = (pr
     }));
   }
 
+  // product image state update
+  const updateProductImage = (file: File, path: string, index: number) => {
 
-  // event handler to submit
-  const handleProductSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
-
-    const isValid: boolean = isValidSync(curProductState)
-
-    console.log(isValid);
-
-    if (isValid) {
-
-      // pass 
-      console.log("passed")
-      if (isNew) {
-        console.log("new product creation")
-        // request
-        api.request({
-          method: 'POST',
-          url: API1_URL + `/products`,
-          data: JSON.stringify(curProductState),
-        }).then((data) => {
-
-          // fetch again
-          dispatch(fetchProductActionCreator())
-
-          enqueueSnackbar("updated successfully.", { variant: "success" })
-        }).catch((error: AxiosError) => {
-          enqueueSnackbar(error.message, { variant: "error" })
-        })
-
-      } else {
-        console.log("new product creation")
-        // request
-        api.request({
-          method: 'PUT',
-          url: API1_URL + `/products/${curProductState.productId}`,
-          data: JSON.stringify(curProductState),
-        }).then((data) => {
-
-          // fetch again
-          dispatch(fetchProductActionCreator())
-
-          enqueueSnackbar("updated successfully.", { variant: "success" })
-        }).catch((error: AxiosError) => {
-          enqueueSnackbar(error.message, { variant: "error" })
-        })
+    setProductState((prev: ProductDataType) => {
+      prev.productImageFiles[index] = file
+      prev.productImages[index] = {
+        productImagePath: path
       }
-    } else {
-      console.log("failed")
-      updateAllValidation()
-    }
+      return {
+        ...prev
+      };
+    })
   }
+
+  const removeProductImage = (index: number) => {
+    setProductState((prev: ProductDataType) => {
+      prev.productImageFiles[index] = null
+      prev.productImages[index] = {
+        ...prev.productImages[index],
+        productImagePath: "",
+      }
+      return {
+        ...prev
+      };
+    })
+  }
+
+  /**
+   * call child function from parent 
+   *
+   * ref: https://stackoverflow.com/questions/37949981/call-child-method-from-parent
+   *
+   **/
+  React.useImperativeHandle(ref, () => ({
+
+    // event handler to submit
+    handleSaveClickEvent(e: React.MouseEvent<HTMLButtonElement>) {
+
+      const isValid: boolean = isValidSync(curProductState)
+
+      console.log(isValid);
+
+      if (isValid) {
+
+        // pass 
+        console.log("passed")
+        if (isNew) {
+          console.log("new product creation")
+          // request
+          api.request({
+            method: 'POST',
+            url: API1_URL + `/products`,
+            data: JSON.stringify(curProductState),
+          }).then((data) => {
+
+            // fetch again
+            dispatch(fetchProductActionCreator())
+
+            enqueueSnackbar("updated successfully.", { variant: "success" })
+          }).catch((error: AxiosError) => {
+            enqueueSnackbar(error.message, { variant: "error" })
+          })
+
+        } else {
+          console.log("new product creation")
+          // request
+          api.request({
+            method: 'PUT',
+            url: API1_URL + `/products/${curProductState.productId}`,
+            data: JSON.stringify(curProductState),
+          }).then((data) => {
+
+            // fetch again
+            dispatch(fetchProductActionCreator())
+
+            enqueueSnackbar("updated successfully.", { variant: "success" })
+          }).catch((error: AxiosError) => {
+            enqueueSnackbar(error.message, { variant: "error" })
+          })
+        }
+      } else {
+        console.log("failed")
+        updateAllValidation()
+      }
+    }
+  }));
 
   return (
     <form className={classes.form} noValidate autoComplete="off">
@@ -358,6 +394,19 @@ const AdminProductForm: React.FunctionComponent<AdminProductFormPropsType> = (pr
           startAdornment: <InputAdornment position="start">$</InputAdornment>,
         }}
       /><br />
+      {/** images **/}
+      <Typography variant="subtitle1" component="h6" align="left" className={classes.subtitle}>
+        Images
+      </Typography>
+      <Typography variant="body2" component="p" color="textSecondary" align="left" className={classes.subtitle}>
+       You can upload up to 5 images and the first image is used as primary one.  
+      </Typography>
+      <ProductImagesForm 
+        productImages={curProductState.productImages}  
+        productImageFiles={curProductState.productImageFiles} 
+        onUpdate={updateProductImage}
+        onRemove={removeProductImage}
+      />
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <KeyboardDatePicker
           margin="normal"
@@ -397,14 +446,9 @@ const AdminProductForm: React.FunctionComponent<AdminProductFormPropsType> = (pr
         helperText={curProductValidationState.note}
         error={curProductValidationState.note !== ""}
       />
-      <Box component="div" className={classes.actionBox}>
-        <Button onClick={handleProductSaveClickEvent}>
-          Save
-        </Button>
-      </Box>
     </form>
   )
-}
+});
 
 export default AdminProductForm
 
