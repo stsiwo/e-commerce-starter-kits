@@ -11,6 +11,13 @@ import { adminLoginSchema } from 'hooks/validation/rules';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
 import { Link as RRLink } from "react-router-dom";
+import { api } from 'configs/axiosConfig';
+import { generateObjectFormData } from 'src/utils';
+import { UserType } from 'domain/user/types';
+import { useDispatch } from 'react-redux';
+import { useSnackbar } from 'notistack';
+import { authActions } from 'reducers/slices/app';
+import { AxiosError } from 'axios';
 
 
 export declare type AdminLoginDataType = {
@@ -69,6 +76,13 @@ const useStyles = makeStyles((theme: Theme) =>
 const AdminLogin: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
+  
+  // dispatch
+  const dispatch = useDispatch();
+
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
 
   // temp user account state
   const [curAdminLoginState, setAdminLoginState] = React.useState<AdminLoginDataType>(defaultAdminLoginData);
@@ -110,10 +124,22 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
     if (isValid) {
       // pass 
       console.log("passed")
-      /**
-       * TODO:
-       * POST /authenticates
-       **/
+      // request
+      api.request({
+        method: 'POST',
+        url: API1_URL + `/authenticate`,
+        data: generateObjectFormData(curAdminLoginState),
+      }).then((data) => {
+        /**
+         *  add new phone
+         **/
+        const loggedInUser: UserType = data.data;
+        dispatch(authActions.loginWithUser(loggedInUser))
+
+        enqueueSnackbar("added successfully.", { variant: "success" })
+      }).catch((error: AxiosError) => {
+        enqueueSnackbar(error.message, { variant: "error" })
+      })
 
     } else {
       updateAllValidation()

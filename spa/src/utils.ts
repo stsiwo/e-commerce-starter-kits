@@ -371,7 +371,7 @@ export function getNanoId(): string {
  *
  * - ref: https://gist.github.com/ghinda/8442a57f22099bdb2e34
  **/
-export function generateObjectFormData(input: any, namespace: string): FormData {
+export function generateObjectFormData(input: any, namespace?: string): FormData {
 
   const fd = new FormData();
   let formKey;

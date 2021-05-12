@@ -1,6 +1,6 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RequestTrackerType, AuthType, UserTypeEnum, FetchStatusEnum } from "src/app";
-import { defaultUser, UserPhoneType, UserAddressType } from "domain/user/types";
+import { defaultUser, UserPhoneType, UserAddressType, UserType } from "domain/user/types";
 
 /**
  * common reducer action type
@@ -33,6 +33,13 @@ export const authSlice = createSlice({
      *
      **/
     login: (state: AuthType, action: authUpdateActionType) => action.payload,
+    loginWithUser: (state: AuthType,  action: PayloadAction<UserType>) => {
+      return {
+        isLoggedIn: true,
+        userType: action.payload.userType,
+        user: action.payload,
+      }
+    },
     update: (state: AuthType, action: authUpdateActionType) => action.payload,
     logout: (state: AuthType) => ({
       isLoggedIn: false,
