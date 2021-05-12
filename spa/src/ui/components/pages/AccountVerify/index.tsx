@@ -179,7 +179,7 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
             {"verified your account successfully."}
           </Typography>
           <Button>
-            {"visit Home"}
+            {"Visit Home"}
           </Button>
         </Box>
       )}

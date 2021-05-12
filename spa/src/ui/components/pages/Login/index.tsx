@@ -18,6 +18,7 @@ import { authActions } from 'reducers/slices/app';
 import { useDispatch } from 'react-redux';
 import { useSnackbar } from 'notistack';
 import { AxiosError } from 'axios';
+import useHistory from "react-router-dom";
 
 export declare type MemberLoginDataType = {
   email: string
@@ -81,6 +82,13 @@ const Login: React.FunctionComponent<{}> = (props) => {
   // usage: 'enqueueSnackbar("message", { variant: "error" };
   const { enqueueSnackbar } = useSnackbar();
 
+  // redirect to original url after user login stuff.
+  
+  //const location = useLocation()
+  // this might not need to implement since you can use history.back() after sucess login
+  //const [curPrevUrl, setPrevUrl] = React.useState<string>("");
+
+
   // temp user account state
   const [curMemberLoginState, setMemberLoginState] = React.useState<MemberLoginDataType>(defaultMemberLoginData);
 
@@ -93,6 +101,18 @@ const Login: React.FunctionComponent<{}> = (props) => {
     schema: memberLoginSchema,
     setValidationDomain: setMemberLoginValidationState
   })
+
+  // redirect to original url after user login stuff.
+  // - store if previous path exist
+  // this might not need to implement since you can use history.back() after sucess login
+  //React.useEffect(() => {
+  //  if (location.state && (location.state as { from: { pathname: string }}).from.pathname) {
+  //    console.log("previous path exist")
+  //    const prevUrl = (location.state as { from: { pathname: string }}).from.pathname
+  //    console.log(prevUrl)
+  //    setPrevUrl(prevUrl);
+  //  }
+  //}, [])
 
   // event handlers
   const handleEmailInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
@@ -128,10 +148,13 @@ const Login: React.FunctionComponent<{}> = (props) => {
         data: generateObjectFormData(curMemberLoginState),
       }).then((data) => {
         /**
-         *  add new phone
+         * login success
          **/
         const loggedInUser: UserType = data.data;
         dispatch(authActions.loginWithUser(loggedInUser))
+
+        // make sure this work.
+        history.back();
 
         enqueueSnackbar("added successfully.", { variant: "success" })
       }).catch((error: AxiosError) => {
