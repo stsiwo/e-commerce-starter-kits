@@ -93,7 +93,7 @@ function useQuery() {
  *
  *    - 6. display result popup message
  **/
-const AdminProductVariantForm: React.FunctionComponent<AdminProductVariantFormPropsType> = (props) => {
+const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPropsType>((props, ref) => {
 
   // mui: makeStyles
   const classes = useStyles();
@@ -155,7 +155,7 @@ const AdminProductVariantForm: React.FunctionComponent<AdminProductVariantFormPr
 
   // event handlers
   const handleProductVariantStockInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextVariantStock = e.currentTarget.value 
+    const nextVariantStock = e.currentTarget.value
     // must not be null
     updateValidationAt("variantStock", e.currentTarget.value);
     setProductVariantState((prev: ProductVariantDataType) => ({
@@ -195,61 +195,69 @@ const AdminProductVariantForm: React.FunctionComponent<AdminProductVariantFormPr
     }));
   };
 
+  /**
+   * call child function from parent 
+   *
+   * ref: https://stackoverflow.com/questions/37949981/call-child-method-from-parent
+   *
+   **/
+  React.useImperativeHandle(ref, () => ({
 
-  // event handler to submit
-  const handleProductSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
+    // event handler to submit
+    handleSaveClickEvent: (e: React.MouseEvent<HTMLButtonElement>) => {
 
-    const isValid: boolean = isValidSync(curProductVariantState)
+      const isValid: boolean = isValidSync(curProductVariantState)
 
-    console.log(isValid);
+      console.log(isValid);
 
-    if (isValid) {
-      // pass 
-      console.log("passed")
+      if (isValid) {
+        // pass 
+        console.log("passed")
 
-      if (isNew) {
-        console.log("new product creation")
-        // request
-        api.request({
-          method: 'POST',
-          url: API1_URL + `/products/${targetProductId}/variants`,
-          data: JSON.stringify(curProductVariantState),
-        }).then((data) => {
+        if (isNew) {
+          console.log("new product creation")
+          // request
+          api.request({
+            method: 'POST',
+            url: API1_URL + `/products/${targetProductId}/variants`,
+            data: JSON.stringify(curProductVariantState),
+          }).then((data) => {
 
-          const newVariant = data.data;
+            const newVariant = data.data;
 
-          // add this new one to redux store
-          dispatch(productActions.appendVariant(newVariant))
+            // add this new one to redux store
+            dispatch(productActions.appendVariant(newVariant))
 
-          enqueueSnackbar("updated successfully.", { variant: "success" })
-        }).catch((error: AxiosError) => {
-          enqueueSnackbar(error.message, { variant: "error" })
-        })
+            enqueueSnackbar("updated successfully.", { variant: "success" })
+          }).catch((error: AxiosError) => {
+            enqueueSnackbar(error.message, { variant: "error" })
+          })
 
+        } else {
+          console.log("new product creation")
+          // request
+          api.request({
+            method: 'PUT',
+            url: API1_URL + `/products/${targetProductId}/variants/${curProductVariantState.variantId}`,
+            data: JSON.stringify(curProductVariantState),
+          }).then((data) => {
+
+            const updatedVariant = data.data;
+
+            // fetch again
+            dispatch(productActions.updateVariant(updatedVariant))
+
+            enqueueSnackbar("updated successfully.", { variant: "success" })
+          }).catch((error: AxiosError) => {
+            enqueueSnackbar(error.message, { variant: "error" })
+          })
+        }
       } else {
-        console.log("new product creation")
-        // request
-        api.request({
-          method: 'PUT',
-          url: API1_URL + `/products/${targetProductId}/variants/${curProductVariantState.variantId}`,
-          data: JSON.stringify(curProductVariantState),
-        }).then((data) => {
-
-          const updatedVariant = data.data;
-
-          // fetch again
-          dispatch(productActions.updateVariant(updatedVariant))
-
-          enqueueSnackbar("updated successfully.", { variant: "success" })
-        }).catch((error: AxiosError) => {
-          enqueueSnackbar(error.message, { variant: "error" })
-        })
+        console.log("failed")
+        updateAllValidation()
       }
-    } else {
-      console.log("failed")
-      updateAllValidation()
     }
-  }
+  }))
 
   return (
     <form className={classes.form} noValidate autoComplete="off">
@@ -339,13 +347,8 @@ const AdminProductVariantForm: React.FunctionComponent<AdminProductVariantFormPr
           className={classes.productDateInput}
         />
       </MuiPickersUtilsProvider>
-      <Box component="div" className={classes.actionBox}>
-        <Button onClick={handleProductSaveClickEvent}>
-          Save
-        </Button>
-      </Box>
     </form>
   )
-}
+})
 
 export default AdminProductVariantForm

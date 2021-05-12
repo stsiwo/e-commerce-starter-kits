@@ -26,6 +26,7 @@ import Button from '@material-ui/core/Button';
 import { useLocation } from 'react-router';
 import { productActions } from 'reducers/slices/domain/product';
 import AdminProductVariantFormDrawer from '../AdminProductVariantDrawer';
+import AdminProductVariantFormDialog from '../AdminProductVariantFormDialog';
 
 declare type AdminProductVariantGridViewPropsType = {
   curFormOpen: boolean
@@ -222,10 +223,10 @@ const AdminProductVariantGridView: React.FunctionComponent<AdminProductVariantGr
       <CardActions disableSpacing>
       </CardActions>
       {/** create/update varaints **/}
-      <AdminProductVariantFormDrawer 
+      <AdminProductVariantFormDialog 
         curFormOpen={props.curFormOpen} 
         setFormOpen={props.setFormOpen} 
-        productVariant={curProductVariant}
+        curProductVariant={curProductVariant}
       />
       {/** onDelete confiramtion dialog **/}
       <Dialog
