@@ -80,7 +80,7 @@ const AdminProductFormDialog: React.FunctionComponent<AdminProductFormDialogProp
         <Button onClick={toggleDialog(false)} color="primary">
           Cancel
         </Button>
-        <Button onClick={() => childRef.current.handleFormSaveClick} color="primary">
+        <Button onClick={(e) => childRef.current.handleSaveClickEvent(e)} color="primary">
           Save
         </Button>
       </DialogActions>

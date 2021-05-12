@@ -209,6 +209,7 @@ export declare type ProductValidationDataType = {
   productName: string
   productDescription: string
   productPath: string
+  productImageFiles: string 
   productBaseUnitPrice: string
   productBaseDiscountPrice?: string
   productBaseDiscountStartDate?: string
@@ -225,6 +226,7 @@ export const defaultProductValidationData: ProductValidationDataType = {
   productName: "",
   productDescription: "",
   productPath: "",
+  productImageFiles: "", 
   productBaseUnitPrice: "",
   productBaseDiscountPrice: "",
   productBaseDiscountStartDate: "",

@@ -76,6 +76,21 @@ export const productSchema = yup.object().shape({
   productName: yup.string().required(),
   productDescription: yup.string().required(),
   productPath: yup.string().required(),
+  productImageFiles: yup.array().test(
+    'has-first-element', 
+    'the primary product image (1st image) is required.',
+    /** 
+     * ref: https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object 
+     * - the first file object exists and not empty object
+     **/
+    (value) => {
+      console.log("product images")
+      console.log(value)
+      console.log("result")
+      console.log(value[0] != null && Object.keys(value[0]).length === 0 && value[0].constructor === Object)
+      return value[0] != null
+    }
+  ),
   productBaseUnitPrice: yup.string().required(),
   productBaseDiscountPrice: yup.string().required(),
   productBaseDiscountStartDate: yup.string().required(),

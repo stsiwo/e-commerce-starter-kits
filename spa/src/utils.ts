@@ -294,6 +294,8 @@ export const asyncForEach = async (array: any[], callback: (...args: any[]) => a
 /**
  * empty a value of all properties of a nested object
  *
+ * NOTE: this makes array empty string, so if you have need to go into elements in the array and make it empty, you need to fix this.
+ *
  **/
 export const emptyNestedObject: (obj: Record<string, any>) => Record<string, any> = (obj) => {
   Object.keys(obj).forEach((key: string) => {
@@ -301,6 +303,8 @@ export const emptyNestedObject: (obj: Record<string, any>) => Record<string, any
     if (
       obj[key] &&  // prevent 'cannot convert undefined / null to object error
       Object.prototype.toString.call(obj[key]) !== '[object Date]' && // check current value is date object 
+      // check if it is array if so go to 'else'
+      !Array.isArray(obj[key]) &&
       typeof obj[key] === 'object' // for nested object
     ) {
       emptyNestedObject(obj[key])
@@ -356,6 +360,41 @@ export function iterateObjectRecursively(obj: Record<string, any>, callback: (ke
  *
  **/
 export function getNanoId(): string {
- return nanoid();
+  return nanoid();
 }
 
+
+/**
+ * formData generator
+ *
+ * - need to test
+ *
+ * - ref: https://gist.github.com/ghinda/8442a57f22099bdb2e34
+ **/
+export function generateObjectFormData(input: any, namespace: string): FormData {
+
+  const fd = new FormData();
+  let formKey;
+  for (let property in input) {
+    if (input.hasOwnProperty(property)) {
+      if (namespace) {
+        formKey = namespace + "[" + property + "]";
+      } else {
+        formKey = property;
+      }
+      if (
+        typeof input[property] === "object" &&
+        !(input[property] instanceof File) &&
+        input[property] !== null
+      ) {
+        this.objectToFormData(input[property], fd, property);
+      } else {
+        if (input[property] !== false) {
+          fd.append(formKey, input[property]);
+        }
+      }
+    }
+  }
+  return fd;
+
+}

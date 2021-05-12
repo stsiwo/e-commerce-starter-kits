@@ -21,6 +21,8 @@ import { fetchCategoryActionCreator } from 'reducers/slices/domain/category';
 import { fetchProductActionCreator } from 'reducers/slices/domain/product';
 import { mSelector } from 'src/selectors/selector';
 import ProductImagesForm from './ProductImagesForm';
+import cloneDeep from 'lodash/cloneDeep';
+import { generateObjectFormData } from 'src/utils';
 
 interface AdminProductFormPropsType {
   product: ProductType
@@ -35,6 +37,10 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(1, 0),
       fontWeight: theme.typography.fontWeightBold
     },
+    errorMsg: {
+      color: theme.palette.error.main,
+      fontSize: theme.typography.subtitle2.fontSize,
+    },
     txtFieldBase: {
       width: "80%",
       margin: theme.spacing(1, 0, 1, 0),
@@ -45,6 +51,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     productDescriptionInput: {
       minWidth: 300,
+      width: "100%",
+      margin: theme.spacing(1, 0, 1, 0),
     },
     productPathInput: {
       maxWidth: 600,
@@ -63,6 +71,11 @@ const useStyles = makeStyles((theme: Theme) =>
       minWidth: 200,
     },
     productDateInput: {
+    },
+    productNoteInput: {
+      minWidth: 300,
+      width: "100%",
+      margin: theme.spacing(1, 0, 1, 0),
     },
     actionBox: {
     },
@@ -219,28 +232,25 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
   // product image state update
   const updateProductImage = (file: File, path: string, index: number) => {
 
-    setProductState((prev: ProductDataType) => {
-      prev.productImageFiles[index] = file
-      prev.productImages[index] = {
-        productImagePath: path
-      }
-      return {
-        ...prev
-      };
-    })
+    const nextState = cloneDeep(curProductState)
+    nextState.productImageFiles[index] = file
+    nextState.productImages[index] = {
+      productImagePath: path
+    }
+
+    updateValidationAt("productImageFiles", nextState.productImageFiles);
+    setProductState(nextState)
   }
 
   const removeProductImage = (index: number) => {
-    setProductState((prev: ProductDataType) => {
-      prev.productImageFiles[index] = null
-      prev.productImages[index] = {
-        ...prev.productImages[index],
-        productImagePath: "",
-      }
-      return {
-        ...prev
-      };
-    })
+
+    const nextState = cloneDeep(curProductState)
+    nextState.productImageFiles[index] = null
+    nextState.productImages[index] = {
+      productImagePath: "",
+    }
+    updateValidationAt("productImageFiles", nextState.productImageFiles);
+    setProductState(nextState)
   }
 
   /**
@@ -252,11 +262,29 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
   React.useImperativeHandle(ref, () => ({
 
     // event handler to submit
-    handleSaveClickEvent(e: React.MouseEvent<HTMLButtonElement>) {
+    handleSaveClickEvent: (e: React.MouseEvent<HTMLButtonElement>) => {
 
       const isValid: boolean = isValidSync(curProductState)
 
       console.log(isValid);
+
+      /**
+       * product images uploading logic.
+       *
+       * - productImages: an object include image public path to the image.
+       *
+       *  - this does not used as request body. even if it is included in the request body, it is not processed at backend.
+       *
+       * - productImageFiles: File[]
+       *
+       *  - this is used to upload the iamges to the api.
+       *
+       *  - need validation.
+       *
+       *  - this is processed at the backend to store the image and generate public path.
+       *
+       *
+       **/
 
       if (isValid) {
 
@@ -268,7 +296,8 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
           api.request({
             method: 'POST',
             url: API1_URL + `/products`,
-            data: JSON.stringify(curProductState),
+            // make sure 'generateObjectFormData' works correctly.
+            data: generateObjectFormData(curProductState, "product"),
           }).then((data) => {
 
             // fetch again
@@ -307,7 +336,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
     <form className={classes.form} noValidate autoComplete="off">
       <TextField
         id="product-name"
-        label="Product Name"
+        label="Name"
         className={`${classes.txtFieldBase} ${classes.productNameInput}`}
         value={curProductState.productName}
         onChange={handleProductNameInputChangeEvent}
@@ -316,10 +345,10 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
       />
       <TextField
         id="product-description"
-        label="Product Description"
+        label="Description"
         multiline
-        rows={2}
-        className={`${classes.txtFieldBase}`}
+        rows={4}
+        className={`${classes.productDescriptionInput}`}
         value={curProductState.productDescription}
         onChange={handleProductDescriptionInputChangeEvent}
         helperText={curProductValidationState.productDescription}
@@ -350,6 +379,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
           </MenuItem>
         ))}
       </TextField>
+      {/** Base **/}
       <Typography variant="subtitle1" component="h6" align="left" className={classes.subtitle}>
         Base
       </Typography>
@@ -358,7 +388,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
       </Typography>
       <TextField
         id="product-base-unit-price"
-        label="Product Base Unit Price"
+        label="Unit Price"
         type="number"
         className={`${classes.txtFieldBase} ${classes.productPriceInput}`}
         value={curProductState.productBaseUnitPrice}
@@ -369,6 +399,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
           startAdornment: <InputAdornment position="start">$</InputAdornment>,
         }}
       /><br />
+      {/** isDiscount **/}
       <FormControlLabel
         control={
           <Checkbox
@@ -382,7 +413,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
       /><br />
       <TextField
         id="product-base-discount-price"
-        label="Product Base Discount Price"
+        label="Discount Price"
         type="number"
         className={`${classes.txtFieldBase} ${classes.productPriceInput}`}
         value={curProductState.productBaseDiscountPrice}
@@ -394,24 +425,11 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
           startAdornment: <InputAdornment position="start">$</InputAdornment>,
         }}
       /><br />
-      {/** images **/}
-      <Typography variant="subtitle1" component="h6" align="left" className={classes.subtitle}>
-        Images
-      </Typography>
-      <Typography variant="body2" component="p" color="textSecondary" align="left" className={classes.subtitle}>
-       You can upload up to 5 images and the first image is used as primary one.  
-      </Typography>
-      <ProductImagesForm 
-        productImages={curProductState.productImages}  
-        productImageFiles={curProductState.productImageFiles} 
-        onUpdate={updateProductImage}
-        onRemove={removeProductImage}
-      />
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <KeyboardDatePicker
           margin="normal"
           id="product-base-discount-start-date"
-          label="Base Discount Start Date"
+          label="Discount Start Date"
           format="MM/dd/yyyy"
           value={curProductState.productBaseDiscountStartDate}
           onChange={handleProductBaseDiscountStartDateChange}
@@ -424,7 +442,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
         <KeyboardDatePicker
           margin="normal"
           id="product-base-discount-end-date"
-          label="Base Discount End Date"
+          label="Discount End Date"
           format="MM/dd/yyyy"
           disabled={!curProductState.isDiscount}
           value={curProductState.productBaseDiscountEndDate}
@@ -435,12 +453,29 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
           className={classes.productDateInput}
         />
       </MuiPickersUtilsProvider>
+      {/** images **/}
+      <Typography variant="subtitle1" component="h6" align="left" className={classes.subtitle}>
+        Images
+      </Typography>
+      <Typography variant="body2" component="p" color="textSecondary" align="left" className={classes.subtitle}>
+        You can upload up to 5 images and the first image is used as primary one.
+      </Typography>
+      <Box className={classes.errorMsg}>
+        {curProductValidationState.productImageFiles}
+      </Box>
+      <ProductImagesForm
+        productImages={curProductState.productImages}
+        productImageFiles={curProductState.productImageFiles}
+        onUpdate={updateProductImage}
+        onRemove={removeProductImage}
+      />
+      {/** note **/}
       <TextField
         id="product-note"
         label="Product Note"
         multiline
-        rows={4}
-        className={`${classes.txtFieldBase}`}
+        rows={8}
+        className={`${classes.productNoteInput}`}
         value={curProductState.note}
         onChange={handleProductNoteInputChangeEvent}
         helperText={curProductValidationState.note}
