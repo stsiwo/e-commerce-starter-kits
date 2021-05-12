@@ -15,6 +15,7 @@ import { mSelector } from 'src/selectors/selector';
 
 interface AdminCategoryFormPropsType {
   category: CategoryType
+  ref: React.MutableRefObject<any>
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -31,14 +32,17 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(1, 0, 1, 0),
     },
     nameInput: {
-      minWidth: 300,
+      minWidth: 280,
       maxWidth: 600,
     },
     descriptionInput: {
+      minWidth: 280,
+      width: "100%",
+      margin: theme.spacing(1, 0, 1, 0),
     },
     pathInput: {
       maxWidth: 600,
-      minWidth: 300,
+      minWidth: 280,
     },
     productDateInput: {
     },
@@ -64,11 +68,11 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  *    - 6. display result popup message
  **/
-const AdminCategoryForm: React.FunctionComponent<AdminCategoryFormPropsType> = (props) => {
+const AdminCategoryForm = React.forwardRef<any, AdminCategoryFormPropsType>((props, ref) => {
 
   // mui: makeStyles
   const classes = useStyles();
-  
+
   // auth
   const auth = useSelector(mSelector.makeAuthSelector())
 
@@ -126,62 +130,71 @@ const AdminCategoryForm: React.FunctionComponent<AdminCategoryFormPropsType> = (
   }
 
 
+  /**
+   * call child function from parent 
+   *
+   * ref: https://stackoverflow.com/questions/37949981/call-child-method-from-parent
+   *
+   **/
+  React.useImperativeHandle(ref, () => ({
 
-  // event handler to submit
-  const handleProductSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
+    // event handler to submit
+    handleSaveClickEvent: (e: React.MouseEvent<HTMLButtonElement>) => {
 
-    const isValid: boolean = isValidSync(curCategoryState)
+      const isValid: boolean = isValidSync(curCategoryState)
 
-    console.log(isValid);
+      console.log(isValid);
 
-    if (isValid) {
-      // pass 
-      console.log("passed")
-      if (isNew) {
-        console.log("new category creation")
-        // request
-        api.request({
-          method: 'POST',
-          url: API1_URL + `/categories`,
-          data: JSON.stringify(curCategoryState),
-        }).then((data) => {
+      if (isValid) {
+        // pass 
+        console.log("passed")
+        if (isNew) {
+          console.log("new category creation")
+          // request
+          api.request({
+            method: 'POST',
+            url: API1_URL + `/categories`,
+            data: JSON.stringify(curCategoryState),
+          }).then((data) => {
 
-          // fetch again
-          dispatch(fetchCategoryActionCreator())
+            // fetch again
+            dispatch(fetchCategoryActionCreator())
 
-          enqueueSnackbar("updated successfully.", { variant: "success" })
-        }).catch((error: AxiosError) => {
-          enqueueSnackbar(error.message, { variant: "error" })
-        })
+            enqueueSnackbar("updated successfully.", { variant: "success" })
+          }).catch((error: AxiosError) => {
+            enqueueSnackbar(error.message, { variant: "error" })
+          })
 
+        } else {
+          console.log("update category")
+          // request
+          api.request({
+            method: 'PUT',
+            url: API1_URL + `/categories/${curCategoryState.categoryId}`,
+            data: JSON.stringify(curCategoryState),
+          }).then((data) => {
+
+            // fetch again
+            dispatch(fetchCategoryActionCreator())
+
+            enqueueSnackbar("updated successfully.", { variant: "success" })
+          }).catch((error: AxiosError) => {
+            enqueueSnackbar(error.message, { variant: "error" })
+          })
+        }
       } else {
-        console.log("update category")
-        // request
-        api.request({
-          method: 'PUT',
-          url: API1_URL + `/categories/${curCategoryState.categoryId}`,
-          data: JSON.stringify(curCategoryState),
-        }).then((data) => {
-
-          // fetch again
-          dispatch(fetchCategoryActionCreator())
-
-          enqueueSnackbar("updated successfully.", { variant: "success" })
-        }).catch((error: AxiosError) => {
-          enqueueSnackbar(error.message, { variant: "error" })
-        })
+        console.log("failed")
+        updateAllValidation()
       }
-    } else {
-      console.log("failed")
-      updateAllValidation()
     }
-  }
+
+  }))
 
   return (
     <form className={classes.form} noValidate autoComplete="off">
       <TextField
         id="category-name"
-        label="Category Name"
+        label="Name"
         className={`${classes.txtFieldBase}`}
         value={curCategoryState.categoryName}
         onChange={handleCategoryNameInputChangeEvent}
@@ -190,10 +203,10 @@ const AdminCategoryForm: React.FunctionComponent<AdminCategoryFormPropsType> = (
       />
       <TextField
         id="category-description"
-        label="Category Description"
+        label="Description"
         multiline
         rows={4}
-        className={`${classes.txtFieldBase} ${classes.descriptionInput}`}
+        className={`${classes.descriptionInput}`}
         value={curCategoryState.categoryDescription}
         onChange={handleCategoryDescriptionInputChangeEvent}
         helperText={curCategoryValidationState.categoryDescription}
@@ -201,20 +214,15 @@ const AdminCategoryForm: React.FunctionComponent<AdminCategoryFormPropsType> = (
       />
       <TextField
         id="category-path"
-        label="Category Path"
+        label="Path"
         className={`${classes.txtFieldBase}`}
         value={curCategoryState.categoryPath}
         onChange={handleCategoryPathInputChangeEvent}
         helperText={curCategoryValidationState.categoryPath}
         error={curCategoryValidationState.categoryPath !== ""}
       />
-      <Box component="div" className={classes.actionBox}>
-        <Button onClick={handleProductSaveClickEvent}>
-          Save
-        </Button>
-      </Box>
     </form>
   )
-}
+})
 
 export default AdminCategoryForm

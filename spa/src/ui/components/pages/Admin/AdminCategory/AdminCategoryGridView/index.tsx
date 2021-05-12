@@ -24,6 +24,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { categoryPaginationPageActions, fetchCategoryActionCreator } from 'reducers/slices/domain/category';
 import { mSelector } from 'src/selectors/selector';
 import AdminCategoryFormDrawer from '../AdminCategoryFormDrawer';
+import AdminCategoryFormDialog from '../AdminCategoryFormDialog';
 
 declare type AdminCategoryGridViewPropsType = {
 }
@@ -219,7 +220,7 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
       <CardActions disableSpacing>
       </CardActions>
       {/** update/create category (without its variants) **/}
-      <AdminCategoryFormDrawer
+      <AdminCategoryFormDialog
         curFormOpen={curFormOpen}
         setFormOpen={setFormOpen}
         category={curCategory}
