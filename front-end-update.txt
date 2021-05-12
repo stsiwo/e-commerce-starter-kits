@@ -26,8 +26,6 @@
 
 - (implementation) add product variant to cart request ??? what is it?
 
-- (fix) phone and address endpoint return its entity itself (not aggregate so fix this)
-
  - (implementation) login page (member/admin) login request and add response to redux store.
  
  - (fix) add caption or small explanation on input (esp path). it must be unique.
