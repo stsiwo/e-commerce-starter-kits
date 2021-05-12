@@ -66,7 +66,7 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  *    - 6. display result popup message
  **/
-const AdminReviewForm: React.FunctionComponent<AdminReviewFormPropsType> = (props) => {
+const AdminReviewForm = React.forwardRef<any, AdminReviewFormPropsType>((props, ref) => {
 
   // mui: makeStyles
   const classes = useStyles();
@@ -130,39 +130,44 @@ const AdminReviewForm: React.FunctionComponent<AdminReviewFormPropsType> = (prop
     }));
   }
 
-  // event handler to submit
-  const handleProductSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
+  /**
+   * call child function from parent 
+   *
+   * ref: https://stackoverflow.com/questions/37949981/call-child-method-from-parent
+   *
+   **/
+  React.useImperativeHandle(ref, () => ({
 
-    const isValid: boolean = isValidSync(curReviewState)
+    // event handler to submit
+    handleSaveClickEvent: (e: React.MouseEvent<HTMLButtonElement>) => {
+      const isValid: boolean = isValidSync(curReviewState)
 
-    console.log(isValid);
+      console.log(isValid);
 
-    if (isValid) {
-      // pass 
-      console.log("passed")
-      console.log("update review")
-      // request
-      api.request({
-        method: 'PUT',
-        url: API1_URL + `/reviews/${curReviewState.reviewId}`,
-        data: JSON.stringify(curReviewState),
-      }).then((data) => {
+      if (isValid) {
+        // pass 
+        console.log("passed")
+        console.log("update review")
+        // request
+        api.request({
+          method: 'PUT',
+          url: API1_URL + `/reviews/${curReviewState.reviewId}`,
+          data: JSON.stringify(curReviewState),
+        }).then((data) => {
 
-        // fetch again
-        dispatch(fetchReviewActionCreator())
+          // fetch again
+          dispatch(fetchReviewActionCreator())
 
-        enqueueSnackbar("updated successfully.", { variant: "success" })
-      }).catch((error: AxiosError) => {
-        enqueueSnackbar(error.message, { variant: "error" })
-      })
-    } else {
-      console.log("failed")
-      updateAllValidation()
+          enqueueSnackbar("updated successfully.", { variant: "success" })
+        }).catch((error: AxiosError) => {
+          enqueueSnackbar(error.message, { variant: "error" })
+        })
+      } else {
+        console.log("failed")
+        updateAllValidation()
+      }
     }
-  }
-
-  // target test product
-  const testProduct = generateProductList(1)[0]
+  }))
 
   return (
     <Grid
@@ -187,7 +192,7 @@ const AdminReviewForm: React.FunctionComponent<AdminReviewFormPropsType> = (prop
         <Typography variant="subtitle1" component="h6" className={classes.title}>
           {"Reviewed Product"}
         </Typography>
-        <ProductHorizontalCard product={testProduct} variant={testProduct.variants[0]} />
+        <ProductHorizontalCard product={props.review.product} variant={props.review.product.variants[0]} />
       </Grid>
       <Grid
         item
@@ -237,16 +242,11 @@ const AdminReviewForm: React.FunctionComponent<AdminReviewFormPropsType> = (prop
             className={`${classes.txtFieldBase}`}
             label="Verified"
           /><br />
-          <Box component="div" className={classes.actionBox}>
-            <Button onClick={handleProductSaveClickEvent}>
-              Save
-            </Button>
-          </Box>
         </form>
       </Grid>
     </Grid>
   )
-}
+})
 
 export default AdminReviewForm
 

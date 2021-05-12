@@ -16,6 +16,7 @@ import { fetchReviewActionCreator, reviewPaginationPageActions } from 'reducers/
 import { mSelector } from 'src/selectors/selector';
 import AdminReviewFormDrawer from '../AdminReviewFormDrawer';
 import { ReviewType } from 'domain/review/type';
+import AdminReviewFormDialog from '../AdminReviewFormDialog';
 
 declare type AdminReviewGridViewPropsType = {
 }
@@ -173,7 +174,7 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
       <CardActions disableSpacing>
       </CardActions>
       {/** update/create review (without its variants) **/}
-      <AdminReviewFormDrawer
+      <AdminReviewFormDialog
         curFormOpen={curFormOpen}
         setFormOpen={setFormOpen}
         review={curReview}
