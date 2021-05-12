@@ -46,17 +46,17 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(1, 0, 1, 0),
     },
     productNameInput: {
-      minWidth: 300,
+      minWidth: 280,
       maxWidth: 600,
     },
     productDescriptionInput: {
-      minWidth: 300,
+      minWidth: 280,
       width: "100%",
       margin: theme.spacing(1, 0, 1, 0),
     },
     productPathInput: {
       maxWidth: 600,
-      minWidth: 300,
+      minWidth: 280,
     },
     productPriceInput: {
       maxWidth: 200,
@@ -73,7 +73,7 @@ const useStyles = makeStyles((theme: Theme) =>
     productDateInput: {
     },
     productNoteInput: {
-      minWidth: 300,
+      minWidth: 280,
       width: "100%",
       margin: theme.spacing(1, 0, 1, 0),
     },

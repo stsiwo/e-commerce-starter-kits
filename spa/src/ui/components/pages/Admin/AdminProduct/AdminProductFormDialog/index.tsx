@@ -7,6 +7,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 declare type AdminProductFormDialogPropsType = {
   curFormOpen: boolean
@@ -27,6 +28,9 @@ const useStyles = makeStyles((theme: Theme) =>
     dialogPaper: {
       width: 240,
     },
+    dialogContentRoot: {
+      padding: theme.spacing(1),
+    },
     toolbar: theme.mixins.toolbar,
     title: {
       textTransform: "uppercase",
@@ -46,6 +50,7 @@ const AdminProductFormDialog: React.FunctionComponent<AdminProductFormDialogProp
   // used to switch 'permanent' or 'temporary' nav menu based on this screen size 
   const theme = useTheme();
   const classes = useStyles();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const toggleDialog = (nextOpen: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
 
@@ -71,9 +76,11 @@ const AdminProductFormDialog: React.FunctionComponent<AdminProductFormDialogProp
 
   // render nav items
   return (
-    <Dialog open={props.curFormOpen} onClose={toggleDialog(false)} aria-labelledby="admin-product-form-dialog">
+    <Dialog fullScreen={fullScreen} open={props.curFormOpen} onClose={toggleDialog(false)} aria-labelledby="admin-product-form-dialog">
       <DialogTitle id="admin-product-form-dialog-title">Product Form</DialogTitle>
-      <DialogContent>
+      <DialogContent classes={{
+        root: classes.dialogContentRoot,
+      }}>
         <AdminProductForm product={props.curProduct} ref={childRef}/>
       </DialogContent>
       <DialogActions>
