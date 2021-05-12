@@ -251,13 +251,11 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
           data: JSON.stringify(curUserAccountAddressState),
         }).then((data) => {
           /**
-           * update auth
+           *  add new address
            **/
-          const updatedUser = data.data;
-          dispatch(authActions.update({
-            ...auth,
-            user: updatedUser,
-          }))
+          const addedAddress: UserAddressType = data.data;
+          dispatch(authActions.appendAddress(addedAddress))
+
           enqueueSnackbar("added successfully.", { variant: "success" })
         }).catch((error: AxiosError) => {
           enqueueSnackbar(error.message, { variant: "error" })
@@ -271,13 +269,11 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
           data: JSON.stringify(curUserAccountAddressState),
         }).then((data) => {
           /**
-           * update auth
+           *  update address
            **/
-          const updatedUser = data.data;
-          dispatch(authActions.update({
-            ...auth,
-            user: updatedUser,
-          }))
+          const updatedAddress: UserAddressType = data.data;
+          dispatch(authActions.updateAddress(updatedAddress))
+
           enqueueSnackbar("updated successfully.", { variant: "success" })
         }).catch((error: AxiosError) => {
           enqueueSnackbar(error.message, { variant: "error" })
@@ -296,7 +292,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
     setModalOpen(true);
   }
 
-  // delete an existing phone number
+  // delete an existing address number
   const handleDeleteAddressClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
     console.log("delete an existing address event triggered")
 
@@ -307,15 +303,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
       url: API1_URL + `/users/${auth.user.userId}/addresses/${addressId}`
     }).then((data) => {
 
-      /**
-       * update auth
-       **/
-      const updatedUser = data.data;
-      dispatch(authActions.update({
-        ...auth,
-        user: updatedUser,
-      }))
-
+      dispatch(authActions.deleteAddress({ addressId: addressId }))
       enqueueSnackbar("deleted successfully.", { variant: "success" })
     }).catch((error: AxiosError) => {
       enqueueSnackbar(error.message, { variant: "error" })
@@ -356,11 +344,8 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
       /**
        * update auth
        **/
-      const updatedUser = data.data;
-      dispatch(authActions.update({
-        ...auth,
-        user: updatedUser,
-      }))
+      const updatedAddress = data.data;
+      dispatch(authActions.switchBillingAddress(updatedAddress))
 
       enqueueSnackbar("updated successfully.", { variant: "success" })
     }).catch((error: AxiosError) => {
@@ -385,11 +370,8 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
       /**
        * update auth
        **/
-      const updatedUser = data.data;
-      dispatch(authActions.update({
-        ...auth,
-        user: updatedUser,
-      }))
+      const updatedAddress = data.data;
+      dispatch(authActions.switchShippingAddress(updatedAddress))
 
       enqueueSnackbar("updated successfully.", { variant: "success" })
     }).catch((error: AxiosError) => {
@@ -399,7 +381,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   }
   // render functions
 
-  // display current phone number list
+  // display current address number list
   const renderCurAddressListComponent: () => React.ReactNode = () => {
 
     return auth.user.addresses.map((address: UserAddressType) => {
@@ -456,7 +438,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
     })
   }
 
-  // display popup modal to add new phone number
+  // display popup modal to add new address number
 
   return (
     <React.Fragment>

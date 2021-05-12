@@ -331,17 +331,13 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
     })
 
     console.log("this one is to update shipping address")
-    /**
-     * TODO:
-     * PUT /users/{userId}/addresses/{addressId} to update one 
-     **/
     if (auth.userType === UserTypeEnum.MEMBER) {
 
       // request
       api.request({
-        method: 'PUT',
+        method: 'PATCH',
         url: API1_URL + `/users/${auth.user.userId}/addresses/${targetAddressId}`,
-        data: JSON.stringify(merge({}, targetAddress, { isShippingAddress: true })), // 
+        data: JSON.stringify(merge({}, targetAddress, { type: "shipping" })), // 
       }).then((data) => {
         /**
          * update auth
@@ -372,17 +368,13 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
     })
 
     console.log("this one is to update billing address")
-    /**
-     * TODO:
-     * PUT /users/{userId}/addresses/{addressId} to update one 
-     **/
     if (auth.userType === UserTypeEnum.MEMBER) {
 
       // request
       api.request({
-        method: 'PUT',
+        method: 'PATCH',
         url: API1_URL + `/users/${auth.user.userId}/addresses/${targetAddressId}`,
-        data: JSON.stringify(merge({}, targetAddress, { isBillingAddress: true })), // 
+        data: JSON.stringify(merge({}, targetAddress, { type: "billing" })), // 
       }).then((data) => {
         /**
          * update auth

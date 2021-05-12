@@ -257,9 +257,6 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
   // delete an existing phone number
   const handleDeletePhoneClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
     console.log("delete an existing phone number event triggered")
-    /**
-     * TODO: DELETE /users/{userId}/phones/{phoneId}
-     **/
     if (auth.userType === UserTypeEnum.MEMBER) {
 
       // request

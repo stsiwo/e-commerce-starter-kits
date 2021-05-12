@@ -190,13 +190,11 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
           data: bodyFormData,
         }).then((data) => {
           /**
-           * update auth
+           *  add new phone
            **/
-          const updatedUser = data.data;
-          dispatch(authActions.update({
-            ...auth,
-            user: updatedUser,
-          }))
+          const addedPhone: UserPhoneType = data.data;
+          dispatch(authActions.appendPhone(addedPhone))
+
           enqueueSnackbar("added successfully.", { variant: "success" })
         }).catch((error: AxiosError) => {
           enqueueSnackbar(error.message, { variant: "error" })
@@ -211,13 +209,11 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
           data: bodyFormData,
         }).then((data) => {
           /**
-           * update auth
+           *  update phone
            **/
-          const updatedUser = data.data;
-          dispatch(authActions.update({
-            ...auth,
-            user: updatedUser,
-          }))
+          const updatedPhone: UserPhoneType = data.data;
+          dispatch(authActions.updatePhone(updatedPhone))
+
           enqueueSnackbar("updated successfully.", { variant: "success" })
         }).catch((error: AxiosError) => {
           enqueueSnackbar(error.message, { variant: "error" })
@@ -262,15 +258,7 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
       url: API1_URL + `/users/${auth.user.userId}/phones/${phoneId}`
     }).then((data) => {
 
-      /**
-       * update auth
-       **/
-      const updatedUser = data.data;
-      dispatch(authActions.update({
-        ...auth,
-        user: updatedUser,
-      }))
-
+      dispatch(authActions.deletePhone({ phoneId: phoneId }))
       enqueueSnackbar("deleted successfully.", { variant: "success" })
     }).catch((error: AxiosError) => {
       enqueueSnackbar(error.message, { variant: "error" })
@@ -306,15 +294,10 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
     }).then((data) => {
 
       /**
-       * update auth
-       *
-       *  - should return all phones since isSelected prop is updated for each phone
+       *  update phone
        **/
-      const updatedUser = data.data;
-      dispatch(authActions.update({
-        ...auth,
-        user: updatedUser,
-      }))
+      const updatedPhone: UserPhoneType = data.data;
+      dispatch(authActions.updatePhone(updatedPhone))
 
       enqueueSnackbar("updated successfully.", { variant: "success" })
     }).catch((error: AxiosError) => {
@@ -339,10 +322,10 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
             secondary={phone.countryCode}
           />
           <ListItemSecondaryAction>
-            <FormControlLabel 
-              value={phone.phoneId} 
-              control={<Radio />} 
-              label={(curPrimary == phone.phoneId) ? "primary" : ""} 
+            <FormControlLabel
+              value={phone.phoneId}
+              control={<Radio />}
+              label={(curPrimary == phone.phoneId) ? "primary" : ""}
             />
             <IconButton edge="end" aria-label="delete" data-phone-id={phone.phoneId} onClick={handleDeletePhoneClickEvent}>
               <DeleteIcon />
@@ -367,10 +350,10 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
           </Typography>
         )}
         {(auth.user.phones.length > 0 &&
-          <RadioGroup 
-            defaultValue={curPrimary} 
-            aria-label="phone" 
-            name="user-phone-radio" 
+          <RadioGroup
+            defaultValue={curPrimary}
+            aria-label="phone"
+            name="user-phone-radio"
             onChange={handlePhonePrimaryChange}
           >
             <List className={classes.listBox}>
