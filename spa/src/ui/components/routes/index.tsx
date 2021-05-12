@@ -22,6 +22,7 @@ import { withAdminBasePage } from 'ui/hoc/withAdminBasePage';
 import { withBasePage } from 'ui/hoc/withBasePage';
 import Contact from 'components/pages/Contact';
 import Order from 'components/pages/Order';
+import AccountVerify from 'components/pages/AccountVerify';
 
 // route data
 export declare type RouteDataType = {
@@ -50,6 +51,10 @@ export const routesData: RoutesDataType = {
       url: "/signup",
       component: withBasePage(Signup),
     },
+    {
+      url: "/account-verify",
+      component: withBasePage(AccountVerify),
+    },
   ],
   // define member only page
   [UserTypeEnum.MEMBER]: [
@@ -64,6 +69,10 @@ export const routesData: RoutesDataType = {
     {
       url: "/orders",
       component: withBasePage(Order),
+    },
+    {
+      url: "/account-verify",
+      component: withBasePage(AccountVerify),
     },
   ],
   // define admin only page
