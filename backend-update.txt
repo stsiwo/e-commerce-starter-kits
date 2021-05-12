@@ -30,6 +30,18 @@ endpoint change:
   - email verification flow implementation 
   
     - need to verify its email.
+    
+  - /products (POST)
+  
+    - include multiple image upload logic
+    
+      - client send POST request with data form which is mixed usual data with multiple files.
+      
+      - the backend responsibilities:
+      
+        - store the images 
+        - generate the public path
+        - save that as ProductImage entity in db.
 
 ## Stripe
 
