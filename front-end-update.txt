@@ -1,3 +1,5 @@
+- (IMPL) login/signup logic
+
 - (IMPL) add contact page
   
   - recapcha for security
@@ -10,6 +12,14 @@
 
   - esp when the guest user purchases.
   
+    - if the guest user decide to signup, we need to save cart items to the backend.
+    
+    - flow
+    
+      1. the guest user signup
+      2. if succeeded, also send POST request to cartItem endpoint to create the guest user's cart info.
+      3. get the user back to the checkout page.
+  
 - (IMPL) verification email flow.
 
 - (testing) admin endpoints request testing (products, orders, categories, customers, and so on)
@@ -18,22 +28,8 @@
 
 - (fix) phone and address endpoint return its entity itself (not aggregate so fix this)
 
-- (fix) product/variant/category admin form update
-
-  - better to use dialog rather than drawer.
-  
-    - product: 
-    
-      - add multiple images upload form
-      
-    - variant: 
-    
-      - make it beautiful
-      
-    - category:
-    
-      - make it beautiful.
-
  - (implementation) login page (member/admin) login request and add response to redux store.
  
  - (fix) add caption or small explanation on input (esp path). it must be unique.
+ 
+ - (implementation) add logo image upload at admin 
