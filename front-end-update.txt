@@ -1,5 +1,3 @@
-- (IMPL) login/signup logic
-
 - (IMPL) add contact page
   
   - recapcha for security
@@ -20,14 +18,10 @@
       2. if succeeded, also send POST request to cartItem endpoint to create the guest user's cart info.
       3. get the user back to the checkout page.
   
-- (IMPL) verification email flow.
-
 - (testing) admin endpoints request testing (products, orders, categories, customers, and so on)
 
 - (implementation) add product variant to cart request ??? what is it?
 
- - (implementation) login page (member/admin) login request and add response to redux store.
- 
  - (fix) add caption or small explanation on input (esp path). it must be unique.
  
  - (implementation) add logo image upload at admin 
