@@ -23,6 +23,7 @@ import { withBasePage } from 'ui/hoc/withBasePage';
 import Contact from 'components/pages/Contact';
 import Order from 'components/pages/Order';
 import AccountVerify from 'components/pages/AccountVerify';
+import ResetPassword from 'components/pages/ResetPassword';
 
 // route data
 export declare type RouteDataType = {
@@ -54,6 +55,10 @@ export const routesData: RoutesDataType = {
     {
       url: "/account-verify",
       component: withBasePage(AccountVerify),
+    },
+    {
+      url: "/reset-password",
+      component: withBasePage(ResetPassword),
     },
   ],
   // define member only page

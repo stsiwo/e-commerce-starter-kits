@@ -3,22 +3,21 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import SentimentSatisfiedOutlinedIcon from '@material-ui/icons/SentimentSatisfiedOutlined';
-import * as React from 'react';
-import { Link as RRLink } from "react-router-dom";
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+import { AxiosError } from 'axios';
+import ForgotPasswordDialog from 'components/common/ForgotPasswordDialog';
+import { api } from 'configs/axiosConfig';
+import { UserType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { memberLoginSchema } from 'hooks/validation/rules';
-import { api } from 'configs/axiosConfig';
-import { generateObjectFormData } from 'src/utils';
-import { UserType } from 'domain/user/types';
-import { authActions } from 'reducers/slices/app';
-import { useDispatch } from 'react-redux';
 import { useSnackbar } from 'notistack';
-import { AxiosError } from 'axios';
-import useHistory from "react-router-dom";
+import * as React from 'react';
+import { useDispatch } from 'react-redux';
+import { authActions } from 'reducers/slices/app';
+import { generateObjectFormData } from 'src/utils';
 
 export declare type MemberLoginDataType = {
   email: string
@@ -68,6 +67,9 @@ const useStyles = makeStyles((theme: Theme) =>
       textAlign: "center",
       margin: theme.spacing(2, 0, 2, 0),
     },
+    cursorLink: {
+      cursor: "pointer",
+    }
   }),
 );
 
@@ -81,6 +83,9 @@ const Login: React.FunctionComponent<{}> = (props) => {
   // snackbar notification
   // usage: 'enqueueSnackbar("message", { variant: "error" };
   const { enqueueSnackbar } = useSnackbar();
+
+  // forgot password dialog
+  const [curForgotPasswordDialogOpen, setForgotPasswordDialogOpen] = React.useState<boolean>(false);
 
   // redirect to original url after user login stuff.
   
@@ -131,6 +136,11 @@ const Login: React.FunctionComponent<{}> = (props) => {
       ...prev,
       password: nextPassword
     }));
+  }
+
+  // event handler for forgot password link click
+  const handleForgotPasswordClick: React.EventHandler<React.MouseEvent<HTMLAnchorElement>> = (e) => {
+    setForgotPasswordDialogOpen(true);
   }
 
   // event handler to submit
@@ -200,7 +210,7 @@ const Login: React.FunctionComponent<{}> = (props) => {
         />
         <Box component="div" className={classes.forgetPasswordBox} >
           <Typography variant="body2" component="p">
-            <Link href="/member/forget-password" component={props => <RRLink {...props} to="/" />}>
+            <Link onClick={handleForgotPasswordClick} className={classes.cursorLink}>
               forget your password?
             </Link>
           </Typography>
@@ -211,6 +221,10 @@ const Login: React.FunctionComponent<{}> = (props) => {
           </Button>
         </Box>
       </form>
+      <ForgotPasswordDialog 
+        curFormOpen={curForgotPasswordDialogOpen}  
+        setFormOpen={setForgotPasswordDialogOpen}
+      />
     </Grid>
   )
 }

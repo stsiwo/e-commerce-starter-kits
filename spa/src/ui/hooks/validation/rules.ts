@@ -143,3 +143,14 @@ export const companySchema = yup.object().shape({
   postalCode: yup.string().required(),
 })
 
+// forgot password 
+export const forgotPasswordSchema = yup.object().shape({
+  email: yup.string().required().email(),
+})
+
+// reset password
+export const resetPasswordSchema = yup.object().shape({
+  password: yup.string().required(),
+  confirm: yup.string().required().oneOf([yup.ref('password'), null], "password must match")
+})
+

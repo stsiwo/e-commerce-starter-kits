@@ -1,18 +1,17 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import * as React from 'react';
-import { useLocation } from 'react-router';
-import { api } from 'configs/axiosConfig';
-import { UserPhoneType } from 'domain/user/types';
-import SentimentSatisfiedOutlinedIcon from '@material-ui/icons/SentimentSatisfiedOutlined';
-import { AxiosError } from 'axios';
-import { useDispatch } from 'react-redux';
-import { useSnackbar } from 'notistack';
 import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
+import SentimentSatisfiedOutlinedIcon from '@material-ui/icons/SentimentSatisfiedOutlined';
+import { AxiosError } from 'axios';
+import { api } from 'configs/axiosConfig';
+import { useSnackbar } from 'notistack';
+import * as React from 'react';
+import { useDispatch } from 'react-redux';
+import { useLocation } from 'react-router';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -130,6 +129,10 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
          *  verification sueceeded.
          **/
         setStatus(AccountVerifyStatusEnum.SUCCEEDED)
+
+        /**
+         * TODO: return updated user so dispatch an action to update auth.user
+         **/
         enqueueSnackbar("verified successfully.", { variant: "success" })
       }).catch((error: AxiosError) => {
 
