@@ -1,11 +1,6 @@
 endpoint change:
   
-  - /users
-    
-    - create user status column
-      
-      - handle temporary signup (e.g., without verification of email), normal user (e.g., after verfication of email), and blacklist (e.g., the admin disable user account)
-    
+  
   - domain calculated values:
     - e.g., cheapest price of the product, avg review points and so on
     
@@ -17,20 +12,8 @@ endpoint change:
    
   - (TEST) create test data for integration & staging
   
-  - /forget-password 
-  
-    forget password flow implementation
-  
-    - impl endpoint
-    - create mail template
-    - temp access url 
- 
   - (minor) orderSpecification: status filter.
   
-  - email verification flow implementation 
-  
-    - need to verify its email.
-    
   - /products (POST)
   
     - include multiple image upload logic
