@@ -22,7 +22,7 @@ import { fetchProductActionCreator } from 'reducers/slices/domain/product';
 import { mSelector } from 'src/selectors/selector';
 import ProductImagesForm from './ProductImagesForm';
 import cloneDeep from 'lodash/cloneDeep';
-import { generateObjectFormData } from 'src/utils';
+import { generateObjectFormData, renameFile } from 'src/utils';
 
 interface AdminProductFormPropsType {
   product: ProductType
@@ -233,10 +233,11 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
   const updateProductImage = (file: File, path: string, index: number) => {
 
     const nextState = cloneDeep(curProductState)
+    renameFile(file, curProductState.productImages[index].productImageName)
     nextState.productImageFiles[index] = file
-    nextState.productImages[index] = {
-      productImagePath: path
-    }
+    nextState.productImages[index].productImagePath = path
+    nextState.productImages[index].isChange = true
+
 
     updateValidationAt("productImageFiles", nextState.productImageFiles);
     setProductState(nextState)
@@ -246,9 +247,9 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
 
     const nextState = cloneDeep(curProductState)
     nextState.productImageFiles[index] = null
-    nextState.productImages[index] = {
-      productImagePath: "",
-    }
+    nextState.productImages[index].productImagePath = ""
+    nextState.productImages[index].isChange = true
+
     updateValidationAt("productImageFiles", nextState.productImageFiles);
     setProductState(nextState)
   }
@@ -314,7 +315,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
           api.request({
             method: 'PUT',
             url: API1_URL + `/products/${curProductState.productId}`,
-            data: JSON.stringify(curProductState),
+            data: generateObjectFormData(curProductState),
           }).then((data) => {
 
             // fetch again

@@ -398,3 +398,14 @@ export function generateObjectFormData(input: any, namespace?: string): FormData
   return fd;
 
 }
+
+/**
+ * rename file
+ **/
+export function renameFile(file: File, newName: string): void {
+  Object.defineProperty(file, 'name', {
+  writable: true,
+  value: newName,
+});
+
+}
