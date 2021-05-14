@@ -12,17 +12,11 @@ endpoint change:
   
   - (minor) orderSpecification: status filter.
   
-  - /products (POST)
+  - (testing)
   
-    - include multiple image upload logic
+    - domain event
+    - POST product (esp multiple ifles)
     
-      - client send POST request with data form which is mixed usual data with multiple files.
-      
-      - the backend responsibilities:
-      
-        - store the images 
-        - generate the public path
-        - save that as ProductImage entity in db.
 
 ## Stripe
 
