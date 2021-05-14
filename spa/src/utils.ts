@@ -400,12 +400,23 @@ export function generateObjectFormData(input: any, namespace?: string): FormData
 }
 
 /**
- * rename file
+ * rename file.
+ *
+ *  - assuming that newName does not include extension.
+ *
+ *  - extract the extension from the original file and append it to new file name.
  **/
 export function renameFile(file: File, newName: string): void {
   Object.defineProperty(file, 'name', {
-  writable: true,
-  value: newName,
-});
+    writable: true,
+    value: newName + "." + extractExtension(file.name),
+  });
+}
 
+/**
+ * extract file extension from a given file
+ **/
+export function extractExtension(fileName: string): string {
+  const re = /(?:\.([^.]+))?$/;
+  return re.exec(fileName)[1];
 }

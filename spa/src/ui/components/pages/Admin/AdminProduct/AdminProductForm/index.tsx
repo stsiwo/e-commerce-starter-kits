@@ -23,6 +23,7 @@ import { mSelector } from 'src/selectors/selector';
 import ProductImagesForm from './ProductImagesForm';
 import cloneDeep from 'lodash/cloneDeep';
 import { generateObjectFormData, renameFile } from 'src/utils';
+import merge from 'lodash/merge';
 
 interface AdminProductFormPropsType {
   product: ProductType
@@ -113,8 +114,12 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
 
   const dispatch = useDispatch()
 
-  // temp user account state
-  const [curProductState, setProductState] = React.useState<ProductDataType>(props.product ? props.product : defaultProductOnlyData);
+  /**
+   *
+   * need to do 'merge({}, defaultProductOnlyData, props.product)' since props.product does not include 'productImageFiles'.
+   * 
+   **/
+  const [curProductState, setProductState] = React.useState<ProductDataType>(props.product ? merge({}, defaultProductOnlyData, props.product) : defaultProductOnlyData);
 
   // update/create logic for product
   //  - true: create
