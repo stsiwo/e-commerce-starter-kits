@@ -9,6 +9,8 @@ import { ProductType } from 'domain/product/types';
 import * as React from 'react';
 import { cadCurrencyFormat } from 'src/utils';
 import SampleProduct1_1Image from 'static/sample-product-1-1.jpg';
+import CornerRibbon from '../CornerRibbon';
+import Box from '@material-ui/core/Box';
 
 declare type ProductCardV2PropsType = {
   product: ProductType
@@ -26,10 +28,15 @@ declare type ProductCardV2PropsType = {
  **/
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    box: {
+      position: "relative",
+      height: "100%",
+    },
     card: {
       height: "100%",
       display: "flex",
       flexDirection: "column",
+
     },
     actions: {
       display: "flex",
@@ -50,37 +57,36 @@ const ProductCardV2: React.FunctionComponent<ProductCardV2PropsType> = ({ produc
 
   const classes = useStyles();
 
-  /**
-   * what is difference btw <CardActionArea> and <CardActions>
-   **/
-
   return (
-    <Card className={classes.card}>
-      <CardMedia
-        className={classes.media}
-        image={(product.productImages.length > 0) ? product.productImages[0].productImagePath : SampleProduct1_1Image }
-      />
-      <CardContent>
-        <Typography variant="body2" color="textSecondary" component="p">
-          {product.category.categoryName}
-        </Typography>
-        <Typography gutterBottom variant="h6" component="h2">
-          {product.productName}
-        </Typography>
-        <Typography variant="body2" color="primary" component="p">
-          {/** 
+    <Box className={classes.box}>
+      <Card className={classes.card}>
+        <CardMedia
+          className={classes.media}
+          image={(product.productImages.length > 0) ? product.productImages[0].productImagePath : SampleProduct1_1Image}
+        />
+        <CardContent>
+          <Typography variant="body2" color="textSecondary" component="p">
+            {product.category.categoryName}
+          </Typography>
+          <Typography gutterBottom variant="h6" component="h2">
+            {product.productName}
+          </Typography>
+          <Typography variant="body2" color="primary" component="p">
+            {/** 
             TODO: need to domain function to select cheapest price via product variant 
                or you can create a property in backend DTO so that you don't need to calculate in front-end 
             **/}
-          <b>${cadCurrencyFormat(product.productBaseUnitPrice)}</b>
-        </Typography>
-      </CardContent>
-      <CardActions className={classes.actions}>
-        <Button>
-          Read More
+            <b>${cadCurrencyFormat(product.productBaseUnitPrice)}</b>
+          </Typography>
+        </CardContent>
+        <CardActions className={classes.actions}>
+          <Button>
+            Read More
         </Button>
-      </CardActions>
-    </Card>
+        </CardActions>
+      </Card>
+      <CornerRibbon text={"Discount"} />
+    </Box>
   )
 }
 
