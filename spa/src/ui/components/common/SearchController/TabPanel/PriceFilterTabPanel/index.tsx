@@ -3,13 +3,8 @@ import Slider from '@material-ui/core/Slider';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import * as React from 'react';
-import { cadCurrencyFormat } from 'src/utils';
 import { useDispatch, useSelector } from 'react-redux';
-import { productQueryMinPriceActions, productQueryMaxPriceActions } from 'reducers/slices/domain/product';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import Input from '@material-ui/core/Input';
-import InputAdornment from '@material-ui/core/InputAdornment';
+import { productQueryMaxPriceActions, productQueryMinPriceActions } from 'reducers/slices/domain/product';
 import { mSelector } from 'src/selectors/selector';
 
 //interface PriceFilterTabPanelPropsType {
@@ -31,6 +26,41 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+const marks = [
+  {
+    value: 0,
+    label: '$0',
+  },
+  {
+    value: 10,
+    label: '$10',
+  },
+  {
+    value: 20,
+    label: '$20',
+  },
+  {
+    value: 50,
+    label: '$50',
+  },
+  {
+    value: 100,
+    label: '$100',
+  },
+  {
+    value: 200,
+    label: '$200',
+  },
+  {
+    value: 300,
+    label: '$300',
+  },
+  {
+    value: 1000,
+    label: '$1,000',
+  },
+];
+
 const PriceFilterTabPanel: React.FunctionComponent<{}> = ({
 }) => {
 
@@ -39,6 +69,8 @@ const PriceFilterTabPanel: React.FunctionComponent<{}> = ({
 
   const curMinPrice = useSelector(mSelector.makeProductQueryMinPriceSelector());
   const curMaxPrice = useSelector(mSelector.makeProductQueryMaxPriceSelector());
+
+  const [curPrices, setPrices] = React.useState<number[]>([curMinPrice, curMaxPrice]);
 
   const handleMinChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextPrice = parseInt(e.currentTarget.value);
@@ -50,31 +82,51 @@ const PriceFilterTabPanel: React.FunctionComponent<{}> = ({
     dispatch(productQueryMaxPriceActions.update(nextPrice))
   }
 
+
+  function valuetext(value: number) {
+    return `$${value}`;
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, newValue: number[]) => {
+
+    let nextMinPrice;
+    let nextMaxPrice;
+
+    /** 
+     * if min value exceed the max value, switch it, and vice versa.
+     **/
+
+    if (newValue[0] <= newValue[1]) {
+      nextMinPrice = newValue[0];
+      nextMaxPrice = newValue[1];
+    } else {
+      nextMinPrice = newValue[1];
+      nextMaxPrice = newValue[0];
+    }
+
+    console.log("next min price: " + nextMinPrice)
+    console.log("next max price: " + nextMaxPrice)
+
+    dispatch(productQueryMinPriceActions.update(nextMinPrice));
+    dispatch(productQueryMaxPriceActions.update(nextMaxPrice))
+
+    setPrices([nextMinPrice, nextMaxPrice])
+  }
+
   return (
     <Box p={3}>
       <Typography id="range-slider" gutterBottom>
         Price Range
       </Typography>
-      <Box className={classes.contentBox}>
-        <FormControl className={classes.margin}>
-          <InputLabel htmlFor="standard-adornment-amount">Minimum Price</InputLabel>
-          <Input
-            id="min-price"
-            value={curMinPrice}
-            onChange={handleMinChange}
-            startAdornment={<InputAdornment position="start">$</InputAdornment>}
-          />
-        </FormControl>
-        <FormControl className={classes.margin}>
-          <InputLabel htmlFor="standard-adornment-amount">Maximum Price</InputLabel>
-          <Input
-            id="max-price"
-            value={curMaxPrice}
-            onChange={handleMaxChange}
-            startAdornment={<InputAdornment position="start">$</InputAdornment>}
-          />
-        </FormControl>
-      </Box>
+      <Slider
+        step={10}
+        value={curPrices}
+        onChange={handleChange}
+        marks={marks}
+        valueLabelDisplay="auto"
+        aria-labelledby="range-slider"
+        getAriaValueText={valuetext}
+      />
     </Box>
   )
 }
