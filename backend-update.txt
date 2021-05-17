@@ -17,6 +17,10 @@ endpoint change:
     - domain event
     - POST product (esp multiple ifles)
     
+  - /products (GET) 
+  
+    - isDiscount query does not work correctly. it return empty result even if some variants have discounts.
+    
 
 ## Stripe
 
