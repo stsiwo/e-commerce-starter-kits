@@ -172,7 +172,7 @@ export const initialState: StateType = {
       data: {},
       query: {
         searchQuery: "",
-        categoryId: "",
+        categoryId: "0",
         minPrice: null,
         maxPrice: null,
         isDiscount: null,

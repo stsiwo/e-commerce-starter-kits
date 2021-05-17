@@ -4,48 +4,50 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import * as React from 'react';
 import { cadCurrencyFormat } from 'src/utils';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { productQueryMinPriceActions, productQueryMaxPriceActions } from 'reducers/slices/domain/product';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import Input from '@material-ui/core/Input';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import { mSelector } from 'src/selectors/selector';
 
-interface PriceFilterTabPanelPropsType {
-  curMinPrice: number
-  curMaxPrice: number
-}
+//interface PriceFilterTabPanelPropsType {
+//  curMinPrice: number
+//  curMaxPrice: number
+//}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     box: {
     },
+    margin: {
+      margin: theme.spacing(1),
+    },
+    contentBox: {
+      display: "flex",
+      alignItems: "center",
+    }
   }),
 );
 
-const PriceFilterTabPanel: React.FunctionComponent<PriceFilterTabPanelPropsType> = ({
-  curMinPrice,
-  curMaxPrice
+const PriceFilterTabPanel: React.FunctionComponent<{}> = ({
 }) => {
 
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const handlePriceRangeChangeEvent = (event: any, newValue: number[]) => {
-    
-    /**
-     * left slider piont and right slider point might be swapped each other.
-     *
-     * also, dispatch only when the value changes.
-     *
-     **/
-    if (newValue[0] <= newValue[1]) {
-      if (newValue[0] != curMinPrice) dispatch(productQueryMinPriceActions.update(newValue[0])) 
-      if (newValue[1] != curMaxPrice) dispatch(productQueryMaxPriceActions.update(newValue[1])) 
-    } else {
-      if (newValue[1] != curMinPrice) dispatch(productQueryMinPriceActions.update(newValue[1])) 
-      if (newValue[0] != curMaxPrice) dispatch(productQueryMaxPriceActions.update(newValue[0])) 
-    }
-  };
+  const curMinPrice = useSelector(mSelector.makeProductQueryMinPriceSelector());
+  const curMaxPrice = useSelector(mSelector.makeProductQueryMaxPriceSelector());
 
-  const labelPrice = (value: number) => {
-    return `$${cadCurrencyFormat(value)}`;
+  const handleMinChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    const nextPrice = parseInt(e.currentTarget.value);
+    dispatch(productQueryMinPriceActions.update(nextPrice));
+  }
+
+  const handleMaxChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    const nextPrice = parseInt(e.currentTarget.value);
+    dispatch(productQueryMaxPriceActions.update(nextPrice))
   }
 
   return (
@@ -53,14 +55,26 @@ const PriceFilterTabPanel: React.FunctionComponent<PriceFilterTabPanelPropsType>
       <Typography id="range-slider" gutterBottom>
         Price Range
       </Typography>
-      <Slider
-        value={[curMinPrice, curMaxPrice]}
-        onChange={handlePriceRangeChangeEvent}
-        valueLabelDisplay="auto"
-        aria-labelledby="range-slider"
-        getAriaValueText={labelPrice}
-        max={1000}
-      />
+      <Box className={classes.contentBox}>
+        <FormControl className={classes.margin}>
+          <InputLabel htmlFor="standard-adornment-amount">Minimum Price</InputLabel>
+          <Input
+            id="min-price"
+            value={curMinPrice}
+            onChange={handleMinChange}
+            startAdornment={<InputAdornment position="start">$</InputAdornment>}
+          />
+        </FormControl>
+        <FormControl className={classes.margin}>
+          <InputLabel htmlFor="standard-adornment-amount">Maximum Price</InputLabel>
+          <Input
+            id="max-price"
+            value={curMaxPrice}
+            onChange={handleMaxChange}
+            startAdornment={<InputAdornment position="start">$</InputAdornment>}
+          />
+        </FormControl>
+      </Box>
     </Box>
   )
 }

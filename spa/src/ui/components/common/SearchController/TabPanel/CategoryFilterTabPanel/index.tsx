@@ -12,9 +12,9 @@ import { fetchCategoryWithCacheActionCreator } from 'reducers/slices/domain/cate
 import { productQueryCategoryIdActions } from 'reducers/slices/domain/product';
 import { mSelector } from 'src/selectors/selector';
 
-interface CategoryFilterTabPanelPropsType {
-  curCategoryId: string
-}
+//interface CategoryFilterTabPanelPropsType {
+//  curCategoryId: string
+//}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -23,8 +23,8 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const CategoryFilterTabPanel: React.FunctionComponent<CategoryFilterTabPanelPropsType> = ({
-  curCategoryId
+const CategoryFilterTabPanel: React.FunctionComponent<{}> = ({
+  
 }) => {
 
   const classes = useStyles();
@@ -34,9 +34,12 @@ const CategoryFilterTabPanel: React.FunctionComponent<CategoryFilterTabPanelProp
   // categories option
   const curCategoryList = useSelector(mSelector.makeCategorySelector())
 
+  // cur query category id 
+  const curCategoryId = useSelector(mSelector.makeProductQueryCategoryIdSelector())
+
   // fetch categories if not fetched before
   React.useEffect(() => {
-    dispatch(fetchCategoryWithCacheActionCreator())  
+    dispatch(fetchCategoryWithCacheActionCreator())
   }, [])
 
   // event handler change
@@ -47,29 +50,38 @@ const CategoryFilterTabPanel: React.FunctionComponent<CategoryFilterTabPanelProp
   const renderCategoryRadioInputs: () => React.ReactNode = () => {
     return curCategoryList.map((category: CategoryType) => {
       return (
-        <FormControlLabel value={category.categoryId} control={<Radio />} label={category.categoryName} key={category.categoryId}/>
+        <FormControlLabel
+          value={category.categoryId.toString()}
+          control={<Radio />}
+          label={category.categoryName}
+          key={category.categoryId}
+        />
       )
     })
   }
 
+  console.log("cur category id (query string)");
+  console.log(curCategoryId);
+
   /**
-   * TODO: RadioButton label is not checked. (internally it is working)
-   *
-   * fix this.
    *
    * bug?: https://stackoverflow.com/questions/58952742/how-can-i-control-a-radiogroup-from-material-ui
    *
    *  - 'value' should not be null/undefined at RadioGroup otherwise, it won't check even if you clicked.
    *
+   * solution: data type inconsistency 
+   *
+   *  when adding 'toString()' to 'value', it solved this problem.
+   *
+   *  - https://github.com/mui-org/material-ui/issues/16272
+   *
    **/
   return (
     <Box p={3}>
-      <FormControl component="fieldset">
-        <FormLabel component="legend">Select Category</FormLabel>
-        <RadioGroup aria-label="product-category" name="product-category-filter" value={curCategoryId} onChange={handleCategoryInputChangeEvent}>
-          {renderCategoryRadioInputs()}
-        </RadioGroup>
-      </FormControl>
+      <RadioGroup aria-label="product-category" name="product-category-filter-radio" value={curCategoryId.toString()} onChange={handleCategoryInputChangeEvent}>
+        <FormControlLabel value={"0"} control={<Radio />} label={"All"} key={"0"} />
+        {renderCategoryRadioInputs()}
+      </RadioGroup>
     </Box>
   )
 }

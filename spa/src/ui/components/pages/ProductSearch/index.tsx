@@ -7,6 +7,7 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductWithCacheActionCreator, productPaginationPageActions } from 'reducers/slices/domain/product';
 import { mSelector } from 'src/selectors/selector';
+import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

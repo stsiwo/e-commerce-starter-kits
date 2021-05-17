@@ -3,6 +3,7 @@ import Grid from '@material-ui/core/Grid';
 import { ProductType } from 'domain/product/types';
 import ProductCardV2 from '../ProductCard/ProductCardV2';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+import { Typography } from '@material-ui/core';
 
 declare type SearchResultPropsType = {
   products: ProductType[],
@@ -20,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
       overflow: "hidden",
       padding: theme.spacing(0, 1, 0, 1),
       margin: theme.spacing(3, 0, 3, 0),
-      minHeight: "100vh",
+      minHeight: "400px",
     },
     gridItem: {
       maxWidth: 200,
@@ -58,6 +59,11 @@ const SearchResult: React.FunctionComponent<SearchResultPropsType> = ({ products
       spacing={0}
       justify="center"
     >
+      {(products && products.length === 0 &&
+        <Typography variant="body1" component="p" align="center">
+          Products are not found.
+        </Typography>
+      )}
       {renderProductList()}
     </Grid>
   )

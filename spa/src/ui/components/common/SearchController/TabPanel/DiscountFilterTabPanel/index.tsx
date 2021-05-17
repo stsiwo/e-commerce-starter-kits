@@ -1,16 +1,16 @@
 import Box from '@material-ui/core/Box';
-import Slider from '@material-ui/core/Slider';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import * as React from 'react';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { productQueryIsDiscountActions } from 'reducers/slices/domain/product';
+import { mSelector } from 'src/selectors/selector';
 
-interface DiscountFilterTabPanelPropsType {
-  curDiscountCheck: boolean
-}
+//interface DiscountFilterTabPanelPropsType {
+//  curDiscountCheck: boolean
+//}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -19,11 +19,12 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const DiscountFilterTabPanel: React.FunctionComponent<DiscountFilterTabPanelPropsType> = ({
-  curDiscountCheck
+const DiscountFilterTabPanel: React.FunctionComponent<{}> = ({
 }) => {
 
   const classes = useStyles();
+
+  const curIsDiscount = useSelector(mSelector.makeProductQueryIsDiscountSelector())
 
   const dispatch = useDispatch();
   const handleDiscountCheckChangeEvent = (event: any, newValue: boolean) => {
@@ -38,7 +39,7 @@ const DiscountFilterTabPanel: React.FunctionComponent<DiscountFilterTabPanelProp
       <FormControlLabel
         control={
           <Checkbox
-            checked={curDiscountCheck}
+            checked={curIsDiscount}
             onChange={handleDiscountCheckChangeEvent}
             name="checkedB"
             color="primary"

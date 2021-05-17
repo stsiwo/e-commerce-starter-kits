@@ -62,6 +62,10 @@ export function generateQueryString(target: { [key: string]: any }): string {
     if (target[key]) {
       if (isDateObject(target[key])) {
         queryString += key + "=" + (target[key] as Date).toISOString() + "&"
+      } else if (key == "categoryId" && target[key] == 0) {
+        /**
+         * if category=0 (e.g., all category), we not gonna append this query string.
+         **/
       } else {
         queryString += key + "=" + target[key] + "&"
       }

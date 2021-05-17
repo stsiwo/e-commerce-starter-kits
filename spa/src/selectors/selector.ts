@@ -50,6 +50,15 @@ export const rsSelector = {
     getOrderPagination: (state: StateType) => state.domain.orders.pagination,
     getProduct: (state: StateType) => state.domain.products.data,
     getProductQuery: (state: StateType) => state.domain.products.query,
+    getProductQuerySearchQuery: (state: StateType) => state.domain.products.query.searchQuery,
+    getProductQueryCategoryId: (state: StateType) => state.domain.products.query.categoryId,
+    getProductQueryMinPrice: (state: StateType) => state.domain.products.query.minPrice,
+    getProductQueryMaxPrice: (state: StateType) => state.domain.products.query.maxPrice,
+    getProductQueryStartDate: (state: StateType) => state.domain.products.query.startDate,
+    getProductQueryEndDate: (state: StateType) => state.domain.products.query.endDate,
+    getProductQueryIsDiscount: (state: StateType) => state.domain.products.query.isDiscount,
+    getProductQueryReviewPoint: (state: StateType) => state.domain.products.query.reviewPoint,
+    getProductQuerySort: (state: StateType) => state.domain.products.query.sort,
     getProductPagination: (state: StateType) => state.domain.products.pagination,
     getProductCurItems: (state: StateType) => state.domain.products.curItems,
   }
@@ -183,7 +192,7 @@ export const mSelector = {
         rsSelector.app.getAuth
       ],
       (auth) => {
-        return auth.user.phones.find((phone: UserPhoneType) => phone.isSelected) 
+        return auth.user.phones.find((phone: UserPhoneType) => phone.isSelected)
       },
     )
   },
@@ -195,7 +204,7 @@ export const mSelector = {
         rsSelector.app.getAuth
       ],
       (auth) => {
-        return auth.user.addresses.find((address: UserAddressType) => address.isShippingAddress) 
+        return auth.user.addresses.find((address: UserAddressType) => address.isShippingAddress)
       },
     )
   },
@@ -207,7 +216,7 @@ export const mSelector = {
         rsSelector.app.getAuth
       ],
       (auth) => {
-        return auth.user.addresses.find((address: UserAddressType) => address.isBillingAddress) 
+        return auth.user.addresses.find((address: UserAddressType) => address.isBillingAddress)
       },
     )
   },
@@ -331,7 +340,7 @@ export const mSelector = {
       },
     )
   },
-  
+
   // domain.categories query string (query + pagination)
   makeCategoryQueryStringSelector: () => {
     return createSelector(
@@ -340,7 +349,7 @@ export const mSelector = {
       ],
       (pagination) => {
         // react state should be immutable so put empty object first
-        return merge({}, { page: pagination.page, limit: pagination.limit }) 
+        return merge({}, { page: pagination.page, limit: pagination.limit })
       },
     )
   },
@@ -379,7 +388,7 @@ export const mSelector = {
       ],
       (pagination) => {
         // react state should be immutable so put empty object first
-        return merge({}, { page: pagination.page, limit: pagination.limit }) 
+        return merge({}, { page: pagination.page, limit: pagination.limit })
       },
     )
   },
@@ -396,7 +405,7 @@ export const mSelector = {
       },
     )
   },
-  
+
   // domain.cartItem with selected
   makeSelectedCartItemSelector: () => {
     return createSelector(
@@ -409,7 +418,7 @@ export const mSelector = {
       },
     )
   },
-  
+
   // domain.wishlistItem
   makeWishlistItemSelector: () => {
     return createSelector(
@@ -444,7 +453,7 @@ export const mSelector = {
       ],
       (pagination) => {
         // react state should be immutable so put empty object first
-        return merge({}, { page: pagination.page, limit: pagination.limit }) 
+        return merge({}, { page: pagination.page, limit: pagination.limit })
       },
     )
   },
@@ -488,12 +497,12 @@ export const mSelector = {
       ],
       (pagination) => {
         // react state should be immutable so put empty object first
-        return merge({}, { page: pagination.page, limit: pagination.limit }) 
+        return merge({}, { page: pagination.page, limit: pagination.limit })
       },
     )
   },
 
-  
+
   // domain.users
   makeUserByIdSelector: (userId: string) => {
     return createSelector(
@@ -511,7 +520,7 @@ export const mSelector = {
       },
     )
   },
-  
+
   // domain.orders
   makeOrderSelector: () => {
     return createSelector(
@@ -551,12 +560,12 @@ export const mSelector = {
       ],
       (pagination) => {
         // react state should be immutable so put empty object first
-        return merge({}, { page: pagination.page, limit: pagination.limit }) 
+        return merge({}, { page: pagination.page, limit: pagination.limit })
       },
     )
   },
 
-  
+
   // domain.products
   makeProductWithoutCacheSelector: () => {
     return createSelector(
@@ -641,13 +650,13 @@ export const mSelector = {
     return createSelector(
       [
         rsSelector.domain.getProduct
-      ], 
+      ],
       (normalizedProducts) => {
         /**
          * return empty array before fetch
          **/
         if (Object.keys(normalizedProducts).length === 0) {
-          return null 
+          return null
         }
 
         /**
@@ -674,13 +683,129 @@ export const mSelector = {
   makeProductQuerySelector: () => {
     return createSelector(
       [
-        rsSelector.domain.getProductQuery
+        rsSelector.domain.getProductQuerySearchQuery,
+        rsSelector.domain.getProductQueryCategoryId,
+        rsSelector.domain.getProductQueryStartDate,
+        rsSelector.domain.getProductQueryEndDate,
+        rsSelector.domain.getProductQueryMinPrice,
+        rsSelector.domain.getProductQueryMaxPrice,
+        rsSelector.domain.getProductQueryIsDiscount,
+        rsSelector.domain.getProductQueryReviewPoint,
+        rsSelector.domain.getProductQuerySort,
+
       ],
-      (query) => {
+      (searchQuery, categoryId, startDate, endDate, minPrice, maxPrice, isDiscount, reviewPoint, sort) => {
 
-        console.log(query)
+        return {
+          searchQuery: searchQuery,
+          categoryId: categoryId,
+          minPrice: minPrice,
+          maxPrice: maxPrice,
+          reviewPoint: reviewPoint,
+          isDiscount: isDiscount,
+          startDate: startDate,
+          endDate: endDate,
+          sort: sort,
+        }
+      },
+    )
+  },
 
-        return query
+  makeProductQuerySearchQuerySelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getProductQuerySearchQuery
+      ],
+      (searchQuery) => {
+        return searchQuery
+      },
+    )
+  },
+
+  makeProductQueryCategoryIdSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getProductQueryCategoryId
+      ],
+      (categoryId) => {
+        return categoryId
+      },
+    )
+  },
+
+  makeProductQueryMinPriceSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getProductQueryMinPrice
+      ],
+      (minPrice) => {
+        return minPrice
+      },
+    )
+  },
+
+  makeProductQueryMaxPriceSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getProductQueryMaxPrice
+      ],
+      (maxPrice) => {
+        return maxPrice
+      },
+    )
+  },
+
+  makeProductQueryReviewPointSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getProductQueryReviewPoint
+      ],
+      (reviewPoint) => {
+        return reviewPoint
+      },
+    )
+  },
+
+  makeProductQueryIsDiscountSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getProductQueryIsDiscount
+      ],
+      (isDiscount) => {
+        return isDiscount
+      },
+    )
+  },
+
+  makeProductQueryStartDateSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getProductQueryStartDate
+      ],
+      (startDate) => {
+        return startDate
+      },
+    )
+  },
+
+  makeProductQueryEndDateSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getProductQueryEndDate
+      ],
+      (endDate) => {
+        return endDate
+      },
+    )
+  },
+
+  makeProductQuerySortSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getProductQuerySort
+      ],
+      (sort) => {
+        return sort
       },
     )
   },
@@ -708,7 +833,7 @@ export const mSelector = {
       ],
       (query, pagination) => {
         // react state should be immutable so put empty object first
-        return merge({}, query, { page: pagination.page, limit: pagination.limit }) 
+        return merge({}, query, { page: pagination.page, limit: pagination.limit })
       },
     )
   },

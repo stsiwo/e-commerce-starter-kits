@@ -5,13 +5,14 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import * as React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { productQueryStartDateActions, productQueryEndDateActions } from 'reducers/slices/domain/product';
+import { mSelector } from 'src/selectors/selector';
 
-interface ReleaseDateFilterTabPanelPropsType {
-  curStartDate: Date
-  curEndDate: Date
-}
+//interface ReleaseDateFilterTabPanelPropsType {
+//  curStartDate: Date
+//  curEndDate: Date
+//}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -34,14 +35,15 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  **/
 
-const ReleaseDateFilterTabPanel: React.FunctionComponent<ReleaseDateFilterTabPanelPropsType> = ({
-  curStartDate,
-  curEndDate
+const ReleaseDateFilterTabPanel: React.FunctionComponent<{}> = ({
 }) => {
 
   const classes = useStyles();
 
   const dispatch = useDispatch();
+
+  const curStartDate = useSelector(mSelector.makeProductQueryStartDateSelector())
+  const curEndDate = useSelector(mSelector.makeProductQueryEndDateSelector())
 
   const handleStartDateChange = (date: Date | null) => {
     dispatch(productQueryStartDateActions.update(date));

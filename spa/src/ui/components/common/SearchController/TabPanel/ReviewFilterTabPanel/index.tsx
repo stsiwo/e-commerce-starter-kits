@@ -4,47 +4,59 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import * as React from 'react';
 import Rating from '@material-ui/lab/Rating/Rating';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { productQueryReviewPointActions } from 'reducers/slices/domain/product';
+import Button from '@material-ui/core/Button';
+import { mSelector } from 'src/selectors/selector';
 
-interface ReviewFilterTabPanelPropsType {
-  curReviewPoint: number
-}
+//interface ReviewFilterTabPanelPropsType {
+//  curReviewPoint: number
+//}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     box: {
     },
+    contentBox: {
+      display: "flex",
+      alignItems: "center",
+    }
   }),
 );
 
-/**
- *  TODO: use this one: https://material-ui.com/components/rating/
- **/
-
-const ReviewFilterTabPanel: React.FunctionComponent<ReviewFilterTabPanelPropsType> = ({
-  curReviewPoint
+const ReviewFilterTabPanel: React.FunctionComponent<{}> = ({
 }) => {
 
   const classes = useStyles();
 
   const dispatch = useDispatch();
 
+  const curReviewPoint = useSelector(mSelector.makeProductQueryReviewPointSelector())
+
   const handleReviewPointChangeEvent = (event: any, newValue: number) => {
     dispatch(productQueryReviewPointActions.update(newValue))
   };
+
+  const handleReset: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+    dispatch(productQueryReviewPointActions.clear())
+  }
 
   return (
     <Box p={3}>
       <Typography id="discrete-slider-always" gutterBottom>
         Review Point
       </Typography>
-      <Rating
-        name="product-filter-review-point"
-        onChange={handleReviewPointChangeEvent}
-        precision={0.5}
-        value={curReviewPoint}
-      />
+      <Box className={classes.contentBox}>
+        <Rating
+          name="product-filter-review-point"
+          onChange={handleReviewPointChangeEvent}
+          precision={0.5}
+          value={curReviewPoint}
+        />
+        <Button onClick={handleReset}>
+          Reset
+      </Button>
+      </Box>
     </Box>
   )
 }
