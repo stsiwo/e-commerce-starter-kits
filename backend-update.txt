@@ -33,6 +33,10 @@ endpoint change:
     
     - min/maxPrice: something is wrong. when 0 (min) - 50 (max), return nothing.
     
+    - validations:
+    
+      - only return products which are 'public' & have at least one variant.
+    
 
 ## Stripe
 
