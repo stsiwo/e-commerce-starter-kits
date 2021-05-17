@@ -36,6 +36,10 @@ endpoint change:
     - validations:
     
       - only return products which are 'public' & have at least one variant.
+      
+  - /products/{productPath} (single GET)
+  
+    - for product detail page. you can't relay on the redux state if a user directly visit the detail page. 
     
 
 ## Stripe
