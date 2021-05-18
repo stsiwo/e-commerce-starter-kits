@@ -9,6 +9,13 @@ export const usePrevious = <S extends any>(input: UsePreviousInput<S>): S => {
     ref.current = input.value
   }, [input.value])
 
+  /**
+   * redux reducer complains about this if you return 'undefined'
+   **/
+  if (!ref.current) {
+    return null
+  }
+
   return ref.current as S
 }
 

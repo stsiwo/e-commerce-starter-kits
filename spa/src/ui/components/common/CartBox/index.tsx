@@ -56,7 +56,7 @@ const CartBox: React.FunctionComponent<{}> = (props) => {
       return (
         <CartItem 
           value={cartItem} 
-          key={cartItem.cartId} 
+          key={cartItem.cartItemId} 
         />
       )
     })

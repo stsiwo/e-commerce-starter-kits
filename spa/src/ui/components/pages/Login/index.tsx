@@ -155,7 +155,8 @@ const Login: React.FunctionComponent<{}> = (props) => {
       api.request({
         method: 'POST',
         url: API1_URL + `/authenticate`,
-        data: generateObjectFormData(curMemberLoginState),
+        data: curMemberLoginState,
+        headers: {"Content-Type": "application/json"}
       }).then((data) => {
         /**
          * login success
@@ -164,7 +165,10 @@ const Login: React.FunctionComponent<{}> = (props) => {
         dispatch(authActions.loginWithUser(loggedInUser))
 
         // make sure this work.
-        history.back();
+        // this does not work esp when there is no previous url.
+        //
+        // solution: to use redux state to store the previous url.
+        history.back(); 
 
         enqueueSnackbar("added successfully.", { variant: "success" })
       }).catch((error: AxiosError) => {

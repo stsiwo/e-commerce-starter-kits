@@ -6,6 +6,7 @@ import { UserType, UserPhoneType, UserAddressType } from "domain/user/types";
 import merge from 'lodash/merge';
 import CartItem from "components/common/CartItem";
 import { CartItemType } from "domain/cart/types";
+import { ProductType } from "domain/product/types";
 
 export const rsSelector = {
   /**
@@ -31,6 +32,7 @@ export const rsSelector = {
 
   app: {
     getAuth: (state: StateType) => state.app.auth,
+    getPreviousUrl: (state: StateType) => state.app.previousUrl,
     getStripeClientSecret: (state: StateType) => state.app.private.stripeClientSecret,
     getSearchKeyword: (state: StateType) => state.app.searchKeyword,
     getRequestTracker: (state: StateType) => state.app.requestTracker,
@@ -232,6 +234,19 @@ export const mSelector = {
       },
     )
   },
+
+  // app.previousUrl
+  makePreviousUrlSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getPreviousUrl
+      ],
+      (previousUrl) => {
+        return previousUrl
+      },
+    )
+  },
+
 
   // app.searchKeyword
   makeSearchKeywordSelector: () => {
@@ -642,6 +657,45 @@ export const mSelector = {
       },
     )
   },
+
+  // domain.products
+  // mainly used for find this product at product detail page rather than sending request to api again.
+  /**
+   * this is not really performant. 
+   *
+   * instead, you should create new state for teh current target product on redux store. then, when users click the product link, update the target product
+   * state and make selector for the target product when the user lands on the product detail page.
+   *
+   * #REFACTOR
+   **/
+  makeProductByPathSelector: (path: string) => {
+    return createSelector(
+      [
+        rsSelector.domain.getProduct,
+      ],
+      (normalizedProducts) => {
+
+        /**
+         * denormalize
+         *
+         * this return { 'domain-name': [{ domain1 }, { domain2 }] in the format
+         **/
+        const denormalizedEntities = denormalize(
+          Object.keys(normalizedProducts), // ex, [0, 1, 2, 3, 4] ('result' prop of normalized data)
+          productSchemaArray,
+          {
+            products: normalizedProducts
+          }, // entities prop of normalized data (ex, { animes: { "1": { ... }, "2": { ... }, ... }})
+        )
+
+        console.log(denormalizedEntities)
+
+        return denormalizedEntities.find((product: ProductType) => product.productPath === path);
+      },
+    )
+  },
+
+
 
   /**
    * get a list of product variant by product id

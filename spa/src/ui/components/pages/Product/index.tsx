@@ -1,25 +1,14 @@
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
-import MenuItem from '@material-ui/core/MenuItem';
-import RadioGroup from '@material-ui/core/RadioGroup';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
-import Rating from '@material-ui/lab/Rating/Rating';
-import Carousel from 'components/common/Carousel';
-import ColorRadio from 'components/common/ColorRadio';
-import { ProductVariantSizeType, ProductVariantType } from 'domain/product/types';
-import uniq from 'lodash/uniq';
+import { AxiosError } from 'axios';
+import { api } from 'configs/axiosConfig';
+import { ProductType } from 'domain/product/types';
+import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
-import { generateProductList } from 'tests/data/product';
+import { mSelector } from 'src/selectors/selector';
+import ProductDetail from './ProductDetail';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -37,61 +26,15 @@ const useStyles = makeStyles((theme: Theme) =>
     controllerBox: {
       textAlign: "center"
     },
-    productName: {
-      fontWeight: theme.typography.fontWeightBold,
-    },
-    productDescTitle: {
-      fontWeight: theme.typography.fontWeightBold,
-    },
-    productDesc: {
-    },
-    productColorTitle: {
-      fontWeight: theme.typography.fontWeightBold,
-    },
-    productColorBox: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-
-    },
-    colorRadioGroup: {
-      display: "flex",
-      flexDirection: 'row',
-    },
-    colorFormLabel: {
-      margin: 0,
-    },
-    sizeInput: {
-      margin: theme.spacing(0, 1, 0, 1),
-    },
-    gridItem: {
-      padding: theme.spacing(1),
-      textAlign: "center",
-
-      "& > *": {
-        margin: `${theme.spacing(2)}px 0`,
-      },
-    },
-    detailNoteBox: {
-      textAlign: "center",
-    },
-    detailNoteTitle: {
-      fontWeight: theme.typography.fontWeightBold,
-    }
   }),
 );
-
-interface ColorSizeSelectionType {
-  color: string
-  size: ProductVariantSizeType
-}
 
 /**
  * product page 
  *
  *  - steps
  *
- *    0: fetch the product detail from api
+ *    0: fetch the product detail from api if redux store is empty
  *
  *    1: display a given product detail including its variants
  *
@@ -112,234 +55,49 @@ const Product: React.FunctionComponent<{}> = (props) => {
 
   const dispatch = useDispatch()
 
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
   const { productPath } = useParams();
 
   // fetch product detail by productPath
 
-  const testProduct = React.useMemo(() => generateProductList(1)[0], []);
-
-  console.log("test product object")
-  console.log(testProduct)
-
-  // state for color & size & quantity
-  const [curSelectedColor, setSelectedColor] = React.useState<string>(testProduct.variants[0].variantColor)
-  const [curSelectedSize, setSelectedSize] = React.useState<ProductVariantSizeType>(testProduct.variants[0].productSize)
-
-  const [curVariant, setVariant] = React.useState<ProductVariantType>(testProduct.variants[0]);
-
-  const [curQty, setQty] = React.useState<number>(1);
-
-  // cur available colors and sizes
-  const [curAvailableColors, setAvailableColors] = React.useState<string[]>(
-    uniq(testProduct.variants.map((variant: ProductVariantType) => {
-      return variant.variantColor
-    }))
+  const [curProduct, setProduct] = React.useState<ProductType>(
+    useSelector(mSelector.makeProductByPathSelector(productPath))
   )
 
-  const [curAvailableSizes, setAvailableSizes] = React.useState<ProductVariantSizeType[]>(
-    uniq(testProduct.variants.map((variant: ProductVariantType) => {
-      return variant.productSize
-    }))
-  )
-
-  // event handlers
-  const handleSizeSelectionChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    // value = productSizeId
-    const nextProductSize = curAvailableSizes.find((size: ProductVariantSizeType) => size.productSizeId === e.currentTarget.value)
-    setSelectedSize(nextProductSize)
-  }
-
-  const handleColorSelectionChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextColor = e.currentTarget.value
-    setSelectedColor(nextColor)
-  }
-
-  // use effect to update available size when curColor change
-  //  - if a user change the color, need to display only available sizes based on the change
   React.useEffect(() => {
-    const nextAvailableVariants = testProduct.variants.filter((variant: ProductVariantType) => variant.variantColor == curSelectedColor);
-    const nextAvailableSizes = uniq(nextAvailableVariants.map((variant: ProductVariantType) => variant.productSize))
 
-    // if there is no cur size in the next available sizes, need to change it to the one in the available sizes
-    if (!nextAvailableSizes.find((size: ProductVariantSizeType) => size.productSizeId == curSelectedSize.productSizeId)) {
+    if (!curProduct) {
+      // oops, the product does not exist in redux store, so send the request to grab this product by path
 
-      const nextSize = nextAvailableSizes[0]
+      api.request({
+        method: 'GET',
+        url: API1_URL + `/products/${productPath}`,
+      }).then((data) => {
 
-      // if does not exists, pick the first one
-      setSelectedSize(nextSize)
+        const targetProduct: ProductType = data.data;
 
-      // -- curVariant --
+        setProduct(targetProduct)
 
-      // update curVariant based on the change of this
-      const nextVariant = testProduct.variants.find((variant: ProductVariantType) => variant.variantColor == curSelectedColor && variant.productSize.productSizeId == nextSize.productSizeId)
-      setVariant(nextVariant)
-    } else {
-      // -- curVariant --
-      const nextVariant = testProduct.variants.find((variant: ProductVariantType) => variant.variantColor == curSelectedColor && variant.productSize.productSizeId == curSelectedSize.productSizeId)
-      setVariant(nextVariant)
+        //enqueueSnackbar("updated successfully.", { variant: "success" })
+      }).catch((error: AxiosError) => {
+        enqueueSnackbar(error.message, { variant: "error" })
+      })
     }
+  }, [])
 
-    setAvailableSizes(nextAvailableSizes)
-  }, [
-      curSelectedColor
-    ])
-
-  // use effect to udpate curVariant when curSize change
-  //  - you don't need to update color stuff.
-  React.useEffect(() => {
-
-    // update curVariant based on the change of this
-    const nextVariant = testProduct.variants.find((variant: ProductVariantType) => variant.variantColor == curSelectedColor && variant.productSize.productSizeId == curSelectedSize.productSizeId)
-    setVariant(nextVariant)
-  }, [
-      curSelectedSize.productSizeId
-    ])
-
-  // render function
-  //      <ColorCell value={color} />
-  const renderAvailableColors: () => React.ReactNode = () => {
-    return curAvailableColors.map((color: string) => {
-      return (
-        <FormControlLabel value={color} control={<ColorRadio />} label="" className={classes.colorFormLabel} key={color} />
-      )
-    })
+  if (!curProduct) {
+    return (
+      <Typography variant="h5" component="h5" align="center" className={classes.title} >
+        Loading...
+      </Typography>
+    )
   }
 
   return (
-    <React.Fragment>
-      <Typography variant="h5" component="h5" align="center" className={classes.title} >
-        {testProduct.productName}
-      </Typography>
-      <Grid
-        container
-        justify="center"
-      >
-        {/** image carousel **/}
-        <Grid
-          item
-          xs={12}
-          md={6}
-          className={classes.gridItem}
-        >
-          <Carousel items={testProduct.productImages} />
-        </Grid>
-        {/** detail info **/}
-        <Grid
-          item
-          xs={12}
-          md={6}
-          className={classes.gridItem}
-        >
-          <Typography variant="body1" component="p" className={classes.subtitle}>
-            Description
-          </Typography>
-          <Typography variant="body1" component="p" className={classes.productDesc}>
-            {testProduct.productDescription}
-          </Typography>
-          <Box component="div" className={classes.productColorBox}>
-            <Typography variant="body1" component="p" className={classes.productColorTitle}>
-              Color:
-            </Typography>
-            <RadioGroup
-              value={curSelectedColor}
-              aria-label="product-variant-color"
-              name="product-variant-color"
-              onChange={handleColorSelectionChangeEvent}
-              className={classes.colorRadioGroup}
-            >
-              {renderAvailableColors()}
-            </RadioGroup>
-          </Box>
-          <Box component="div" className={classes.productColorBox}>
-            <Typography variant="body1" component="p" className={classes.productColorTitle}>
-              Size:
-            </Typography>
-            <TextField
-              id="product-size"
-              label=""
-              select
-              value={curSelectedSize.productSizeId}
-              onChange={handleSizeSelectionChangeEvent}
-              className={classes.sizeInput}
-            >
-              {curAvailableSizes.map((size: ProductVariantSizeType) => (
-                <MenuItem key={size.productSizeId} value={size.productSizeId}>
-                  {size.productSizeName}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Box>
-          <Box component="div" className={classes.productColorBox}>
-            <Typography variant="body1" component="p" className={classes.productColorTitle}>
-              Qty:
-            </Typography>
-            <ButtonGroup size="small" aria-label="small outlined button group">
-              <IconButton>
-                <AddCircleIcon />
-              </IconButton>
-              <Button disabled>{curQty}</Button>
-              <IconButton>
-                <RemoveCircleIcon />
-              </IconButton>
-            </ButtonGroup>
-          </Box>
-          <Box component="div" className={classes.productColorBox}>
-            <Typography variant="body1" component="p" className={classes.productColorTitle}>
-              Review Point:
-            </Typography>
-            <Rating
-              disabled
-              name="product-review-point"
-              precision={0.1}
-              value={testProduct.averageReviewPoint}
-              size="small"
-            /><br />
-          </Box>
-          <Box component="div" >
-            <Typography variant="body1" component="p" className={classes.productColorTitle}>
-              Price: <b>$ {`${curVariant.variantUnitPrice ? curVariant.variantUnitPrice * curQty : testProduct.productBaseUnitPrice * curQty}`}</b>
-            </Typography>
-            <Typography variant="body2" component="p" color="textSecondary">
-              * this does not include tax and shipping fee
-            </Typography>
-          </Box>
-          <Box component="div" className={classes.controllerBox}>
-            <Button>
-              {"Add to Cart"}
-            </Button>
-            <Button>
-              {"save to Wishlist"}
-            </Button>
-            <Button>
-              {"buy now"}
-            </Button>
-          </Box>
-        </Grid>
-        <Grid
-          item
-          xs={12}
-          className={classes.detailNoteBox}
-        >
-          <Typography variant="body1" component="h6" className={classes.subtitle}>
-            Detail Note 
-          </Typography>
-          <Typography variant="body1" component="p">
-            {testProduct.note}
-          </Typography>
-          <Box component="div" className={classes.controllerBox}>
-            <Button>
-              {"Add to Cart"}
-            </Button>
-            <Button>
-              {"save to Wishlist"}
-            </Button>
-            <Button>
-              {"buy now"}
-            </Button>
-          </Box>
-        </Grid>
-      </Grid>
-    </React.Fragment>
+    <ProductDetail product={curProduct} />
   )
 }
 

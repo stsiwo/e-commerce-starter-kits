@@ -8,6 +8,12 @@
 
     - this is because of Spring Boot framework.
 
+  - design note: when you want to assign fetch data as initial data of useState.
+
+    - you might struggle with null safety of the state. e.g., every where you need to null check such as initial value of 'useState', inside useEffect, and inside render function. in this case, you can separate the component for two component. one of them is to fetch teh data and the other component is to manimulate the data as state.
+
+    - checkout Product/index.tsx and ProductDetail/index.tsx
+
 ## Role Management Library: Casl
 
   ### Terms:
@@ -135,3 +141,9 @@
       - for example, your one of the dependency (react-redux) use the latest one but, you uses react 16 as main dependency of your project.
 
     - bump up to react 17
+
+  - Select/TextField with 'select' prop
+
+    - DON'T use 'currentTarget'!!! does not work!!
+
+    - use 'target' instead.

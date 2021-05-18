@@ -55,11 +55,13 @@ export const cartItemSlice = createSlice({
     // use when update existing one
     merge: (state: CartItemType[], action: CartItemActionType) => merge(state, action.payload),
 
+    append: (state: CartItemType[], action: PayloadAction<CartItemType>) => merge(state, [action.payload]),
+
     // use when you want to replace
     update: (state: CartItemType[], action: CartItemActionType) => action.payload,
 
     // use when you want to remove a single entity
-    delete: (state: CartItemType[], action: PayloadAction<CartItemType>) => remove(state, (cartItem: CartItemType) => cartItem.cartId == action.payload.cartId),
+    delete: (state: CartItemType[], action: PayloadAction<CartItemType>) => remove(state, (cartItem: CartItemType) => cartItem.cartItemId == action.payload.cartItemId),
 
     clear: (state: CartItemType[]) => [],
   },

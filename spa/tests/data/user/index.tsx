@@ -1,4 +1,4 @@
-import { UserAddressType, UserPhoneType, UserType } from "domain/user/types";
+import { UserAddressType, UserPhoneType, UserType, guestUserType } from "domain/user/types";
 import { UserTypeEnum } from "src/app";
 
 
@@ -64,7 +64,7 @@ export const testGuestUser: UserType = {
   lastName: "Iwao",
   avatarImagePath: "",
   email: "",
-  userType: UserTypeEnum.GUEST,
+  userType: guestUserType, 
   addresses: [],
   orders: [],
   reviews: [],
@@ -78,7 +78,10 @@ export const testMemberUser: UserType = {
   lastName: "Iwao",
   avatarImagePath: "",
   email: TEST_MEMBER_EMAIL , 
-  userType: UserTypeEnum.MEMBER,
+  userType: {
+    userTypeId: "2",
+    userType: UserTypeEnum.MEMBER,
+  },
   addresses: testAddressList,
   phones: testPhoneList,
   orders: [],
@@ -92,7 +95,10 @@ export const testAdminUser: UserType = {
   lastName: "Iwao",
   avatarImagePath: "",
   email: TEST_ADMIN_EMAIL,
-  userType: UserTypeEnum.ADMIN,
+  userType: {
+    userTypeId: "1",
+    userType: UserTypeEnum.ADMIN,
+  },
   addresses: [],
   phones: [],
   orders: [],

@@ -11,6 +11,7 @@ import { cadCurrencyFormat } from 'src/utils';
 import SampleProduct1_1Image from 'static/sample-product-1-1.jpg';
 import CornerRibbon from '../CornerRibbon';
 import Box from '@material-ui/core/Box';
+import { Link as RRLink } from "react-router-dom";
 
 declare type ProductCardV2PropsType = {
   product: ProductType
@@ -76,11 +77,11 @@ const ProductCardV2: React.FunctionComponent<ProductCardV2PropsType> = ({ produc
             TODO: need to domain function to select cheapest price via product variant 
                or you can create a property in backend DTO so that you don't need to calculate in front-end 
             **/}
-            <b>${cadCurrencyFormat(product.productBaseUnitPrice)}</b>
+            <b>${cadCurrencyFormat(product.productBaseUnitPrice)} ~</b>
           </Typography>
         </CardContent>
         <CardActions className={classes.actions}>
-          <Button>
+          <Button component={RRLink} to={`/products/${product.productPath}`}>
             Read More
         </Button>
         </CardActions>

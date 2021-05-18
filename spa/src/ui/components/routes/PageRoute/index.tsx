@@ -1,14 +1,17 @@
 import * as React from 'react';
-import { useSelector } from 'react-redux';
-import { useLocation } from 'react-router';
+import { useSelector, useDispatch } from 'react-redux';
+import { useLocation, useHistory } from 'react-router';
 import { Route, Switch } from 'react-router-dom';
 import { AuthType } from 'src/app';
 import { mSelector } from 'src/selectors/selector';
 import { commonRoutesData, RouteDataType, routesData } from '..';
 import { withBasePage } from 'ui/hoc/withBasePage';
 import NotFound from 'components/pages/NotFound';
+import { usePrevious } from 'hooks/previous';
+import { previousUrlActions } from 'reducers/slices/app';
 
 const PageRoute: React.FunctionComponent<{}> = (props) => {
+
 
   const location = useLocation()
 
@@ -21,6 +24,27 @@ const PageRoute: React.FunctionComponent<{}> = (props) => {
     ...routesData[auth.userType],
     ...commonRoutesData
   ];
+
+  /**
+   * previousUrl: every time url has changed, we keep track of this for the sake of "Redirect User After Login"
+   *
+   * - use 'usePrevious' and 'history.listen' method together. 
+   *
+   **/
+  const history = useHistory()
+  const [curUrl, setUrl] = React.useState<string>("");
+  const dispatch = useDispatch();
+
+  React.useEffect(() => {
+
+    return history.listen((location) => {
+      setUrl(location.pathname)
+    })
+
+  }, [history])
+
+  const previousValue = usePrevious<string>({ value: curUrl });
+  dispatch(previousUrlActions.update(previousValue))
 
   /**
    * Not Found Page Logic

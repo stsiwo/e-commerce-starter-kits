@@ -128,7 +128,7 @@ export function* postCartItemWorker(action: PayloadAction<CartItemType>) {
      **/
     const tempId = getUuidv4()
     const newEntity = action.payload
-    newEntity.cartId = tempId
+    newEntity.cartItemId = tempId
 
     /**
      * update categories domain in state

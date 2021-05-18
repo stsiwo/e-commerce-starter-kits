@@ -36,7 +36,7 @@ export const authSlice = createSlice({
     loginWithUser: (state: AuthType,  action: PayloadAction<UserType>) => {
       return {
         isLoggedIn: true,
-        userType: action.payload.userType,
+        userType: action.payload.userType.userType,
         user: action.payload,
       }
     },
@@ -139,6 +139,46 @@ export const authSlice = createSlice({
 
 export const authSliceReducer = authSlice.reducer
 export const authActions = authSlice.actions
+
+/**
+ * app.previousUrl state Slice
+ **/
+export type previousUrlUpdateActionType = PayloadAction<string>
+
+export const previousUrlSlice = createSlice({
+  name: "app/previousUrl", // a name used in action type
+  initialState: "",
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+    update: (state: string, action: previousUrlUpdateActionType) => action.payload,
+    clear: (state: string) => "",
+
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   **/
+  extraReducers: (builder) => {
+    builder.addCase(
+      clearAllSortAndFilterActionCreator,
+      (state: string) => ""
+    )
+  }
+})
+
+export const previousUrlSliceReducer = previousUrlSlice.reducer
+export const previousUrlActions = previousUrlSlice.actions
+
+
 
 /**
  * app.searchKeyword state Slice

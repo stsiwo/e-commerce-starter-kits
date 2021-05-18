@@ -38,6 +38,15 @@ export declare type AdminCompanyType = {
   postalCode: string
 }
 
+export declare type UserTypeType = {
+  userTypeId?: string,
+  userType: UserTypeEnum,
+}
+
+export const guestUserType : UserTypeType = {
+  userType: UserTypeEnum.GUEST
+}
+
 export declare type UserType = {
   userId?: string
   firstName: string
@@ -46,7 +55,7 @@ export declare type UserType = {
   avatarImagePath: string
   addresses: UserAddressType[]
   phones: UserPhoneType[]
-  userType: UserTypeEnum
+  userType: UserTypeType
   reviews: ReviewType[]
   orders: OrderType[]
   cartItems: CartItemType[]
@@ -66,7 +75,7 @@ export const defaultUser: UserType = {
   reviews: [],
   orders: [],
   cartItems: [],
-  userType: UserTypeEnum.GUEST
+  userType: guestUserType, 
 }
 
 // form & input 

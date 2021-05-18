@@ -95,7 +95,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
         // put to replace the whole cart item 
         api.request({
           method: 'PUT',
-          url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartId}`,
+          url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartItemId}`,
           data: JSON.stringify(nextCartItem)
         }).then((data) => {
 
@@ -126,7 +126,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
         // put to replace the whole cart item 
         api.request({
           method: 'PUT',
-          url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartId}`,
+          url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartItemId}`,
           data: JSON.stringify(nextCartItem)
         }).then((data) => {
 
@@ -157,7 +157,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
       // put to replace the whole cart item 
       api.request({
         method: 'PUT',
-        url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartId}`,
+        url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartItemId}`,
         data: JSON.stringify(nextCartItem)
       }).then((data) => {
 
@@ -185,7 +185,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
       // put to replace the whole cart item 
       api.request({
         method: 'DELETE',
-        url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartId}`,
+        url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartItemId}`,
       }).then((data) => {
 
         // update cart item in redux store 

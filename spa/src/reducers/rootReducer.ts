@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { authSliceReducer, requestTrackerSliceReducer, searchKeywordSliceReducer } from './slices/app';
+import { authSliceReducer, requestTrackerSliceReducer, searchKeywordSliceReducer, previousUrlSliceReducer } from './slices/app';
 import { deleteCartItemFetchStatusSliceReducer, deleteSingleCartItemFetchStatusSliceReducer, getCartItemFetchStatusSliceReducer, postCartItemFetchStatusSliceReducer, putCartItemFetchStatusSliceReducer } from './slices/app/fetchStatus/cartItem';
 import { deleteSingleCategoryFetchStatusSliceReducer, getCategoryFetchStatusSliceReducer, postCategoryFetchStatusSliceReducer, putCategoryFetchStatusSliceReducer } from './slices/app/fetchStatus/category';
 import { deleteSingleOrderFetchStatusSliceReducer, getOrderFetchStatusSliceReducer, getSingleOrderFetchStatusSliceReducer, postOrderFetchStatusSliceReducer, putOrderFetchStatusSliceReducer } from './slices/app/fetchStatus/order';
@@ -34,6 +34,7 @@ export const rootReducer = combineReducers({
 
   app: combineReducers({
     auth: authSliceReducer,
+    previousUrl: previousUrlSliceReducer,
     searchKeyword: searchKeywordSliceReducer,
     requestTracker: requestTrackerSliceReducer,
     fetchStatus: combineReducers({

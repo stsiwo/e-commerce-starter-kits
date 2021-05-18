@@ -1,7 +1,5 @@
-import * as React from 'react';
-import { Button } from '@material-ui/core';
 import PageRoute from 'components/routes/PageRoute';
-import Header from 'components/common/Header';
+import * as React from 'react';
 
 const Content: React.FunctionComponent<{}> = (props) => {
 

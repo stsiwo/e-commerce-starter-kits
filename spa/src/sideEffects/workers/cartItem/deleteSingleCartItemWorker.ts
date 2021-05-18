@@ -60,7 +60,7 @@ export function* deleteSingleCartItemWorker(action: PayloadAction<CartItemType>)
     /**
      * grab all domain
      **/
-    const apiUrl = `${API1_URL}/users/${curAuth.user.userId}/cartItems/${action.payload.cartId}`
+    const apiUrl = `${API1_URL}/users/${curAuth.user.userId}/cartItems/${action.payload.cartItemId}`
 
     /**
      * fetch data

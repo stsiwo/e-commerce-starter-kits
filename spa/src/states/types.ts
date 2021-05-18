@@ -19,6 +19,7 @@ export declare type UiStateType = {
 
 export declare type AppStateType = {
   auth: AuthType 
+  previousUrl: string
   searchKeyword: string
   requestTracker: RequestTrackerType
   fetchStatus: {

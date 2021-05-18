@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme: Theme) =>
  *      (GUEST): just only update redux state
  *
  *    3.2: remove: need to remove the selected item
- *      (MEMBER): send api request (/users/{userId}/cart/{cartId} DELETE: delete) 
+ *      (MEMBER): send api request (/users/{userId}/cart/{cartItemId} DELETE: delete) 
  *      (GUEST): just only update redux state
  *
  *    3.3: increment/decrement quantity

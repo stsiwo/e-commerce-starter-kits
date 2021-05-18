@@ -73,6 +73,7 @@ export const initialState: StateType = {
       userType: UserTypeEnum.GUEST,
       user: defaultUser,
     },
+    previousUrl: "",
     searchKeyword: "",
     requestTracker: {},
     fetchStatus: {

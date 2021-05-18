@@ -1,8 +1,6 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { NormalizedProductType, ProductSortEnum, ProductType, ProductVariantType } from "domain/product/types";
 import merge from "lodash/merge";
-import remove from 'lodash/remove';
-import { ProductType, NormalizedProductType, ProductSortEnum, ProductVariantType } from "domain/product/types";
-import { DomainPaginationType } from "states/types";
 
 /**
  * redux-sage actions (side effects)
@@ -14,6 +12,10 @@ import { DomainPaginationType } from "states/types";
 // for GET request with cache
 export const fetchProductWithCacheActionCreator = createAction("saga/domain/product/fetch/cache")
 export const fetchProductWithCacheActionTypeName = fetchProductWithCacheActionCreator().type
+
+// for GET request with cache
+export const fetchSingleProductWithCacheActionCreator = createAction("saga/domain/product/fetchSingle/cache")
+export const fetchSingleProductWithCacheActionTypeName = fetchSingleProductWithCacheActionCreator().type
 
 // for GET request
 export const fetchProductActionCreator = createAction("saga/domain/product/fetch")

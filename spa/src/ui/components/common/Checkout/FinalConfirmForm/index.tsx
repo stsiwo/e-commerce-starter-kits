@@ -99,7 +99,7 @@ const FinalConfirmForm: React.FunctionComponent<FinalConfirmFormPropsType> = (pr
         return (
           <CartItemConfirmCard
             value={cartItem}
-            key={cartItem.cartId}
+            key={cartItem.cartItemId}
           />
         )
       })
