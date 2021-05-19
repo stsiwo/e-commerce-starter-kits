@@ -67,30 +67,7 @@ axios.defaults.transformResponse = [].concat(
   axios.defaults.transformResponse,
 )
 
-/**
- *
-    const ISORegex = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/;
-    if (data) {
-      console.log("before json parse")
-      console.log(data)
-
-      iterateObjectRecursively(data, (key, value) => {
-        if (typeof value === 'string') {
-          console.log("after json parse")
-
-          console.log(`key: ${key} and value: ${value}`)
-
-          const a = ISORegex.exec(value);
-
-          if (a) {
-            console.log("found date value")
-            return new Date(value)
-          }
-        }
-        return value
-      })
-    }
-    return data
-  **/
+// set default 'withCredential'
+axios.defaults.withCredentials = true;
 
 export const api = axios;

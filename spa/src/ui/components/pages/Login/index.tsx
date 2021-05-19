@@ -15,9 +15,10 @@ import { useValidation } from 'hooks/validation';
 import { memberLoginSchema } from 'hooks/validation/rules';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { authActions } from 'reducers/slices/app';
-import { generateObjectFormData } from 'src/utils';
+import { mSelector } from 'src/selectors/selector';
+import { useHistory } from 'react-router';
 
 export declare type MemberLoginDataType = {
   email: string
@@ -80,19 +81,18 @@ const Login: React.FunctionComponent<{}> = (props) => {
   // dispatch
   const dispatch = useDispatch();
 
+  // history 
+  const history = useHistory();
+
   // snackbar notification
   // usage: 'enqueueSnackbar("message", { variant: "error" };
   const { enqueueSnackbar } = useSnackbar();
 
+  // redirect to previous url if exist
+  const curPreviousUrl = useSelector(mSelector.makePreviousUrlSelector());
+
   // forgot password dialog
   const [curForgotPasswordDialogOpen, setForgotPasswordDialogOpen] = React.useState<boolean>(false);
-
-  // redirect to original url after user login stuff.
-  
-  //const location = useLocation()
-  // this might not need to implement since you can use history.back() after sucess login
-  //const [curPrevUrl, setPrevUrl] = React.useState<string>("");
-
 
   // temp user account state
   const [curMemberLoginState, setMemberLoginState] = React.useState<MemberLoginDataType>(defaultMemberLoginData);
@@ -106,18 +106,6 @@ const Login: React.FunctionComponent<{}> = (props) => {
     schema: memberLoginSchema,
     setValidationDomain: setMemberLoginValidationState
   })
-
-  // redirect to original url after user login stuff.
-  // - store if previous path exist
-  // this might not need to implement since you can use history.back() after sucess login
-  //React.useEffect(() => {
-  //  if (location.state && (location.state as { from: { pathname: string }}).from.pathname) {
-  //    console.log("previous path exist")
-  //    const prevUrl = (location.state as { from: { pathname: string }}).from.pathname
-  //    console.log(prevUrl)
-  //    setPrevUrl(prevUrl);
-  //  }
-  //}, [])
 
   // event handlers
   const handleEmailInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
@@ -168,7 +156,34 @@ const Login: React.FunctionComponent<{}> = (props) => {
         // this does not work esp when there is no previous url.
         //
         // solution: to use redux state to store the previous url.
-        history.back(); 
+        //history.back(); 
+        
+        let nextDest = "/"
+        
+        if (!curPreviousUrl) {
+          nextDest = curPreviousUrl
+        }
+
+        /**
+         * don't confused with 'history' (window) and 'history' (react-router-dom)
+         *
+         * window: history.pushState()
+         *
+         * react-router-dom: history.push() <- use this one.
+         *
+         **/
+        history.push(nextDest);
+
+        /**
+         * TODO: fix the security issue.
+         *
+         * api-token (secure&httpOnly) cookie is not included and I don't know why.
+         * fix this. 
+         *
+         * this might be because you applying secure & httpOnly at development? NO. the backend set both values are false at development.
+         *
+         * */
+        
 
         enqueueSnackbar("added successfully.", { variant: "success" })
       }).catch((error: AxiosError) => {
