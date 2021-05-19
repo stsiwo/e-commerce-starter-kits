@@ -1,6 +1,13 @@
 import { PayloadAction, createSlice, createAction } from "@reduxjs/toolkit";
 
 /**
+ * IMPORTANT NOTE:
+ *
+ * - NEVER EVER store this redux state in persistent system (localstorage, persistent storage, any thing at front-end)
+ *
+ **/
+
+/**
  * redux-sage actions (side effects)
  *
  *  - use this in index.tsx at watchers
@@ -8,7 +15,7 @@ import { PayloadAction, createSlice, createAction } from "@reduxjs/toolkit";
  **/
 
 // for GET request
-export const requestStripeClientSecretActionCreator = createAction("saga/app/private/stripeClientSecret/request")
+export const requestStripeClientSecretActionCreator = createAction("saga/sensitive/stripeClientSecret/request")
 export const requestStripeClientSecretActionTypeName = requestStripeClientSecretActionCreator().type
 
 
@@ -18,7 +25,7 @@ export const requestStripeClientSecretActionTypeName = requestStripeClientSecret
 export type StripeClientSecretActionType = PayloadAction<string>
 
 export const stripeClientSecretSlice = createSlice({
-  name: "app/private/stripeClientSecret", // a name used in action type
+  name: "sensitive/stripeClientSecret", // a name used in action type
   initialState: "",
   reducers: {
     /**
@@ -42,5 +49,4 @@ export const stripeClientSecretSlice = createSlice({
 
 export const stripeClientSecretSliceReducer = stripeClientSecretSlice.reducer
 export const stripeClientSecretActions = stripeClientSecretSlice.actions
-
 

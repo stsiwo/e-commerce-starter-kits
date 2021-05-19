@@ -1,12 +1,11 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { StateType } from "states/types";
-import { denormalize } from "normalizr";
-import { categorySchemaArray, productSchemaArray } from "states/state";
-import { UserType, UserPhoneType, UserAddressType } from "domain/user/types";
-import merge from 'lodash/merge';
-import CartItem from "components/common/CartItem";
 import { CartItemType } from "domain/cart/types";
 import { ProductType } from "domain/product/types";
+import { UserAddressType, UserPhoneType, UserType } from "domain/user/types";
+import merge from 'lodash/merge';
+import { denormalize } from "normalizr";
+import { categorySchemaArray, productSchemaArray } from "states/state";
+import { StateType } from "states/types";
 
 export const rsSelector = {
   /**
@@ -33,7 +32,6 @@ export const rsSelector = {
   app: {
     getAuth: (state: StateType) => state.app.auth,
     getPreviousUrl: (state: StateType) => state.app.previousUrl,
-    getStripeClientSecret: (state: StateType) => state.app.private.stripeClientSecret,
     getSearchKeyword: (state: StateType) => state.app.searchKeyword,
     getRequestTracker: (state: StateType) => state.app.requestTracker,
   },
@@ -63,6 +61,10 @@ export const rsSelector = {
     getProductQuerySort: (state: StateType) => state.domain.products.query.sort,
     getProductPagination: (state: StateType) => state.domain.products.pagination,
     getProductCurItems: (state: StateType) => state.domain.products.curItems,
+  },
+
+  senstive: {
+    getStripeClientSecret: (state: StateType) => state.sensitive.stripeClientSecret,
   }
 }
 
@@ -227,7 +229,7 @@ export const mSelector = {
   makeStipeClientSecretSelector: () => {
     return createSelector(
       [
-        rsSelector.app.getStripeClientSecret
+        rsSelector.senstive.getStripeClientSecret
       ],
       (stripeClientSecret) => {
         return stripeClientSecret

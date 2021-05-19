@@ -69,10 +69,6 @@ export declare type AppStateType = {
       delete: FetchStatusEnum
     }
   },
-  // NEVER EVER STORE THIS ON LOCAL STORAGE/SESSION STORAGE. just for only in-memory
-  private: {
-    stripeClientSecret: string
-  }
 }
 
 export declare type DomainPaginationType = {
@@ -127,8 +123,14 @@ export declare type DomainStateType = {
   }
 }
 
+export declare type SensitiveStateType = {
+  stripeClientSecret: string
+}
+
 export declare type StateType = {
   ui?: UiStateType
   app?: AppStateType
   domain?: DomainStateType
+  // NEVER EVER STORE THIS ON LOCAL STORAGE/SESSION STORAGE. just for only in-memory
+  sensitive: SensitiveStateType 
 }

@@ -16,7 +16,7 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import { Link as RRLink } from "react-router-dom";
 import { CheckoutStepEnum } from 'components/pages/Checkout';
-import { requestStripeClientSecretActionCreator } from 'reducers/slices/app/private/stripeClientSecret';
+import { requestStripeClientSecretActionCreator } from 'reducers/slices/sensitive';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

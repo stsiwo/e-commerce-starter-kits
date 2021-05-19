@@ -21,6 +21,18 @@ export const store = createStore(rootReducer, initialState as StateType, compose
     applyMiddleware(...middleware)
 ));
 
+/**
+ * register any listeners...
+ **/
+
+// persist to localstorage
+store.subscribe(() => {
+
+  const auth = store.getState().app.auth
+  localStorage.setItem("auth", JSON.stringify(auth));
+
+})
+
 // run saga
 /**
  * you have to run sage AFTER 'createStore'

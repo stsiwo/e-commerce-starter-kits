@@ -70,7 +70,7 @@ const CartDrawer: React.FunctionComponent<{}> = (props) => {
         paper: classes.drawerPaper,
       }}
       ModalProps={{
-        keepMounted: true, // Better open performance on mobile.
+        keepMounted: false, // Better open performance on mobile.
       }}
     >
       {/**<div className={classes.toolbar} />**/}

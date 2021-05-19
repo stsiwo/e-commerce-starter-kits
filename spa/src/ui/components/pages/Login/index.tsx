@@ -30,6 +30,11 @@ const defaultMemberLoginData: MemberLoginDataType = {
   password: "",
 }
 
+if (NODE_ENV !== "production") {
+  defaultMemberLoginData.email = "test_member1@test.com"
+  defaultMemberLoginData.password = "test_password"
+}
+
 export declare type MemberLoginValidationDataType = {
   email?: string
   password?: string

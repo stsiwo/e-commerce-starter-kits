@@ -2,9 +2,9 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { AxiosPromise, AxiosRequestConfig } from "axios";
 import { api } from "configs/axiosConfig";
 import { stripeClientSecretFetchStatusActions } from "reducers/slices/app/fetchStatus/stripeClientSecret";
-import { stripeClientSecretActions } from "reducers/slices/app/private/stripeClientSecret";
 import { call, put } from "redux-saga/effects";
 import { FetchStatusEnum } from "src/app";
+import { stripeClientSecretActions } from "reducers/slices/sensitive";
 
 /**
  * a worker (generator)    

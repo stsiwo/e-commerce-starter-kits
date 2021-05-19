@@ -15,7 +15,7 @@ const categorySchemaEntity = new schema.Entity(
   "categories",
   {},
   {
-    idAttribute: "categoryId", 
+    idAttribute: "categoryId",
   }
 )
 
@@ -68,7 +68,8 @@ export const initialState: StateType = {
     cartModal: false,
   },
   app: {
-    auth: {
+    // if "auth" exists in localStorage, retrieve as initial state, otherwise, get default Guest auth.
+    auth: localStorage.getItem("auth") != null ? JSON.parse(localStorage.getItem("auth")) : {
       isLoggedIn: false,
       userType: UserTypeEnum.GUEST,
       user: defaultUser,
@@ -97,7 +98,7 @@ export const initialState: StateType = {
         getSingle: FetchStatusEnum.INITIAL,
         post: FetchStatusEnum.INITIAL,
         put: FetchStatusEnum.INITIAL,
-        patch: FetchStatusEnum.INITIAL, 
+        patch: FetchStatusEnum.INITIAL,
         deleteSingle: FetchStatusEnum.INITIAL,
       },
       categories: {
@@ -123,9 +124,6 @@ export const initialState: StateType = {
         deleteSingle: FetchStatusEnum.INITIAL,
       }
     },
-    private: {
-      stripeClientSecret: ""
-    }
   },
   domain: {
     categories: {
@@ -135,7 +133,7 @@ export const initialState: StateType = {
         limit: 10,
         totalPages: 1,
       },
-    }, 
+    },
     cartItems: [],
     wishlistItems: {
       data: [],
@@ -190,4 +188,8 @@ export const initialState: StateType = {
       curItems: [],
     }
   },
+  // never persist
+  sensitive: {
+    stripeClientSecret: ""
+  }
 }
