@@ -152,7 +152,7 @@ const AdminReviewForm = React.forwardRef<any, AdminReviewFormPropsType>((props, 
         api.request({
           method: 'PUT',
           url: API1_URL + `/reviews/${curReviewState.reviewId}`,
-          data: JSON.stringify(curReviewState),
+          data: curReviewState,
         }).then((data) => {
 
           // fetch again

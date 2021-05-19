@@ -130,7 +130,7 @@ const ContactForm: React.FunctionComponent<{}> = (props) => {
       api.request({
         method: 'POST',
         url: API1_URL + `/contact`,
-        data: JSON.stringify(curContactFormState),
+        data: curContactFormState, // application/json since object
       }).then((data) => {
 
         enqueueSnackbar("updated successfully.", { variant: "success" })

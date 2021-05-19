@@ -220,7 +220,7 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
           api.request({
             method: 'POST',
             url: API1_URL + `/products/${targetProductId}/variants`,
-            data: JSON.stringify(curProductVariantState),
+            data: curProductVariantState,
           }).then((data) => {
 
             const newVariant = data.data;
@@ -239,7 +239,7 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
           api.request({
             method: 'PUT',
             url: API1_URL + `/products/${targetProductId}/variants/${curProductVariantState.variantId}`,
-            data: JSON.stringify(curProductVariantState),
+            data: curProductVariantState,
           }).then((data) => {
 
             const updatedVariant = data.data;

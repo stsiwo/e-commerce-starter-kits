@@ -154,7 +154,7 @@ const AdminCategoryForm = React.forwardRef<any, AdminCategoryFormPropsType>((pro
           api.request({
             method: 'POST',
             url: API1_URL + `/categories`,
-            data: JSON.stringify(curCategoryState),
+            data: curCategoryState,
           }).then((data) => {
 
             // fetch again
@@ -171,7 +171,7 @@ const AdminCategoryForm = React.forwardRef<any, AdminCategoryFormPropsType>((pro
           api.request({
             method: 'PUT',
             url: API1_URL + `/categories/${curCategoryState.categoryId}`,
-            data: JSON.stringify(curCategoryState),
+            data: curCategoryState,
           }).then((data) => {
 
             // fetch again

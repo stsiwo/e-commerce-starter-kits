@@ -176,10 +176,6 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
       // pass 
       console.log("passed")
 
-      const bodyFormData = new FormData();
-      bodyFormData.append("phoneNumber", curUserAccountPhoneState.phoneNumber);
-      bodyFormData.append("countryCode", curUserAccountPhoneState.countryCode);
-
       if (isNew) {
         console.log("this one is to create new one")
 
@@ -187,7 +183,7 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
         api.request({
           method: 'POST',
           url: API1_URL + `/users/${auth.user.userId}/phones`,
-          data: bodyFormData,
+          data: curUserAccountPhoneState,
         }).then((data) => {
           /**
            *  add new phone
@@ -206,7 +202,7 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
         api.request({
           method: 'PUT',
           url: API1_URL + `/users/${auth.user.userId}/phones/${curUserAccountPhoneState.phoneId}`,
-          data: bodyFormData,
+          data: curUserAccountPhoneState,
         }).then((data) => {
           /**
            *  update phone

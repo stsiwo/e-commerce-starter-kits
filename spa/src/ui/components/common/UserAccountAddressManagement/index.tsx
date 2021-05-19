@@ -248,7 +248,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
         api.request({
           method: 'POST',
           url: API1_URL + `/users/${auth.user.userId}/addresses`,
-          data: JSON.stringify(curUserAccountAddressState),
+          data: curUserAccountAddressState,
         }).then((data) => {
           /**
            *  add new address
@@ -266,7 +266,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
         api.request({
           method: 'PUT',
           url: API1_URL + `/users/${auth.user.userId}/addresses/${curUserAccountAddressState.addressId}`,
-          data: JSON.stringify(curUserAccountAddressState),
+          data: curUserAccountAddressState,
         }).then((data) => {
           /**
            *  update address
@@ -338,7 +338,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
     api.request({
       method: 'PATCH',
       url: API1_URL + `/users/${auth.user.userId}/addresses/${nextBillingAddress}`,
-      data: JSON.stringify({ type: "billing" })
+      data: { type: "billing" }
     }).then((data) => {
 
       /**
@@ -364,7 +364,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
     api.request({
       method: 'PATCH',
       url: API1_URL + `/users/${auth.user.userId}/addresses/${nextShippingAddress}`,
-      data: JSON.stringify({ type: "shipping" })
+      data: { type: "shipping" }
     }).then((data) => {
 
       /**

@@ -217,7 +217,7 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
       api.request({
         method: 'PUT',
         url: API1_URL + `/users/${auth.user.userId}/companies`,
-        data: JSON.stringify(curAdminCompanyFormState),
+        data: curAdminCompanyFormState,
       }).then((data) => {
 
         /**

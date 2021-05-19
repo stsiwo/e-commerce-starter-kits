@@ -2,19 +2,18 @@ import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { createStyles, makeStyles, Theme, useTheme } from '@material-ui/core/styles';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import * as React from 'react';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import TextField from '@material-ui/core/TextField';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { AxiosError } from 'axios';
+import { api } from 'configs/axiosConfig';
 import { useValidation } from 'hooks/validation';
 import { forgotPasswordSchema } from 'hooks/validation/rules';
-import { api } from 'configs/axiosConfig';
-import { generateObjectFormData } from 'src/utils';
-import { useDispatch } from 'react-redux';
 import { useSnackbar } from 'notistack';
-import { AxiosError } from 'axios';
+import * as React from 'react';
+import { useDispatch } from 'react-redux';
 
 export declare type ForgotPasswordDataType = {
   email: string
@@ -133,7 +132,7 @@ const ForgotPasswordDialog: React.FunctionComponent<ForgotPasswordDialogPropsTyp
       api.request({
         method: 'POST',
         url: API1_URL + `/forgot-password`,
-        data: generateObjectFormData(curForgotPasswordState),
+        data: curForgotPasswordState,
       }).then((data) => {
         enqueueSnackbar("Please check your email box.", { variant: "success" })
       }).catch((error: AxiosError) => {

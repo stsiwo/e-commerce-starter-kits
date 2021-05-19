@@ -170,7 +170,7 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
           api.request({
             method: 'POST',
             url: API1_URL + `/users/${auth.user.userId}/phones`,
-            data: JSON.stringify(omit(curCustomerPhonesFormState, 'phoneId')), // DON'T FORGET to remove 'phoneId' for new.
+            data: omit(curCustomerPhonesFormState, 'phoneId'), // DON'T FORGET to remove 'phoneId' for new.
           }).then((data) => {
             /**
              * update auth
@@ -205,7 +205,7 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
           api.request({
             method: 'PUT',
             url: API1_URL + `/users/${auth.user.userId}/phones/${curCustomerPhonesFormState.phoneId}`,
-            data: JSON.stringify(curCustomerPhonesFormState),
+            data: curCustomerPhonesFormState,
           }).then((data) => {
             /**
              * update auth
@@ -315,7 +315,7 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
       api.request({
         method: 'PUT',
         url: API1_URL + `/users/${auth.user.userId}/phones/${targetPhoneId}`,
-        data: JSON.stringify(merge({}, targetPhone, { isSelected: true })), // 
+        data: merge({}, targetPhone, { isSelected: true }), // 
       }).then((data) => {
         /**
          * update auth

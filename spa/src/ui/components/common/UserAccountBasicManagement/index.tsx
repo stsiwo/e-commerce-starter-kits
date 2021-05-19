@@ -13,6 +13,7 @@ import { authActions } from 'reducers/slices/app';
 import { AxiosError } from 'axios';
 import Typography from '@material-ui/core/Typography';
 import { api } from 'configs/axiosConfig';
+import omit from 'lodash/omit';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -168,7 +169,7 @@ const UserAccountBasicManagement: React.FunctionComponent<UserAccountBasicManage
       api.request({
         method: 'POST',
         url: API1_URL + `/users/${auth.user.userId}`,
-        data: bodyFormData,
+        data: omit(curUserAccountState, 'confirm') ,
       }).then((data) => {
 
         /**

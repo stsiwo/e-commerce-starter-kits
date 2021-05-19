@@ -119,7 +119,7 @@ const TimelineUpdateForm: React.FunctionComponent<TimelineUpdateFormPropsType> =
     api.request({
       method: 'POST',
       url: API1_URL + `/orders/${orderId}/events`,
-      data: JSON.stringify(curOrderEventState),
+      data: curOrderEventState,
     }).then((data) => {
 
       const newOrderEvent = data.data; 

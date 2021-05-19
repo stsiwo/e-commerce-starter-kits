@@ -70,7 +70,7 @@ const CartDrawer: React.FunctionComponent<{}> = (props) => {
         paper: classes.drawerPaper,
       }}
       ModalProps={{
-        keepMounted: false, // Better open performance on mobile.
+        keepMounted: false, // make this false. otherwise, every time when page change, this send an api request to fetch current cart items. (keepMouted: true => Better open performance on mobile).
       }}
     >
       {/**<div className={classes.toolbar} />**/}

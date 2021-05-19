@@ -8,14 +8,11 @@ import Typography from '@material-ui/core/Typography';
 import SentimentSatisfiedOutlinedIcon from '@material-ui/icons/SentimentSatisfiedOutlined';
 import { AxiosError } from 'axios';
 import { api } from 'configs/axiosConfig';
-import { UserType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { resetPasswordSchema } from 'hooks/validation/rules';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
-import { authActions } from 'reducers/slices/app';
-import { generateObjectFormData } from 'src/utils';
 import { useLocation } from 'react-router';
 
 export declare type ResetPasswordDataType = {
@@ -137,10 +134,10 @@ const ResetPassword: React.FunctionComponent<{}> = (props) => {
       api.request({
         method: 'POST',
         url: API1_URL + `/reset-password`,
-        data: generateObjectFormData({
+        data: {
           password: curResetPasswordState.password,
           token: forgotPasswordToken,
-        }),
+        },
       }).then((data) => {
         enqueueSnackbar("password was successfully reset.", { variant: "success" })
       }).catch((error: AxiosError) => {

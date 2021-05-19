@@ -78,7 +78,7 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
       api.request({
         method: 'POST',
         url: API1_URL + `/orders/${props.orderId}/events`,
-        data: JSON.stringify(curOrderEventState),
+        data: curOrderEventState,
       }).then((data) => {
 
         const newOrderEvent = data.data;
@@ -97,7 +97,7 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
       api.request({
         method: 'PUT',
         url: API1_URL + `/orders/${props.orderId}/events/${curOrderEventState.orderEventId}`,
-        data: JSON.stringify(curOrderEventState),
+        data: curOrderEventState,
       }).then((data) => {
 
         const updatedOrderEvent = data.data;

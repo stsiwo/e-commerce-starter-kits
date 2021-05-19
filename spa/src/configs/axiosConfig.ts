@@ -70,4 +70,14 @@ axios.defaults.transformResponse = [].concat(
 // set default 'withCredential'
 axios.defaults.withCredentials = true;
 
+/**
+ * default header content type.
+ *
+ * Axios converts this Javascript data to JSON by default. 
+ * It also sets the “content-type” header to “application/json”. 
+ * However, if you pass a serialized JSON object as data, Axios treats the content type as “application/x-www-form-urlencoded” (form-encoded request body).
+ *
+ *
+ **/
+
 export const api = axios;

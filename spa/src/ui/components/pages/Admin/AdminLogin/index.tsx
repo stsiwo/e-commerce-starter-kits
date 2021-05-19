@@ -128,7 +128,7 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
       api.request({
         method: 'POST',
         url: API1_URL + `/authenticate`,
-        data: generateObjectFormData(curAdminLoginState),
+        data: curAdminLoginState,
       }).then((data) => {
         /**
          *  add new phone

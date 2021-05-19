@@ -12,12 +12,12 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { useValidation } from 'hooks/validation';
 import { memberSignupSchema } from 'hooks/validation/rules';
 import { api } from 'configs/axiosConfig';
-import { generateObjectFormData } from 'src/utils';
 import { useDispatch } from 'react-redux';
 import { useSnackbar } from 'notistack';
 import { UserType } from 'domain/user/types';
 import { authActions } from 'reducers/slices/app';
 import { AxiosError } from 'axios';
+import omit from 'lodash/omit';
 
 export declare type MemberSignupDataType = {
   firstName: string
@@ -173,7 +173,7 @@ const Signup: React.FunctionComponent<{}> = (props) => {
       api.request({
         method: 'POST',
         url: API1_URL + `/signup`,
-        data: generateObjectFormData(curMemberSignupState),
+        data: omit(curMemberSignupState, "confirm"),
       }).then((data) => {
         /**
          *  add new phone

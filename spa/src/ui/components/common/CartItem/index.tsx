@@ -96,7 +96,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
         api.request({
           method: 'PUT',
           url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartItemId}`,
-          data: JSON.stringify(nextCartItem)
+          data: nextCartItem
         }).then((data) => {
 
           const updatedCartItem = data.data;
@@ -127,7 +127,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
         api.request({
           method: 'PUT',
           url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartItemId}`,
-          data: JSON.stringify(nextCartItem)
+          data: nextCartItem
         }).then((data) => {
 
           const updatedCartItem = data.data;
@@ -158,7 +158,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
       api.request({
         method: 'PUT',
         url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartItemId}`,
-        data: JSON.stringify(nextCartItem)
+        data: nextCartItem
       }).then((data) => {
 
         const updatedCartItem = data.data;

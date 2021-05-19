@@ -170,7 +170,7 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
       api.request({
         method: 'POST',
         url: API1_URL + `/users/${auth.user.userId}`,
-        data: JSON.stringify(curUserAccountState),
+        data: curUserAccountState,
       }).then((data) => {
 
         /**

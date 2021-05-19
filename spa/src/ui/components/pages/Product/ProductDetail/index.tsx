@@ -253,13 +253,13 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
         method: 'POST',
         url: API1_URL + `/users/${auth.user.userId}/cartItem`,
         // make sure 'generateObjectFormData' works correctly.
-        data: JSON.stringify({
+        data: {
           createdAt: new Date(Date.now()),
           isSelected: true,
           product: props.product,
           quantity: curQty,
           userId: auth.user.userId,
-        }),
+        },
       }).then((data) => {
 
         // fetch again

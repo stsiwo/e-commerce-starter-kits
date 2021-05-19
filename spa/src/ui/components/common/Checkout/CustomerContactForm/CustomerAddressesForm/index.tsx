@@ -214,7 +214,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
           /**
            * remove temp id from phone state
            *
-           *  - temp id is necessary for manipulating new phones at front-end.
+           *  - temp id is necessary for manipulating new phones at front-end, but don't need it at backend if it is new so remove before sending a POST request.
            **/
 
           console.log("member")
@@ -222,7 +222,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
           api.request({
             method: 'POST',
             url: API1_URL + `/users/${auth.user.userId}/addresses`,
-            data: JSON.stringify(omit(curCustomerAddressesFormState, 'addressId')), // DON'T FORGET to remove 'phoneId' for new.
+            data: omit(curCustomerAddressesFormState, 'addressId'), // DON'T FORGET to remove 'phoneId' for new.
           }).then((data) => {
             /**
              * update auth
@@ -261,7 +261,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
           api.request({
             method: 'PUT',
             url: API1_URL + `/users/${auth.user.userId}/addresses/${curCustomerAddressesFormState.addressId}`,
-            data: JSON.stringify(curCustomerAddressesFormState),
+            data: curCustomerAddressesFormState,
           }).then((data) => {
             /**
              * update auth
@@ -337,7 +337,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
       api.request({
         method: 'PATCH',
         url: API1_URL + `/users/${auth.user.userId}/addresses/${targetAddressId}`,
-        data: JSON.stringify(merge({}, targetAddress, { type: "shipping" })), // 
+        data: merge({}, targetAddress, { type: "shipping" }), // 
       }).then((data) => {
         /**
          * update auth
@@ -374,7 +374,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
       api.request({
         method: 'PATCH',
         url: API1_URL + `/users/${auth.user.userId}/addresses/${targetAddressId}`,
-        data: JSON.stringify(merge({}, targetAddress, { type: "billing" })), // 
+        data: merge({}, targetAddress, { type: "billing" }), // 
       }).then((data) => {
         /**
          * update auth
