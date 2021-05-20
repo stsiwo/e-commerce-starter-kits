@@ -58,8 +58,11 @@ export const cartItemSlice = createSlice({
     append: (state: CartItemType[], action: PayloadAction<CartItemType>) => merge(state, [action.payload]),
 
     // use when you want to replace
-    update: (state: CartItemType[], action: CartItemActionType) => action.payload,
-
+    update: (state: CartItemType[], action: CartItemActionType) => {
+      console.log("inside cart item reducer")
+      console.log(action.payload)
+      return action.payload;
+    },
     // use when you want to remove a single entity
     delete: (state: CartItemType[], action: PayloadAction<CartItemType>) => remove(state, (cartItem: CartItemType) => cartItem.cartItemId == action.payload.cartItemId),
 

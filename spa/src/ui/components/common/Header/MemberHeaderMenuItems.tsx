@@ -1,22 +1,26 @@
-import Grid from '@material-ui/core/Grid';
-import Link from '@material-ui/core/Link';
-import { createStyles, makeStyles, Theme, useTheme } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
-import * as React from 'react';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
+import Badge from '@material-ui/core/Badge';
 import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import Link from '@material-ui/core/Link';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import { Link as RRLink } from "react-router-dom";
-import IconButton from '@material-ui/core/IconButton';
-import Badge from '@material-ui/core/Badge';
+import { createStyles, makeStyles, Theme, useTheme } from '@material-ui/core/styles';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
+import { AxiosError } from 'axios';
+import { api } from 'configs/axiosConfig';
+import { useSnackbar } from 'notistack';
+import * as React from 'react';
 import { useDispatch } from 'react-redux';
+import { Link as RRLink } from "react-router-dom";
+import { authActions } from 'reducers/slices/app';
 import { cartModalActions } from 'reducers/slices/ui';
 
 declare interface MenuItemType {
   url: string
   label: string
+  isLogout: boolean
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -30,23 +34,31 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
 
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
   // data
   const menuItemList: MenuItemType[] = React.useMemo(() => [
     {
       url: "/account",
       label: "Accounts",
+      isLogout: false,
     },
     {
       url: "/wishlist",
       label: "Wish List",
+      isLogout: false,
     },
     {
       url: "/orders",
       label: "Orders",
+      isLogout: false,
     },
     {
-      url: "/logout",
+      url: "/",
       label: "Log Out",
+      isLogout: true,
     },
   ], []);
 
@@ -75,15 +87,44 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
     setAnchorEl(null);
   };
 
+  // logout event handler
+  const handleLogout: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+
+    e.preventDefault()
+
+    console.log("start handling logout...")
+    console.log(API1_URL + `/logout`)
+
+    // request
+    api.request({
+      method: 'post',
+      url: API1_URL + `/logout`,
+      data: null 
+    }).then((data) => {
+
+      // fetch again
+      dispatch(authActions.logout())
+
+      enqueueSnackbar("logged out successfully.", { variant: "success" })
+    }).catch((error: AxiosError) => {
+      enqueueSnackbar(error.message, { variant: "error" })
+    })
+  }
+
   // rendering stuff
   const renderMenuItemListForLargeScreen: () => React.ReactNode = () => {
     return menuItemList.map((menuItem: MenuItemType) => {
+
+      const linkProps = {
+        className: classes.menuItem,
+        component: RRLink,
+        to: menuItem.url,
+      }
+
       return (
         <Link key={menuItem.url}
           color="inherit"
-          className={classes.menuItem}
-          component={RRLink}
-          to={menuItem.url}
+          {...linkProps}
         >
           {menuItem.label}
         </Link>
@@ -116,7 +157,12 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
         </Badge>
       </IconButton>
       {(isMdUp &&
-        renderMenuItemListForLargeScreen()
+        <React.Fragment>
+          {renderMenuItemListForLargeScreen()}
+          <Button onClick={handleLogout}>
+            Logout
+          </Button>
+        </React.Fragment>
       )}
       {(!isMdUp &&
         <React.Fragment>
@@ -131,6 +177,9 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
             onClose={handleDropDownMenuCloseClickEvent}
           >
             {renderMenuItemListForSmallScreen()}
+            <Button onClick={handleLogout}>
+              Logout
+            </Button>
           </Menu>
         </React.Fragment>
       )}

@@ -15,7 +15,7 @@ import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import Rating from '@material-ui/lab/Rating/Rating';
 import Carousel from 'components/common/Carousel';
 import ColorRadio from 'components/common/ColorRadio';
-import { filterUniqueVariantColors, filterUniqueVariantSizes, isExceedStock } from 'domain/product';
+import { filterUniqueVariantColors, filterUniqueVariantSizes, isExceedStock, filterSingleVariant } from 'domain/product';
 import { ProductType, ProductVariantSizeType, ProductVariantType } from 'domain/product/types';
 import uniq from 'lodash/uniq';
 import { useSnackbar } from 'notistack';
@@ -26,6 +26,7 @@ import { UserTypeEnum } from 'src/app';
 import { cartItemActions } from 'reducers/slices/domain/cartItem';
 import { api } from 'configs/axiosConfig';
 import { AxiosError } from 'axios';
+import cloneDeep from 'lodash/cloneDeep';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -238,11 +239,15 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
   // event handler for adding cart
   const handleAddCart: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
 
+    // temp product to filter the selected variant
+    const tempProduct = cloneDeep(props.product)
+    tempProduct.variants = filterSingleVariant(curVariant.variantId, tempProduct); 
+
     if (auth.userType === UserTypeEnum.GUEST) {
       dispatch(cartItemActions.append({
         createdAt: new Date(Date.now()),
         isSelected: true,
-        product: props.product,
+        product: tempProduct, // need to set filtered product (only contains selected variant) 
         quantity: curQty,
         user: null,
       }))
@@ -254,9 +259,8 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
         url: API1_URL + `/users/${auth.user.userId}/cartItem`,
         // make sure 'generateObjectFormData' works correctly.
         data: {
-          createdAt: new Date(Date.now()),
+          variantId: curVariant.variantId,
           isSelected: true,
-          product: props.product,
           quantity: curQty,
           userId: auth.user.userId,
         },

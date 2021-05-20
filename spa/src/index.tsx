@@ -13,7 +13,7 @@ import { SnackbarProvider } from 'notistack';
 /**
  * dev env only
  **/
-const RoleSwitch = (NODE_ENV === "development") ? loadable(() => import("tests/debug/compoments/RoleSwitch")) : null
+//const RoleSwitch = (NODE_ENV === "development") ? loadable(() => import("tests/debug/compoments/RoleSwitch")) : null
 
 const Index = (props: any) => {
 
@@ -26,9 +26,9 @@ const Index = (props: any) => {
             <Provider store={store}>
               <Router>
                 <Content />
-                {(RoleSwitch &&
+                {/**(RoleSwitch &&
                   <RoleSwitch />
-                )}
+                )**/}
               </Router>
             </Provider>
           </CssBaseline>

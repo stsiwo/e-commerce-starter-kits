@@ -165,7 +165,7 @@ const Login: React.FunctionComponent<{}> = (props) => {
         
         let nextDest = "/"
         
-        if (!curPreviousUrl) {
+        if (curPreviousUrl) {
           nextDest = curPreviousUrl
         }
 
@@ -179,18 +179,7 @@ const Login: React.FunctionComponent<{}> = (props) => {
          **/
         history.push(nextDest);
 
-        /**
-         * TODO: fix the security issue.
-         *
-         * api-token (secure&httpOnly) cookie is not included and I don't know why.
-         * fix this. 
-         *
-         * this might be because you applying secure & httpOnly at development? NO. the backend set both values are false at development.
-         *
-         * */
-        
-
-        enqueueSnackbar("added successfully.", { variant: "success" })
+        enqueueSnackbar("logged in successfully.", { variant: "success" })
       }).catch((error: AxiosError) => {
         enqueueSnackbar(error.message, { variant: "error" })
       })

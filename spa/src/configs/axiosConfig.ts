@@ -46,21 +46,20 @@ axios.defaults.transformResponse = [].concat(
       console.log("before json parse")
       console.log(data)
 
-      return JSON.parse(data, (key: string, value: any) => {
-        console.log("after json parse")
+      const updated = JSON.parse(data, (key: string, value: any) => {
         if (typeof value === 'string') {
-          console.log(`${key} and ${value}`);
-
           const a = ISORegex1.exec(value);
           const b = ISORegex2.exec(value);
-
           if (a || b) {
-            console.log("found date value")
             return new Date(value)
           }
         }
         return value
       });
+      console.log("after json parse")
+      console.log(updated)
+
+      return updated
     }
     return data
   },

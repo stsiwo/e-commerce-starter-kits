@@ -23,3 +23,8 @@ export function isExceedStock(amount: number, variantId: string, product: Produc
 
   return amount > targetVariant.variantStock
 }
+
+// return the filtered variant as array
+export function filterSingleVariant(variantId: string, product: ProductType) {
+  return product.variants.filter((variant: ProductVariantType) => variant.variantId == variantId);
+}

@@ -68,8 +68,10 @@ export function* fetchCartItemWorker(action: PayloadAction<{}>) {
        * update cartItem domain in state
        *
        **/
+      console.log("recived cart items from api")
+      console.log(response.data) // no pagination, use response.data.
       yield put(
-        cartItemActions.update(response.data.data)
+        cartItemActions.update(response.data)
       )
 
       /**
