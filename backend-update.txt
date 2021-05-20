@@ -37,6 +37,10 @@ endpoint change:
     
       - only return products which are 'public' & have at least one variant.
       
+  - /orders/{orderId}/events
+  
+    return manipulated order event! not string message.
+      
     
 
 ## Stripe
