@@ -34,6 +34,10 @@ const useStyles = makeStyles((theme: Theme) =>
       }
     },
     drawerPaper: {
+
+      padding: `0 ${theme.spacing(1)}px`,
+      overflowY: "scroll",
+
       [theme.breakpoints.down('xs')]: {
         width: "100%",
       }
@@ -62,7 +66,6 @@ const CartDrawer: React.FunctionComponent<{}> = (props) => {
   return (
     <Drawer
       className={classes.drawer}
-      variant={'temporary'}
       anchor="right"
       open={curCartOpen}
       onClose={toggleDrawer(false)}

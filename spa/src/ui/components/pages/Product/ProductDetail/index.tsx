@@ -27,6 +27,7 @@ import { cartItemActions } from 'reducers/slices/domain/cartItem';
 import { api } from 'configs/axiosConfig';
 import { AxiosError } from 'axios';
 import cloneDeep from 'lodash/cloneDeep';
+import { getNanoId } from 'src/utils';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -245,6 +246,7 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
 
     if (auth.userType === UserTypeEnum.GUEST) {
       dispatch(cartItemActions.append({
+        cartItemId: getNanoId(), // temp id
         createdAt: new Date(Date.now()),
         isSelected: true,
         product: tempProduct, // need to set filtered product (only contains selected variant) 
@@ -256,7 +258,7 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
       // request
       api.request({
         method: 'POST',
-        url: API1_URL + `/users/${auth.user.userId}/cartItem`,
+        url: API1_URL + `/users/${auth.user.userId}/cartItems`,
         // make sure 'generateObjectFormData' works correctly.
         data: {
           variantId: curVariant.variantId,

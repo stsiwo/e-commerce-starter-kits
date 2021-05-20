@@ -1,6 +1,7 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import merge from "lodash/merge";
 import { ReviewType } from "domain/review/type";
+import remove from 'lodash/remove';
 
 /**
  * redux-sage actions (side effects)
@@ -38,7 +39,7 @@ export const deleteReviewActionTypeName = deleteReviewActionCreator().type
  *
  **/
 // action type             
-export type ReviewActionType = PayloadAction<ReviewType> 
+export type ReviewActionType = PayloadAction<ReviewType[]> 
 
 export const reviewSlice = createSlice({ 
   name: "domain/reviews", // a name used in action type
@@ -53,11 +54,47 @@ export const reviewSlice = createSlice({
      *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
      *
      **/
-    merge: (state: ReviewType, action: ReviewActionType) => merge(state, action.payload),
 
-    update: (state: ReviewType, action: ReviewActionType) => action.payload,
+    /**
+     * be careful that duplicate might exist.
+     *
+     * - not unique.
+     *
+     **/
+    concat: (state: ReviewType[], action: ReviewActionType) => {
+      return state.concat(action.payload); 
+    },
 
-    clear: (state: ReviewType) => [],
+    // use when update existing one (only apply for array: don't use for object)
+    updateOne: (state: ReviewType[], action: PayloadAction<ReviewType>) => {
+      return state.map((domain: ReviewType) => {
+        if (domain.reviewId === action.payload.reviewId) {
+          return action.payload
+        }
+        return domain
+      })
+    },
+
+    append: (state: ReviewType[], action: PayloadAction<ReviewType>) => merge(state, [action.payload]),
+
+    // use when you want to replace the whole array
+    update: (state: ReviewType[], action: ReviewActionType) => {
+      console.log("inside cart item reducer")
+      console.log(action.payload)
+      return action.payload;
+    },
+    // use when you want to remove a single entity
+    delete: (state: ReviewType[], action: PayloadAction<ReviewType>) => {
+      /**
+       * mutable.
+       * original one: the rest of elements
+       * return one: the removed elements
+       **/
+      remove(state, (cartItem: ReviewType) => cartItem.reviewId == action.payload.reviewId)
+      return state
+    },
+
+    clear: (state: ReviewType[]) => [],
   },
   /**
    * extraReducers property

@@ -119,6 +119,10 @@
     - read this: https://material-ui.com/guides/composition/#link
 
 
+  ### Drawer Not Showing Vertical Scrollbar.
+
+    - this is because content deos not have min height. so set each min height. (e.g., CartItem#card#minHeight)
+
 
 ## Data Grid library
 

@@ -81,7 +81,7 @@ export function* postOrderWorker(action: PayloadAction<OrderType>) {
        *
        **/
       yield put(
-        orderActions.merge(response.data.data)
+        orderActions.concat(response.data.data)
       )
 
       /**

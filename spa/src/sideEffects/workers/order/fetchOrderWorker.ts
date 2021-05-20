@@ -79,7 +79,7 @@ export function* fetchOrderWorker(action: PayloadAction<{}>) {
        *
        **/
       yield put(
-        orderActions.merge(response.data.data)
+        orderActions.concat(response.data.data)
       )
 
       /**

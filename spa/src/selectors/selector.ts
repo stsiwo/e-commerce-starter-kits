@@ -436,6 +436,17 @@ export const mSelector = {
     )
   },
 
+  // domain.cartItem (# of cart items) 
+  makeNumberOfCartItemSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getCartItem
+      ],
+      (cartItem) => {
+        return cartItem.length; 
+      },
+    )
+  },
   // domain.wishlistItem
   makeWishlistItemSelector: () => {
     return createSelector(

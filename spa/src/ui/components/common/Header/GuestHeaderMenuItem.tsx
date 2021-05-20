@@ -7,9 +7,10 @@ import { Link as RRLink } from "react-router-dom";
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { cartModalActions } from 'reducers/slices/ui';
 import { constructLinkWrapper } from 'src/componentUtils';
+import { mSelector } from 'src/selectors/selector';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -33,6 +34,9 @@ const GuestHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
 
   const dispatch = useDispatch();
 
+  // cur cart item #
+  const curNumberOfCartItems = useSelector(mSelector.makeNumberOfCartItemSelector());
+
   const handleCartModalOpenClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
     dispatch(cartModalActions.toggle());
   }
@@ -46,7 +50,7 @@ const GuestHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
         Sign Up
       </Link>
       <IconButton onClick={handleCartModalOpenClick}>
-        <Badge badgeContent={4} color="error">
+        <Badge badgeContent={curNumberOfCartItems} color="error">
           <ShoppingCartIcon />
         </Badge>
       </IconButton>

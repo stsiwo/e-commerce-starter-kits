@@ -56,14 +56,35 @@ export const orderSlice = createSlice({
      *
      **/
 
-    // use when update existing one
-    merge: (state: OrderType[], action: OrderActionType) => merge(state, action.payload),
+    /**
+     * be careful that duplicate might exist.
+     *
+     * - not unique.
+     *
+     **/
+    concat: (state: OrderType[], action: OrderActionType) => {
+      return state.concat(action.payload); 
+    },
+
+    // use when update existing one (only apply for array: don't use for object)
+    updateOne: (state: OrderType[], action: PayloadAction<OrderType>) => {
+      return state.map((domain: OrderType) => {
+        if (domain.orderId === action.payload.orderId) {
+          return action.payload
+        }
+        return domain
+      })
+    },
+
 
     // use when you want to replace
     update: (state: OrderType[], action: OrderActionType) => action.payload,
 
     // use when you want to remove a single entity
-    delete: (state: OrderType[], action: PayloadAction<OrderType>) => remove(state, (order: OrderType) => order.orderId == action.payload.orderId),
+    delete: (state: OrderType[], action: PayloadAction<OrderType>) => {
+      remove(state, (order: OrderType) => order.orderId == action.payload.orderId)
+      return state;
+    },
 
     appendEvent: (state: OrderType[], action: PayloadAction<{ orderId: string, event: OrderEventType }>) => {
 

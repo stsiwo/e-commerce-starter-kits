@@ -12,10 +12,11 @@ import { AxiosError } from 'axios';
 import { api } from 'configs/axiosConfig';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link as RRLink } from "react-router-dom";
 import { authActions } from 'reducers/slices/app';
 import { cartModalActions } from 'reducers/slices/ui';
+import { mSelector } from 'src/selectors/selector';
 
 declare interface MenuItemType {
   url: string
@@ -64,6 +65,9 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
 
   // styles
   const classes = useStyles();
+
+  // cur cart item #
+  const curNumberOfCartItems = useSelector(mSelector.makeNumberOfCartItemSelector());
 
   // responsive
   const theme = useTheme();
@@ -152,7 +156,7 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
   return (
     <Grid item>
       <IconButton onClick={handleCartModalOpenClick}>
-        <Badge badgeContent={4} color="error">
+        <Badge badgeContent={curNumberOfCartItems} color="error">
           <ShoppingCartIcon />
         </Badge>
       </IconButton>

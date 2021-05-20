@@ -85,7 +85,7 @@ export function* putCartItemWorker(action: PayloadAction<CartItemType>) {
        *
        **/
       yield put(
-        cartItemActions.merge(response.data.data)
+        cartItemActions.updateOne(response.data.data)
       )
 
       /**
@@ -121,7 +121,7 @@ export function* putCartItemWorker(action: PayloadAction<CartItemType>) {
      *
      **/
     yield put(
-      cartItemActions.merge([action.payload])
+      cartItemActions.updateOne(action.payload)
     )
   }
 }

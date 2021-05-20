@@ -13,6 +13,15 @@ export declare type CartItemType = {
   createdAt: Date
 }
 
+export declare type CartItemCriteria = {
+  cartItemId?: string
+  variantId: string
+  isSelected: boolean
+  quantity: number
+  userId?: string
+  createdAt?: Date
+}
+
 // form data
 export declare type CartItemDataType = {
   cartItemId?: string,

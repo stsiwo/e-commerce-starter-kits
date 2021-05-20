@@ -70,7 +70,7 @@ export function* fetchSingleOrderWorker(action: PayloadAction<{ orderId: string 
        *
        **/
       yield put(
-        orderActions.merge(response.data.data)
+        orderActions.concat(response.data.data)
       )
 
       /**

@@ -63,20 +63,18 @@ const AdminProductFormDrawer: React.FunctionComponent<AdminProductFormDrawerProp
 
   // render nav items
   return (
-    <React.Fragment>
-      <Drawer
-        className={classes.drawer}
-        variant={'temporary'}
-        anchor="right"
-        open={props.curFormOpen}
-        onClose={toggleDrawer(false)}
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-      >
-        <AdminProductForm product={props.curProduct} />
-      </Drawer>
-    </React.Fragment>
+    <Drawer
+      className={classes.drawer}
+      variant={'temporary'}
+      anchor="right"
+      open={props.curFormOpen}
+      onClose={toggleDrawer(false)}
+      classes={{
+        paper: classes.drawerPaper,
+      }}
+    >
+      <AdminProductForm product={props.curProduct} />
+    </Drawer>
   )
 }
 

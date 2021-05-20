@@ -14,7 +14,7 @@ import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import { AxiosError } from 'axios';
 import { api } from 'configs/axiosConfig';
-import { CartItemType } from 'domain/cart/types';
+import { CartItemType, CartItemCriteria } from 'domain/cart/types';
 import merge from 'lodash/merge';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
@@ -41,6 +41,21 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(1)
     },
     card: {
+      /**
+       * need this one to make vertical scrollbar appears of the parent drawer.
+       **/
+
+
+      /**
+       * when small screen, the controller of a cart item moves to the next row, so need "157px".
+       *
+       * otherwise, it is single row, so need "133px".
+       **/
+      minHeight: "157px",
+
+      [theme.breakpoints.up('sm')]: {
+        minHeight: "133px",
+      }
     },
     cardHeader: {
       width: "100%",
@@ -54,6 +69,11 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     media: {
       width: 200,
+    },
+    btnRoot: {
+      "&:disabled": {
+        color: "#000",
+      }
     },
     actionBox: {
       display: "flex",
@@ -96,13 +116,19 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
         api.request({
           method: 'PUT',
           url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartItemId}`,
-          data: nextCartItem
+          data: {
+            cartItemId: nextCartItem.cartItemId,
+            isSelected: nextCartItem.isSelected,
+            quantity: nextCartItem.quantity,
+            userId: nextCartItem.user.userId,
+            variantId: nextCartItem.product.variants[0].variantId,
+          } as CartItemCriteria
         }).then((data) => {
 
           const updatedCartItem = data.data;
 
           // update cart item in redux store 
-          dispatch(cartItemActions.merge([updatedCartItem]))
+          dispatch(cartItemActions.updateOne(updatedCartItem))
 
           enqueueSnackbar("updated successfully.", { variant: "success" })
         }).catch((error: AxiosError) => {
@@ -110,7 +136,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
         })
       } else {
         // update cart item in redux store 
-        dispatch(cartItemActions.merge([nextCartItem]))
+        dispatch(cartItemActions.updateOne(nextCartItem))
       }
 
     }
@@ -127,13 +153,19 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
         api.request({
           method: 'PUT',
           url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartItemId}`,
-          data: nextCartItem
+          data: {
+            cartItemId: nextCartItem.cartItemId,
+            isSelected: nextCartItem.isSelected,
+            quantity: nextCartItem.quantity,
+            userId: nextCartItem.user.userId,
+            variantId: nextCartItem.product.variants[0].variantId,
+          } as CartItemCriteria
         }).then((data) => {
 
           const updatedCartItem = data.data;
 
           // update cart item in redux store 
-          dispatch(cartItemActions.merge([updatedCartItem]))
+          dispatch(cartItemActions.updateOne(updatedCartItem))
 
           enqueueSnackbar("updated successfully.", { variant: "success" })
         }).catch((error: AxiosError) => {
@@ -141,7 +173,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
         })
       } else {
         // update cart item in redux store 
-        dispatch(cartItemActions.merge([nextCartItem]))
+        dispatch(cartItemActions.updateOne(nextCartItem))
       }
     }
   }
@@ -153,18 +185,28 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
      **/
     const nextCartItem = merge({}, value, { isSelected: e.currentTarget.checked })
 
+    console.log("target cart item id: " + value.cartItemId)
+
     if (auth.userType === UserTypeEnum.MEMBER) {
       // put to replace the whole cart item 
       api.request({
         method: 'PUT',
         url: API1_URL + `/users/${auth.user.userId}/cartItems/${value.cartItemId}`,
-        data: nextCartItem
+        data: {
+            cartItemId: nextCartItem.cartItemId,
+            isSelected: nextCartItem.isSelected,
+            quantity: nextCartItem.quantity,
+            userId: nextCartItem.user.userId,
+            variantId: nextCartItem.product.variants[0].variantId,
+          } as CartItemCriteria
       }).then((data) => {
 
         const updatedCartItem = data.data;
 
+        console.log(updatedCartItem)
+
         // update cart item in redux store 
-        dispatch(cartItemActions.merge([updatedCartItem]))
+        dispatch(cartItemActions.updateOne(updatedCartItem))
 
         enqueueSnackbar("updated successfully.", { variant: "success" })
       }).catch((error: AxiosError) => {
@@ -172,7 +214,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
       })
     } else {
       // update cart item in redux store 
-      dispatch(cartItemActions.merge([nextCartItem]))
+      dispatch(cartItemActions.updateOne(nextCartItem))
     }
   }
 
@@ -227,7 +269,15 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
               >
                 <AddCircleIcon />
               </Button>
-              <Button disabled>{value.quantity}</Button>
+              <Button
+                disabled
+                classes={{
+                  /** this override default and 'disable' custom style. **/
+                  root: classes.btnRoot,
+                }}
+              >
+                {value.quantity}
+              </Button>
               <Button
                 onClick={handleQtyDecrement}
                 disabled={value.quantity === 1}

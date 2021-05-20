@@ -52,19 +52,34 @@ export const cartItemSlice = createSlice({
      *
      **/
 
-    // use when update existing one
-    merge: (state: CartItemType[], action: CartItemActionType) => merge(state, action.payload),
+    // use when update existing one (only apply for array: don't use for object)
+    updateOne: (state: CartItemType[], action: PayloadAction<CartItemType>) => {
+      return state.map((domain: CartItemType) => {
+        if (domain.cartItemId === action.payload.cartItemId) {
+          return action.payload
+        }
+        return domain
+      })
+    },
 
     append: (state: CartItemType[], action: PayloadAction<CartItemType>) => merge(state, [action.payload]),
 
-    // use when you want to replace
+    // use when you want to replace the whole array
     update: (state: CartItemType[], action: CartItemActionType) => {
       console.log("inside cart item reducer")
       console.log(action.payload)
       return action.payload;
     },
     // use when you want to remove a single entity
-    delete: (state: CartItemType[], action: PayloadAction<CartItemType>) => remove(state, (cartItem: CartItemType) => cartItem.cartItemId == action.payload.cartItemId),
+    delete: (state: CartItemType[], action: PayloadAction<CartItemType>) => {
+      /**
+       * mutable.
+       * original one: the rest of elements
+       * return one: the removed elements
+       **/
+      remove(state, (cartItem: CartItemType) => cartItem.cartItemId == action.payload.cartItemId)
+      return state
+    },
 
     clear: (state: CartItemType[]) => [],
   },

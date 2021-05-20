@@ -12,6 +12,7 @@ import { fetchCartItemActionCreator } from 'reducers/slices/domain/cartItem';
 import { UserTypeEnum } from 'src/app';
 import { mSelector } from 'src/selectors/selector';
 import { generateCartItemList } from 'tests/data/cart';
+import { cadCurrencyFormat } from 'src/utils';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -67,14 +68,11 @@ const CartBox: React.FunctionComponent<{}> = (props) => {
       {(curCartItems.length === 0 &&
         <React.Fragment>
         <Typography variant="body1" component="p" align="center">
-          {"Oops, you don't have any item in your cart."}
+          {"Oops, Your cart is empty."}
         </Typography>
-        <Box component="div">
+        <Box component="div" className={classes.controllerBox}>
           <Button>  
-            {"log in"}
-          </Button>
-          <Button>  
-            {"search"}
+            {"go search"}
           </Button>
         </Box>
         </React.Fragment>
@@ -84,7 +82,7 @@ const CartBox: React.FunctionComponent<{}> = (props) => {
           {renderCartItems()}
           <Box component="div" className={classes.subtotalBox}>
             <Typography variant="subtitle1" component="h3" align="right" >
-               Subtotal (<b>{calcSubTotalProductNumbers(curCartItems)}</b>  items): $<b>{calcSubTotalPriceAmount(curCartItems)}</b>
+               Subtotal (<b>{calcSubTotalProductNumbers(curCartItems)}</b>  items): $<b>{cadCurrencyFormat(calcSubTotalPriceAmount(curCartItems))}</b>
             </Typography>
           </Box>
           <Box component="div" className={classes.controllerBox}>
