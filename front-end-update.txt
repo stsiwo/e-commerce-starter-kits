@@ -27,3 +27,5 @@
  - (implementation) add logo image upload at admin 
  
  - (refactor) refactor snackbar and spinner : need to make sure the logic
+ 
+ - (bug) productDetail page: duplicated size option (e.g., list same size twice)
