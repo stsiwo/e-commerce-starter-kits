@@ -29,3 +29,9 @@
  - (refactor) refactor snackbar and spinner : need to make sure the logic
  
  - (bug) productDetail page: duplicated size option (e.g., list same size twice)
+ 
+ - carts
+ 
+  - when you merge cart items of guest user to the cart items of the member user when the guest user signs up, make sure that don't send 'cartItemId' to the backend. 
+  
+    - cart items of guest users have temp cart item id for each temporarly.
