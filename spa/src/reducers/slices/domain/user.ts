@@ -34,9 +34,18 @@ export const deleteSingleUserActionTypeName = deleteSingleUserActionCreator().ty
 export const deleteUserActionCreator = createAction<UserType>("saga/domain/user/delete")
 export const deleteUserActionTypeName = deleteUserActionCreator().type
 
-// for POST (upload new avatar image) /users/avatar-image request
-//export const postUserAvatarActionCreator = createAction<UserType>("saga/domain/user/post/avatar-image")
-//export const postUserAvatarActionTypeName = postUserAvatarActionCreator().type
+
+// for POST (avatar-image) request
+export declare type PostAvatarImageActionType = { avatarImage: File, userId: string } 
+export const postAvatarImageActionCreator = createAction<PostAvatarImageActionType>("saga/domain/user/avatar-image/post")
+export const postAvatarImageActionTypeName = postAvatarImageActionCreator().type
+
+
+// for DELETE (avatar-image) request
+export declare type DeleteAvatarImageActionType = { userId: string } 
+export const deleteAvatarImageActionCreator = createAction<DeleteAvatarImageActionType>("saga/domain/user/avatar-image/delete")
+export const deleteAvatarImageActionTypeName = deleteAvatarImageActionCreator().type
+
 
 /**
  *

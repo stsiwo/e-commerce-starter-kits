@@ -15,6 +15,8 @@ import { mSelector } from 'src/selectors/selector';
 import merge from 'lodash/merge';
 import { authActions } from 'reducers/slices/app';
 import { api } from 'configs/axiosConfig';
+import { postAvatarImageActionCreator, deleteAvatarImageActionCreator } from 'reducers/slices/domain/user';
+import { MessageTypeEnum } from 'src/app';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -26,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      margin: `${theme.spacing(1)}px 0`,
+      margin: `${theme.spacing(4)}px 0`,
     },
     avatar: {
       width: 100,
@@ -35,7 +37,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     btnBox: {
       display: "flex",
-      justifyContent: "right",
+      justifyContent: "center",
       alignItems: "center",
     }
   }),
@@ -73,13 +75,19 @@ const UserAccountAvatarManagement: React.FunctionComponent<UserAccountAvatarMana
   // snackbar notification
   // usage: 'enqueueSnackbar("message", { variant: "error" };
   const { enqueueSnackbar } = useSnackbar();
+  const curMessage = useSelector(mSelector.makeMessageSelector())
+  React.useEffect(() => {
+    if (curMessage.type !== MessageTypeEnum.INITIAL) {
+      enqueueSnackbar(curMessage.message, { variant: curMessage.type });
+    }
+  }, [curMessage.id])
 
   const dispatch = useDispatch()
   /**
    * file uploading stuff
    **/
   const [curFile, setFile] = React.useState<File>(null);
-  const [curFilePath, setFilePath] = React.useState<string>(null);
+  const [curFilePath, setFilePath] = React.useState<string>(API1_URL + auth.user.avatarImagePath);
   const imageInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleTriggerClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
@@ -101,52 +109,16 @@ const UserAccountAvatarManagement: React.FunctionComponent<UserAccountAvatarMana
       return false;
     }
 
-    // request body prep
-    const bodyFormData = new FormData();
-    bodyFormData.append("avatarImage", curFile);
-
-    // request
-    api.request({
-      method: 'POST',
-      url: API1_URL + `/users/${auth.user.userId}/avatar-image`,
-      data: bodyFormData,
-      headers: { "Content-Type": "multipart/form-data" },
-    }).then((data) => {
-      /**
-       * update state
-       **/
-      dispatch(authActions.update(merge({}, auth, {
-        user: {
-          avatarImagePath: data.data.avatarImagePath,
-        }
-      })));
-      enqueueSnackbar("uploaded successfully.", { variant: "success" })
-    }).catch((error: AxiosError) => {
-      enqueueSnackbar(error.message, { variant: "error" })
-    })
+    dispatch(
+      postAvatarImageActionCreator({ avatarImage: curFile, userId: auth.user.userId })
+    )
   }
 
 
   const handleDeleteClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-
-    // request
-    api.request({
-      method: 'DELETE',
-      url: API1_URL + `/users/${auth.user.userId}/avatar-image`
-    }).then((data) => {
-      /**
-       * remove it from state
-       **/
-      dispatch(authActions.update(merge({}, auth, {
-        user: {
-          avatarImagePath: "",
-        }
-      })));
-      enqueueSnackbar("deleted successfully.", { variant: "success" })
-    }).catch((error: AxiosError) => {
-      enqueueSnackbar(error.message, { variant: "error" })
-    })
-
+    dispatch(
+      deleteAvatarImageActionCreator({ userId: auth.user.userId })
+    )
   }
 
   return (

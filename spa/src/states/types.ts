@@ -46,6 +46,8 @@ export declare type AppStateType = {
       put: FetchStatusEnum
       patch: FetchStatusEnum
       deleteSingle: FetchStatusEnum
+      postAvatarImage: FetchStatusEnum
+      deleteAvatarImage: FetchStatusEnum
     },
     categories: {
       get: FetchStatusEnum

@@ -21,7 +21,6 @@ const useStyles = makeStyles((theme: Theme) =>
     gridBox: {
     },
     gridItem: {
-      margin: theme.spacing(1) 
     }
   }),
 );
@@ -42,8 +41,8 @@ const Account: React.FunctionComponent<{}> = (props) => {
       </Typography>
       <Grid 
         container 
-        justify="center" 
-        alignItems="center"
+        justify="space-around" 
+        alignItems="flex-start"
         className={classes.gridBox}
       >
         <Grid 

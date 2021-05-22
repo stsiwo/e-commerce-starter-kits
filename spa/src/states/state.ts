@@ -107,6 +107,8 @@ export const initialState: StateType = {
         put: FetchStatusEnum.INITIAL,
         patch: FetchStatusEnum.INITIAL,
         deleteSingle: FetchStatusEnum.INITIAL,
+        postAvatarImage: FetchStatusEnum.INITIAL,
+        deleteAvatarImage: FetchStatusEnum.INITIAL,
       },
       categories: {
         get: FetchStatusEnum.INITIAL,

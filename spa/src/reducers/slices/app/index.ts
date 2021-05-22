@@ -48,6 +48,11 @@ export const authSlice = createSlice({
       user: defaultUser
     }),
 
+    updateAvatarImagePath: (state: AuthType, action: PayloadAction<string>) => {
+      state.user.avatarImagePath = action.payload
+      return state
+    },
+
     switchPrimaryPhone: (state: AuthType, action: PayloadAction<UserPhoneType>) => {
       state.user.phones = state.user.phones.map((phone: UserPhoneType) => {
         if (phone.phoneId == action.payload.phoneId) {

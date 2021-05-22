@@ -223,3 +223,67 @@ export const deleteUserFetchStatusSliceReducer = deleteUserFetchStatusSlice.redu
 export const deleteUserFetchStatusActions = deleteUserFetchStatusSlice.actions
 
 
+/**
+ * app.fetchStatus.user.delete state Slice
+ **/
+export type postAvatarImageFetchStatusActionType = PayloadAction<FetchStatusEnum>
+
+export const postAvatarImageFetchStatusSlice = createSlice({
+  name: "app/fetchStatus/user/avatar-image/post", // a name used in action type
+  initialState: {},
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+    update: (state: FetchStatusEnum, action: postAvatarImageFetchStatusActionType) => action.payload,
+    clear: (state: FetchStatusEnum) => FetchStatusEnum.INITIAL
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   **/
+})
+
+export const postAvatarImageFetchStatusSliceReducer = postAvatarImageFetchStatusSlice.reducer
+export const postAvatarImageFetchStatusActions = postAvatarImageFetchStatusSlice.actions
+
+
+/**
+ * app.fetchStatus.user.delete state Slice
+ **/
+export type deleteAvatarImageFetchStatusActionType = PayloadAction<FetchStatusEnum>
+
+export const deleteAvatarImageFetchStatusSlice = createSlice({
+  name: "app/fetchStatus/user/avatar-image/delete", // a name used in action type
+  initialState: {},
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+    update: (state: FetchStatusEnum, action: deleteAvatarImageFetchStatusActionType) => action.payload,
+    clear: (state: FetchStatusEnum) => FetchStatusEnum.INITIAL
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   **/
+})
+
+export const deleteAvatarImageFetchStatusSliceReducer = deleteAvatarImageFetchStatusSlice.reducer
+export const deleteAvatarImageFetchStatusActions = deleteAvatarImageFetchStatusSlice.actions
+
+

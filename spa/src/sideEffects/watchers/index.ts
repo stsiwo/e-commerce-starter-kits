@@ -2,7 +2,7 @@ import { deleteCartItemActionTypeName, deleteSingleCartItemActionTypeName, fetch
 import { deleteSingleCategoryActionTypeName, fetchCategoryActionTypeName, fetchCategoryWithCacheActionTypeName, postCategoryActionTypeName, putCategoryActionTypeName } from 'reducers/slices/domain/category';
 import { fetchOrderActionTypeName, fetchSingleOrderActionTypeName, postOrderActionTypeName, putOrderActionTypeName } from 'reducers/slices/domain/order';
 import { deleteSingleProductActionTypeName, fetchProductActionTypeName, fetchProductWithCacheActionTypeName, fetchSingleProductActionTypeName, postProductActionTypeName, putProductActionTypeName } from 'reducers/slices/domain/product';
-import { deleteSingleUserActionTypeName, fetchSingleUserActionTypeName, fetchUserActionTypeName, putUserActionTypeName } from 'reducers/slices/domain/user';
+import { deleteSingleUserActionTypeName, fetchSingleUserActionTypeName, fetchUserActionTypeName, putUserActionTypeName, postAvatarImageActionTypeName, deleteAvatarImageActionTypeName } from 'reducers/slices/domain/user';
 import { deleteSingleWishlistItemActionTypeName, deleteWishlistItemActionTypeName, fetchWishlistItemActionTypeName, postWishlistItemActionTypeName, patchWishlistItemActionTypeName } from 'reducers/slices/domain/wishlistItem';
 import { requestStripeClientSecretActionTypeName } from 'reducers/slices/sensitive';
 import { toggleLeftNavMenuActionTypeName } from 'reducers/slices/ui';
@@ -38,6 +38,8 @@ import { deleteWishlistItemWorker } from 'sideEffects/workers/wishlistItems/dele
 import { fetchWishlistItemWorker } from 'sideEffects/workers/wishlistItems/fetchWishlistItemWorker';
 import { postWishlistItemWorker } from 'sideEffects/workers/wishlistItems/postWishlistItemWorker';
 import { patchWishlistItemWorker } from 'sideEffects/workers/wishlistItems/patchWishlistItemWorker';
+import { postAvatarImageWorker } from 'sideEffects/workers/user/postAvatarImageWorker';
+import { deleteAvatarImageWorker } from 'sideEffects/workers/user/deleteAvatarImageWorker';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -183,6 +185,19 @@ export function* deleteSingleUserWatcher() {
   )
 }
 
+export function* postAvatarImageWatcher() {
+  yield takeLatest(
+    postAvatarImageActionTypeName,
+    postAvatarImageWorker,
+  )
+}
+
+export function* deleteAvatarImageWatcher() {
+  yield takeLatest(
+    deleteAvatarImageActionTypeName,
+    deleteAvatarImageWorker,
+  )
+}
 
 // order
 export function* fetchOrderWatcher() {
