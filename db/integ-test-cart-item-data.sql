@@ -28,7 +28,7 @@ VALUES ('a2901f19-715a-44fe-9701-fae6713fd764', '19', '1');
 -- test member user 3
 -- item 1 
 INSERT INTO `ec-schema`.`cart_items` (`user_id`, `variant_id`, `quantity`)
-VALUES ('d2474e1c-4c69-467b-8a7f-11d3ffe8d6d3', '18', '1'); 
+VALUES ('d2474e1c-4c69-467b-8a7f-11d3ffe8d6d3', '20', '1'); 
 
 -- item 2 
 INSERT INTO `ec-schema`.`cart_items` (`user_id`, `variant_id`, `quantity`)
