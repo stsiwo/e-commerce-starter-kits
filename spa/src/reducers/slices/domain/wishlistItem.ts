@@ -1,6 +1,6 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { WishlistItemType } from "domain/wishlist/types";
-import merge from "lodash/merge";
+import { ProductType } from "domain/product/types";
+import { WishlistItemCriteria, WishlistItemSortEnum, WishlistItemType } from "domain/wishlist/types";
 import remove from 'lodash/remove';
 
 /**
@@ -11,15 +11,23 @@ import remove from 'lodash/remove';
  **/
 
 // for GET request
+//export declare type FetchWishlistItemActionType = WishlistItemQueryStringCriteria
 export const fetchWishlistItemActionCreator = createAction("saga/domain/wishlistItem/fetch")
 export const fetchWishlistItemActionTypeName = fetchWishlistItemActionCreator().type
 
 // for POST (add a new wishlist item) request
-export const postWishlistItemActionCreator = createAction<WishlistItemType>("saga/domain/wishlistItem/post")
+export declare type PostWishlistItemActionType = WishlistItemCriteria & { product: ProductType }
+export const postWishlistItemActionCreator = createAction<PostWishlistItemActionType>("saga/domain/wishlistItem/post")
 export const postWishlistItemActionTypeName = postWishlistItemActionCreator().type
 
+// for PATCH (add a new wishlist item) request
+export declare type PatchWishlistItemActionType = { wishlistItemId: string }
+export const patchWishlistItemActionCreator = createAction<PatchWishlistItemActionType>("saga/domain/wishlistItem/patch")
+export const patchWishlistItemActionTypeName = patchWishlistItemActionCreator().type
+
 // for DELETE (delete single wishlist item) request
-export const deleteSingleWishlistItemActionCreator = createAction("saga/domain/wishlistItem/deleteSingle")
+export declare type DeleteSingleWishlistItemActionType = { wishlistItemId: string } 
+export const deleteSingleWishlistItemActionCreator = createAction<DeleteSingleWishlistItemActionType>("saga/domain/wishlistItem/deleteSingle")
 export const deleteSingleWishlistItemActionTypeName = deleteSingleWishlistItemActionCreator().type
 
 // for DELETE (delete all of wishlist items) request
@@ -48,15 +56,22 @@ export const wishlistItemSlice = createSlice({
      *
      **/
 
-    // use when update existing one
-    merge: (state: WishlistItemType[], action: WishlistItemActionType) => merge(state, action.payload),
+    // use when update existing one (only apply for array: don't use for object)
+    updateOne: (state: WishlistItemType[], action: PayloadAction<WishlistItemType>) => {
+      return state.map((domain: WishlistItemType) => {
+        if (domain.wishlistItemId === action.payload.wishlistItemId) {
+          return action.payload
+        }
+        return domain
+      })
+    },
 
     // use when you want to replace
     update: (state: WishlistItemType[], action: WishlistItemActionType) => action.payload,
 
     // use when you want to remove a single entity
     delete: (state: WishlistItemType[], action: PayloadAction<string>) => {
-      remove(state, (wishlistItem: WishlistItemType) => wishlistItem.wishlistId == action.payload)
+      remove(state, (wishlistItem: WishlistItemType) => wishlistItem.wishlistItemId == action.payload)
       return state
     },
 
@@ -72,6 +87,348 @@ export const wishlistItemSlice = createSlice({
 
 export const wishlistItemSliceReducer = wishlistItemSlice.reducer
 export const wishlistItemActions = wishlistItemSlice.actions
+
+
+/**
+ *
+ * domain.wishlistItems.query.searchQuery state Slice (no side effects)
+ *
+ **/
+// action type             
+export type WishlistItemQuerySearchQueryActionType = PayloadAction<string> 
+
+export const wishlistItemQuerySearchQuerySlice = createSlice({ 
+  name: "domain/wishlistItems/query/searchQuery", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: WishlistItemQuerySearchQueryActionType) => action.payload,
+    clear: (state: string) => "",
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const wishlistItemQuerySearchQuerySliceReducer = wishlistItemQuerySearchQuerySlice.reducer
+export const wishlistItemQuerySearchQueryActions = wishlistItemQuerySearchQuerySlice.actions
+
+
+/**
+ *
+ * domain.wishlistItems.query.categoryId state Slice (no side effects)
+ *
+ **/
+// action type             
+export type WishlistItemQueryCategoryIdActionType = PayloadAction<string> 
+
+export const wishlistItemQueryCategoryIdSlice = createSlice({ 
+  name: "domain/wishlistItems/query/categoryId", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: WishlistItemQueryCategoryIdActionType) => action.payload,
+    clear: (state: string) => "",
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const wishlistItemQueryCategoryIdSliceReducer = wishlistItemQueryCategoryIdSlice.reducer
+export const wishlistItemQueryCategoryIdActions = wishlistItemQueryCategoryIdSlice.actions
+
+
+/**
+ *
+ * domain.wishlistItems.query.minPrice state Slice (no side effects)
+ *
+ **/
+// action type             
+export type WishlistItemQueryMinPriceActionType = PayloadAction<number> 
+
+export const wishlistItemQueryMinPriceSlice = createSlice({ 
+  name: "domain/wishlistItems/query/minPrice", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: WishlistItemQueryMinPriceActionType) => action.payload,
+    clear: (state: string) => null,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const wishlistItemQueryMinPriceSliceReducer = wishlistItemQueryMinPriceSlice.reducer
+export const wishlistItemQueryMinPriceActions = wishlistItemQueryMinPriceSlice.actions
+
+
+/**
+ *
+ * domain.wishlistItems.query.maxPrice state Slice (no side effects)
+ *
+ **/
+// action type             
+export type WishlistItemQueryMaxPriceActionType = PayloadAction<number> 
+
+export const wishlistItemQueryMaxPriceSlice = createSlice({ 
+  name: "domain/wishlistItems/query/maxPrice", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: WishlistItemQueryMaxPriceActionType) => action.payload,
+    clear: (state: string) => null,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const wishlistItemQueryMaxPriceSliceReducer = wishlistItemQueryMaxPriceSlice.reducer
+export const wishlistItemQueryMaxPriceActions = wishlistItemQueryMaxPriceSlice.actions
+
+
+/**
+ *
+ * domain.wishlistItems.query.reviewPoint state Slice (no side effects)
+ *
+ **/
+// action type             
+export type WishlistItemQueryReviewPointActionType = PayloadAction<number> 
+
+export const wishlistItemQueryReviewPointSlice = createSlice({ 
+  name: "domain/wishlistItems/query/reviewPoint", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: WishlistItemQueryReviewPointActionType) => action.payload,
+    clear: (state: string) => null,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const wishlistItemQueryReviewPointSliceReducer = wishlistItemQueryReviewPointSlice.reducer
+export const wishlistItemQueryReviewPointActions = wishlistItemQueryReviewPointSlice.actions
+
+
+/**
+ *
+ * domain.wishlistItems.query.isDiscount state Slice (no side effects)
+ *
+ **/
+// action type             
+export type WishlistItemQueryIsDiscountActionType = PayloadAction<boolean> 
+
+export const wishlistItemQueryIsDiscountSlice = createSlice({ 
+  name: "domain/wishlistItems/query/isDiscount", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: WishlistItemQueryIsDiscountActionType) => action.payload,
+    clear: (state: string) => null,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const wishlistItemQueryIsDiscountSliceReducer = wishlistItemQueryIsDiscountSlice.reducer
+export const wishlistItemQueryIsDiscountActions = wishlistItemQueryIsDiscountSlice.actions
+
+
+/**
+ *
+ * domain.wishlistItems.query.startDate state Slice (no side effects)
+ *
+ **/
+// action type             
+export type WishlistItemQueryStartDateActionType = PayloadAction<Date> 
+
+export const wishlistItemQueryStartDateSlice = createSlice({ 
+  name: "domain/wishlistItems/query/startDate", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: WishlistItemQueryStartDateActionType) => action.payload,
+    clear: (state: string) => null,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const wishlistItemQueryStartDateSliceReducer = wishlistItemQueryStartDateSlice.reducer
+export const wishlistItemQueryStartDateActions = wishlistItemQueryStartDateSlice.actions
+
+
+/**
+ *
+ * domain.wishlistItems.query.endDate state Slice (no side effects)
+ *
+ **/
+// action type             
+export type WishlistItemQueryEndDateActionType = PayloadAction<Date> 
+
+export const wishlistItemQueryEndDateSlice = createSlice({ 
+  name: "domain/wishlistItems/query/endDate", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: WishlistItemQueryEndDateActionType) => action.payload,
+    clear: (state: string) => null,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const wishlistItemQueryEndDateSliceReducer = wishlistItemQueryEndDateSlice.reducer
+export const wishlistItemQueryEndDateActions = wishlistItemQueryEndDateSlice.actions
+
+
+/**
+ *
+ * domain.wishlistItems.query.sort state Slice (no side effects)
+ *
+ **/
+// action type             
+export type WishlistItemQuerySortActionType = PayloadAction<WishlistItemSortEnum> 
+
+export const wishlistItemQuerySortSlice = createSlice({ 
+  name: "domain/wishlistItems/query/sort", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: WishlistItemQuerySortActionType) => action.payload,
+    clear: (state: string) => WishlistItemSortEnum.DATE_DESC,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const wishlistItemQuerySortSliceReducer = wishlistItemQuerySortSlice.reducer
+export const wishlistItemQuerySortActions = wishlistItemQuerySortSlice.actions
 
 
 /**

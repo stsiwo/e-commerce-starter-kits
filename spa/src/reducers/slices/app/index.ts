@@ -1,6 +1,7 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RequestTrackerType, AuthType, UserTypeEnum, FetchStatusEnum } from "src/app";
+import { RequestTrackerType, AuthType, UserTypeEnum, FetchStatusEnum, MessageStateType, MessageTypeEnum } from "src/app";
 import { defaultUser, UserPhoneType, UserAddressType, UserType } from "domain/user/types";
+import { getNanoId } from "src/utils";
 
 /**
  * common reducer action type
@@ -177,6 +178,43 @@ export const previousUrlSlice = createSlice({
 
 export const previousUrlSliceReducer = previousUrlSlice.reducer
 export const previousUrlActions = previousUrlSlice.actions
+
+
+/**
+ * app.message state Slice
+ **/
+export type MessageActionType = PayloadAction<MessageStateType>
+
+export const messageSlice = createSlice({
+  name: "app/message", // a name used in action type
+  initialState: {},
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+    update: (state: MessageStateType, action: MessageActionType) => action.payload,
+    clear: (state: MessageStateType) => ({
+      id: getNanoId(),
+      type: MessageTypeEnum.INITIAL,
+      message: "",
+    }),
+
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   **/
+})
+
+export const messageSliceReducer = messageSlice.reducer
+export const messageActions = messageSlice.actions
 
 
 

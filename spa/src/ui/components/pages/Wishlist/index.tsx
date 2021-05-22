@@ -10,8 +10,11 @@ import { WishlistItemType } from 'domain/wishlist/types';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchWishlistItemActionCreator, wishlistItemActions, wishlistItemPaginationPageActions } from 'reducers/slices/domain/wishlistItem';
+import { fetchWishlistItemActionCreator, wishlistItemActions, wishlistItemPaginationPageActions, deleteWishlistItemActionCreator, deleteSingleWishlistItemActionCreator, patchWishlistItemActionCreator } from 'reducers/slices/domain/wishlistItem';
 import { mSelector } from 'src/selectors/selector';
+import { MessageTypeEnum } from 'src/app';
+import WishlistItemSearchController from 'components/common/WishlistItemSearchController';
+import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -23,7 +26,8 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: theme.spacing(1),
     },
     controllerBox: {
-      textAlign: "center"
+      textAlign: "center",
+      margin: theme.spacing(3),
     }
   }),
 );
@@ -40,7 +44,7 @@ const useStyles = makeStyles((theme: Theme) =>
  *  3. when the user updates (e.g., select, remove), dispatch following actions:
  *
  *    3.2: remove: need to remove the selected item
- *      (MEMBER): send api request (/users/{userId}/wishlist/{wishlistId} DELETE: delete) 
+ *      (MEMBER): send api request (/users/{userId}/wishlist/{wishlistItemId} DELETE: delete) 
  *      (GUEST): just only update redux state
  *
  *  4. received updated state from redux
@@ -59,61 +63,46 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
 
   const curWishlistItems = useSelector(mSelector.makeWishlistItemSelector())
 
+  const curQueryString = useSelector(mSelector.makeWishlistItemQueryStringSelector())
   const pagination = useSelector(mSelector.makeWishlistItemPaginationSelector())
 
   // snackbar notification
   // usage: 'enqueueSnackbar("message", { variant: "error" };
   const { enqueueSnackbar } = useSnackbar();
+  const curMessage = useSelector(mSelector.makeMessageSelector())
+  React.useEffect(() => {
+    if (curMessage.type !== MessageTypeEnum.INITIAL) {
+      enqueueSnackbar(curMessage.message, { variant: curMessage.type });
+    }
+  }, [curMessage.id])
 
   // fetch wishlistItems
   React.useEffect(() => {
     dispatch(fetchWishlistItemActionCreator())
   }, [
-    pagination.page
+      JSON.stringify(curQueryString)
     ])
 
   const handleMoveToCartClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
 
-    const wishlistId = e.currentTarget.getAttribute("data-wishlist-id")
+    const wishlistItemId = e.currentTarget.getAttribute("data-wishlist-id")
+    dispatch(
+      patchWishlistItemActionCreator({ wishlistItemId: wishlistItemId })
+    );
 
-    // patch to 'move-to-cart' request
-    api.request({
-      method: 'PATCH',
-      url: API1_URL + `/users/${auth.user.userId}/wishlists/${wishlistId}`,
-    }).then((data) => {
-
-      // remove from the wishlist
-      dispatch(wishlistItemActions.delete(wishlistId))
-
-      enqueueSnackbar("added successfully.", { variant: "success" })
-    }).catch((error: AxiosError) => {
-      enqueueSnackbar(error.message, { variant: "error" })
-    })
   }
 
   const handleDeleteClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-
-    const wishlistId = e.currentTarget.getAttribute("data-wishlist-id")
-
-    // patch to 'move-to-cart' request
-    api.request({
-      method: 'DELETE',
-      url: API1_URL + `/users/${auth.user.userId}/wishlists/${wishlistId}`,
-    }).then((data) => {
-
-      // remove from the wishlist
-      dispatch(wishlistItemActions.delete(wishlistId))
-
-      enqueueSnackbar("added successfully.", { variant: "success" })
-    }).catch((error: AxiosError) => {
-      enqueueSnackbar(error.message, { variant: "error" })
-    })
+    const wishlistItemId = e.currentTarget.getAttribute("data-wishlist-id")
+    dispatch(
+      deleteSingleWishlistItemActionCreator({ wishlistItemId: wishlistItemId })
+    );
   }
 
   const renderWishlistItems: () => React.ReactNode = () => {
     return curWishlistItems.map((wishlistItem: WishlistItemType) => {
       return (
-        <WishlistItem value={wishlistItem} onMoveToCartClick={handleMoveToCartClick} onDelete={handleDeleteClick} key={wishlistItem.wishlistId} />
+        <WishlistItem value={wishlistItem} onMoveToCartClick={handleMoveToCartClick} onDelete={handleDeleteClick} key={wishlistItem.wishlistItemId} />
       )
     })
   }
@@ -128,18 +117,16 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
   };
   return (
     <React.Fragment>
+      <WishlistItemSearchController />
       <Typography variant="h5" component="h5" align="center" className={classes.title} >
         {"Wishlist"}
       </Typography>
       {(curWishlistItems.length === 0 &&
         <React.Fragment>
           <Typography variant="body1" component="p" align="center">
-            {"Oops, you don't have any item in your wishlist."}
+            {"Oops, Your wishlist is empty."}
           </Typography>
-          <Box component="div">
-            <Button>
-              {"log in"}
-            </Button>
+          <Box component="div" className={classes.controllerBox}>
             <Button>
               {"search"}
             </Button>
@@ -149,20 +136,17 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
       {(curWishlistItems.length > 0 &&
         <React.Fragment>
           {renderWishlistItems()}
-          <Box component="div" className={classes.controllerBox}>
-            <Button>
-              {"Go to cart"}
-            </Button>
-          </Box>
-          <Pagination
-            page={pagination.page + 1} // don't forget to increment when display
-            count={pagination.totalPages}
-            color="primary"
-            showFirstButton
-            showLastButton
-            size={"medium"}
-            onChange={handlePaginationChange}
-          />
+          <Grid container justify="center" className={classes.controllerBox}>
+            <Pagination
+              page={pagination.page + 1} // don't forget to increment when display
+              count={pagination.totalPages}
+              color="primary"
+              showFirstButton
+              showLastButton
+              size={"medium"}
+              onChange={handlePaginationChange}
+            />
+          </Grid>
         </React.Fragment>
       )}
     </React.Fragment>

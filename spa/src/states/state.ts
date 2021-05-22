@@ -1,8 +1,10 @@
 import { StateType } from "./types";
-import { UserTypeEnum, FetchStatusEnum } from "src/app";
+import { UserTypeEnum, FetchStatusEnum, MessageTypeEnum } from "src/app";
 import { defaultUser } from "domain/user/types";
 import { normalize, schema } from 'normalizr';
 import { ProductSortEnum } from "domain/product/types";
+import { getNanoId } from "src/utils";
+import { WishlistItemSortEnum } from "domain/wishlist/types";
 
 /**
  *
@@ -75,6 +77,11 @@ export const initialState: StateType = {
       user: defaultUser,
     },
     previousUrl: "",
+    message: {
+      id: getNanoId(),
+      type: MessageTypeEnum.INITIAL,
+      message: ""
+    },
     searchKeyword: "",
     requestTracker: {},
     fetchStatus: {
@@ -120,6 +127,7 @@ export const initialState: StateType = {
       wishlistItems: {
         get: FetchStatusEnum.INITIAL,
         post: FetchStatusEnum.INITIAL,
+        patch: FetchStatusEnum.INITIAL,
         delete: FetchStatusEnum.INITIAL,
         deleteSingle: FetchStatusEnum.INITIAL,
       }
@@ -141,7 +149,17 @@ export const initialState: StateType = {
         page: 0, // start from 0 (not 1)
         limit: 10,
         totalPages: 1,
-      }
+      },
+      query: {
+        searchQuery: "",
+        minPrice: null,
+        maxPrice: null,
+        isDiscount: null,
+        reviewPoint: null,
+        startDate: null,
+        endDate: null,
+        sort: WishlistItemSortEnum.DATE_DESC,
+      },
     },
     users: {
       data: [],

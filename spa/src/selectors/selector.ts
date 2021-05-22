@@ -6,6 +6,7 @@ import merge from 'lodash/merge';
 import { denormalize } from "normalizr";
 import { categorySchemaArray, productSchemaArray } from "states/state";
 import { StateType } from "states/types";
+import { WishlistItemType } from "domain/wishlist/types";
 
 export const rsSelector = {
   /**
@@ -32,6 +33,7 @@ export const rsSelector = {
   app: {
     getAuth: (state: StateType) => state.app.auth,
     getPreviousUrl: (state: StateType) => state.app.previousUrl,
+    getMessage: (state: StateType) => state.app.message,
     getSearchKeyword: (state: StateType) => state.app.searchKeyword,
     getRequestTracker: (state: StateType) => state.app.requestTracker,
   },
@@ -39,15 +41,31 @@ export const rsSelector = {
   domain: {
     getCategory: (state: StateType) => state.domain.categories.data,
     getCategoryPagination: (state: StateType) => state.domain.categories.pagination,
+
     getReview: (state: StateType) => state.domain.reviews.data,
     getReviewPagination: (state: StateType) => state.domain.reviews.pagination,
+
     getCartItem: (state: StateType) => state.domain.cartItems,
+
+
     getWishlistItem: (state: StateType) => state.domain.wishlistItems.data,
     getWishlistItemPagination: (state: StateType) => state.domain.wishlistItems.pagination,
+    getWishlistItemQuery: (state: StateType) => state.domain.wishlistItems.query,
+    getWishlistItemQuerySearchQuery: (state: StateType) => state.domain.wishlistItems.query.searchQuery,
+    getWishlistItemQueryMinPrice: (state: StateType) => state.domain.wishlistItems.query.minPrice,
+    getWishlistItemQueryMaxPrice: (state: StateType) => state.domain.wishlistItems.query.maxPrice,
+    getWishlistItemQueryStartDate: (state: StateType) => state.domain.wishlistItems.query.startDate,
+    getWishlistItemQueryEndDate: (state: StateType) => state.domain.wishlistItems.query.endDate,
+    getWishlistItemQueryIsDiscount: (state: StateType) => state.domain.wishlistItems.query.isDiscount,
+    getWishlistItemQueryReviewPoint: (state: StateType) => state.domain.wishlistItems.query.reviewPoint,
+    getWishlistItemQuerySort: (state: StateType) => state.domain.wishlistItems.query.sort,
+
     getUser: (state: StateType) => state.domain.users.data,
     getUserPagination: (state: StateType) => state.domain.users.pagination,
+
     getOrder: (state: StateType) => state.domain.orders.data,
     getOrderPagination: (state: StateType) => state.domain.orders.pagination,
+
     getProduct: (state: StateType) => state.domain.products.data,
     getProductQuery: (state: StateType) => state.domain.products.query,
     getProductQuerySearchQuery: (state: StateType) => state.domain.products.query.searchQuery,
@@ -245,6 +263,18 @@ export const mSelector = {
       ],
       (previousUrl) => {
         return previousUrl
+      },
+    )
+  },
+
+  // app.message
+  makeMessageSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getMessage
+      ],
+      (message) => {
+        return message
       },
     )
   },
@@ -447,6 +477,7 @@ export const mSelector = {
       },
     )
   },
+
   // domain.wishlistItem
   makeWishlistItemSelector: () => {
     return createSelector(
@@ -456,6 +487,19 @@ export const mSelector = {
       (wishlistItem) => {
         // this is array of cart item
         return wishlistItem
+      },
+    )
+  },
+
+  // domain.wishlistItem
+  makeSingleWishlistItemSelector: (wishlistItemId: string) => {
+    return createSelector(
+      [
+        rsSelector.domain.getWishlistItem
+      ],
+      (wishlistItem) => {
+        // this is array of cart item
+        return wishlistItem.find((wishlistItem: WishlistItemType) => wishlistItem.wishlistItemId === wishlistItemId)
       },
     )
   },
@@ -477,14 +521,132 @@ export const mSelector = {
   makeWishlistItemQueryStringSelector: () => {
     return createSelector(
       [
-        rsSelector.domain.getWishlistItemPagination
+        rsSelector.domain.getWishlistItemPagination,
+        rsSelector.domain.getWishlistItemQuerySort,
+        rsSelector.domain.getWishlistItemQuerySearchQuery,
+        rsSelector.domain.getWishlistItemQueryStartDate,
+        rsSelector.domain.getWishlistItemQueryEndDate,
+        rsSelector.domain.getWishlistItemQueryReviewPoint,
+        rsSelector.domain.getWishlistItemQueryMinPrice,
+        rsSelector.domain.getWishlistItemQueryMaxPrice,
+        rsSelector.domain.getWishlistItemQueryIsDiscount,
+        rsSelector.app.getAuth, // don't forget this. used to get wishlist items for this user only.
       ],
-      (pagination) => {
+      (pagination, sort, searchQuery, startDate, endDate, reviewPoint, minPrice, maxPrice, isDiscount, auth) => {
         // react state should be immutable so put empty object first
-        return merge({}, { page: pagination.page, limit: pagination.limit })
+        return merge({}, { 
+          sort: sort,
+          searchQuery: searchQuery,
+          startDate: startDate,
+          endDate: endDate,
+          reviewPoint: reviewPoint,
+          minPrice: minPrice,
+          maxPrice: maxPrice,
+          isDiscount: isDiscount,
+          page: pagination.page,
+          limit: pagination.limit,
+          userId: auth.user.userId,
+        })
       },
     )
   },
+
+  // domain.wishlistItems.query.isDiscount
+  makeWishlistItemQueryIsDiscountSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getWishlistItemQueryIsDiscount,
+      ],
+      (isDiscount) => {
+        return isDiscount
+      },
+    )
+  },
+
+  // domain.wishlistItems.query.maxPrice
+  makeWishlistItemQueryMaxPriceSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getWishlistItemQueryMaxPrice,
+      ],
+      (maxPrice) => {
+        return maxPrice
+      },
+    )
+  },
+
+  // domain.wishlistItems.query.minPrice
+  makeWishlistItemQueryMinPriceSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getWishlistItemQueryMinPrice,
+      ],
+      (minPrice) => {
+        return minPrice
+      },
+    )
+  },
+
+  // domain.wishlistItems.query.reviewPoint
+  makeWishlistItemQueryReviewPointSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getWishlistItemQueryReviewPoint,
+      ],
+      (reviewPoint) => {
+        return reviewPoint
+      },
+    )
+  },
+
+  // domain.wishlistItems.query.endDate
+  makeWishlistItemQueryEndDateSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getWishlistItemQueryEndDate,
+      ],
+      (endDate) => {
+        return endDate
+      },
+    )
+  },
+
+  // domain.wishlistItems.query.startDate
+  makeWishlistItemQueryStartDateSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getWishlistItemQueryStartDate,
+      ],
+      (startDate) => {
+        return startDate
+      },
+    )
+  },
+
+  // domain.wishlistItems.query.searchQuery
+  makeWishlistItemQuerySearchQuerySelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getWishlistItemQuerySearchQuery,
+      ],
+      (searchQuery) => {
+        return searchQuery
+      },
+    )
+  },
+
+  // domain.wishlistItems.query.sort
+  makeWishlistItemQuerySortSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getWishlistItemQuerySort,
+      ],
+      (sort) => {
+        return sort
+      },
+    )
+  },
+
 
   // domain.users
   makeUserSelector: () => {

@@ -64,6 +64,37 @@ export const postWishlistItemFetchStatusSliceReducer = postWishlistItemFetchStat
 export const postWishlistItemFetchStatusActions = postWishlistItemFetchStatusSlice.actions
 
 /**
+ * app.fetchStatus.wishlistItem.patch state Slice
+ **/
+export type patchWishlistItemFetchStatusActionType = PayloadAction<FetchStatusEnum>
+
+export const patchWishlistItemFetchStatusSlice = createSlice({
+  name: "app/fetchStatus/wishlistItem/patch", // a name used in action type
+  initialState: {},
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+    update: (state: FetchStatusEnum, action: patchWishlistItemFetchStatusActionType) => action.payload,
+    clear: (state: FetchStatusEnum) => FetchStatusEnum.INITIAL
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   **/
+})
+
+export const patchWishlistItemFetchStatusSliceReducer = patchWishlistItemFetchStatusSlice.reducer
+export const patchWishlistItemFetchStatusActions = patchWishlistItemFetchStatusSlice.actions
+
+/**
  * app.fetchStatus.wishlistItem.deleteSingle state Slice
  **/
 export type deleteSingleWishlistItemFetchStatusActionType = PayloadAction<FetchStatusEnum>

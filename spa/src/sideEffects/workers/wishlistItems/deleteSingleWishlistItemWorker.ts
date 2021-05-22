@@ -3,10 +3,12 @@ import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { WishlistItemType } from "domain/wishlist/types";
 import { deleteSingleWishlistItemFetchStatusActions } from "reducers/slices/app/fetchStatus/wishlistItem";
-import { wishlistItemActions } from "reducers/slices/domain/wishlistItem";
+import { wishlistItemActions, DeleteSingleWishlistItemActionType } from "reducers/slices/domain/wishlistItem";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
+import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
+import { messageActions } from "reducers/slices/app";
+import { getNanoId } from "src/utils";
 
 /**
  * a worker (generator)    
@@ -36,7 +38,7 @@ import { rsSelector } from "src/selectors/selector";
  *  - note:
  *
  **/
-export function* deleteSingleWishlistItemWorker(action: PayloadAction<WishlistItemType>) {
+export function* deleteSingleWishlistItemWorker(action: PayloadAction<DeleteSingleWishlistItemActionType>) {
 
   /**
    * get cur user type
@@ -60,7 +62,7 @@ export function* deleteSingleWishlistItemWorker(action: PayloadAction<WishlistIt
     /**
      * grab all domain
      **/
-    const apiUrl = `${API1_URL}/users/${curAuth.user.userId}/wishlistItems/${action.payload.wishlistId}`
+    const apiUrl = `${API1_URL}/users/${curAuth.user.userId}/wishlistItems/${action.payload.wishlistItemId}`
 
     /**
      * fetch data
@@ -82,7 +84,7 @@ export function* deleteSingleWishlistItemWorker(action: PayloadAction<WishlistIt
        *
        **/
       yield put(
-        wishlistItemActions.delete(action.payload.wishlistId)
+        wishlistItemActions.delete(action.payload.wishlistItemId)
       )
 
       /**
@@ -90,6 +92,17 @@ export function* deleteSingleWishlistItemWorker(action: PayloadAction<WishlistIt
        **/
       yield put(
         deleteSingleWishlistItemFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+      )
+
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.SUCCESS,
+          message: "deleted successfully.", 
+        }) 
       )
 
     } catch (error) {
@@ -101,6 +114,16 @@ export function* deleteSingleWishlistItemWorker(action: PayloadAction<WishlistIt
        **/
       yield put(
         deleteSingleWishlistItemFetchStatusActions.update(FetchStatusEnum.FAILED)
+      )
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.ERROR,
+          message: error.message, 
+        }) 
       )
     }
 
@@ -115,7 +138,7 @@ export function* deleteSingleWishlistItemWorker(action: PayloadAction<WishlistIt
      * delete the target entity from redux store
      **/
     yield put(
-      wishlistItemActions.delete(action.payload.wishlistId)
+      wishlistItemActions.delete(action.payload.wishlistItemId)
     )
   }
 }

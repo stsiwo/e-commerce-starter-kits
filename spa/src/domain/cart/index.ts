@@ -1,4 +1,6 @@
-import { CartItemType, CartItemCriteria } from "./types";
+import { ProductType } from "domain/product/types";
+import { getNanoId } from "src/utils";
+import { CartItemType } from "./types";
 
 export const calcSubTotalPriceAmount: (cartItems: CartItemType[]) => number = (cartItems) => {
     return cartItems.reduce((acc: number, cartItem: CartItemType) => {
@@ -20,6 +22,25 @@ export const calcTotalWeight: (cartItems: CartItemType[]) => number = (cartItems
       acc +=  cartItem.product.variants[0].weight 
       return acc
     }, 0)
+}
+
+/**
+ * create new cart item.
+ *
+ * used when move wishlist to cart item.
+ *
+ * used for only guest user. for member users, fetch from api.
+ *
+ **/
+export const createCartItem: (variantId: string, filteredProduct: ProductType) => CartItemType = (variantId, filteredProduct) => {
+  return {
+    cartItemId: getNanoId(),
+    createdAt: new Date(Date.now()),
+    isSelected: true,
+    product: filteredProduct, 
+    quantity: 1,
+    user: null
+  } as CartItemType
 }
 
 /**

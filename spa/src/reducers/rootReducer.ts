@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { authSliceReducer, previousUrlSliceReducer, requestTrackerSliceReducer, searchKeywordSliceReducer } from './slices/app';
+import { authSliceReducer, previousUrlSliceReducer, requestTrackerSliceReducer, searchKeywordSliceReducer, messageSliceReducer } from './slices/app';
 import { deleteCartItemFetchStatusSliceReducer, deleteSingleCartItemFetchStatusSliceReducer, getCartItemFetchStatusSliceReducer, postCartItemFetchStatusSliceReducer, putCartItemFetchStatusSliceReducer } from './slices/app/fetchStatus/cartItem';
 import { deleteSingleCategoryFetchStatusSliceReducer, getCategoryFetchStatusSliceReducer, postCategoryFetchStatusSliceReducer, putCategoryFetchStatusSliceReducer } from './slices/app/fetchStatus/category';
 import { deleteSingleOrderFetchStatusSliceReducer, getOrderFetchStatusSliceReducer, getSingleOrderFetchStatusSliceReducer, postOrderFetchStatusSliceReducer, putOrderFetchStatusSliceReducer } from './slices/app/fetchStatus/order';
@@ -14,9 +14,9 @@ import { orderPaginationLimitSliceReducer, orderPaginationPageSliceReducer, orde
 import { productCurItemsSliceReducer, productPaginationLimitSliceReducer, productPaginationPageSliceReducer, productPaginationTotalPagesSliceReducer, productQueryCategoryIdSliceReducer, productQueryEndDateSliceReducer, productQueryIsDiscountSliceReducer, productQueryMaxPriceSliceReducer, productQueryMinPriceSliceReducer, productQueryReviewPointSliceReducer, productQuerySearchQuerySliceReducer, productQuerySortSliceReducer, productQueryStartDateSliceReducer, productSliceReducer } from './slices/domain/product';
 import { reviewPaginationLimitSliceReducer, reviewPaginationPageSliceReducer, reviewPaginationTotalPagesSliceReducer, reviewSliceReducer } from './slices/domain/review';
 import { userPaginationLimitSliceReducer, userPaginationPageSliceReducer, userPaginationTotalPagesSliceReducer, userSliceReducer } from './slices/domain/user';
-import { wishlistItemPaginationLimitSliceReducer, wishlistItemPaginationPageSliceReducer, wishlistItemPaginationTotalPagesSliceReducer, wishlistItemSliceReducer } from './slices/domain/wishlistItem';
-import { cartModalSliceReducer, leftNavMenuSliceReducer, rightNavMenuSliceReducer, searchModalSliceReducer } from './slices/ui';
+import { wishlistItemPaginationLimitSliceReducer, wishlistItemPaginationPageSliceReducer, wishlistItemPaginationTotalPagesSliceReducer, wishlistItemSliceReducer, wishlistItemQuerySearchQuerySliceReducer, wishlistItemQueryMinPriceSliceReducer, wishlistItemQueryMaxPriceSliceReducer, wishlistItemQueryReviewPointSliceReducer, wishlistItemQueryIsDiscountSliceReducer, wishlistItemQueryStartDateSliceReducer, wishlistItemQueryEndDateSliceReducer, wishlistItemQuerySortSliceReducer } from './slices/domain/wishlistItem';
 import { stripeClientSecretSliceReducer } from './slices/sensitive';
+import { cartModalSliceReducer, leftNavMenuSliceReducer, rightNavMenuSliceReducer, searchModalSliceReducer } from './slices/ui';
 
 // ** REFACTOR to new approach **/
 
@@ -35,6 +35,7 @@ export const rootReducer = combineReducers({
   app: combineReducers({
     auth: authSliceReducer,
     previousUrl: previousUrlSliceReducer,
+    message: messageSliceReducer,
     searchKeyword: searchKeywordSliceReducer,
     requestTracker: requestTrackerSliceReducer,
     fetchStatus: combineReducers({
@@ -101,6 +102,16 @@ export const rootReducer = combineReducers({
         page: wishlistItemPaginationPageSliceReducer,
         limit: wishlistItemPaginationLimitSliceReducer,
         totalPages: wishlistItemPaginationTotalPagesSliceReducer,
+      }),
+      query: combineReducers({
+        searchQuery: wishlistItemQuerySearchQuerySliceReducer,
+        minPrice: wishlistItemQueryMinPriceSliceReducer,
+        maxPrice: wishlistItemQueryMaxPriceSliceReducer,
+        reviewPoint: wishlistItemQueryReviewPointSliceReducer,
+        isDiscount: wishlistItemQueryIsDiscountSliceReducer,
+        startDate: wishlistItemQueryStartDateSliceReducer,
+        endDate: wishlistItemQueryEndDateSliceReducer,
+        sort: wishlistItemQuerySortSliceReducer,
       }),
     }),
     users: combineReducers({

@@ -1,20 +1,41 @@
-import { ProductType, ProductVariantType } from "domain/product/types";
+import { ProductType } from "domain/product/types";
 import { UserType } from "domain/user/types";
 
 export declare type WishlistItemType = {
-  wishlistId?: string
-  user: UserType
+  wishlistItemId?: string
+  user?: UserType
   /**
-   * hmm.. should i keep variant or product?
-   *
    *  - assuming that this product only contains a selected product.
-   *
-   *  #TODO: refactor based on the logic you decide.
-   *
    **/
   product: ProductType
-  variant: ProductVariantType
-  createdAt: Date
-  updatedAt: Date
+  createdAt?: Date
+  updatedAt?: Date
 }
 
+// criteria
+export declare type WishlistItemCriteria = {
+  wishlistItemId?: string
+  userId?: string
+  variantId: string
+}
+
+export declare type WishlistItemQueryStringCriteria = {
+  userId: string
+  searchQuery?: string
+  reviewPoint?: number
+  minPrice?: number
+  maxPrice?: number
+  isDiscount?: boolean
+  startDate?: Date
+  endDate?: Date
+}
+
+
+export enum WishlistItemSortEnum {
+  DATE_DESC = "DATE_DESC",
+  DATE_ASC = "DATE_ASC",
+  ALPHABETIC_ASC = "ALPHABETIC_ASC",
+  ALPHABETIC_DESC = "ALPHABETIC_DESC",
+  PRICE_ASC = "PRICE_ASC",
+  PRICE_DESC = "PRICE_DESC",
+}

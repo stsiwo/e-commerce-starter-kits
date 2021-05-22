@@ -154,7 +154,7 @@ const Login: React.FunctionComponent<{}> = (props) => {
         /**
          * login success
          **/
-        const loggedInUser: UserType = data.data;
+        const loggedInUser: UserType = data.data.user;
         dispatch(authActions.loginWithUser(loggedInUser))
 
         // make sure this work.

@@ -22,12 +22,14 @@ import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
-import { UserTypeEnum } from 'src/app';
+import { UserTypeEnum, MessageTypeEnum } from 'src/app';
 import { cartItemActions } from 'reducers/slices/domain/cartItem';
 import { api } from 'configs/axiosConfig';
 import { AxiosError } from 'axios';
 import cloneDeep from 'lodash/cloneDeep';
 import { getNanoId } from 'src/utils';
+import { postWishlistItemFetchStatusActions } from 'reducers/slices/app/fetchStatus/wishlistItem';
+import { postWishlistItemActionCreator } from 'reducers/slices/domain/wishlistItem';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -130,6 +132,13 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
   // snackbar notification
   // usage: 'enqueueSnackbar("message", { variant: "error" };
   const { enqueueSnackbar } = useSnackbar();
+  const curMessage = useSelector(mSelector.makeMessageSelector())
+
+  React.useEffect(() => {
+    if (curMessage.type !== MessageTypeEnum.INITIAL) {
+      enqueueSnackbar(curMessage.message, { variant: curMessage.type });
+    }
+  }, [curMessage.id])
 
   // state for color & size & quantity
   const [curSelectedColor, setSelectedColor] = React.useState<string>(
@@ -240,16 +249,12 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
   // event handler for adding cart
   const handleAddCart: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
 
-    // temp product to filter the selected variant
-    const tempProduct = cloneDeep(props.product)
-    tempProduct.variants = filterSingleVariant(curVariant.variantId, tempProduct); 
-
     if (auth.userType === UserTypeEnum.GUEST) {
       dispatch(cartItemActions.append({
         cartItemId: getNanoId(), // temp id
         createdAt: new Date(Date.now()),
         isSelected: true,
-        product: tempProduct, // need to set filtered product (only contains selected variant) 
+        product: filterSingleVariant(curVariant.variantId, props.product), // need to set filtered product (only contains selected variant) 
         quantity: curQty,
         user: null,
       }))
@@ -259,7 +264,6 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
       api.request({
         method: 'POST',
         url: API1_URL + `/users/${auth.user.userId}/cartItems`,
-        // make sure 'generateObjectFormData' works correctly.
         data: {
           variantId: curVariant.variantId,
           isSelected: true,
@@ -281,7 +285,10 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
 
   // event handler for adding cart
   const handleAddWishlist: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    return false;
+    dispatch(postWishlistItemActionCreator({
+      variantId: curVariant.variantId,
+      product: props.product
+    }))
   }
 
   const handleBuyNow: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {

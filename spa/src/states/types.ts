@@ -1,7 +1,7 @@
 import { NormalizedCategoryType, NormalizedProductType, ProductSortEnum } from "domain/product/types";
-import { AuthType, RequestTrackerType, FetchStatusEnum } from "src/app/";
+import { AuthType, RequestTrackerType, FetchStatusEnum, MessageTypeEnum, MessageStateType } from "src/app/";
 import { CartItemType } from "domain/cart/types";
-import { WishlistItemType } from "domain/wishlist/types";
+import { WishlistItemType, WishlistItemSortEnum } from "domain/wishlist/types";
 import { UserType } from "domain/user/types";
 import { OrderType } from "domain/order/types";
 import { ReviewType } from "domain/review/type";
@@ -20,6 +20,7 @@ export declare type UiStateType = {
 export declare type AppStateType = {
   auth: AuthType 
   previousUrl: string
+  message: MessageStateType 
   searchKeyword: string
   requestTracker: RequestTrackerType
   fetchStatus: {
@@ -65,6 +66,7 @@ export declare type AppStateType = {
     wishlistItems: {
       get: FetchStatusEnum
       post: FetchStatusEnum
+      patch: FetchStatusEnum
       deleteSingle: FetchStatusEnum
       delete: FetchStatusEnum
     }
@@ -91,7 +93,16 @@ export declare type DomainStateType = {
   wishlistItems: {
     data: WishlistItemType[] // don't need to normalized
     pagination: DomainPaginationType,
-    // no cache so don't need curItems
+    query: {
+      searchQuery: string,
+      minPrice: number,
+      maxPrice: number,
+      reviewPoint: number,
+      isDiscount: boolean,
+      startDate: Date,
+      endDate: Date,
+      sort: WishlistItemSortEnum,
+    },
   },
   users: {
     data: UserType[] // don't need to normalized

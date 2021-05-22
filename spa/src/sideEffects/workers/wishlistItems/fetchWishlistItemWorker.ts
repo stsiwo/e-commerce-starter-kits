@@ -1,12 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
+import { messageActions } from "reducers/slices/app";
 import { getWishlistItemFetchStatusActions } from "reducers/slices/app/fetchStatus/wishlistItem";
 import { wishlistItemActions, wishlistItemPaginationPageActions, wishlistItemPaginationTotalPagesActions } from "reducers/slices/domain/wishlistItem";
 import { all, call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
+import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
-import { generateQueryString } from "src/utils";
+import { generateQueryString, getNanoId } from "src/utils";
 
 /**
  * a worker (generator)    
@@ -77,8 +78,10 @@ export function* fetchWishlistItemWorker(action: PayloadAction<{}>) {
        *
        * don't use 'merge' since no cache
        **/
+      console.log("wishlist item dto response data")
+      console.log(response.data)
       yield put(
-        wishlistItemActions.update(response.data.data)
+        wishlistItemActions.update(response.data.content)
       )
 
       /**
@@ -136,6 +139,17 @@ export function* fetchWishlistItemWorker(action: PayloadAction<{}>) {
         put(wishlistItemPaginationTotalPagesActions.update(response.data.totalPages)),
       ])
 
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.SUCCESS,
+          message: "fetched successfully.", 
+        }) 
+      )
+
     } catch (error) {
 
       console.log(error)
@@ -145,6 +159,17 @@ export function* fetchWishlistItemWorker(action: PayloadAction<{}>) {
        **/
       yield put(
         getWishlistItemFetchStatusActions.update(FetchStatusEnum.FAILED)
+      )
+
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.ERROR,
+          message: error.message, 
+        }) 
       )
     }
   }

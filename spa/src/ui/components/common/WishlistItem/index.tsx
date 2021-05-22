@@ -78,21 +78,21 @@ const WishlistItem: React.FunctionComponent<WishlistItemPropsType> = ({ value, o
           justify="space-between"
         >
           <Box component="div" className={classes.actionBox}>
-            <ColorCell value={value.variant.variantColor} />
-            <SizeCell value={value.variant.productSize.productSizeName} />
+            <ColorCell value={value.product.variants[0].variantColor} />
+            <SizeCell value={value.product.variants[0].productSize.productSizeName} />
           </Box>
           <Box component="div" className={classes.actionBox}>
             <Button
               variant="contained"
               startIcon={<AddShoppingCartIcon />}
               onClick={onMoveToCartClick}
-              data-wishlist-id={value.wishlistId}
+              data-wishlist-id={value.wishlistItemId}
             >
               Move To Cart
             </Button>
             <IconButton 
               onClick={onDelete}
-              data-wishlist-id={value.wishlistId}
+              data-wishlist-id={value.wishlistItemId}
             >
               <DeleteForeverIcon />
             </IconButton>

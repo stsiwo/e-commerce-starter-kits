@@ -36,3 +36,18 @@ export declare type AuthType = {
   userType: UserTypeEnum
   user: UserType
 }
+
+
+export enum MessageTypeEnum {
+  INITIAL = "initial", // no message to show
+  SUCCESS = 'success',
+  WARNING = 'warning',
+  ERROR = 'error',
+  INFO = 'info',
+}
+
+export declare type MessageStateType = {
+  id: string
+  type: MessageTypeEnum
+  message: string
+}

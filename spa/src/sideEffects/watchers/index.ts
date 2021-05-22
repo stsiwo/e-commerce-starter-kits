@@ -1,9 +1,10 @@
 import { deleteCartItemActionTypeName, deleteSingleCartItemActionTypeName, fetchCartItemActionTypeName, postCartItemActionTypeName, putCartItemActionTypeName } from 'reducers/slices/domain/cartItem';
-import { deleteSingleCategoryActionTypeName, fetchCategoryActionTypeName, postCategoryActionTypeName, putCategoryActionTypeName, fetchCategoryWithCacheActionTypeName } from 'reducers/slices/domain/category';
+import { deleteSingleCategoryActionTypeName, fetchCategoryActionTypeName, fetchCategoryWithCacheActionTypeName, postCategoryActionTypeName, putCategoryActionTypeName } from 'reducers/slices/domain/category';
 import { fetchOrderActionTypeName, fetchSingleOrderActionTypeName, postOrderActionTypeName, putOrderActionTypeName } from 'reducers/slices/domain/order';
-import { deleteSingleProductActionTypeName, fetchProductActionTypeName, fetchSingleProductActionTypeName, postProductActionTypeName, putProductActionTypeName, fetchProductWithCacheActionTypeName } from 'reducers/slices/domain/product';
+import { deleteSingleProductActionTypeName, fetchProductActionTypeName, fetchProductWithCacheActionTypeName, fetchSingleProductActionTypeName, postProductActionTypeName, putProductActionTypeName } from 'reducers/slices/domain/product';
 import { deleteSingleUserActionTypeName, fetchSingleUserActionTypeName, fetchUserActionTypeName, putUserActionTypeName } from 'reducers/slices/domain/user';
-import { deleteSingleWishlistItemActionTypeName, deleteWishlistItemActionTypeName, fetchWishlistItemActionTypeName, postWishlistItemActionTypeName } from 'reducers/slices/domain/wishlistItem';
+import { deleteSingleWishlistItemActionTypeName, deleteWishlistItemActionTypeName, fetchWishlistItemActionTypeName, postWishlistItemActionTypeName, patchWishlistItemActionTypeName } from 'reducers/slices/domain/wishlistItem';
+import { requestStripeClientSecretActionTypeName } from 'reducers/slices/sensitive';
 import { toggleLeftNavMenuActionTypeName } from 'reducers/slices/ui';
 import { takeEvery, takeLatest } from 'redux-saga/effects';
 import { deleteCartItemWorker } from 'sideEffects/workers/cartItem/deleteCartItemWorker';
@@ -15,6 +16,8 @@ import { deleteSingleCategoryWorker } from 'sideEffects/workers/category/deleteS
 import { fetchCategoryWorker } from 'sideEffects/workers/category/fetchCategoryWorker';
 import { postCategoryWorker } from 'sideEffects/workers/category/postCategoryWorker';
 import { putCategoryWorker } from 'sideEffects/workers/category/putCategoryWorker';
+import { fetchCategoryWithCacheWorker } from 'sideEffects/workers/fetchCategoryWithCacheWorker';
+import { fetchProductWithCacheWorker } from 'sideEffects/workers/fetchProductWithCacheWorker';
 import { leftNavMenuWorkerWorker } from 'sideEffects/workers/leftNavMenuWorker';
 import { fetchOrderWorker } from 'sideEffects/workers/order/fetchOrderWorker';
 import { fetchSingleOrderWorker } from 'sideEffects/workers/order/fetchSingleOrderWorker';
@@ -25,6 +28,7 @@ import { fetchProductWorker } from 'sideEffects/workers/product/fetchProductWork
 import { fetchSingleProductWorker } from 'sideEffects/workers/product/fetchSingleProductWorker';
 import { postProductWorker } from 'sideEffects/workers/product/postProductWorker';
 import { putProductWorker } from 'sideEffects/workers/product/putProductWorker';
+import { requestStripeClientSecretWorker } from 'sideEffects/workers/sensitive/stripeClientSecret';
 import { deleteSingleUserWorker } from 'sideEffects/workers/user/deleteSingleUserWorker';
 import { fetchSingleUserWorker } from 'sideEffects/workers/user/fetchSingleUserWorker';
 import { fetchUserWorker } from 'sideEffects/workers/user/fetchUserWorker';
@@ -33,10 +37,7 @@ import { deleteSingleWishlistItemWorker } from 'sideEffects/workers/wishlistItem
 import { deleteWishlistItemWorker } from 'sideEffects/workers/wishlistItems/deleteWishlistItemWorker';
 import { fetchWishlistItemWorker } from 'sideEffects/workers/wishlistItems/fetchWishlistItemWorker';
 import { postWishlistItemWorker } from 'sideEffects/workers/wishlistItems/postWishlistItemWorker';
-import { fetchProductWithCacheWorker } from 'sideEffects/workers/fetchProductWithCacheWorker';
-import { fetchCategoryWithCacheWorker } from 'sideEffects/workers/fetchCategoryWithCacheWorker';
-import { requestStripeClientSecretActionTypeName } from 'reducers/slices/sensitive';
-import { requestStripeClientSecretWorker } from 'sideEffects/workers/sensitive/stripeClientSecret';
+import { patchWishlistItemWorker } from 'sideEffects/workers/wishlistItems/patchWishlistItemWorker';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -100,6 +101,13 @@ export function* postWishlistItemWatcher() {
   yield takeLatest(
     postWishlistItemActionTypeName,
     postWishlistItemWorker,
+  )
+}
+
+export function* patchWishlistItemWatcher() {
+  yield takeLatest(
+    patchWishlistItemActionTypeName,
+    patchWishlistItemWorker,
   )
 }
 
