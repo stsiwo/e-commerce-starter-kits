@@ -40,6 +40,10 @@ endpoint change:
   - /orders/{orderId}/events
   
     return manipulated order event! not string message.
+    
+  - avatar-image
+  
+    - add cache feature (hasing file name or something)
       
     
 
