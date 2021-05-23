@@ -1,5 +1,5 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { defaultUser, UserAddressType, UserCriteria, UserPhoneType, UserType, UserPhoneCriteria } from "domain/user/types";
+import { defaultUser, UserAddressType, UserCriteria, UserPhoneType, UserType, UserPhoneCriteria, UserAddressCriteria } from "domain/user/types";
 import { AuthType, MessageStateType, MessageTypeEnum, RequestTrackerType, UserTypeEnum } from "src/app";
 import { getNanoId } from "src/utils";
 
@@ -37,6 +37,27 @@ export const patchAuthPhoneActionTypeName = patchAuthPhoneActionCreator().type
 export declare type DeleteAuthPhoneActionType = { phoneId: string }
 export const deleteAuthPhoneActionCreator = createAction<DeleteAuthPhoneActionType>("saga/domain/auth/phone/delete")
 export const deleteAuthPhoneActionTypeName = deleteAuthPhoneActionCreator().type
+
+
+// for POST (create a address) request
+export declare type PostAuthAddressActionType = UserAddressCriteria
+export const postAuthAddressActionCreator = createAction<PostAuthAddressActionType>("saga/domain/auth/address/post")
+export const postAuthAddressActionTypeName = postAuthAddressActionCreator().type
+
+// for PUT (replace a address) request
+export declare type PutAuthAddressActionType = UserAddressCriteria
+export const putAuthAddressActionCreator = createAction<PutAuthAddressActionType>("saga/domain/auth/address/put")
+export const putAuthAddressActionTypeName = putAuthAddressActionCreator().type
+
+// for PATCH (replace a address) request
+export declare type PatchAuthAddressActionType = { addressId: string, type: string }  // 'billing'/'shipping'
+export const patchAuthAddressActionCreator = createAction<PatchAuthAddressActionType>("saga/domain/auth/address/patch")
+export const patchAuthAddressActionTypeName = patchAuthAddressActionCreator().type
+
+// for DELETE (delete a address) request
+export declare type DeleteAuthAddressActionType = { addressId: string }
+export const deleteAuthAddressActionCreator = createAction<DeleteAuthAddressActionType>("saga/domain/auth/address/delete")
+export const deleteAuthAddressActionTypeName = deleteAuthAddressActionCreator().type
 
 
 // for POST (avatar-image) request
@@ -151,6 +172,11 @@ export const authSlice = createSlice({
         return address
       })
       return state
+    },
+
+    replaceAddress: (state: AuthType, action: PayloadAction<UserAddressType[]>) => {
+      state.user.addresses = action.payload
+      return state;
     },
 
     appendAddress: (state: AuthType, action: PayloadAction<UserAddressType>) => {

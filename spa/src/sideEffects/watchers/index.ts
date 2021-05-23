@@ -40,7 +40,7 @@ import { postWishlistItemWorker } from 'sideEffects/workers/wishlistItems/postWi
 import { patchWishlistItemWorker } from 'sideEffects/workers/wishlistItems/patchWishlistItemWorker';
 import { postUserAvatarImageWorker } from 'sideEffects/workers/user/postUserAvatarImageWorker';
 import { deleteUserAvatarImageWorker } from 'sideEffects/workers/user/deleteUserAvatarImageWorker';
-import { postAuthAvatarImageActionTypeName, deleteAuthAvatarImageActionTypeName, putAuthActionTypeName, postAuthPhoneActionTypeName, putAuthPhoneActionTypeName, deleteAuthPhoneActionTypeName, patchAuthPhoneActionTypeName } from 'reducers/slices/app';
+import { postAuthAvatarImageActionTypeName, deleteAuthAvatarImageActionTypeName, putAuthActionTypeName, postAuthPhoneActionTypeName, putAuthPhoneActionTypeName, deleteAuthPhoneActionTypeName, patchAuthPhoneActionTypeName, postAuthAddressActionTypeName, putAuthAddressActionTypeName, patchAuthAddressActionTypeName, deleteAuthAddressActionTypeName } from 'reducers/slices/app';
 import { postAuthAvatarImageWorker } from 'sideEffects/workers/auth/postAuthAvatarImageWorker';
 import { deleteAuthAvatarImageWorker } from 'sideEffects/workers/auth/deleteAuthAvatarImageWorker';
 import { putAuthWorker } from 'sideEffects/workers/auth/putAuthWorker';
@@ -48,6 +48,10 @@ import { postAuthPhoneWorker } from 'sideEffects/workers/auth/postAuthPhoneWorke
 import { putAuthPhoneWorker } from 'sideEffects/workers/auth/putAuthPhoneWorker';
 import { deleteAuthPhoneWorker } from 'sideEffects/workers/auth/deleteAuthPhoneWorker';
 import { patchAuthPhoneWorker } from 'sideEffects/workers/auth/patchAuthPhoneWorker';
+import { postAuthAddressWorker } from 'sideEffects/workers/auth/postAuthAddressWorker';
+import { putAuthAddressWorker } from 'sideEffects/workers/auth/putAuthAddressWorker';
+import { patchAuthAddressWorker } from 'sideEffects/workers/auth/patchAuthAddressWorker';
+import { deleteAuthAddressWorker } from 'sideEffects/workers/auth/deleteAuthAddressWorker';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -319,6 +323,34 @@ export function* deleteAuthPhoneWatcher() {
   yield takeLatest(
     deleteAuthPhoneActionTypeName,
     deleteAuthPhoneWorker,
+  )
+}
+
+export function* postAuthAddressWatcher() {
+  yield takeLatest(
+    postAuthAddressActionTypeName,
+    postAuthAddressWorker,
+  )
+}
+
+export function* putAuthAddressWatcher() {
+  yield takeLatest(
+    putAuthAddressActionTypeName,
+    putAuthAddressWorker,
+  )
+}
+
+export function* patchAuthAddressWatcher() {
+  yield takeLatest(
+    patchAuthAddressActionTypeName,
+    patchAuthAddressWorker,
+  )
+}
+
+export function* deleteAuthAddressWatcher() {
+  yield takeLatest(
+    deleteAuthAddressActionTypeName,
+    deleteAuthAddressWorker,
   )
 }
 

@@ -78,6 +78,17 @@ export declare type UserPhoneCriteria = {
   countryCode: string
 }
 
+export declare type UserAddressCriteria = {
+  addressId?: string
+  address1: string
+  address2: string
+  city: string
+  province: string
+  country: string
+  postalCode: string
+  isBillingAddress: boolean
+  isShippingAddress: boolean
+}
 
 // empty
 

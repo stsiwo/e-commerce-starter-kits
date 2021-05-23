@@ -16,55 +16,16 @@ import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import HomeIcon from '@material-ui/icons/Home';
-import { AxiosError } from 'axios';
-import { api } from 'configs/axiosConfig';
-import { getBillingAddressId, getShippingAddressId } from 'domain/user';
-import { UserAddressType } from 'domain/user/types';
+import { getBillingAddressId, getShippingAddressId, toAddressString } from 'domain/user';
+import { CustomerAddressesFormDataType, CustomerAddressesFormValidationDataType, defaultUserAccountValidationAddressData, generateDefaultCustomerAddressesFormData, UserAddressType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { userAccountAddressSchema } from 'hooks/validation/rules';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { authActions } from 'reducers/slices/app';
+import { deleteAuthAddressActionCreator, patchAuthAddressActionCreator, postAuthAddressActionCreator, putAuthAddressActionCreator } from 'reducers/slices/app';
+import { MessageTypeEnum } from 'src/app';
 import { mSelector } from 'src/selectors/selector';
-
-export declare type UserAccountAddressDataType = {
-  addressId?: string
-  address1: string
-  address2: string
-  city: string
-  province: string
-  country: string
-  postalCode: string
-}
-
-const defaultUserAccountAddressData: UserAccountAddressDataType = {
-  address1: "",
-  address2: "",
-  city: "",
-  province: "",
-  country: "",
-  postalCode: "",
-}
-
-export declare type UserAccountAddressValidationDataType = {
-  addressId?: string
-  address1?: string
-  address2?: string
-  city?: string
-  province?: string
-  country?: string
-  postalCode?: string
-}
-
-const defaultUserAccountValidationAddressData: UserAccountAddressValidationDataType = {
-  address1: "",
-  address2: "",
-  city: "",
-  province: "",
-  country: "",
-  postalCode: "",
-}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -144,12 +105,23 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   // snackbar notification
   // usage: 'enqueueSnackbar("message", { variant: "error" };
   const { enqueueSnackbar } = useSnackbar();
+  const curMessage = useSelector(mSelector.makeMessageSelector())
+  React.useEffect(() => {
+    if (curMessage.type !== MessageTypeEnum.INITIAL) {
+      /**
+       * TODO: show this message 3 times. idon't knwo why.
+       *
+       **/
+      console.log("too many message");
+      enqueueSnackbar(curMessage.message, { variant: curMessage.type });
+    }
+  }, [curMessage.id])
 
   // temp user account state
-  const [curUserAccountAddressState, setUserAccountAddressState] = React.useState<UserAccountAddressDataType>(defaultUserAccountAddressData);
+  const [curUserAccountAddressState, setUserAccountAddressState] = React.useState<CustomerAddressesFormDataType>(generateDefaultCustomerAddressesFormData());
 
   // validation logic (should move to hooks)
-  const [curUserAccountAddressValidationState, setUserAccountAddressValidationState] = React.useState<UserAccountAddressValidationDataType>(defaultUserAccountValidationAddressData);
+  const [curUserAccountAddressValidationState, setUserAccountAddressValidationState] = React.useState<CustomerAddressesFormValidationDataType>(defaultUserAccountValidationAddressData);
 
   const { updateValidationAt, updateAllValidation, isValidSync } = useValidation({
     curDomain: curUserAccountAddressState,
@@ -162,7 +134,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   const handleAddress1InputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextAddress1 = e.currentTarget.value
     updateValidationAt("address1", e.currentTarget.value);
-    setUserAccountAddressState((prev: UserAccountAddressDataType) => ({
+    setUserAccountAddressState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       address1: nextAddress1
     }));
@@ -172,7 +144,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   const handleAddress2InputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextAddress2 = e.currentTarget.value
     updateValidationAt("address2", e.currentTarget.value);
-    setUserAccountAddressState((prev: UserAccountAddressDataType) => ({
+    setUserAccountAddressState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       address2: nextAddress2
     }));
@@ -182,7 +154,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   const handleCityInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextCity = e.currentTarget.value
     updateValidationAt("city", e.currentTarget.value);
-    setUserAccountAddressState((prev: UserAccountAddressDataType) => ({
+    setUserAccountAddressState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       city: nextCity
     }));
@@ -191,7 +163,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   const handleProvinceInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextProvince = e.currentTarget.value
     updateValidationAt("province", e.currentTarget.value);
-    setUserAccountAddressState((prev: UserAccountAddressDataType) => ({
+    setUserAccountAddressState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       province: nextProvince
     }));
@@ -200,7 +172,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   const handleCountryInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextCountry = e.currentTarget.value
     updateValidationAt("country", e.currentTarget.value);
-    setUserAccountAddressState((prev: UserAccountAddressDataType) => ({
+    setUserAccountAddressState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       country: nextCountry
     }));
@@ -209,7 +181,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   const handlePostalCodeInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextPostalCode = e.currentTarget.value
     updateValidationAt("postalCode", e.currentTarget.value);
-    setUserAccountAddressState((prev: UserAccountAddressDataType) => ({
+    setUserAccountAddressState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       postalCode: nextPostalCode
     }));
@@ -244,40 +216,33 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
       console.log("passed")
       if (isNew) {
         console.log("this one is to create new one")
-        // request
-        api.request({
-          method: 'POST',
-          url: API1_URL + `/users/${auth.user.userId}/addresses`,
-          data: curUserAccountAddressState,
-        }).then((data) => {
-          /**
-           *  add new address
-           **/
-          const addedAddress: UserAddressType = data.data;
-          dispatch(authActions.appendAddress(addedAddress))
-
-          enqueueSnackbar("added successfully.", { variant: "success" })
-        }).catch((error: AxiosError) => {
-          enqueueSnackbar(error.message, { variant: "error" })
-        })
+        dispatch(
+          postAuthAddressActionCreator({
+            address1: curUserAccountAddressState.address1,
+            address2: curUserAccountAddressState.address2,
+            city: curUserAccountAddressState.city,
+            province: curUserAccountAddressState.province,
+            country: curUserAccountAddressState.country,
+            postalCode: curUserAccountAddressState.postalCode,
+            isBillingAddress: false,
+            isShippingAddress: false,
+          })
+        )
       } else {
         console.log("this one is to update existing one")
-        // request
-        api.request({
-          method: 'PUT',
-          url: API1_URL + `/users/${auth.user.userId}/addresses/${curUserAccountAddressState.addressId}`,
-          data: curUserAccountAddressState,
-        }).then((data) => {
-          /**
-           *  update address
-           **/
-          const updatedAddress: UserAddressType = data.data;
-          dispatch(authActions.updateAddress(updatedAddress))
-
-          enqueueSnackbar("updated successfully.", { variant: "success" })
-        }).catch((error: AxiosError) => {
-          enqueueSnackbar(error.message, { variant: "error" })
-        })
+        dispatch(
+          putAuthAddressActionCreator({
+            addressId: curUserAccountAddressState.addressId,
+            address1: curUserAccountAddressState.address1,
+            address2: curUserAccountAddressState.address2,
+            city: curUserAccountAddressState.city,
+            province: curUserAccountAddressState.province,
+            country: curUserAccountAddressState.country,
+            postalCode: curUserAccountAddressState.postalCode,
+            isBillingAddress: curUserAccountAddressState.isBillingAddress,
+            isShippingAddress: curUserAccountAddressState.isShippingAddress,
+          })
+        )
       }
     } else {
       updateAllValidation()
@@ -286,7 +251,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
 
   // event handler for click 'add new one' button
   const handleAddNewAddressBtnClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    setUserAccountAddressState(defaultUserAccountAddressData)
+    setUserAccountAddressState(generateDefaultCustomerAddressesFormData())
     setUserAccountAddressValidationState(defaultUserAccountValidationAddressData)
     setNew(true);
     setModalOpen(true);
@@ -297,17 +262,15 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
     console.log("delete an existing address event triggered")
 
     const addressId = e.currentTarget.getAttribute("data-address-id")
-    // request
-    api.request({
-      method: 'DELETE',
-      url: API1_URL + `/users/${auth.user.userId}/addresses/${addressId}`
-    }).then((data) => {
 
-      dispatch(authActions.deleteAddress({ addressId: addressId }))
-      enqueueSnackbar("deleted successfully.", { variant: "success" })
-    }).catch((error: AxiosError) => {
-      enqueueSnackbar(error.message, { variant: "error" })
-    })
+    console.log("target address id to be remvoed: " + addressId);
+
+    dispatch(
+      deleteAuthAddressActionCreator({
+        addressId: addressId,
+      })
+    )
+    // request
   }
 
   // event handler to click an address list item to update address
@@ -328,56 +291,22 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   const [curShippingId, setShippingId] = React.useState<string>(getShippingAddressId(auth.user.addresses));
   const [curBillingId, setBillingId] = React.useState<string>(getBillingAddressId(auth.user.addresses));
 
-  const handleBillingAddressChange: React.EventHandler<React.MouseEvent<HTMLLabelElement>> = (e) => {
+  const handleBillingAddressChange = (e: React.MouseEvent<HTMLLabelElement>, addressId: string) => {
 
-    const nextBillingAddress = e.currentTarget.getAttribute("data-billing-address-id")
+    setBillingId(addressId)
 
-    setBillingId(nextBillingAddress)
-
-    // request
-    api.request({
-      method: 'PATCH',
-      url: API1_URL + `/users/${auth.user.userId}/addresses/${nextBillingAddress}`,
-      data: { type: "billing" }
-    }).then((data) => {
-
-      /**
-       * update auth
-       **/
-      const updatedAddress = data.data;
-      dispatch(authActions.switchBillingAddress(updatedAddress))
-
-      enqueueSnackbar("updated successfully.", { variant: "success" })
-    }).catch((error: AxiosError) => {
-      enqueueSnackbar(error.message, { variant: "error" })
-    })
-
+    dispatch(
+      patchAuthAddressActionCreator({ addressId: addressId, type: "billing" })
+    );
   }
 
-  const handleShippingAddressChange: React.EventHandler<React.MouseEvent<HTMLLabelElement>> = (e) => {
+  const handleShippingAddressChange = (e: React.MouseEvent<HTMLLabelElement>, addressId: string) => {
 
-    const nextShippingAddress = e.currentTarget.getAttribute("data-shipping-address-id")
+    setShippingId(addressId)
 
-    setShippingId(nextShippingAddress)
-
-    // request
-    api.request({
-      method: 'PATCH',
-      url: API1_URL + `/users/${auth.user.userId}/addresses/${nextShippingAddress}`,
-      data: { type: "shipping" }
-    }).then((data) => {
-
-      /**
-       * update auth
-       **/
-      const updatedAddress = data.data;
-      dispatch(authActions.switchShippingAddress(updatedAddress))
-
-      enqueueSnackbar("updated successfully.", { variant: "success" })
-    }).catch((error: AxiosError) => {
-      enqueueSnackbar(error.message, { variant: "error" })
-    })
-
+    dispatch(
+      patchAuthAddressActionCreator({ addressId: addressId, type: "shipping" })
+    );
   }
   // render functions
 
@@ -385,7 +314,9 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   const renderCurAddressListComponent: () => React.ReactNode = () => {
 
     return auth.user.addresses.map((address: UserAddressType) => {
-      const addressString = Object.values(address).join(" ");
+
+      console.log("render address compoennt: " + address.addressId)
+
       return (
         <ListItem key={address.addressId} >
           <ListItemAvatar>
@@ -394,7 +325,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
             </Avatar>
           </ListItemAvatar>
           <ListItemText
-            primary={addressString}
+            primary={toAddressString(address)}
             secondary={
               <React.Fragment>
                 {/**
@@ -410,7 +341,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
                   labelPlacement="bottom"
                   label={curShippingId === address.addressId ? "shipping" : ""}
                   name="user-billing-address"
-                  onClick={handleShippingAddressChange}
+                  onClick={(e) => handleShippingAddressChange(e, address.addressId)}
                 />
                 <FormControlLabel
                   value={address.addressId}
@@ -420,7 +351,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
                   labelPlacement="bottom"
                   label={curBillingId === address.addressId ? "billing" : ""}
                   name="user-shipping-address"
-                  onClick={handleBillingAddressChange}
+                  onClick={(e) => handleBillingAddressChange(e, address.addressId)}
                 />
                 <IconButton edge="end" aria-label="delete" data-address-id={address.addressId} onClick={handleDeleteAddressClickEvent}>
                   <DeleteIcon />

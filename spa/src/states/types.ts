@@ -79,6 +79,10 @@ export declare type AppStateType = {
       putPhone: FetchStatusEnum
       patchPhone: FetchStatusEnum
       deletePhone: FetchStatusEnum
+      postAddress: FetchStatusEnum
+      putAddress: FetchStatusEnum
+      patchAddress: FetchStatusEnum
+      deleteAddress: FetchStatusEnum
       postAvatarImage: FetchStatusEnum
       deleteAvatarImage: FetchStatusEnum
     },

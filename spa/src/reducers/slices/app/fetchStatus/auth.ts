@@ -199,6 +199,138 @@ export const deleteAuthPhoneFetchStatusSliceReducer = deleteAuthPhoneFetchStatus
 export const deleteAuthPhoneFetchStatusActions = deleteAuthPhoneFetchStatusSlice.actions
 
 /**
+ * app.fetchStatus.auth.put state Slice
+ *
+ *  - update auth data of the same id
+ **/
+export type postAuthAddressFetchStatusActionType = PayloadAction<FetchStatusEnum>
+
+export const postAuthAddressFetchStatusSlice = createSlice({
+  name: "app/fetchStatus/auth/put", // a name used in action type
+  initialState: {},
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+    update: (state: FetchStatusEnum, action: postAuthAddressFetchStatusActionType) => action.payload,
+    clear: (state: FetchStatusEnum) => FetchStatusEnum.INITIAL
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   **/
+})
+
+export const postAuthAddressFetchStatusSliceReducer = postAuthAddressFetchStatusSlice.reducer
+export const postAuthAddressFetchStatusActions = postAuthAddressFetchStatusSlice.actions
+
+/**
+ * app.fetchStatus.auth.put state Slice
+ *
+ *  - update auth data of the same id
+ **/
+export type putAuthAddressFetchStatusActionType = PayloadAction<FetchStatusEnum>
+
+export const putAuthAddressFetchStatusSlice = createSlice({
+  name: "app/fetchStatus/auth/put", // a name used in action type
+  initialState: {},
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+    update: (state: FetchStatusEnum, action: putAuthAddressFetchStatusActionType) => action.payload,
+    clear: (state: FetchStatusEnum) => FetchStatusEnum.INITIAL
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   **/
+})
+
+export const putAuthAddressFetchStatusSliceReducer = putAuthAddressFetchStatusSlice.reducer
+export const putAuthAddressFetchStatusActions = putAuthAddressFetchStatusSlice.actions
+
+/**
+ * app.fetchStatus.auth.put state Slice
+ *
+ *  - update auth data of the same id
+ **/
+export type patchAuthAddressFetchStatusActionType = PayloadAction<FetchStatusEnum>
+
+export const patchAuthAddressFetchStatusSlice = createSlice({
+  name: "app/fetchStatus/auth/patch", // a name used in action type
+  initialState: {},
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+    update: (state: FetchStatusEnum, action: patchAuthAddressFetchStatusActionType) => action.payload,
+    clear: (state: FetchStatusEnum) => FetchStatusEnum.INITIAL
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   **/
+})
+
+export const patchAuthAddressFetchStatusSliceReducer = patchAuthAddressFetchStatusSlice.reducer
+export const patchAuthAddressFetchStatusActions = patchAuthAddressFetchStatusSlice.actions
+
+/**
+ * app.fetchStatus.auth.delete state Slice
+ *
+ *  - update auth data of the same id
+ **/
+export type deleteAuthAddressFetchStatusActionType = PayloadAction<FetchStatusEnum>
+
+export const deleteAuthAddressFetchStatusSlice = createSlice({
+  name: "app/fetchStatus/auth/delete", // a name used in action type
+  initialState: {},
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+    update: (state: FetchStatusEnum, action: deleteAuthAddressFetchStatusActionType) => action.payload,
+    clear: (state: FetchStatusEnum) => FetchStatusEnum.INITIAL
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   **/
+})
+
+export const deleteAuthAddressFetchStatusSliceReducer = deleteAuthAddressFetchStatusSlice.reducer
+export const deleteAuthAddressFetchStatusActions = deleteAuthAddressFetchStatusSlice.actions
+
+/**
  * app.fetchStatus.auth.delete state Slice
  **/
 export type postAuthAvatarImageFetchStatusActionType = PayloadAction<FetchStatusEnum>
