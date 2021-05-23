@@ -37,3 +37,7 @@
     - cart items of guest users have temp cart item id for each temporarly.
     
   - should I set max cart item numbers? like 5.
+  
+ - phones:
+ 
+  - set max phone like 3
