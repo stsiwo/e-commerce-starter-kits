@@ -171,6 +171,23 @@ export const mSelector = {
     )
   },
 
+  // app.auth.user.phones with isSelected
+  makeAuthSelectedPhoneIdSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getAuth
+      ],
+      (auth) => {
+        const selectedPhone = auth.user.phones.find((phone: UserPhoneType) => phone.isSelected)
+
+        if (!selectedPhone) {
+          return ""
+        }
+        return selectedPhone.phoneId
+      },
+    )
+  },
+
   // app.auth.user.addresses with isBillingAddress
   makeAuthBillingAddressSelector: () => {
     return createSelector(

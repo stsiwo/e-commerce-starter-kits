@@ -62,6 +62,23 @@ export declare type UserType = {
   companies?: AdminCompanyType[]
 }
 
+// criteira
+export declare type UserCriteria = {
+  userId?: string
+  firstName: string
+  lastName: string
+  email: string
+  password?: string
+}
+
+export declare type UserPhoneCriteria = {
+  phoneId?: string
+  isSelected: boolean
+  phoneNumber: string
+  countryCode: string
+}
+
+
 // empty
 
 // state 

@@ -9,11 +9,12 @@ import { UserType, UserBasicAccountDataType, defaultUserBasicAccountData, UserBa
 import { useSelector, useDispatch } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
 import { useSnackbar } from 'notistack';
-import { authActions } from 'reducers/slices/app';
+import { authActions, putAuthActionCreator } from 'reducers/slices/app';
 import { AxiosError } from 'axios';
 import Typography from '@material-ui/core/Typography';
 import { api } from 'configs/axiosConfig';
 import omit from 'lodash/omit';
+import { MessageTypeEnum } from 'src/app';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -73,6 +74,12 @@ const UserAccountBasicManagement: React.FunctionComponent<UserAccountBasicManage
   // snackbar notification
   // usage: 'enqueueSnackbar("message", { variant: "error" };
   const { enqueueSnackbar } = useSnackbar();
+  const curMessage = useSelector(mSelector.makeMessageSelector())
+  React.useEffect(() => {
+    if (curMessage.type !== MessageTypeEnum.INITIAL) {
+      enqueueSnackbar(curMessage.message, { variant: curMessage.type });
+    }
+  }, [curMessage.id])
 
   // temp user account state
   const [curUserAccountState, setUserAccountState] = React.useState<UserBasicAccountDataType>(defaultUserBasicAccountData)
@@ -158,34 +165,15 @@ const UserAccountBasicManagement: React.FunctionComponent<UserAccountBasicManage
       // pass 
       console.log("passed")
 
-      // pre request body
-      const bodyFormData = new FormData();
-      bodyFormData.append("firstName", curUserAccountState.firstName);
-      bodyFormData.append("lastName", curUserAccountState.lastName);
-      bodyFormData.append("email", curUserAccountState.email);
-      bodyFormData.append("password", curUserAccountState.password);
-
-      // request
-      api.request({
-        method: 'POST',
-        url: API1_URL + `/users/${auth.user.userId}`,
-        data: omit(curUserAccountState, 'confirm') ,
-      }).then((data) => {
-
-        /**
-         * update auth state 
-         **/
-        const updatedUser = data.data;
-        dispatch(authActions.update({
-          ...auth,
-          user: updatedUser,
-        }));
-
-        enqueueSnackbar("updated successfully.", { variant: "success" })
-      }).catch((error: AxiosError) => {
-        enqueueSnackbar(error.message, { variant: "error" })
-      })
-
+      dispatch(
+        putAuthActionCreator({
+          userId: auth.user.userId,
+          firstName: curUserAccountState.firstName,
+          lastName: curUserAccountState.lastName,
+          email: curUserAccountState.email,
+          ...(curUserAccountState.password ? { password: curUserAccountState.password } : {}), 
+        }) 
+      );
 
     } else {
       updateAllValidation()

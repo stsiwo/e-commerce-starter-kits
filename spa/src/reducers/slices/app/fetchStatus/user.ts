@@ -226,9 +226,9 @@ export const deleteUserFetchStatusActions = deleteUserFetchStatusSlice.actions
 /**
  * app.fetchStatus.user.delete state Slice
  **/
-export type postAvatarImageFetchStatusActionType = PayloadAction<FetchStatusEnum>
+export type postUserAvatarImageFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
-export const postAvatarImageFetchStatusSlice = createSlice({
+export const postUserAvatarImageFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/avatar-image/post", // a name used in action type
   initialState: {},
   reducers: {
@@ -241,7 +241,7 @@ export const postAvatarImageFetchStatusSlice = createSlice({
      *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
      *
      **/
-    update: (state: FetchStatusEnum, action: postAvatarImageFetchStatusActionType) => action.payload,
+    update: (state: FetchStatusEnum, action: postUserAvatarImageFetchStatusActionType) => action.payload,
     clear: (state: FetchStatusEnum) => FetchStatusEnum.INITIAL
   },
   /**
@@ -251,16 +251,16 @@ export const postAvatarImageFetchStatusSlice = createSlice({
    **/
 })
 
-export const postAvatarImageFetchStatusSliceReducer = postAvatarImageFetchStatusSlice.reducer
-export const postAvatarImageFetchStatusActions = postAvatarImageFetchStatusSlice.actions
+export const postUserAvatarImageFetchStatusSliceReducer = postUserAvatarImageFetchStatusSlice.reducer
+export const postUserAvatarImageFetchStatusActions = postUserAvatarImageFetchStatusSlice.actions
 
 
 /**
  * app.fetchStatus.user.delete state Slice
  **/
-export type deleteAvatarImageFetchStatusActionType = PayloadAction<FetchStatusEnum>
+export type deleteUserAvatarImageFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
-export const deleteAvatarImageFetchStatusSlice = createSlice({
+export const deleteUserAvatarImageFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/avatar-image/delete", // a name used in action type
   initialState: {},
   reducers: {
@@ -273,7 +273,7 @@ export const deleteAvatarImageFetchStatusSlice = createSlice({
      *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
      *
      **/
-    update: (state: FetchStatusEnum, action: deleteAvatarImageFetchStatusActionType) => action.payload,
+    update: (state: FetchStatusEnum, action: deleteUserAvatarImageFetchStatusActionType) => action.payload,
     clear: (state: FetchStatusEnum) => FetchStatusEnum.INITIAL
   },
   /**
@@ -283,7 +283,7 @@ export const deleteAvatarImageFetchStatusSlice = createSlice({
    **/
 })
 
-export const deleteAvatarImageFetchStatusSliceReducer = deleteAvatarImageFetchStatusSlice.reducer
-export const deleteAvatarImageFetchStatusActions = deleteAvatarImageFetchStatusSlice.actions
+export const deleteUserAvatarImageFetchStatusSliceReducer = deleteUserAvatarImageFetchStatusSlice.reducer
+export const deleteUserAvatarImageFetchStatusActions = deleteUserAvatarImageFetchStatusSlice.actions
 
 

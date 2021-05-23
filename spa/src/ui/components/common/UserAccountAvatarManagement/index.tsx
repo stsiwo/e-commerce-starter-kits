@@ -6,17 +6,13 @@ import Typography from '@material-ui/core/Typography';
 import BackupIcon from '@material-ui/icons/Backup';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import ImageIcon from '@material-ui/icons/Image';
-import { AxiosError } from 'axios';
 import { UserType } from 'domain/user/types';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { mSelector } from 'src/selectors/selector';
-import merge from 'lodash/merge';
-import { authActions } from 'reducers/slices/app';
-import { api } from 'configs/axiosConfig';
-import { postAvatarImageActionCreator, deleteAvatarImageActionCreator } from 'reducers/slices/domain/user';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteAuthAvatarImageActionCreator, postAuthAvatarImageActionCreator } from 'reducers/slices/app';
 import { MessageTypeEnum } from 'src/app';
+import { mSelector } from 'src/selectors/selector';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -110,15 +106,17 @@ const UserAccountAvatarManagement: React.FunctionComponent<UserAccountAvatarMana
     }
 
     dispatch(
-      postAvatarImageActionCreator({ avatarImage: curFile, userId: auth.user.userId })
+      postAuthAvatarImageActionCreator({ avatarImage: curFile, userId: auth.user.userId })
     )
   }
 
 
   const handleDeleteClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
     dispatch(
-      deleteAvatarImageActionCreator({ userId: auth.user.userId })
+      deleteAuthAvatarImageActionCreator({ userId: auth.user.userId })
     )
+
+    setFilePath("");
   }
 
   return (

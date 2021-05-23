@@ -1,7 +1,7 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import merge from "lodash/merge";
 import remove from 'lodash/remove';
-import { UserType } from "domain/user/types";
+import { UserType, UserCriteria } from "domain/user/types";
 
 /**
  * redux-sage actions (side effects)
@@ -23,7 +23,8 @@ export const postUserActionCreator = createAction<UserType>("saga/domain/user/po
 export const postUserActionTypeName = postUserActionCreator().type
 
 // for PUT (replace) request
-export const putUserActionCreator = createAction<UserType>("saga/domain/user/put")
+export declare type PutUserActionType = UserCriteria
+export const putUserActionCreator = createAction<PutUserActionType>("saga/domain/user/put")
 export const putUserActionTypeName = putUserActionCreator().type
 
 // for DELETE (delete single cart item) request
@@ -36,15 +37,15 @@ export const deleteUserActionTypeName = deleteUserActionCreator().type
 
 
 // for POST (avatar-image) request
-export declare type PostAvatarImageActionType = { avatarImage: File, userId: string } 
-export const postAvatarImageActionCreator = createAction<PostAvatarImageActionType>("saga/domain/user/avatar-image/post")
-export const postAvatarImageActionTypeName = postAvatarImageActionCreator().type
+export declare type PostUserAvatarImageActionType = { avatarImage: File, userId: string } 
+export const postUserAvatarImageActionCreator = createAction<PostUserAvatarImageActionType>("saga/domain/user/avatar-image/post")
+export const postUserAvatarImageActionTypeName = postUserAvatarImageActionCreator().type
 
 
 // for DELETE (avatar-image) request
-export declare type DeleteAvatarImageActionType = { userId: string } 
-export const deleteAvatarImageActionCreator = createAction<DeleteAvatarImageActionType>("saga/domain/user/avatar-image/delete")
-export const deleteAvatarImageActionTypeName = deleteAvatarImageActionCreator().type
+export declare type DeleteUserAvatarImageActionType = { userId: string } 
+export const deleteUserAvatarImageActionCreator = createAction<DeleteUserAvatarImageActionType>("saga/domain/user/avatar-image/delete")
+export const deleteUserAvatarImageActionTypeName = deleteUserAvatarImageActionCreator().type
 
 
 /**

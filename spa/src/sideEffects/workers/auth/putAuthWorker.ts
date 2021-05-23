@@ -1,39 +1,37 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { UserType } from "domain/user/types";
-import { putUserFetchStatusActions, deleteAvatarImageFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
-import { userActions, DeleteAvatarImageActionType } from "reducers/slices/domain/user";
+import { UserCriteria } from "domain/user/types";
+import { authActions, PutAuthActionType, messageActions } from "reducers/slices/app";
+import { putAuthFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { messageActions, authActions } from "reducers/slices/app";
 import { getNanoId } from "src/utils";
 
 /**
  * a worker (generator)    
  *
- *  - delete user avatar image 
+ *  - put auth (its own) data (not others) 
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
  *  - (UserType)
  *
  *      - (Guest): N/A (permission denied) 
- *      - (Member): OK 
+ *      - (Member): N/A (permission denied)
  *      - (Admin): OK 
  *
  *  - steps:
  *
- *
  *  - note:
  *
- *    - does not necessary auth user upload its own avatar image (e.g., admin might update other avatar image) 
+ *    - userId always refers to auth userid 
  *
- *      - use input 'userId' and don't use auth's userId.
+ *      - don't refer to other userId 
  *
  **/
-export function* deleteAvatarImageWorker(action: PayloadAction<DeleteAvatarImageActionType>) {
+export function* putAuthWorker(action: PayloadAction<PutAuthActionType>) {
 
   /**
    * get cur user type
@@ -51,23 +49,26 @@ export function* deleteAvatarImageWorker(action: PayloadAction<DeleteAvatarImage
      * update status for put user data
      **/
     yield put(
-      deleteAvatarImageFetchStatusActions.update(FetchStatusEnum.FETCHING)
+      putAuthFetchStatusActions.update(FetchStatusEnum.FETCHING)
     )
 
     /**
      * grab this  domain
      **/
-    const apiUrl = `${API1_URL}/users/${action.payload.userId}/avatar-image`
+    const apiUrl = `${API1_URL}/users/${curAuth.user.userId}`
 
     /**
      * fetch data
      **/
     try {
 
+      // prep keyword if necessary
+
       // start fetching
       const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "DELETE",
+        method: "PUT",
         url: apiUrl,
+        data: action.payload as UserCriteria
       })
 
       /**
@@ -75,14 +76,17 @@ export function* deleteAvatarImageWorker(action: PayloadAction<DeleteAvatarImage
        *
        **/
       yield put(
-        authActions.updateAvatarImagePath("")
+        authActions.update({
+          ...curAuth,
+          user: response.data.data
+        })
       )
 
       /**
        * update fetch status sucess
        **/
       yield put(
-        deleteAvatarImageFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+        putAuthFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -92,9 +96,10 @@ export function* deleteAvatarImageWorker(action: PayloadAction<DeleteAvatarImage
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
-          message: "deleted successfully.",
+          message: "added successfully.",
         }) 
       )
+
     } catch (error) {
 
       console.log(error)
@@ -103,7 +108,7 @@ export function* deleteAvatarImageWorker(action: PayloadAction<DeleteAvatarImage
        * update fetch status failed
        **/
       yield put(
-        putUserFetchStatusActions.update(FetchStatusEnum.FAILED)
+        putAuthFetchStatusActions.update(FetchStatusEnum.FAILED)
       )
 
       /**
@@ -118,7 +123,7 @@ export function* deleteAvatarImageWorker(action: PayloadAction<DeleteAvatarImage
       )
     }
   } else {
-    console.log("permission defined: you are " + curAuth.userType)
+    console.log("permission denied: you are " + curAuth.userType)
   }
 }
 

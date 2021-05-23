@@ -1,12 +1,13 @@
 import { combineReducers } from 'redux';
-import { authSliceReducer, previousUrlSliceReducer, requestTrackerSliceReducer, searchKeywordSliceReducer, messageSliceReducer } from './slices/app';
+import { authSliceReducer, messageSliceReducer, previousUrlSliceReducer, requestTrackerSliceReducer, searchKeywordSliceReducer } from './slices/app';
+import { deleteAuthAvatarImageFetchStatusSliceReducer, getSingleAuthFetchStatusSliceReducer, postAuthAvatarImageFetchStatusSliceReducer, putAuthFetchStatusSliceReducer, postAuthPhoneFetchStatusSliceReducer, putAuthPhoneFetchStatusSliceReducer, deleteAuthPhoneFetchStatusSliceReducer, patchAuthPhoneFetchStatusSliceReducer } from './slices/app/fetchStatus/auth';
 import { deleteCartItemFetchStatusSliceReducer, deleteSingleCartItemFetchStatusSliceReducer, getCartItemFetchStatusSliceReducer, postCartItemFetchStatusSliceReducer, putCartItemFetchStatusSliceReducer } from './slices/app/fetchStatus/cartItem';
 import { deleteSingleCategoryFetchStatusSliceReducer, getCategoryFetchStatusSliceReducer, postCategoryFetchStatusSliceReducer, putCategoryFetchStatusSliceReducer } from './slices/app/fetchStatus/category';
 import { deleteSingleOrderFetchStatusSliceReducer, getOrderFetchStatusSliceReducer, getSingleOrderFetchStatusSliceReducer, postOrderFetchStatusSliceReducer, putOrderFetchStatusSliceReducer } from './slices/app/fetchStatus/order';
 import { deleteSingleProductFetchStatusSliceReducer, getProductFetchStatusSliceReducer, getSingleProductFetchStatusSliceReducer, postProductFetchStatusSliceReducer, putProductFetchStatusSliceReducer } from './slices/app/fetchStatus/product';
 import { getReviewFetchStatusSliceReducer } from './slices/app/fetchStatus/review';
 import { stripeClientSecretFetchStatusSliceReducer } from './slices/app/fetchStatus/stripeClientSecret';
-import { deleteSingleUserFetchStatusSliceReducer, getSingleUserFetchStatusSliceReducer, getUserFetchStatusSliceReducer, patchUserFetchStatusSliceReducer, postUserFetchStatusSliceReducer, putUserFetchStatusSliceReducer } from './slices/app/fetchStatus/user';
+import { deleteSingleUserFetchStatusSliceReducer, deleteUserAvatarImageFetchStatusSliceReducer, getSingleUserFetchStatusSliceReducer, getUserFetchStatusSliceReducer, patchUserFetchStatusSliceReducer, postUserAvatarImageFetchStatusSliceReducer, postUserFetchStatusSliceReducer, putUserFetchStatusSliceReducer } from './slices/app/fetchStatus/user';
 import { deleteSingleWishlistItemFetchStatusSliceReducer, deleteWishlistItemFetchStatusSliceReducer, getWishlistItemFetchStatusSliceReducer, postWishlistItemFetchStatusSliceReducer } from './slices/app/fetchStatus/wishlistItem';
 import { cartItemSliceReducer } from './slices/domain/cartItem';
 import { categoryPaginationLimitSliceReducer, categoryPaginationPageSliceReducer, categoryPaginationTotalPagesSliceReducer, categorySliceReducer } from './slices/domain/category';
@@ -14,7 +15,7 @@ import { orderPaginationLimitSliceReducer, orderPaginationPageSliceReducer, orde
 import { productCurItemsSliceReducer, productPaginationLimitSliceReducer, productPaginationPageSliceReducer, productPaginationTotalPagesSliceReducer, productQueryCategoryIdSliceReducer, productQueryEndDateSliceReducer, productQueryIsDiscountSliceReducer, productQueryMaxPriceSliceReducer, productQueryMinPriceSliceReducer, productQueryReviewPointSliceReducer, productQuerySearchQuerySliceReducer, productQuerySortSliceReducer, productQueryStartDateSliceReducer, productSliceReducer } from './slices/domain/product';
 import { reviewPaginationLimitSliceReducer, reviewPaginationPageSliceReducer, reviewPaginationTotalPagesSliceReducer, reviewSliceReducer } from './slices/domain/review';
 import { userPaginationLimitSliceReducer, userPaginationPageSliceReducer, userPaginationTotalPagesSliceReducer, userSliceReducer } from './slices/domain/user';
-import { wishlistItemPaginationLimitSliceReducer, wishlistItemPaginationPageSliceReducer, wishlistItemPaginationTotalPagesSliceReducer, wishlistItemSliceReducer, wishlistItemQuerySearchQuerySliceReducer, wishlistItemQueryMinPriceSliceReducer, wishlistItemQueryMaxPriceSliceReducer, wishlistItemQueryReviewPointSliceReducer, wishlistItemQueryIsDiscountSliceReducer, wishlistItemQueryStartDateSliceReducer, wishlistItemQueryEndDateSliceReducer, wishlistItemQuerySortSliceReducer } from './slices/domain/wishlistItem';
+import { wishlistItemPaginationLimitSliceReducer, wishlistItemPaginationPageSliceReducer, wishlistItemPaginationTotalPagesSliceReducer, wishlistItemQueryEndDateSliceReducer, wishlistItemQueryIsDiscountSliceReducer, wishlistItemQueryMaxPriceSliceReducer, wishlistItemQueryMinPriceSliceReducer, wishlistItemQueryReviewPointSliceReducer, wishlistItemQuerySearchQuerySliceReducer, wishlistItemQuerySortSliceReducer, wishlistItemQueryStartDateSliceReducer, wishlistItemSliceReducer } from './slices/domain/wishlistItem';
 import { stripeClientSecretSliceReducer } from './slices/sensitive';
 import { cartModalSliceReducer, leftNavMenuSliceReducer, rightNavMenuSliceReducer, searchModalSliceReducer } from './slices/ui';
 
@@ -61,6 +62,8 @@ export const rootReducer = combineReducers({
         put: putUserFetchStatusSliceReducer,
         deleteSingle: deleteSingleUserFetchStatusSliceReducer,
         patch: patchUserFetchStatusSliceReducer,
+        postAvatarImage: postUserAvatarImageFetchStatusSliceReducer,
+        deleteAvatarImage: deleteUserAvatarImageFetchStatusSliceReducer,
       }),
       categories: combineReducers({
         get: getCategoryFetchStatusSliceReducer,
@@ -83,7 +86,17 @@ export const rootReducer = combineReducers({
         post: postWishlistItemFetchStatusSliceReducer,
         deleteSingle: deleteSingleWishlistItemFetchStatusSliceReducer,
         delete: deleteWishlistItemFetchStatusSliceReducer,
-      })
+      }),
+      auth: combineReducers({
+        getSingle: getSingleAuthFetchStatusSliceReducer,
+        put: putAuthFetchStatusSliceReducer,
+        postPhone: postAuthPhoneFetchStatusSliceReducer,
+        putPhone: putAuthPhoneFetchStatusSliceReducer,
+        patchPhone: patchAuthPhoneFetchStatusSliceReducer,
+        deletePhone: deleteAuthPhoneFetchStatusSliceReducer,
+        postAvatarImage: postAuthAvatarImageFetchStatusSliceReducer,
+        deleteAvatarImage: deleteAuthAvatarImageFetchStatusSliceReducer,
+      }),
     }),
   }),
   domain: combineReducers({

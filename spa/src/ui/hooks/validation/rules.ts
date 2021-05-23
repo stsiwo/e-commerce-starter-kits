@@ -28,7 +28,7 @@ export const userAccountSchema = yup.object().shape({
 
 
 export const userAccountPhoneSchema = yup.object().shape({
-  phone: yup.string().required(),
+  phoneNumber: yup.string().required(),
   countryCode: yup.string().required(),
 })
 
@@ -133,7 +133,7 @@ export const companySchema = yup.object().shape({
   companyName: yup.string().required(),
   description: yup.string().required(),
   email: yup.string().required().email(),
-  phone: yup.string().required(),
+  phoneNumber: yup.string().required(),
   countryCode: yup.string().required(),
   address1: yup.string().required(),
   address2: yup.string().optional().nullable(),

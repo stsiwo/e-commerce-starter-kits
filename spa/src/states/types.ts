@@ -71,7 +71,17 @@ export declare type AppStateType = {
       patch: FetchStatusEnum
       deleteSingle: FetchStatusEnum
       delete: FetchStatusEnum
-    }
+    },
+    auth: {
+      getSingle: FetchStatusEnum
+      put: FetchStatusEnum
+      postPhone: FetchStatusEnum
+      putPhone: FetchStatusEnum
+      patchPhone: FetchStatusEnum
+      deletePhone: FetchStatusEnum
+      postAvatarImage: FetchStatusEnum
+      deleteAvatarImage: FetchStatusEnum
+    },
   },
 }
 

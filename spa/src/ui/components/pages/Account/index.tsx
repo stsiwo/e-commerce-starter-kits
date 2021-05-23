@@ -6,6 +6,8 @@ import UserAccountPhoneManagement from 'components/common/UserAccountPhoneManage
 import UserAccountAddressManagement from 'components/common/UserAccountAddressManagement';
 import Grid from '@material-ui/core/Grid';
 import UserAccountAvatarManagement from 'components/common/UserAccountAvatarManagement';
+import { useSelector } from 'react-redux';
+import { mSelector } from 'src/selectors/selector';
 
 
 /**
@@ -33,6 +35,8 @@ const Account: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
 
+  const auth = useSelector(mSelector.makeAuthSelector());
+
 
   return (
     <React.Fragment>
@@ -59,7 +63,7 @@ const Account: React.FunctionComponent<{}> = (props) => {
           md={6}
           className={classes.gridItem}
         >
-          <UserAccountBasicManagement />
+          <UserAccountBasicManagement user={auth.user} />
         </Grid>
         <Grid 
           item

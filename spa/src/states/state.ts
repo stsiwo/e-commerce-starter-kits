@@ -132,7 +132,17 @@ export const initialState: StateType = {
         patch: FetchStatusEnum.INITIAL,
         delete: FetchStatusEnum.INITIAL,
         deleteSingle: FetchStatusEnum.INITIAL,
-      }
+      },
+      auth: {
+        getSingle: FetchStatusEnum.INITIAL,
+        put: FetchStatusEnum.INITIAL,
+        postPhone: FetchStatusEnum.INITIAL,
+        putPhone: FetchStatusEnum.INITIAL,
+        patchPhone: FetchStatusEnum.INITIAL,
+        deletePhone: FetchStatusEnum.INITIAL,
+        postAvatarImage: FetchStatusEnum.INITIAL,
+        deleteAvatarImage: FetchStatusEnum.INITIAL,
+      },
     },
   },
   domain: {

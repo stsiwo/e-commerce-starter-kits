@@ -1,6 +1,6 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RequestTrackerType, AuthType, UserTypeEnum, FetchStatusEnum, MessageStateType, MessageTypeEnum } from "src/app";
-import { defaultUser, UserPhoneType, UserAddressType, UserType } from "domain/user/types";
+import { defaultUser, UserAddressType, UserCriteria, UserPhoneType, UserType, UserPhoneCriteria } from "domain/user/types";
+import { AuthType, MessageStateType, MessageTypeEnum, RequestTrackerType, UserTypeEnum } from "src/app";
 import { getNanoId } from "src/utils";
 
 /**
@@ -11,6 +11,45 @@ import { getNanoId } from "src/utils";
 // cancel all sort & filter
 export const clearAllSortAndFilterActionCreator = createAction("/app/common/clearAllSortAndFilter")
 export const clearAllSortAndFilterActionTypeName = clearAllSortAndFilterActionCreator().type
+
+
+// for PUT (replace) request
+export declare type PutAuthActionType = UserCriteria
+export const putAuthActionCreator = createAction<PutAuthActionType>("saga/domain/auth/put")
+export const putAuthActionTypeName = putAuthActionCreator().type
+
+// for POST (create a phone) request
+export declare type PostAuthPhoneActionType = UserPhoneCriteria
+export const postAuthPhoneActionCreator = createAction<PostAuthPhoneActionType>("saga/domain/auth/phone/post")
+export const postAuthPhoneActionTypeName = postAuthPhoneActionCreator().type
+
+// for PUT (replace a phone) request
+export declare type PutAuthPhoneActionType = UserPhoneCriteria
+export const putAuthPhoneActionCreator = createAction<PutAuthPhoneActionType>("saga/domain/auth/phone/put")
+export const putAuthPhoneActionTypeName = putAuthPhoneActionCreator().type
+
+// for PATCH (replace a phone) request
+export declare type PatchAuthPhoneActionType = { phoneId: string } 
+export const patchAuthPhoneActionCreator = createAction<PatchAuthPhoneActionType>("saga/domain/auth/phone/patch")
+export const patchAuthPhoneActionTypeName = patchAuthPhoneActionCreator().type
+
+// for DELETE (delete a phone) request
+export declare type DeleteAuthPhoneActionType = { phoneId: string }
+export const deleteAuthPhoneActionCreator = createAction<DeleteAuthPhoneActionType>("saga/domain/auth/phone/delete")
+export const deleteAuthPhoneActionTypeName = deleteAuthPhoneActionCreator().type
+
+
+// for POST (avatar-image) request
+export declare type PostAuthAvatarImageActionType = { avatarImage: File, userId: string } 
+export const postAuthAvatarImageActionCreator = createAction<PostAuthAvatarImageActionType>("saga/domain/auth/avatar-image/post")
+export const postAuthAvatarImageActionTypeName = postAuthAvatarImageActionCreator().type
+
+
+// for DELETE (avatar-image) request
+export declare type DeleteAuthAvatarImageActionType = { userId: string } 
+export const deleteAuthAvatarImageActionCreator = createAction<DeleteAuthAvatarImageActionType>("saga/domain/auth/avatar-image/delete")
+export const deleteAuthAvatarImageActionTypeName = deleteAuthAvatarImageActionCreator().type
+
 
 /**
  * app.auth state Slice
@@ -65,6 +104,10 @@ export const authSlice = createSlice({
       return state
     },
 
+    replacePhone: (state: AuthType, action: PayloadAction<UserPhoneType[]>) => {
+      state.user.phones = action.payload
+      return state;
+    },
 
     appendPhone: (state: AuthType, action: PayloadAction<UserPhoneType>) => {
       state.user.phones.push(action.payload)

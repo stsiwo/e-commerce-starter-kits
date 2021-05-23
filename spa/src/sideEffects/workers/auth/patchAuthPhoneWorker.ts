@@ -1,17 +1,17 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { UserType, UserCriteria } from "domain/user/types";
-import { putUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
-import { userActions, PutUserActionType } from "reducers/slices/domain/user";
+import { authActions, messageActions, PatchAuthPhoneActionType } from "reducers/slices/app";
+import { patchAuthPhoneFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
+import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
+import { getNanoId } from "src/utils";
 
 /**
  * a worker (generator)    
  *
- *  - put user item to replace
+ *  - patch auth (its own) data (not others) 
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
@@ -25,12 +25,12 @@ import { rsSelector } from "src/selectors/selector";
  *
  *  - note:
  *
- *    - does not necessary auth user upload its own avatar image (e.g., admin might update other avatar image) 
+ *    - userId always refers to auth userid 
  *
- *      - use input 'userId' and don't use auth's userId.
+ *      - don't refer to other userId 
  *
  **/
-export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
+export function* patchAuthPhoneWorker(action: PayloadAction<PatchAuthPhoneActionType>) {
 
   /**
    * get cur user type
@@ -42,19 +42,19 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
    * Admin User Type
    *
    **/
-  if (curAuth.userType === UserTypeEnum.ADMIN) {
+  if (curAuth.userType === UserTypeEnum.ADMIN || curAuth.userType === UserTypeEnum.MEMBER) {
 
     /**
      * update status for put user data
      **/
     yield put(
-      putUserFetchStatusActions.update(FetchStatusEnum.FETCHING)
+      patchAuthPhoneFetchStatusActions.update(FetchStatusEnum.FETCHING)
     )
 
     /**
      * grab this  domain
      **/
-    const apiUrl = `${API1_URL}/users/${action.payload.userId}`
+    const apiUrl = `${API1_URL}/users/${curAuth.user.userId}/phones/${action.payload.phoneId}`
 
     /**
      * fetch data
@@ -65,9 +65,8 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
 
       // start fetching
       const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "PUT",
+        method: "PATCH",
         url: apiUrl,
-        data: action.payload as UserCriteria
       })
 
       /**
@@ -75,14 +74,25 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
        *
        **/
       yield put(
-        userActions.merge(response.data.data)
+        authActions.replacePhone(response.data)
       )
 
       /**
        * update fetch status sucess
        **/
       yield put(
-        putUserFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+        patchAuthPhoneFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+      )
+
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.SUCCESS,
+          message: "switched primary successfully.",
+        }) 
       )
 
     } catch (error) {
@@ -93,13 +103,26 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
        * update fetch status failed
        **/
       yield put(
-        putUserFetchStatusActions.update(FetchStatusEnum.FAILED)
+        patchAuthPhoneFetchStatusActions.update(FetchStatusEnum.FAILED)
+      )
+
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.ERROR,
+          message: error.message, 
+        }) 
       )
     }
   } else {
     console.log("permission denied: you are " + curAuth.userType)
   }
 }
+
+
 
 
 

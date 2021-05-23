@@ -1,39 +1,37 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { UserType } from "domain/user/types";
-import { putUserFetchStatusActions, postAvatarImageFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
-import { userActions, PostAvatarImageActionType } from "reducers/slices/domain/user";
+import { UserPhoneCriteria } from "domain/user/types";
+import { authActions, messageActions, PostAuthPhoneActionType } from "reducers/slices/app";
+import { postAuthPhoneFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
+import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { messageActions, authActions } from "reducers/slices/app";
 import { getNanoId } from "src/utils";
 
 /**
  * a worker (generator)    
  *
- *  - post user avatar image 
+ *  - put auth (its own) data (not others) 
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
  *  - (UserType)
  *
  *      - (Guest): N/A (permission denied) 
- *      - (Member): OK 
+ *      - (Member): N/A (permission denied)
  *      - (Admin): OK 
  *
  *  - steps:
  *
- *
  *  - note:
  *
- *    - does not necessary auth user upload its own avatar image (e.g., admin might update other avatar image) 
+ *    - userId always refers to auth userid 
  *
- *      - use input 'userId' and don't use auth's userId.
+ *      - don't refer to other userId 
  *
  **/
-export function* postAvatarImageWorker(action: PayloadAction<PostAvatarImageActionType>) {
+export function* postAuthPhoneWorker(action: PayloadAction<PostAuthPhoneActionType>) {
 
   /**
    * get cur user type
@@ -51,44 +49,43 @@ export function* postAvatarImageWorker(action: PayloadAction<PostAvatarImageActi
      * update status for put user data
      **/
     yield put(
-      postAvatarImageFetchStatusActions.update(FetchStatusEnum.FETCHING)
+      postAuthPhoneFetchStatusActions.update(FetchStatusEnum.FETCHING)
     )
 
     /**
      * grab this  domain
      **/
-    const apiUrl = `${API1_URL}/users/${action.payload.userId}/avatar-image`
+    const apiUrl = `${API1_URL}/users/${curAuth.user.userId}/phones`
 
     /**
      * fetch data
      **/
     try {
 
-      // prep form data
-      const formData = new FormData();
-      formData.append("avatarImage", action.payload.avatarImage)
+      // prep keyword if necessary
 
       // start fetching
       const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "POST",
         url: apiUrl,
-        data: formData, 
-        headers: { "Content-Type": "multipart/form-data" },
+        data: action.payload as UserPhoneCriteria
       })
 
       /**
        * update this domain in state
        *
        **/
+      console.log("added phone from response")
+      console.log(response.data)
       yield put(
-        authActions.updateAvatarImagePath(response.data.imagePath)
+        authActions.appendPhone(response.data)
       )
 
       /**
        * update fetch status sucess
        **/
       yield put(
-        postAvatarImageFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+        postAuthPhoneFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -101,6 +98,7 @@ export function* postAvatarImageWorker(action: PayloadAction<PostAvatarImageActi
           message: "added successfully.",
         }) 
       )
+
     } catch (error) {
 
       console.log(error)
@@ -109,7 +107,7 @@ export function* postAvatarImageWorker(action: PayloadAction<PostAvatarImageActi
        * update fetch status failed
        **/
       yield put(
-        putUserFetchStatusActions.update(FetchStatusEnum.FAILED)
+        postAuthPhoneFetchStatusActions.update(FetchStatusEnum.FAILED)
       )
 
       /**
@@ -124,9 +122,10 @@ export function* postAvatarImageWorker(action: PayloadAction<PostAvatarImageActi
       )
     }
   } else {
-    console.log("permission defined: you are " + curAuth.userType)
+    console.log("permission denied: you are " + curAuth.userType)
   }
 }
+
 
 
 
