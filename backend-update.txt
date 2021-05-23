@@ -44,6 +44,10 @@ endpoint change:
   - avatar-image
   
     - add cache feature (hasing file name or something)
+    
+  - performance:
+  
+    - identify N+1 sql using logging & monitor.
       
     
 
