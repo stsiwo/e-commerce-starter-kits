@@ -11,6 +11,15 @@ import SampleSelfImage from 'static/self.jpeg';
 import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import { Link as RRLink } from "react-router-dom";
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import { api } from 'configs/axiosConfig';
+import { authActions } from 'reducers/slices/app';
+import { useSnackbar } from 'notistack';
+import { AxiosError } from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router';
+import { mSelector } from 'src/selectors/selector';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -27,12 +36,65 @@ const useStyles = makeStyles((theme: Theme) =>
       '& > *': {
       }
     },
+    pointer: {
+      cursor: "pointer",
+    }
   }),
 );
 
 const AdminHeader: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
+
+  // auth
+  const auth = useSelector(mSelector.makeAuthSelector());
+
+  // cart icon click
+  const dispatch = useDispatch();
+  
+  // history 
+  const history = useHistory();
+
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
+
+  /**
+   * account menu stuff
+   **/
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleMenuOpenClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  // handle logout menu item click
+  const handleLogout = (e: React.MouseEvent<HTMLElement>) => {
+
+    // request
+    api.request({
+      method: 'post',
+      url: API1_URL + `/logout`,
+      data: null 
+    }).then((data) => {
+
+      // fetch again
+      dispatch(authActions.logout())
+
+      history.push("/admin/login");
+
+
+      enqueueSnackbar("logged out successfully.", { variant: "success" })
+    }).catch((error: AxiosError) => {
+      enqueueSnackbar(error.message, { variant: "error" })
+    })
+
+    handleMenuClose()
+  }
 
   return (
     <AppBar position="sticky" className={classes.appBar}>
@@ -44,25 +106,32 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
         >
           <Grid item>
             <Link color="inherit" component={RRLink} to="/">
-              <IconButton edge="start"  color="inherit" aria-label="admin-logo">
+              <IconButton edge="start" color="inherit" aria-label="admin-logo">
                 <SentimentSatisfiedOutlinedIcon />
               </IconButton>
             </Link>
           </Grid>
           <Grid item className={classes.gridItemRight}>
             <Link color="inherit" component={RRLink} to="/">
-              <IconButton edge="start"  color="inherit" aria-label="admin-menu-search">
+              <IconButton edge="start" color="inherit" aria-label="admin-menu-search">
                 <NotificationsIcon />
               </IconButton>
             </Link>
-            <Link color="inherit" component={RRLink} to="/">
-              <IconButton edge="start"  color="inherit" aria-label="admin-menu-search">
-                <SearchOutlinedIcon />
-              </IconButton>
-            </Link>
-            <Link color="inherit"  component={RRLink} to="/admin/account">
-              <Avatar alt="Satoshi Iwao" src={SampleSelfImage}/>
-            </Link>
+            <Avatar 
+              alt="Satoshi Iwao" 
+              className={classes.pointer}
+              src={auth.user.avatarImagePath ? API1_URL + auth.user.avatarImagePath : null} 
+              onClick={handleMenuOpenClick}
+            />
+            <Menu
+              id="admin-account-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+            >
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            </Menu>
           </Grid>
         </Grid>
       </Toolbar>

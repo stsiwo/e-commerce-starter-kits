@@ -131,8 +131,8 @@ export const contactSchema = yup.object().shape({
 // admin company
 export const companySchema = yup.object().shape({
   companyName: yup.string().required(),
-  description: yup.string().required(),
-  email: yup.string().required().email(),
+  companyDescription: yup.string().required(),
+  companyEmail: yup.string().required().email(),
   phoneNumber: yup.string().required(),
   countryCode: yup.string().required(),
   address1: yup.string().required(),

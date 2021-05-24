@@ -96,9 +96,6 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
 
     e.preventDefault()
 
-    console.log("start handling logout...")
-    console.log(API1_URL + `/logout`)
-
     // request
     api.request({
       method: 'post',

@@ -2,19 +2,16 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+import { defaultUserBasicAccountData, defaultUserBasicAccountValidationData, UserBasicAccountDataType, UserBasicAccountValidationDataType, UserType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { userAccountSchema } from 'hooks/validation/rules';
-import * as React from 'react';
-import { UserType, UserBasicAccountDataType, defaultUserBasicAccountData, UserBasicAccountValidationDataType, defaultUserBasicAccountValidationData } from 'domain/user/types';
-import { useSelector, useDispatch } from 'react-redux';
-import { mSelector } from 'src/selectors/selector';
 import { useSnackbar } from 'notistack';
-import { authActions, putAuthActionCreator } from 'reducers/slices/app';
-import { AxiosError } from 'axios';
-import Typography from '@material-ui/core/Typography';
-import { api } from 'configs/axiosConfig';
-import omit from 'lodash/omit';
+import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { putAuthActionCreator } from 'reducers/slices/app';
 import { MessageTypeEnum } from 'src/app';
+import { mSelector } from 'src/selectors/selector';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -73,13 +70,7 @@ const UserAccountBasicManagement: React.FunctionComponent<UserAccountBasicManage
 
   // snackbar notification
   // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
-  const curMessage = useSelector(mSelector.makeMessageSelector())
-  React.useEffect(() => {
-    if (curMessage.type !== MessageTypeEnum.INITIAL) {
-      enqueueSnackbar(curMessage.message, { variant: curMessage.type });
-    }
-  }, [curMessage.id])
+  //const { enqueueSnackbar } = useSnackbar();
 
   // temp user account state
   const [curUserAccountState, setUserAccountState] = React.useState<UserBasicAccountDataType>(defaultUserBasicAccountData)

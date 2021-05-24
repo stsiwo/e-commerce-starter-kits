@@ -8,8 +8,10 @@ import { userAccountSchema } from 'hooks/validation/rules';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { authActions } from 'reducers/slices/app';
+import { authActions, putAuthActionCreator } from 'reducers/slices/app';
 import { mSelector } from 'src/selectors/selector';
+import { UserBasicAccountDataType, defaultUserBasicAccountData, UserBasicAccountValidationDataType, defaultUserBasicAccountValidationData } from 'domain/user/types';
+import { MessageTypeEnum } from 'src/app';
 
 export declare type UserAccountDataType = {
   firstName: string
@@ -82,22 +84,24 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
   const { enqueueSnackbar } = useSnackbar();
 
   // temp user account state
-  const [curUserAccountState, setUserAccountState] = React.useState<UserAccountDataType>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirm: "",
-  });
+  const [curUserAccountState, setUserAccountState] = React.useState<UserBasicAccountDataType>(defaultUserBasicAccountData);
+
+  // use effect to update user state if exists after render jsx
+  React.useEffect(() => {
+
+    if (auth.user) {
+      setUserAccountState((prev: UserBasicAccountDataType) => ({
+        ...prev,
+        firstName: auth.user.firstName,
+        lastName: auth.user.lastName,
+        email: auth.user.email,
+      }))
+    }
+
+  }, [])
 
   // validation logic (should move to hooks)
-  const [curUserAccountValidationState, setUserAccountValidationState] = React.useState<UserAccountValidationDataType>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirm: "",
-  });
+  const [curUserAccountValidationState, setUserAccountValidationState] = React.useState<UserBasicAccountValidationDataType>(defaultUserBasicAccountValidationData);
 
   const { updateValidationAt, updateAllValidation, isValidSync } = useValidation({
     curDomain: curUserAccountState,
@@ -166,26 +170,15 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
       // pass 
       console.log("passed")
 
-      // request
-      api.request({
-        method: 'POST',
-        url: API1_URL + `/users/${auth.user.userId}`,
-        data: curUserAccountState,
-      }).then((data) => {
-
-        /**
-         * update auth state 
-         **/
-        const updatedUser = data.data;
-        dispatch(authActions.update({
-          ...auth,
-          user: updatedUser,
-        }));
-
-        enqueueSnackbar("updated successfully.", { variant: "success" })
-      }).catch((error: AxiosError) => {
-        enqueueSnackbar(error.message, { variant: "error" })
-      })
+      dispatch(
+        putAuthActionCreator({
+          userId: auth.user.userId,
+          firstName: curUserAccountState.firstName,
+          lastName: curUserAccountState.lastName,
+          email: curUserAccountState.email,
+          ...(curUserAccountState.password ? { password: curUserAccountState.password } : {}), 
+        }) 
+      );
     } else {
       updateAllValidation()
     }

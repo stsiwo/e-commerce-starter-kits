@@ -74,7 +74,7 @@ export const putAuthFetchStatusActions = putAuthFetchStatusSlice.actions
 export type postAuthPhoneFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const postAuthPhoneFetchStatusSlice = createSlice({
-  name: "app/fetchStatus/auth/put", // a name used in action type
+  name: "app/fetchStatus/auth/phone/put", // a name used in action type
   initialState: {},
   reducers: {
     /**
@@ -107,7 +107,7 @@ export const postAuthPhoneFetchStatusActions = postAuthPhoneFetchStatusSlice.act
 export type putAuthPhoneFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const putAuthPhoneFetchStatusSlice = createSlice({
-  name: "app/fetchStatus/auth/put", // a name used in action type
+  name: "app/fetchStatus/auth/phone/put", // a name used in action type
   initialState: {},
   reducers: {
     /**
@@ -140,7 +140,7 @@ export const putAuthPhoneFetchStatusActions = putAuthPhoneFetchStatusSlice.actio
 export type patchAuthPhoneFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const patchAuthPhoneFetchStatusSlice = createSlice({
-  name: "app/fetchStatus/auth/patch", // a name used in action type
+  name: "app/fetchStatus/auth/phone/patch", // a name used in action type
   initialState: {},
   reducers: {
     /**
@@ -173,7 +173,7 @@ export const patchAuthPhoneFetchStatusActions = patchAuthPhoneFetchStatusSlice.a
 export type deleteAuthPhoneFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const deleteAuthPhoneFetchStatusSlice = createSlice({
-  name: "app/fetchStatus/auth/delete", // a name used in action type
+  name: "app/fetchStatus/auth/phone/delete", // a name used in action type
   initialState: {},
   reducers: {
     /**
@@ -206,7 +206,7 @@ export const deleteAuthPhoneFetchStatusActions = deleteAuthPhoneFetchStatusSlice
 export type postAuthAddressFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const postAuthAddressFetchStatusSlice = createSlice({
-  name: "app/fetchStatus/auth/put", // a name used in action type
+  name: "app/fetchStatus/auth/address/put", // a name used in action type
   initialState: {},
   reducers: {
     /**
@@ -239,7 +239,7 @@ export const postAuthAddressFetchStatusActions = postAuthAddressFetchStatusSlice
 export type putAuthAddressFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const putAuthAddressFetchStatusSlice = createSlice({
-  name: "app/fetchStatus/auth/put", // a name used in action type
+  name: "app/fetchStatus/auth/address/put", // a name used in action type
   initialState: {},
   reducers: {
     /**
@@ -272,7 +272,7 @@ export const putAuthAddressFetchStatusActions = putAuthAddressFetchStatusSlice.a
 export type patchAuthAddressFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const patchAuthAddressFetchStatusSlice = createSlice({
-  name: "app/fetchStatus/auth/patch", // a name used in action type
+  name: "app/fetchStatus/auth/address/patch", // a name used in action type
   initialState: {},
   reducers: {
     /**
@@ -305,7 +305,7 @@ export const patchAuthAddressFetchStatusActions = patchAuthAddressFetchStatusSli
 export type deleteAuthAddressFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const deleteAuthAddressFetchStatusSlice = createSlice({
-  name: "app/fetchStatus/auth/delete", // a name used in action type
+  name: "app/fetchStatus/auth/address/delete", // a name used in action type
   initialState: {},
   reducers: {
     /**
@@ -394,4 +394,36 @@ export const deleteAuthAvatarImageFetchStatusSliceReducer = deleteAuthAvatarImag
 export const deleteAuthAvatarImageFetchStatusActions = deleteAuthAvatarImageFetchStatusSlice.actions
 
 
+/**
+ * app.fetchStatus.auth.put state Slice
+ *
+ *  - update auth data of the same id
+ **/
+export type putAuthCompanyFetchStatusActionType = PayloadAction<FetchStatusEnum>
+
+export const putAuthCompanyFetchStatusSlice = createSlice({
+  name: "app/fetchStatus/auth/company/put", // a name used in action type
+  initialState: {},
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+    update: (state: FetchStatusEnum, action: putAuthCompanyFetchStatusActionType) => action.payload,
+    clear: (state: FetchStatusEnum) => FetchStatusEnum.INITIAL
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   **/
+})
+
+export const putAuthCompanyFetchStatusSliceReducer = putAuthCompanyFetchStatusSlice.reducer
+export const putAuthCompanyFetchStatusActions = putAuthCompanyFetchStatusSlice.actions
 

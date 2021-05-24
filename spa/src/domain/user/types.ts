@@ -26,8 +26,8 @@ export declare type UserAddressType = {
 export declare type AdminCompanyType = {
   companyId: string
   companyName: string
-  description: string
-  email: string
+  companyDescription: string
+  companyEmail: string
   phoneNumber: string
   countryCode: string
   address1: string
@@ -88,6 +88,21 @@ export declare type UserAddressCriteria = {
   postalCode: string
   isBillingAddress: boolean
   isShippingAddress: boolean
+}
+
+export declare type UserCompanyCriteria = {
+  companyId: string
+  companyName: string
+  companyDescription: string
+  companyEmail: string
+  phoneNumber: string
+  countryCode: string
+  address1: string
+  address2: string
+  city: string
+  province: string
+  country: string
+  postalCode: string
 }
 
 // empty
@@ -253,9 +268,10 @@ export const defaultContactFormValidationData: ContactFormValidationDataType = {
 
 // admin company form
 export declare type AdminCompanyFormDataType = {
+  companyId: string
   companyName: string
-  description: string
-  email: string
+  companyDescription: string
+  companyEmail: string
   phoneNumber: string
   countryCode: string
   address1: string
@@ -268,9 +284,10 @@ export declare type AdminCompanyFormDataType = {
 
 export const generateDefaultAdminCompanyFormData: () => AdminCompanyFormDataType = () => {
   return {
+    companyId: getNanoId(),
     companyName: "",
-    description: "",
-    email: "",
+    companyDescription: "",
+    companyEmail: "",
     phoneNumber: "",
     countryCode: "",
     address1: "",
@@ -284,8 +301,8 @@ export const generateDefaultAdminCompanyFormData: () => AdminCompanyFormDataType
 
 export declare type AdminCompanyFormValidationDataType = {
   companyName: string,
-  description: string,
-  email: string,
+  companyDescription: string,
+  companyEmail: string,
   phoneNumber: string,
   countryCode: string,
   address1: string,
@@ -298,8 +315,8 @@ export declare type AdminCompanyFormValidationDataType = {
 
 export const defaultAdminCompanyFormValidationData: AdminCompanyFormValidationDataType = {
   companyName: "",
-  description: "",
-  email: "",
+  companyDescription: "",
+  companyEmail: "",
   phoneNumber: "",
   countryCode: "",
   address1: "",

@@ -105,17 +105,6 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   // snackbar notification
   // usage: 'enqueueSnackbar("message", { variant: "error" };
   const { enqueueSnackbar } = useSnackbar();
-  const curMessage = useSelector(mSelector.makeMessageSelector())
-  React.useEffect(() => {
-    if (curMessage.type !== MessageTypeEnum.INITIAL) {
-      /**
-       * TODO: show this message 3 times. idon't knwo why.
-       *
-       **/
-      console.log("too many message");
-      enqueueSnackbar(curMessage.message, { variant: curMessage.type });
-    }
-  }, [curMessage.id])
 
   // temp user account state
   const [curUserAccountAddressState, setUserAccountAddressState] = React.useState<CustomerAddressesFormDataType>(generateDefaultCustomerAddressesFormData());

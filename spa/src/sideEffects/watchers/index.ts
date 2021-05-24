@@ -40,7 +40,7 @@ import { postWishlistItemWorker } from 'sideEffects/workers/wishlistItems/postWi
 import { patchWishlistItemWorker } from 'sideEffects/workers/wishlistItems/patchWishlistItemWorker';
 import { postUserAvatarImageWorker } from 'sideEffects/workers/user/postUserAvatarImageWorker';
 import { deleteUserAvatarImageWorker } from 'sideEffects/workers/user/deleteUserAvatarImageWorker';
-import { postAuthAvatarImageActionTypeName, deleteAuthAvatarImageActionTypeName, putAuthActionTypeName, postAuthPhoneActionTypeName, putAuthPhoneActionTypeName, deleteAuthPhoneActionTypeName, patchAuthPhoneActionTypeName, postAuthAddressActionTypeName, putAuthAddressActionTypeName, patchAuthAddressActionTypeName, deleteAuthAddressActionTypeName } from 'reducers/slices/app';
+import { postAuthAvatarImageActionTypeName, deleteAuthAvatarImageActionTypeName, putAuthActionTypeName, postAuthPhoneActionTypeName, putAuthPhoneActionTypeName, deleteAuthPhoneActionTypeName, patchAuthPhoneActionTypeName, postAuthAddressActionTypeName, putAuthAddressActionTypeName, patchAuthAddressActionTypeName, deleteAuthAddressActionTypeName, putAuthCompanyActionTypeName } from 'reducers/slices/app';
 import { postAuthAvatarImageWorker } from 'sideEffects/workers/auth/postAuthAvatarImageWorker';
 import { deleteAuthAvatarImageWorker } from 'sideEffects/workers/auth/deleteAuthAvatarImageWorker';
 import { putAuthWorker } from 'sideEffects/workers/auth/putAuthWorker';
@@ -52,6 +52,7 @@ import { postAuthAddressWorker } from 'sideEffects/workers/auth/postAuthAddressW
 import { putAuthAddressWorker } from 'sideEffects/workers/auth/putAuthAddressWorker';
 import { patchAuthAddressWorker } from 'sideEffects/workers/auth/patchAuthAddressWorker';
 import { deleteAuthAddressWorker } from 'sideEffects/workers/auth/deleteAuthAddressWorker';
+import { putAuthCompanyWorker } from 'sideEffects/workers/auth/putAuthCompanyWorker';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -353,6 +354,14 @@ export function* deleteAuthAddressWatcher() {
     deleteAuthAddressWorker,
   )
 }
+
+export function* putAuthCompanyWatcher() {
+  yield takeLatest(
+    putAuthCompanyActionTypeName,
+    putAuthCompanyWorker,
+  )
+}
+
 
 // cache
 export function* fetchProductWithCacheWatcher() {

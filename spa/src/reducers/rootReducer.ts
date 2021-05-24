@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import { authSliceReducer, messageSliceReducer, previousUrlSliceReducer, requestTrackerSliceReducer, searchKeywordSliceReducer } from './slices/app';
-import { deleteAuthAvatarImageFetchStatusSliceReducer, getSingleAuthFetchStatusSliceReducer, postAuthAvatarImageFetchStatusSliceReducer, putAuthFetchStatusSliceReducer, postAuthPhoneFetchStatusSliceReducer, putAuthPhoneFetchStatusSliceReducer, deleteAuthPhoneFetchStatusSliceReducer, patchAuthPhoneFetchStatusSliceReducer, postAuthAddressFetchStatusSliceReducer, putAuthAddressFetchStatusSliceReducer, patchAuthAddressFetchStatusSliceReducer, deleteAuthAddressFetchStatusSliceReducer } from './slices/app/fetchStatus/auth';
+import { deleteAuthAvatarImageFetchStatusSliceReducer, getSingleAuthFetchStatusSliceReducer, postAuthAvatarImageFetchStatusSliceReducer, putAuthFetchStatusSliceReducer, postAuthPhoneFetchStatusSliceReducer, putAuthPhoneFetchStatusSliceReducer, deleteAuthPhoneFetchStatusSliceReducer, patchAuthPhoneFetchStatusSliceReducer, postAuthAddressFetchStatusSliceReducer, putAuthAddressFetchStatusSliceReducer, patchAuthAddressFetchStatusSliceReducer, deleteAuthAddressFetchStatusSliceReducer, putAuthCompanyFetchStatusSliceReducer } from './slices/app/fetchStatus/auth';
 import { deleteCartItemFetchStatusSliceReducer, deleteSingleCartItemFetchStatusSliceReducer, getCartItemFetchStatusSliceReducer, postCartItemFetchStatusSliceReducer, putCartItemFetchStatusSliceReducer } from './slices/app/fetchStatus/cartItem';
 import { deleteSingleCategoryFetchStatusSliceReducer, getCategoryFetchStatusSliceReducer, postCategoryFetchStatusSliceReducer, putCategoryFetchStatusSliceReducer } from './slices/app/fetchStatus/category';
 import { deleteSingleOrderFetchStatusSliceReducer, getOrderFetchStatusSliceReducer, getSingleOrderFetchStatusSliceReducer, postOrderFetchStatusSliceReducer, putOrderFetchStatusSliceReducer } from './slices/app/fetchStatus/order';
@@ -100,6 +100,7 @@ export const rootReducer = combineReducers({
         deleteAddress: deleteAuthAddressFetchStatusSliceReducer,
         postAvatarImage: postAuthAvatarImageFetchStatusSliceReducer,
         deleteAvatarImage: deleteAuthAvatarImageFetchStatusSliceReducer,
+        putCompany: putAuthCompanyFetchStatusSliceReducer,
       }),
     }),
   }),

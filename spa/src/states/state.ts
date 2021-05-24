@@ -146,6 +146,7 @@ export const initialState: StateType = {
         deleteAddress: FetchStatusEnum.INITIAL,
         postAvatarImage: FetchStatusEnum.INITIAL,
         deleteAvatarImage: FetchStatusEnum.INITIAL,
+        putCompany: FetchStatusEnum.INITIAL,
       },
     },
   },

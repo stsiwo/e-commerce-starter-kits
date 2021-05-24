@@ -3,21 +3,18 @@ import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
+import Grid from '@material-ui/core/Grid';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { AxiosError } from 'axios';
-import { api } from 'configs/axiosConfig';
+import Typography from '@material-ui/core/Typography';
+import { AdminCompanyFormDataType, AdminCompanyFormValidationDataType, defaultAdminCompanyFormValidationData } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
-import { userAccountSchema, companySchema } from 'hooks/validation/rules';
+import { companySchema } from 'hooks/validation/rules';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { authActions } from 'reducers/slices/app';
+import { putAuthCompanyActionCreator } from 'reducers/slices/app';
 import { mSelector } from 'src/selectors/selector';
-import { AdminCompanyFormDataType, generateDefaultAdminCompanyFormData, AdminCompanyFormValidationDataType, defaultAdminCompanyFormValidationData } from 'domain/user/types';
-import { UserAccountValidationDataType } from '../AdminAccountBasicManagement';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -75,7 +72,10 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
   const { enqueueSnackbar } = useSnackbar();
 
   // temp user account state
-  const [curAdminCompanyFormState, setAdminCompanyFormState] = React.useState<AdminCompanyFormDataType>(generateDefaultAdminCompanyFormData());
+  const [curAdminCompanyFormState, setAdminCompanyFormState] = React.useState<AdminCompanyFormDataType>(
+    auth.user.companies[0] 
+  );
+
 
   // validation logic (should move to hooks)
   const [curAdminCompanyFormValidationState, setAdminCompanyFormValidationState] = React.useState<AdminCompanyFormValidationDataType>(defaultAdminCompanyFormValidationData);
@@ -101,21 +101,21 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
 
   const handleDescriptionInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextDescription = e.currentTarget.value
-    updateValidationAt("description", e.currentTarget.value);
+    updateValidationAt("companyDescription", e.currentTarget.value);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      description: nextDescription
+      companyDescription: nextDescription
     }));
 
   }
 
 
-  const handleEmailInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextEmail = e.currentTarget.value
-    updateValidationAt("email", e.currentTarget.value);
+  const handleCompanyEmailInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    const nextCompanyEmail = e.currentTarget.value
+    updateValidationAt("companyEmail", e.currentTarget.value);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      email: nextEmail
+      companyEmail: nextCompanyEmail
     }));
 
   }
@@ -213,26 +213,23 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
       // pass 
       console.log("passed")
 
-      // request
-      api.request({
-        method: 'PUT',
-        url: API1_URL + `/users/${auth.user.userId}/companies`,
-        data: curAdminCompanyFormState,
-      }).then((data) => {
+      dispatch(
+        putAuthCompanyActionCreator({
+          companyId: curAdminCompanyFormState.companyId, 
+          companyName: curAdminCompanyFormState.companyName, 
+          companyDescription: curAdminCompanyFormState.companyDescription,
+          companyEmail: curAdminCompanyFormState.companyEmail,
+          phoneNumber: curAdminCompanyFormState.phoneNumber,
+          countryCode: curAdminCompanyFormState.countryCode,
+          address1: curAdminCompanyFormState.address1,
+          address2: curAdminCompanyFormState.address2,
+          city: curAdminCompanyFormState.city,
+          province: curAdminCompanyFormState.province,
+          country: curAdminCompanyFormState.country,
+          postalCode: curAdminCompanyFormState.postalCode
+        }) 
+      );
 
-        /**
-         * update auth state 
-         **/
-        const updatedUser = data.data;
-        dispatch(authActions.update({
-          ...auth,
-          user: updatedUser,
-        }));
-
-        enqueueSnackbar("updated successfully.", { variant: "success" })
-      }).catch((error: AxiosError) => {
-        enqueueSnackbar(error.message, { variant: "error" })
-      })
     } else {
       updateAllValidation()
     }
@@ -277,25 +274,25 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
 
               />
               <TextField
-                id="descriptioin"
+                id="company-description"
                 label="Description"
                 multiline
                 rows={3}
                 className={classes.formControl}
-                value={curAdminCompanyFormState.description}
+                value={curAdminCompanyFormState.companyDescription}
                 onChange={handleDescriptionInputChangeEvent}
-                helperText={curAdminCompanyFormValidationState.description}
-                error={curAdminCompanyFormValidationState.description !== ""}
+                helperText={curAdminCompanyFormValidationState.companyDescription}
+                error={curAdminCompanyFormValidationState.companyDescription !== ""}
               />
               <TextField
-                id="email"
+                id="company-email"
                 label="Email"
                 type="email"
                 className={classes.formControl}
-                value={curAdminCompanyFormState.email}
-                onChange={handleEmailInputChangeEvent}
-                helperText={curAdminCompanyFormValidationState.email}
-                error={curAdminCompanyFormValidationState.email !== ""}
+                value={curAdminCompanyFormState.companyEmail}
+                onChange={handleCompanyEmailInputChangeEvent}
+                helperText={curAdminCompanyFormValidationState.companyEmail}
+                error={curAdminCompanyFormValidationState.companyEmail !== ""}
               />
               <Typography variant="h6" component="h6" align="left" gutterBottom>
                 {"Phone"}

@@ -11,8 +11,9 @@ import merge from 'lodash/merge';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { authActions } from 'reducers/slices/app';
+import { authActions, postAuthAvatarImageActionCreator, deleteAuthAvatarImageActionCreator } from 'reducers/slices/app';
 import { mSelector } from 'src/selectors/selector';
+import { MessageTypeEnum } from 'src/app';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -95,7 +96,7 @@ const AdminAccountAvatarManagement: React.FunctionComponent<{}> = (props) => {
    * file uploading stuff
    **/
   const [curFile, setFile] = React.useState<File>(null);
-  const [curFilePath, setFilePath] = React.useState<string>(null);
+  const [curFilePath, setFilePath] = React.useState<string>(API1_URL + auth.user.avatarImagePath);
   const imageInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleTriggerClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
@@ -117,55 +118,19 @@ const AdminAccountAvatarManagement: React.FunctionComponent<{}> = (props) => {
       return false;
     }
 
-    // request body prep
-    const bodyFormData = new FormData();
-    bodyFormData.append("avatarImage", curFile);
-
-    // request
-    api.request({
-      method: 'POST',
-      url: API1_URL + `/users/${auth.user.userId}/avatar-image`,
-      data: bodyFormData,
-      headers: { "Content-Type": "multipart/form-data" },
-    }).then((data) => {
-
-      /**
-       * update state
-       **/
-      dispatch(authActions.update(merge({}, auth, {
-        user: {
-          avatarImagePath: data.data.avatarImagePath,
-        }
-      })));
-
-      enqueueSnackbar("uploaded successfully.", { variant: "success"})
-    }).catch((error: AxiosError) => {
-      enqueueSnackbar(error.message, { variant: "error"})
-    })
+    dispatch(
+      postAuthAvatarImageActionCreator({ avatarImage: curFile, userId: auth.user.userId })
+    )
   }
 
 
   const handleDeleteClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
 
-    // request
-    api.request({
-      method: 'DELETE',
-      url: API1_URL + `/users/${auth.user.userId}/avatar-image`
-    }).then((data) => {
+    dispatch(
+      deleteAuthAvatarImageActionCreator({ userId: auth.user.userId })
+    )
 
-      /**
-       * remove it from state
-       **/
-      dispatch(authActions.update(merge({}, auth, {
-        user: {
-          avatarImagePath: "",
-        }
-      })));
-
-      enqueueSnackbar("deleted successfully.", { variant: "success"})
-    }).catch((error: AxiosError) => {
-      enqueueSnackbar(error.message, { variant: "error"})
-    })
+    setFilePath("");
   }
 
   return (

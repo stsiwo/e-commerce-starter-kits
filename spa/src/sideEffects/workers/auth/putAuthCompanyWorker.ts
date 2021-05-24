@@ -1,13 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { UserCriteria } from "domain/user/types";
-import { authActions, PutAuthActionType, messageActions } from "reducers/slices/app";
-import { putAuthFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
+import { UserCriteria, UserCompanyCriteria } from "domain/user/types";
+import { authActions, PutAuthActionType, messageActions, PutAuthCompanyActionType } from "reducers/slices/app";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
+import { putAuthCompanyFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
 
 /**
  * a worker (generator)    
@@ -31,7 +31,7 @@ import { getNanoId } from "src/utils";
  *      - don't refer to other userId 
  *
  **/
-export function* putAuthWorker(action: PayloadAction<PutAuthActionType>) {
+export function* putAuthCompanyWorker(action: PayloadAction<PutAuthCompanyActionType>) {
 
   /**
    * get cur user type
@@ -49,13 +49,13 @@ export function* putAuthWorker(action: PayloadAction<PutAuthActionType>) {
      * update status for put user data
      **/
     yield put(
-      putAuthFetchStatusActions.update(FetchStatusEnum.FETCHING)
+      putAuthCompanyFetchStatusActions.update(FetchStatusEnum.FETCHING)
     )
 
     /**
      * grab this  domain
      **/
-    const apiUrl = `${API1_URL}/users/${curAuth.user.userId}`
+    const apiUrl = `${API1_URL}/users/${curAuth.user.userId}/companies/${action.payload.companyId}`
 
     /**
      * fetch data
@@ -68,7 +68,7 @@ export function* putAuthWorker(action: PayloadAction<PutAuthActionType>) {
       const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "PUT",
         url: apiUrl,
-        data: action.payload as UserCriteria
+        data: action.payload as UserCompanyCriteria
       })
 
       /**
@@ -76,17 +76,14 @@ export function* putAuthWorker(action: PayloadAction<PutAuthActionType>) {
        *
        **/
       yield put(
-        authActions.update({
-          ...curAuth,
-          user: response.data
-        })
+        authActions.updateCompany(response.data)
       )
 
       /**
        * update fetch status sucess
        **/
       yield put(
-        putAuthFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+        putAuthCompanyFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -96,7 +93,7 @@ export function* putAuthWorker(action: PayloadAction<PutAuthActionType>) {
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
-          message: "added successfully.",
+          message: "updated successfully.",
         }) 
       )
 
@@ -108,7 +105,7 @@ export function* putAuthWorker(action: PayloadAction<PutAuthActionType>) {
        * update fetch status failed
        **/
       yield put(
-        putAuthFetchStatusActions.update(FetchStatusEnum.FAILED)
+        putAuthCompanyFetchStatusActions.update(FetchStatusEnum.FAILED)
       )
 
       /**
@@ -126,6 +123,7 @@ export function* putAuthWorker(action: PayloadAction<PutAuthActionType>) {
     console.log("permission denied: you are " + curAuth.userType)
   }
 }
+
 
 
 

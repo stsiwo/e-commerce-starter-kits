@@ -71,12 +71,6 @@ const UserAccountAvatarManagement: React.FunctionComponent<UserAccountAvatarMana
   // snackbar notification
   // usage: 'enqueueSnackbar("message", { variant: "error" };
   const { enqueueSnackbar } = useSnackbar();
-  const curMessage = useSelector(mSelector.makeMessageSelector())
-  React.useEffect(() => {
-    if (curMessage.type !== MessageTypeEnum.INITIAL) {
-      enqueueSnackbar(curMessage.message, { variant: curMessage.type });
-    }
-  }, [curMessage.id])
 
   const dispatch = useDispatch()
   /**

@@ -49,6 +49,10 @@ export const routesData: RoutesDataType = {
       component: withBasePage(Login),
     },
     {
+      url: "/admin/login",
+      component: AdminLogin,
+    },
+    {
       url: "/signup",
       component: withBasePage(Signup),
     },
@@ -85,10 +89,6 @@ export const routesData: RoutesDataType = {
     {
       url: "/admin",
       component: withAdminBasePage(Admin),
-    },
-    {
-      url: "/admin/login",
-      component: AdminLogin,
     },
     {
       url: "/admin/account",

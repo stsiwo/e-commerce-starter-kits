@@ -1,5 +1,5 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { defaultUser, UserAddressType, UserCriteria, UserPhoneType, UserType, UserPhoneCriteria, UserAddressCriteria } from "domain/user/types";
+import { defaultUser, UserAddressType, UserCriteria, UserPhoneType, UserType, UserPhoneCriteria, UserAddressCriteria, UserCompanyCriteria, AdminCompanyType } from "domain/user/types";
 import { AuthType, MessageStateType, MessageTypeEnum, RequestTrackerType, UserTypeEnum } from "src/app";
 import { getNanoId } from "src/utils";
 
@@ -70,6 +70,11 @@ export const postAuthAvatarImageActionTypeName = postAuthAvatarImageActionCreato
 export declare type DeleteAuthAvatarImageActionType = { userId: string } 
 export const deleteAuthAvatarImageActionCreator = createAction<DeleteAuthAvatarImageActionType>("saga/domain/auth/avatar-image/delete")
 export const deleteAuthAvatarImageActionTypeName = deleteAuthAvatarImageActionCreator().type
+
+// for PUT (replace a company) request
+export declare type PutAuthCompanyActionType = UserCompanyCriteria
+export const putAuthCompanyActionCreator = createAction<PutAuthCompanyActionType>("saga/domain/auth/company/put")
+export const putAuthCompanyActionTypeName = putAuthCompanyActionCreator().type
 
 
 /**
@@ -196,6 +201,16 @@ export const authSlice = createSlice({
 
     deleteAddress: (state: AuthType, action: PayloadAction<{ addressId: string }>) => {
       state.user.addresses = state.user.addresses.filter((address: UserAddressType) => address.addressId != action.payload.addressId)
+      return state
+    },
+
+    updateCompany: (state: AuthType, action: PayloadAction<AdminCompanyType>) => {
+      state.user.companies = state.user.companies.map((company: AdminCompanyType) => {
+        if (company.companyId == action.payload.companyId) {
+          return action.payload
+        }
+        return company
+      })
       return state
     },
   }

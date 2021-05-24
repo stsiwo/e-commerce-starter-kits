@@ -1,23 +1,24 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import * as React from 'react';
-import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
-import SentimentSatisfiedOutlinedIcon from '@material-ui/icons/SentimentSatisfiedOutlined';
-import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import Link from '@material-ui/core/Link';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+import SentimentSatisfiedOutlinedIcon from '@material-ui/icons/SentimentSatisfiedOutlined';
+import { AxiosError } from 'axios';
+import { api } from 'configs/axiosConfig';
+import { UserType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { adminLoginSchema } from 'hooks/validation/rules';
-import Typography from '@material-ui/core/Typography';
-import Link from '@material-ui/core/Link';
-import { Link as RRLink } from "react-router-dom";
-import { api } from 'configs/axiosConfig';
-import { generateObjectFormData } from 'src/utils';
-import { UserType } from 'domain/user/types';
-import { useDispatch } from 'react-redux';
 import { useSnackbar } from 'notistack';
+import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link as RRLink } from "react-router-dom";
 import { authActions } from 'reducers/slices/app';
-import { AxiosError } from 'axios';
+import { mSelector } from 'src/selectors/selector';
+import { useHistory } from 'react-router';
 
 
 export declare type AdminLoginDataType = {
@@ -28,6 +29,11 @@ export declare type AdminLoginDataType = {
 const defaultAdminLoginData: AdminLoginDataType = {
   email: "",
   password: "",
+}
+
+if (NODE_ENV !== "production") {
+  defaultAdminLoginData.email = "test_admin@test.com"
+  defaultAdminLoginData.password = "test_password"
 }
 
 export declare type AdminLoginValidationDataType = {
@@ -79,6 +85,12 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
   
   // dispatch
   const dispatch = useDispatch();
+  
+  // redirect to previous url if exist
+  const curPreviousUrl = useSelector(mSelector.makePreviousUrlSelector());
+
+  // history 
+  const history = useHistory();
 
   // snackbar notification
   // usage: 'enqueueSnackbar("message", { variant: "error" };
@@ -133,8 +145,30 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
         /**
          *  add new phone
          **/
-        const loggedInUser: UserType = data.data;
+        const loggedInUser: UserType = data.data.user;
         dispatch(authActions.loginWithUser(loggedInUser))
+        
+        // make sure this work.
+        // this does not work esp when there is no previous url.
+        //
+        // solution: to use redux state to store the previous url.
+        //history.back(); 
+        
+        let nextDest = "/admin"
+        
+        if (curPreviousUrl) {
+          nextDest = curPreviousUrl
+        }
+
+        /**
+         * don't confused with 'history' (window) and 'history' (react-router-dom)
+         *
+         * window: history.pushState()
+         *
+         * react-router-dom: history.push() <- use this one.
+         *
+         **/
+        history.push(nextDest);
 
         enqueueSnackbar("added successfully.", { variant: "success" })
       }).catch((error: AxiosError) => {
