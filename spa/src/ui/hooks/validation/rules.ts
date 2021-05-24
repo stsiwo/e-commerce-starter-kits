@@ -76,7 +76,7 @@ export const productSchema = yup.object().shape({
   productName: yup.string().required(),
   productDescription: yup.string().required(),
   productPath: yup.string().required(),
-  productImageFiles: yup.array().test(
+  productImages: yup.array().test(
     'has-first-element', 
     'the primary product image (1st image) is required.',
     /** 
@@ -88,7 +88,7 @@ export const productSchema = yup.object().shape({
       console.log(value)
       console.log("result")
       console.log(value[0] != null && Object.keys(value[0]).length === 0 && value[0].constructor === Object)
-      return value[0] != null
+      return value[0].productImagePath != ""
     }
   ),
   productBaseUnitPrice: yup.string().required(),
@@ -96,9 +96,33 @@ export const productSchema = yup.object().shape({
   productBaseDiscountStartDate: yup.string().required(),
   productBaseDiscountEndDate: yup.string().required(),
   isDiscount: yup.string().required(),
-  isPublic: yup.string().required(),
+  isPublic: yup.string().test(
+    'has-at-least-one-varaint',
+    'Oops. you need to have at least one variant. come back here after you create variants.',
+    (value) => {
+      /**
+       * be careful this 'value' is string which contains 'true'/'false' as string so you need to convert it to boolean first.
+       **/
+      const isPublic = (value === 'true');
+      if (isPublic) {
+        const variants = yup.ref("productVariants")
+        return variants && (variants as unknown as any[]).length > 0
+      }
+      return true
+    }
+  ),
   releaseDate: yup.string().optional().nullable(),
-  category: yup.object().required(),
+  /**
+   * cateogry object validation not working.
+   *
+   * always complains about 'final value is null'....
+   *
+   * for now, make this nullable.
+   *
+   **/
+  category: yup.object().shape({
+    categoryId: yup.string().required() 
+  }).nullable(),
   productVariants: yup.array().of(productVariantSchema),
   note: yup.string().optional().nullable(),
 })

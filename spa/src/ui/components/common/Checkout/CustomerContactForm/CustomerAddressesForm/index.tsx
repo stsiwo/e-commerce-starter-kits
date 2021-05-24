@@ -121,7 +121,8 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
     curDomain: curCustomerAddressesFormState,
     curValidationDomain: curCustomerAddressesFormValidationState,
     schema: userAccountAddressSchema,
-    setValidationDomain: setCustomerAddressesFormValidationState
+    setValidationDomain: setCustomerAddressesFormValidationState,
+    defaultValidationDomain: defaultUserAccountValidationAddressData,
   })
 
   // event handlers

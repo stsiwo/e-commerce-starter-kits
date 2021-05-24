@@ -2,7 +2,7 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { getUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
-import { userActions, userPaginationTotalPagesActions, userPaginationPageActions } from "reducers/slices/domain/user";
+import { userActions, userPaginationTotalPagesActions, userPaginationPageActions, userPaginationTotalElementsActions } from "reducers/slices/domain/user";
 import { call, put, select, all } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector, mSelector } from "src/selectors/selector";
@@ -135,6 +135,7 @@ export function* fetchUserWorker(action: PayloadAction<{}>) {
       yield all([
         put(userPaginationPageActions.update(response.data.pageable.pageNumber)),
         put(userPaginationTotalPagesActions.update(response.data.totalPages)),
+        put(userPaginationTotalElementsActions.update(response.data.totalElements)),
       ])
     } catch (error) {
 

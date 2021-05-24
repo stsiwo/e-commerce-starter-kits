@@ -6,11 +6,9 @@ import Typography from '@material-ui/core/Typography';
 import { defaultUserBasicAccountData, defaultUserBasicAccountValidationData, UserBasicAccountDataType, UserBasicAccountValidationDataType, UserType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { userAccountSchema } from 'hooks/validation/rules';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { putAuthActionCreator } from 'reducers/slices/app';
-import { MessageTypeEnum } from 'src/app';
 import { mSelector } from 'src/selectors/selector';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -96,7 +94,8 @@ const UserAccountBasicManagement: React.FunctionComponent<UserAccountBasicManage
     curDomain: curUserAccountState,
     curValidationDomain: curUserAccountValidationState,
     schema: userAccountSchema,
-    setValidationDomain: setUserAccountValidationState
+    setValidationDomain: setUserAccountValidationState,
+    defaultValidationDomain: defaultUserBasicAccountValidationData, 
   })
 
   // event handlers

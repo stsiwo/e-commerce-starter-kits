@@ -84,7 +84,8 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
     curDomain: curAdminCompanyFormState,
     curValidationDomain: curAdminCompanyFormValidationState,
     schema: companySchema,
-    setValidationDomain: setAdminCompanyFormValidationState
+    setValidationDomain: setAdminCompanyFormValidationState,
+    defaultValidationDomain: defaultAdminCompanyFormValidationData,
   })
 
 

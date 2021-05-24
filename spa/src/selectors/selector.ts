@@ -782,6 +782,7 @@ export const mSelector = {
       ],
       (normalizedProducts, pagination) => {
 
+        console.log("should be called once create a new product")
         // need pagination??
 
         /**

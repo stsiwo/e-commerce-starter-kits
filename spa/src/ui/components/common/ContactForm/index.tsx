@@ -1,16 +1,15 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import * as React from 'react';
-import { useDispatch } from 'react-redux';
-import TextField from '@material-ui/core/TextField';
-import { ContactFormDataType, generateDefaultContactFormData, ContactFormValidationDataType, defaultContactFormValidationData } from 'domain/user/types';
-import { useValidation } from 'hooks/validation';
-import { contactSchema } from 'hooks/validation/rules';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
-import { api } from 'configs/axiosConfig';
-import { useSnackbar } from 'notistack';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
 import { AxiosError } from 'axios';
+import { api } from 'configs/axiosConfig';
+import { ContactFormDataType, ContactFormValidationDataType, defaultContactFormValidationData, generateDefaultContactFormData } from 'domain/user/types';
+import { useValidation } from 'hooks/validation';
+import { contactSchema } from 'hooks/validation/rules';
+import { useSnackbar } from 'notistack';
+import * as React from 'react';
+import { useDispatch } from 'react-redux';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -65,6 +64,7 @@ const ContactForm: React.FunctionComponent<{}> = (props) => {
     curValidationDomain: curContactFormValidationState,
     schema: contactSchema,
     setValidationDomain: setContactFormValidationState,
+    defaultValidationDomain: defaultContactFormValidationData,
   })
 
   // event handlers

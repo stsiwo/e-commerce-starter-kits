@@ -1,5 +1,3 @@
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { AxiosError } from 'axios';
@@ -98,7 +96,8 @@ const AdminCategoryForm = React.forwardRef<any, AdminCategoryFormPropsType>((pro
     curDomain: curCategoryState,
     curValidationDomain: curCategoryValidationState,
     schema: categorySchema,
-    setValidationDomain: setCategoryValidationState
+    setValidationDomain: setCategoryValidationState,
+    defaultValidationDomain: defaultCategoryValidationData,
   })
 
   // event handlers

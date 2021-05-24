@@ -1,27 +1,25 @@
 import DateFnsUtils from '@date-io/date-fns';
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormLabel from '@material-ui/core/FormLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import MenuItem from '@material-ui/core/MenuItem';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { defaultProductVariantData, defaultProductVariantValidationData, ProductVariantDataType, ProductVariantSizeType, ProductVariantValidationDataType, ProductVariantType } from 'domain/product/types';
+import { AxiosError } from 'axios';
+import { api } from 'configs/axiosConfig';
+import { defaultProductVariantData, defaultProductVariantValidationData, ProductVariantDataType, ProductVariantSizeType, ProductVariantType, ProductVariantValidationDataType } from 'domain/product/types';
 import { useValidation } from 'hooks/validation';
 import { productVariantSchema } from 'hooks/validation/rules';
+import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { ChromePicker, ColorResult } from 'react-color';
-import { generateCategoryList, testProductVariantSizeObj } from 'tests/data/product';
-import FormLabel from '@material-ui/core/FormLabel';
-import { useSelector, useDispatch } from 'react-redux';
-import { mSelector } from 'src/selectors/selector';
-import { useSnackbar } from 'notistack';
-import { api } from 'configs/axiosConfig';
-import { fetchProductActionCreator, productActions } from 'reducers/slices/domain/product';
-import { AxiosError } from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
+import { productActions } from 'reducers/slices/domain/product';
+import { mSelector } from 'src/selectors/selector';
+import { testProductVariantSizeObj } from 'tests/data/product';
 
 interface AdminProductVariantFormPropsType {
   productVariant: ProductVariantType
@@ -127,7 +125,8 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
     curDomain: curProductVariantState,
     curValidationDomain: curProductVariantValidationState,
     schema: productVariantSchema,
-    setValidationDomain: setProductVariantValidationState
+    setValidationDomain: setProductVariantValidationState,
+    defaultValidationDomain: defaultProductVariantValidationData,
   })
 
   // test product variant size list

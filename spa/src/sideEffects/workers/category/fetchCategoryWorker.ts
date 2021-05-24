@@ -4,7 +4,7 @@ import { api } from "configs/axiosConfig";
 import { NormalizedCategoryType } from "domain/product/types";
 import { normalize } from "normalizr";
 import { getCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
-import { categoryActions, categoryPaginationPageActions, categoryPaginationTotalPagesActions } from "reducers/slices/domain/category";
+import { categoryActions, categoryPaginationPageActions, categoryPaginationTotalPagesActions, categoryPaginationTotalElementsActions } from "reducers/slices/domain/category";
 import { all, call, put, select } from "redux-saga/effects";
 import { FetchStatusEnum } from "src/app";
 import { mSelector } from "src/selectors/selector";
@@ -149,6 +149,7 @@ export function* fetchCategoryWorker(action: PayloadAction<{}>) {
     yield all([
       put(categoryPaginationPageActions.update(response.data.pageable.pageNumber)),
       put(categoryPaginationTotalPagesActions.update(response.data.totalPages)),
+      put(categoryPaginationTotalElementsActions.update(response.data.totalElements)),
     ])
 
   } catch (error) {

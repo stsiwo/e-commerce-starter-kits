@@ -543,3 +543,41 @@ export const wishlistItemPaginationTotalPagesSlice = createSlice({
 
 export const wishlistItemPaginationTotalPagesSliceReducer = wishlistItemPaginationTotalPagesSlice.reducer
 export const wishlistItemPaginationTotalPagesActions = wishlistItemPaginationTotalPagesSlice.actions
+
+
+/**
+ *
+ * domain.wishlistItems.pagination.totalElements state Slice (no side effects)
+ *
+ **/
+// action type             
+export type WishlistItemPaginationTotalElementsActionType = PayloadAction<number> 
+
+export const wishlistItemPaginationTotalElementsSlice = createSlice({ 
+  name: "domain/wishlistItems/pagination/totalElements", // a name used in action type
+  initialState: 0,        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: number, action: WishlistItemPaginationTotalElementsActionType) => action.payload,
+    clear: (state: number) => 1,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const wishlistItemPaginationTotalElementsSliceReducer = wishlistItemPaginationTotalElementsSlice.reducer
+export const wishlistItemPaginationTotalElementsActions = wishlistItemPaginationTotalElementsSlice.actions

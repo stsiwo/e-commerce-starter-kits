@@ -2,7 +2,7 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { getReviewFetchStatusActions } from "reducers/slices/app/fetchStatus/review";
-import { reviewActions, reviewPaginationPageActions, reviewPaginationTotalPagesActions } from "reducers/slices/domain/review";
+import { reviewActions, reviewPaginationPageActions, reviewPaginationTotalPagesActions, reviewPaginationTotalElementsActions } from "reducers/slices/domain/review";
 import { call, put, select, all } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector, mSelector } from "src/selectors/selector";
@@ -134,6 +134,7 @@ export function* fetchReviewWorker(action: PayloadAction<{}>) {
       yield all([
         put(reviewPaginationPageActions.update(response.data.pageable.pageNumber)),
         put(reviewPaginationTotalPagesActions.update(response.data.totalPages)),
+        put(reviewPaginationTotalElementsActions.update(response.data.totalElements)),
       ])
 
     } catch (error) {

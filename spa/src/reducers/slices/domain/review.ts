@@ -220,3 +220,40 @@ export const reviewPaginationTotalPagesSlice = createSlice({
 export const reviewPaginationTotalPagesSliceReducer = reviewPaginationTotalPagesSlice.reducer
 export const reviewPaginationTotalPagesActions = reviewPaginationTotalPagesSlice.actions
 
+/**
+ *
+ * domain.reviews.pagination.totalElements state Slice (no side effects)
+ *
+ **/
+// action type             
+export type ReviewPaginationTotalElementsActionType = PayloadAction<number> 
+
+export const reviewPaginationTotalElementsSlice = createSlice({ 
+  name: "domain/reviews/pagination/totalElements", // a name used in action type
+  initialState: 0,        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: number, action: ReviewPaginationTotalElementsActionType) => action.payload,
+    clear: (state: number) => 0,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const reviewPaginationTotalElementsSliceReducer = reviewPaginationTotalElementsSlice.reducer
+export const reviewPaginationTotalElementsActions = reviewPaginationTotalElementsSlice.actions
+

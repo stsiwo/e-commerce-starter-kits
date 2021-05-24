@@ -95,7 +95,8 @@ const ForgotPasswordDialog: React.FunctionComponent<ForgotPasswordDialogPropsTyp
     curDomain: curForgotPasswordState,
     curValidationDomain: curForgotPasswordValidationState,
     schema: forgotPasswordSchema,
-    setValidationDomain: setForgotPasswordValidationState
+    setValidationDomain: setForgotPasswordValidationState,
+    defaultValidationDomain: defaultForgotPasswordValidationData,
   })
 
   const handleEmailInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {

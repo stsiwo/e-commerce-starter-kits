@@ -2,7 +2,7 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { getOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
-import { orderActions, orderPaginationPageActions, orderPaginationTotalPagesActions } from "reducers/slices/domain/order";
+import { orderActions, orderPaginationPageActions, orderPaginationTotalPagesActions, orderPaginationTotalElementsActions } from "reducers/slices/domain/order";
 import { call, put, select, all } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector, mSelector } from "src/selectors/selector";
@@ -135,6 +135,7 @@ export function* fetchOrderWorker(action: PayloadAction<{}>) {
       yield all([
         put(orderPaginationPageActions.update(response.data.pageable.pageNumber)),
         put(orderPaginationTotalPagesActions.update(response.data.totalPages)),
+        put(orderPaginationTotalElementsActions.update(response.data.totalElements)),
       ])
 
     } catch (error) {

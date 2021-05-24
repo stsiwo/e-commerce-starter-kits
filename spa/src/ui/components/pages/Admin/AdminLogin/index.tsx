@@ -106,7 +106,8 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
     curDomain: curAdminLoginState,
     curValidationDomain: curAdminLoginValidationState,
     schema: adminLoginSchema,
-    setValidationDomain: setAdminLoginValidationState
+    setValidationDomain: setAdminLoginValidationState,
+    defaultValidationDomain: defaultAdminLoginValidationData,
   })
 
   // event handlers

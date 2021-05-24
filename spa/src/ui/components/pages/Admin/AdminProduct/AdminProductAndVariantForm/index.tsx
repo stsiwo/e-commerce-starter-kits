@@ -92,7 +92,8 @@ const AdminProductAndVariantForm: React.FunctionComponent<{}> = (props) => {
     curDomain: curProductState,
     curValidationDomain: curProductValidationState,
     schema: productSchema,
-    setValidationDomain: setProductValidationState
+    setValidationDomain: setProductValidationState,
+    defaultValidationDomain: defaultProductValidationData,
   })
 
   // test category list

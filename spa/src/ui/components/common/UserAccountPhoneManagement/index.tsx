@@ -16,18 +16,13 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
 import PhoneIphoneIcon from '@material-ui/icons/PhoneIphone';
-import { AxiosError } from 'axios';
-import { api } from 'configs/axiosConfig';
-import { getPrimaryPhoneId } from 'domain/user';
-import { UserPhoneType, CustomerPhonesFormDataType, generateDefaultCustomerPhonesFormData, CustomerPhonesFormValidationDataType, defaultUserAccountValidationPhoneData } from 'domain/user/types';
+import { CustomerPhonesFormDataType, CustomerPhonesFormValidationDataType, defaultUserAccountValidationPhoneData, generateDefaultCustomerPhonesFormData, UserPhoneType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { userAccountPhoneSchema } from 'hooks/validation/rules';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { authActions, postAuthPhoneActionCreator, putAuthPhoneActionCreator, deleteAuthPhoneActionCreator, patchAuthPhoneActionCreator } from 'reducers/slices/app';
+import { deleteAuthPhoneActionCreator, patchAuthPhoneActionCreator, postAuthPhoneActionCreator, putAuthPhoneActionCreator } from 'reducers/slices/app';
 import { mSelector } from 'src/selectors/selector';
-import { MessageTypeEnum } from 'src/app';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -118,7 +113,8 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
     curDomain: curUserAccountPhoneState,
     curValidationDomain: curUserAccountPhoneValidationState,
     schema: userAccountPhoneSchema,
-    setValidationDomain: setUserAccountPhoneValidationState
+    setValidationDomain: setUserAccountPhoneValidationState,
+    defaultValidationDomain: defaultUserAccountValidationPhoneData,
   })
 
   // event handlers

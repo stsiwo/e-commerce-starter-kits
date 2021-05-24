@@ -1,32 +1,36 @@
-import { ProductDataType } from "./types";
+import { ProductCriteria } from "./types";
 
-export const productDataGenerator = (input: ProductDataType) => {
+export const productFormDataGenerator = (input: ProductCriteria) => {
 
   const formData = new FormData();
 
-  if (input.productId)
-    formData.append("productId", input.productId)
+  /**
+   * extract 'productImageFiles' (e.g., array of File) and make the rest of data json string and send the two data as form data.
+   *
+   * 1. files: File[] (files)
+   * 2. criteria: string (application/json)
+   *
+   **/
 
-  formData.append("productName", input.productName)
-  formData.append("productDescription", input.productDescription)
-  formData.append("productPath", input.productPath)
-  formData.append("productBaseUnitPrice", input.productBaseUnitPrice.toString())
+  // save files to form data
+  const productImageFiles = input.productImageFiles;
 
-  if (input.productBaseDiscountPrice)
-    formData.append("productBaseDiscountPrice", input.productBaseDiscountPrice.toString())
+  productImageFiles.forEach((file: File) => {
+    formData.append("files", file)
+  })
+
+  // remove 'productImageFiles' from input
+  delete input.productImageFiles
+
+  // make the rest of data json and save it to form data
+
+  /**
+   * you need to make this file to prevent below error.
+   *
+   * Spring: 415: ContentType: application/octet-stream is not supported.
+   *
+   **/
+  formData.append("criteria", new Blob([JSON.stringify(input)], { type: 'application/json' }));
   
-  if (input.productBaseDiscountStartDate)
-    formData.append("productBaseDiscountStartDate", input.productBaseDiscountStartDate.toISOString())
-
-  if (input.productBaseDiscountEndDate)
-    formData.append("productBaseDiscountEndDate", input.productBaseDiscountEndDate.toISOString())
-
-  if (input.isDiscount) 
-    formData.append("isDiscount", input.isDiscount.toString())
-
-  if (input.isPublic) 
-    formData.append("isPublic", input.isPublic.toString())
-
-  formData.append("category", input.category.toString())
-
+  return formData
 }

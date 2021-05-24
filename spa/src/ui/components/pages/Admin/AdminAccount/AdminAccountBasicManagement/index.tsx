@@ -1,17 +1,14 @@
 import Button from '@material-ui/core/Button';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { AxiosError } from 'axios';
-import { api } from 'configs/axiosConfig';
+import { defaultUserBasicAccountData, defaultUserBasicAccountValidationData, UserBasicAccountDataType, UserBasicAccountValidationDataType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { userAccountSchema } from 'hooks/validation/rules';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { authActions, putAuthActionCreator } from 'reducers/slices/app';
+import { putAuthActionCreator } from 'reducers/slices/app';
 import { mSelector } from 'src/selectors/selector';
-import { UserBasicAccountDataType, defaultUserBasicAccountData, UserBasicAccountValidationDataType, defaultUserBasicAccountValidationData } from 'domain/user/types';
-import { MessageTypeEnum } from 'src/app';
 
 export declare type UserAccountDataType = {
   firstName: string
@@ -107,7 +104,8 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
     curDomain: curUserAccountState,
     curValidationDomain: curUserAccountValidationState,
     schema: userAccountSchema,
-    setValidationDomain: setUserAccountValidationState
+    setValidationDomain: setUserAccountValidationState,
+    defaultValidationDomain: defaultUserBasicAccountValidationData,
   })
 
 

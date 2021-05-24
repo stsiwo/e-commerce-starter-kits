@@ -2,13 +2,13 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { CheckoutStepComponentPropsType } from 'components/pages/Checkout/checkoutSteps';
-import { UserAddressType, UserPhoneType, UserType } from 'domain/user/types';
-import { useSnackbar, VariantType } from 'notistack';
+import { UserType } from 'domain/user/types';
+import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import CustomerAddressesForm from './CustomerAddressesForm';
-import CustomerPhonesForm from './CustomerPhonesForm';
 import { useSelector } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
+import CustomerAddressesForm from './CustomerAddressesForm';
+import CustomerPhonesForm from './CustomerPhonesForm';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

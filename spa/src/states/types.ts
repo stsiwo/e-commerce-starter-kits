@@ -94,6 +94,7 @@ export declare type DomainPaginationType = {
   page: number
   limit: number
   totalPages: number
+  totalElements: number
 }
 
 export declare type DomainStateSubType<D extends Record<string, any>> = {

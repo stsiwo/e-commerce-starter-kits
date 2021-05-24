@@ -33,11 +33,7 @@ export const useValidation = <D extends Record<string, unknown>>(input: UseValid
   const updateAllValidation: () => void = async () => {
 
     // copy cur domain state to temp validation state
-    const tempValidationData = cloneDeep(input.curDomain)
-    console.log(tempValidationData)
-
-    // make value of all properties 
-    const tempEmptyValidationData = emptyNestedObject(tempValidationData)
+    const tempEmptyValidationData = cloneDeep(input.defaultValidationDomain)
     console.log(tempEmptyValidationData)
 
     console.log("error object")

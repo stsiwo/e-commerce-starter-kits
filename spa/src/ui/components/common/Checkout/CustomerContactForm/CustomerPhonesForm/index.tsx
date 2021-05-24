@@ -121,7 +121,8 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
     curDomain: curCustomerPhonesFormState,
     curValidationDomain: curCustomerPhonesFormValidationState,
     schema: userAccountPhoneSchema,
-    setValidationDomain: setCustomerPhonesFormValidationState
+    setValidationDomain: setCustomerPhonesFormValidationState,
+    defaultValidationDomain: defaultUserAccountValidationPhoneData,
   })
 
   // event handlers

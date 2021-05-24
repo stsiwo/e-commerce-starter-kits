@@ -77,6 +77,25 @@ export enum ProductSortEnum {
   PRICE_DESC = "PRICE_DESC",
 }
 
+// productCriteria
+export declare type ProductCriteria = {
+  productId?: string
+  productName: string
+  productDescription: string
+  productPath: string
+  productBaseUnitPrice: number
+  productBaseDiscountPrice?: number
+  productBaseDiscountStartDate?: Date
+  productBaseDiscountEndDate?: Date
+  isDiscount: boolean
+  isPublic: boolean
+  category: CategoryType
+  releaseDate: Date
+  note: string
+  productImageFiles?: File[] // to upload file in product form
+  productImages?: ProductImageType[] // to display teh image at client side (also send this to backend)
+}
+
 // product variant state type for form & input
 export declare type ProductVariantDataType = {
   variantId?: string 
@@ -237,7 +256,7 @@ export declare type ProductValidationDataType = {
   productName: string
   productDescription: string
   productPath: string
-  productImageFiles: string 
+  productImages: string 
   productBaseUnitPrice: string
   productBaseDiscountPrice?: string
   productBaseDiscountStartDate?: string
@@ -254,7 +273,7 @@ export const defaultProductValidationData: ProductValidationDataType = {
   productName: "",
   productDescription: "",
   productPath: "",
-  productImageFiles: "", 
+  productImages: "", 
   productBaseUnitPrice: "",
   productBaseDiscountPrice: "",
   productBaseDiscountStartDate: "",

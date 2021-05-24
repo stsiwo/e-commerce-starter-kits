@@ -13,6 +13,7 @@ export declare type UseValidationInputType<D extends Record<string, unknown>> = 
   curDomain: D
   curValidationDomain: DomainValidationType<D> 
   setValidationDomain: React.Dispatch<React.SetStateAction<DomainValidationType<D>>>
+  defaultValidationDomain: DomainValidationType<D>
 }
 
 export declare type UseValidationOutputType<D extends Record<string, unknown>> = {

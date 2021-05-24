@@ -195,6 +195,7 @@ export function* fetchProductWithCacheWorker(action: PayloadAction<{}>) {
                 page: response.data.pageable.pageNumber,
                 limit: curQueryString.limit,
                 totalPages: response.data.totalPages,
+                totalElements: response.data.totalElements,
               }
             }
           })

@@ -100,7 +100,8 @@ const ResetPassword: React.FunctionComponent<{}> = (props) => {
     curDomain: curResetPasswordState,
     curValidationDomain: curResetPasswordValidationState,
     schema: resetPasswordSchema,
-    setValidationDomain: setResetPasswordValidationState
+    setValidationDomain: setResetPasswordValidationState,
+    defaultValidationDomain: defaultResetPasswordValidationData,
   })
 
   // event handlers

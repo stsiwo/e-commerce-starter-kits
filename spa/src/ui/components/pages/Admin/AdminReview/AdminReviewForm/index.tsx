@@ -1,26 +1,23 @@
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
-import Rating from '@material-ui/lab/Rating';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import Switch from '@material-ui/core/Switch';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import * as React from 'react';
-import { defaultReviewData, ReviewDataType, ReviewValidationDataType, defaultReviewValidationData, ReviewType } from 'domain/review/type';
+import Rating from '@material-ui/lab/Rating';
+import { AxiosError } from 'axios';
+import ProductHorizontalCard from 'components/common/ProductCard/ProductHorizontalCard';
+import UserCard from 'components/common/UserCard';
+import { api } from 'configs/axiosConfig';
+import { defaultReviewValidationData, ReviewDataType, ReviewType, ReviewValidationDataType } from 'domain/review/type';
 import { useValidation } from 'hooks/validation';
 import { reviewSchema } from 'hooks/validation/rules';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
-import UserCard from 'components/common/UserCard';
-import { testMemberUser } from 'tests/data/user';
-import ProductHorizontalCard from 'components/common/ProductCard/ProductHorizontalCard';
-import { generateProductList } from 'tests/data/product';
-import { useSelector, useDispatch } from 'react-redux';
-import { mSelector } from 'src/selectors/selector';
 import { useSnackbar } from 'notistack';
-import { api } from 'configs/axiosConfig';
-import { AxiosError } from 'axios';
+import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { fetchReviewActionCreator } from 'reducers/slices/domain/review';
+import { mSelector } from 'src/selectors/selector';
+import { testMemberUser } from 'tests/data/user';
 
 interface AdminReviewFormPropsType {
   review: ReviewType
@@ -90,7 +87,8 @@ const AdminReviewForm = React.forwardRef<any, AdminReviewFormPropsType>((props, 
     curDomain: curReviewState,
     curValidationDomain: curReviewValidationState,
     schema: reviewSchema,
-    setValidationDomain: setReviewValidationState
+    setValidationDomain: setReviewValidationState,
+    defaultValidationDomain: defaultReviewValidationData,
   })
 
   // event handlers

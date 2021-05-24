@@ -136,7 +136,7 @@ const ProductImagesForm: React.FunctionComponent<ProductImageFormPropsType> = (p
           />
           <CardMedia
             className={classes.media}
-            image={props.productImages[index] ? props.productImages[index].productImagePath : ""}
+            image={!props.productImages[index].isChange ? API1_URL + props.productImages[index].productImagePath : props.productImages[index].productImagePath}
             title={file ? file.name : ""}
           />
           <CardActions disableSpacing>

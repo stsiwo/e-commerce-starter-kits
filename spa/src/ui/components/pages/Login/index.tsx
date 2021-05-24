@@ -109,7 +109,8 @@ const Login: React.FunctionComponent<{}> = (props) => {
     curDomain: curMemberLoginState,
     curValidationDomain: curMemberLoginValidationState,
     schema: memberLoginSchema,
-    setValidationDomain: setMemberLoginValidationState
+    setValidationDomain: setMemberLoginValidationState,
+    defaultValidationDomain: defaultMemberLoginValidationData,
   })
 
   // event handlers

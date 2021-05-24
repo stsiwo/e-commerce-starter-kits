@@ -1,14 +1,17 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { ProductType, NormalizedProductType } from "domain/product/types";
-import { putProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
-import { productActions } from "reducers/slices/domain/product";
-import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
-import { rsSelector } from "src/selectors/selector";
-import { normalize } from "normalizr";
-import { productSchemaArray } from "states/state";
+import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
+import { NormalizedProductType } from "domain/product/types";
+import { normalize } from "normalizr";
+import { messageActions } from "reducers/slices/app";
+import { putProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
+import { productActions, PutProductActionType } from "reducers/slices/domain/product";
+import { call, put, select } from "redux-saga/effects";
+import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import { rsSelector } from "src/selectors/selector";
+import { generateObjectFormData, getNanoId } from "src/utils";
+import { productSchemaArray, productSchemaEntity } from "states/state";
+import { productFormDataGenerator } from "domain/product/formData";
 
 /**
  * a worker (generator)    
@@ -36,7 +39,7 @@ import { api } from "configs/axiosConfig";
  *    - keep the same id since it is replacement 
  *
  **/
-export function* putProductWorker(action: PayloadAction<ProductType>) {
+export function* putProductWorker(action: PayloadAction<PutProductActionType>) {
 
   /**
    * get cur user type
@@ -67,13 +70,15 @@ export function* putProductWorker(action: PayloadAction<ProductType>) {
      **/
     try {
 
-      // prep keyword if necessary
+      // prep form data
+      const formData = productFormDataGenerator(action.payload)
 
       // start fetching
       const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "PUT",
         url: apiUrl,
-        data: action.payload
+        data: formData, 
+        headers: { "Content-Type": "multipart/form-data" },
       })
 
       /**
@@ -81,14 +86,15 @@ export function* putProductWorker(action: PayloadAction<ProductType>) {
        *
        *  - TODO: make sure response structure with remote api
        **/
-      const normalizedData = normalize(response.data.data, productSchemaArray)
+      const normalizedData = normalize(response.data, productSchemaEntity)
 
       /**
        * update product domain in state
        *
        **/
       yield put(
-        productActions.merge(normalizedData.entities as NormalizedProductType)
+        // be careful when normalized a single object, you need to append its domain name (plural) to 'entities'
+        productActions.merge(normalizedData.entities.products as NormalizedProductType)
       )
 
       /**
@@ -98,6 +104,16 @@ export function* putProductWorker(action: PayloadAction<ProductType>) {
         putProductFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.SUCCESS,
+          message: "updated successfully.",
+        }) 
+      )
     } catch (error) {
 
       console.log(error)
@@ -107,6 +123,17 @@ export function* putProductWorker(action: PayloadAction<ProductType>) {
        **/
       yield put(
         putProductFetchStatusActions.update(FetchStatusEnum.FAILED)
+      )
+
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.ERROR,
+          message: error.message, 
+        }) 
       )
     }
   } 

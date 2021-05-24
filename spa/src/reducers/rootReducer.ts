@@ -8,14 +8,14 @@ import { deleteSingleProductFetchStatusSliceReducer, getProductFetchStatusSliceR
 import { getReviewFetchStatusSliceReducer } from './slices/app/fetchStatus/review';
 import { stripeClientSecretFetchStatusSliceReducer } from './slices/app/fetchStatus/stripeClientSecret';
 import { deleteSingleUserFetchStatusSliceReducer, deleteUserAvatarImageFetchStatusSliceReducer, getSingleUserFetchStatusSliceReducer, getUserFetchStatusSliceReducer, patchUserFetchStatusSliceReducer, postUserAvatarImageFetchStatusSliceReducer, postUserFetchStatusSliceReducer, putUserFetchStatusSliceReducer } from './slices/app/fetchStatus/user';
-import { deleteSingleWishlistItemFetchStatusSliceReducer, deleteWishlistItemFetchStatusSliceReducer, getWishlistItemFetchStatusSliceReducer, postWishlistItemFetchStatusSliceReducer } from './slices/app/fetchStatus/wishlistItem';
+import { deleteSingleWishlistItemFetchStatusSliceReducer, deleteWishlistItemFetchStatusSliceReducer, getWishlistItemFetchStatusSliceReducer, postWishlistItemFetchStatusSliceReducer, patchWishlistItemFetchStatusSliceReducer } from './slices/app/fetchStatus/wishlistItem';
 import { cartItemSliceReducer } from './slices/domain/cartItem';
-import { categoryPaginationLimitSliceReducer, categoryPaginationPageSliceReducer, categoryPaginationTotalPagesSliceReducer, categorySliceReducer } from './slices/domain/category';
-import { orderPaginationLimitSliceReducer, orderPaginationPageSliceReducer, orderPaginationTotalPagesSliceReducer, orderSliceReducer } from './slices/domain/order';
-import { productCurItemsSliceReducer, productPaginationLimitSliceReducer, productPaginationPageSliceReducer, productPaginationTotalPagesSliceReducer, productQueryCategoryIdSliceReducer, productQueryEndDateSliceReducer, productQueryIsDiscountSliceReducer, productQueryMaxPriceSliceReducer, productQueryMinPriceSliceReducer, productQueryReviewPointSliceReducer, productQuerySearchQuerySliceReducer, productQuerySortSliceReducer, productQueryStartDateSliceReducer, productSliceReducer } from './slices/domain/product';
-import { reviewPaginationLimitSliceReducer, reviewPaginationPageSliceReducer, reviewPaginationTotalPagesSliceReducer, reviewSliceReducer } from './slices/domain/review';
-import { userPaginationLimitSliceReducer, userPaginationPageSliceReducer, userPaginationTotalPagesSliceReducer, userSliceReducer } from './slices/domain/user';
-import { wishlistItemPaginationLimitSliceReducer, wishlistItemPaginationPageSliceReducer, wishlistItemPaginationTotalPagesSliceReducer, wishlistItemQueryEndDateSliceReducer, wishlistItemQueryIsDiscountSliceReducer, wishlistItemQueryMaxPriceSliceReducer, wishlistItemQueryMinPriceSliceReducer, wishlistItemQueryReviewPointSliceReducer, wishlistItemQuerySearchQuerySliceReducer, wishlistItemQuerySortSliceReducer, wishlistItemQueryStartDateSliceReducer, wishlistItemSliceReducer } from './slices/domain/wishlistItem';
+import { categoryPaginationLimitSliceReducer, categoryPaginationPageSliceReducer, categoryPaginationTotalPagesSliceReducer, categorySliceReducer, categoryPaginationTotalElementsSliceReducer } from './slices/domain/category';
+import { orderPaginationLimitSliceReducer, orderPaginationPageSliceReducer, orderPaginationTotalPagesSliceReducer, orderSliceReducer, orderPaginationTotalElementsSliceReducer } from './slices/domain/order';
+import { productCurItemsSliceReducer, productPaginationLimitSliceReducer, productPaginationPageSliceReducer, productPaginationTotalPagesSliceReducer, productQueryCategoryIdSliceReducer, productQueryEndDateSliceReducer, productQueryIsDiscountSliceReducer, productQueryMaxPriceSliceReducer, productQueryMinPriceSliceReducer, productQueryReviewPointSliceReducer, productQuerySearchQuerySliceReducer, productQuerySortSliceReducer, productQueryStartDateSliceReducer, productSliceReducer, productPaginationTotalElementsSliceReducer } from './slices/domain/product';
+import { reviewPaginationLimitSliceReducer, reviewPaginationPageSliceReducer, reviewPaginationTotalPagesSliceReducer, reviewSliceReducer, reviewPaginationTotalElementsSliceReducer } from './slices/domain/review';
+import { userPaginationLimitSliceReducer, userPaginationPageSliceReducer, userPaginationTotalPagesSliceReducer, userSliceReducer, userPaginationTotalElementsSliceReducer } from './slices/domain/user';
+import { wishlistItemPaginationLimitSliceReducer, wishlistItemPaginationPageSliceReducer, wishlistItemPaginationTotalPagesSliceReducer, wishlistItemQueryEndDateSliceReducer, wishlistItemQueryIsDiscountSliceReducer, wishlistItemQueryMaxPriceSliceReducer, wishlistItemQueryMinPriceSliceReducer, wishlistItemQueryReviewPointSliceReducer, wishlistItemQuerySearchQuerySliceReducer, wishlistItemQuerySortSliceReducer, wishlistItemQueryStartDateSliceReducer, wishlistItemSliceReducer, wishlistItemPaginationTotalElementsSliceReducer } from './slices/domain/wishlistItem';
 import { stripeClientSecretSliceReducer } from './slices/sensitive';
 import { cartModalSliceReducer, leftNavMenuSliceReducer, rightNavMenuSliceReducer, searchModalSliceReducer } from './slices/ui';
 
@@ -84,6 +84,7 @@ export const rootReducer = combineReducers({
       wishlistItems: combineReducers({
         get: getWishlistItemFetchStatusSliceReducer,
         post: postWishlistItemFetchStatusSliceReducer,
+        patch: patchWishlistItemFetchStatusSliceReducer,
         deleteSingle: deleteSingleWishlistItemFetchStatusSliceReducer,
         delete: deleteWishlistItemFetchStatusSliceReducer,
       }),
@@ -111,6 +112,7 @@ export const rootReducer = combineReducers({
         page: categoryPaginationPageSliceReducer,
         limit: categoryPaginationLimitSliceReducer,
         totalPages: categoryPaginationTotalPagesSliceReducer,
+        totalElements: categoryPaginationTotalElementsSliceReducer,
       })
     }),
     cartItems: cartItemSliceReducer,
@@ -120,6 +122,7 @@ export const rootReducer = combineReducers({
         page: wishlistItemPaginationPageSliceReducer,
         limit: wishlistItemPaginationLimitSliceReducer,
         totalPages: wishlistItemPaginationTotalPagesSliceReducer,
+        totalElements: wishlistItemPaginationTotalElementsSliceReducer,
       }),
       query: combineReducers({
         searchQuery: wishlistItemQuerySearchQuerySliceReducer,
@@ -138,6 +141,7 @@ export const rootReducer = combineReducers({
         page: userPaginationPageSliceReducer,
         limit: userPaginationLimitSliceReducer,
         totalPages: userPaginationTotalPagesSliceReducer,
+        totalElements: userPaginationTotalElementsSliceReducer,
       }),
     }),
     orders: combineReducers({
@@ -146,6 +150,7 @@ export const rootReducer = combineReducers({
         page: orderPaginationPageSliceReducer,
         limit: orderPaginationLimitSliceReducer,
         totalPages: orderPaginationTotalPagesSliceReducer,
+        totalElements: orderPaginationTotalElementsSliceReducer,
       }),
     }),
     reviews: combineReducers({
@@ -154,6 +159,7 @@ export const rootReducer = combineReducers({
         page: reviewPaginationPageSliceReducer,
         limit: reviewPaginationLimitSliceReducer,
         totalPages: reviewPaginationTotalPagesSliceReducer,
+        totalElements: reviewPaginationTotalElementsSliceReducer,
       }),
     }),
     products: combineReducers({
@@ -173,6 +179,7 @@ export const rootReducer = combineReducers({
         page: productPaginationPageSliceReducer,
         limit: productPaginationLimitSliceReducer,
         totalPages: productPaginationTotalPagesSliceReducer,
+        totalElements: productPaginationTotalElementsSliceReducer,
       }),
       curItems: productCurItemsSliceReducer,
     })

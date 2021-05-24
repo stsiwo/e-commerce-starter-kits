@@ -1,6 +1,5 @@
 import DateFnsUtils from '@date-io/date-fns';
 import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
@@ -9,21 +8,21 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { AxiosError } from 'axios';
-import { api } from 'configs/axiosConfig';
 import { CategoryType, defaultProductOnlyData, defaultProductValidationData, ProductDataType, ProductType, ProductValidationDataType } from 'domain/product/types';
 import { useValidation } from 'hooks/validation';
 import { productSchema } from 'hooks/validation/rules';
+import cloneDeep from 'lodash/cloneDeep';
+import merge from 'lodash/merge';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCategoryActionCreator } from 'reducers/slices/domain/category';
-import { fetchProductActionCreator } from 'reducers/slices/domain/product';
+import { postProductActionCreator, putProductActionCreator } from 'reducers/slices/domain/product';
 import { mSelector } from 'src/selectors/selector';
+import { renameFile } from 'src/utils';
 import ProductImagesForm from './ProductImagesForm';
-import cloneDeep from 'lodash/cloneDeep';
-import { generateObjectFormData, renameFile } from 'src/utils';
-import merge from 'lodash/merge';
+import Favorite from '@material-ui/icons/Favorite';
+import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
 
 interface AdminProductFormPropsType {
   product: ProductType
@@ -134,7 +133,8 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
     curDomain: curProductState,
     curValidationDomain: curProductValidationState,
     schema: productSchema,
-    setValidationDomain: setProductValidationState
+    setValidationDomain: setProductValidationState,
+    defaultValidationDomain: defaultProductValidationData,  
   })
 
   // test category list
@@ -144,6 +144,20 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
   React.useEffect(() => {
     dispatch(fetchCategoryActionCreator());
   }, [])
+
+  // set default category after category list is filled
+  React.useEffect(() => {
+
+    if (!curProductState.category && categoryList.length > 0) {
+      setProductState((prev: ProductDataType) => ({
+        ...prev,
+        category: categoryList[0],
+      }))
+    }
+    
+  }, [
+    categoryList.length 
+  ])
 
   // event handlers
   const handleProductNameInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
@@ -174,7 +188,11 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
   }
 
   const handleProductCategoryInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCategory = categoryList.find((category: CategoryType) => e.currentTarget.value === category.categoryId)
+
+    // DON'T USE 'e.currentTarget.value' for select input (material-ui)
+    const nextCategoryId = e.target.value;
+
+    const nextCategory = categoryList.find((category: CategoryType) => nextCategoryId === category.categoryId)
     // must not be null
     updateValidationAt("category", e.currentTarget.value);
     setProductState((prev: ProductDataType) => ({
@@ -182,6 +200,13 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
       category: nextCategory
     }));
   }
+
+  const handleProductReleaseDateChange = (date: Date | null) => {
+    setProductState((prev: ProductDataType) => ({
+      ...prev,
+      releaseDate: date
+    }));
+  };
 
   const handleProductBaseUnitPriceInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextProductBaseUnitPrice = e.currentTarget.value
@@ -234,17 +259,26 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
     }));
   }
 
+  const handleProductPublicChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    const nextProductPublic: boolean = e.currentTarget.checked
+    updateValidationAt("isPublic", e.currentTarget.value);
+    setProductState((prev: ProductDataType) => ({
+      ...prev,
+      isPublic: nextProductPublic,
+    }));
+  }
+
   // product image state update
   const updateProductImage = (file: File, path: string, index: number) => {
 
     const nextState = cloneDeep(curProductState)
-    renameFile(file, curProductState.productImages[index].productImageName)
-    nextState.productImageFiles[index] = file
+    const renamedFile = renameFile(file, curProductState.productImages[index].productImageName);
+    nextState.productImageFiles[index] = renamedFile 
     nextState.productImages[index].productImagePath = path
     nextState.productImages[index].isChange = true
 
 
-    updateValidationAt("productImageFiles", nextState.productImageFiles);
+    updateValidationAt("productImages", nextState.productImages);
     setProductState(nextState)
   }
 
@@ -255,7 +289,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
     nextState.productImages[index].productImagePath = ""
     nextState.productImages[index].isChange = true
 
-    updateValidationAt("productImageFiles", nextState.productImageFiles);
+    updateValidationAt("productImages", nextState.productImages);
     setProductState(nextState)
   }
 
@@ -299,37 +333,48 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
         if (isNew) {
           console.log("new product creation")
           // request
-          api.request({
-            method: 'POST',
-            url: API1_URL + `/products`,
-            // make sure 'generateObjectFormData' works correctly.
-            data: generateObjectFormData(curProductState, "product"),
-          }).then((data) => {
-
-            // fetch again
-            dispatch(fetchProductActionCreator())
-
-            enqueueSnackbar("updated successfully.", { variant: "success" })
-          }).catch((error: AxiosError) => {
-            enqueueSnackbar(error.message, { variant: "error" })
-          })
+          dispatch(
+            postProductActionCreator({
+              productName: curProductState.productName,
+              productDescription: curProductState.productDescription,
+              productPath: curProductState.productPath,
+              productBaseUnitPrice: curProductState.productBaseUnitPrice,
+              productBaseDiscountPrice: curProductState.productBaseDiscountPrice,
+              productBaseDiscountStartDate: curProductState.productBaseDiscountStartDate,
+              productBaseDiscountEndDate: curProductState.productBaseDiscountEndDate,
+              isDiscount: curProductState.isDiscount,
+              isPublic: curProductState.isPublic,
+              category: curProductState.category,
+              releaseDate: curProductState.releaseDate,
+              note: curProductState.note,
+              productImageFiles: curProductState.productImageFiles,
+              productImages: curProductState.productImages,
+            }) 
+          )
 
         } else {
           console.log("new product creation")
           // request
-          api.request({
-            method: 'PUT',
-            url: API1_URL + `/products/${curProductState.productId}`,
-            data: generateObjectFormData(curProductState),
-          }).then((data) => {
-
-            // fetch again
-            dispatch(fetchProductActionCreator())
-
-            enqueueSnackbar("updated successfully.", { variant: "success" })
-          }).catch((error: AxiosError) => {
-            enqueueSnackbar(error.message, { variant: "error" })
-          })
+          dispatch(
+            putProductActionCreator({
+              productId: curProductState.productId,
+              productName: curProductState.productName,
+              productDescription: curProductState.productDescription,
+              productPath: curProductState.productPath,
+              productBaseUnitPrice: curProductState.productBaseUnitPrice,
+              productBaseDiscountPrice: curProductState.productBaseDiscountPrice,
+              productBaseDiscountStartDate: curProductState.productBaseDiscountStartDate,
+              productBaseDiscountEndDate: curProductState.productBaseDiscountEndDate,
+              isDiscount: curProductState.isDiscount,
+              isPublic: curProductState.isPublic,
+              category: curProductState.category,
+              releaseDate: curProductState.releaseDate,
+              note: curProductState.note,
+              productImageFiles: curProductState.productImageFiles,
+              productImages: curProductState.productImages,
+            }) 
+          )
+          
         }
       } else {
         console.log("failed")
@@ -385,6 +430,20 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
           </MenuItem>
         ))}
       </TextField>
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <KeyboardDatePicker
+          margin="normal"
+          id="product-release-date"
+          label="Release Date"
+          format="MM/dd/yyyy"
+          value={curProductState.releaseDate}
+          onChange={handleProductReleaseDateChange}
+          KeyboardButtonProps={{
+            'aria-label': 'change release date',
+          }}
+          className={classes.productDateInput}
+        />
+      </MuiPickersUtilsProvider>
       {/** Base **/}
       <Typography variant="subtitle1" component="h6" align="left" className={classes.subtitle}>
         Base
@@ -467,7 +526,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
         You can upload up to 5 images and the first image is used as primary one.
       </Typography>
       <Box className={classes.errorMsg}>
-        {curProductValidationState.productImageFiles}
+        {curProductValidationState.productImages}
       </Box>
       <ProductImagesForm
         productImages={curProductState.productImages}
@@ -487,6 +546,29 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
         helperText={curProductValidationState.note}
         error={curProductValidationState.note !== ""}
       />
+      {/** PUblish **/}
+      <Typography variant="subtitle1" component="h6" align="left" className={classes.subtitle}>
+        Publish
+      </Typography>
+      <Typography variant="body2" component="p" color="textSecondary" align="left" className={classes.subtitle}>
+        To publish this product, you need to add at least one variant. You can add as many variants as you want at its management page. Click the link at 'Variants' column of your target product. 
+      </Typography>
+      <Box className={classes.errorMsg}>
+        {curProductValidationState.isPublic}
+      </Box>
+      <FormControlLabel
+        control={
+          <Checkbox
+            icon={<FavoriteBorder />}
+            checkedIcon={<Favorite />}
+            checked={curProductState.isPublic}
+            onChange={handleProductPublicChangeEvent}
+            name="checkedB"
+            color="primary"
+          />
+        }
+        label="Ready to Publish?"
+      /><br />
     </form>
   )
 });

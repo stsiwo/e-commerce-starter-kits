@@ -3,7 +3,7 @@ import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { messageActions } from "reducers/slices/app";
 import { getWishlistItemFetchStatusActions } from "reducers/slices/app/fetchStatus/wishlistItem";
-import { wishlistItemActions, wishlistItemPaginationPageActions, wishlistItemPaginationTotalPagesActions } from "reducers/slices/domain/wishlistItem";
+import { wishlistItemActions, wishlistItemPaginationPageActions, wishlistItemPaginationTotalPagesActions, wishlistItemPaginationTotalElementsActions } from "reducers/slices/domain/wishlistItem";
 import { all, call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
@@ -137,6 +137,7 @@ export function* fetchWishlistItemWorker(action: PayloadAction<{}>) {
       yield all([
         put(wishlistItemPaginationPageActions.update(response.data.pageable.pageNumber)),
         put(wishlistItemPaginationTotalPagesActions.update(response.data.totalPages)),
+        put(wishlistItemPaginationTotalElementsActions.update(response.data.totalElements)),
       ])
 
       /**

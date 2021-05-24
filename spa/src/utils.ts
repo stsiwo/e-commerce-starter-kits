@@ -375,9 +375,9 @@ export function getNanoId(): string {
  *
  * - ref: https://gist.github.com/ghinda/8442a57f22099bdb2e34
  **/
-export function generateObjectFormData(input: any, namespace?: string): FormData {
+export function generateObjectFormData(input: any, form?: FormData, namespace?: string): FormData {
 
-  const fd = new FormData();
+  const fd = form || new FormData();
   let formKey;
   for (let property in input) {
     if (input.hasOwnProperty(property)) {
@@ -391,7 +391,7 @@ export function generateObjectFormData(input: any, namespace?: string): FormData
         !(input[property] instanceof File) &&
         input[property] !== null
       ) {
-        this.objectToFormData(input[property], fd, property);
+        generateObjectFormData(input[property], fd, property);
       } else {
         if (input[property] !== false) {
           fd.append(formKey, input[property]);
@@ -410,11 +410,8 @@ export function generateObjectFormData(input: any, namespace?: string): FormData
  *
  *  - extract the extension from the original file and append it to new file name.
  **/
-export function renameFile(file: File, newName: string): void {
-  Object.defineProperty(file, 'name', {
-    writable: true,
-    value: newName + "." + extractExtension(file.name),
-  });
+export function renameFile(file: File, newName: string): File {
+  return new File([file], newName + "." + extractExtension(file.name), { type: file.type});
 }
 
 /**

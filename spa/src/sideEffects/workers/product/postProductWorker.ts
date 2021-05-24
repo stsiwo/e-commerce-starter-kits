@@ -1,14 +1,17 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { NormalizedProductType, ProductType } from "domain/product/types";
+import { productFormDataGenerator } from "domain/product/formData";
+import { NormalizedProductType } from "domain/product/types";
 import { normalize } from "normalizr";
+import { messageActions } from "reducers/slices/app";
 import { postProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
-import { productActions } from "reducers/slices/domain/product";
+import { PostProductActionType, productActions } from "reducers/slices/domain/product";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
+import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { productSchemaArray } from "states/state";
+import { getNanoId } from "src/utils";
+import { productSchemaEntity } from "states/state";
 
 /**
  * a worker (generator)    
@@ -36,7 +39,7 @@ import { productSchemaArray } from "states/state";
  *    - this domain does not have its id yet.
  *
  **/
-export function* postProductWorker(action: PayloadAction<ProductType>) {
+export function* postProductWorker(action: PayloadAction<PostProductActionType>) {
 
   /**
    * get cur user type
@@ -67,28 +70,37 @@ export function* postProductWorker(action: PayloadAction<ProductType>) {
      **/
     try {
 
-      // prep keyword if necessary
+      // prep form data
+      const formData = productFormDataGenerator(action.payload)
+
 
       // start fetching
       const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "POST",
         url: apiUrl,
-        data: action.payload
+        data: formData, 
+        headers: { "Content-Type": "multipart/form-data" },
       })
 
+      console.log("posted product")
+      console.log(response.data)
       /**
        * normalize response data
        *
        *  - TODO: make sure response structure with remote api
        **/
-      const normalizedData = normalize(response.data.data, productSchemaArray)
+      const normalizedData = normalize(response.data, productSchemaEntity)
+
+      console.log("normalized product")
+      console.log(normalizedData)
 
       /**
        * update product domain in state
        *
        **/
       yield put(
-        productActions.merge(normalizedData.entities as NormalizedProductType)
+        // be careful when normalized a single object, you need to append its domain name (plural) to 'entities'
+        productActions.merge(normalizedData.entities.products as NormalizedProductType)
       )
 
       /**
@@ -98,6 +110,16 @@ export function* postProductWorker(action: PayloadAction<ProductType>) {
         postProductFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.SUCCESS,
+          message: "added successfully.",
+        }) 
+      )
     } catch (error) {
 
       console.log(error)
@@ -107,6 +129,17 @@ export function* postProductWorker(action: PayloadAction<ProductType>) {
        **/
       yield put(
         postProductFetchStatusActions.update(FetchStatusEnum.FAILED)
+      )
+
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.ERROR,
+          message: error.message, 
+        }) 
       )
     }
   } 

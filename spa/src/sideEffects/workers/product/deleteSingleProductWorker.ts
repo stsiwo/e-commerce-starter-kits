@@ -3,10 +3,12 @@ import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { ProductType } from "domain/product/types";
 import { deleteSingleProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
-import { productActions } from "reducers/slices/domain/product";
+import { productActions, DeleteSingleProductActionType } from "reducers/slices/domain/product";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
+import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
+import { messageActions } from "reducers/slices/app";
+import { getNanoId } from "src/utils";
 
 /**
  * a worker (generator)    
@@ -32,7 +34,7 @@ import { rsSelector } from "src/selectors/selector";
  *  - note:
  *
  **/
-export function* deleteSingleProductWorker(action: PayloadAction<ProductType>) {
+export function* deleteSingleProductWorker(action: PayloadAction<DeleteSingleProductActionType>) {
 
   /**
    * get cur user type
@@ -76,14 +78,28 @@ export function* deleteSingleProductWorker(action: PayloadAction<ProductType>) {
        *
        **/
       yield put(
-        productActions.delete(action.payload)
+        productActions.delete({
+          productId: action.payload.productId
+        })
       )
+      
 
       /**
        * update fetch status sucess
        **/
       yield put(
         deleteSingleProductFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+      )
+
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.SUCCESS,
+          message: "added successfully.",
+        }) 
       )
 
     } catch (error) {
@@ -96,6 +112,18 @@ export function* deleteSingleProductWorker(action: PayloadAction<ProductType>) {
       yield put(
         deleteSingleProductFetchStatusActions.update(FetchStatusEnum.FAILED)
       )
+
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.ERROR,
+          message: error.message, 
+        }) 
+      )
+
     }
   }
 }

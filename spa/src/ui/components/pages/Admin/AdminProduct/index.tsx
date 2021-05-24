@@ -39,9 +39,6 @@ const AdminProduct: React.FunctionComponent<{}> = (props) => {
 
   return (
     <Box component="div" className={classes.box}>
-      <Typography variant="body2" component="p" align="left" className={classes.title} >
-        {"Products"}
-      </Typography>
       <AdminProductGridView />
     </Box>
   )

@@ -4,7 +4,7 @@ import { api } from "configs/axiosConfig";
 import { NormalizedProductType } from "domain/product/types";
 import { normalize } from "normalizr";
 import { getProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
-import { productActions, productPaginationPageActions, productPaginationTotalPagesActions } from "reducers/slices/domain/product";
+import { productActions, productPaginationPageActions, productPaginationTotalPagesActions, productPaginationTotalElementsActions } from "reducers/slices/domain/product";
 import { all, call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
@@ -150,6 +150,7 @@ export function* fetchProductWorker(action: PayloadAction<{}>) {
       yield all([
         put(productPaginationPageActions.update(response.data.pageable.pageNumber)),
         put(productPaginationTotalPagesActions.update(response.data.totalPages)),
+        put(productPaginationTotalElementsActions.update(response.data.totalElements)),
       ])
 
     } catch (error) {

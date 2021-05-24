@@ -24,7 +24,6 @@ import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteAuthAddressActionCreator, patchAuthAddressActionCreator, postAuthAddressActionCreator, putAuthAddressActionCreator } from 'reducers/slices/app';
-import { MessageTypeEnum } from 'src/app';
 import { mSelector } from 'src/selectors/selector';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -116,7 +115,8 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
     curDomain: curUserAccountAddressState,
     curValidationDomain: curUserAccountAddressValidationState,
     schema: userAccountAddressSchema,
-    setValidationDomain: setUserAccountAddressValidationState
+    setValidationDomain: setUserAccountAddressValidationState,
+    defaultValidationDomain: defaultUserAccountValidationAddressData,
   })
 
   // event handlers

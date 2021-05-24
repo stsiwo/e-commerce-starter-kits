@@ -11,11 +11,10 @@ import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { DataGrid, GridCellParams, GridColDef, GridRowsProp } from '@material-ui/data-grid';
+import { DataGrid, GridCellParams, GridColDef, GridPageChangeParams, GridRowsProp } from '@material-ui/data-grid';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import EditIcon from '@material-ui/icons/Edit';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
-import Pagination from '@material-ui/lab/Pagination/Pagination';
 import { AxiosError } from 'axios';
 import { api } from 'configs/axiosConfig';
 import { ProductType } from 'domain/product/types';
@@ -23,9 +22,10 @@ import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link as RRLink } from "react-router-dom";
-import { fetchProductActionCreator, productPaginationPageActions } from 'reducers/slices/domain/product';
+import { fetchProductActionCreator, productPaginationPageActions, deleteSingleProductActionCreator } from 'reducers/slices/domain/product';
 import { mSelector } from 'src/selectors/selector';
 import AdminProductFormDialog from '../AdminProductFormDialog';
+import AdminProductSearchController from '../ADminProductSearchController';
 
 declare type AdminProductGridViewPropsType = {
 }
@@ -34,6 +34,7 @@ declare type AdminProductGridViewPropsType = {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
+      paddingBottom: theme.spacing(4),
     },
     media: {
     },
@@ -134,10 +135,14 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
 
   const pagination = useSelector(mSelector.makeProductPaginationSelector())
 
+  const curQueryString = useSelector(mSelector.makeProductQuerySelector())
+
   // fetch product
   React.useEffect(() => {
     dispatch(fetchProductActionCreator())
-  }, [])
+  }, [
+    JSON.stringify(curQueryString)
+  ])
 
 
   const [curFormOpen, setFormOpen] = React.useState<boolean>(false);
@@ -156,15 +161,9 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
   const handleDeletionOk: React.EventHandler<React.MouseEvent<HTMLElement>> = (e) => {
 
     // request
-    api.request({
-      method: 'DELETE',
-      url: API1_URL + `/products/${auth.user.userId}`
-    }).then((data) => {
-
-      enqueueSnackbar("deleted successfully.", { variant: "success" })
-    }).catch((error: AxiosError) => {
-      enqueueSnackbar(error.message, { variant: "error" })
-    })
+    dispatch(
+      deleteSingleProductActionCreator({ productId: curProduct.productId }) 
+    )
   }
 
   // grid event handler stuff
@@ -196,13 +195,20 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
    * TODO: make sure pagiantion working when you have more data.
    *
    **/
-  const handlePaginationChange = (event: React.ChangeEvent<unknown>, value: number) => {
+  //const handlePaginationChange = (event: React.ChangeEvent<unknown>, value: number) => {
 
+  //  // need to decrement since we incremented when display
+  //  const nextPage = value - 1;
+
+  //  dispatch(productPaginationPageActions.update(nextPage))
+  //};
+
+  const handlePageChange = (param: GridPageChangeParams) => {
     // need to decrement since we incremented when display
-    const nextPage = value - 1;
+    const nextPage = param.page;
 
     dispatch(productPaginationPageActions.update(nextPage))
-  };
+  }
 
 
   return (
@@ -214,7 +220,7 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
         subheaderTypographyProps={{
           variant: 'body1'
         }}
-        title="List"
+        title="Product List"
         action={
           <IconButton aria-label="add" onClick={handleNewFormToggleBtnClickEvent}>
             <AddCircleIcon />
@@ -224,22 +230,15 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
       <CardContent
         className={classes.cardContentBox}
       >
+        <AdminProductSearchController />        
         <DataGrid
-          autoHeight
           rows={generateRows(curProductList)}
           columns={generateColumns(handleEditClick, handleDeleteClick)}
+          page={pagination.page} // don't forget to increment when display
           pageSize={pagination.limit}
-          rowCount={pagination.limit}
+          rowCount={pagination.totalElements}
+          onPageChange={handlePageChange}
           // not gonna use pagination of this DataGrid
-        />
-        <Pagination
-          page={pagination.page + 1} // don't forget to increment when display
-          count={pagination.totalPages}
-          color="primary"
-          showFirstButton
-          showLastButton
-          size={"medium"}
-          onChange={handlePaginationChange}
         />
       </CardContent>
       <CardActions disableSpacing>

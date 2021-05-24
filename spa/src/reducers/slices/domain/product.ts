@@ -1,5 +1,5 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { NormalizedProductType, ProductSortEnum, ProductType, ProductVariantType } from "domain/product/types";
+import { NormalizedProductType, ProductSortEnum, ProductType, ProductVariantType, ProductCriteria } from "domain/product/types";
 import merge from "lodash/merge";
 
 /**
@@ -26,15 +26,18 @@ export const fetchSingleProductActionCreator = createAction<{ productId: string 
 export const fetchSingleProductActionTypeName = fetchSingleProductActionCreator().type
 
 // for POST (add a new cart item) request
-export const postProductActionCreator = createAction<ProductType>("saga/domain/product/post")
+export declare type PostProductActionType = ProductCriteria 
+export const postProductActionCreator = createAction<PostProductActionType>("saga/domain/product/post")
 export const postProductActionTypeName = postProductActionCreator().type
 
 // for PUT (replace) request
-export const putProductActionCreator = createAction<ProductType>("saga/domain/product/put")
+export declare type PutProductActionType = ProductCriteria 
+export const putProductActionCreator = createAction<PutProductActionType>("saga/domain/product/put")
 export const putProductActionTypeName = putProductActionCreator().type
 
 // for DELETE (delete single cart item) request
-export const deleteSingleProductActionCreator = createAction<ProductType>("saga/domain/product/deleteSingle")
+export declare type DeleteSingleProductActionType = { productId: string } 
+export const deleteSingleProductActionCreator = createAction<DeleteSingleProductActionType>("saga/domain/product/deleteSingle")
 export const deleteSingleProductActionTypeName = deleteSingleProductActionCreator().type
 
 // for DELETE (delete all of cart items) request
@@ -70,7 +73,7 @@ export const productSlice = createSlice({
     update: (state: NormalizedProductType, action: ProductActionType) => action.payload,
 
     // use when you want to remove a single entity
-    delete: (state: NormalizedProductType, action: PayloadAction<ProductType>) =>  {
+    delete: (state: NormalizedProductType, action: PayloadAction<{ productId: string }>) =>  {
       delete state[action.payload.productId]
       return state
     },
@@ -611,6 +614,44 @@ export const productPaginationTotalPagesSlice = createSlice({
 
 export const productPaginationTotalPagesSliceReducer = productPaginationTotalPagesSlice.reducer
 export const productPaginationTotalPagesActions = productPaginationTotalPagesSlice.actions
+
+
+/**
+ *
+ * domain.products.pagination.totalElements state Slice (no side effects)
+ *
+ **/
+// action type             
+export type ProductPaginationTotalElementsActionType = PayloadAction<number> 
+
+export const productPaginationTotalElementsSlice = createSlice({ 
+  name: "domain/products/pagination/totalElements", // a name used in action type
+  initialState: 0,        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: number, action: ProductPaginationTotalElementsActionType) => action.payload,
+    clear: (state: number) => 0,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const productPaginationTotalElementsSliceReducer = productPaginationTotalElementsSlice.reducer
+export const productPaginationTotalElementsActions = productPaginationTotalElementsSlice.actions
 
 
 /**

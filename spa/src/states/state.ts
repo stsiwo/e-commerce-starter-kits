@@ -24,7 +24,7 @@ const categorySchemaEntity = new schema.Entity(
 export const categorySchemaArray = new schema.Array(categorySchemaEntity);
 
 // product
-const productSchemaEntity = new schema.Entity(
+export const productSchemaEntity = new schema.Entity(
   "products",
   {},
   {
@@ -157,6 +157,7 @@ export const initialState: StateType = {
         page: 0, // start from 0 (not 1)
         limit: 10,
         totalPages: 1,
+        totalElements: 0,
       },
     },
     cartItems: [],
@@ -166,6 +167,7 @@ export const initialState: StateType = {
         page: 0, // start from 0 (not 1)
         limit: 10,
         totalPages: 1,
+        totalElements: 0,
       },
       query: {
         searchQuery: "",
@@ -184,6 +186,7 @@ export const initialState: StateType = {
         page: 0, // start from 0 (not 1)
         limit: 10,
         totalPages: 1,
+        totalElements: 0,
       },
     },
     orders: {
@@ -192,6 +195,7 @@ export const initialState: StateType = {
         page: 0, // start from 0 (not 1)
         limit: 10,
         totalPages: 1,
+        totalElements: 0,
       },
     },
     reviews: {
@@ -200,6 +204,7 @@ export const initialState: StateType = {
         page: 0, // start from 0 (not 1)
         limit: 10,
         totalPages: 1,
+        totalElements: 0,
       },
     },
     products: {
@@ -219,6 +224,7 @@ export const initialState: StateType = {
         page: 0, // start from 0 (not 1)
         limit: 20,
         totalPages: 1,
+        totalElements: 0,
       },
       curItems: [],
     }

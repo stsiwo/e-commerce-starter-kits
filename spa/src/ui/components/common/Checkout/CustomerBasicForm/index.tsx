@@ -92,7 +92,8 @@ const CustomerBasicForm: React.FunctionComponent<CustomerBasicFormPropsType> = (
     curDomain: curUserAccountState,
     curValidationDomain: curUserAccountValidationState,
     schema: userAccountSchema,
-    setValidationDomain: setUserAccountValidationState
+    setValidationDomain: setUserAccountValidationState,
+    defaultValidationDomain: defaultUserBasicAccountValidationData,
   })
 
   // event handlers
