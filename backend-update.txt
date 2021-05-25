@@ -47,7 +47,9 @@ endpoint change:
   
   - categories/
   
-    - what should I do when category is deleted and its has several products which are blonged to the category
+    - what should I do when category is deleted and its has several products which are blonged to the category.
+    
+      - force the admin to delete all products which are blongs to the category first. until then, disable delete option.
   
   - performance:
   
