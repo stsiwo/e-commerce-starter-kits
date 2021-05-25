@@ -114,6 +114,14 @@ export declare type ProductVariantCriteria = {
   variantLength: number
 }
 
+// category criteria
+export declare type CategoryCriteria = {
+  categoryId?: string
+  categoryName: string
+  categoryDescription: string
+  categoryPath: string
+}
+
 // product variant state type for form & input
 export declare type ProductVariantDataType = {
   variantId?: string 

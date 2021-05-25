@@ -1,14 +1,16 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { CategoryType, NormalizedCategoryType } from "domain/product/types";
+import { CategoryType, NormalizedCategoryType, CategoryCriteria } from "domain/product/types";
 import { normalize } from "normalizr";
 import { putCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
-import { categoryActions } from "reducers/slices/domain/category";
+import { categoryActions, PutCategoryActionType } from "reducers/slices/domain/category";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
+import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { categorySchemaArray } from "states/state";
+import { categorySchemaArray, categorySchemaEntity } from "states/state";
+import { messageActions } from "reducers/slices/app";
+import { getNanoId } from "src/utils";
 
 /**
  * a worker (generator)    
@@ -36,7 +38,7 @@ import { categorySchemaArray } from "states/state";
  *    - keep the same id since it is replacement 
  *
  **/
-export function* putCategoryWorker(action: PayloadAction<CategoryType>) {
+export function* putCategoryWorker(action: PayloadAction<PutCategoryActionType>) {
 
   /**
    * get cur user type
@@ -73,7 +75,12 @@ export function* putCategoryWorker(action: PayloadAction<CategoryType>) {
       const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "PUT",
         url: apiUrl,
-        data: action.payload
+        data: {
+          categoryId: action.payload.categoryId,
+          categoryDescription: action.payload.categoryDescription,
+          categoryName: action.payload.categoryName,
+          categoryPath: action.payload.categoryPath
+        } as CategoryCriteria
       })
 
       /**
@@ -81,14 +88,14 @@ export function* putCategoryWorker(action: PayloadAction<CategoryType>) {
        *
        *  - TODO: make sure response structure with remote api
        **/
-      const normalizedData = normalize(response.data.data, categorySchemaArray)
+      const normalizedData = normalize(response.data, categorySchemaEntity)
 
       /**
        * update categories domain in state
        *
        **/
       yield put(
-        categoryActions.update(normalizedData.entities as NormalizedCategoryType)
+        categoryActions.merge(normalizedData.entities.categories as NormalizedCategoryType)
       )
 
       /**
@@ -96,6 +103,17 @@ export function* putCategoryWorker(action: PayloadAction<CategoryType>) {
        **/
       yield put(
         putCategoryFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+      )
+
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.SUCCESS,
+          message: "added successfully.",
+        }) 
       )
 
     } catch (error) {
@@ -107,6 +125,17 @@ export function* putCategoryWorker(action: PayloadAction<CategoryType>) {
        **/
       yield put(
         putCategoryFetchStatusActions.update(FetchStatusEnum.FAILED)
+      )
+
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.ERROR,
+          message: error.message, 
+        }) 
       )
     }
   } 

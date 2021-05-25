@@ -8,7 +8,7 @@ import { categorySchema } from 'hooks/validation/rules';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCategoryActionCreator } from 'reducers/slices/domain/category';
+import { fetchCategoryActionCreator, postCategoryActionCreator, putCategoryActionCreator } from 'reducers/slices/domain/category';
 import { mSelector } from 'src/selectors/selector';
 
 interface AdminCategoryFormPropsType {
@@ -128,7 +128,6 @@ const AdminCategoryForm = React.forwardRef<any, AdminCategoryFormPropsType>((pro
     }));
   }
 
-
   /**
    * call child function from parent 
    *
@@ -150,36 +149,16 @@ const AdminCategoryForm = React.forwardRef<any, AdminCategoryFormPropsType>((pro
         if (isNew) {
           console.log("new category creation")
           // request
-          api.request({
-            method: 'POST',
-            url: API1_URL + `/categories`,
-            data: curCategoryState,
-          }).then((data) => {
-
-            // fetch again
-            dispatch(fetchCategoryActionCreator())
-
-            enqueueSnackbar("updated successfully.", { variant: "success" })
-          }).catch((error: AxiosError) => {
-            enqueueSnackbar(error.message, { variant: "error" })
-          })
+          dispatch(
+            postCategoryActionCreator(curCategoryState) 
+          )
 
         } else {
           console.log("update category")
           // request
-          api.request({
-            method: 'PUT',
-            url: API1_URL + `/categories/${curCategoryState.categoryId}`,
-            data: curCategoryState,
-          }).then((data) => {
-
-            // fetch again
-            dispatch(fetchCategoryActionCreator())
-
-            enqueueSnackbar("updated successfully.", { variant: "success" })
-          }).catch((error: AxiosError) => {
-            enqueueSnackbar(error.message, { variant: "error" })
-          })
+          dispatch(
+            putCategoryActionCreator(curCategoryState) 
+          )
         }
       } else {
         console.log("failed")

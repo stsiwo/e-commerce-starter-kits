@@ -187,20 +187,6 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
     setProduct(targetProduct);
   }
 
-  // pagination event handler
-  
-  /**
-   * TODO: make sure pagiantion working when you have more data.
-   *
-   **/
-  //const handlePaginationChange = (event: React.ChangeEvent<unknown>, value: number) => {
-
-  //  // need to decrement since we incremented when display
-  //  const nextPage = value - 1;
-
-  //  dispatch(productPaginationPageActions.update(nextPage))
-  //};
-
   const handlePageChange = (param: GridPageChangeParams) => {
     // need to decrement since we incremented when display
     const nextPage = param.page;

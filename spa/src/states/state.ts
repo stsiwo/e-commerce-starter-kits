@@ -13,7 +13,7 @@ import { WishlistItemSortEnum } from "domain/wishlist/types";
  **/
 
 // category
-const categorySchemaEntity = new schema.Entity(
+export const categorySchemaEntity = new schema.Entity(
   "categories",
   {},
   {

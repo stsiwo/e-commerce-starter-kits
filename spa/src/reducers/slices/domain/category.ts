@@ -1,5 +1,5 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CategoryType, NormalizedCategoryType } from "domain/product/types";
+import { CategoryType, NormalizedCategoryType, CategoryCriteria } from "domain/product/types";
 import merge from "lodash/merge";
 
 /**
@@ -18,15 +18,18 @@ export const fetchCategoryActionCreator = createAction("saga/domain/category/fet
 export const fetchCategoryActionTypeName = fetchCategoryActionCreator().type
 
 // for POST (add a new category item) request
-export const postCategoryActionCreator = createAction<CategoryType>("saga/domain/category/post")
+export declare type PostCategoryActionType = CategoryCriteria 
+export const postCategoryActionCreator = createAction<PostCategoryActionType>("saga/domain/category/post")
 export const postCategoryActionTypeName = postCategoryActionCreator().type
 
 // for PUT (replace) request
-export const putCategoryActionCreator = createAction<CategoryType>("saga/domain/category/put")
+export declare type PutCategoryActionType = CategoryCriteria 
+export const putCategoryActionCreator = createAction<PutCategoryActionType>("saga/domain/category/put")
 export const putCategoryActionTypeName = putCategoryActionCreator().type
 
 // for DELETE (delete single category item) request
-export const deleteSingleCategoryActionCreator = createAction<CategoryType>("saga/domain/category/deleteSingle")
+export declare type DeleteSingleCategoryActionType = { categoryId: string } 
+export const deleteSingleCategoryActionCreator = createAction<DeleteSingleCategoryActionType>("saga/domain/category/deleteSingle")
 export const deleteSingleCategoryActionTypeName = deleteSingleCategoryActionCreator().type
 
 // for DELETE (delete all of category items) request
@@ -58,7 +61,7 @@ export const categorySlice = createSlice({
     update: (state: NormalizedCategoryType, action: CategoryActionType) => action.payload,
 
     // use when you want to remove a single entity
-    delete: (state: NormalizedCategoryType, action: PayloadAction<CategoryType>) => {
+    delete: (state: NormalizedCategoryType, action: PayloadAction<{ categoryId: string }>) => {
       delete state[action.payload.categoryId]
       return state
     },

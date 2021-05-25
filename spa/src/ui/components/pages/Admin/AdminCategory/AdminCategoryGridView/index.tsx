@@ -10,20 +10,18 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { DataGrid, GridCellParams, GridColDef, GridRowsProp } from '@material-ui/data-grid';
+import { DataGrid, GridCellParams, GridColDef, GridPageChangeParams, GridRowsProp } from '@material-ui/data-grid';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import EditIcon from '@material-ui/icons/Edit';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
-import Pagination from '@material-ui/lab/Pagination/Pagination';
 import { AxiosError } from 'axios';
 import { api } from 'configs/axiosConfig';
 import { CategoryType } from 'domain/product/types';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { categoryPaginationPageActions, fetchCategoryActionCreator } from 'reducers/slices/domain/category';
+import { categoryPaginationPageActions, fetchCategoryActionCreator, deleteSingleCategoryActionCreator } from 'reducers/slices/domain/category';
 import { mSelector } from 'src/selectors/selector';
-import AdminCategoryFormDrawer from '../AdminCategoryFormDrawer';
 import AdminCategoryFormDialog from '../AdminCategoryFormDialog';
 
 declare type AdminCategoryGridViewPropsType = {
@@ -61,9 +59,9 @@ const generateRows: (domains: CategoryType[]) => GridRowsProp = (domains) => {
 const generateColumns: (onEdit: React.EventHandler<React.MouseEvent<HTMLButtonElement>>, onDelete: React.EventHandler<React.MouseEvent<HTMLButtonElement>>) => GridColDef[] = (onEdit, onDelete) => {
   return [
     { field: 'name', headerName: 'Name', width: 150 },
-    { field: 'description', headerName: 'Description', width: 400 },
     { field: 'path', headerName: 'Path', width: 150 },
     { field: 'products', headerName: 'Products', width: 150 },
+    { field: 'description', headerName: 'Description', width: 400 },
     {
       field: 'actions',
       headerName: 'Actions',
@@ -130,17 +128,11 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
   const handleDeletionOk: React.EventHandler<React.MouseEvent<HTMLElement>> = (e) => {
 
     // request
-    api.request({
-      method: 'DELETE',
-      url: API1_URL + `/categories/${curCategory.categoryId}`
-    }).then((data) => {
-
-      dispatch(fetchCategoryActionCreator())
-
-      enqueueSnackbar("deleted successfully.", { variant: "success" })
-    }).catch((error: AxiosError) => {
-      enqueueSnackbar(error.message, { variant: "error" })
-    })
+    dispatch(
+      deleteSingleCategoryActionCreator({
+        categoryId: curCategory.categoryId, 
+      }) 
+    )
   }
 
   // grid event handler stuff
@@ -166,19 +158,12 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
     setCategory(targetCategory);
   }
 
-  // pagination event handler
-  
-  /**
-   * TODO: make sure pagiantion working when you have more data.
-   *
-   **/
-  const handlePaginationChange = (event: React.ChangeEvent<unknown>, value: number) => {
-
+  const handlePageChange = (param: GridPageChangeParams) => {
     // need to decrement since we incremented when display
-    const nextPage = value - 1;
+    const nextPage = param.page;
 
     dispatch(categoryPaginationPageActions.update(nextPage))
-  };
+  }
 
   return (
     <Card className={classes.root}>
@@ -189,7 +174,7 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
         subheaderTypographyProps={{
           variant: 'body1'
         }}
-        title="List"
+        title="Category List"
         action={
           <IconButton aria-label="add" onClick={handleNewFormToggleBtnClickEvent}>
             <AddCircleIcon />
@@ -200,21 +185,13 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
         className={classes.cardContentBox}
       >
         <DataGrid
-          autoHeight
           rows={generateRows(curCategoryList)}
           columns={generateColumns(handleEditClick, handleDeleteClick)}
+          page={pagination.page} // don't forget to increment when display
           pageSize={pagination.limit}
-          rowCount={pagination.limit}
+          rowCount={pagination.totalElements}
+          onPageChange={handlePageChange}
           // not gonna use pagination of this DataGrid
-        />
-        <Pagination
-          page={pagination.page + 1} // don't forget to increment when display
-          count={pagination.totalPages}
-          color="primary"
-          showFirstButton
-          showLastButton
-          size={"medium"}
-          onChange={handlePaginationChange}
         />
       </CardContent>
       <CardActions disableSpacing>
@@ -240,13 +217,18 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
           </Typography>
           <Typography variant="body1" component="p" align="left" className={null} >
             Category Name: <b>{curCategory && curCategory.categoryName}</b>
+          </Typography><br />
+          {(curCategory && curCategory.totalProductCount > 0 &&
+          <Typography variant="body2" component="p" align="left" color={"error"} className={null} >
+            {"Oops, this category holds several products. come back here after you change the category of those products if you want to delete this category."}
           </Typography>
+          )}
         </DialogContent>
         <DialogActions>
           <Button autoFocus onClick={handleDeletionCancel} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleDeletionOk} color="primary">
+          <Button onClick={handleDeletionOk} color="primary" disabled={curCategory && curCategory.totalProductCount > 0}>
             Ok
           </Button>
         </DialogActions>

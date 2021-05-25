@@ -3,10 +3,12 @@ import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { CategoryType } from "domain/product/types";
 import { deleteSingleCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
-import { categoryActions } from "reducers/slices/domain/category";
+import { categoryActions, DeleteSingleCategoryActionType } from "reducers/slices/domain/category";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
+import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
+import { messageActions } from "reducers/slices/app";
+import { getNanoId } from "src/utils";
 
 /**
  * a worker (generator)    
@@ -32,7 +34,7 @@ import { rsSelector } from "src/selectors/selector";
  *  - note:
  *
  **/
-export function* deleteSingleCategoryWorker(action: PayloadAction<CategoryType>) {
+export function* deleteSingleCategoryWorker(action: PayloadAction<DeleteSingleCategoryActionType>) {
 
   /**
    * get cur user type
@@ -76,7 +78,9 @@ export function* deleteSingleCategoryWorker(action: PayloadAction<CategoryType>)
        *
        **/
       yield put(
-        categoryActions.delete(action.payload)
+        categoryActions.delete({
+          categoryId: action.payload.categoryId 
+        })
       )
 
       /**
@@ -84,6 +88,17 @@ export function* deleteSingleCategoryWorker(action: PayloadAction<CategoryType>)
        **/
       yield put(
         deleteSingleCategoryFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+      )
+
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.SUCCESS,
+          message: "deleted successfully.",
+        }) 
       )
 
     } catch (error) {
@@ -95,6 +110,17 @@ export function* deleteSingleCategoryWorker(action: PayloadAction<CategoryType>)
        **/
       yield put(
         deleteSingleCategoryFetchStatusActions.update(FetchStatusEnum.FAILED)
+      )
+
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.ERROR,
+          message: error.message, 
+        }) 
       )
     }
   }
