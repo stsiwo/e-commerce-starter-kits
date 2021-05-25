@@ -44,10 +44,16 @@ endpoint change:
   - avatar-image
   
     - add cache feature (hasing file name or something)
-    
+  
+  - categories/
+  
+    - what should I do when category is deleted and its has several products which are blonged to the category
+  
   - performance:
   
     - identify N+1 sql using logging & monitor.
+    
+    
       
     
 
