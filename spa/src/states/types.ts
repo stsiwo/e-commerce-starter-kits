@@ -31,6 +31,9 @@ export declare type AppStateType = {
       post: FetchStatusEnum
       put: FetchStatusEnum
       deleteSingle: FetchStatusEnum
+      postVariant: FetchStatusEnum
+      putVariant: FetchStatusEnum
+      deleteSingleVariant: FetchStatusEnum
     },
     orders: {
       get: FetchStatusEnum

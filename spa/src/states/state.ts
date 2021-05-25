@@ -92,6 +92,9 @@ export const initialState: StateType = {
         post: FetchStatusEnum.INITIAL,
         put: FetchStatusEnum.INITIAL,
         deleteSingle: FetchStatusEnum.INITIAL,
+        postVariant: FetchStatusEnum.INITIAL,
+        putVariant: FetchStatusEnum.INITIAL,
+        deleteSingleVariant: FetchStatusEnum.INITIAL,
       },
       orders: {
         get: FetchStatusEnum.INITIAL,

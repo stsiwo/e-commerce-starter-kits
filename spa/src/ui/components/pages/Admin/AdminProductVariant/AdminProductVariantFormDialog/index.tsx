@@ -77,7 +77,7 @@ const AdminProductVariantFormDialog: React.FunctionComponent<AdminProductVariant
   // render nav items
   return (
     <Dialog fullScreen={fullScreen} open={props.curFormOpen} onClose={toggleDialog(false)} aria-labelledby="admin-productVariant-form-dialog">
-      <DialogTitle id="admin-productVariant-form-dialog-title">ProductVariant Form</DialogTitle>
+      <DialogTitle id="admin-productVariant-form-dialog-title">Product Variant Form</DialogTitle>
       <DialogContent classes={{
         root: classes.dialogContentRoot,
       }}>

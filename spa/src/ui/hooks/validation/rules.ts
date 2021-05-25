@@ -61,7 +61,15 @@ export const memberLoginSchema = yup.object().shape({
 
 // products
 export const productVariantSchema = yup.object().shape({
-  productSize: yup.object().required(),
+  /**
+   * product size object validation not working.
+   *
+   * always complains about 'final value is null'....
+   *
+   * for now, make this nullable.
+   *
+   **/
+  productSize: yup.object().nullable(),
   variantColor: yup.string().required(),
   variantUnitPrice: yup.string().optional().nullable(),
   variantDiscountPrice: yup.number().optional().nullable(),
@@ -70,6 +78,10 @@ export const productVariantSchema = yup.object().shape({
   variantStock: yup.number().required(),
   isDiscount: yup.string().optional().nullable(),
   note: yup.string().optional().nullable(),
+  variantWeight: yup.number().required(),
+  variantHeight: yup.number().required(),
+  variantLength: yup.number().required(),
+  variantWidth: yup.number().required(),
 })
 
 export const productSchema = yup.object().shape({

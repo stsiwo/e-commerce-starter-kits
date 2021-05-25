@@ -1,31 +1,28 @@
+import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
 import { DataGrid, GridCellParams, GridColDef, GridRowsProp } from '@material-ui/data-grid';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import EditIcon from '@material-ui/icons/Edit';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import ColorCell from 'components/common/GridData/ColorCell';
 import SizeCell from 'components/common/GridData/SizeCell';
-import * as React from 'react';
-import { ProductVariantType } from 'domain/product/types';
-import { useSelector, useDispatch } from 'react-redux';
-import { mSelector } from 'src/selectors/selector';
+import { ProductVariantType, ProductType } from 'domain/product/types';
 import { useSnackbar } from 'notistack';
-import { api } from 'configs/axiosConfig';
-import { AxiosError } from 'axios';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import Typography from '@material-ui/core/Typography';
-import DialogActions from '@material-ui/core/DialogActions';
-import Button from '@material-ui/core/Button';
+import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
-import { productActions } from 'reducers/slices/domain/product';
-import AdminProductVariantFormDrawer from '../AdminProductVariantDrawer';
+import { deleteSingleProductVariantActionCreator, fetchSingleProductActionCreator } from 'reducers/slices/domain/product';
+import { mSelector } from 'src/selectors/selector';
 import AdminProductVariantFormDialog from '../AdminProductVariantFormDialog';
 
 declare type AdminProductVariantGridViewPropsType = {
@@ -48,17 +45,18 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const generateRows: (domains: ProductVariantType[]) => GridRowsProp = (domains) => {
+const generateRows: (domains: ProductVariantType[], product: ProductType) => GridRowsProp = (domains, product) => {
 
   return domains.map((domain: ProductVariantType) => {
     return {
       id: domain.variantId,
       size: domain.productSize.productSizeName,
       color: domain.variantColor,
-      unitPrice: domain.variantUnitPrice,
+      unitPrice: domain.variantUnitPrice ? domain.variantUnitPrice : product.productBaseUnitPrice,
       stock: domain.variantStock,
       discount: domain.isDiscount,
       soldCount: domain.soldCount,
+      weight: domain.variantWeight,
       actions: domain.variantId,
     }
   });
@@ -66,27 +64,28 @@ const generateRows: (domains: ProductVariantType[]) => GridRowsProp = (domains) 
 
 const generateColumns: (onEdit: React.EventHandler<React.MouseEvent<HTMLButtonElement>>, onDelete: React.EventHandler<React.MouseEvent<HTMLButtonElement>>) => GridColDef[] = (onEdit, onDelete) => {
   return [
-    { field: 'id', headerName: 'ID', width: 150 },
+    { field: 'id', headerName: 'ID', width: 80 },
     {
       field: 'size',
       headerName: 'Size',
-      width: 150,
+      width: 100,
       renderCell: (params: GridCellParams) => (<SizeCell value={params.value as string} />)
     },
     {
       field: 'color',
       headerName: 'Color',
-      width: 150,
+      width: 100,
       renderCell: (params: GridCellParams) => (<ColorCell value={params.value as string} />)
     },
-    { field: 'unitPrice', headerName: 'Unit Price', width: 150 },
-    { field: 'stock', headerName: 'Stock #', width: 150 },
-    { field: 'discount', headerName: 'Discount', width: 150 },
-    { field: 'soldCount', headerName: 'Sold #', width: 150 },
+    { field: 'unitPrice', headerName: 'Unit Price', width: 100 },
+    { field: 'stock', headerName: 'Stock #', width: 100 },
+    { field: 'discount', headerName: 'Discount', width: 100 },
+    { field: 'soldCount', headerName: 'Sold #', width: 100 },
+    { field: 'weight', headerName: 'Weight', width: 100 },
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 150,
+      width: 100,
       renderCell: (params: GridCellParams) => (
         <React.Fragment>
           <IconButton data-variant-id={params.value} onClick={onEdit}>
@@ -127,6 +126,19 @@ const AdminProductVariantGridView: React.FunctionComponent<AdminProductVariantGr
 
   // cur selected product item
   const curProduct = useSelector(mSelector.makeProductVariantByProductIdSelector(targetProductId));
+
+  // if the product is not in redux store, we need to fetch from the backend.
+  React.useEffect(() => {
+    if (!curProduct) {
+      dispatch(
+        fetchSingleProductActionCreator({ productId: targetProductId })
+      )
+    }
+  }, [
+
+    ])
+
+
   const [curProductVariant, setProductVariant] = React.useState<ProductVariantType>(null);
 
   /**
@@ -154,21 +166,12 @@ const AdminProductVariantGridView: React.FunctionComponent<AdminProductVariantGr
   const handleDeletionOk: React.EventHandler<React.MouseEvent<HTMLElement>> = (e) => {
 
     // request
-    api.request({
-      method: 'DELETE',
-      url: API1_URL + `/products/${targetProductId}/variants/${curProductVariant.variantId}`
-    }).then((data) => {
-
-      // remove the variant from redux store
-      dispatch(productActions.deleteVariant({
+    dispatch(
+      deleteSingleProductVariantActionCreator({
         productId: targetProductId,
         variantId: curProductVariant.variantId,
-      }))
-
-      enqueueSnackbar("deleted successfully.", { variant: "success" })
-    }).catch((error: AxiosError) => {
-      enqueueSnackbar(error.message, { variant: "error" })
-    })
+      }) 
+    )
   }
 
   // grid event handler stuff
@@ -194,6 +197,10 @@ const AdminProductVariantGridView: React.FunctionComponent<AdminProductVariantGr
     setProductVariant(targetProduct);
   }
 
+  if (!curProduct) {
+    return (<p>Fetching Data...</p>)
+  }
+
 
   return (
     <Card className={classes.root}>
@@ -204,7 +211,7 @@ const AdminProductVariantGridView: React.FunctionComponent<AdminProductVariantGr
         subheaderTypographyProps={{
           variant: 'body1'
         }}
-        title="List"
+        title="Product Variant List"
         action={
           <IconButton aria-label="add" onClick={handleNewProductVariantFormToggleBtnClickEvent}>
             <AddCircleIcon />
@@ -216,16 +223,16 @@ const AdminProductVariantGridView: React.FunctionComponent<AdminProductVariantGr
       >
         <DataGrid
           autoHeight
-          rows={generateRows(curProduct.variants)}
+          rows={generateRows(curProduct.variants, curProduct)}
           columns={generateColumns(handleEditClick, handleDeleteClick)}
         />
       </CardContent>
       <CardActions disableSpacing>
       </CardActions>
       {/** create/update varaints **/}
-      <AdminProductVariantFormDialog 
-        curFormOpen={props.curFormOpen} 
-        setFormOpen={props.setFormOpen} 
+      <AdminProductVariantFormDialog
+        curFormOpen={props.curFormOpen}
+        setFormOpen={props.setFormOpen}
         curProductVariant={curProductVariant}
       />
       {/** onDelete confiramtion dialog **/}

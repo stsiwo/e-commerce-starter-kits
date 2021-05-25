@@ -1,7 +1,7 @@
 import { deleteCartItemActionTypeName, deleteSingleCartItemActionTypeName, fetchCartItemActionTypeName, postCartItemActionTypeName, putCartItemActionTypeName } from 'reducers/slices/domain/cartItem';
 import { deleteSingleCategoryActionTypeName, fetchCategoryActionTypeName, fetchCategoryWithCacheActionTypeName, postCategoryActionTypeName, putCategoryActionTypeName } from 'reducers/slices/domain/category';
 import { fetchOrderActionTypeName, fetchSingleOrderActionTypeName, postOrderActionTypeName, putOrderActionTypeName } from 'reducers/slices/domain/order';
-import { deleteSingleProductActionTypeName, fetchProductActionTypeName, fetchProductWithCacheActionTypeName, fetchSingleProductActionTypeName, postProductActionTypeName, putProductActionTypeName } from 'reducers/slices/domain/product';
+import { deleteSingleProductActionTypeName, fetchProductActionTypeName, fetchProductWithCacheActionTypeName, fetchSingleProductActionTypeName, postProductActionTypeName, putProductActionTypeName, postProductVariantActionTypeName, putProductVariantActionTypeName, deleteSingleProductVariantActionTypeName } from 'reducers/slices/domain/product';
 import { deleteSingleUserActionTypeName, fetchSingleUserActionTypeName, fetchUserActionTypeName, putUserActionTypeName, postUserAvatarImageActionTypeName, deleteUserAvatarImageActionTypeName } from 'reducers/slices/domain/user';
 import { deleteSingleWishlistItemActionTypeName, deleteWishlistItemActionTypeName, fetchWishlistItemActionTypeName, postWishlistItemActionTypeName, patchWishlistItemActionTypeName } from 'reducers/slices/domain/wishlistItem';
 import { requestStripeClientSecretActionTypeName } from 'reducers/slices/sensitive';
@@ -53,6 +53,9 @@ import { putAuthAddressWorker } from 'sideEffects/workers/auth/putAuthAddressWor
 import { patchAuthAddressWorker } from 'sideEffects/workers/auth/patchAuthAddressWorker';
 import { deleteAuthAddressWorker } from 'sideEffects/workers/auth/deleteAuthAddressWorker';
 import { putAuthCompanyWorker } from 'sideEffects/workers/auth/putAuthCompanyWorker';
+import { postProductVariantWorker } from 'sideEffects/workers/product/postProductVariantWorker';
+import { putProductVariantWorker } from 'sideEffects/workers/product/putProductVariantWorker';
+import { deleteSingleProductVariantWorker } from 'sideEffects/workers/product/deleteSingleProductVariantWorker';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -274,6 +277,27 @@ export function* deleteSingleProductWatcher() {
   yield takeLatest(
     deleteSingleProductActionTypeName,
     deleteSingleProductWorker,
+  )
+}
+
+export function* postProductVariantWatcher() {
+  yield takeLatest(
+    postProductVariantActionTypeName,
+    postProductVariantWorker,
+  )
+}
+
+export function* putProductVariantWatcher() {
+  yield takeLatest(
+    putProductVariantActionTypeName,
+    putProductVariantWorker,
+  )
+}
+
+export function* deleteSingleProductVariantWatcher() {
+  yield takeLatest(
+    deleteSingleProductVariantActionTypeName,
+    deleteSingleProductVariantWorker,
   )
 }
 

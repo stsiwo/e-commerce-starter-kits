@@ -15,14 +15,12 @@ import { DataGrid, GridCellParams, GridColDef, GridPageChangeParams, GridRowsPro
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import EditIcon from '@material-ui/icons/Edit';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
-import { AxiosError } from 'axios';
-import { api } from 'configs/axiosConfig';
 import { ProductType } from 'domain/product/types';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link as RRLink } from "react-router-dom";
-import { fetchProductActionCreator, productPaginationPageActions, deleteSingleProductActionCreator } from 'reducers/slices/domain/product';
+import { deleteSingleProductActionCreator, fetchProductActionCreator, productPaginationPageActions } from 'reducers/slices/domain/product';
 import { mSelector } from 'src/selectors/selector';
 import AdminProductFormDialog from '../AdminProductFormDialog';
 import AdminProductSearchController from '../ADminProductSearchController';

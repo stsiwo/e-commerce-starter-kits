@@ -17,9 +17,11 @@ import * as React from 'react';
 import { ChromePicker, ColorResult } from 'react-color';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
-import { productActions } from 'reducers/slices/domain/product';
+import { productActions, postProductVariantActionCreator, putProductVariantActionCreator } from 'reducers/slices/domain/product';
 import { mSelector } from 'src/selectors/selector';
 import { testProductVariantSizeObj } from 'tests/data/product';
+import Box from '@material-ui/core/Box';
+import Typography from '@material-ui/core/Typography';
 
 interface AdminProductVariantFormPropsType {
   productVariant: ProductVariantType
@@ -33,6 +35,14 @@ const useStyles = makeStyles((theme: Theme) =>
     subtitle: {
       margin: theme.spacing(1, 0),
       fontWeight: theme.typography.fontWeightBold
+    },
+    noteMsg: {
+      color: theme.palette.secondary.main,
+      fontSize: theme.typography.caption.fontSize,
+    },
+    smallCheckBox: {
+      verticalAlign: "bottom",
+      marginLeft: 0,
     },
     txtFieldBase: {
       width: "80%",
@@ -56,6 +66,7 @@ const useStyles = makeStyles((theme: Theme) =>
     productSizeInput: {
       maxWidth: 200,
       minWidth: 200,
+      marginRight: theme.spacing(3),
     },
     productCategoryInput: {
       maxWidth: 200,
@@ -129,13 +140,46 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
     defaultValidationDomain: defaultProductVariantValidationData,
   })
 
+  // unit price disable stuff
+  const [curUnitPriceDisable, setUnitPriceDisable] = React.useState<boolean>(false);
+
+  const handleUnitPriceDisable: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    const nextProductVariantUnitPriceDisable: boolean = e.currentTarget.checked
+    setUnitPriceDisable(nextProductVariantUnitPriceDisable)
+    if (nextProductVariantUnitPriceDisable) {
+      setProductVariantState((prev: ProductVariantDataType) => ({
+        ...prev,
+        variantUnitPrice: null,
+      }))
+    } else {
+      setProductVariantState((prev: ProductVariantDataType) => ({
+        ...prev,
+        variantUnitPrice: 1,
+      }))
+    }
+  }
+
   // test product variant size list
   // #TODO: replace with real one when you are ready
   const testProductVariantSizeList = Object.values(testProductVariantSizeObj)
 
   // event handlers
+  const handleProductVariantUnitPriceInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    const nextVariantUnitPrice = e.currentTarget.value
+    // must not be null
+    updateValidationAt("variantUnitPrice", e.currentTarget.value);
+    setProductVariantState((prev: ProductVariantDataType) => ({
+      ...prev,
+      variantUnitPrice: parseInt(nextVariantUnitPrice)
+    }));
+  }
+
+  // event handlers
   const handleProductVariantSizeInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextVariantSize = testProductVariantSizeList.find((size: ProductVariantSizeType) => e.currentTarget.value === size.productSizeId)
+    /**
+     * DON'T user 'e.currentTarget' for select
+     **/
+    const nextVariantSize = testProductVariantSizeList.find((size: ProductVariantSizeType) => e.target.value === size.productSizeId)
     // must not be null
     updateValidationAt("productSize", e.currentTarget.value);
     setProductVariantState((prev: ProductVariantDataType) => ({
@@ -160,6 +204,46 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
       variantStock: parseInt(nextVariantStock)
+    }));
+  }
+
+  const handleProductVariantWeightInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    const nextVariantWeight = e.currentTarget.value
+    // must not be null
+    updateValidationAt("variantWeight", e.currentTarget.value);
+    setProductVariantState((prev: ProductVariantDataType) => ({
+      ...prev,
+      variantWeight: parseInt(nextVariantWeight)
+    }));
+  }
+
+  const handleProductVariantLengthInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    const nextVariantLength = e.currentTarget.value
+    // must not be null
+    updateValidationAt("variantLength", e.currentTarget.value);
+    setProductVariantState((prev: ProductVariantDataType) => ({
+      ...prev,
+      variantLength: parseInt(nextVariantLength)
+    }));
+  }
+
+  const handleProductVariantWidthInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    const nextVariantWidth = e.currentTarget.value
+    // must not be null
+    updateValidationAt("variantWidth", e.currentTarget.value);
+    setProductVariantState((prev: ProductVariantDataType) => ({
+      ...prev,
+      variantWidth: parseInt(nextVariantWidth)
+    }));
+  }
+
+  const handleProductVariantHeightInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    const nextVariantHeight = e.currentTarget.value
+    // must not be null
+    updateValidationAt("variantHeight", e.currentTarget.value);
+    setProductVariantState((prev: ProductVariantDataType) => ({
+      ...prev,
+      variantHeight: parseInt(nextVariantHeight)
     }));
   }
 
@@ -216,40 +300,22 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
         if (isNew) {
           console.log("new product creation")
           // request
-          api.request({
-            method: 'POST',
-            url: API1_URL + `/products/${targetProductId}/variants`,
-            data: curProductVariantState,
-          }).then((data) => {
-
-            const newVariant = data.data;
-
-            // add this new one to redux store
-            dispatch(productActions.appendVariant(newVariant))
-
-            enqueueSnackbar("updated successfully.", { variant: "success" })
-          }).catch((error: AxiosError) => {
-            enqueueSnackbar(error.message, { variant: "error" })
-          })
+          dispatch(
+            postProductVariantActionCreator({
+              ...curProductVariantState,
+              productId: targetProductId,
+            }) 
+          )
 
         } else {
           console.log("new product creation")
           // request
-          api.request({
-            method: 'PUT',
-            url: API1_URL + `/products/${targetProductId}/variants/${curProductVariantState.variantId}`,
-            data: curProductVariantState,
-          }).then((data) => {
-
-            const updatedVariant = data.data;
-
-            // fetch again
-            dispatch(productActions.updateVariant(updatedVariant))
-
-            enqueueSnackbar("updated successfully.", { variant: "success" })
-          }).catch((error: AxiosError) => {
-            enqueueSnackbar(error.message, { variant: "error" })
-          })
+          dispatch(
+            putProductVariantActionCreator({
+              ...curProductVariantState,
+              productId: targetProductId,
+            }) 
+          )
         }
       } else {
         console.log("failed")
@@ -260,6 +326,36 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
 
   return (
     <form className={classes.form} noValidate autoComplete="off">
+      <TextField
+        id="variant-unit-price"
+        label="Unit Price"
+        type="number"
+        className={`${classes.txtFieldBase} ${classes.productPriceInput}`}
+        value={curProductVariantState.variantUnitPrice}
+        onChange={handleProductVariantUnitPriceInputChangeEvent}
+        helperText={curProductVariantValidationState.variantUnitPrice}
+        error={curProductVariantValidationState.variantUnitPrice !== ""}
+        disabled={curUnitPriceDisable}
+        InputProps={{
+          startAdornment: <InputAdornment position="start">$</InputAdornment>,
+        }}
+      />
+      <FormControlLabel
+        className={classes.smallCheckBox}
+        control={
+          <Checkbox
+            checked={curUnitPriceDisable}
+            onChange={handleUnitPriceDisable}
+            name="checkedB"
+            color="primary"
+          />
+        }
+        label={
+          <Typography variant="subtitle2" component="span" color="textSecondary">
+            {"Same as Product Base?"}
+          </Typography>
+        }
+      /><br />
       <FormLabel>
         {"Variant Color"}
       </FormLabel>
@@ -269,7 +365,7 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
       />
       <TextField
         id="product-variant-size"
-        label="Variant Size"
+        label="Size"
         className={`${classes.txtFieldBase} ${classes.productSizeInput}`}
         select
         value={curProductVariantState.productSize ? curProductVariantState.productSize.productSizeId : "1"}
@@ -285,13 +381,65 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
       </TextField><br />
       <TextField
         id="product-variant-stock"
-        label="Product Variant Stock"
+        label="Stock"
         type="number"
         className={`${classes.txtFieldBase} ${classes.productSizeInput}`}
         value={curProductVariantState.variantStock}
         onChange={handleProductVariantStockInputChangeEvent}
         helperText={curProductVariantValidationState.variantStock}
         error={curProductVariantValidationState.variantStock !== ""}
+      /><br />
+      <TextField
+        id="product-variant-weight"
+        label="Weight"
+        type="number"
+        className={`${classes.txtFieldBase} ${classes.productSizeInput}`}
+        value={curProductVariantState.variantWeight}
+        onChange={handleProductVariantWeightInputChangeEvent}
+        helperText={curProductVariantValidationState.variantWeight}
+        error={curProductVariantValidationState.variantWeight !== ""}
+        InputProps={{
+          endAdornment: <InputAdornment position="end">Kg</InputAdornment>,
+        }}
+      />
+      <TextField
+        id="product-variant-length"
+        label="Length"
+        type="number"
+        className={`${classes.txtFieldBase} ${classes.productSizeInput}`}
+        value={curProductVariantState.variantLength}
+        onChange={handleProductVariantLengthInputChangeEvent}
+        helperText={curProductVariantValidationState.variantLength}
+        error={curProductVariantValidationState.variantLength !== ""}
+        InputProps={{
+          endAdornment: <InputAdornment position="end">Cm</InputAdornment>,
+        }}
+      />
+      <TextField
+        id="product-variant-width"
+        label="Width"
+        type="number"
+        className={`${classes.txtFieldBase} ${classes.productSizeInput}`}
+        value={curProductVariantState.variantWidth}
+        onChange={handleProductVariantWidthInputChangeEvent}
+        helperText={curProductVariantValidationState.variantWidth}
+        error={curProductVariantValidationState.variantWidth !== ""}
+        InputProps={{
+          endAdornment: <InputAdornment position="end">Cm</InputAdornment>,
+        }}
+      />
+      <TextField
+        id="product-variant-height"
+        label="Height"
+        type="number"
+        className={`${classes.txtFieldBase} ${classes.productSizeInput}`}
+        value={curProductVariantState.variantHeight}
+        onChange={handleProductVariantHeightInputChangeEvent}
+        helperText={curProductVariantValidationState.variantHeight}
+        error={curProductVariantValidationState.variantHeight !== ""}
+        InputProps={{
+          endAdornment: <InputAdornment position="end">Cm</InputAdornment>,
+        }}
       /><br />
       <FormControlLabel
         control={
@@ -306,7 +454,7 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
       /><br />
       <TextField
         id="product-variant-discount-price"
-        label="Product Variant Discount Price"
+        label="Discount Price"
         type="number"
         className={`${classes.txtFieldBase} ${classes.productPriceInput}`}
         value={curProductVariantState.variantDiscountPrice}
@@ -322,7 +470,7 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
         <KeyboardDatePicker
           margin="normal"
           id="product-variant-discount-start-date"
-          label="Variant Discount Start Date"
+          label="Discount Start Date"
           format="MM/dd/yyyy"
           value={curProductVariantState.variantDiscountStartDate}
           onChange={handleProductVariantDiscountStartDateChange}
@@ -335,7 +483,7 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
         <KeyboardDatePicker
           margin="normal"
           id="product-variant-discount-end-date"
-          label="Variant Discount End Date"
+          label="Discount End Date"
           format="MM/dd/yyyy"
           value={curProductVariantState.variantDiscountEndDate}
           onChange={handleProductVariantDiscountEndDateChange}

@@ -1,5 +1,5 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { NormalizedProductType, ProductSortEnum, ProductType, ProductVariantType, ProductCriteria } from "domain/product/types";
+import { NormalizedProductType, ProductSortEnum, ProductType, ProductVariantType, ProductCriteria, ProductVariantCriteria } from "domain/product/types";
 import merge from "lodash/merge";
 
 /**
@@ -22,7 +22,8 @@ export const fetchProductActionCreator = createAction("saga/domain/product/fetch
 export const fetchProductActionTypeName = fetchProductActionCreator().type
 
 // for GET by Id request
-export const fetchSingleProductActionCreator = createAction<{ productId: string }>("saga/domain/product/fetchSingle")
+export declare type FetchSingleProductActionType = { productId: string } 
+export const fetchSingleProductActionCreator = createAction<FetchSingleProductActionType>("saga/domain/product/fetchSingle")
 export const fetchSingleProductActionTypeName = fetchSingleProductActionCreator().type
 
 // for POST (add a new cart item) request
@@ -43,6 +44,21 @@ export const deleteSingleProductActionTypeName = deleteSingleProductActionCreato
 // for DELETE (delete all of cart items) request
 export const deleteProductActionCreator = createAction<ProductType>("saga/domain/product/delete")
 export const deleteProductActionTypeName = deleteProductActionCreator().type
+
+// for POST (add a new cart item) request
+export declare type PostProductVariantActionType = ProductVariantCriteria & { productId: string }
+export const postProductVariantActionCreator = createAction<PostProductVariantActionType>("saga/domain/product/variant/post")
+export const postProductVariantActionTypeName = postProductVariantActionCreator().type
+
+// for PUT (replace) request
+export declare type PutProductVariantActionType = ProductVariantCriteria & { productId: string }
+export const putProductVariantActionCreator = createAction<PutProductVariantActionType>("saga/domain/product/variant/put")
+export const putProductVariantActionTypeName = putProductVariantActionCreator().type
+
+// for DELETE (delete single cart item) request
+export declare type DeleteSingleProductVariantActionType = { variantId: string, productId: string } 
+export const deleteSingleProductVariantActionCreator = createAction<DeleteSingleProductVariantActionType>("saga/domain/product/variant/deleteSingle")
+export const deleteSingleProductVariantActionTypeName = deleteSingleProductVariantActionCreator().type
 
 /**
  *

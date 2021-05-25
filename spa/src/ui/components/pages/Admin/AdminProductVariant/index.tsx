@@ -1,9 +1,7 @@
-import * as React from 'react';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import * as React from 'react';
 import AdminProductVariantGridView from './AdminProductVariantGridView';
-import AdminProductVariantFormDrawer from './AdminProductVariantDrawer';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -42,9 +40,6 @@ const AdminProductVariant: React.FunctionComponent<{}> = (props) => {
 
   return (
     <Box component="div" className={classes.box}>
-      <Typography variant="body2" component="p" align="left" className={classes.title} >
-        {"Product Variants"}
-      </Typography>
       <AdminProductVariantGridView 
         curFormOpen={curFormOpen} 
         setFormOpen={setFormOpen} 

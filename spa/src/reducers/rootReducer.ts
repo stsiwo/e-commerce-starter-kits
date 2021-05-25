@@ -4,7 +4,7 @@ import { deleteAuthAvatarImageFetchStatusSliceReducer, getSingleAuthFetchStatusS
 import { deleteCartItemFetchStatusSliceReducer, deleteSingleCartItemFetchStatusSliceReducer, getCartItemFetchStatusSliceReducer, postCartItemFetchStatusSliceReducer, putCartItemFetchStatusSliceReducer } from './slices/app/fetchStatus/cartItem';
 import { deleteSingleCategoryFetchStatusSliceReducer, getCategoryFetchStatusSliceReducer, postCategoryFetchStatusSliceReducer, putCategoryFetchStatusSliceReducer } from './slices/app/fetchStatus/category';
 import { deleteSingleOrderFetchStatusSliceReducer, getOrderFetchStatusSliceReducer, getSingleOrderFetchStatusSliceReducer, postOrderFetchStatusSliceReducer, putOrderFetchStatusSliceReducer } from './slices/app/fetchStatus/order';
-import { deleteSingleProductFetchStatusSliceReducer, getProductFetchStatusSliceReducer, getSingleProductFetchStatusSliceReducer, postProductFetchStatusSliceReducer, putProductFetchStatusSliceReducer } from './slices/app/fetchStatus/product';
+import { deleteSingleProductFetchStatusSliceReducer, getProductFetchStatusSliceReducer, getSingleProductFetchStatusSliceReducer, postProductFetchStatusSliceReducer, putProductFetchStatusSliceReducer, postProductVariantFetchStatusSliceReducer, putProductVariantFetchStatusSliceReducer, deleteSingleProductVariantFetchStatusSliceReducer } from './slices/app/fetchStatus/product';
 import { getReviewFetchStatusSliceReducer } from './slices/app/fetchStatus/review';
 import { stripeClientSecretFetchStatusSliceReducer } from './slices/app/fetchStatus/stripeClientSecret';
 import { deleteSingleUserFetchStatusSliceReducer, deleteUserAvatarImageFetchStatusSliceReducer, getSingleUserFetchStatusSliceReducer, getUserFetchStatusSliceReducer, patchUserFetchStatusSliceReducer, postUserAvatarImageFetchStatusSliceReducer, postUserFetchStatusSliceReducer, putUserFetchStatusSliceReducer } from './slices/app/fetchStatus/user';
@@ -47,6 +47,9 @@ export const rootReducer = combineReducers({
         post: postProductFetchStatusSliceReducer,
         put: putProductFetchStatusSliceReducer,
         deleteSingle: deleteSingleProductFetchStatusSliceReducer,
+        postVariant: postProductVariantFetchStatusSliceReducer,
+        putVariant: putProductVariantFetchStatusSliceReducer,
+        deleteSingleVariant: deleteSingleProductVariantFetchStatusSliceReducer,
       }),
       orders: combineReducers({
         get: getOrderFetchStatusSliceReducer,

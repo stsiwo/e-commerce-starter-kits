@@ -4,11 +4,13 @@ import { api } from "configs/axiosConfig";
 import { NormalizedProductType } from "domain/product/types";
 import { normalize } from "normalizr";
 import { getProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
-import { productActions } from "reducers/slices/domain/product";
+import { productActions, FetchSingleProductActionType } from "reducers/slices/domain/product";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
+import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { productSchemaArray } from "states/state";
+import { productSchemaArray, productSchemaEntity } from "states/state";
+import { messageActions } from "reducers/slices/app";
+import { getNanoId } from "src/utils";
 
 /**
  * a worker (generator)    
@@ -32,7 +34,7 @@ import { productSchemaArray } from "states/state";
  *        a2. receive the response and save it to redux store
  *  
  **/
-export function* fetchSingleProductWorker(action: PayloadAction<{ productId: string }>) {
+export function* fetchSingleProductWorker(action: PayloadAction<FetchSingleProductActionType>) {
 
   /**
    * get cur user type
@@ -73,14 +75,15 @@ export function* fetchSingleProductWorker(action: PayloadAction<{ productId: str
        *
        *  - TODO: make sure response structure with remote api
        **/
-      const normalizedData = normalize(response.data.data, productSchemaArray)
+      const normalizedData = normalize(response.data, productSchemaEntity)
 
       /**
        * update product domain in state
        *
        **/
       yield put(
-        productActions.merge(normalizedData.entities as NormalizedProductType)
+        // be careful when normalized a single object, you need to append its domain name (plural) to 'entities'
+        productActions.merge(normalizedData.entities.products as NormalizedProductType)
       )
 
       /**
@@ -88,6 +91,17 @@ export function* fetchSingleProductWorker(action: PayloadAction<{ productId: str
        **/
       yield put(
         getProductFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+      )
+
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.SUCCESS,
+          message: "fetched successfully.",
+        }) 
       )
 
     } catch (error) {
@@ -99,6 +113,17 @@ export function* fetchSingleProductWorker(action: PayloadAction<{ productId: str
        **/
       yield put(
         getProductFetchStatusActions.update(FetchStatusEnum.FAILED)
+      )
+
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.ERROR,
+          message: error.message, 
+        }) 
       )
     }
   } else {
