@@ -3,7 +3,7 @@ import { AuthType, RequestTrackerType, FetchStatusEnum, MessageTypeEnum, Message
 import { CartItemType } from "domain/cart/types";
 import { WishlistItemType, WishlistItemSortEnum } from "domain/wishlist/types";
 import { UserType } from "domain/user/types";
-import { OrderType } from "domain/order/types";
+import { OrderType, OrderSortEnum } from "domain/order/types";
 import { ReviewType } from "domain/review/type";
 
 //import { NormalizedBlogType } from "domain/blog";
@@ -41,6 +41,9 @@ export declare type AppStateType = {
       post: FetchStatusEnum
       put: FetchStatusEnum
       deleteSingle: FetchStatusEnum
+      postEvent: FetchStatusEnum
+      deleteSingleEvent: FetchStatusEnum
+      putEvent: FetchStatusEnum
     },
     users: {
       get: FetchStatusEnum
@@ -131,6 +134,13 @@ export declare type DomainStateType = {
   },
   orders: {
     data: OrderType[] // don't need to normalized 
+    query: {
+      searchQuery: string,
+      orderStatus: string,
+      startDate: Date,
+      endDate: Date,
+      sort: OrderSortEnum,
+    },
     pagination: DomainPaginationType,
   },
   reviews: {  

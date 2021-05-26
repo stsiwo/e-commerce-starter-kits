@@ -18,13 +18,11 @@ import TimelineDot from '@material-ui/lab/TimelineDot';
 import TimelineItem from '@material-ui/lab/TimelineItem';
 import TimelineOppositeContent from '@material-ui/lab/TimelineOppositeContent';
 import TimelineSeparator from '@material-ui/lab/TimelineSeparator';
-import { AxiosError } from 'axios';
-import { api } from 'configs/axiosConfig';
-import { OrderEventType, orderStatusBagList } from 'domain/order/types';
+import { OrderEventType, orderStatusBagList, OrderType } from 'domain/order/types';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
-import { orderActions } from 'reducers/slices/domain/order';
+import { deleteSingleOrderEventActionCreator } from 'reducers/slices/domain/order';
 import { toDateString } from 'src/utils';
 import OrderEventUpdateFormDialog from '../OrderEventUpdateFormDialog';
 
@@ -44,25 +42,34 @@ import OrderEventUpdateFormDialog from '../OrderEventUpdateFormDialog';
  **/
 
 interface OrderTimelinePropsType {
-  orderEvents: OrderEventType[]
-  orderId: string
+  order: OrderType
 }
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    root: {
+      margin: `${theme.spacing(1)}px auto`,
+      maxWidth: 700,
+    },
     paper: {
       padding: '6px 16px',
     },
     secondaryTail: {
       backgroundColor: theme.palette.secondary.main,
     },
+    btnBox: {
+      textAlign: "center",
+    },
+    addBtn: {
+      margin: theme.spacing(1),
+    }
   }),
 );
 
 /**
  * member or admin account management component
  **/
-const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({ orderEvents, orderId }) => {
+const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({ order }) => {
 
   // mui: makeStyles
   const classes = useStyles();
@@ -83,11 +90,14 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({ orderE
   const [curDeleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(false)
 
   // event handlers to order event 
-  const handleEditClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+  const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>, orderEventId: string) => {
 
-    const orderEventId = e.currentTarget.getAttribute("data-orderEvent-id")
+    console.log("selected order event id: " + orderEventId)
 
-    const targetOrderEvent = orderEvents.find((orderEvent: OrderEventType) => orderEvent.orderEventId == orderEventId)
+    const targetOrderEvent = order.orderEvents.find((orderEvent: OrderEventType) => orderEvent.orderEventId == orderEventId)
+
+    console.log("selected order event:")
+    console.log(targetOrderEvent)
 
     setOrderEvent(targetOrderEvent);
 
@@ -95,12 +105,9 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({ orderE
 
   }
 
-  const handleDeleteClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+  const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>, orderEventId: string) => {
     setDeleteDialogOpen(true);
-
-    const orderEventId = e.currentTarget.getAttribute("data-orderEvent-id")
-
-    const targetOrderEvent = orderEvents.find((orderEvent: OrderEventType) => orderEvent.orderEventId == orderEventId)
+    const targetOrderEvent = order.orderEvents.find((orderEvent: OrderEventType) => orderEvent.orderEventId == orderEventId)
 
     setOrderEvent(targetOrderEvent);
   }
@@ -116,33 +123,30 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({ orderE
    * deletion confirm dialog event handlers
    **/
   const handleDeletionCancel: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    setFormOpen(false);
+    setDeleteDialogOpen(false);
   }
 
   const handleDeletionOk: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
     /**
      * DELETE request
      **/
-    // request
-    api.request({
-      method: 'DELETE',
-      url: API1_URL + `/orders/${orderId}/events/${curOrderEvent.orderEventId}`
-    }).then((data) => {
-
-      // remove the order event from redux store 
-      dispatch(orderActions.deleteEvent({
-        orderId: orderId,
-        eventId: curOrderEvent.orderEventId
-      }))
-
-      enqueueSnackbar("deleted successfully.", { variant: "success" })
-    }).catch((error: AxiosError) => {
-      enqueueSnackbar(error.message, { variant: "error" })
-    })
+    dispatch(
+      deleteSingleOrderEventActionCreator({
+        orderEventId: curOrderEvent.orderEventId,
+        orderId: order.orderId,
+      }) 
+    )
   }
 
-  const renderTimelineContent: (orderEvent: OrderEventType) => React.ReactNode = (orderEvent) => {
+  // handle add new order event
+  const handleAddNewClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setOrderEvent(null)
+    setFormOpen(true);
+  }
 
+  const renderTimelineContent: (orderEvent: OrderEventType, latestOrderEvent: OrderEventType) => React.ReactNode = (orderEvent, latestOrderEvent) => {
+
+    
     const OrderStatusIcon = orderStatusBagList[orderEvent.orderStatus].icon
     const orderStatusObj = orderStatusBagList[orderEvent.orderStatus]
 
@@ -172,13 +176,16 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({ orderE
             <Typography variant="body2" component="p" color="textSecondary">
               {orderStatusObj.defaultNote}
             </Typography>
+            <Typography variant="body2" component="p" color="textSecondary">
+              {orderEvent.note}
+            </Typography>
             <Divider />
             <Box>
-              <IconButton data-order-event-id={orderEvent.orderId} onClick={handleEditClick}>
+              <IconButton onClick={(e) => handleEditClick(e, orderEvent.orderEventId)}>
                 <EditIcon />
               </IconButton>
-              {(orderEvent.undoable &&
-                <IconButton data-order-event-id={orderEvent.orderId} onClick={handleDeleteClick}>
+              {(orderEvent.undoable && orderEvent.orderEventId === latestOrderEvent.orderEventId && 
+                <IconButton onClick={(e) => handleDeleteClick(e, orderEvent.orderEventId)}>
                   <RemoveCircleIcon />
                 </IconButton>
               )}
@@ -190,23 +197,31 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({ orderE
   }
 
   const renderTimeline: () => React.ReactNode = () => {
-    return orderEvents.map((orderEvent: OrderEventType, index: number) => {
-      return renderTimelineContent(orderEvent)
+    return order.orderEvents.map((orderEvent: OrderEventType, index: number) => {
+      return renderTimelineContent(orderEvent, order.latestOrderEvent)
     })
   }
 
   return (
     <React.Fragment>
-      <Timeline align="alternate">
+      <Timeline align="alternate" className={classes.root}>
         {renderTimeline()}
+        <Box className={classes.btnBox}>
+          <Button 
+            className={classes.addBtn} 
+            disabled={!order.nextAdminOrderEventOptions || order.nextAdminOrderEventOptions.length === 0} 
+            onClick={(e) => handleAddNewClick(e)}
+          >
+            {"Add New Order Event"}
+          </Button>
+        </Box>
       </Timeline>
       {/** update form dialog **/}
       <OrderEventUpdateFormDialog
         onClose={handleFormCloseClick}
         open={curFormOpen}
         orderEvent={curOrderEvent}
-        orderEvents={orderEvents}
-        orderId={orderId}
+        order={order}
       />
       {/** onDelete confiramtion dialog **/}
       <Dialog

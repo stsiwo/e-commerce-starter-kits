@@ -4,6 +4,7 @@ import { OrderType } from 'domain/order/types';
 import * as React from 'react';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
+import InputAdornment from '@material-ui/core/InputAdornment';
 
 interface AdminOrderDetailPropsType {
   order: OrderType
@@ -38,28 +39,39 @@ const AdminOrderDetail: React.FunctionComponent<AdminOrderDetailPropsType> = ({ 
           label="Order #"
           className={`${classes.textField}`}
           value={order.orderNumber}
-          disabled
+          inputProps={{
+            readOnly: true,
+          }}
         />
         <TextField
           id="order-product-cost"
           label="Product Cost"
           className={`${classes.textField}`}
           value={order.productCost}
-          disabled
+          inputProps={{
+            readOnly: true,
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+          }}
         />
         <TextField
           id="order-tax-cost"
           label="Tax Cost"
           className={`${classes.textField}`}
           value={order.taxCost}
-          disabled
+          inputProps={{
+            readOnly: true,
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+          }}
         />
         <TextField
           id="order-total-cost"
           label="Total Cost"
           className={`${classes.textField}`}
           value={order.taxCost + order.productCost}
-          disabled
+          inputProps={{
+            readOnly: true,
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+          }}
         />
       </Box>
     </React.Fragment>

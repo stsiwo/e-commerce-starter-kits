@@ -2,18 +2,22 @@ import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import IconButton from '@material-ui/core/IconButton';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { DataGrid, GridCellParams, GridColDef, GridRowsProp } from '@material-ui/data-grid';
+import Typography from '@material-ui/core/Typography';
+import { DataGrid, GridCellParams, GridColDef, GridPageChangeParams, GridRowsProp } from '@material-ui/data-grid';
 import EditIcon from '@material-ui/icons/Edit';
-import Pagination from '@material-ui/lab/Pagination/Pagination';
+import { getCurOrderStatus } from 'domain/order';
 import { OrderType } from 'domain/order/types';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchOrderActionCreator, orderPaginationPageActions } from 'reducers/slices/domain/order';
-import { mSelector } from 'src/selectors/selector';
+import { FetchStatusEnum } from 'src/app';
+import { mSelector, rsSelector } from 'src/selectors/selector';
 import AdminOrderFormDrawer from '../AdminOrderFormDrawer';
+import AdminOrderSearchController from '../AdminOrderSearchController';
 
 declare type AdminOrderGridViewPropsType = {
 }
@@ -22,6 +26,7 @@ declare type AdminOrderGridViewPropsType = {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
+      paddingBottom: theme.spacing(4),
     },
     media: {
     },
@@ -37,11 +42,10 @@ const useStyles = makeStyles((theme: Theme) =>
 const generateRows: (domains: OrderType[]) => GridRowsProp = (domains) => {
   return domains.map((domain: OrderType) => {
     return {
-      id: domain.orderId,
-      number: domain.orderNumber,
+      id: domain.orderNumber,
       date: domain.createdAt,
       cost: domain.productCost, // TODO: implement this at the backend 
-      status: domain.orderEvents[domain.orderEvents.length - 1].orderStatus,
+      status: getCurOrderStatus(domain), //domain.orderEvents[domain.orderEvents.length - 1].orderStatus,
       actions: domain.orderId,
     }
   })
@@ -50,7 +54,6 @@ const generateRows: (domains: OrderType[]) => GridRowsProp = (domains) => {
 const generateColumns: (onEdit: React.EventHandler<React.MouseEvent<HTMLButtonElement>>) => GridColDef[] = (onEdit) => {
   return [
     { field: 'id', headerName: 'ID', width: 150 },
-    { field: 'number', headerName: '#', width: 150 },
     { field: 'date', headerName: 'Order Date', width: 150 },
     { field: 'cost', headerName: 'Cost', width: 150 },
     { field: 'status', headerName: 'Status', width: 150 },
@@ -83,22 +86,31 @@ const AdminOrderGridView: React.FunctionComponent<AdminOrderGridViewPropsType> =
 
   const dispatch = useDispatch()
 
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
-
   // domain cur item
-  const curOrderList = useSelector(mSelector.makeOrderSelector())
+  const curOrderList = useSelector(mSelector.makeOrderSelector());
+
+  /**
+   * WARN: don't create duplicated data like 'curOrder' as state.
+   *
+   * breaking the rule of 'a single source of truth'. when you need to refer to data, always go to redux store. !!!
+   *
+   **/
 
   // cur selected order item
-  const [curOrder, setOrder] = React.useState<OrderType>(null);
+  const [curOrderId, setOrderId] = React.useState<string>(null);
 
   const pagination = useSelector(mSelector.makeProductPaginationSelector())
+
+  const curQueryString = useSelector(mSelector.makeOrderQuerySelector())
+
+  // fetch order fetching result
+  const curFetchOrderStatus = useSelector(mSelector.makeFetchOrderFetchStatusSelector())
 
   // fetch order
   React.useEffect(() => {
     dispatch(fetchOrderActionCreator())
   }, [
+    JSON.stringify(curQueryString),
     pagination.page 
   ])
 
@@ -108,27 +120,31 @@ const AdminOrderGridView: React.FunctionComponent<AdminOrderGridViewPropsType> =
   const handleEditClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
 
     const orderId = e.currentTarget.getAttribute("data-order-id")
-
-    const targetOrder = curOrderList.find((order: OrderType) => order.orderId == orderId)
-
-    setOrder(targetOrder);
-
+    setOrderId(orderId);
     setFormOpen(true);
   }
 
   // pagination event handler
   
-  /**
-   * TODO: make sure pagiantion working when you have more data.
-   *
-   **/
-  const handlePaginationChange = (event: React.ChangeEvent<unknown>, value: number) => {
-
+  const handlePageChange = (param: GridPageChangeParams) => {
     // need to decrement since we incremented when display
-    const nextPage = value - 1;
+    const nextPage = param.page;
 
     dispatch(orderPaginationPageActions.update(nextPage))
-  };
+  }
+
+  // fetch result
+  if (curFetchOrderStatus === FetchStatusEnum.FETCHING) {
+    return <CircularProgress />
+  } else if (curFetchOrderStatus === FetchStatusEnum.FAILED) {
+    return (
+      <Typography variant="body1" component="h2" >
+        {"failed to fetch data... please try again..."}
+      </Typography>
+    )
+  }
+
+
   return (
     <Card className={classes.root}>
       <CardHeader
@@ -143,21 +159,14 @@ const AdminOrderGridView: React.FunctionComponent<AdminOrderGridViewPropsType> =
       <CardContent
         className={classes.cardContentBox}
       >
+        <AdminOrderSearchController />
         <DataGrid
-          autoHeight
           rows={generateRows(curOrderList)}
           columns={generateColumns(handleEditClick)}
+          page={pagination.page} // don't forget to increment when display
           pageSize={pagination.limit}
-          rowCount={pagination.limit}
-        />
-        <Pagination
-          page={pagination.page + 1} // don't forget to increment when display
-          count={pagination.totalPages}
-          color="primary"
-          showFirstButton
-          showLastButton
-          size={"medium"}
-          onChange={handlePaginationChange}
+          rowCount={pagination.totalElements}
+          onPageChange={handlePageChange}
         />
       </CardContent>
       <CardActions disableSpacing>
@@ -165,7 +174,7 @@ const AdminOrderGridView: React.FunctionComponent<AdminOrderGridViewPropsType> =
       <AdminOrderFormDrawer
         curFormOpen={curFormOpen}
         setFormOpen={setFormOpen}
-        order={curOrder}
+        order={curOrderList.find((order: OrderType) => order.orderId === curOrderId)}
       />
     </Card>
   )

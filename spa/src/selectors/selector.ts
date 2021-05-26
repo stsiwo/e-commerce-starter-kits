@@ -7,6 +7,7 @@ import { denormalize } from "normalizr";
 import { categorySchemaArray, productSchemaArray } from "states/state";
 import { StateType } from "states/types";
 import { WishlistItemType } from "domain/wishlist/types";
+import { OrderType } from "domain/order/types";
 
 export const rsSelector = {
   /**
@@ -36,6 +37,8 @@ export const rsSelector = {
     getMessage: (state: StateType) => state.app.message,
     getSearchKeyword: (state: StateType) => state.app.searchKeyword,
     getRequestTracker: (state: StateType) => state.app.requestTracker,
+
+    getFetchOrderFetchStatus: (state: StateType) => state.app.fetchStatus.orders.get,
   },
 
   domain: {
@@ -65,6 +68,11 @@ export const rsSelector = {
 
     getOrder: (state: StateType) => state.domain.orders.data,
     getOrderPagination: (state: StateType) => state.domain.orders.pagination,
+    getOrderQuerySearchQuery: (state: StateType) => state.domain.orders.query.searchQuery,
+    getOrderQueryOrderStatus: (state: StateType) => state.domain.orders.query.orderStatus,
+    getOrderQueryStartDate: (state: StateType) => state.domain.orders.query.startDate,
+    getOrderQueryEndDate: (state: StateType) => state.domain.orders.query.endDate,
+    getOrderQuerySort: (state: StateType) => state.domain.orders.query.sort,
 
     getProduct: (state: StateType) => state.domain.products.data,
     getProductQuery: (state: StateType) => state.domain.products.query,
@@ -318,6 +326,18 @@ export const mSelector = {
       ],
       (requestTracker) => {
         return requestTracker
+      },
+    )
+  },
+
+  // app.fetchStatus.orders.get
+  makeFetchOrderFetchStatusSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getFetchOrderFetchStatus
+      ],
+      (fetchStatus) => {
+        return fetchStatus
       },
     )
   },
@@ -736,12 +756,23 @@ export const mSelector = {
       ],
       (order) => {
 
-        /**
-         * TODO: Pagination & Sort & Filter
-         **/
+        console.log("makeOrderSelector is called...")
+        console.log(order)
 
-        // this is array of cart item
         return order
+      },
+    )
+  },
+
+  // domain.orders.data
+  makeOrderByIdSelector: (orderId: string) => {
+    return createSelector(
+      [
+        rsSelector.domain.getOrder
+      ],
+      (orders) => {
+
+        return orders.find((order: OrderType) => order.orderId === orderId);
       },
     )
   },
@@ -763,11 +794,103 @@ export const mSelector = {
   makeOrderQueryStringSelector: () => {
     return createSelector(
       [
+        rsSelector.domain.getOrderQuerySearchQuery,
+        rsSelector.domain.getOrderQueryOrderStatus,
+        rsSelector.domain.getOrderQueryStartDate,
+        rsSelector.domain.getOrderQueryEndDate,
+        rsSelector.domain.getOrderQuerySort,
         rsSelector.domain.getOrderPagination
       ],
-      (pagination) => {
+      (searchQuery, orderStatus, startDate, endDate, sort, pagination) => {
         // react state should be immutable so put empty object first
-        return merge({}, { page: pagination.page, limit: pagination.limit })
+        return merge({}, { 
+          searchQuery: searchQuery,
+          orderStatus: orderStatus,
+          startDate: startDate,
+          endDate: endDate,
+          sort: sort,
+          page: pagination.page, 
+          limit: pagination.limit 
+        })
+      },
+    )
+  },
+
+  // domain.orders.query
+  makeOrderQuerySelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getOrderQuerySearchQuery,
+        rsSelector.domain.getOrderQueryOrderStatus,
+        rsSelector.domain.getOrderQueryStartDate,
+        rsSelector.domain.getOrderQueryEndDate,
+        rsSelector.domain.getOrderQuerySort,
+
+      ],
+      (searchQuery, orderStatus, startDate, endDate, sort) => {
+
+        return {
+          searchQuery: searchQuery,
+          orderStatus: orderStatus,
+          startDate: startDate,
+          endDate: endDate,
+          sort: sort,
+        }
+      },
+    )
+  },
+
+  makeOrderQuerySearchQuerySelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getOrderQuerySearchQuery
+      ],
+      (searchQuery) => {
+        return searchQuery
+      },
+    )
+  },
+
+  makeOrderQueryOrderStatusSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getOrderQueryOrderStatus
+      ],
+      (orderStatus) => {
+        return orderStatus
+      },
+    )
+  },
+
+  makeOrderQueryStartDateSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getOrderQueryStartDate
+      ],
+      (startDate) => {
+        return startDate
+      },
+    )
+  },
+
+  makeOrderQueryEndDateSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getOrderQueryEndDate
+      ],
+      (endDate) => {
+        return endDate
+      },
+    )
+  },
+
+  makeOrderQuerySortSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getOrderQuerySort
+      ],
+      (sort) => {
+        return sort
       },
     )
   },

@@ -5,6 +5,7 @@ import { normalize, schema } from 'normalizr';
 import { ProductSortEnum } from "domain/product/types";
 import { getNanoId } from "src/utils";
 import { WishlistItemSortEnum } from "domain/wishlist/types";
+import { OrderSortEnum } from "domain/order/types";
 
 /**
  *
@@ -102,6 +103,9 @@ export const initialState: StateType = {
         post: FetchStatusEnum.INITIAL,
         put: FetchStatusEnum.INITIAL,
         deleteSingle: FetchStatusEnum.INITIAL,
+        postEvent: FetchStatusEnum.INITIAL,
+        deleteSingleEvent: FetchStatusEnum.INITIAL,
+        putEvent: FetchStatusEnum.INITIAL,
       },
       users: {
         get: FetchStatusEnum.INITIAL,
@@ -194,6 +198,13 @@ export const initialState: StateType = {
     },
     orders: {
       data: [],
+      query: {
+        searchQuery: "",
+        orderStatus: null,
+        startDate: null,
+        endDate: null,
+        sort: OrderSortEnum.DATE_DESC,
+      },
       pagination: {
         page: 0, // start from 0 (not 1)
         limit: 10,

@@ -1,6 +1,6 @@
 import { deleteCartItemActionTypeName, deleteSingleCartItemActionTypeName, fetchCartItemActionTypeName, postCartItemActionTypeName, putCartItemActionTypeName } from 'reducers/slices/domain/cartItem';
 import { deleteSingleCategoryActionTypeName, fetchCategoryActionTypeName, fetchCategoryWithCacheActionTypeName, postCategoryActionTypeName, putCategoryActionTypeName } from 'reducers/slices/domain/category';
-import { fetchOrderActionTypeName, fetchSingleOrderActionTypeName, postOrderActionTypeName, putOrderActionTypeName } from 'reducers/slices/domain/order';
+import { fetchOrderActionTypeName, fetchSingleOrderActionTypeName, postOrderActionTypeName, putOrderActionTypeName, postOrderEventActionTypeName, putOrderEventActionTypeName, deleteSingleOrderEventActionTypeName } from 'reducers/slices/domain/order';
 import { deleteSingleProductActionTypeName, fetchProductActionTypeName, fetchProductWithCacheActionTypeName, fetchSingleProductActionTypeName, postProductActionTypeName, putProductActionTypeName, postProductVariantActionTypeName, putProductVariantActionTypeName, deleteSingleProductVariantActionTypeName } from 'reducers/slices/domain/product';
 import { deleteSingleUserActionTypeName, fetchSingleUserActionTypeName, fetchUserActionTypeName, putUserActionTypeName, postUserAvatarImageActionTypeName, deleteUserAvatarImageActionTypeName } from 'reducers/slices/domain/user';
 import { deleteSingleWishlistItemActionTypeName, deleteWishlistItemActionTypeName, fetchWishlistItemActionTypeName, postWishlistItemActionTypeName, patchWishlistItemActionTypeName } from 'reducers/slices/domain/wishlistItem';
@@ -56,6 +56,9 @@ import { putAuthCompanyWorker } from 'sideEffects/workers/auth/putAuthCompanyWor
 import { postProductVariantWorker } from 'sideEffects/workers/product/postProductVariantWorker';
 import { putProductVariantWorker } from 'sideEffects/workers/product/putProductVariantWorker';
 import { deleteSingleProductVariantWorker } from 'sideEffects/workers/product/deleteSingleProductVariantWorker';
+import { postOrderEventWorker } from 'sideEffects/workers/order/postOrderEventWorker';
+import { putOrderEventWorker } from 'sideEffects/workers/order/putOrderEventWorker';
+import { deleteSingleOrderEventWorker } from 'sideEffects/workers/order/deleteSingleOrderEventWorker';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -241,6 +244,27 @@ export function* putOrderWatcher() {
   yield takeLatest(
     putOrderActionTypeName,
     putOrderWorker,
+  )
+}
+
+export function* postOrderEventWatcher() {
+  yield takeLatest(
+    postOrderEventActionTypeName,
+    postOrderEventWorker,
+  )
+}
+
+export function* putOrderEventWatcher() {
+  yield takeLatest(
+    putOrderEventActionTypeName,
+    putOrderEventWorker,
+  )
+}
+
+export function* deleteSingleOrderEventWatcher() {
+  yield takeLatest(
+    deleteSingleOrderEventActionTypeName,
+    deleteSingleOrderEventWorker,
   )
 }
 

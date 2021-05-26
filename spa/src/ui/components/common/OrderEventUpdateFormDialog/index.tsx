@@ -6,22 +6,19 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import MenuItem from '@material-ui/core/MenuItem';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { AxiosError } from 'axios';
-import { api } from 'configs/axiosConfig';
-import { defaultOrderEventData, hasNextOrderOptions, OrderEventType, orderStatusBagList, OrderStatusEnum } from 'domain/order/types';
+import { defaultOrderEventData, OrderEventType, orderStatusBagList, OrderStatusEnum, OrderType } from 'domain/order/types';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { orderActions } from 'reducers/slices/domain/order';
+import { postOrderEventActionCreator, putOrderEventActionCreator } from 'reducers/slices/domain/order';
 import { AuthType } from 'src/app';
 import { mSelector } from 'src/selectors/selector';
 
 interface OrderEventUpdateFormDialogPropsType {
   open: boolean
   onClose: React.EventHandler<React.MouseEvent<HTMLButtonElement>>
-  orderEvents: OrderEventType[]
   orderEvent: OrderEventType
-  orderId: string
+  order: OrderType
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -48,20 +45,32 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
   const { enqueueSnackbar } = useSnackbar();
 
   // order bag item
-  const lastOrderEvent = props.orderEvents.length > 0 ? props.orderEvents[props.orderEvents.length - 1] : null
+  const lastOrderEvent = props.order.latestOrderEvent;
   const lastOrderStatusBag = orderStatusBagList[lastOrderEvent.orderStatus]
 
   const dispatch = useDispatch()
 
   // order event form stuff
   const auth: AuthType = useSelector(mSelector.makeAuthSelector())
-  const [curOrderEventState, setOrderEventState] = React.useState<OrderEventType>(props.orderEvent ? props.orderEvent : defaultOrderEventData);
+  const [curOrderEventState, setOrderEventState] = React.useState<OrderEventType>(defaultOrderEventData);
 
   // update/create logic for product
   //  - true: create
   //  - false: update
   // if props.product exists, it updates, otherwise, new
-  const [isNew, setNew] = React.useState<boolean>(props.orderEvent ? false : true);
+  const [isNew, setNew] = React.useState<boolean>(true);
+
+  React.useEffect(() => {
+    if (props.orderEvent) {
+      setNew(false);
+      setOrderEventState(props.orderEvent)
+    } else {
+      setNew(true);
+      setOrderEventState(defaultOrderEventData)
+    }
+  }, [
+    JSON.stringify(props.orderEvent) 
+  ])
 
   /**
    * update btn click event handler
@@ -72,46 +81,29 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
      * skip validation since there is less fields to validate (overkill)
      *
      **/
+
     if (isNew) {
       console.log("new order event creation")
       // request
-      api.request({
-        method: 'POST',
-        url: API1_URL + `/orders/${props.orderId}/events`,
-        data: curOrderEventState,
-      }).then((data) => {
-
-        const newOrderEvent = data.data;
-
-        // append this order event
-        dispatch(orderActions.appendEvent(newOrderEvent))
-
-        enqueueSnackbar("updated successfully.", { variant: "success" })
-      }).catch((error: AxiosError) => {
-        enqueueSnackbar(error.message, { variant: "error" })
-      })
-
+      dispatch(
+        postOrderEventActionCreator({
+          orderStatus: curOrderEventState.orderStatus,
+          orderId: props.order.orderId,
+          note: curOrderEventState.note,
+          userId: auth.user.userId,
+        }) 
+      )
     } else {
       console.log("update order event")
       // request
-      api.request({
-        method: 'PUT',
-        url: API1_URL + `/orders/${props.orderId}/events/${curOrderEventState.orderEventId}`,
-        data: curOrderEventState,
-      }).then((data) => {
-
-        const updatedOrderEvent = data.data;
-
-        // append this order event
-        dispatch(orderActions.updateEvent({
-          orderId: props.orderId,
-          event: updatedOrderEvent,
-        }))
-
-        enqueueSnackbar("updated successfully.", { variant: "success" })
-      }).catch((error: AxiosError) => {
-        enqueueSnackbar(error.message, { variant: "error" })
-      })
+      dispatch(
+        putOrderEventActionCreator({
+          orderEventId: curOrderEventState.orderEventId,
+          orderId: props.order.orderId,
+          note: curOrderEventState.note,
+          userId: auth.user.userId,
+        }) 
+      )
     }
   }
 
@@ -124,24 +116,16 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
   }
 
   const handleOrderStatusInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextOrderStatus = lastOrderStatusBag.nextOptions[auth.userType].find((orderStatus: OrderStatusEnum) => e.currentTarget.value === orderStatus)
+    const nextOrderStatus = e.target.value as OrderStatusEnum; 
     setOrderEventState((prev: OrderEventType) => ({
       ...prev,
       orderStatus: nextOrderStatus
     }));
   }
 
-  const handleCreatedAtChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCreatedAt = e.currentTarget.value
-    setOrderEventState((prev: OrderEventType) => ({
-      ...prev,
-      createdat: nextCreatedAt
-    }));
-  }
-
   return (
     <Dialog open={props.open} onClose={props.onClose} aria-labelledby="order-event-update-dialog">
-      <DialogTitle id="order-event-update-dialog-title">Subscribe</DialogTitle>
+      <DialogTitle id="order-event-update-dialog-title">Order Event Form</DialogTitle>
       <DialogContent>
         <form className={classes.form} noValidate autoComplete="off">
           <TextField
@@ -153,29 +137,17 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
             onChange={handleOrderStatusInputChangeEvent}
             disabled={isNew ? false : true} // if existing order event, you can't edit this
           >
-            {(lastOrderEvent &&
-              hasNextOrderOptions(lastOrderStatusBag, auth.userType) &&
-              lastOrderStatusBag.nextOptions[auth.userType].map((orderStatus: OrderStatusEnum) => (
+            {(!isNew && curOrderEventState && 
+              <MenuItem key={curOrderEventState.orderStatus} value={curOrderEventState.orderStatus}>
+                {curOrderEventState.orderStatus}
+              </MenuItem>
+            )}
+            {(props.order.nextAdminOrderEventOptions.map((orderStatus: OrderStatusEnum) => (
                 <MenuItem key={orderStatus} value={orderStatus}>
                   {orderStatus}
                 </MenuItem>
               )))}
           </TextField>
-          {/** TODO: validation: prevent the admin input past date. **/}
-          {/** https://material-ui.com/components/pickers/ **/}
-          <TextField
-            id="order-event-created-at"
-            label="Date"
-            type="datetime-local"
-            value={curOrderEventState.createdAt}
-            defaultValue={new Date().toString()}
-            className={classes.txtFieldBase}
-            onChange={handleCreatedAtChangeEvent}
-            InputLabelProps={{
-              shrink: true,
-            }}
-            disabled={isNew ? false : true} // if existing order event, you can't edit this
-          />
           <TextField
             id="order-event-note"
             label="Note"

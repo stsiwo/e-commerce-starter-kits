@@ -1,14 +1,17 @@
 import Grid from '@material-ui/core/Grid';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import LocalShippingIcon from '@material-ui/icons/LocalShipping';
+import ReceiptIcon from '@material-ui/icons/Receipt';
 import OrderTimeline from 'components/common/OrderTimeline';
 import ProductHorizontalCard from 'components/common/ProductCard/ProductHorizontalCard';
-import TimelineUpdateForm from 'components/common/TimelineUpdateForm';
 import UserCard from 'components/common/UserCard';
 import { OrderDetailType, OrderType } from 'domain/order/types';
 import * as React from 'react';
-import { generateOrderList } from 'tests/data/order';
+import { UserTypeEnum } from 'src/app';
 import AdminOrderDetail from '../AdminOrderDetail';
+import AddressCard from './AddressCard';
+import PhoneCard from './PhoneCard';
 
 interface AdminOrderFormPropsType {
   order: OrderType
@@ -56,7 +59,6 @@ const AdminOrderForm: React.FunctionComponent<AdminOrderFormPropsType> = (props)
       <Grid
         item
         xs={12}
-        justify="center"
         className={classes.orderDetailBox}
       >
         <Typography variant="subtitle1" component="h6" className={classes.title}>
@@ -67,24 +69,65 @@ const AdminOrderForm: React.FunctionComponent<AdminOrderFormPropsType> = (props)
       <Grid
         item
         xs={12}
-        md={6}
+        md={12}
       >
         <Typography variant="subtitle1" component="h6" className={classes.title}>
           {"Customer"}
         </Typography>
-        <UserCard user={props.order.user} />
+          <UserCard 
+            firstName={props.order.orderFirstName}
+            lastName={props.order.orderLastName}
+            email={props.order.orderEmail}
+            userType={props.order.user ? props.order.user.userType.userType : UserTypeEnum.GUEST}
+            avatarImagePath={props.order.user ? props.order.user.avatarImagePath : null}
+          />
+        <Grid
+          container
+          justify="center"
+        >
+          <Grid
+            item
+            xs={12}
+            md={4}
+
+          >
+            <PhoneCard phone={props.order.orderPhone} />
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            md={4}
+          >
+            <AddressCard
+              address={props.order.shippingAddress}
+              headerIcon={<LocalShippingIcon />}
+              title={"Shipping Address"}
+            />
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            md={4}
+          >
+            <AddressCard
+              address={props.order.billingAddress}
+              headerIcon={<ReceiptIcon />}
+              title={"Billing Address"}
+            />
+          </Grid>
+        </Grid>
       </Grid>
       <Grid
         item
         xs={12}
-        md={6}
+        md={12}
       >
         <Typography variant="subtitle1" component="h6" className={classes.title}>
           {"Products"}
         </Typography>
         {
           props.order.orderDetails.map((orderDetail: OrderDetailType, index: number) => (
-            <ProductHorizontalCard orderDetail={orderDetail} key={index}/>
+            <ProductHorizontalCard orderDetail={orderDetail} key={index} />
           ))
         }
       </Grid>
@@ -95,7 +138,7 @@ const AdminOrderForm: React.FunctionComponent<AdminOrderFormPropsType> = (props)
         <Typography variant="subtitle1" component="h6" className={classes.title}>
           {"Status"}
         </Typography>
-        <OrderTimeline orderEvents={props.order.orderEvents} orderId={props.order.orderId} /> 
+        <OrderTimeline order={props.order} />
       </Grid>
     </Grid>
   )

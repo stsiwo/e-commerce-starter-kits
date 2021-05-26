@@ -1,7 +1,7 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import merge from "lodash/merge";
 import remove from 'lodash/remove';
-import { OrderType, OrderEventType } from "domain/order/types";
+import { OrderType, OrderEventType, OrderSortEnum, OrderEventCriteria } from "domain/order/types";
 
 /**
  * redux-sage actions (side effects)
@@ -33,6 +33,21 @@ export const deleteSingleOrderActionTypeName = deleteSingleOrderActionCreator().
 // for DELETE (delete all of cart items) request
 export const deleteOrderActionCreator = createAction<OrderType>("saga/domain/order/delete")
 export const deleteOrderActionTypeName = deleteOrderActionCreator().type
+
+// for POST (add a new order event) request
+export declare type PostOrderEventActionType = OrderEventCriteria  & { orderId: string }
+export const postOrderEventActionCreator = createAction<PostOrderEventActionType>("saga/domain/order/event/post")
+export const postOrderEventActionTypeName = postOrderEventActionCreator().type
+
+// for PUT (replace a order event) request
+export declare type PutOrderEventActionType = OrderEventCriteria & { orderId: string } 
+export const putOrderEventActionCreator = createAction<PutOrderEventActionType>("saga/domain/order/event/put")
+export const putOrderEventActionTypeName = putOrderEventActionCreator().type
+
+// for DELETE (delete single order event) request
+export declare type DeleteSingleOrderEventActionType = { orderEventId: string, orderId: string } 
+export const deleteSingleOrderEventActionCreator = createAction<DeleteSingleOrderEventActionType>("saga/domain/order/event/deleteSingle")
+export const deleteSingleOrderEventActionTypeName = deleteSingleOrderEventActionCreator().type
 
 /**
  *
@@ -87,40 +102,46 @@ export const orderSlice = createSlice({
     },
 
     appendEvent: (state: OrderType[], action: PayloadAction<{ orderId: string, event: OrderEventType }>) => {
-
       for (let i = 0; i < state.length; i++) {
         if (state[i].orderId == action.payload.orderId) {
           state[i].orderEvents.push(action.payload.event)
         }
       }
+      return state
+    },
 
+    /**
+     * replace the whole order. this is because deleting an order event affects the other properties of the order.
+     **/
+    replace: (state: OrderType[], action: PayloadAction<{ orderId: string, order: OrderType }>) => {
+      for (let i = 0; i < state.length; i++) {
+        if (state[i].orderId == action.payload.orderId) {
+          state[i] = action.payload.order;
+        }
+      }
       return state
     },
 
     deleteEvent: (state: OrderType[], action: PayloadAction<{ orderId: string, eventId: string }>) => {
-
       for (let i = 0; i < state.length; i++) {
         if (state[i].orderId == action.payload.orderId) {
-          state[i].orderEvents = state[i].orderEvents.filter((orderEvent: OrderEventType) => orderEvent.orderId != action.payload.eventId) 
+          state[i].orderEvents = state[i].orderEvents.filter((orderEvent: OrderEventType) => orderEvent.orderEventId != action.payload.eventId) 
         }
       }
-
       return state
     },
 
     updateEvent: (state: OrderType[], action: PayloadAction<{ orderId: string, event: OrderEventType }>) => {
-
       for (let i = 0; i < state.length; i++) {
         if (state[i].orderId == action.payload.orderId) {
           state[i].orderEvents = state[i].orderEvents.map((orderEvent: OrderEventType) => {
-            if (orderEvent.orderId == action.payload.event.orderEventId) {
+            if (orderEvent.orderEventId == action.payload.event.orderEventId) {
               return action.payload.event 
             }
             return orderEvent
           })
         }
       }
-
       return state
     },
 
@@ -286,4 +307,196 @@ export const orderPaginationTotalElementsSlice = createSlice({
 
 export const orderPaginationTotalElementsSliceReducer = orderPaginationTotalElementsSlice.reducer
 export const orderPaginationTotalElementsActions = orderPaginationTotalElementsSlice.actions
+
+
+
+/**
+ *
+ * domain.orders.query.searchQuery state Slice (no side effects)
+ *
+ **/
+// action type             
+export type OrderQuerySearchQueryActionType = PayloadAction<string> 
+
+export const orderQuerySearchQuerySlice = createSlice({ 
+  name: "domain/orders/query/searchQuery", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: OrderQuerySearchQueryActionType) => action.payload,
+    clear: (state: string) => "",
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const orderQuerySearchQuerySliceReducer = orderQuerySearchQuerySlice.reducer
+export const orderQuerySearchQueryActions = orderQuerySearchQuerySlice.actions
+
+
+/**
+ *
+ * domain.orders.query.orderStatus state Slice (no side effects)
+ *
+ **/
+// action type             
+export type OrderQueryOrderStatusActionType = PayloadAction<string> 
+
+export const orderQueryOrderStatusSlice = createSlice({ 
+  name: "domain/orders/query/orderStatus", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: OrderQueryOrderStatusActionType) => action.payload,
+    clear: (state: string) => "",
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const orderQueryOrderStatusSliceReducer = orderQueryOrderStatusSlice.reducer
+export const orderQueryOrderStatusActions = orderQueryOrderStatusSlice.actions
+
+
+/**
+ *
+ * domain.orders.query.startDate state Slice (no side effects)
+ *
+ **/
+// action type             
+export type OrderQueryStartDateActionType = PayloadAction<Date> 
+
+export const orderQueryStartDateSlice = createSlice({ 
+  name: "domain/orders/query/startDate", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: OrderQueryStartDateActionType) => action.payload,
+    clear: (state: string) => null,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const orderQueryStartDateSliceReducer = orderQueryStartDateSlice.reducer
+export const orderQueryStartDateActions = orderQueryStartDateSlice.actions
+
+
+/**
+ *
+ * domain.orders.query.endDate state Slice (no side effects)
+ *
+ **/
+// action type             
+export type OrderQueryEndDateActionType = PayloadAction<Date> 
+
+export const orderQueryEndDateSlice = createSlice({ 
+  name: "domain/orders/query/endDate", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: OrderQueryEndDateActionType) => action.payload,
+    clear: (state: string) => null,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const orderQueryEndDateSliceReducer = orderQueryEndDateSlice.reducer
+export const orderQueryEndDateActions = orderQueryEndDateSlice.actions
+
+
+/**
+ *
+ * domain.orders.query.sort state Slice (no side effects)
+ *
+ **/
+// action type             
+export type OrderQuerySortActionType = PayloadAction<OrderSortEnum> 
+
+export const orderQuerySortSlice = createSlice({ 
+  name: "domain/orders/query/sort", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: OrderQuerySortActionType) => action.payload,
+    clear: (state: string) => OrderSortEnum.DATE_DESC,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const orderQuerySortSliceReducer = orderQuerySortSlice.reducer
+export const orderQuerySortActions = orderQuerySortSlice.actions
+
 

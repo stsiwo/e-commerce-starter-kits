@@ -44,9 +44,6 @@ const AdminOrder: React.FunctionComponent<{}> = (props) => {
 
   return (
     <Box component="div" className={classes.box}>
-      <Typography variant="body2" component="p" align="left" className={classes.title} >
-        {"Orders"}
-      </Typography>
       <AdminOrderGridView />
     </Box>
   )

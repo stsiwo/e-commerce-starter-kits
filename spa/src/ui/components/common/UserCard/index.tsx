@@ -5,17 +5,22 @@ import IconButton from '@material-ui/core/IconButton';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import * as React from 'react';
+import { UserTypeEnum } from 'src/app';
 import SampleSelfImage from 'static/self.jpeg';
-import { UserType } from 'domain/user/types';
 
 interface UserCardPropsType {
-  user: UserType
+  firstName: string
+  lastName: string
+  userType: UserTypeEnum
+  email: string
+  avatarImagePath: string
 }
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      margin: theme.spacing(1)
+      margin: `${theme.spacing(1)}px auto`,
+      maxWidth: 700,
     },
     title: {
       textAlign: "center",
@@ -43,18 +48,22 @@ const useStyles = makeStyles((theme: Theme) =>
 /**
  * member or admin account management component
  **/
-const UserCard: React.FunctionComponent<UserCardPropsType> = ({ user }) => {
+const UserCard: React.FunctionComponent<UserCardPropsType> = (props) => {
 
   // mui: makeStyles
   const classes = useStyles();
+
+  const imagePath = props.avatarImagePath ? API1_URL + props.avatarImagePath : ""
 
   return (
     <Card className={`${classes.card} ${classes.root}`}>
       <CardHeader
         className={classes.cardHeader}
-        avatar={<Avatar alt="" src={SampleSelfImage} />}
-        title={user.firstName + " " + user.lastName}
-        subheader={user.userType}
+        avatar={
+          <Avatar alt="" src={imagePath} />
+        }
+        title={`${props.firstName} ${props.lastName} (${props.userType})`}
+        subheader={props.email}
         action={
           <IconButton aria-label="settings">
             <MoreVertIcon />

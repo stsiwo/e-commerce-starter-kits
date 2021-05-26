@@ -180,72 +180,78 @@ const AdminReviewForm = React.forwardRef<any, AdminReviewFormPropsType>((props, 
         <Typography variant="subtitle1" component="h6" className={classes.title}>
           {"Reviewing Customer"}
         </Typography>
-        <UserCard user={testMemberUser} />
+        <UserCard
+          firstName={testMemberUser.firstName}
+          lastName={testMemberUser.lastName}
+          email={testMemberUser.email}
+          userType={testMemberUser.userType.userType}
+          avatarImagePath={testMemberUser.avatarImagePath}
+        />
       </Grid>
-      <Grid
-        item
-        xs={12}
-        md={6}
-      >
-        <Typography variant="subtitle1" component="h6" className={classes.title}>
-          {"Reviewed Product"}
-        </Typography>
-        <ProductHorizontalCard product={props.review.product} variant={props.review.product.variants[0]} />
+        <Grid
+          item
+          xs={12}
+          md={6}
+        >
+          <Typography variant="subtitle1" component="h6" className={classes.title}>
+            {"Reviewed Product"}
+          </Typography>
+          <ProductHorizontalCard product={props.review.product} variant={props.review.product.variants[0]} />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          className={classes.orderDetailBox}
+        >
+          <Typography variant="subtitle1" component="h6" className={classes.title}>
+            {"Review Form"}
+          </Typography>
+          <form className={classes.form} noValidate autoComplete="off">
+            <Typography component="legend">click/touch stars to rate this product.</Typography>
+            <Rating
+              name="review-point"
+              precision={0.1}
+              value={curReviewState.reviewPoint}
+              onChange={handleReviewPointInputChangeEvent}
+              className={`${classes.txtFieldBase}`}
+              size="large"
+            /><br />
+            <TextField
+              id="review-title"
+              label="Review Title"
+              className={`${classes.txtFieldBase}`}
+              value={curReviewState.reviewTitle}
+              onChange={handleReviewTitleInputChangeEvent}
+              helperText={curReviewValidationState.reviewTitle}
+              error={curReviewValidationState.reviewTitle !== ""}
+            /><br />
+            <TextField
+              id="review-description"
+              label="Review Description"
+              multiline
+              rows={4}
+              className={`${classes.txtFieldBase}`}
+              value={curReviewState.reviewDescription}
+              onChange={handleReviewDescriptionInputChangeEvent}
+              helperText={curReviewValidationState.reviewDescription}
+              error={curReviewValidationState.reviewDescription !== ""}
+            /><br />
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={curReviewState.isVerified}
+                  onChange={handleReviewIsVerifiedInputChangeEvent}
+                  name="review-is-verified" />
+              }
+              className={`${classes.txtFieldBase}`}
+              label="Verified"
+            /><br />
+          </form>
+        </Grid>
       </Grid>
-      <Grid
-        item
-        xs={12}
-        className={classes.orderDetailBox}
-      >
-        <Typography variant="subtitle1" component="h6" className={classes.title}>
-          {"Review Form"}
-        </Typography>
-        <form className={classes.form} noValidate autoComplete="off">
-          <Typography component="legend">click/touch stars to rate this product.</Typography>
-          <Rating
-            name="review-point"
-            precision={0.1}
-            value={curReviewState.reviewPoint}
-            onChange={handleReviewPointInputChangeEvent}
-            className={`${classes.txtFieldBase}`}
-            size="large"
-          /><br />
-          <TextField
-            id="review-title"
-            label="Review Title"
-            className={`${classes.txtFieldBase}`}
-            value={curReviewState.reviewTitle}
-            onChange={handleReviewTitleInputChangeEvent}
-            helperText={curReviewValidationState.reviewTitle}
-            error={curReviewValidationState.reviewTitle !== ""}
-          /><br />
-          <TextField
-            id="review-description"
-            label="Review Description"
-            multiline
-            rows={4}
-            className={`${classes.txtFieldBase}`}
-            value={curReviewState.reviewDescription}
-            onChange={handleReviewDescriptionInputChangeEvent}
-            helperText={curReviewValidationState.reviewDescription}
-            error={curReviewValidationState.reviewDescription !== ""}
-          /><br />
-          <FormControlLabel
-            control={
-              <Switch
-                checked={curReviewState.isVerified}
-                onChange={handleReviewIsVerifiedInputChangeEvent}
-                name="review-is-verified" />
-            }
-            className={`${classes.txtFieldBase}`}
-            label="Verified"
-          /><br />
-        </form>
-      </Grid>
-    </Grid>
-  )
-})
-
-export default AdminReviewForm
-
-
+      )
+    })
+    
+    export default AdminReviewForm
+    
+    

@@ -1,18 +1,14 @@
 import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import * as React from 'react';
-import { useSelector } from 'react-redux';
-import { mSelector } from 'src/selectors/selector';
 import Grid from '@material-ui/core/Grid';
-import PhoneConfirmCard from '../PhoneConfirmCard';
-import { testMemberUser } from 'tests/data/user';
-import AddressConfirmCard from '../AddressConfirmCard';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import ReceiptIcon from '@material-ui/icons/Receipt';
 import { CheckoutStepEnum } from 'components/pages/Checkout';
-import Typography from '@material-ui/core/Typography';
+import * as React from 'react';
+import { useSelector } from 'react-redux';
+import { mSelector } from 'src/selectors/selector';
+import AddressConfirmCard from '../AddressConfirmCard';
+import PhoneConfirmCard from '../PhoneConfirmCard';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

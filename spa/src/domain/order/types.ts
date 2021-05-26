@@ -5,27 +5,57 @@ import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import PaymentIcon from '@material-ui/icons/Payment';
 import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
+import HomeIcon from '@material-ui/icons/Home';
 import AssignmentReturnIcon from '@material-ui/icons/AssignmentReturn';
 import CancelPresentationIcon from '@material-ui/icons/CancelPresentation';
+import TimerOffIcon from '@material-ui/icons/TimerOff';
 import ErrorIcon from '@material-ui/icons/Error';
 import { theme } from "ui/css/theme";
 import { OverridableComponent } from "@material-ui/core/OverridableComponent";
 import { SvgIconTypeMap } from "@material-ui/core/SvgIcon";
-import { UserType } from "domain/user/types";
+import { UserType, UserAddressType } from "domain/user/types";
 
 export enum OrderStatusEnum {
   DRAFT = "DRAFT",
+  SESSION_TIMEOUT = "SESSION_TIMEOUT",
   ORDERED = "ORDERED",
   FAILED_PAYMENT = "FAILED_PAYMENT",
-  PAYMENT_AGAIN = "PAYMENT_AGAIN",
   PAID = "PAID",
-  SHIPPED = "SHIPPED",
-  COMPLETED = "COMPLETED",
-  RECEIVED_RETURN_REQUEST = "RECEIVED_RETURN_REQUEST",
-  RETURNED = "RETURNED",
+  CANCEL_REQUEST = "CANCEL_REQUEST",
   RECEIVED_CANCEL_REQUEST = "RECEIVED_CANCEL_REQUEST",
   CANCELED = "CANCELED",
+  SHIPPED = "SHIPPED",
+  DELIVERED = "DELIVERED",
+  RETURN_REQUEST = "RETURN_REQUEST",
+  RECEIVED_RETURN_REQUEST = "RECEIVED_RETURN_REQUEST",
+  RETURNED = "RETURNED",
   ERROR = "ERROR",
+}
+
+export declare type OrderStatusLabelListType = {
+  [key in OrderStatusEnum]: string
+}
+
+export const orderStatusLabelList: OrderStatusLabelListType = {
+  [OrderStatusEnum.DRAFT]: "Draft",
+  [OrderStatusEnum.ORDERED]: "Ordered",
+  [OrderStatusEnum.FAILED_PAYMENT]: "Failed Payment",
+  [OrderStatusEnum.PAID]: "Paid",
+  [OrderStatusEnum.CANCEL_REQUEST]: "Cancel Request",
+  [OrderStatusEnum.RECEIVED_CANCEL_REQUEST]: "Received Cancel Request",
+  [OrderStatusEnum.CANCELED]: "Canceled",
+  [OrderStatusEnum.SHIPPED]: "Shipped",
+  [OrderStatusEnum.DELIVERED]: "Delivered",
+  [OrderStatusEnum.RETURN_REQUEST]: "Return Request",
+  [OrderStatusEnum.RECEIVED_RETURN_REQUEST]: "Received Return Request",
+  [OrderStatusEnum.RETURNED]: "Returned",
+  [OrderStatusEnum.ERROR]: "Error",
+  [OrderStatusEnum.SESSION_TIMEOUT]: "Session Timeout",
+}
+
+export enum OrderSortEnum {
+  DATE_DESC = "DATE_DESC",
+  DATE_ASC = "DATE_ASC",
 }
 
 export declare type OrderStatusNextOptionType = {
@@ -57,29 +87,6 @@ export const orderStatusBagList: OrderStatusBagListType = {
     defaultNote: "the customer failed payment.",
     icon: PaymentIcon,
     color: theme.palette.error.main,
-    nextOptions: {
-      [UserTypeEnum.ADMIN]: [
-        OrderStatusEnum.ERROR
-      ],
-      [UserTypeEnum.MEMBER]: [
-        OrderStatusEnum.PAYMENT_AGAIN
-      ]
-    }
-  },
-  [OrderStatusEnum.PAYMENT_AGAIN]: {
-    label: "Payment Again",
-    defaultNote: "the customer made payment again",
-    icon: PaymentIcon,
-    color: theme.palette.error.main,
-    nextOptions: {
-      [UserTypeEnum.ADMIN]: [
-        OrderStatusEnum.PAID,
-        OrderStatusEnum.FAILED_PAYMENT,
-      ],
-      [UserTypeEnum.MEMBER]: [
-        OrderStatusEnum.RECEIVED_CANCEL_REQUEST
-      ]
-    }
   },
   [OrderStatusEnum.PAID]: {
     label: "Paid:)",
@@ -92,100 +99,66 @@ export const orderStatusBagList: OrderStatusBagListType = {
     defaultNote: "the order draft submitted.",
     icon: ShoppingCartIcon,
     color: theme.palette.success.main,
-    nextOptions: {
-      [UserTypeEnum.ADMIN]: [
-        OrderStatusEnum.SHIPPED,
-        OrderStatusEnum.ERROR
-      ],
-      [UserTypeEnum.MEMBER]: [
-        OrderStatusEnum.RECEIVED_CANCEL_REQUEST
-      ]
-    }
   },
-  [OrderStatusEnum.RECEIVED_CANCEL_REQUEST]: {
-    label: "Received Cancel Request:(",
+  [OrderStatusEnum.CANCEL_REQUEST]: {
+    label: "Sent Cancel Request:(",
     defaultNote: "the customer submitted cancelation request",
     icon: CancelPresentationIcon,
     color: theme.palette.error.main,
-    nextOptions: {
-      [UserTypeEnum.ADMIN]: [
-        OrderStatusEnum.CANCELED,
-        OrderStatusEnum.ERROR
-      ]
-    }
+  },
+  [OrderStatusEnum.RECEIVED_CANCEL_REQUEST]: {
+    label: "Received Cancel Request:(",
+    defaultNote: "we confirmed cancelation request",
+    icon: CancelPresentationIcon,
+    color: theme.palette.error.main,
   },
   [OrderStatusEnum.CANCELED]: {
     label: "Canceled:)",
     defaultNote: "we canceled the order successfully.",
-    icon: CancelPresentationIcon,
+    icon: AssignmentTurnedInIcon,
     color: theme.palette.success.main,
-    nextOptions: {
-      [UserTypeEnum.ADMIN]: [
-        OrderStatusEnum.COMPLETED,
-        OrderStatusEnum.ERROR
-      ],
-    }
   },
   [OrderStatusEnum.SHIPPED]: {
     label: "Shipped:)",
     defaultNote: "we shipped the products successfully.",
     icon: LocalShippingIcon,
     color: theme.palette.success.main,
-    nextOptions: {
-      [UserTypeEnum.ADMIN]: [
-        OrderStatusEnum.COMPLETED,
-        OrderStatusEnum.ERROR
-      ],
-      [UserTypeEnum.MEMBER]: [
-        OrderStatusEnum.RECEIVED_RETURN_REQUEST
-      ]
-    }
   },
-  [OrderStatusEnum.COMPLETED]: {
-    label: "Completed:)",
-    defaultNote: "we completed the order successfully.",
-    icon: AssignmentTurnedInIcon,
+  [OrderStatusEnum.DELIVERED]: {
+    label: "Delivered:)",
+    defaultNote: "we delivered the package successfully.",
+    icon: HomeIcon,
     color: theme.palette.success.main,
-    nextOptions: {
-      [UserTypeEnum.MEMBER]: [
-        OrderStatusEnum.RECEIVED_RETURN_REQUEST
-      ]
-    }
   },
-  [OrderStatusEnum.RECEIVED_RETURN_REQUEST]: {
-    label: "Received Return Request:)",
+  [OrderStatusEnum.RETURN_REQUEST]: {
+    label: "Sent Return Request:)",
     defaultNote: "the customer submitted return request.",
     icon: AssignmentReturnIcon,
     color: theme.palette.error.main,
-    nextOptions: {
-      [UserTypeEnum.ADMIN]: [
-        OrderStatusEnum.RETURNED,
-        OrderStatusEnum.ERROR
-      ],
-    }
+  },
+  [OrderStatusEnum.RECEIVED_RETURN_REQUEST]: {
+    label: "Received Return Request:)",
+    defaultNote: "we confirmed return request.",
+    icon: AssignmentReturnIcon,
+    color: theme.palette.error.main,
   },
   [OrderStatusEnum.RETURNED]: {
     label: "Returned:)",
-    defaultNote: "we recevied the products successfully.",
-    icon: AssignmentReturnIcon,
+    defaultNote: "we processed the request successfully.",
+    icon: AssignmentTurnedInIcon,
     color: theme.palette.success.main,
-    nextOptions: {
-      [UserTypeEnum.ADMIN]: [
-        OrderStatusEnum.COMPLETED,
-        OrderStatusEnum.ERROR
-      ],
-    }
+  },
+  [OrderStatusEnum.SESSION_TIMEOUT]: {
+    label: "Session Timeout:(",
+    defaultNote: "the customer timeed out his session.",
+    icon: TimerOffIcon,
+    color: theme.palette.error.main,
   },
   [OrderStatusEnum.ERROR]: {
     label: "Error:)",
     defaultNote: "unexpected error happened.",
     icon: ErrorIcon,
     color: theme.palette.error.main,
-    nextOptions: {
-      [UserTypeEnum.ADMIN]: [
-        OrderStatusEnum.COMPLETED
-      ],
-    }
   },
 }
 
@@ -207,7 +180,6 @@ export declare type OrderEventType = {
   orderId: string
   orderStatus: OrderStatusEnum
   undoable: boolean
-  isUndo: boolean
   user: UserType
   note: string
 }
@@ -226,6 +198,12 @@ export declare type OrderType = {
   orderId: string
   user: UserType
   orderNumber: string
+  orderFirstName: string
+  orderLastName: string
+  orderEmail: string
+  orderPhone: string
+  shippingAddress: UserAddressType
+  billingAddress: UserAddressType
   orderEvents: OrderEventType[]
   orderDetails: OrderDetailType[]
   productCost: number
@@ -234,15 +212,26 @@ export declare type OrderType = {
   note: string
   createdAt: Date
   updatedAt: Date
+  nextAdminOrderEventOptions: OrderStatusEnum[],
+  nextMemberOrderEventOptions: OrderStatusEnum[],
+  latestOrderEvent: OrderEventType,
 }
 
 // form & input state
 export const defaultOrderEventData: OrderEventType = {
   createdAt: null,
-  isUndo: false,
   undoable: false,
   user: null,
   orderId: "",
   orderStatus: null,
   note: "",
+}
+
+// criteria
+
+export declare type OrderEventCriteria = {
+  orderEventId?: string
+  orderStatus?: OrderStatusEnum
+  note: string
+  userId: string
 }
