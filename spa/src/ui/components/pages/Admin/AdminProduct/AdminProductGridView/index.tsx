@@ -16,7 +16,6 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import EditIcon from '@material-ui/icons/Edit';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import { ProductType } from 'domain/product/types';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link as RRLink } from "react-router-dom";
@@ -126,14 +125,7 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
   // mui: makeStyles
   const classes = useStyles();
 
-  // auth
-  const auth = useSelector(mSelector.makeAuthSelector())
-
   const dispatch = useDispatch()
-
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
 
   const curProductList = useSelector(mSelector.makeProductWithoutCacheSelector())
 
@@ -148,7 +140,8 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
   React.useEffect(() => {
     dispatch(fetchProductActionCreator())
   }, [
-    JSON.stringify(curQueryString)
+    JSON.stringify(curQueryString),
+    pagination.page
   ])
 
 

@@ -15,7 +15,7 @@ import { reviewSchema } from 'hooks/validation/rules';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchReviewActionCreator } from 'reducers/slices/domain/review';
+import { fetchReviewActionCreator, putReviewActionCreator } from 'reducers/slices/domain/review';
 import { mSelector } from 'src/selectors/selector';
 import { testMemberUser } from 'tests/data/user';
 
@@ -68,13 +68,6 @@ const AdminReviewForm = React.forwardRef<any, AdminReviewFormPropsType>((props, 
   // mui: makeStyles
   const classes = useStyles();
 
-  // auth
-  const auth = useSelector(mSelector.makeAuthSelector())
-
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
-
   const dispatch = useDispatch()
 
   // temp user account state
@@ -119,6 +112,15 @@ const AdminReviewForm = React.forwardRef<any, AdminReviewFormPropsType>((props, 
     }));
   }
 
+  const handleNoteInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    const nextNote = e.currentTarget.value
+    updateValidationAt("note", e.currentTarget.value);
+    setReviewState((prev: ReviewDataType) => ({
+      ...prev,
+      note: nextNote
+    }));
+  }
+
   const handleReviewIsVerifiedInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextReviewIsVerified = e.currentTarget.checked
     updateValidationAt("isVerified", e.currentTarget.checked);
@@ -146,20 +148,19 @@ const AdminReviewForm = React.forwardRef<any, AdminReviewFormPropsType>((props, 
         // pass 
         console.log("passed")
         console.log("update review")
-        // request
-        api.request({
-          method: 'PUT',
-          url: API1_URL + `/reviews/${curReviewState.reviewId}`,
-          data: curReviewState,
-        }).then((data) => {
 
-          // fetch again
-          dispatch(fetchReviewActionCreator())
-
-          enqueueSnackbar("updated successfully.", { variant: "success" })
-        }).catch((error: AxiosError) => {
-          enqueueSnackbar(error.message, { variant: "error" })
-        })
+        dispatch(
+          putReviewActionCreator({
+            reviewId: curReviewState.reviewId,
+            isVerified: curReviewState.isVerified,
+            reviewTitle: curReviewState.reviewTitle,
+            reviewDescription: curReviewState.reviewDescription,
+            note: curReviewState.note,
+            reviewPoint: curReviewState.reviewPoint,
+            productId: curReviewState.product.productId,
+            userId: curReviewState.user.userId,
+          })
+        );
       } else {
         console.log("failed")
         updateAllValidation()
@@ -175,7 +176,6 @@ const AdminReviewForm = React.forwardRef<any, AdminReviewFormPropsType>((props, 
       <Grid
         item
         xs={12}
-        md={6}
       >
         <Typography variant="subtitle1" component="h6" className={classes.title}>
           {"Reviewing Customer"}
@@ -188,70 +188,80 @@ const AdminReviewForm = React.forwardRef<any, AdminReviewFormPropsType>((props, 
           avatarImagePath={testMemberUser.avatarImagePath}
         />
       </Grid>
-        <Grid
-          item
-          xs={12}
-          md={6}
-        >
-          <Typography variant="subtitle1" component="h6" className={classes.title}>
-            {"Reviewed Product"}
-          </Typography>
-          <ProductHorizontalCard product={props.review.product} variant={props.review.product.variants[0]} />
-        </Grid>
-        <Grid
-          item
-          xs={12}
-          className={classes.orderDetailBox}
-        >
-          <Typography variant="subtitle1" component="h6" className={classes.title}>
-            {"Review Form"}
-          </Typography>
-          <form className={classes.form} noValidate autoComplete="off">
-            <Typography component="legend">click/touch stars to rate this product.</Typography>
-            <Rating
-              name="review-point"
-              precision={0.1}
-              value={curReviewState.reviewPoint}
-              onChange={handleReviewPointInputChangeEvent}
-              className={`${classes.txtFieldBase}`}
-              size="large"
-            /><br />
-            <TextField
-              id="review-title"
-              label="Review Title"
-              className={`${classes.txtFieldBase}`}
-              value={curReviewState.reviewTitle}
-              onChange={handleReviewTitleInputChangeEvent}
-              helperText={curReviewValidationState.reviewTitle}
-              error={curReviewValidationState.reviewTitle !== ""}
-            /><br />
-            <TextField
-              id="review-description"
-              label="Review Description"
-              multiline
-              rows={4}
-              className={`${classes.txtFieldBase}`}
-              value={curReviewState.reviewDescription}
-              onChange={handleReviewDescriptionInputChangeEvent}
-              helperText={curReviewValidationState.reviewDescription}
-              error={curReviewValidationState.reviewDescription !== ""}
-            /><br />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={curReviewState.isVerified}
-                  onChange={handleReviewIsVerifiedInputChangeEvent}
-                  name="review-is-verified" />
-              }
-              className={`${classes.txtFieldBase}`}
-              label="Verified"
-            /><br />
-          </form>
-        </Grid>
+      <Grid
+        item
+        xs={12}
+      >
+        <Typography variant="subtitle1" component="h6" className={classes.title}>
+          {"Reviewed Product"}
+        </Typography>
+        <ProductHorizontalCard product={props.review.product} variant={props.review.product.variants[0]} />
       </Grid>
-      )
-    })
-    
-    export default AdminReviewForm
-    
-    
+      <Grid
+        item
+        xs={12}
+        className={classes.orderDetailBox}
+      >
+        <Typography variant="subtitle1" component="h6" className={classes.title}>
+          {"Review Form"}
+        </Typography>
+        <form className={classes.form} noValidate autoComplete="off">
+          <Typography component="legend">click/touch stars to rate this product.</Typography>
+          <Rating
+            name="review-point"
+            precision={0.1}
+            value={curReviewState.reviewPoint}
+            onChange={handleReviewPointInputChangeEvent}
+            className={`${classes.txtFieldBase}`}
+            size="large"
+          /><br />
+          <TextField
+            id="review-title"
+            label="Review Title"
+            className={`${classes.txtFieldBase}`}
+            value={curReviewState.reviewTitle}
+            onChange={handleReviewTitleInputChangeEvent}
+            helperText={curReviewValidationState.reviewTitle}
+            error={curReviewValidationState.reviewTitle !== ""}
+          /><br />
+          <TextField
+            id="review-description"
+            label="Review Description"
+            multiline
+            rows={6}
+            className={`${classes.txtFieldBase}`}
+            value={curReviewState.reviewDescription}
+            onChange={handleReviewDescriptionInputChangeEvent}
+            helperText={curReviewValidationState.reviewDescription}
+            error={curReviewValidationState.reviewDescription !== ""}
+          /><br />
+          <TextField
+            id="review-note"
+            label="Review Note (Only Visible Admin)"
+            multiline
+            rows={6}
+            className={`${classes.txtFieldBase}`}
+            value={curReviewState.note}
+            onChange={handleNoteInputChangeEvent}
+            helperText={curReviewValidationState.note}
+            error={curReviewValidationState.note !== ""}
+          /><br />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={curReviewState.isVerified}
+                onChange={handleReviewIsVerifiedInputChangeEvent}
+                name="review-is-verified" />
+            }
+            className={`${classes.txtFieldBase}`}
+            label="Verified"
+          /><br />
+        </form>
+      </Grid>
+    </Grid>
+  )
+})
+
+export default AdminReviewForm
+
+

@@ -47,3 +47,23 @@ export const defaultReviewValidationData: ReviewValidationDataType = {
   isVerified: "",
   note: ""
 }
+
+// sort
+export enum ReviewSortEnum {
+  DATE_DESC = "DATE_DESC",
+  DATE_ASC = "DATE_ASC",
+  REVIEW_POINT_ASC = "REVIEW_POINT_ASC",
+  REVIEW_POINT_DESC = "REVIEW_POINT_DESC",
+}
+
+// criteria
+export declare type ReviewCriteria = {
+  reviewId?: string
+  userId: string
+  productId: string
+  reviewPoint: number
+  reviewTitle: string
+  reviewDescription: string
+  isVerified: boolean
+  note?: string
+}

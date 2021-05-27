@@ -38,6 +38,7 @@ export const rsSelector = {
     getSearchKeyword: (state: StateType) => state.app.searchKeyword,
     getRequestTracker: (state: StateType) => state.app.requestTracker,
 
+    getFetchReviewFetchStatus: (state: StateType) => state.app.fetchStatus.reviews.get,
     getFetchProductFetchStatus: (state: StateType) => state.app.fetchStatus.products.get,
     getFetchCategoryFetchStatus: (state: StateType) => state.app.fetchStatus.categories.get,
     getFetchOrderFetchStatus: (state: StateType) => state.app.fetchStatus.orders.get,
@@ -50,6 +51,15 @@ export const rsSelector = {
 
     getReview: (state: StateType) => state.domain.reviews.data,
     getReviewPagination: (state: StateType) => state.domain.reviews.pagination,
+    getReviewQuery: (state: StateType) => state.domain.reviews.query,
+    getReviewQuerySearchQuery: (state: StateType) => state.domain.reviews.query.searchQuery,
+    getReviewQueryUserId: (state: StateType) => state.domain.reviews.query.userId,
+    getReviewQueryProductId: (state: StateType) => state.domain.reviews.query.productId,
+    getReviewQueryStartDate: (state: StateType) => state.domain.reviews.query.startDate,
+    getReviewQueryEndDate: (state: StateType) => state.domain.reviews.query.endDate,
+    getReviewQueryIsVerified: (state: StateType) => state.domain.reviews.query.isVerified,
+    getReviewQueryReviewPoint: (state: StateType) => state.domain.reviews.query.reviewPoint,
+    getReviewQuerySort: (state: StateType) => state.domain.reviews.query.sort,
 
     getCartItem: (state: StateType) => state.domain.cartItems,
 
@@ -384,6 +394,18 @@ export const mSelector = {
     )
   },
 
+  // app.fetchStatus.reviews.get
+  makeFetchReviewFetchStatusSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getFetchReviewFetchStatus
+      ],
+      (fetchStatus) => {
+        return fetchStatus
+      },
+    )
+  },
+
   // domain.categories
   makeCategorySelector: () => {
     return createSelector(
@@ -506,15 +528,133 @@ export const mSelector = {
     )
   },
 
+  // domain.reviews.query
+  makeReviewQuerySelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getReviewQuerySearchQuery,
+        rsSelector.domain.getReviewQueryUserId,
+        rsSelector.domain.getReviewQueryProductId,
+        rsSelector.domain.getReviewQueryStartDate,
+        rsSelector.domain.getReviewQueryEndDate,
+        rsSelector.domain.getReviewQueryIsVerified,
+        rsSelector.domain.getReviewQueryReviewPoint,
+        rsSelector.domain.getReviewQuerySort,
+
+      ],
+      (searchQuery, userId, productId, startDate, endDate, isVerified, reviewPoint, sort) => {
+        return {
+          searchQuery: searchQuery,
+          userId: userId,
+          productId: productId,
+          reviewPoint: reviewPoint,
+          isVerified: isVerified,
+          startDate: startDate,
+          endDate: endDate,
+          sort: sort,
+        }
+      },
+    )
+  },
+
+  makeReviewQuerySearchQuerySelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getReviewQuerySearchQuery
+      ],
+      (searchQuery) => {
+        return searchQuery
+      },
+    )
+  },
+
+  makeReviewQueryProductIdSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getReviewQueryProductId
+      ],
+      (productId) => {
+        return productId
+      },
+    )
+  },
+
+  makeReviewQueryUserIdSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getReviewQueryUserId
+      ],
+      (userId) => {
+        return userId
+      },
+    )
+  },
+
+  makeReviewQueryReviewPointSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getReviewQueryReviewPoint
+      ],
+      (reviewPoint) => {
+        return reviewPoint
+      },
+    )
+  },
+
+  makeReviewQueryIsVerifiedSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getReviewQueryIsVerified
+      ],
+      (isDiscount) => {
+        return isDiscount
+      },
+    )
+  },
+
+  makeReviewQueryStartDateSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getReviewQueryStartDate
+      ],
+      (startDate) => {
+        return startDate
+      },
+    )
+  },
+
+  makeReviewQueryEndDateSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getReviewQueryEndDate
+      ],
+      (endDate) => {
+        return endDate
+      },
+    )
+  },
+
+  makeReviewQuerySortSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getReviewQuerySort
+      ],
+      (sort) => {
+        return sort
+      },
+    )
+  },
+
   // domain.reviews query string (query + pagination)
   makeReviewQueryStringSelector: () => {
     return createSelector(
       [
+        rsSelector.domain.getReviewQuery,
         rsSelector.domain.getReviewPagination
       ],
-      (pagination) => {
+      (query, pagination) => {
         // react state should be immutable so put empty object first
-        return merge({}, { page: pagination.page, limit: pagination.limit })
+        return merge({}, query, { page: pagination.page, limit: pagination.limit })
       },
     )
   },

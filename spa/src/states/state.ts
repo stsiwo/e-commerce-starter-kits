@@ -6,6 +6,7 @@ import { ProductSortEnum } from "domain/product/types";
 import { getNanoId } from "src/utils";
 import { WishlistItemSortEnum } from "domain/wishlist/types";
 import { OrderSortEnum } from "domain/order/types";
+import { ReviewSortEnum } from "domain/review/type";
 
 /**
  *
@@ -133,6 +134,9 @@ export const initialState: StateType = {
       },
       reviews: {
         get: FetchStatusEnum.INITIAL,
+        post: FetchStatusEnum.INITIAL,
+        put: FetchStatusEnum.INITIAL,
+        deleteSingle: FetchStatusEnum.INITIAL,
       },
       cartItems: {
         get: FetchStatusEnum.INITIAL,
@@ -233,6 +237,16 @@ export const initialState: StateType = {
         limit: 10,
         totalPages: 1,
         totalElements: 0,
+      },
+      query: {
+        searchQuery: "",
+        reviewPoint: null,
+        isVerified: null,
+        startDate: null,
+        endDate: null,
+        userId: "",
+        productId: "",
+        sort: ReviewSortEnum.DATE_DESC,
       },
     },
     products: {

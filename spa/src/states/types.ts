@@ -4,7 +4,7 @@ import { CartItemType } from "domain/cart/types";
 import { WishlistItemType, WishlistItemSortEnum } from "domain/wishlist/types";
 import { UserType, UserSortEnum } from "domain/user/types";
 import { OrderType, OrderSortEnum } from "domain/order/types";
-import { ReviewType } from "domain/review/type";
+import { ReviewType, ReviewSortEnum } from "domain/review/type";
 
 //import { NormalizedBlogType } from "domain/blog";
 //import { NormalizedCategoryType } from "domain/category";
@@ -71,6 +71,9 @@ export declare type AppStateType = {
     },
     reviews: {
       get: FetchStatusEnum
+      post: FetchStatusEnum
+      put: FetchStatusEnum
+      deleteSingle: FetchStatusEnum
     },
     cartItems: {
       get: FetchStatusEnum
@@ -160,6 +163,16 @@ export declare type DomainStateType = {
   reviews: {  
     data: ReviewType[],
     pagination: DomainPaginationType,
+    query: {
+      searchQuery: string,
+      reviewPoint: number,
+      isVerified: boolean,
+      startDate: Date,
+      endDate: Date,
+      userId: string,
+      productId: string,
+      sort: ReviewSortEnum,
+    },
   },
   products: {
     data: NormalizedProductType 

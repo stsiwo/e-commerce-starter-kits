@@ -67,6 +67,11 @@ import { postUserAddressWorker } from 'sideEffects/workers/user/postUserAddressW
 import { putUserAddressWorker } from 'sideEffects/workers/user/putUserAddressWorker';
 import { patchUserAddressWorker } from 'sideEffects/workers/user/patchUserAddressWorker';
 import { deleteUserAddressWorker } from 'sideEffects/workers/user/deleteUserAddressWorker';
+import { fetchReviewActionTypeName, postReviewActionTypeName, putReviewActionTypeName, deleteSingleReviewActionTypeName } from 'reducers/slices/domain/review';
+import { fetchReviewWorker } from 'sideEffects/workers/review/fetchReviewWorker';
+import { postReviewWorker } from 'sideEffects/workers/review/postReviewWorker';
+import { putReviewWorker } from 'sideEffects/workers/review/putReviewWorker';
+import { deleteSingleReviewWorker } from 'sideEffects/workers/review/deleteSingleReviewWorker';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -79,6 +84,35 @@ export function* leftNavMenuWatcher() {
   yield takeEvery(
     toggleLeftNavMenuActionTypeName,
     leftNavMenuWorkerWorker,
+  )
+}
+
+// review
+export function* fetchReviewWatcher() {
+  yield takeLatest(
+    fetchReviewActionTypeName,
+    fetchReviewWorker,
+  )
+}
+
+export function* postReviewWatcher() {
+  yield takeLatest(
+    postReviewActionTypeName,
+    postReviewWorker,
+  )
+}
+
+export function* putReviewWatcher() {
+  yield takeLatest(
+    putReviewActionTypeName,
+    putReviewWorker,
+  )
+}
+
+export function* deleteSingleReviewWatcher() {
+  yield takeLatest(
+    deleteSingleReviewActionTypeName,
+    deleteSingleReviewWorker,
   )
 }
 

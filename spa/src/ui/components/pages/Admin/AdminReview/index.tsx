@@ -44,9 +44,6 @@ const AdminReview: React.FunctionComponent<{}> = (props) => {
 
   return (
     <Box component="div" className={classes.box}>
-      <Typography variant="subtitle1" component="h4" align="left" className={classes.title} >
-        {"Reviews"}
-      </Typography>
       <AdminReviewGridView />
     </Box>
   )

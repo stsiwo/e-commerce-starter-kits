@@ -78,7 +78,7 @@ export function* fetchReviewWorker(action: PayloadAction<{}>) {
        *
        **/
       yield put(
-        reviewActions.concat(response.data.data)
+        reviewActions.update(response.data.content)
       )
 
       /**
