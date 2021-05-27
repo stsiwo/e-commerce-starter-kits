@@ -10,10 +10,8 @@ import { UserType } from 'domain/user/types';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteAuthAvatarImageActionCreator, postAuthAvatarImageActionCreator } from 'reducers/slices/app';
-import { MessageTypeEnum } from 'src/app';
+import { deleteUserAvatarImageActionCreator, postUserAvatarImageActionCreator } from 'reducers/slices/domain/user';
 import { mSelector } from 'src/selectors/selector';
-import { postUserAvatarImageActionCreator, deleteUserAvatarImageActionCreator } from 'reducers/slices/domain/user';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

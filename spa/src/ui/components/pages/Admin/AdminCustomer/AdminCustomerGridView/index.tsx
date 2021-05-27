@@ -23,6 +23,10 @@ import { fetchUserActionCreator, userPaginationPageActions } from 'reducers/slic
 import { mSelector } from 'src/selectors/selector';
 import AdminCustomerFormDrawer from '../AdminCustomerFormDrawer';
 import AdminUserSearchController from '../AdminCustomerSearchController';
+import Avatar from '@material-ui/core/Avatar';
+import { FetchStatusEnum } from 'src/app';
+import Box from '@material-ui/core/Box';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 declare type AdminCustomerGridViewPropsType = {
@@ -33,6 +37,12 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       paddingBottom: theme.spacing(4),
+    },
+    loadingBox: {
+      height: "80vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
     },
     media: {
     },
@@ -49,9 +59,10 @@ const generateRows: (domains: UserType[]) => GridRowsProp = (domains) => {
   return domains.map((domain: UserType) => {
     return {
       id: domain.userId,
+      avatar: domain.avatarImagePath,
       name: domain.firstName + " " + domain.lastName,
       email: domain.email,
-      type: domain.userType,
+      type: domain.userType.userType,
       status: domain.userType,
       //orders: domain.orders.length,
       //reviews: domain.reviews.length,
@@ -62,7 +73,16 @@ const generateRows: (domains: UserType[]) => GridRowsProp = (domains) => {
 
 const generateColumns: (onEdit: React.EventHandler<React.MouseEvent<HTMLButtonElement>>, onDelete: React.EventHandler<React.MouseEvent<HTMLButtonElement>>) => GridColDef[] = (onEdit, onDelete) => {
   return [
-    { field: 'avatar', headerName: "Avatar", width: 150 },
+    { 
+      field: 'avatar', 
+      headerName: "Avatar", 
+      width: 100,
+      renderCell: (params: GridCellParams) => (
+        <Avatar
+          src={params.value? API1_URL + params.value : null}
+        />
+      ),
+    },
     { field: 'name', headerName: 'Name', width: 150 },
     { field: 'email', headerName: 'Email', width: 150 },
     { field: 'type', headerName: 'Type', width: 150 },
@@ -181,6 +201,24 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
     dispatch(userPaginationPageActions.update(nextPage))
   }
 
+  // fetch result
+  // fetch order fetching result
+  const curFetchCustomerStatus = useSelector(mSelector.makeFetchUserFetchStatusSelector())
+  if (curFetchCustomerStatus === FetchStatusEnum.FETCHING) {
+    return (
+      <Box className={classes.loadingBox}>
+        <CircularProgress />
+      </Box>
+    )
+  } else if (curFetchCustomerStatus === FetchStatusEnum.FAILED) {
+    return (
+      <Box className={classes.loadingBox}>
+        <Typography variant="body1" component="h2" >
+          {"failed to fetch data... please try again..."}
+        </Typography>
+      </Box>
+    )
+  }
 
   return (
     <Card className={classes.root}>

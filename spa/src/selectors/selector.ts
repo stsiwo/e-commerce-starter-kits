@@ -38,7 +38,10 @@ export const rsSelector = {
     getSearchKeyword: (state: StateType) => state.app.searchKeyword,
     getRequestTracker: (state: StateType) => state.app.requestTracker,
 
+    getFetchProductFetchStatus: (state: StateType) => state.app.fetchStatus.products.get,
+    getFetchCategoryFetchStatus: (state: StateType) => state.app.fetchStatus.categories.get,
     getFetchOrderFetchStatus: (state: StateType) => state.app.fetchStatus.orders.get,
+    getFetchUserFetchStatus: (state: StateType) => state.app.fetchStatus.users.get,
   },
 
   domain: {
@@ -333,11 +336,47 @@ export const mSelector = {
     )
   },
 
+  // app.fetchStatus.products.get
+  makeFetchProductFetchStatusSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getFetchProductFetchStatus
+      ],
+      (fetchStatus) => {
+        return fetchStatus
+      },
+    )
+  },
+
+  // app.fetchStatus.categorys.get
+  makeFetchCategoryFetchStatusSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getFetchCategoryFetchStatus
+      ],
+      (fetchStatus) => {
+        return fetchStatus
+      },
+    )
+  },
+
   // app.fetchStatus.orders.get
   makeFetchOrderFetchStatusSelector: () => {
     return createSelector(
       [
         rsSelector.app.getFetchOrderFetchStatus
+      ],
+      (fetchStatus) => {
+        return fetchStatus
+      },
+    )
+  },
+
+  // app.fetchStatus.users.get
+  makeFetchUserFetchStatusSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getFetchUserFetchStatus
       ],
       (fetchStatus) => {
         return fetchStatus

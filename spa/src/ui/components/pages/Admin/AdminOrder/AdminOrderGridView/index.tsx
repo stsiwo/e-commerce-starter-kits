@@ -1,3 +1,4 @@
+import Box from '@material-ui/core/Box';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
@@ -10,12 +11,11 @@ import { DataGrid, GridCellParams, GridColDef, GridPageChangeParams, GridRowsPro
 import EditIcon from '@material-ui/icons/Edit';
 import { getCurOrderStatus } from 'domain/order';
 import { OrderType } from 'domain/order/types';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchOrderActionCreator, orderPaginationPageActions } from 'reducers/slices/domain/order';
 import { FetchStatusEnum } from 'src/app';
-import { mSelector, rsSelector } from 'src/selectors/selector';
+import { mSelector } from 'src/selectors/selector';
 import AdminOrderFormDrawer from '../AdminOrderFormDrawer';
 import AdminOrderSearchController from '../AdminOrderSearchController';
 
@@ -27,6 +27,12 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       paddingBottom: theme.spacing(4),
+    },
+    loadingBox: {
+      height: "80vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
     },
     media: {
     },
@@ -110,9 +116,9 @@ const AdminOrderGridView: React.FunctionComponent<AdminOrderGridViewPropsType> =
   React.useEffect(() => {
     dispatch(fetchOrderActionCreator())
   }, [
-    JSON.stringify(curQueryString),
-    pagination.page 
-  ])
+      JSON.stringify(curQueryString),
+      pagination.page
+    ])
 
   const [curFormOpen, setFormOpen] = React.useState<boolean>(false);
 
@@ -125,7 +131,7 @@ const AdminOrderGridView: React.FunctionComponent<AdminOrderGridViewPropsType> =
   }
 
   // pagination event handler
-  
+
   const handlePageChange = (param: GridPageChangeParams) => {
     // need to decrement since we incremented when display
     const nextPage = param.page;
@@ -135,12 +141,18 @@ const AdminOrderGridView: React.FunctionComponent<AdminOrderGridViewPropsType> =
 
   // fetch result
   if (curFetchOrderStatus === FetchStatusEnum.FETCHING) {
-    return <CircularProgress />
+    return (
+      <Box className={classes.loadingBox}>
+        <CircularProgress />
+      </Box>
+    )
   } else if (curFetchOrderStatus === FetchStatusEnum.FAILED) {
     return (
-      <Typography variant="body1" component="h2" >
-        {"failed to fetch data... please try again..."}
-      </Typography>
+      <Box className={classes.loadingBox}>
+        <Typography variant="body1" component="h2" >
+          {"failed to fetch data... please try again..."}
+        </Typography>
+      </Box>
     )
   }
 

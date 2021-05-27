@@ -14,15 +14,16 @@ import { DataGrid, GridCellParams, GridColDef, GridPageChangeParams, GridRowsPro
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import EditIcon from '@material-ui/icons/Edit';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
-import { AxiosError } from 'axios';
-import { api } from 'configs/axiosConfig';
 import { CategoryType } from 'domain/product/types';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { categoryPaginationPageActions, fetchCategoryActionCreator, deleteSingleCategoryActionCreator } from 'reducers/slices/domain/category';
+import { categoryPaginationPageActions, deleteSingleCategoryActionCreator, fetchCategoryActionCreator } from 'reducers/slices/domain/category';
 import { mSelector } from 'src/selectors/selector';
 import AdminCategoryFormDialog from '../AdminCategoryFormDialog';
+import { FetchStatusEnum } from 'src/app';
+import Box from '@material-ui/core/Box';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 declare type AdminCategoryGridViewPropsType = {
 }
@@ -31,6 +32,12 @@ declare type AdminCategoryGridViewPropsType = {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
+    },
+    loadingBox: {
+      height: "80vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
     },
     media: {
     },
@@ -165,6 +172,24 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
     dispatch(categoryPaginationPageActions.update(nextPage))
   }
 
+  // fetch result
+  // fetch order fetching result
+  const curFetchCategoryStatus = useSelector(mSelector.makeFetchCategoryFetchStatusSelector())
+  if (curFetchCategoryStatus === FetchStatusEnum.FETCHING) {
+    return (
+      <Box className={classes.loadingBox}>
+        <CircularProgress />
+      </Box>
+    )
+  } else if (curFetchCategoryStatus === FetchStatusEnum.FAILED) {
+    return (
+      <Box className={classes.loadingBox}>
+        <Typography variant="body1" component="h2" >
+          {"failed to fetch data... please try again..."}
+        </Typography>
+      </Box>
+    )
+  }
   return (
     <Card className={classes.root}>
       <CardHeader

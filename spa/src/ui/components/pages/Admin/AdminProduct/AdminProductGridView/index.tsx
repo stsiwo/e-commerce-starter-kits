@@ -24,6 +24,9 @@ import { deleteSingleProductActionCreator, fetchProductActionCreator, productPag
 import { mSelector } from 'src/selectors/selector';
 import AdminProductFormDialog from '../AdminProductFormDialog';
 import AdminProductSearchController from '../ADminProductSearchController';
+import { FetchStatusEnum } from 'src/app';
+import Box from '@material-ui/core/Box';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 declare type AdminProductGridViewPropsType = {
 }
@@ -33,6 +36,12 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       paddingBottom: theme.spacing(4),
+    },
+    loadingBox: {
+      height: "80vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
     },
     media: {
     },
@@ -192,6 +201,25 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
     const nextPage = param.page;
 
     dispatch(productPaginationPageActions.update(nextPage))
+  }
+
+  // fetch result
+  // fetch order fetching result
+  const curFetchProductStatus = useSelector(mSelector.makeFetchProductFetchStatusSelector())
+  if (curFetchProductStatus === FetchStatusEnum.FETCHING) {
+    return (
+      <Box className={classes.loadingBox}>
+        <CircularProgress />
+      </Box>
+    )
+  } else if (curFetchProductStatus === FetchStatusEnum.FAILED) {
+    return (
+      <Box className={classes.loadingBox}>
+        <Typography variant="body1" component="h2" >
+          {"failed to fetch data... please try again..."}
+        </Typography>
+      </Box>
+    )
   }
 
 
