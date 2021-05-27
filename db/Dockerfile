@@ -25,5 +25,6 @@ COPY ./integ-test-product-data.sql /docker-entrypoint-initdb.d/d.sql
 COPY ./integ-test-cart-item-data.sql /docker-entrypoint-initdb.d/e.sql
 COPY ./integ-test-wishlist-item-data.sql /docker-entrypoint-initdb.d/f.sql
 COPY ./integ-test-order-data.sql /docker-entrypoint-initdb.d/g.sql
+COPY ./integ-test-review-data.sql /docker-entrypoint-initdb.d/h.sql
 
 
