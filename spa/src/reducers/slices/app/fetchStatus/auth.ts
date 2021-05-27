@@ -67,14 +67,14 @@ export const putAuthFetchStatusSliceReducer = putAuthFetchStatusSlice.reducer
 export const putAuthFetchStatusActions = putAuthFetchStatusSlice.actions
 
 /**
- * app.fetchStatus.auth.put state Slice
+ * app.fetchStatus.auth.post state Slice
  *
  *  - update auth data of the same id
  **/
 export type postAuthPhoneFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const postAuthPhoneFetchStatusSlice = createSlice({
-  name: "app/fetchStatus/auth/phone/put", // a name used in action type
+  name: "app/fetchStatus/auth/phone/post", // a name used in action type
   initialState: {},
   reducers: {
     /**

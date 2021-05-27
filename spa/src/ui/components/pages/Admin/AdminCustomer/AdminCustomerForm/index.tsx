@@ -1,19 +1,13 @@
 import Grid from '@material-ui/core/Grid';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import OrderTimeline from 'components/common/OrderTimeline';
-import ProductHorizontalCard from 'components/common/ProductCard/ProductHorizontalCard';
-import TimelineUpdateForm from 'components/common/TimelineUpdateForm';
-import UserCard from 'components/common/UserCard';
-import { OrderDetailType, OrderType } from 'domain/order/types';
-import * as React from 'react';
-import { generateOrderList } from 'tests/data/order';
-import AdminCustomerDetail from '../AdminCustomerDetail';
-import { testMemberUser } from 'tests/data/user';
-import UserAccountBasicManagement from 'components/common/UserAccountBasicManagement';
-import UserAccountPhoneManagement from 'components/common/UserAccountPhoneManagement';
-import UserAccountAddressManagement from 'components/common/UserAccountAddressManagement';
 import { UserType } from 'domain/user/types';
+import * as React from 'react';
+import AdminCustomerAddressForm from './AdminCustomerAddressForm';
+import AdminCustomerBasicForm from './AdminCustomerBasicForm';
+import AdminCustomerPhoneForm from './AdminCustomerPhoneForm';
+import AdminCustomerAvatarForm from './AdminCustomerAvatarForm';
+import TextField from '@material-ui/core/TextField';
 
 interface AdminCustomerFormPropsType {
   user: UserType
@@ -27,6 +21,14 @@ const useStyles = makeStyles((theme: Theme) =>
     title: {
       textAlign: "center",
       fontWeight: theme.typography.fontWeightBold
+    },
+    formControl: {
+      // need to be 'flex', otherwise, default animation (e.g., when click the input, the placeholder goes up to the left top) collapses.
+      display: "flex",
+      maxWidth: 400,
+      width: "80%",
+      margin: "5px auto",
+
     },
   }),
 );
@@ -67,30 +69,45 @@ const AdminCustomerForm: React.FunctionComponent<AdminCustomerFormPropsType> = (
         xs={12}
         className={classes.orderDetailBox}
       >
-        <Typography variant="subtitle1" component="h6" className={classes.title}>
-          {"Basic"}
-        </Typography>
-        <UserAccountBasicManagement user={props.user}/>
+        <TextField
+          id="customer-id"
+          label="Customer Id"
+          className={classes.formControl}
+          value={props.user.userId}
+          inputProps={{
+            readOnly: true,
+          }}
+        />
+      </Grid>
+      <Grid
+        item
+        xs={12}
+        md={6}
+        className={classes.orderDetailBox}
+      >
+        <AdminCustomerAvatarForm user={props.user}/>
+      </Grid>
+      <Grid
+        item
+        xs={12}
+        md={6}
+        className={classes.orderDetailBox}
+      >
+        <AdminCustomerBasicForm user={props.user}/>
       </Grid>
       <Grid
         item
         xs={12}
         md={6}
       >
-        <Typography variant="subtitle1" component="h6" className={classes.title}>
-          {"Phones"}
-        </Typography>
-        <UserAccountPhoneManagement phones={props.user.phones} />
+        <AdminCustomerPhoneForm phones={props.user.phones} userId={props.user.userId} />
       </Grid>
       <Grid
         item
         xs={12}
         md={6}
       >
-        <Typography variant="subtitle1" component="h6" className={classes.title}>
-          {"Addresses"}
-        </Typography>
-        <UserAccountAddressManagement addresses={props.user.addresses} />
+        <AdminCustomerAddressForm addresses={props.user.addresses}  userId={props.user.userId} />
       </Grid>
     </Grid>
   )

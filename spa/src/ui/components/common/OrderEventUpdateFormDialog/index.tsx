@@ -137,7 +137,7 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
             onChange={handleOrderStatusInputChangeEvent}
             disabled={isNew ? false : true} // if existing order event, you can't edit this
           >
-            {(!isNew && curOrderEventState && 
+            {(!isNew && curOrderEventState &&  // this is to display the order status of existing order event. nothing relating to new order event.
               <MenuItem key={curOrderEventState.orderStatus} value={curOrderEventState.orderStatus}>
                 {curOrderEventState.orderStatus}
               </MenuItem>

@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: 0,
     },
     drawerPaper: {
+      paddingBottom: theme.spacing(2),
     },
     toolbar: theme.mixins.toolbar,
     title: {

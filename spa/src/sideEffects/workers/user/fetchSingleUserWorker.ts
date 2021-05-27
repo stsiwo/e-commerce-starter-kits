@@ -70,7 +70,7 @@ export function* fetchSingleUserWorker(action: PayloadAction<{ userId: string }>
        *
        **/
       yield put(
-        userActions.merge(response.data.data)
+        userActions.concat([response.data])
       )
 
       /**

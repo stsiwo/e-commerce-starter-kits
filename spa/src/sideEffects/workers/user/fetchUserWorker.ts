@@ -79,7 +79,7 @@ export function* fetchUserWorker(action: PayloadAction<{}>) {
        *
        **/
       yield put(
-        userActions.merge(response.data.data)
+        userActions.update(response.data.content)
       )
 
       /**

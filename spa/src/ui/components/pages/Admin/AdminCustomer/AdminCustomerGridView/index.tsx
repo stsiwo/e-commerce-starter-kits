@@ -1,31 +1,28 @@
+import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { DataGrid, GridCellParams, GridColDef, GridRowsProp } from '@material-ui/data-grid';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
+import Typography from '@material-ui/core/Typography';
+import { DataGrid, GridCellParams, GridColDef, GridPageChangeParams, GridRowsProp } from '@material-ui/data-grid';
 import EditIcon from '@material-ui/icons/Edit';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
-import * as React from 'react';
-import AdminCustomerFormDrawer from '../AdminCustomerFormDrawer';
-import Link from '@material-ui/core/Link';
-import { Link as RRLink } from "react-router-dom";
-import { UserType } from 'domain/user/types';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import Typography from '@material-ui/core/Typography';
-import DialogActions from '@material-ui/core/DialogActions';
-import Button from '@material-ui/core/Button';
-import { useSelector, useDispatch } from 'react-redux';
-import { mSelector } from 'src/selectors/selector';
-import { useSnackbar } from 'notistack';
-import { api } from 'configs/axiosConfig';
 import { AxiosError } from 'axios';
+import { api } from 'configs/axiosConfig';
+import { UserType } from 'domain/user/types';
+import { useSnackbar } from 'notistack';
+import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserActionCreator, userPaginationPageActions } from 'reducers/slices/domain/user';
-import Pagination from '@material-ui/lab/Pagination';
+import { mSelector } from 'src/selectors/selector';
+import AdminCustomerFormDrawer from '../AdminCustomerFormDrawer';
+import AdminUserSearchController from '../AdminCustomerSearchController';
 
 
 declare type AdminCustomerGridViewPropsType = {
@@ -35,6 +32,7 @@ declare type AdminCustomerGridViewPropsType = {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
+      paddingBottom: theme.spacing(4),
     },
     media: {
     },
@@ -55,8 +53,8 @@ const generateRows: (domains: UserType[]) => GridRowsProp = (domains) => {
       email: domain.email,
       type: domain.userType,
       status: domain.userType,
-      orders: domain.orders.length,
-      reviews: domain.reviews.length,
+      //orders: domain.orders.length,
+      //reviews: domain.reviews.length,
       actions: domain.userId,
     }
   })
@@ -69,16 +67,16 @@ const generateColumns: (onEdit: React.EventHandler<React.MouseEvent<HTMLButtonEl
     { field: 'email', headerName: 'Email', width: 150 },
     { field: 'type', headerName: 'Type', width: 150 },
     { field: 'status', headerName: 'Status', width: 150 },
-    {
-      field: 'orders',
-      headerName: 'Orders',
-      width: 150,
-    },
-    {
-      field: 'reviews',
-      headerName: 'Reviews',
-      width: 150,
-    },
+    //{
+    //  field: 'orders',
+    //  headerName: 'Orders',
+    //  width: 150,
+    //},
+    //{
+    //  field: 'reviews',
+    //  headerName: 'Reviews',
+    //  width: 150,
+    //},
     {
       field: 'actions',
       headerName: 'Actions',
@@ -119,14 +117,19 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
   const curUserList = useSelector(mSelector.makeUserSelector())
 
   // cur selected user item
-  const [curUser, setUser] = React.useState<UserType>(null);
+  const [curUserId, setUserId] = React.useState<string>(null);
+
+  const curQueryString = useSelector(mSelector.makeUserQuerySelector());
 
   const pagination = useSelector(mSelector.makeProductPaginationSelector())
 
   // fetch user
   React.useEffect(() => {
     dispatch(fetchUserActionCreator())
-  }, [])
+  }, [
+    JSON.stringify(curQueryString),
+    pagination.page 
+  ])
 
   const [curFormOpen, setFormOpen] = React.useState<boolean>(false);
 
@@ -142,7 +145,7 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
     // request (permenently)
     api.request({
       method: 'DELETE',
-      url: API1_URL + `/users/${curUser.userId}`
+      url: API1_URL + `/users/${curUserId}`
     }).then((data) => {
 
       dispatch(fetchUserActionCreator())
@@ -157,10 +160,7 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
   const handleEditClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
 
     const userId = e.currentTarget.getAttribute("data-user-id")
-
-    const targetUser = curUserList.find((user: UserType) => user.userId == userId)
-
-    setUser(targetUser);
+    setUserId(userId);
 
     setFormOpen(true);
 
@@ -170,25 +170,17 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
     setDeleteDialogOpen(true);
 
     const userId = e.currentTarget.getAttribute("data-user-id")
-
-    const targetUser = curUserList.find((user: UserType) => user.userId == userId)
-
-    setUser(targetUser);
+    setUserId(userId);
   }
 
   // pagination event handler
-  
-  /**
-   * TODO: make sure pagiantion working when you have more data.
-   *
-   **/
-  const handlePaginationChange = (event: React.ChangeEvent<unknown>, value: number) => {
-
+  const handlePageChange = (param: GridPageChangeParams) => {
     // need to decrement since we incremented when display
-    const nextPage = value - 1;
+    const nextPage = param.page;
 
     dispatch(userPaginationPageActions.update(nextPage))
-  };
+  }
+
 
   return (
     <Card className={classes.root}>
@@ -199,26 +191,19 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
         subheaderTypographyProps={{
           variant: 'body1'
         }}
-        title="List"
+        title="Customer List"
       />
       <CardContent
         className={classes.cardContentBox}
       >
+        <AdminUserSearchController />
         <DataGrid
-          autoHeight
           rows={generateRows(curUserList)}
           columns={generateColumns(handleEditClick, handleDeleteClick)}
+          page={pagination.page} // don't forget to increment when display
           pageSize={pagination.limit}
-          rowCount={pagination.limit}
-        />
-        <Pagination
-          page={pagination.page + 1} // don't forget to increment when display
-          count={pagination.totalPages}
-          color="primary"
-          showFirstButton
-          showLastButton
-          size={"medium"}
-          onChange={handlePaginationChange}
+          rowCount={pagination.totalElements}
+          onPageChange={handlePageChange}
         />
       </CardContent>
       <CardActions disableSpacing>
@@ -226,7 +211,7 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
       <AdminCustomerFormDrawer
         curFormOpen={curFormOpen}
         setFormOpen={setFormOpen}
-        user={curUser}
+        user={curUserList.find((user: UserType) => user.userId === curUserId)}
       />
       {/** onDelete confiramtion dialog **/}
       <Dialog
@@ -242,7 +227,7 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
             {"Do you want to delete this user permenently?"}
           </Typography>
           <Typography variant="body1" component="p" align="left" className={null} >
-            User Name: <b>{curUser && curUser.email}</b>
+            User Email: <b>{curUserList.find((user: UserType) => user.userId === curUserId) && curUserList.find((user: UserType) => user.userId === curUserId).email}</b>
           </Typography>
         </DialogContent>
         <DialogActions>

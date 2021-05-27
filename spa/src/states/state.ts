@@ -1,6 +1,6 @@
 import { StateType } from "./types";
 import { UserTypeEnum, FetchStatusEnum, MessageTypeEnum } from "src/app";
-import { defaultUser } from "domain/user/types";
+import { defaultUser, UserSortEnum } from "domain/user/types";
 import { normalize, schema } from 'normalizr';
 import { ProductSortEnum } from "domain/product/types";
 import { getNanoId } from "src/utils";
@@ -113,6 +113,14 @@ export const initialState: StateType = {
         post: FetchStatusEnum.INITIAL,
         put: FetchStatusEnum.INITIAL,
         patch: FetchStatusEnum.INITIAL,
+        postPhone: FetchStatusEnum.INITIAL,
+        putPhone: FetchStatusEnum.INITIAL,
+        patchPhone: FetchStatusEnum.INITIAL,
+        deletePhone: FetchStatusEnum.INITIAL,
+        postAddress: FetchStatusEnum.INITIAL,
+        putAddress: FetchStatusEnum.INITIAL,
+        patchAddress: FetchStatusEnum.INITIAL,
+        deleteAddress: FetchStatusEnum.INITIAL,
         deleteSingle: FetchStatusEnum.INITIAL,
         postAvatarImage: FetchStatusEnum.INITIAL,
         deleteAvatarImage: FetchStatusEnum.INITIAL,
@@ -189,6 +197,12 @@ export const initialState: StateType = {
     },
     users: {
       data: [],
+      query: {
+        searchQuery: "",
+        startDate: null,
+        endDate: null,
+        sort: UserSortEnum.DATE_DESC,
+      },
       pagination: {
         page: 0, // start from 0 (not 1)
         limit: 10,

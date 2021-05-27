@@ -1,7 +1,7 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import merge from "lodash/merge";
 import remove from 'lodash/remove';
-import { UserType, UserCriteria } from "domain/user/types";
+import { UserType, UserCriteria, UserSortEnum, UserPhoneCriteria, UserAddressCriteria, UserPhoneType, UserAddressType } from "domain/user/types";
 
 /**
  * redux-sage actions (side effects)
@@ -35,6 +35,46 @@ export const deleteSingleUserActionTypeName = deleteSingleUserActionCreator().ty
 export const deleteUserActionCreator = createAction<UserType>("saga/domain/user/delete")
 export const deleteUserActionTypeName = deleteUserActionCreator().type
 
+// for POST (create a phone) request
+export declare type PostUserPhoneActionType = UserPhoneCriteria & { userId: string }
+export const postUserPhoneActionCreator = createAction<PostUserPhoneActionType>("saga/domain/user/phone/post")
+export const postUserPhoneActionTypeName = postUserPhoneActionCreator().type
+
+// for PUT (replace a phone) request
+export declare type PutUserPhoneActionType = UserPhoneCriteria & { userId: string }
+export const putUserPhoneActionCreator = createAction<PutUserPhoneActionType>("saga/domain/user/phone/put")
+export const putUserPhoneActionTypeName = putUserPhoneActionCreator().type
+
+// for PATCH (replace a phone) request
+export declare type PatchUserPhoneActionType = { phoneId: string, userId: string } 
+export const patchUserPhoneActionCreator = createAction<PatchUserPhoneActionType>("saga/domain/user/phone/patch")
+export const patchUserPhoneActionTypeName = patchUserPhoneActionCreator().type
+
+// for DELETE (delete a phone) request
+export declare type DeleteUserPhoneActionType = { phoneId: string, userId: string }
+export const deleteUserPhoneActionCreator = createAction<DeleteUserPhoneActionType>("saga/domain/user/phone/delete")
+export const deleteUserPhoneActionTypeName = deleteUserPhoneActionCreator().type
+
+
+// for POST (create a address) request
+export declare type PostUserAddressActionType = UserAddressCriteria & { userId: string }
+export const postUserAddressActionCreator = createAction<PostUserAddressActionType>("saga/domain/user/address/post")
+export const postUserAddressActionTypeName = postUserAddressActionCreator().type
+
+// for PUT (replace a address) request
+export declare type PutUserAddressActionType = UserAddressCriteria & { userId: string }
+export const putUserAddressActionCreator = createAction<PutUserAddressActionType>("saga/domain/user/address/put")
+export const putUserAddressActionTypeName = putUserAddressActionCreator().type
+
+// for PATCH (replace a address) request
+export declare type PatchUserAddressActionType = { addressId: string, type: string, userId: string }  // 'billing'/'shipping'
+export const patchUserAddressActionCreator = createAction<PatchUserAddressActionType>("saga/domain/user/address/patch")
+export const patchUserAddressActionTypeName = patchUserAddressActionCreator().type
+
+// for DELETE (delete a address) request
+export declare type DeleteUserAddressActionType = { addressId: string, userId: string }
+export const deleteUserAddressActionCreator = createAction<DeleteUserAddressActionType>("saga/domain/user/address/delete")
+export const deleteUserAddressActionTypeName = deleteUserAddressActionCreator().type
 
 // for POST (avatar-image) request
 export declare type PostUserAvatarImageActionType = { avatarImage: File, userId: string } 
@@ -70,14 +110,114 @@ export const userSlice = createSlice({
      *
      **/
 
+    /**
+     * be careful that duplicate might exist.
+     *
+     * - not unique.
+     *
+     **/
     // use when update existing one
-    merge: (state: UserType[], action: UserActionType) => merge(state, action.payload),
+    concat: (state: UserType[], action: UserActionType) => {
+      return state.concat(action.payload); 
+    },
 
     // use when you want to replace
     update: (state: UserType[], action: UserActionType) => action.payload,
 
+    // update a single user
+    updateUser: (state: UserType[], action: PayloadAction<{ userId: string, user: UserType }>) => {
+      for (let i = 0; i < state.length; i++) {
+        if (state[i].userId === action.payload.userId) {
+          state[i] = action.payload.user;
+        }
+      }
+      return state;
+    },
+
     // use when you want to remove a single entity
     delete: (state: UserType[], action: PayloadAction<UserType>) => remove(state, (user: UserType) => user.userId == action.payload.userId),
+
+    appendPhone: (state: UserType[], action: PayloadAction<{ userId: string, phone: UserPhoneType }>) => {
+      for (let i = 0; i < state.length; i++) {
+        if (state[i].userId === action.payload.userId) {
+          state[i].phones.push(action.payload.phone);
+        }
+      }
+      return state;
+    },
+
+    replacePhones: (state: UserType[], action: PayloadAction<{ userId: string, phones: UserPhoneType[] }>) => { 
+      for (let i = 0; i < state.length; i++) {
+        if (state[i].userId === action.payload.userId) {
+          state[i].phones = action.payload.phones;
+        }
+      }
+      return state;
+    },
+
+    updatePhone: (state: UserType[], action: PayloadAction<{ userId: string, phone: UserPhoneType }>) => {
+      for (let i = 0; i < state.length; i++) {
+        if (state[i].userId === action.payload.userId) {
+          state[i].phones = state[i].phones.map((phone: UserPhoneType) => {
+            if (phone.phoneId === action.payload.phone.phoneId) {
+              return action.payload.phone;
+            }
+            return phone
+          });
+        }
+      }
+      return state;
+    },
+
+    removePhone: (state: UserType[], action: PayloadAction<{ userId: string, phoneId: string }>) => {
+      for (let i = 0; i < state.length; i++) {
+        if (state[i].userId === action.payload.userId) {
+          state[i].phones = state[i].phones.filter((phone: UserPhoneType) => phone.phoneId != action.payload.phoneId);
+        }
+      }
+      return state;
+    },
+
+    appendAddress: (state: UserType[], action: PayloadAction<{ userId: string, address: UserAddressType }>) => {
+      for (let i = 0; i < state.length; i++) {
+        if (state[i].userId === action.payload.userId) {
+          state[i].addresses.push(action.payload.address);
+        }
+      }
+      return state;
+    },
+
+    replaceAddresses: (state: UserType[], action: PayloadAction<{ userId: string, addresses: UserAddressType[] }>) => { 
+      for (let i = 0; i < state.length; i++) {
+        if (state[i].userId === action.payload.userId) {
+          state[i].addresses = action.payload.addresses;
+        }
+      }
+      return state;
+    },
+
+    updateAddress: (state: UserType[], action: PayloadAction<{ userId: string, address: UserAddressType }>) => {
+      for (let i = 0; i < state.length; i++) {
+        if (state[i].userId === action.payload.userId) {
+          state[i].addresses = state[i].addresses.map((address: UserAddressType) => {
+            if (address.addressId === action.payload.address.addressId) {
+              return action.payload.address;
+            }
+            return address
+          });
+        }
+      }
+      return state;
+    },
+
+    removeAddress: (state: UserType[], action: PayloadAction<{ userId: string, addressId: string }>) => {
+      for (let i = 0; i < state.length; i++) {
+        if (state[i].userId === action.payload.userId) {
+          state[i].addresses = state[i].addresses.filter((address: UserAddressType) => address.addressId != action.payload.addressId);
+        }
+      }
+      return state;
+    },
 
     clear: (state: UserType[]) => [],
   },
@@ -242,3 +382,156 @@ export const userPaginationTotalElementsSlice = createSlice({
 
 export const userPaginationTotalElementsSliceReducer = userPaginationTotalElementsSlice.reducer
 export const userPaginationTotalElementsActions = userPaginationTotalElementsSlice.actions
+
+/**
+ *
+ * domain.users.query.searchQuery state Slice (no side effects)
+ *
+ **/
+// action type             
+export type UserQuerySearchQueryActionType = PayloadAction<string> 
+
+export const userQuerySearchQuerySlice = createSlice({ 
+  name: "domain/users/query/searchQuery", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: UserQuerySearchQueryActionType) => action.payload,
+    clear: (state: string) => "",
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const userQuerySearchQuerySliceReducer = userQuerySearchQuerySlice.reducer
+export const userQuerySearchQueryActions = userQuerySearchQuerySlice.actions
+
+
+/**
+ *
+ * domain.users.query.startDate state Slice (no side effects)
+ *
+ **/
+// action type             
+export type UserQueryStartDateActionType = PayloadAction<Date> 
+
+export const userQueryStartDateSlice = createSlice({ 
+  name: "domain/users/query/startDate", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: UserQueryStartDateActionType) => action.payload,
+    clear: (state: string) => null,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const userQueryStartDateSliceReducer = userQueryStartDateSlice.reducer
+export const userQueryStartDateActions = userQueryStartDateSlice.actions
+
+
+/**
+ *
+ * domain.users.query.endDate state Slice (no side effects)
+ *
+ **/
+// action type             
+export type UserQueryEndDateActionType = PayloadAction<Date> 
+
+export const userQueryEndDateSlice = createSlice({ 
+  name: "domain/users/query/endDate", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: UserQueryEndDateActionType) => action.payload,
+    clear: (state: string) => null,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const userQueryEndDateSliceReducer = userQueryEndDateSlice.reducer
+export const userQueryEndDateActions = userQueryEndDateSlice.actions
+
+
+/**
+ *
+ * domain.users.query.sort state Slice (no side effects)
+ *
+ **/
+// action type             
+export type UserQuerySortActionType = PayloadAction<UserSortEnum> 
+
+export const userQuerySortSlice = createSlice({ 
+  name: "domain/users/query/sort", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: UserQuerySortActionType) => action.payload,
+    clear: (state: string) => UserSortEnum.DATE_DESC,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const userQuerySortSliceReducer = userQuerySortSlice.reducer
+export const userQuerySortActions = userQuerySortSlice.actions
+
+

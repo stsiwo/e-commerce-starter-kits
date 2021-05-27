@@ -7,14 +7,14 @@ import { deleteSingleOrderFetchStatusSliceReducer, getOrderFetchStatusSliceReduc
 import { deleteSingleProductFetchStatusSliceReducer, getProductFetchStatusSliceReducer, getSingleProductFetchStatusSliceReducer, postProductFetchStatusSliceReducer, putProductFetchStatusSliceReducer, postProductVariantFetchStatusSliceReducer, putProductVariantFetchStatusSliceReducer, deleteSingleProductVariantFetchStatusSliceReducer } from './slices/app/fetchStatus/product';
 import { getReviewFetchStatusSliceReducer } from './slices/app/fetchStatus/review';
 import { stripeClientSecretFetchStatusSliceReducer } from './slices/app/fetchStatus/stripeClientSecret';
-import { deleteSingleUserFetchStatusSliceReducer, deleteUserAvatarImageFetchStatusSliceReducer, getSingleUserFetchStatusSliceReducer, getUserFetchStatusSliceReducer, patchUserFetchStatusSliceReducer, postUserAvatarImageFetchStatusSliceReducer, postUserFetchStatusSliceReducer, putUserFetchStatusSliceReducer } from './slices/app/fetchStatus/user';
+import { deleteSingleUserFetchStatusSliceReducer, deleteUserAvatarImageFetchStatusSliceReducer, getSingleUserFetchStatusSliceReducer, getUserFetchStatusSliceReducer, patchUserFetchStatusSliceReducer, postUserAvatarImageFetchStatusSliceReducer, postUserFetchStatusSliceReducer, putUserFetchStatusSliceReducer, postUserPhoneFetchStatusSliceReducer, putUserPhoneFetchStatusSliceReducer, patchUserPhoneFetchStatusSliceReducer, deleteUserPhoneFetchStatusSliceReducer, postUserAddressFetchStatusSliceReducer, putUserAddressFetchStatusSliceReducer, patchUserAddressFetchStatusSliceReducer, deleteUserAddressFetchStatusSliceReducer } from './slices/app/fetchStatus/user';
 import { deleteSingleWishlistItemFetchStatusSliceReducer, deleteWishlistItemFetchStatusSliceReducer, getWishlistItemFetchStatusSliceReducer, postWishlistItemFetchStatusSliceReducer, patchWishlistItemFetchStatusSliceReducer } from './slices/app/fetchStatus/wishlistItem';
 import { cartItemSliceReducer } from './slices/domain/cartItem';
 import { categoryPaginationLimitSliceReducer, categoryPaginationPageSliceReducer, categoryPaginationTotalPagesSliceReducer, categorySliceReducer, categoryPaginationTotalElementsSliceReducer } from './slices/domain/category';
 import { orderPaginationLimitSliceReducer, orderPaginationPageSliceReducer, orderPaginationTotalPagesSliceReducer, orderSliceReducer, orderPaginationTotalElementsSliceReducer, orderQuerySearchQuerySliceReducer, orderQueryOrderStatusSliceReducer, orderQueryStartDateSliceReducer, orderQueryEndDateSliceReducer, orderQuerySortSliceReducer } from './slices/domain/order';
 import { productCurItemsSliceReducer, productPaginationLimitSliceReducer, productPaginationPageSliceReducer, productPaginationTotalPagesSliceReducer, productQueryCategoryIdSliceReducer, productQueryEndDateSliceReducer, productQueryIsDiscountSliceReducer, productQueryMaxPriceSliceReducer, productQueryMinPriceSliceReducer, productQueryReviewPointSliceReducer, productQuerySearchQuerySliceReducer, productQuerySortSliceReducer, productQueryStartDateSliceReducer, productSliceReducer, productPaginationTotalElementsSliceReducer } from './slices/domain/product';
 import { reviewPaginationLimitSliceReducer, reviewPaginationPageSliceReducer, reviewPaginationTotalPagesSliceReducer, reviewSliceReducer, reviewPaginationTotalElementsSliceReducer } from './slices/domain/review';
-import { userPaginationLimitSliceReducer, userPaginationPageSliceReducer, userPaginationTotalPagesSliceReducer, userSliceReducer, userPaginationTotalElementsSliceReducer } from './slices/domain/user';
+import { userPaginationLimitSliceReducer, userPaginationPageSliceReducer, userPaginationTotalPagesSliceReducer, userSliceReducer, userPaginationTotalElementsSliceReducer, userQueryStartDateSliceReducer, userQueryEndDateSliceReducer, userQuerySortSliceReducer, userQuerySearchQuerySliceReducer } from './slices/domain/user';
 import { wishlistItemPaginationLimitSliceReducer, wishlistItemPaginationPageSliceReducer, wishlistItemPaginationTotalPagesSliceReducer, wishlistItemQueryEndDateSliceReducer, wishlistItemQueryIsDiscountSliceReducer, wishlistItemQueryMaxPriceSliceReducer, wishlistItemQueryMinPriceSliceReducer, wishlistItemQueryReviewPointSliceReducer, wishlistItemQuerySearchQuerySliceReducer, wishlistItemQuerySortSliceReducer, wishlistItemQueryStartDateSliceReducer, wishlistItemSliceReducer, wishlistItemPaginationTotalElementsSliceReducer } from './slices/domain/wishlistItem';
 import { stripeClientSecretSliceReducer } from './slices/sensitive';
 import { cartModalSliceReducer, leftNavMenuSliceReducer, rightNavMenuSliceReducer, searchModalSliceReducer } from './slices/ui';
@@ -68,6 +68,14 @@ export const rootReducer = combineReducers({
         put: putUserFetchStatusSliceReducer,
         deleteSingle: deleteSingleUserFetchStatusSliceReducer,
         patch: patchUserFetchStatusSliceReducer,
+        postPhone: postUserPhoneFetchStatusSliceReducer,
+        putPhone: putUserPhoneFetchStatusSliceReducer,
+        patchPhone: patchUserPhoneFetchStatusSliceReducer,
+        deletePhone: deleteUserPhoneFetchStatusSliceReducer,
+        postAddress: postUserAddressFetchStatusSliceReducer,
+        putAddress: putUserAddressFetchStatusSliceReducer,
+        patchAddress: patchUserAddressFetchStatusSliceReducer,
+        deleteAddress: deleteUserAddressFetchStatusSliceReducer,
         postAvatarImage: postUserAvatarImageFetchStatusSliceReducer,
         deleteAvatarImage: deleteUserAvatarImageFetchStatusSliceReducer,
       }),
@@ -143,6 +151,12 @@ export const rootReducer = combineReducers({
     }),
     users: combineReducers({
       data: userSliceReducer,
+      query: combineReducers({
+        searchQuery: userQuerySearchQuerySliceReducer,
+        startDate: userQueryStartDateSliceReducer,
+        endDate: userQueryEndDateSliceReducer,
+        sort: userQuerySortSliceReducer,
+      }),
       pagination: combineReducers({
         page: userPaginationPageSliceReducer,
         limit: userPaginationLimitSliceReducer,

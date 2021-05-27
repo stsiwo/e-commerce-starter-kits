@@ -2,7 +2,7 @@ import { deleteCartItemActionTypeName, deleteSingleCartItemActionTypeName, fetch
 import { deleteSingleCategoryActionTypeName, fetchCategoryActionTypeName, fetchCategoryWithCacheActionTypeName, postCategoryActionTypeName, putCategoryActionTypeName } from 'reducers/slices/domain/category';
 import { fetchOrderActionTypeName, fetchSingleOrderActionTypeName, postOrderActionTypeName, putOrderActionTypeName, postOrderEventActionTypeName, putOrderEventActionTypeName, deleteSingleOrderEventActionTypeName } from 'reducers/slices/domain/order';
 import { deleteSingleProductActionTypeName, fetchProductActionTypeName, fetchProductWithCacheActionTypeName, fetchSingleProductActionTypeName, postProductActionTypeName, putProductActionTypeName, postProductVariantActionTypeName, putProductVariantActionTypeName, deleteSingleProductVariantActionTypeName } from 'reducers/slices/domain/product';
-import { deleteSingleUserActionTypeName, fetchSingleUserActionTypeName, fetchUserActionTypeName, putUserActionTypeName, postUserAvatarImageActionTypeName, deleteUserAvatarImageActionTypeName } from 'reducers/slices/domain/user';
+import { deleteSingleUserActionTypeName, fetchSingleUserActionTypeName, fetchUserActionTypeName, putUserActionTypeName, postUserAvatarImageActionTypeName, deleteUserAvatarImageActionTypeName, postUserPhoneActionTypeName, putUserPhoneActionTypeName, patchUserPhoneActionTypeName, deleteUserPhoneActionTypeName, postUserAddressActionTypeName, putUserAddressActionTypeName, patchUserAddressActionTypeName, deleteUserAddressActionTypeName } from 'reducers/slices/domain/user';
 import { deleteSingleWishlistItemActionTypeName, deleteWishlistItemActionTypeName, fetchWishlistItemActionTypeName, postWishlistItemActionTypeName, patchWishlistItemActionTypeName } from 'reducers/slices/domain/wishlistItem';
 import { requestStripeClientSecretActionTypeName } from 'reducers/slices/sensitive';
 import { toggleLeftNavMenuActionTypeName } from 'reducers/slices/ui';
@@ -59,6 +59,14 @@ import { deleteSingleProductVariantWorker } from 'sideEffects/workers/product/de
 import { postOrderEventWorker } from 'sideEffects/workers/order/postOrderEventWorker';
 import { putOrderEventWorker } from 'sideEffects/workers/order/putOrderEventWorker';
 import { deleteSingleOrderEventWorker } from 'sideEffects/workers/order/deleteSingleOrderEventWorker';
+import { postUserPhoneWorker } from 'sideEffects/workers/user/postUserPhoneWorker';
+import { putUserPhoneWorker } from 'sideEffects/workers/user/putUserPhoneWorker';
+import { patchUserPhoneWorker } from 'sideEffects/workers/user/patchUserPhoneWorker';
+import { deleteUserPhoneWorker } from 'sideEffects/workers/user/deleteUserPhoneWorker';
+import { postUserAddressWorker } from 'sideEffects/workers/user/postUserAddressWorker';
+import { putUserAddressWorker } from 'sideEffects/workers/user/putUserAddressWorker';
+import { patchUserAddressWorker } from 'sideEffects/workers/user/patchUserAddressWorker';
+import { deleteUserAddressWorker } from 'sideEffects/workers/user/deleteUserAddressWorker';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -217,6 +225,63 @@ export function* deleteUserAvatarImageWatcher() {
     deleteUserAvatarImageWorker,
   )
 }
+
+export function* postUserPhoneWatcher() {
+  yield takeLatest(
+    postUserPhoneActionTypeName,
+    postUserPhoneWorker,
+  )
+}
+
+export function* putUserPhoneWatcher() {
+  yield takeLatest(
+    putUserPhoneActionTypeName,
+    putUserPhoneWorker,
+  )
+}
+
+export function* patchUserPhoneWatcher() {
+  yield takeLatest(
+    patchUserPhoneActionTypeName,
+    patchUserPhoneWorker,
+  )
+}
+
+export function* deleteUserPhoneWatcher() {
+  yield takeLatest(
+    deleteUserPhoneActionTypeName,
+    deleteUserPhoneWorker,
+  )
+}
+
+export function* postUserAddressWatcher() {
+  yield takeLatest(
+    postUserAddressActionTypeName,
+    postUserAddressWorker,
+  )
+}
+
+export function* putUserAddressWatcher() {
+  yield takeLatest(
+    putUserAddressActionTypeName,
+    putUserAddressWorker,
+  )
+}
+
+export function* patchUserAddressWatcher() {
+  yield takeLatest(
+    patchUserAddressActionTypeName,
+    patchUserAddressWorker,
+  )
+}
+
+export function* deleteUserAddressWatcher() {
+  yield takeLatest(
+    deleteUserAddressActionTypeName,
+    deleteUserAddressWorker,
+  )
+}
+
 
 // order
 export function* fetchOrderWatcher() {

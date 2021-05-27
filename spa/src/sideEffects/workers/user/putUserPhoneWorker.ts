@@ -1,19 +1,20 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { UserCriteria } from "domain/user/types";
-import { putUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
-import { PutUserActionType, userActions } from "reducers/slices/domain/user";
+import { UserPhoneCriteria } from "domain/user/types";
+import { authActions, messageActions, PutAuthPhoneActionType } from "reducers/slices/app";
+import { putAuthPhoneFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
+import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { messageActions } from "reducers/slices/app";
 import { getNanoId } from "src/utils";
+import { PutUserPhoneActionType, userActions } from "reducers/slices/domain/user";
+import { putUserPhoneFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 
 /**
  * a worker (generator)    
  *
- *  - put user item to replace
+ *  - put user's phone of the other member (not for auth) 
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
@@ -27,10 +28,10 @@ import { getNanoId } from "src/utils";
  *
  *  - note:
  *
- *    - userId must be the other member (not for auth) 
+ *    - userId: the other member
  *
  **/
-export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
+export function* putUserPhoneWorker(action: PayloadAction<PutUserPhoneActionType>) {
 
   /**
    * get cur user type
@@ -48,13 +49,13 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
      * update status for put user data
      **/
     yield put(
-      putUserFetchStatusActions.update(FetchStatusEnum.FETCHING)
+      putUserPhoneFetchStatusActions.update(FetchStatusEnum.FETCHING)
     )
 
     /**
      * grab this  domain
      **/
-    const apiUrl = `${API1_URL}/users/${action.payload.userId}`
+    const apiUrl = `${API1_URL}/users/${action.payload.userId}/phones/${action.payload.phoneId}`
 
     /**
      * fetch data
@@ -67,7 +68,12 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
       const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
         method: "PUT",
         url: apiUrl,
-        data: action.payload as UserCriteria
+        data: {
+          phoneNumber: action.payload.phoneNumber,
+          countryCode: action.payload.countryCode,
+          isSelected: action.payload.isSelected,
+          phoneId: action.payload.phoneId
+        } as UserPhoneCriteria
       })
 
       /**
@@ -75,9 +81,9 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
        *
        **/
       yield put(
-        userActions.updateUser({
+        userActions.updatePhone({
+          phone: response.data,
           userId: action.payload.userId,
-          user: response.data
         })
       )
 
@@ -85,7 +91,7 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
        * update fetch status sucess
        **/
       yield put(
-        putUserFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+        putUserPhoneFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -98,6 +104,7 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
           message: "updated successfully.",
         }) 
       )
+
     } catch (error) {
 
       console.log(error)
@@ -106,7 +113,7 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
        * update fetch status failed
        **/
       yield put(
-        putUserFetchStatusActions.update(FetchStatusEnum.FAILED)
+        putUserPhoneFetchStatusActions.update(FetchStatusEnum.FAILED)
       )
 
       /**
@@ -124,6 +131,8 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
     console.log("permission denied: you are " + curAuth.userType)
   }
 }
+
+
 
 
 

@@ -326,3 +326,11 @@ export const defaultAdminCompanyFormValidationData: AdminCompanyFormValidationDa
   country: "",
   postalCode: "",
 }
+
+// sort
+export enum UserSortEnum {
+  DATE_DESC = "DATE_DESC",
+  DATE_ASC = "DATE_ASC",
+  NAME_ASC = "NAME_ASC",
+  NAME_DESC = "NAME_DESC",
+}

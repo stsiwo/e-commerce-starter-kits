@@ -50,7 +50,6 @@ export const rsSelector = {
 
     getCartItem: (state: StateType) => state.domain.cartItems,
 
-
     getWishlistItem: (state: StateType) => state.domain.wishlistItems.data,
     getWishlistItemPagination: (state: StateType) => state.domain.wishlistItems.pagination,
     getWishlistItemQuery: (state: StateType) => state.domain.wishlistItems.query,
@@ -65,6 +64,10 @@ export const rsSelector = {
 
     getUser: (state: StateType) => state.domain.users.data,
     getUserPagination: (state: StateType) => state.domain.users.pagination,
+    getUserQuerySearchQuery: (state: StateType) => state.domain.users.query.searchQuery,
+    getUserQueryStartDate: (state: StateType) => state.domain.users.query.startDate,
+    getUserQueryEndDate: (state: StateType) => state.domain.users.query.endDate,
+    getUserQuerySort: (state: StateType) => state.domain.users.query.sort,
 
     getOrder: (state: StateType) => state.domain.orders.data,
     getOrderPagination: (state: StateType) => state.domain.orders.pagination,
@@ -703,6 +706,24 @@ export const mSelector = {
     )
   },
 
+  // app.auth.user.phones with isSelected
+  makeUserSelectedPhoneIdSelector: (userId: string) => {
+    return createSelector(
+      [
+        rsSelector.domain.getUser
+      ],
+      (users) => {
+        const targetUser = users.find((user: UserType) => user.userId === userId);
+        const selectedPhone = targetUser.phones.find((phone: UserPhoneType) => phone.isSelected)
+
+        if (!selectedPhone) {
+          return ""
+        }
+        return selectedPhone.phoneId
+      },
+    )
+  },
+
   // domain.users.pagination
   makeUserPaginationSelector: () => {
     return createSelector(
@@ -720,15 +741,91 @@ export const mSelector = {
   makeUserQueryStringSelector: () => {
     return createSelector(
       [
+        rsSelector.domain.getUserQuerySearchQuery,
+        rsSelector.domain.getUserQueryStartDate,
+        rsSelector.domain.getUserQueryEndDate,
+        rsSelector.domain.getUserQuerySort,
         rsSelector.domain.getUserPagination
       ],
-      (pagination) => {
+      (searchQuery, startDate, endDate, sort, pagination) => {
         // react state should be immutable so put empty object first
-        return merge({}, { page: pagination.page, limit: pagination.limit })
+        return merge({}, { 
+          searchQuery: searchQuery,
+          startDate: startDate,
+          endDate: endDate,
+          sort: sort,
+          page: pagination.page, 
+          limit: pagination.limit 
+        })
       },
     )
   },
 
+  // domain.users.query
+  makeUserQuerySelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getUserQuerySearchQuery,
+        rsSelector.domain.getUserQueryStartDate,
+        rsSelector.domain.getUserQueryEndDate,
+        rsSelector.domain.getUserQuerySort,
+
+      ],
+      (searchQuery, startDate, endDate, sort) => {
+
+        return {
+          searchQuery: searchQuery,
+          startDate: startDate,
+          endDate: endDate,
+          sort: sort,
+        }
+      },
+    )
+  },
+
+  makeUserQuerySearchQuerySelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getUserQuerySearchQuery
+      ],
+      (searchQuery) => {
+        return searchQuery
+      },
+    )
+  },
+
+  makeUserQueryStartDateSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getUserQueryStartDate
+      ],
+      (startDate) => {
+        return startDate
+      },
+    )
+  },
+
+  makeUserQueryEndDateSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getUserQueryEndDate
+      ],
+      (endDate) => {
+        return endDate
+      },
+    )
+  },
+
+  makeUserQuerySortSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getUserQuerySort
+      ],
+      (sort) => {
+        return sort
+      },
+    )
+  },
 
   // domain.users
   makeUserByIdSelector: (userId: string) => {

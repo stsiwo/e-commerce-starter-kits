@@ -1,19 +1,18 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { UserCriteria } from "domain/user/types";
-import { putUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
-import { PutUserActionType, userActions } from "reducers/slices/domain/user";
-import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
-import { rsSelector } from "src/selectors/selector";
 import { messageActions } from "reducers/slices/app";
+import { call, put, select } from "redux-saga/effects";
+import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
+import { PatchUserPhoneActionType, userActions } from "reducers/slices/domain/user";
+import { patchUserPhoneFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 
 /**
  * a worker (generator)    
  *
- *  - put user item to replace
+ *  - patch the other memebr's phone 
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
@@ -27,10 +26,10 @@ import { getNanoId } from "src/utils";
  *
  *  - note:
  *
- *    - userId must be the other member (not for auth) 
+ *    - userId always refers to the other member's userid 
  *
  **/
-export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
+export function* patchUserPhoneWorker(action: PayloadAction<PatchUserPhoneActionType>) {
 
   /**
    * get cur user type
@@ -48,13 +47,13 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
      * update status for put user data
      **/
     yield put(
-      putUserFetchStatusActions.update(FetchStatusEnum.FETCHING)
+      patchUserPhoneFetchStatusActions.update(FetchStatusEnum.FETCHING)
     )
 
     /**
      * grab this  domain
      **/
-    const apiUrl = `${API1_URL}/users/${action.payload.userId}`
+    const apiUrl = `${API1_URL}/users/${action.payload.userId}/phones/${action.payload.phoneId}`
 
     /**
      * fetch data
@@ -65,9 +64,8 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
 
       // start fetching
       const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "PUT",
+        method: "PATCH",
         url: apiUrl,
-        data: action.payload as UserCriteria
       })
 
       /**
@@ -75,9 +73,9 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
        *
        **/
       yield put(
-        userActions.updateUser({
+        userActions.replacePhones({
+          phones: response.data,
           userId: action.payload.userId,
-          user: response.data
         })
       )
 
@@ -85,7 +83,7 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
        * update fetch status sucess
        **/
       yield put(
-        putUserFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+        patchUserPhoneFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -95,9 +93,10 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
-          message: "updated successfully.",
+          message: "switched primary successfully.",
         }) 
       )
+
     } catch (error) {
 
       console.log(error)
@@ -106,7 +105,7 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
        * update fetch status failed
        **/
       yield put(
-        putUserFetchStatusActions.update(FetchStatusEnum.FAILED)
+        patchUserPhoneFetchStatusActions.update(FetchStatusEnum.FAILED)
       )
 
       /**
@@ -124,6 +123,8 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
     console.log("permission denied: you are " + curAuth.userType)
   }
 }
+
+
 
 
 

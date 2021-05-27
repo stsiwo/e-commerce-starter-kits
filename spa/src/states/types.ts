@@ -2,7 +2,7 @@ import { NormalizedCategoryType, NormalizedProductType, ProductSortEnum } from "
 import { AuthType, RequestTrackerType, FetchStatusEnum, MessageTypeEnum, MessageStateType } from "src/app/";
 import { CartItemType } from "domain/cart/types";
 import { WishlistItemType, WishlistItemSortEnum } from "domain/wishlist/types";
-import { UserType } from "domain/user/types";
+import { UserType, UserSortEnum } from "domain/user/types";
 import { OrderType, OrderSortEnum } from "domain/order/types";
 import { ReviewType } from "domain/review/type";
 
@@ -51,6 +51,14 @@ export declare type AppStateType = {
       post: FetchStatusEnum
       put: FetchStatusEnum
       patch: FetchStatusEnum
+      postPhone: FetchStatusEnum
+      putPhone: FetchStatusEnum
+      patchPhone: FetchStatusEnum
+      deletePhone: FetchStatusEnum
+      postAddress: FetchStatusEnum
+      putAddress: FetchStatusEnum
+      patchAddress: FetchStatusEnum
+      deleteAddress: FetchStatusEnum
       deleteSingle: FetchStatusEnum
       postAvatarImage: FetchStatusEnum
       deleteAvatarImage: FetchStatusEnum
@@ -131,6 +139,12 @@ export declare type DomainStateType = {
   users: {
     data: UserType[] // don't need to normalized
     pagination: DomainPaginationType,
+    query: {
+      searchQuery: string,
+      startDate: Date,
+      endDate: Date,
+      sort: UserSortEnum,
+    },
   },
   orders: {
     data: OrderType[] // don't need to normalized 
