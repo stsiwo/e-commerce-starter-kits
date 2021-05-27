@@ -55,6 +55,10 @@ endpoint change:
   
     - identify N+1 sql using logging & monitor.
     
+  - /users (esp admin)
+  
+    - create user status mange form (e.g., active, blacklist and its reason)
+    
     
       
     
