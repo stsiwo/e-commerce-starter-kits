@@ -63,6 +63,8 @@ endpoint change:
   
     - trim all string input from client.
     
+    - cross site request forgery enable. research on this subject since we use cookie (httpOnly&secure).
+    
     
       
     
