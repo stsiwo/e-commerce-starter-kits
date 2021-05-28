@@ -59,6 +59,10 @@ endpoint change:
   
     - create user status mange form (e.g., active, blacklist and its reason)
     
+  - security: 
+  
+    - trim all string input from client.
+    
     
       
     
