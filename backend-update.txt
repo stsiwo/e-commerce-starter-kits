@@ -65,6 +65,9 @@ endpoint change:
     
     - cross site request forgery enable. research on this subject since we use cookie (httpOnly&secure).
     
+  - unit test
+    - addable next order event status
+    
     
       
     
