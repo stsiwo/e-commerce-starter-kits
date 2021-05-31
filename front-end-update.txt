@@ -41,3 +41,9 @@
  - phones:
  
   - set max phone like 3
+  
+  - orders
+ 
+    - change product with only selected variant to product with all variant and selectedvariant.
+    
+    
