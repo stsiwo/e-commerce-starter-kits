@@ -9,10 +9,13 @@ import { CartItemType } from 'domain/cart/types';
 import { UserType } from 'domain/user/types';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
 import Box from '@material-ui/core/Box';
 import { Link as RRLink } from "react-router-dom";
+import { messageActions } from 'reducers/slices/app';
+import { getNanoId } from 'src/utils';
+import { MessageTypeEnum } from 'src/app';
 
 /**
  * currently not used
@@ -44,9 +47,7 @@ const OrderItemForm: React.FunctionComponent<OrderItemFormPropsType> = (props) =
   // mui: makeStyles
   const classes = useStyles();
 
-
-  // snakbar stuff when no phone & addresses are selected
-  const { enqueueSnackbar } = useSnackbar();
+  const dispatch = useDispatch();
 
   const cartItems = useSelector(mSelector.makeCartItemSelector())
 
@@ -55,9 +56,13 @@ const OrderItemForm: React.FunctionComponent<OrderItemFormPropsType> = (props) =
   // event handler to validate phone & addresses
   const handleValidateClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
     if (selectedCartItems.length == 0) {
-      enqueueSnackbar("Please select product items to buy.", {
-        variant: 'error',
-      })
+      dispatch(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.ERROR,
+          message: "please select at least one product to buy.",
+        }) 
+      );
     } else {
       props.goToNextStep()
     }
@@ -110,10 +115,10 @@ const OrderItemForm: React.FunctionComponent<OrderItemFormPropsType> = (props) =
             md={6}
           >
             <Typography variant="h6" component="h3" align="right" gutterBottom>
-              SubTotal: $<b>{calcSubTotalPriceAmount(props.user.cartItems)}</b>
+              SubTotal: $<b>{calcSubTotalPriceAmount(selectedCartItems)}</b>
             </Typography>
-            <Typography variant="body2" component="p" align="right" gutterBottom >
-              * tax and shipping costs are not included yet.
+            <Typography variant="caption" component="p" align="right" color="textSecondary" gutterBottom >
+              * total cost included tax and shipping costs are available at next step.
             </Typography>
           </Grid>
         </React.Fragment>

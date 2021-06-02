@@ -1,22 +1,23 @@
+import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
 import CartItemTotal from 'components/common/CartItemTotal';
+import { CheckoutStepEnum } from 'components/pages/Checkout';
 import { CheckoutStepComponentPropsType } from 'components/pages/Checkout/checkoutSteps';
 import { CartItemType } from 'domain/cart/types';
 import { UserType } from 'domain/user/types';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { messageActions } from 'reducers/slices/app';
+import { postOrderActionCreator } from 'reducers/slices/domain/order';
+import { FetchStatusEnum, MessageTypeEnum } from 'src/app';
+import { mSelector, rsSelector } from 'src/selectors/selector';
+import { getNanoId } from 'src/utils';
 import CartItemConfirmCard from './CartItemConfirmCard';
 import CustomerBasicConfirm from './CustomerBasicConfirm';
 import CustomerContactConfirm from './CustomerContactConfirm';
-import { useSelector, useDispatch } from 'react-redux';
-import { mSelector } from 'src/selectors/selector';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import { Link as RRLink } from "react-router-dom";
-import { CheckoutStepEnum } from 'components/pages/Checkout';
-import { requestStripeClientSecretActionCreator } from 'reducers/slices/sensitive';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -45,11 +46,11 @@ const FinalConfirmForm: React.FunctionComponent<FinalConfirmFormPropsType> = (pr
   // mui: makeStyles
   const classes = useStyles();
 
-  // snakbar stuff when no phone & addresses are selected
-  const { enqueueSnackbar } = useSnackbar();
-
   // dispatch
   const dispatch = useDispatch()
+
+  // cur OrderCriteria
+  const curOrderCriteria = useSelector(mSelector.makeOrderCriteriaSelector());
 
   // selected cart item
   const selectedCartItems = useSelector(mSelector.makeSelectedCartItemSelector());
@@ -62,35 +63,50 @@ const FinalConfirmForm: React.FunctionComponent<FinalConfirmFormPropsType> = (pr
   // event handler to validate phone & addresses
   const handleValidateClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
 
+    let result = true;
+    let message = "";
+
     // validate basic info
     if (!isValidCustomerBasicInfo) {
-      enqueueSnackbar("You are missing some of customer basic information.", {
-        variant: 'error',
-      })
-      return false
+      message = "You are missing some of customer basic information."
+      result = false
     }
 
     // validate phone/shipping/billing address
     if (!isValidCustomerBillingAddress || !isValidCustomerShippingAddress) {
-      enqueueSnackbar("You are missing some of customer contact information.", {
-        variant: 'error',
-      })
-      return false
+      message = "You are missing some of customer contact information."
+      result = false
     }
 
     // validate cart items
     if (selectedCartItems.length === 0) {
-      enqueueSnackbar("Please select product items to buy.", {
-        variant: 'error',
+      message = "Please select product items to buy."
+      result = false
+    }
+
+    if (!result) {
+      messageActions.update({
+        id: getNanoId(),
+        type: MessageTypeEnum.ERROR,
+        message: message,
       })
       return false
     }
 
     // request client secret (Stripe) 
-    dispatch(requestStripeClientSecretActionCreator())
+    dispatch(postOrderActionCreator(curOrderCriteria))
 
-    props.goToNextStep()
   }
+
+  // wait for the request for stripe client to be done and based on the result, guide the customer to the payment page.
+  const curRequestStripeClientFetchStatus = useSelector(rsSelector.app.getPostOrderFetchStatus)
+  React.useEffect(() => {
+    if (curRequestStripeClientFetchStatus === FetchStatusEnum.SUCCESS) {
+      props.goToNextStep()
+    }
+  }, [
+    curRequestStripeClientFetchStatus 
+  ])
 
   // render current cart item
   const renderCartItemConfirmCards: () => React.ReactNode = () => {
@@ -114,18 +130,18 @@ const FinalConfirmForm: React.FunctionComponent<FinalConfirmFormPropsType> = (pr
         item
         xs={12}
       >
-          <Typography variant="h6" component="h6" align="left" >
-            {"Basic Information"}
-          </Typography>
+        <Typography variant="h6" component="h6" align="left" >
+          {"Basic Information"}
+        </Typography>
         <CustomerBasicConfirm goToStep={props.goToStep} />
       </Grid>
       <Grid
         item
         xs={12}
       >
-          <Typography variant="h6" component="h6" align="left" >
-            {"Contact Information"}
-          </Typography>
+        <Typography variant="h6" component="h6" align="left" >
+          {"Contact Information"}
+        </Typography>
         <CustomerContactConfirm goToStep={props.goToStep} />
       </Grid>
       <Grid

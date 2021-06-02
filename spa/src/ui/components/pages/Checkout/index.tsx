@@ -42,7 +42,7 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
 
   const auth = useSelector(mSelector.makeAuthSelector())
 
-  
+
   /**
    * steps:
    *  0: customer basic information
@@ -53,7 +53,7 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
   const [activeStep, setActiveStep] = React.useState<CheckoutStepEnum>(CheckoutStepEnum.CUSTOMER_BASIC_INFORMATION);
 
   // step event handlers
-  
+
   const goToStep: (step: CheckoutStepEnum) => void = (step) => {
     setActiveStep(step);
   }
@@ -78,36 +78,40 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
         <Step >
           <StepLabel>{"Customer Basic Information"}</StepLabel>
           <StepContent>
-            <CustomerBasicForm 
-              goToNextStep={goToNextStep} 
-              goToPrevStep={goToPrevStep} 
-              goToStep={goToStep} 
-              user={auth.user} 
+            <CustomerBasicForm
+              goToNextStep={goToNextStep}
+              goToPrevStep={goToPrevStep}
+              goToStep={goToStep}
+              user={auth.user}
             />
-            <Button onClick={(e) => goToStep(CheckoutStepEnum.FINAL_CONFIRM)}>Final Conform</Button>
-            <Button onClick={(e) => goToStep(CheckoutStepEnum.ORDER_ITEMS)}>Order Items</Button>
-            <Button onClick={(e) => goToStep(CheckoutStepEnum.PAYMENT)}>Payment</Button>
+            {(NODE_ENV === 'development' &&
+              <React.Fragment>
+                <Button onClick={(e) => goToStep(CheckoutStepEnum.FINAL_CONFIRM)}>Final Conform</Button>
+                <Button onClick={(e) => goToStep(CheckoutStepEnum.ORDER_ITEMS)}>Order Items</Button>
+                <Button onClick={(e) => goToStep(CheckoutStepEnum.PAYMENT)}>Payment</Button>
+              </React.Fragment>
+            )}
           </StepContent>
         </Step>
         {/** customer contact info **/}
         <Step >
           <StepLabel>{"Customer Contact Information"}</StepLabel>
           <StepContent>
-            <CustomerContactForm 
-              goToNextStep={goToNextStep} 
-              goToPrevStep={goToPrevStep} 
-              goToStep={goToStep} 
-              user={auth.user} 
+            <CustomerContactForm
+              goToNextStep={goToNextStep}
+              goToPrevStep={goToPrevStep}
+              goToStep={goToStep}
+              user={auth.user}
             />
           </StepContent>
         </Step>
         <Step >
           <StepLabel>{"Order Items"}</StepLabel>
           <StepContent>
-            <OrderItemForm 
-              goToNextStep={goToNextStep} 
-              goToPrevStep={goToPrevStep} 
-              goToStep={goToStep} 
+            <OrderItemForm
+              goToNextStep={goToNextStep}
+              goToPrevStep={goToPrevStep}
+              goToStep={goToStep}
               user={auth.user}
             />
           </StepContent>
@@ -115,10 +119,10 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
         <Step >
           <StepLabel>{"Final Confirm"}</StepLabel>
           <StepContent>
-            <FinalConfirmForm 
-              goToNextStep={goToNextStep} 
-              goToPrevStep={goToPrevStep} 
-              goToStep={goToStep} 
+            <FinalConfirmForm
+              goToNextStep={goToNextStep}
+              goToPrevStep={goToPrevStep}
+              goToStep={goToStep}
               user={auth.user}
             />
           </StepContent>
@@ -126,10 +130,10 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
         <Step >
           <StepLabel>{"Payment"}</StepLabel>
           <StepContent>
-            <Payment 
-              goToNextStep={goToNextStep} 
-              goToPrevStep={goToPrevStep} 
-              goToStep={goToStep} 
+            <Payment
+              goToNextStep={goToNextStep}
+              goToPrevStep={goToPrevStep}
+              goToStep={goToStep}
               user={auth.user}
             />
           </StepContent>

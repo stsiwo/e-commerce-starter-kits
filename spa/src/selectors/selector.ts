@@ -7,7 +7,10 @@ import { denormalize } from "normalizr";
 import { categorySchemaArray, productSchemaArray } from "states/state";
 import { StateType } from "states/types";
 import { WishlistItemType } from "domain/wishlist/types";
-import { OrderType } from "domain/order/types";
+import { OrderType, OrderCriteria } from "domain/order/types";
+import { toPhoneStringWithoutSpace } from "domain/user";
+import { toOrderAddress, toOrderDetailCriteriaList } from "domain/order";
+import { UserTypeEnum } from "src/app";
 
 export const rsSelector = {
   /**
@@ -38,6 +41,7 @@ export const rsSelector = {
     getSearchKeyword: (state: StateType) => state.app.searchKeyword,
     getRequestTracker: (state: StateType) => state.app.requestTracker,
 
+    getPostOrderFetchStatus: (state: StateType) => state.app.fetchStatus.orders.post,
     getFetchReviewFetchStatus: (state: StateType) => state.app.fetchStatus.reviews.get,
     getFetchProductFetchStatus: (state: StateType) => state.app.fetchStatus.products.get,
     getFetchCategoryFetchStatus: (state: StateType) => state.app.fetchStatus.categories.get,
@@ -118,6 +122,14 @@ export const rsSelector = {
  * However, if multiple component instances use the same memorized selector instance, you CAN'T use this cache features. since the memorized selector recognized that revieved arguments are different every time when it is called.
  *
  * Therefore, you have to give a copy of momerized selector to each component instance. (I'm not sure it is true when using redux-saga though)
+ *
+ * #Question:
+ *
+ *  - do i need to use memorized selector for trivial (non-cpu-expensive calculation)??
+ *
+ *    - i guesss you should use this if you have cpu-expensive calculation, otherwise, it just make selector logic complex and there is no benefit for performance.
+ *
+ *    - even if the value is cached, the memorized selector is called so if it id not heavy calculation, does not make sense to use it.
  *
  **/
 
@@ -345,6 +357,7 @@ export const mSelector = {
       },
     )
   },
+
 
   // app.fetchStatus.products.get
   makeFetchProductFetchStatusSelector: () => {
@@ -692,7 +705,7 @@ export const mSelector = {
         rsSelector.domain.getCartItem
       ],
       (cartItem) => {
-        return cartItem.length; 
+        return cartItem.length;
       },
     )
   },
@@ -753,7 +766,7 @@ export const mSelector = {
       ],
       (pagination, sort, searchQuery, startDate, endDate, reviewPoint, minPrice, maxPrice, isDiscount, auth) => {
         // react state should be immutable so put empty object first
-        return merge({}, { 
+        return merge({}, {
           sort: sort,
           searchQuery: searchQuery,
           startDate: startDate,
@@ -928,13 +941,13 @@ export const mSelector = {
       ],
       (searchQuery, startDate, endDate, sort, pagination) => {
         // react state should be immutable so put empty object first
-        return merge({}, { 
+        return merge({}, {
           searchQuery: searchQuery,
           startDate: startDate,
           endDate: endDate,
           sort: sort,
-          page: pagination.page, 
-          limit: pagination.limit 
+          page: pagination.page,
+          limit: pagination.limit
         })
       },
     )
@@ -1079,14 +1092,14 @@ export const mSelector = {
       ],
       (searchQuery, orderStatus, startDate, endDate, sort, pagination) => {
         // react state should be immutable so put empty object first
-        return merge({}, { 
+        return merge({}, {
           searchQuery: searchQuery,
           orderStatus: orderStatus,
           startDate: startDate,
           endDate: endDate,
           sort: sort,
-          page: pagination.page, 
-          limit: pagination.limit 
+          page: pagination.page,
+          limit: pagination.limit
         })
       },
     )
@@ -1483,4 +1496,34 @@ export const mSelector = {
       },
     )
   },
+
+
+  // order criteria (for postOrderActionCreator) to create order at final confirm.
+  // just only use when creating a new order.
+  makeOrderCriteriaSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getAuth,
+        mSelector.makeSelectedCartItemSelector(),
+        mSelector.makeAuthSelectedPhoneSelector(),
+        mSelector.makeAuthShippingAddressSelector(),
+        mSelector.makeAuthBillingAddressSelector(),
+      ],
+      (auth, selectedCartItems, selectedPhone, shippingAddress, billingAddress) => {
+        return {
+          orderFirstName: auth.user.firstName,
+          orderLastName: auth.user.lastName,
+          orderEmail: auth.user.email,
+          orderPhone: toPhoneStringWithoutSpace(selectedPhone),
+          shippingAddress: toOrderAddress(shippingAddress),
+          billingAddress: toOrderAddress(billingAddress),
+          currency: "cad", // refactor when necessary
+          note: "",
+          userId: (auth.userType === UserTypeEnum.MEMBER) ? auth.user.userId : null,
+          orderDetails: toOrderDetailCriteriaList(selectedCartItems),
+        } as OrderCriteria
+      },
+    )
+  },
+
 }

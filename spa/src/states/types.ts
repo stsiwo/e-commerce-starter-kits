@@ -24,9 +24,9 @@ export declare type AppStateType = {
   searchKeyword: string
   requestTracker: RequestTrackerType
   fetchStatus: {
-    stripeClientSecret: FetchStatusEnum,
     products: {
       get: FetchStatusEnum
+      getPublic: FetchStatusEnum
       getSingle: FetchStatusEnum
       post: FetchStatusEnum
       put: FetchStatusEnum

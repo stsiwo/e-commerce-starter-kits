@@ -3,26 +3,43 @@ import { getNanoId } from "src/utils";
 import { CartItemType } from "./types";
 
 export const calcSubTotalPriceAmount: (cartItems: CartItemType[]) => number = (cartItems) => {
-    return cartItems.reduce((acc: number, cartItem: CartItemType) => {
+  return cartItems.reduce((acc: number, cartItem: CartItemType) => {
+    if (cartItem.isSelected) {
       const unitPrice = cartItem.product.variants[0].variantUnitPrice ? cartItem.product.variants[0].variantUnitPrice : cartItem.product.productBaseUnitPrice
-      acc +=  (unitPrice * cartItem.quantity)
-      return acc
-    }, 0)
-  }
+      acc += (unitPrice * cartItem.quantity)
+    }
+    return acc
+  }, 0)
+}
 
 export const calcSubTotalProductNumbers: (cartItems: CartItemType[]) => number = (cartItems) => {
-    return cartItems.reduce((acc: number, cartItem: CartItemType) => {
-      acc +=  cartItem.quantity 
-      return acc
-    }, 0)
-  }
+  return cartItems.reduce((acc: number, cartItem: CartItemType) => {
+    if (cartItem.isSelected) {
+      acc += cartItem.quantity
+    }
+    return acc
+  }, 0)
+}
 
 export const calcTotalWeight: (cartItems: CartItemType[]) => number = (cartItems) => {
-    return cartItems.reduce((acc: number, cartItem: CartItemType) => {
-      acc +=  cartItem.product.variants[0].variantWeight 
-      return acc
-    }, 0)
+  return cartItems.reduce((acc: number, cartItem: CartItemType) => {
+    acc += cartItem.product.variants[0].variantWeight
+    return acc
+  }, 0)
 }
+
+/**
+ * validate cartItem if the customer moves to checkout.
+ *
+ * - at least one item must be selected.
+ *
+ **/
+export const validateCartItemsForCheckout: (cartItems: CartItemType[]) => boolean = (cartItems) => {
+  const selectedItems = cartItems.filter((cartItem: CartItemType) => cartItem.isSelected === true);
+  return selectedItems.length > 0;
+}
+
+
 
 /**
  * create new cart item.
@@ -37,7 +54,7 @@ export const createCartItem: (variantId: string, filteredProduct: ProductType) =
     cartItemId: getNanoId(),
     createdAt: new Date(Date.now()),
     isSelected: true,
-    product: filteredProduct, 
+    product: filteredProduct,
     quantity: 1,
     user: null
   } as CartItemType

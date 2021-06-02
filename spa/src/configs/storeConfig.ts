@@ -28,8 +28,13 @@ export const store = createStore(rootReducer, initialState as StateType, compose
 // persist to localstorage
 store.subscribe(() => {
 
+  // for guest users
   const auth = store.getState().app.auth
   localStorage.setItem("auth", JSON.stringify(auth));
+
+  // for guest users
+  const cartItems = store.getState().domain.cartItems
+  localStorage.setItem("cartItems", JSON.stringify(cartItems));
 
 })
 

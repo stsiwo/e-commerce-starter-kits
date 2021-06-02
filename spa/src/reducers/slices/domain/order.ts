@@ -1,7 +1,7 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import merge from "lodash/merge";
 import remove from 'lodash/remove';
-import { OrderType, OrderEventType, OrderSortEnum, OrderEventCriteria } from "domain/order/types";
+import { OrderType, OrderEventType, OrderSortEnum, OrderEventCriteria, OrderCriteria } from "domain/order/types";
 
 /**
  * redux-sage actions (side effects)
@@ -18,8 +18,9 @@ export const fetchOrderActionTypeName = fetchOrderActionCreator().type
 export const fetchSingleOrderActionCreator = createAction<{ orderId: string }>("saga/domain/order/fetchSingle")
 export const fetchSingleOrderActionTypeName = fetchSingleOrderActionCreator().type
 
-// for POST (add a new cart item) request
-export const postOrderActionCreator = createAction<OrderType>("saga/domain/order/post")
+// for POST (add order with clientSecret) request
+export declare type PostOrderActionType = OrderCriteria  
+export const postOrderActionCreator = createAction<PostOrderActionType>("saga/domain/order/post")
 export const postOrderActionTypeName = postOrderActionCreator().type
 
 // for PUT (replace) request

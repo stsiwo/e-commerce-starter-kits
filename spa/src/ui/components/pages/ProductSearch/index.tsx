@@ -5,9 +5,8 @@ import SearchController from 'components/common/SearchController';
 import SearchResult from 'components/common/SearchResult';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProductWithCacheActionCreator, productPaginationPageActions } from 'reducers/slices/domain/product';
+import { fetchPublicProductActionCreator, productPaginationPageActions } from 'reducers/slices/domain/product';
 import { mSelector } from 'src/selectors/selector';
-import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -34,7 +33,7 @@ const ProductSearch: React.FunctionComponent<{}> = (props) => {
   const dispatch = useDispatch()
 
   // filter/sort/pagination
-  const curDomains = useSelector(mSelector.makeProductSelector()); 
+  const curDomains = useSelector(mSelector.makeProductWithoutCacheSelector()); 
 
   const curQuery = useSelector(mSelector.makeProductQuerySelector())
 
@@ -50,7 +49,7 @@ const ProductSearch: React.FunctionComponent<{}> = (props) => {
 
   // api request every time query/page changes
   React.useEffect(() => {
-    dispatch(fetchProductWithCacheActionCreator())
+    dispatch(fetchPublicProductActionCreator())
   }, [
     JSON.stringify(curQuery),
     curPagination.page,

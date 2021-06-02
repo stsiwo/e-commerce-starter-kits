@@ -1,12 +1,25 @@
+import { deleteAuthAddressActionTypeName, deleteAuthAvatarImageActionTypeName, deleteAuthPhoneActionTypeName, patchAuthAddressActionTypeName, patchAuthPhoneActionTypeName, postAuthAddressActionTypeName, postAuthAvatarImageActionTypeName, postAuthPhoneActionTypeName, putAuthActionTypeName, putAuthAddressActionTypeName, putAuthCompanyActionTypeName, putAuthPhoneActionTypeName } from 'reducers/slices/app';
 import { deleteCartItemActionTypeName, deleteSingleCartItemActionTypeName, fetchCartItemActionTypeName, postCartItemActionTypeName, putCartItemActionTypeName } from 'reducers/slices/domain/cartItem';
 import { deleteSingleCategoryActionTypeName, fetchCategoryActionTypeName, fetchCategoryWithCacheActionTypeName, postCategoryActionTypeName, putCategoryActionTypeName } from 'reducers/slices/domain/category';
-import { fetchOrderActionTypeName, fetchSingleOrderActionTypeName, postOrderActionTypeName, putOrderActionTypeName, postOrderEventActionTypeName, putOrderEventActionTypeName, deleteSingleOrderEventActionTypeName } from 'reducers/slices/domain/order';
-import { deleteSingleProductActionTypeName, fetchProductActionTypeName, fetchProductWithCacheActionTypeName, fetchSingleProductActionTypeName, postProductActionTypeName, putProductActionTypeName, postProductVariantActionTypeName, putProductVariantActionTypeName, deleteSingleProductVariantActionTypeName } from 'reducers/slices/domain/product';
-import { deleteSingleUserActionTypeName, fetchSingleUserActionTypeName, fetchUserActionTypeName, putUserActionTypeName, postUserAvatarImageActionTypeName, deleteUserAvatarImageActionTypeName, postUserPhoneActionTypeName, putUserPhoneActionTypeName, patchUserPhoneActionTypeName, deleteUserPhoneActionTypeName, postUserAddressActionTypeName, putUserAddressActionTypeName, patchUserAddressActionTypeName, deleteUserAddressActionTypeName } from 'reducers/slices/domain/user';
-import { deleteSingleWishlistItemActionTypeName, deleteWishlistItemActionTypeName, fetchWishlistItemActionTypeName, postWishlistItemActionTypeName, patchWishlistItemActionTypeName } from 'reducers/slices/domain/wishlistItem';
-import { requestStripeClientSecretActionTypeName } from 'reducers/slices/sensitive';
+import { deleteSingleOrderEventActionTypeName, fetchOrderActionTypeName, fetchSingleOrderActionTypeName, postOrderActionTypeName, postOrderEventActionTypeName, putOrderActionTypeName, putOrderEventActionTypeName } from 'reducers/slices/domain/order';
+import { deleteSingleProductActionTypeName, deleteSingleProductVariantActionTypeName, fetchProductActionTypeName, fetchProductWithCacheActionTypeName, fetchPublicProductActionTypeName, fetchSingleProductActionTypeName, postProductActionTypeName, postProductVariantActionTypeName, putProductActionTypeName, putProductVariantActionTypeName } from 'reducers/slices/domain/product';
+import { deleteSingleReviewActionTypeName, fetchReviewActionTypeName, postReviewActionTypeName, putReviewActionTypeName } from 'reducers/slices/domain/review';
+import { deleteSingleUserActionTypeName, deleteUserAddressActionTypeName, deleteUserAvatarImageActionTypeName, deleteUserPhoneActionTypeName, fetchSingleUserActionTypeName, fetchUserActionTypeName, patchUserAddressActionTypeName, patchUserPhoneActionTypeName, postUserAddressActionTypeName, postUserAvatarImageActionTypeName, postUserPhoneActionTypeName, putUserActionTypeName, putUserAddressActionTypeName, putUserPhoneActionTypeName } from 'reducers/slices/domain/user';
+import { deleteSingleWishlistItemActionTypeName, deleteWishlistItemActionTypeName, fetchWishlistItemActionTypeName, patchWishlistItemActionTypeName, postWishlistItemActionTypeName } from 'reducers/slices/domain/wishlistItem';
 import { toggleLeftNavMenuActionTypeName } from 'reducers/slices/ui';
 import { takeEvery, takeLatest } from 'redux-saga/effects';
+import { deleteAuthAddressWorker } from 'sideEffects/workers/auth/deleteAuthAddressWorker';
+import { deleteAuthAvatarImageWorker } from 'sideEffects/workers/auth/deleteAuthAvatarImageWorker';
+import { deleteAuthPhoneWorker } from 'sideEffects/workers/auth/deleteAuthPhoneWorker';
+import { patchAuthAddressWorker } from 'sideEffects/workers/auth/patchAuthAddressWorker';
+import { patchAuthPhoneWorker } from 'sideEffects/workers/auth/patchAuthPhoneWorker';
+import { postAuthAddressWorker } from 'sideEffects/workers/auth/postAuthAddressWorker';
+import { postAuthAvatarImageWorker } from 'sideEffects/workers/auth/postAuthAvatarImageWorker';
+import { postAuthPhoneWorker } from 'sideEffects/workers/auth/postAuthPhoneWorker';
+import { putAuthAddressWorker } from 'sideEffects/workers/auth/putAuthAddressWorker';
+import { putAuthCompanyWorker } from 'sideEffects/workers/auth/putAuthCompanyWorker';
+import { putAuthPhoneWorker } from 'sideEffects/workers/auth/putAuthPhoneWorker';
+import { putAuthWorker } from 'sideEffects/workers/auth/putAuthWorker';
 import { deleteCartItemWorker } from 'sideEffects/workers/cartItem/deleteCartItemWorker';
 import { deleteSingleCartItemWorker } from 'sideEffects/workers/cartItem/deleteSingleCartItemWorker';
 import { fetchCartItemWorker } from 'sideEffects/workers/cartItem/fetchCartItemWorker';
@@ -19,59 +32,45 @@ import { putCategoryWorker } from 'sideEffects/workers/category/putCategoryWorke
 import { fetchCategoryWithCacheWorker } from 'sideEffects/workers/fetchCategoryWithCacheWorker';
 import { fetchProductWithCacheWorker } from 'sideEffects/workers/fetchProductWithCacheWorker';
 import { leftNavMenuWorkerWorker } from 'sideEffects/workers/leftNavMenuWorker';
+import { deleteSingleOrderEventWorker } from 'sideEffects/workers/order/deleteSingleOrderEventWorker';
 import { fetchOrderWorker } from 'sideEffects/workers/order/fetchOrderWorker';
 import { fetchSingleOrderWorker } from 'sideEffects/workers/order/fetchSingleOrderWorker';
+import { postOrderEventWorker } from 'sideEffects/workers/order/postOrderEventWorker';
 import { postOrderWorker } from 'sideEffects/workers/order/postOrderWorker';
+import { putOrderEventWorker } from 'sideEffects/workers/order/putOrderEventWorker';
 import { putOrderWorker } from 'sideEffects/workers/order/putOrderWorker';
+import { deleteSingleProductVariantWorker } from 'sideEffects/workers/product/deleteSingleProductVariantWorker';
 import { deleteSingleProductWorker } from 'sideEffects/workers/product/deleteSingleProductWorker';
 import { fetchProductWorker } from 'sideEffects/workers/product/fetchProductWorker';
+import { fetchPublicProductWorker } from 'sideEffects/workers/product/fetchPublicProductWorker';
 import { fetchSingleProductWorker } from 'sideEffects/workers/product/fetchSingleProductWorker';
+import { postProductVariantWorker } from 'sideEffects/workers/product/postProductVariantWorker';
 import { postProductWorker } from 'sideEffects/workers/product/postProductWorker';
+import { putProductVariantWorker } from 'sideEffects/workers/product/putProductVariantWorker';
 import { putProductWorker } from 'sideEffects/workers/product/putProductWorker';
-import { requestStripeClientSecretWorker } from 'sideEffects/workers/sensitive/stripeClientSecret';
+import { deleteSingleReviewWorker } from 'sideEffects/workers/review/deleteSingleReviewWorker';
+import { fetchReviewWorker } from 'sideEffects/workers/review/fetchReviewWorker';
+import { postReviewWorker } from 'sideEffects/workers/review/postReviewWorker';
+import { putReviewWorker } from 'sideEffects/workers/review/putReviewWorker';
 import { deleteSingleUserWorker } from 'sideEffects/workers/user/deleteSingleUserWorker';
+import { deleteUserAddressWorker } from 'sideEffects/workers/user/deleteUserAddressWorker';
+import { deleteUserAvatarImageWorker } from 'sideEffects/workers/user/deleteUserAvatarImageWorker';
+import { deleteUserPhoneWorker } from 'sideEffects/workers/user/deleteUserPhoneWorker';
 import { fetchSingleUserWorker } from 'sideEffects/workers/user/fetchSingleUserWorker';
 import { fetchUserWorker } from 'sideEffects/workers/user/fetchUserWorker';
+import { patchUserAddressWorker } from 'sideEffects/workers/user/patchUserAddressWorker';
+import { patchUserPhoneWorker } from 'sideEffects/workers/user/patchUserPhoneWorker';
+import { postUserAddressWorker } from 'sideEffects/workers/user/postUserAddressWorker';
+import { postUserAvatarImageWorker } from 'sideEffects/workers/user/postUserAvatarImageWorker';
+import { postUserPhoneWorker } from 'sideEffects/workers/user/postUserPhoneWorker';
+import { putUserAddressWorker } from 'sideEffects/workers/user/putUserAddressWorker';
+import { putUserPhoneWorker } from 'sideEffects/workers/user/putUserPhoneWorker';
 import { putUserWorker } from 'sideEffects/workers/user/putUserWorker';
 import { deleteSingleWishlistItemWorker } from 'sideEffects/workers/wishlistItems/deleteSingleWishlistItemWorker';
 import { deleteWishlistItemWorker } from 'sideEffects/workers/wishlistItems/deleteWishlistItemWorker';
 import { fetchWishlistItemWorker } from 'sideEffects/workers/wishlistItems/fetchWishlistItemWorker';
-import { postWishlistItemWorker } from 'sideEffects/workers/wishlistItems/postWishlistItemWorker';
 import { patchWishlistItemWorker } from 'sideEffects/workers/wishlistItems/patchWishlistItemWorker';
-import { postUserAvatarImageWorker } from 'sideEffects/workers/user/postUserAvatarImageWorker';
-import { deleteUserAvatarImageWorker } from 'sideEffects/workers/user/deleteUserAvatarImageWorker';
-import { postAuthAvatarImageActionTypeName, deleteAuthAvatarImageActionTypeName, putAuthActionTypeName, postAuthPhoneActionTypeName, putAuthPhoneActionTypeName, deleteAuthPhoneActionTypeName, patchAuthPhoneActionTypeName, postAuthAddressActionTypeName, putAuthAddressActionTypeName, patchAuthAddressActionTypeName, deleteAuthAddressActionTypeName, putAuthCompanyActionTypeName } from 'reducers/slices/app';
-import { postAuthAvatarImageWorker } from 'sideEffects/workers/auth/postAuthAvatarImageWorker';
-import { deleteAuthAvatarImageWorker } from 'sideEffects/workers/auth/deleteAuthAvatarImageWorker';
-import { putAuthWorker } from 'sideEffects/workers/auth/putAuthWorker';
-import { postAuthPhoneWorker } from 'sideEffects/workers/auth/postAuthPhoneWorker';
-import { putAuthPhoneWorker } from 'sideEffects/workers/auth/putAuthPhoneWorker';
-import { deleteAuthPhoneWorker } from 'sideEffects/workers/auth/deleteAuthPhoneWorker';
-import { patchAuthPhoneWorker } from 'sideEffects/workers/auth/patchAuthPhoneWorker';
-import { postAuthAddressWorker } from 'sideEffects/workers/auth/postAuthAddressWorker';
-import { putAuthAddressWorker } from 'sideEffects/workers/auth/putAuthAddressWorker';
-import { patchAuthAddressWorker } from 'sideEffects/workers/auth/patchAuthAddressWorker';
-import { deleteAuthAddressWorker } from 'sideEffects/workers/auth/deleteAuthAddressWorker';
-import { putAuthCompanyWorker } from 'sideEffects/workers/auth/putAuthCompanyWorker';
-import { postProductVariantWorker } from 'sideEffects/workers/product/postProductVariantWorker';
-import { putProductVariantWorker } from 'sideEffects/workers/product/putProductVariantWorker';
-import { deleteSingleProductVariantWorker } from 'sideEffects/workers/product/deleteSingleProductVariantWorker';
-import { postOrderEventWorker } from 'sideEffects/workers/order/postOrderEventWorker';
-import { putOrderEventWorker } from 'sideEffects/workers/order/putOrderEventWorker';
-import { deleteSingleOrderEventWorker } from 'sideEffects/workers/order/deleteSingleOrderEventWorker';
-import { postUserPhoneWorker } from 'sideEffects/workers/user/postUserPhoneWorker';
-import { putUserPhoneWorker } from 'sideEffects/workers/user/putUserPhoneWorker';
-import { patchUserPhoneWorker } from 'sideEffects/workers/user/patchUserPhoneWorker';
-import { deleteUserPhoneWorker } from 'sideEffects/workers/user/deleteUserPhoneWorker';
-import { postUserAddressWorker } from 'sideEffects/workers/user/postUserAddressWorker';
-import { putUserAddressWorker } from 'sideEffects/workers/user/putUserAddressWorker';
-import { patchUserAddressWorker } from 'sideEffects/workers/user/patchUserAddressWorker';
-import { deleteUserAddressWorker } from 'sideEffects/workers/user/deleteUserAddressWorker';
-import { fetchReviewActionTypeName, postReviewActionTypeName, putReviewActionTypeName, deleteSingleReviewActionTypeName } from 'reducers/slices/domain/review';
-import { fetchReviewWorker } from 'sideEffects/workers/review/fetchReviewWorker';
-import { postReviewWorker } from 'sideEffects/workers/review/postReviewWorker';
-import { putReviewWorker } from 'sideEffects/workers/review/putReviewWorker';
-import { deleteSingleReviewWorker } from 'sideEffects/workers/review/deleteSingleReviewWorker';
+import { postWishlistItemWorker } from 'sideEffects/workers/wishlistItems/postWishlistItemWorker';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -375,6 +374,13 @@ export function* fetchProductWatcher() {
   )
 }
 
+export function* fetchPublicProductWatcher() {
+  yield takeLatest(
+    fetchPublicProductActionTypeName,
+    fetchPublicProductWorker,
+  )
+}
+
 export function* fetchSingleProductWatcher() {
   yield takeLatest(
     fetchSingleProductActionTypeName,
@@ -524,12 +530,3 @@ export function* fetchCategoryWithCacheWatcher() {
     fetchCategoryWithCacheWorker,
   )
 }
-
-// stripeClientSecret request
-export function* requestStripeClientSecretWatcher() {
-  yield takeLatest(
-    requestStripeClientSecretActionTypeName,
-    requestStripeClientSecretWorker,
-  )
-}
-

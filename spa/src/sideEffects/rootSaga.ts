@@ -1,5 +1,5 @@
 import { all, call, spawn } from 'redux-saga/effects';
-import { deleteCartItemWatcher, deleteSingleCartItemWatcher, fetchCartItemWatcher, leftNavMenuWatcher, postCartItemWatcher, putCartItemWatcher, fetchWishlistItemWatcher, postWishlistItemWatcher, deleteSingleWishlistItemWatcher, deleteWishlistItemWatcher, fetchCategoryWatcher, postCategoryWatcher, putCategoryWatcher, deleteSingleCategoryWatcher, fetchUserWatcher, fetchSingleUserWatcher, putUserWatcher, deleteSingleUserWatcher, fetchOrderWatcher, fetchSingleOrderWatcher, postOrderWatcher, putOrderWatcher, fetchProductWatcher, fetchSingleProductWatcher, postProductWatcher, putProductWatcher, deleteSingleProductWatcher, requestStripeClientSecretWatcher, fetchProductWithCacheWatcher, fetchCategoryWithCacheWatcher, patchWishlistItemWatcher, deleteUserAvatarImageWatcher, postAuthAvatarImageWatcher, deleteAuthAvatarImageWatcher, postUserAvatarImageWatcher, putAuthWatcher, putAuthPhoneWatcher, deleteAuthPhoneWatcher, postAuthPhoneWatcher, patchAuthPhoneWatcher, postAuthAddressWatcher, putAuthAddressWatcher, patchAuthAddressWatcher, deleteAuthAddressWatcher, putAuthCompanyWatcher, postProductVariantWatcher, putProductVariantWatcher, deleteSingleProductVariantWatcher, postOrderEventWatcher, putOrderEventWatcher, deleteSingleOrderEventWatcher, postUserPhoneWatcher, putUserPhoneWatcher, patchUserPhoneWatcher, deleteUserPhoneWatcher, postUserAddressWatcher, putUserAddressWatcher, patchUserAddressWatcher, deleteUserAddressWatcher, fetchReviewWatcher, postReviewWatcher, putReviewWatcher, deleteSingleReviewWatcher } from './watchers';
+import { deleteAuthAddressWatcher, deleteAuthAvatarImageWatcher, deleteAuthPhoneWatcher, deleteCartItemWatcher, deleteSingleCartItemWatcher, deleteSingleCategoryWatcher, deleteSingleOrderEventWatcher, deleteSingleProductVariantWatcher, deleteSingleProductWatcher, deleteSingleReviewWatcher, deleteSingleUserWatcher, deleteSingleWishlistItemWatcher, deleteUserAddressWatcher, deleteUserAvatarImageWatcher, deleteUserPhoneWatcher, deleteWishlistItemWatcher, fetchCartItemWatcher, fetchCategoryWatcher, fetchCategoryWithCacheWatcher, fetchOrderWatcher, fetchProductWatcher, fetchProductWithCacheWatcher, fetchPublicProductWatcher, fetchReviewWatcher, fetchSingleOrderWatcher, fetchSingleProductWatcher, fetchSingleUserWatcher, fetchUserWatcher, fetchWishlistItemWatcher, leftNavMenuWatcher, patchAuthAddressWatcher, patchAuthPhoneWatcher, patchUserAddressWatcher, patchUserPhoneWatcher, patchWishlistItemWatcher, postAuthAddressWatcher, postAuthAvatarImageWatcher, postAuthPhoneWatcher, postCartItemWatcher, postCategoryWatcher, postOrderEventWatcher, postOrderWatcher, postProductVariantWatcher, postProductWatcher, postReviewWatcher, postUserAddressWatcher, postUserAvatarImageWatcher, postUserPhoneWatcher, postWishlistItemWatcher, putAuthAddressWatcher, putAuthCompanyWatcher, putAuthPhoneWatcher, putAuthWatcher, putCartItemWatcher, putCategoryWatcher, putOrderEventWatcher, putOrderWatcher, putProductVariantWatcher, putProductWatcher, putReviewWatcher, putUserAddressWatcher, putUserPhoneWatcher, putUserWatcher } from './watchers';
 
 export function* rootSaga() {
 
@@ -11,9 +11,6 @@ export function* rootSaga() {
   const sagas: any[] = [
     // app
     leftNavMenuWatcher,
-
-    /// private - clientSecret
-    requestStripeClientSecretWatcher,
 
     // ui
     
@@ -88,6 +85,7 @@ export function* rootSaga() {
     /// product
     fetchProductWatcher,
     fetchSingleProductWatcher,
+    fetchPublicProductWatcher,
     postProductWatcher,
     putProductWatcher,
     deleteSingleProductWatcher,

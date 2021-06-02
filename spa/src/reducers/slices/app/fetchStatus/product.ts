@@ -33,6 +33,37 @@ export const getProductFetchStatusSliceReducer = getProductFetchStatusSlice.redu
 export const getProductFetchStatusActions = getProductFetchStatusSlice.actions
 
 /**
+ * app.fetchStatus.product.getPublic state Slice
+ **/
+export type getPublicProductFetchStatusActionType = PayloadAction<FetchStatusEnum>
+
+export const getPublicProductFetchStatusSlice = createSlice({
+  name: "app/fetchStatus/product/getPublic", // a name used in action type
+  initialState: {},
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+    update: (state: FetchStatusEnum, action: getPublicProductFetchStatusActionType) => action.payload,
+    clear: (state: FetchStatusEnum) => FetchStatusEnum.INITIAL
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   **/
+})
+
+export const getPublicProductFetchStatusSliceReducer = getPublicProductFetchStatusSlice.reducer
+export const getPublicProductFetchStatusActions = getPublicProductFetchStatusSlice.actions
+
+/**
  * app.fetchStatus.product.getSingle state Slice
  **/
 export type getSingleProductFetchStatusActionType = PayloadAction<FetchStatusEnum>

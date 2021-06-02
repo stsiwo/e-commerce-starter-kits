@@ -26,6 +26,10 @@ export declare type FetchSingleProductActionType = { productId: string }
 export const fetchSingleProductActionCreator = createAction<FetchSingleProductActionType>("saga/domain/product/fetchSingle")
 export const fetchSingleProductActionTypeName = fetchSingleProductActionCreator().type
 
+// for GET request 
+export const fetchPublicProductActionCreator = createAction("saga/domain/product/fetchPublic")
+export const fetchPublicProductActionTypeName = fetchPublicProductActionCreator().type
+
 // for POST (add a new cart item) request
 export declare type PostProductActionType = ProductCriteria 
 export const postProductActionCreator = createAction<PostProductActionType>("saga/domain/product/post")

@@ -35,8 +35,13 @@ export function toAddressString(address: UserAddressType): string {
   return `${address.address1} ${address.address2} ${address.city} ${address.province} ${address.country} ${address.postalCode}`
 }
 
+
 export function toPhoneString(phone: UserPhoneType): string {
   return `${phone.countryCode} ${phone.phoneNumber}`
+}
+
+export function toPhoneStringWithoutSpace(phone: UserPhoneType): string {
+  return `${phone.countryCode}${phone.phoneNumber}`
 }
 
 export function toFullNameString(user: UserType): string {

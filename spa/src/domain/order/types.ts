@@ -1,5 +1,5 @@
 import { UserTypeEnum } from "src/app";
-import { ProductType } from "domain/product/types";
+import { ProductType, ProductVariantType } from "domain/product/types";
 import DraftsIcon from '@material-ui/icons/Drafts';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import PaymentIcon from '@material-ui/icons/Payment';
@@ -174,6 +174,16 @@ export const hasNextOrderOptions: (orderStatusBag: OrderStatusBagType, targetUse
 
 // type def
 
+export declare type OrderAddressType = {
+  addressId?: string
+  address1: string
+  address2: string
+  city: string
+  province: string
+  country: string
+  postalCode: string
+}
+
 export declare type OrderEventType = {
   orderEventId?: string
   createdAt: Date
@@ -191,6 +201,7 @@ export declare type OrderDetailType = {
   productColor: string,
   productSize: string,
   productName: string
+  productVariant: ProductVariantType // selected variant
   product?: ProductType // if still the product exist
 }
 
@@ -228,6 +239,29 @@ export const defaultOrderEventData: OrderEventType = {
 }
 
 // criteria
+
+export declare type OrderDetailCriteria = {
+  orderDetailId: string,
+  productQuantity: number,
+  productVariantId: string // selected variant
+  productId: string // if still the product exist
+}
+
+export declare type OrderCriteria = {
+  orderId?: string
+  orderNumber?: string
+  orderFirstName: string
+  orderLastName: string
+  orderEmail: string
+  orderPhone: string
+  shippingAddress: OrderAddressType
+  billingAddress: OrderAddressType
+  note: string
+  userId: string
+  orderDetails: OrderDetailCriteria[]
+  orderEvents?: string[]
+  currency: string
+}
 
 export declare type OrderEventCriteria = {
   orderEventId?: string

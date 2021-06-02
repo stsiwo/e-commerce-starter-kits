@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme: Theme) =>
       // need to be 'flex', otherwise, default animation (e.g., when click the input, the placeholder goes up to the left top) collapses.
       maxWidth: 300,
       margin: "5px 5px",
-      
+
     },
     disabled: {
       color: theme.palette.text.primary
@@ -63,7 +63,9 @@ const CustomerBasicConfirm: React.FunctionComponent<CustomerBasicConfirmPropsTyp
         label="First Name"
         className={classes.formControl}
         value={auth.user.firstName}
-        disabled
+        inputProps={{
+          readOnly: true,
+        }}
         color={'primary'}
       />
       <TextField
@@ -71,14 +73,18 @@ const CustomerBasicConfirm: React.FunctionComponent<CustomerBasicConfirmPropsTyp
         label="Last Name"
         className={classes.formControl}
         value={auth.user.lastName}
-        disabled
+        inputProps={{
+          readOnly: true,
+        }}
       />
       <TextField
         id="email"
         label="Email"
         className={classes.formControl}
         value={auth.user.email}
-        disabled
+        inputProps={{
+          readOnly: true,
+        }}
       />
       <Box component="div" className={classes.actionBox}>
         <Button onClick={(e) => props.goToStep(CheckoutStepEnum.CUSTOMER_BASIC_INFORMATION)}>

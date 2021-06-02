@@ -3,16 +3,19 @@ import Button from '@material-ui/core/Button';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import CartItem from 'components/common/CartItem';
-import { calcSubTotalPriceAmount, calcSubTotalProductNumbers } from 'domain/cart';
+import { calcSubTotalPriceAmount, calcSubTotalProductNumbers, validateCartItemsForCheckout } from 'domain/cart';
 import { CartItemType } from 'domain/cart/types';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link as RRLink } from "react-router-dom";
 import { fetchCartItemActionCreator } from 'reducers/slices/domain/cartItem';
-import { UserTypeEnum } from 'src/app';
+import { UserTypeEnum, MessageTypeEnum } from 'src/app';
 import { mSelector } from 'src/selectors/selector';
 import { generateCartItemList } from 'tests/data/cart';
-import { cadCurrencyFormat } from 'src/utils';
+import { cadCurrencyFormat, getNanoId } from 'src/utils';
+import { useHistory } from 'react-router';
+import { useSnackbar } from 'notistack';
+import { messageActions } from 'reducers/slices/app';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -35,7 +38,6 @@ const useStyles = makeStyles((theme: Theme) =>
  **/
 const CartBox: React.FunctionComponent<{}> = (props) => {
 
-
   const classes = useStyles();
 
   const auth = useSelector(mSelector.makeAuthSelector());
@@ -44,6 +46,8 @@ const CartBox: React.FunctionComponent<{}> = (props) => {
 
   const curCartItems = useSelector(mSelector.makeCartItemSelector())
 
+  const history = useHistory();
+  
   // fetch cart item from api (member only)
   React.useEffect(() => {
     if (auth.userType === UserTypeEnum.MEMBER) {
@@ -61,6 +65,20 @@ const CartBox: React.FunctionComponent<{}> = (props) => {
         />
       )
     })
+  }
+
+  const handleCheckoutClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (validateCartItemsForCheckout(curCartItems)) {
+      history.push("/checkout");
+    } else {
+      dispatch(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.ERROR,
+          message: "please select at least one product to buy.",
+        }) 
+      );
+    }
   }
 
   return (
@@ -86,7 +104,7 @@ const CartBox: React.FunctionComponent<{}> = (props) => {
             </Typography>
           </Box>
           <Box component="div" className={classes.controllerBox}>
-            <Button component={RRLink} to="/checkout">
+            <Button onClick={handleCheckoutClick}>
               {"Checkout"}
             </Button>
           </Box>

@@ -87,9 +87,9 @@ export const initialState: StateType = {
     searchKeyword: "",
     requestTracker: {},
     fetchStatus: {
-      stripeClientSecret: FetchStatusEnum.INITIAL,
       products: {
         get: FetchStatusEnum.INITIAL,
+        getPublic: FetchStatusEnum.INITIAL,
         getSingle: FetchStatusEnum.INITIAL,
         post: FetchStatusEnum.INITIAL,
         put: FetchStatusEnum.INITIAL,
@@ -179,7 +179,7 @@ export const initialState: StateType = {
         totalElements: 0,
       },
     },
-    cartItems: [],
+    cartItems: localStorage.getItem("cartItems") != null ? JSON.parse(localStorage.getItem("cartItems")) : [],
     wishlistItems: {
       data: [],
       pagination: {

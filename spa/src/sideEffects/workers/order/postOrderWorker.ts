@@ -1,12 +1,15 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { OrderType } from "domain/order/types";
+import { OrderType, OrderCriteria } from "domain/order/types";
 import { postOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
-import { orderActions } from "reducers/slices/domain/order";
+import { orderActions, PostOrderActionType } from "reducers/slices/domain/order";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
+import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
+import { messageActions } from "reducers/slices/app";
+import { getNanoId } from "src/utils";
+import { stripeClientSecretActions } from "reducers/slices/sensitive";
 
 /**
  * a worker (generator)    
@@ -36,7 +39,7 @@ import { rsSelector } from "src/selectors/selector";
  *    - dont' send back the sensitive information about this order
  *
  **/
-export function* postOrderWorker(action: PayloadAction<OrderType>) {
+export function* postOrderWorker(action: PayloadAction<PostOrderActionType>) {
 
   /**
    * get cur user type
@@ -48,7 +51,7 @@ export function* postOrderWorker(action: PayloadAction<OrderType>) {
    * Admin User Type
    *
    **/
-  if (curAuth.userType === UserTypeEnum.ADMIN) {
+  if (curAuth.userType === UserTypeEnum.GUEST || curAuth.userType === UserTypeEnum.MEMBER) {
 
     /**
      * update status for post order data
@@ -71,9 +74,9 @@ export function* postOrderWorker(action: PayloadAction<OrderType>) {
 
       // start fetching
       const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "PUT",
+        method: "POST",
         url: apiUrl,
-        data: action.payload
+        data: action.payload as OrderCriteria
       })
 
       /**
@@ -81,7 +84,11 @@ export function* postOrderWorker(action: PayloadAction<OrderType>) {
        *
        **/
       yield put(
-        orderActions.concat(response.data.data)
+        orderActions.concat(response.data.order)
+      )
+
+      yield put(
+        stripeClientSecretActions.update(response.data.clientSecret)
       )
 
       /**
@@ -91,6 +98,16 @@ export function* postOrderWorker(action: PayloadAction<OrderType>) {
         postOrderFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.SUCCESS,
+          message: "we confirmed your request.",
+        }) 
+      )
     } catch (error) {
 
       console.log(error)
@@ -101,8 +118,21 @@ export function* postOrderWorker(action: PayloadAction<OrderType>) {
       yield put(
         postOrderFetchStatusActions.update(FetchStatusEnum.FAILED)
       )
+
+      /**
+       * update message
+       **/
+      yield put(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.ERROR,
+          message: error.message, 
+        }) 
+      )
     }
-  } 
+  } else {
+    console.log("permission denied. you are " + curAuth.userType)
+  }
 }
 
 

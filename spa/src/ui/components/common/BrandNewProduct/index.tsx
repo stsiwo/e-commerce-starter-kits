@@ -6,10 +6,10 @@ import Typography from '@material-ui/core/Typography';
 import { ProductType } from 'domain/product/types';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProductWithCacheActionCreator } from 'reducers/slices/domain/product';
+import { Link as RRLink } from "react-router-dom";
 import { mSelector } from 'src/selectors/selector';
 import ProductCard from '../ProductCard';
-import { Link as RRLink } from "react-router-dom";
+import { fetchPublicProductActionCreator } from 'reducers/slices/domain/product';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -39,11 +39,11 @@ const BrandNewProduct: React.FunctionComponent<{}> = (props) => {
 
   const dispatch = useDispatch();
 
-  const curDomains = useSelector(mSelector.makeProductSelector())
+  const curDomains = useSelector(mSelector.makeProductWithoutCacheSelector())
 
   // fetch new blogs only once
   React.useEffect(() => {
-    dispatch(fetchProductWithCacheActionCreator())
+    dispatch(fetchPublicProductActionCreator())
   }, [])
 
   const renderDomains: () => React.ReactNode = () => {
