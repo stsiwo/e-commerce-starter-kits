@@ -8,24 +8,11 @@ endpoint change:
 
     - properties:
     
-      - cheapestPriceThruAllVariant: cheapest price at product aggregate
-      
-        - thsi is to display cheapest price at product search then display something like this 'Price: $25.00 ~' (e.g., 25 is cheapest price)
-      
-      - isDiscoutAvailableThruAllVariant: if any variant/prodcut itself is discount, make this true
-      
-        - thsi is to display 'discount' label on product search.
+      - (order) totalCost: prevent front-end from calculating (single source of truth)
 
   - (impl) /reviews
   
     - customer review logic review & flow checking
-  
-  - (minor) orderSpecification: status filter.
-  
-  - (testing)
-  
-    - domain event
-    - POST product (esp multiple ifles)
     
   - /products (GET) 
   
@@ -36,20 +23,10 @@ endpoint change:
     - validations:
     
       - only return products which are 'public' & have at least one variant.
-      
-  - /orders/{orderId}/events
-  
-    return manipulated order event! not string message.
     
   - avatar-image
   
     - add cache feature (hasing file name or something)
-  
-  - categories/
-  
-    - what should I do when category is deleted and its has several products which are blonged to the category.
-    
-      - force the admin to delete all products which are blongs to the category first. until then, disable delete option.
   
   - performance:
   
@@ -64,6 +41,8 @@ endpoint change:
     - trim all string input from client.
     
     - cross site request forgery enable. research on this subject since we use cookie (httpOnly&secure).
+    
+    - disable cart icon (on header) when checkout page (don't need to cart drawer at this page)
     
   - unit test
     - addable next order event status
