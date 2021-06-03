@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { getOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
 import { orderActions } from "reducers/slices/domain/order";
@@ -55,41 +54,38 @@ export function* fetchSingleOrderWorker(action: PayloadAction<{ orderId: string 
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "GET",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "GET",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      getOrderFetchStatusActions.update(response.fetchStatus)
+    )
 
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update order domain in state
        *
        **/
       yield put(
-        orderActions.concat(response.data.data)
+        orderActions.concat(response.data)
       )
 
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        getOrderFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        getOrderFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
     }
   } else {
     console.log("permission denied. your order type: " + curAuth.userType)

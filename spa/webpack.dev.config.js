@@ -29,6 +29,7 @@ module.exports = merge(common, {
       TEST_MEMBER_EMAIL: JSON.stringify("test_member@test.com"),
       TEST_USER_PASSWORD: JSON.stringify("test_password"),
       OWNER_BUCKET_NAME: JSON.stringify("bactivityhair.com-dev-bucket"),
+      CHECKOUT_SESSION_TIMEOUT: JSON.stringify("60000"),
       API1_URL: JSON.stringify("http://localhost:8080"),
       PUBLIC_IMAGE_PATH: JSON.stringify("/images/"),
     })

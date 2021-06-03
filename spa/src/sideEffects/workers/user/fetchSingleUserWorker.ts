@@ -1,11 +1,10 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { api } from "configs/axiosConfig";
 import { getUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 import { userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { api } from "configs/axiosConfig";
 
 /**
  * a worker (generator)    
@@ -55,16 +54,26 @@ export function* fetchSingleUserWorker(action: PayloadAction<{ userId: string }>
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "GET",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "GET",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      getUserFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update user domain in state
        *
@@ -73,23 +82,10 @@ export function* fetchSingleUserWorker(action: PayloadAction<{ userId: string }>
         userActions.concat([response.data])
       )
 
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        getUserFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-    } catch (error) {
+      console.log(response.message)
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        getUserFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
     }
   } else {
     console.log("permission denied. your user type: " + curAuth.userType)

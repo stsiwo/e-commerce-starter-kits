@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { UserType } from "domain/user/types";
 import { deleteSingleUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
@@ -61,15 +60,26 @@ export function* deleteSingleUserWorker(action: PayloadAction<UserType>) {
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "DELETE",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "DELETE",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      deleteSingleUserFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       /**
        * update categories domain in state
@@ -79,23 +89,10 @@ export function* deleteSingleUserWorker(action: PayloadAction<UserType>) {
         userActions.delete(action.payload)
       )
 
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        deleteSingleUserFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-    } catch (error) {
+      console.log(response.message)
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        deleteSingleUserFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
     }
   }
 }

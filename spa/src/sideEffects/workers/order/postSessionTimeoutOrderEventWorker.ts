@@ -1,9 +1,10 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { api } from "configs/axiosConfig";
-import { UserCriteria } from "domain/user/types";
+import { SessionTimeoutOrderEventCriteria } from "domain/order/types";
 import { messageActions } from "reducers/slices/app";
-import { putUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
-import { PutUserActionType, userActions } from "reducers/slices/domain/user";
+import { postSessionTimeoutOrderEventFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
+import { checkoutOrderActions } from "reducers/slices/domain/checkout";
+import { PostSessionTimeoutOrderEventActionType } from "reducers/slices/domain/order";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
@@ -12,24 +13,28 @@ import { getNanoId } from "src/utils";
 /**
  * a worker (generator)    
  *
- *  - put user item to replace
+ *  - delete single order event 
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
  *  - (UserType)
  *
  *      - (Guest): N/A (permission denied) 
- *      - (Member): N/A (permission denied)
- *      - (Admin): OK 
+ *      - (Member): N/A (permission denied) 
+ *      - (Admin): OK
  *
  *  - steps:
  *
+ *      (Admin): 
+ *
+ *        a1. send delete request to api to delete the target entity 
+ *
+ *        a2. receive the response and delete it from redux store if success
+ *
  *  - note:
  *
- *    - userId must be the other member (not for auth) 
- *
  **/
-export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
+export function* postSessionTimeoutOrderEventWorker(action: PayloadAction<PostSessionTimeoutOrderEventActionType>) {
 
   /**
    * get cur user type
@@ -41,31 +46,31 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
    * Admin User Type
    *
    **/
-  if (curAuth.userType === UserTypeEnum.ADMIN) {
+  if (curAuth.userType === UserTypeEnum.GUEST || curAuth.userType === UserTypeEnum.MEMBER) {
 
     /**
-     * update status for put user data
+     * update status for put product data
      **/
     yield put(
-      putUserFetchStatusActions.update(FetchStatusEnum.FETCHING)
+      postSessionTimeoutOrderEventFetchStatusActions.update(FetchStatusEnum.FETCHING)
     )
 
     /**
-     * grab this  domain
+     * grab this domain
      **/
-    const apiUrl = `${API1_URL}/users/${action.payload.userId}`
+    const apiUrl = `${API1_URL}/orders/${action.payload.orderId}/events/session-timeout`
 
     /**
      * fetch data
      **/
 
-    // prep keyword if necessary
-
     // start fetching
     const response = yield call(() => api({
-      method: "PUT",
+      method: "POST",
       url: apiUrl,
-      data: action.payload as UserCriteria
+      data: {
+        orderNumber: action.payload.orderNumber
+      } as SessionTimeoutOrderEventCriteria
     })
       .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
       .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
@@ -75,19 +80,16 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
      * update fetch status sucess
      **/
     yield put(
-      putUserFetchStatusActions.update(response.fetchStatus)
+      postSessionTimeoutOrderEventFetchStatusActions.update(response.fetchStatus)
     )
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
-       * update this domain in state
+       * update product domain in state
        *
        **/
       yield put(
-        userActions.updateUser({
-          userId: action.payload.userId,
-          user: response.data
-        })
+        checkoutOrderActions.update(response.data)
       )
 
       /**
@@ -96,13 +98,11 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
       yield put(
         messageActions.update({
           id: getNanoId(),
-          type: MessageTypeEnum.SUCCESS,
-          message: "updated successfully.",
+          type: MessageTypeEnum.ERROR,
+          message: "sorry, your session is timeout. please start over again.",
         })
       )
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-
-      console.log(response.message)
 
       /**
        * update message
@@ -116,10 +116,8 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
       )
     }
   } else {
-    console.log("permission denied: you are " + curAuth.userType)
+    console.log("permission denied. you are " + curAuth.userType)
   }
 }
-
-
 
 

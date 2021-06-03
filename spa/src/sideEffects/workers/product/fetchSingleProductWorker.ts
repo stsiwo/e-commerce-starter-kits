@@ -1,16 +1,15 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { NormalizedProductType } from "domain/product/types";
 import { normalize } from "normalizr";
-import { getProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
-import { productActions, FetchSingleProductActionType } from "reducers/slices/domain/product";
-import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
-import { rsSelector } from "src/selectors/selector";
-import { productSchemaArray, productSchemaEntity } from "states/state";
 import { messageActions } from "reducers/slices/app";
+import { getProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
+import { FetchSingleProductActionType, productActions } from "reducers/slices/domain/product";
+import { call, put, select } from "redux-saga/effects";
+import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
+import { productSchemaEntity } from "states/state";
 
 /**
  * a worker (generator)    
@@ -60,16 +59,26 @@ export function* fetchSingleProductWorker(action: PayloadAction<FetchSingleProdu
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "GET",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "GET",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      getProductFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * normalize response data
        *
@@ -87,13 +96,6 @@ export function* fetchSingleProductWorker(action: PayloadAction<FetchSingleProdu
       )
 
       /**
-       * update fetch status sucess
-       **/
-      yield put(
-        getProductFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
-
-      /**
        * update message
        **/
       yield put(
@@ -101,19 +103,12 @@ export function* fetchSingleProductWorker(action: PayloadAction<FetchSingleProdu
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "fetched successfully.",
-        }) 
+        })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        getProductFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      console.log(response.message)
 
       /**
        * update message
@@ -122,8 +117,8 @@ export function* fetchSingleProductWorker(action: PayloadAction<FetchSingleProdu
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
     }
   } else {

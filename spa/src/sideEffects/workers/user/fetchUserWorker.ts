@@ -1,11 +1,10 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { getUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
-import { userActions, userPaginationTotalPagesActions, userPaginationPageActions, userPaginationTotalElementsActions } from "reducers/slices/domain/user";
-import { call, put, select, all } from "redux-saga/effects";
+import { userActions, userPaginationPageActions, userPaginationTotalElementsActions, userPaginationTotalPagesActions } from "reducers/slices/domain/user";
+import { all, call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
-import { rsSelector, mSelector } from "src/selectors/selector";
+import { mSelector, rsSelector } from "src/selectors/selector";
 import { generateQueryString } from "src/utils";
 
 /**
@@ -64,29 +63,32 @@ export function* fetchUserWorker(action: PayloadAction<{}>) {
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "GET",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "GET",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, content: response.data.content, pageable: response.data.pageable, totalPages: response.data.totalPages, totalElements: response.data.totalElements }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      getUserFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update user domain in state
        *
        **/
       yield put(
-        userActions.update(response.data.content)
-      )
-
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        getUserFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+        userActions.update(response.content)
       )
 
       /**
@@ -127,26 +129,20 @@ export function* fetchUserWorker(action: PayloadAction<{}>) {
        **/
 
 
-      console.log(response.data.pageable)
+      console.log(response.pageable)
 
       console.log("total pages")
-      console.log(response.data.totalPages)
+      console.log(response.totalPages)
 
       yield all([
-        put(userPaginationPageActions.update(response.data.pageable.pageNumber)),
-        put(userPaginationTotalPagesActions.update(response.data.totalPages)),
-        put(userPaginationTotalElementsActions.update(response.data.totalElements)),
+        put(userPaginationPageActions.update(response.pageable.pageNumber)),
+        put(userPaginationTotalPagesActions.update(response.totalPages)),
+        put(userPaginationTotalElementsActions.update(response.totalElements)),
       ])
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        getUserFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
     }
   } else {
     console.log("permission denied. your user type: " + curAuth.userType)

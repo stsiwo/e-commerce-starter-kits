@@ -41,6 +41,7 @@ export const rsSelector = {
     getSearchKeyword: (state: StateType) => state.app.searchKeyword,
     getRequestTracker: (state: StateType) => state.app.requestTracker,
 
+    getPostSessionTimeoutOrderEventFetchStatus: (state: StateType) => state.app.fetchStatus.orders.postSessionTimeoutEvent,
     getPostOrderFetchStatus: (state: StateType) => state.app.fetchStatus.orders.post,
     getFetchReviewFetchStatus: (state: StateType) => state.app.fetchStatus.reviews.get,
     getFetchProductFetchStatus: (state: StateType) => state.app.fetchStatus.products.get,
@@ -107,6 +108,8 @@ export const rsSelector = {
     getProductQuerySort: (state: StateType) => state.domain.products.query.sort,
     getProductPagination: (state: StateType) => state.domain.products.pagination,
     getProductCurItems: (state: StateType) => state.domain.products.curItems,
+
+    getCheckoutOrder: (state: StateType) => state.domain.checkout.order,
   },
 
   senstive: {

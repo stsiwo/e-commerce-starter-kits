@@ -63,29 +63,31 @@ export function* fetchReviewWorker(action: PayloadAction<{}>) {
     /**
      * fetch data
      **/
-    try {
 
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
+    const response = yield call(() => api({
         method: "GET",
         url: apiUrl,
       })
-
-      /**
-       * update review domain in state
-       *
-       **/
-      yield put(
-        reviewActions.update(response.data.content)
-      )
-
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, content: response.data.content, pageable: response.data.pageable, totalPages: response.data.totalPages, totalElements: response.data.totalElements }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
       /**
        * update fetch status sucess
        **/
       yield put(
         getReviewFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+      )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
+      /**
+       * update review domain in state
+       *
+       **/
+      yield put(
+        reviewActions.update(response.content)
       )
 
       /**
@@ -126,27 +128,21 @@ export function* fetchReviewWorker(action: PayloadAction<{}>) {
        **/
 
 
-      console.log(response.data.pageable)
+      console.log(response.pageable)
 
       console.log("total pages")
-      console.log(response.data.totalPages)
+      console.log(response.totalPages)
 
       yield all([
-        put(reviewPaginationPageActions.update(response.data.pageable.pageNumber)),
-        put(reviewPaginationTotalPagesActions.update(response.data.totalPages)),
-        put(reviewPaginationTotalElementsActions.update(response.data.totalElements)),
+        put(reviewPaginationPageActions.update(response.pageable.pageNumber)),
+        put(reviewPaginationTotalPagesActions.update(response.totalPages)),
+        put(reviewPaginationTotalElementsActions.update(response.totalElements)),
       ])
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        getReviewFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
     }
   } else {
     console.log("permission denied. your review type: " + curAuth.userType)

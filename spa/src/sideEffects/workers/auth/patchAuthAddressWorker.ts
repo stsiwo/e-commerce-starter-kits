@@ -59,30 +59,34 @@ export function* patchAuthAddressWorker(action: PayloadAction<PatchAuthAddressAc
     /**
      * fetch data
      **/
-    try {
 
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
+    const response = yield call(() => api({
         method: "PATCH",
         url: apiUrl,
         data: { type: action.payload.type }
       })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+      /**
+       * update fetch status sucess
+       **/
+      yield put(
+        patchAuthAddressFetchStatusActions.update(response.fetchStatus)
+      )
+
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update this domain in state
        *
        **/
       yield put(
         authActions.replaceAddress(response.data)
-      )
-
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        patchAuthAddressFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -96,16 +100,9 @@ export function* patchAuthAddressWorker(action: PayloadAction<PatchAuthAddressAc
         }) 
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        patchAuthAddressFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      console.log(response.message)
 
       /**
        * update message
@@ -114,7 +111,7 @@ export function* patchAuthAddressWorker(action: PayloadAction<PatchAuthAddressAc
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
+          message: response.message, 
         }) 
       )
     }

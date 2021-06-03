@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { ProductVariantCriteria } from "domain/product/types";
 import { messageActions } from "reducers/slices/app";
@@ -65,29 +64,39 @@ export function* postProductVariantWorker(action: PayloadAction<PostProductVaria
     /**
      * fetch data
      **/
-    try {
 
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "POST",
-        url: apiUrl,
-        data: {
-          variantColor: action.payload.variantColor,
-          productSize: action.payload.productSize,
-          variantUnitPrice: action.payload.variantUnitPrice,
-          isDiscount: action.payload.isDiscount,
-          variantDiscountPrice: action.payload.variantDiscountPrice,
-          variantDiscountStartDate: action.payload.variantDiscountStartDate,
-          variantDiscountEndDate: action.payload.variantDiscountEndDate,
-          variantWeight: action.payload.variantWeight,
-          variantHeight: action.payload.variantHeight,
-          variantLength: action.payload.variantLength,
-          variantWidth: action.payload.variantWidth,
-          note: action.payload.note,
-          variantStock: action.payload.variantStock,
-        } as ProductVariantCriteria , 
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "POST",
+      url: apiUrl,
+      data: {
+        variantColor: action.payload.variantColor,
+        productSize: action.payload.productSize,
+        variantUnitPrice: action.payload.variantUnitPrice,
+        isDiscount: action.payload.isDiscount,
+        variantDiscountPrice: action.payload.variantDiscountPrice,
+        variantDiscountStartDate: action.payload.variantDiscountStartDate,
+        variantDiscountEndDate: action.payload.variantDiscountEndDate,
+        variantWeight: action.payload.variantWeight,
+        variantHeight: action.payload.variantHeight,
+        variantLength: action.payload.variantLength,
+        variantWidth: action.payload.variantWidth,
+        note: action.payload.note,
+        variantStock: action.payload.variantStock,
+      } as ProductVariantCriteria,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      postProductVariantFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       console.log("posted product")
       console.log(response.data)
@@ -103,13 +112,6 @@ export function* postProductVariantWorker(action: PayloadAction<PostProductVaria
       )
 
       /**
-       * update fetch status sucess
-       **/
-      yield put(
-        postProductVariantFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
-
-      /**
        * update message
        **/
       yield put(
@@ -117,18 +119,11 @@ export function* postProductVariantWorker(action: PayloadAction<PostProductVaria
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
-        }) 
+        })
       )
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        postProductVariantFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      console.log(response.message)
 
       /**
        * update message
@@ -137,11 +132,11 @@ export function* postProductVariantWorker(action: PayloadAction<PostProductVaria
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
     }
-  } 
+  }
 }
 
 

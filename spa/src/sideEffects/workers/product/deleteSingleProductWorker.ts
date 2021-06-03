@@ -1,13 +1,11 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { ProductType } from "domain/product/types";
-import { deleteSingleProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
-import { productActions, DeleteSingleProductActionType } from "reducers/slices/domain/product";
-import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
-import { rsSelector } from "src/selectors/selector";
 import { messageActions } from "reducers/slices/app";
+import { deleteSingleProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
+import { DeleteSingleProductActionType, productActions } from "reducers/slices/domain/product";
+import { call, put, select } from "redux-saga/effects";
+import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
 
 /**
@@ -63,15 +61,25 @@ export function* deleteSingleProductWorker(action: PayloadAction<DeleteSinglePro
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "DELETE",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "DELETE",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      deleteSingleProductFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       /**
        * update categories domain in state
@@ -82,14 +90,7 @@ export function* deleteSingleProductWorker(action: PayloadAction<DeleteSinglePro
           productId: action.payload.productId
         })
       )
-      
 
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        deleteSingleProductFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
 
       /**
        * update message
@@ -99,12 +100,12 @@ export function* deleteSingleProductWorker(action: PayloadAction<DeleteSinglePro
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
-        }) 
+        })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
       /**
        * update fetch status failed
@@ -120,8 +121,8 @@ export function* deleteSingleProductWorker(action: PayloadAction<DeleteSinglePro
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
 
     }

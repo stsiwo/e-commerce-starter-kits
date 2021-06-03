@@ -1,11 +1,10 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { getOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
-import { orderActions, orderPaginationPageActions, orderPaginationTotalPagesActions, orderPaginationTotalElementsActions } from "reducers/slices/domain/order";
-import { call, put, select, all } from "redux-saga/effects";
+import { orderActions, orderPaginationPageActions, orderPaginationTotalElementsActions, orderPaginationTotalPagesActions } from "reducers/slices/domain/order";
+import { all, call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
-import { rsSelector, mSelector } from "src/selectors/selector";
+import { mSelector, rsSelector } from "src/selectors/selector";
 import { generateQueryString } from "src/utils";
 
 /**
@@ -64,29 +63,31 @@ export function* fetchOrderWorker(action: PayloadAction<{}>) {
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "GET",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "GET",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, content: response.data.content, pageable: response.data.pageable, totalPages: response.data.totalPages, totalElements: response.data.totalElements }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      getOrderFetchStatusActions.update(response.fetchStatus)
+    )
 
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update order domain in state
        *
        **/
       yield put(
-        orderActions.update(response.data.content)
-      )
-
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        getOrderFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+        orderActions.update(response.content)
       )
 
       /**
@@ -127,27 +128,21 @@ export function* fetchOrderWorker(action: PayloadAction<{}>) {
        **/
 
 
-      console.log(response.data.pageable)
+      console.log(response.pageable)
 
       console.log("total pages")
-      console.log(response.data.totalPages)
+      console.log(response.totalPages)
 
       yield all([
-        put(orderPaginationPageActions.update(response.data.pageable.pageNumber)),
-        put(orderPaginationTotalPagesActions.update(response.data.totalPages)),
-        put(orderPaginationTotalElementsActions.update(response.data.totalElements)),
+        put(orderPaginationPageActions.update(response.pageNumber)),
+        put(orderPaginationTotalPagesActions.update(response.totalPages)),
+        put(orderPaginationTotalElementsActions.update(response.totalElements)),
       ])
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        getOrderFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
     }
   } else {
     console.log("permission denied. your order type: " + curAuth.userType)

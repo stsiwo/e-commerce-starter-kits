@@ -1,13 +1,12 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { messageActions } from "reducers/slices/app";
+import { patchUserAddressFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
+import { PatchUserAddressActionType, userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { PatchUserAddressActionType, userActions } from "reducers/slices/domain/user";
-import { patchUserAddressFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 
 /**
  * a worker (generator)    
@@ -58,17 +57,26 @@ export function* patchUserAddressWorker(action: PayloadAction<PatchUserAddressAc
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "PATCH",
-        url: apiUrl,
-        data: { type: action.payload.type }
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "PATCH",
+      url: apiUrl,
+      data: { type: action.payload.type }
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      patchUserAddressFetchStatusActions.update(response.fetchStatus)
+    )
 
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update this domain in state
        *
@@ -81,13 +89,6 @@ export function* patchUserAddressWorker(action: PayloadAction<PatchUserAddressAc
       )
 
       /**
-       * update fetch status sucess
-       **/
-      yield put(
-        patchUserAddressFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
-
-      /**
        * update message
        **/
       yield put(
@@ -95,12 +96,12 @@ export function* patchUserAddressWorker(action: PayloadAction<PatchUserAddressAc
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "switched primary successfully.",
-        }) 
+        })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
       /**
        * update fetch status failed
@@ -116,8 +117,8 @@ export function* patchUserAddressWorker(action: PayloadAction<PatchUserAddressAc
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
     }
   } else {

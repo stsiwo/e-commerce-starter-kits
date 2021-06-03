@@ -60,16 +60,26 @@ export function* postAuthPhoneWorker(action: PayloadAction<PostAuthPhoneActionTy
     /**
      * fetch data
      **/
-    try {
 
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
+    const response = yield call(() => api({
         method: "POST",
         url: apiUrl,
         data: action.payload as UserPhoneCriteria
       })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+      /**
+       * update fetch status sucess
+       **/
+      yield put(
+        postAuthPhoneFetchStatusActions.update(response.fetchStatus)
+      )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       /**
        * update this domain in state
@@ -79,13 +89,6 @@ export function* postAuthPhoneWorker(action: PayloadAction<PostAuthPhoneActionTy
       console.log(response.data)
       yield put(
         authActions.appendPhone(response.data)
-      )
-
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        postAuthPhoneFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -99,9 +102,9 @@ export function* postAuthPhoneWorker(action: PayloadAction<PostAuthPhoneActionTy
         }) 
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
       /**
        * update fetch status failed
@@ -117,7 +120,7 @@ export function* postAuthPhoneWorker(action: PayloadAction<PostAuthPhoneActionTy
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
+          message: response.message, 
         }) 
       )
     }

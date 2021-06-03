@@ -1,7 +1,7 @@
 import { deleteAuthAddressActionTypeName, deleteAuthAvatarImageActionTypeName, deleteAuthPhoneActionTypeName, patchAuthAddressActionTypeName, patchAuthPhoneActionTypeName, postAuthAddressActionTypeName, postAuthAvatarImageActionTypeName, postAuthPhoneActionTypeName, putAuthActionTypeName, putAuthAddressActionTypeName, putAuthCompanyActionTypeName, putAuthPhoneActionTypeName } from 'reducers/slices/app';
 import { deleteCartItemActionTypeName, deleteSingleCartItemActionTypeName, fetchCartItemActionTypeName, postCartItemActionTypeName, putCartItemActionTypeName } from 'reducers/slices/domain/cartItem';
 import { deleteSingleCategoryActionTypeName, fetchCategoryActionTypeName, fetchCategoryWithCacheActionTypeName, postCategoryActionTypeName, putCategoryActionTypeName } from 'reducers/slices/domain/category';
-import { deleteSingleOrderEventActionTypeName, fetchOrderActionTypeName, fetchSingleOrderActionTypeName, postOrderActionTypeName, postOrderEventActionTypeName, putOrderActionTypeName, putOrderEventActionTypeName } from 'reducers/slices/domain/order';
+import { deleteSingleOrderEventActionTypeName, fetchOrderActionTypeName, fetchSingleOrderActionTypeName, postOrderActionTypeName, postOrderEventActionTypeName, postSessionTimeoutOrderEventActionTypeName, putOrderActionTypeName, putOrderEventActionTypeName } from 'reducers/slices/domain/order';
 import { deleteSingleProductActionTypeName, deleteSingleProductVariantActionTypeName, fetchProductActionTypeName, fetchProductWithCacheActionTypeName, fetchPublicProductActionTypeName, fetchSingleProductActionTypeName, postProductActionTypeName, postProductVariantActionTypeName, putProductActionTypeName, putProductVariantActionTypeName } from 'reducers/slices/domain/product';
 import { deleteSingleReviewActionTypeName, fetchReviewActionTypeName, postReviewActionTypeName, putReviewActionTypeName } from 'reducers/slices/domain/review';
 import { deleteSingleUserActionTypeName, deleteUserAddressActionTypeName, deleteUserAvatarImageActionTypeName, deleteUserPhoneActionTypeName, fetchSingleUserActionTypeName, fetchUserActionTypeName, patchUserAddressActionTypeName, patchUserPhoneActionTypeName, postUserAddressActionTypeName, postUserAvatarImageActionTypeName, postUserPhoneActionTypeName, putUserActionTypeName, putUserAddressActionTypeName, putUserPhoneActionTypeName } from 'reducers/slices/domain/user';
@@ -37,6 +37,7 @@ import { fetchOrderWorker } from 'sideEffects/workers/order/fetchOrderWorker';
 import { fetchSingleOrderWorker } from 'sideEffects/workers/order/fetchSingleOrderWorker';
 import { postOrderEventWorker } from 'sideEffects/workers/order/postOrderEventWorker';
 import { postOrderWorker } from 'sideEffects/workers/order/postOrderWorker';
+import { postSessionTimeoutOrderEventWorker } from 'sideEffects/workers/order/postSessionTimeoutOrderEventWorker';
 import { putOrderEventWorker } from 'sideEffects/workers/order/putOrderEventWorker';
 import { putOrderWorker } from 'sideEffects/workers/order/putOrderWorker';
 import { deleteSingleProductVariantWorker } from 'sideEffects/workers/product/deleteSingleProductVariantWorker';
@@ -366,6 +367,13 @@ export function* deleteSingleOrderEventWatcher() {
   )
 }
 
+export function* postSessionTimeoutOrderEventWatcher() {
+  yield takeLatest(
+    postSessionTimeoutOrderEventActionTypeName,
+    postSessionTimeoutOrderEventWorker,
+  )
+}
+
 // product
 export function* fetchProductWatcher() {
   yield takeLatest(
@@ -530,3 +538,4 @@ export function* fetchCategoryWithCacheWatcher() {
     fetchCategoryWithCacheWorker,
   )
 }
+

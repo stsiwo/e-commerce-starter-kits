@@ -1,14 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { UserPhoneCriteria } from "domain/user/types";
 import { messageActions } from "reducers/slices/app";
 import { postUserPhoneFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
+import { PostUserPhoneActionType, userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { PostUserPhoneActionType, userActions } from "reducers/slices/domain/user";
 
 /**
  * a worker (generator)    
@@ -60,20 +59,30 @@ export function* postUserPhoneWorker(action: PayloadAction<PostUserPhoneActionTy
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "POST",
-        url: apiUrl,
-        data: {
-          phoneNumber: action.payload.phoneNumber, 
-          countryCode: action.payload.countryCode,
-          isSelected: action.payload.isSelected,
-        } as UserPhoneCriteria
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "POST",
+      url: apiUrl,
+      data: {
+        phoneNumber: action.payload.phoneNumber,
+        countryCode: action.payload.countryCode,
+        isSelected: action.payload.isSelected,
+      } as UserPhoneCriteria
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      postUserPhoneFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       /**
        * update this domain in state
@@ -89,13 +98,6 @@ export function* postUserPhoneWorker(action: PayloadAction<PostUserPhoneActionTy
       )
 
       /**
-       * update fetch status sucess
-       **/
-      yield put(
-        postUserPhoneFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
-
-      /**
        * update message
        **/
       yield put(
@@ -103,19 +105,12 @@ export function* postUserPhoneWorker(action: PayloadAction<PostUserPhoneActionTy
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
-        }) 
+        })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        postUserPhoneFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      console.log(response.message)
 
       /**
        * update message
@@ -124,8 +119,8 @@ export function* postUserPhoneWorker(action: PayloadAction<PostUserPhoneActionTy
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
     }
   } else {

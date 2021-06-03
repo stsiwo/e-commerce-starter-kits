@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { UserPhoneCriteria } from "domain/user/types";
 import { authActions, messageActions, PutAuthPhoneActionType } from "reducers/slices/app";
@@ -60,30 +59,33 @@ export function* putAuthPhoneWorker(action: PayloadAction<PutAuthPhoneActionType
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "PUT",
-        url: apiUrl,
-        data: action.payload as UserPhoneCriteria
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "PUT",
+      url: apiUrl,
+      data: action.payload as UserPhoneCriteria
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      putAuthPhoneFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update this domain in state
        *
        **/
       yield put(
         authActions.updatePhone(response.data)
-      )
-
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        putAuthPhoneFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -94,19 +96,12 @@ export function* putAuthPhoneWorker(action: PayloadAction<PutAuthPhoneActionType
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
-        }) 
+        })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        putAuthPhoneFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      console.log(response.message)
 
       /**
        * update message
@@ -115,8 +110,8 @@ export function* putAuthPhoneWorker(action: PayloadAction<PutAuthPhoneActionType
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message,
+        })
       )
     }
   } else {

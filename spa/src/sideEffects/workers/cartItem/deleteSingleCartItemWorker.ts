@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { CartItemType } from "domain/cart/types";
 import { deleteSingleCartItemFetchStatusActions } from "reducers/slices/app/fetchStatus/cartItem";
@@ -65,16 +64,25 @@ export function* deleteSingleCartItemWorker(action: PayloadAction<CartItemType>)
     /**
      * fetch data
      **/
-    try {
+    // prep keyword if necessary
 
-      // prep keyword if necessary
+    // start fetching
+    const response = yield call(() => api({
+      method: "DELETE",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      deleteSingleCartItemFetchStatusActions.update(response.fetchStatus)
+    )
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "DELETE",
-        url: apiUrl,
-      })
 
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update categories domain in state
        *
@@ -85,23 +93,10 @@ export function* deleteSingleCartItemWorker(action: PayloadAction<CartItemType>)
         cartItemActions.delete(action.payload)
       )
 
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        deleteSingleCartItemFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-    } catch (error) {
+      console.log(response.message)
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        deleteSingleCartItemFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
     }
 
 

@@ -62,7 +62,8 @@ const CartItemTotal: React.FunctionComponent<CartItemTotalPropsType> = (props) =
 
       enqueueSnackbar("updated successfully.", { variant: "success" })
     }).catch((error: AxiosError) => {
-      enqueueSnackbar(error.message, { variant: "error" })
+      // use error.response.data.message from api
+      enqueueSnackbar(error.response.data.message, { variant: "error" })
     })
   }, [
   

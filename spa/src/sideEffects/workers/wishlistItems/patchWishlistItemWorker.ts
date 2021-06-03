@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { createCartItem } from "domain/cart";
 import { WishlistItemType } from "domain/wishlist/types";
@@ -79,16 +78,26 @@ export function* patchWishlistItemWorker(action: PayloadAction<PatchWishlistItem
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "PATCH",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "PATCH",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      patchWishlistItemFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update categories domain in state
        *
@@ -97,13 +106,6 @@ export function* patchWishlistItemWorker(action: PayloadAction<PatchWishlistItem
        **/
       yield put(
         wishlistItemActions.delete(action.payload.wishlistItemId)
-      )
-
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        patchWishlistItemFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -117,9 +119,9 @@ export function* patchWishlistItemWorker(action: PayloadAction<PatchWishlistItem
         })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
       /**
        * update fetch status failed
@@ -135,11 +137,10 @@ export function* patchWishlistItemWorker(action: PayloadAction<PatchWishlistItem
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message,
+          message: response.message
         })
       )
     }
-
 
   } else if (curAuth.userType === UserTypeEnum.GUEST) {
 

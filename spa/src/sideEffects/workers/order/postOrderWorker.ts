@@ -10,6 +10,7 @@ import { rsSelector } from "src/selectors/selector";
 import { messageActions } from "reducers/slices/app";
 import { getNanoId } from "src/utils";
 import { stripeClientSecretActions } from "reducers/slices/sensitive";
+import { checkoutOrderActions } from "reducers/slices/domain/checkout";
 
 /**
  * a worker (generator)    
@@ -65,30 +66,43 @@ export function* postOrderWorker(action: PayloadAction<PostOrderActionType>) {
      **/
     const apiUrl = `${API1_URL}/orders`
 
+
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "POST",
-        url: apiUrl,
-        data: action.payload as OrderCriteria
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "POST",
+      url: apiUrl,
+      data: action.payload as OrderCriteria
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, order: response.data.order, clientSecret: response.data.clientSecret }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      postOrderFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update this domain in state
        *
+       * - NOTE: TO checkout/order (not domain/orders)
+       *
        **/
       yield put(
-        orderActions.concat(response.data.order)
+        checkoutOrderActions.update(response.order)
       )
 
       yield put(
-        stripeClientSecretActions.update(response.data.clientSecret)
+        stripeClientSecretActions.update(response.clientSecret)
       )
 
       /**
@@ -106,19 +120,9 @@ export function* postOrderWorker(action: PayloadAction<PostOrderActionType>) {
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "we confirmed your request.",
-        }) 
+        })
       )
-    } catch (error) {
-
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        postOrderFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
-
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       /**
        * update message
        **/
@@ -126,8 +130,8 @@ export function* postOrderWorker(action: PayloadAction<PostOrderActionType>) {
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message,
+        })
       )
     }
   } else {

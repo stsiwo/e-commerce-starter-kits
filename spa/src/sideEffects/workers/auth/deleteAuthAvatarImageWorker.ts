@@ -60,13 +60,24 @@ export function* deleteAuthAvatarImageWorker(action: PayloadAction<DeleteAuthAva
     /**
      * fetch data
      **/
-    try {
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
+      const response = yield call(() => api({
         method: "DELETE",
         url: apiUrl,
       })
+        .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS }))
+        .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+      )
+
+      /**
+       * update fetch status sucess
+       **/
+      yield put(
+        deleteAuthAvatarImageFetchStatusActions.update(response.fetchStatus)
+      )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       /**
        * update this domain in state
@@ -77,13 +88,6 @@ export function* deleteAuthAvatarImageWorker(action: PayloadAction<DeleteAuthAva
       )
 
       /**
-       * update fetch status sucess
-       **/
-      yield put(
-        deleteAuthAvatarImageFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
-
-      /**
        * update message
        **/
       yield put(
@@ -91,18 +95,11 @@ export function* deleteAuthAvatarImageWorker(action: PayloadAction<DeleteAuthAva
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "deleted successfully.",
-        }) 
+        })
       )
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        deleteAuthAvatarImageFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      console.log(response.message)
 
       /**
        * update message
@@ -111,8 +108,8 @@ export function* deleteAuthAvatarImageWorker(action: PayloadAction<DeleteAuthAva
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
     }
   } else {

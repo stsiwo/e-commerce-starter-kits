@@ -44,6 +44,7 @@ export declare type AppStateType = {
       postEvent: FetchStatusEnum
       deleteSingleEvent: FetchStatusEnum
       putEvent: FetchStatusEnum
+      postSessionTimeoutEvent: FetchStatusEnum
     },
     users: {
       get: FetchStatusEnum
@@ -189,6 +190,9 @@ export declare type DomainStateType = {
     },
     pagination: DomainPaginationType,
     curItems: string[],
+  },
+  checkout: {
+    order: OrderType,
   }
 }
 

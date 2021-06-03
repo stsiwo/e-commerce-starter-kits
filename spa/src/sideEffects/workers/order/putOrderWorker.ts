@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { OrderType } from "domain/order/types";
 import { putOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
@@ -63,44 +62,41 @@ export function* putOrderWorker(action: PayloadAction<OrderType>) {
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "PUT",
-        url: apiUrl,
-        data: action.payload
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "PUT",
+      url: apiUrl,
+      data: action.payload
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      putOrderFetchStatusActions.update(response.fetchStatus)
+    )
 
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update this domain in state
        *
        **/
       yield put(
-        orderActions.concat(response.data.data)
+        orderActions.concat(response.data)
       )
 
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        putOrderFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        putOrderFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
     }
-  } 
+  }
 }
 
 

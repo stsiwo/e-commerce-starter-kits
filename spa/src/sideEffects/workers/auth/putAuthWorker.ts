@@ -1,11 +1,10 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { UserCriteria } from "domain/user/types";
-import { authActions, PutAuthActionType, messageActions } from "reducers/slices/app";
+import { authActions, messageActions, PutAuthActionType } from "reducers/slices/app";
 import { putAuthFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
+import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
 
@@ -60,16 +59,26 @@ export function* putAuthWorker(action: PayloadAction<PutAuthActionType>) {
     /**
      * fetch data
      **/
-    try {
 
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
+    const response = yield call(() => api({
         method: "PUT",
         url: apiUrl,
         data: action.payload as UserCriteria
       })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+      /**
+       * update fetch status sucess
+       **/
+      yield put(
+        putAuthFetchStatusActions.update(response.fetchStatus)
+      )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       /**
        * update this domain in state
@@ -83,13 +92,6 @@ export function* putAuthWorker(action: PayloadAction<PutAuthActionType>) {
       )
 
       /**
-       * update fetch status sucess
-       **/
-      yield put(
-        putAuthFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
-
-      /**
        * update message
        **/
       yield put(
@@ -100,16 +102,9 @@ export function* putAuthWorker(action: PayloadAction<PutAuthActionType>) {
         }) 
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        putAuthFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      console.log(response.message)
 
       /**
        * update message
@@ -118,7 +113,7 @@ export function* putAuthWorker(action: PayloadAction<PutAuthActionType>) {
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
+          message: response.message 
         }) 
       )
     }

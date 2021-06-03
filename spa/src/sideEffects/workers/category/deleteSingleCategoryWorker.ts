@@ -1,13 +1,11 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { CategoryType } from "domain/product/types";
+import { messageActions } from "reducers/slices/app";
 import { deleteSingleCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
 import { categoryActions, DeleteSingleCategoryActionType } from "reducers/slices/domain/category";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
+import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { messageActions } from "reducers/slices/app";
 import { getNanoId } from "src/utils";
 
 /**
@@ -63,15 +61,25 @@ export function* deleteSingleCategoryWorker(action: PayloadAction<DeleteSingleCa
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "DELETE",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "DELETE",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      deleteSingleCategoryFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       /**
        * update categories domain in state
@@ -79,15 +87,8 @@ export function* deleteSingleCategoryWorker(action: PayloadAction<DeleteSingleCa
        **/
       yield put(
         categoryActions.delete({
-          categoryId: action.payload.categoryId 
+          categoryId: action.payload.categoryId
         })
-      )
-
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        deleteSingleCategoryFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -98,19 +99,12 @@ export function* deleteSingleCategoryWorker(action: PayloadAction<DeleteSingleCa
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "deleted successfully.",
-        }) 
+        })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        deleteSingleCategoryFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      console.log(response.message)
 
       /**
        * update message
@@ -119,8 +113,8 @@ export function* deleteSingleCategoryWorker(action: PayloadAction<DeleteSingleCa
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message,
+        })
       )
     }
   }

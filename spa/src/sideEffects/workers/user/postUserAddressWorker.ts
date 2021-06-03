@@ -1,14 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { UserAddressCriteria } from "domain/user/types";
 import { messageActions } from "reducers/slices/app";
+import { postUserAddressFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
+import { PostUserAddressActionType, userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { PostUserAddressActionType, userActions } from "reducers/slices/domain/user";
-import { postUserAddressFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 
 /**
  * a worker (generator)    
@@ -61,26 +60,36 @@ export function* postUserAddressWorker(action: PayloadAction<PostUserAddressActi
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "POST",
-        url: apiUrl,
-        data: {
-          address1: action.payload.address1,
-          address2: action.payload.address2,
-          city: action.payload.city,
-          province: action.payload.province,
-          country: action.payload.country,
-          postalCode: action.payload.postalCode,
-          isBillingAddress: action.payload.isBillingAddress,
-          isShippingAddress: action.payload.isShippingAddress,
-        } as UserAddressCriteria
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "POST",
+      url: apiUrl,
+      data: {
+        address1: action.payload.address1,
+        address2: action.payload.address2,
+        city: action.payload.city,
+        province: action.payload.province,
+        country: action.payload.country,
+        postalCode: action.payload.postalCode,
+        isBillingAddress: action.payload.isBillingAddress,
+        isShippingAddress: action.payload.isShippingAddress,
+      } as UserAddressCriteria
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      postUserAddressFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update this domain in state
        *
@@ -95,13 +104,6 @@ export function* postUserAddressWorker(action: PayloadAction<PostUserAddressActi
       )
 
       /**
-       * update fetch status sucess
-       **/
-      yield put(
-        postUserAddressFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
-
-      /**
        * update message
        **/
       yield put(
@@ -109,12 +111,12 @@ export function* postUserAddressWorker(action: PayloadAction<PostUserAddressActi
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
-        }) 
+        })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
       /**
        * update fetch status failed
@@ -130,8 +132,8 @@ export function* postUserAddressWorker(action: PayloadAction<PostUserAddressActi
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
     }
   } else {

@@ -59,15 +59,24 @@ export function* patchAuthPhoneWorker(action: PayloadAction<PatchAuthPhoneAction
     /**
      * fetch data
      **/
-    try {
-
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
+    const response = yield call(() => api({
         method: "PATCH",
         url: apiUrl,
       })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+      /**
+       * update fetch status sucess
+       **/
+      yield put(
+        patchAuthPhoneFetchStatusActions.update(response.fetchStatus)
+      )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       /**
        * update this domain in state
@@ -75,13 +84,6 @@ export function* patchAuthPhoneWorker(action: PayloadAction<PatchAuthPhoneAction
        **/
       yield put(
         authActions.replacePhone(response.data)
-      )
-
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        patchAuthPhoneFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -95,16 +97,9 @@ export function* patchAuthPhoneWorker(action: PayloadAction<PatchAuthPhoneAction
         }) 
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        patchAuthPhoneFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      console.log(response.message)
 
       /**
        * update message
@@ -113,7 +108,7 @@ export function* patchAuthPhoneWorker(action: PayloadAction<PatchAuthPhoneAction
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
+          message: response.message, 
         }) 
       )
     }

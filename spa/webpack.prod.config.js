@@ -19,6 +19,7 @@ module.exports = merge(common, {
     new webpack.HashedModuleIdsPlugin(),
     new webpack.DefinePlugin({
       NODE_ENV: JSON.stringify("production"),
+      CHECKOUT_SESSION_TIMEOUT: JSON.stringify("600000"), // 10 mins
       //OWNER_BUCKET_NAME: JSON.stringify("bactivityhair.com-bucket"),
       //API1_URL: JSON.stringify("https://api.bactivityhair.com"),
       //PUBLIC_IMAGE_PATH: JSON.stringify("/images/"),

@@ -1,7 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { UserPhoneCriteria } from "domain/user/types";
 import { authActions, DeleteAuthPhoneActionType, messageActions } from "reducers/slices/app";
 import { deleteAuthPhoneFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
 import { call, put, select } from "redux-saga/effects";
@@ -60,15 +59,25 @@ export function* deleteAuthPhoneWorker(action: PayloadAction<DeleteAuthPhoneActi
     /**
      * fetch data
      **/
-    try {
 
       // prep keyword if necessary
 
       // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
+    const response = yield call(() => api({
         method: "DELETE",
         url: apiUrl,
-      })
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+      /**
+       * update fetch status sucess
+       **/
+      yield put(
+        deleteAuthPhoneFetchStatusActions.update(response.fetchStatus)
+      )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       /**
        * update this domain in state
@@ -76,13 +85,6 @@ export function* deleteAuthPhoneWorker(action: PayloadAction<DeleteAuthPhoneActi
        **/
       yield put(
         authActions.deletePhone({ phoneId : action.payload.phoneId })
-      )
-
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        deleteAuthPhoneFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -96,16 +98,9 @@ export function* deleteAuthPhoneWorker(action: PayloadAction<DeleteAuthPhoneActi
         }) 
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        deleteAuthPhoneFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      console.log(response.message)
 
       /**
        * update message
@@ -114,7 +109,7 @@ export function* deleteAuthPhoneWorker(action: PayloadAction<DeleteAuthPhoneActi
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
+          message: response.message, 
         }) 
       )
     }

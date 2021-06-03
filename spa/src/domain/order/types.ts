@@ -240,6 +240,10 @@ export const defaultOrderEventData: OrderEventType = {
 
 // criteria
 
+export declare type SessionTimeoutOrderEventCriteria = {
+  orderNumber: string
+}
+
 export declare type OrderDetailCriteria = {
   orderDetailId: string,
   productQuantity: number,

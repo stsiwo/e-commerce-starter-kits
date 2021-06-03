@@ -1,11 +1,10 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { NormalizedProductType } from "domain/product/types";
 import { normalize } from "normalizr";
 import { requestTrackerActions } from "reducers/slices/app";
 import { getProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
-import { productActions, productCurItemsActions, productPaginationLimitActions, productPaginationPageActions, productPaginationTotalPagesActions } from "reducers/slices/domain/product";
+import { productActions, productCurItemsActions, productPaginationLimitActions, productPaginationPageActions, productPaginationTotalElementsActions, productPaginationTotalPagesActions } from "reducers/slices/domain/product";
 import { all, call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, RequestTrackerBaseType, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
@@ -87,7 +86,7 @@ export function* fetchProductWithCacheWorker(action: PayloadAction<{}>) {
        * update cur items
        **/
       yield put(
-        productCurItemsActions.update(targetRequestTrackerBase.ids) 
+        productCurItemsActions.update(targetRequestTrackerBase.ids)
       )
 
       // currently do nothing
@@ -96,15 +95,25 @@ export function* fetchProductWithCacheWorker(action: PayloadAction<{}>) {
       /**
        * fetch data
        **/
-      try {
 
-        // prep keyword if necessary
+      // prep keyword if necessary
 
-        // start fetching
-        const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-          method: "GET",
-          url: apiUrl,
-        })
+      // start fetching
+      const response = yield call(() => api({
+        method: "GET",
+        url: apiUrl,
+      })
+        .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, content: response.data.content, pageable: response.data.pageable, totalPages: response.data.totalPages, totalElements: response.data.totalElements }))
+        .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+      )
+
+      /**
+       * update fetch status sucess
+       **/
+      yield put(
+        getProductFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+      )
+      if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
         /**
          * normalize response data
@@ -112,7 +121,7 @@ export function* fetchProductWithCacheWorker(action: PayloadAction<{}>) {
          *  - TODO: make sure response structure with remote api
          **/
         console.log(response)
-        const normalizedData = normalize(response.data.content, productSchemaArray)
+        const normalizedData = normalize(response.content, productSchemaArray)
 
         /**
          * update product domain in state
@@ -120,13 +129,6 @@ export function* fetchProductWithCacheWorker(action: PayloadAction<{}>) {
          **/
         yield put(
           productActions.merge(normalizedData.entities.products as NormalizedProductType)
-        )
-
-        /**
-         * update fetch status sucess
-         **/
-        yield put(
-          getProductFetchStatusActions.update(FetchStatusEnum.SUCCESS)
         )
 
         /**
@@ -173,14 +175,15 @@ export function* fetchProductWithCacheWorker(action: PayloadAction<{}>) {
          * </PageImpl>
          **/
 
-        console.log(response.data.pageable)
+        console.log(response.pageable)
 
         console.log("total pages")
-        console.log(response.data.totalPages)
+        console.log(response.totalPages)
 
         yield all([
-          put(productPaginationPageActions.update(response.data.pageable.pageNumber)), 
-          put(productPaginationTotalPagesActions.update(response.data.totalPages)), 
+          put(productPaginationPageActions.update(response.pageable.pageNumber)),
+          put(productPaginationTotalPagesActions.update(response.totalPages)),
+          put(productPaginationTotalElementsActions.update(response.totalPages)),
         ])
 
         /**
@@ -201,16 +204,10 @@ export function* fetchProductWithCacheWorker(action: PayloadAction<{}>) {
           })
         );
 
-      } catch (error) {
+      } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-        console.log(error)
+        console.log(response.message)
 
-        /**
-         * update fetch status failed
-         **/
-        yield put(
-          getProductFetchStatusActions.update(FetchStatusEnum.FAILED)
-        )
       }
     }
   } else {

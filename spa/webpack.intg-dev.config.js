@@ -23,6 +23,7 @@ module.exports = merge(common, {
     new webpack.DefinePlugin({
       NODE_ENV: JSON.stringify("intg-dev"),
       OWNER_BUCKET_NAME: JSON.stringify("bactivityhair.com-dev-bucket"),
+      CHECKOUT_SESSION_TIMEOUT: JSON.stringify("60000"),
       API1_URL: JSON.stringify("http://localhost:8080"),
       PUBLIC_IMAGE_PATH: JSON.stringify("/images/"),
     })

@@ -1,12 +1,11 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosPromise, AxiosRequestConfig } from 'axios';
+import { api } from "configs/axiosConfig";
 import { UserType } from "domain/user/types";
 import { patchUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 import { userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { api } from "configs/axiosConfig";
 
 /**
  * a worker (generator)    
@@ -64,21 +63,32 @@ export function* patchUserWorker(action: PayloadAction<UserType>) {
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "PATCH",
-        url: apiUrl,
-        // TODO: make sure backend
-        data: { 
-          isDeleted: true,
-          deletedAccountDate: new Date().toString(),
-        }
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "PATCH",
+      url: apiUrl,
+      // TODO: make sure backend
+      data: {
+        isDeleted: true,
+        deletedAccountDate: new Date().toString(),
+      }
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      patchUserFetchStatusActions.update(response.fetchStatus)
+    )
+
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update categories domain in state
        *
@@ -87,25 +97,13 @@ export function* patchUserWorker(action: PayloadAction<UserType>) {
         userActions.delete(action.payload)
       )
 
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        patchUserFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        patchUserFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
     }
-  } 
+  }
 }
 
 

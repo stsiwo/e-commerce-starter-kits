@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { messageActions } from "reducers/slices/app";
 import { deleteUserAvatarImageFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
@@ -60,13 +59,23 @@ export function* deleteUserAvatarImageWorker(action: PayloadAction<DeleteUserAva
     /**
      * fetch data
      **/
-    try {
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "DELETE",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "DELETE",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      deleteUserAvatarImageFetchStatusActions.update(response.fetchStatus)
+    )
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       /**
        * update this domain in state
@@ -79,13 +88,6 @@ export function* deleteUserAvatarImageWorker(action: PayloadAction<DeleteUserAva
       //)
 
       /**
-       * update fetch status sucess
-       **/
-      yield put(
-        deleteUserAvatarImageFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
-
-      /**
        * update message
        **/
       yield put(
@@ -93,11 +95,11 @@ export function* deleteUserAvatarImageWorker(action: PayloadAction<DeleteUserAva
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "deleted successfully.",
-        }) 
+        })
       )
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
       /**
        * update fetch status failed
@@ -113,8 +115,8 @@ export function* deleteUserAvatarImageWorker(action: PayloadAction<DeleteUserAva
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
     }
   } else {

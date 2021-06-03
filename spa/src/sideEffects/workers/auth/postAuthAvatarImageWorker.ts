@@ -60,33 +60,36 @@ export function* postAuthAvatarImageWorker(action: PayloadAction<PostAuthAvatarI
     /**
      * fetch data
      **/
-    try {
 
-      // prep form data
-      const formData = new FormData();
-      formData.append("avatarImage", action.payload.avatarImage)
+    // prep form data
+    const formData = new FormData();
+    formData.append("avatarImage", action.payload.avatarImage)
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "POST",
-        url: apiUrl,
-        data: formData, 
-        headers: { "Content-Type": "multipart/form-data" },
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "POST",
+      url: apiUrl,
+      data: formData,
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, imagePath: response.data.imagePath }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      postAuthAvatarImageFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       /**
        * update this domain in state
        *
        **/
       yield put(
-        authActions.updateAvatarImagePath(response.data.imagePath)
-      )
-
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-       postAuthAvatarImageFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+        authActions.updateAvatarImagePath(response.imagePath)
       )
 
       /**
@@ -97,18 +100,11 @@ export function* postAuthAvatarImageWorker(action: PayloadAction<PostAuthAvatarI
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
-        }) 
+        })
       )
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        postAuthAvatarImageFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      console.log(response.message)
 
       /**
        * update message
@@ -117,8 +113,8 @@ export function* postAuthAvatarImageWorker(action: PayloadAction<PostAuthAvatarI
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message,
+        })
       )
     }
   } else {

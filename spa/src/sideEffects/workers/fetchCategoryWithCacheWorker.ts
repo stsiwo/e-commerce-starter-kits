@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { NormalizedCategoryType } from "domain/product/types";
 import { normalize } from "normalizr";
@@ -27,7 +26,7 @@ export function* fetchCategoryWithCacheWorker(action: PayloadAction<{}>) {
    * update status for anime data
    **/
   yield put(
-   getCategoryFetchStatusActions.update(FetchStatusEnum.FETCHING)
+    getCategoryFetchStatusActions.update(FetchStatusEnum.FETCHING)
   )
 
   /**
@@ -49,22 +48,32 @@ export function* fetchCategoryWithCacheWorker(action: PayloadAction<{}>) {
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "get",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "get",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, content: response.data.content, pageable: response.data.pageable, totalPages: response.data.totalPages, totalElements: response.data.totalElements }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      getCategoryFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * normalize response data
        *
        *  - TODO: make sure response structure with remote api
        **/
-      const normalizedData = normalize(response.data.content, categorySchemaArray)
+      const normalizedData = normalize(response.content, categorySchemaArray)
 
       /**
        * update categories domain in state
@@ -72,13 +81,6 @@ export function* fetchCategoryWithCacheWorker(action: PayloadAction<{}>) {
        **/
       yield put(
         categoryActions.update(normalizedData.entities.categories as NormalizedCategoryType)
-      )
-
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-       getCategoryFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -90,19 +92,13 @@ export function* fetchCategoryWithCacheWorker(action: PayloadAction<{}>) {
             ids: normalizedData.result,
             //pagination: ...
           }
-        }) 
+        })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        getCategoryFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
     }
 
   }

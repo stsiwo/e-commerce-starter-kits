@@ -1,16 +1,15 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { CategoryType, NormalizedCategoryType, CategoryCriteria } from "domain/product/types";
+import { CategoryCriteria, NormalizedCategoryType } from "domain/product/types";
 import { normalize } from "normalizr";
+import { messageActions } from "reducers/slices/app";
 import { postCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
 import { categoryActions, PostCategoryActionType } from "reducers/slices/domain/category";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
+import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { categorySchemaArray, categorySchemaEntity } from "states/state";
-import { messageActions } from "reducers/slices/app";
 import { getNanoId } from "src/utils";
+import { categorySchemaEntity } from "states/state";
 
 /**
  * a worker (generator)    
@@ -67,20 +66,31 @@ export function* postCategoryWorker(action: PayloadAction<PostCategoryActionType
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "POST",
-        url: apiUrl,
-        data: {
-          categoryName: action.payload.categoryName,
-          categoryPath: action.payload.categoryPath,
-          categoryDescription: action.payload.categoryDescription,
-        } as CategoryCriteria
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "POST",
+      url: apiUrl,
+      data: {
+        categoryName: action.payload.categoryName,
+        categoryPath: action.payload.categoryPath,
+        categoryDescription: action.payload.categoryDescription,
+      } as CategoryCriteria
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      postCategoryFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       /**
        * normalize response data
@@ -99,13 +109,6 @@ export function* postCategoryWorker(action: PayloadAction<PostCategoryActionType
       )
 
       /**
-       * update fetch status sucess
-       **/
-      yield put(
-        postCategoryFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
-
-      /**
        * update message
        **/
       yield put(
@@ -113,19 +116,12 @@ export function* postCategoryWorker(action: PayloadAction<PostCategoryActionType
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
-        }) 
+        })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        postCategoryFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
-
+      console.log(response.message)
       /**
        * update message
        **/
@@ -133,11 +129,11 @@ export function* postCategoryWorker(action: PayloadAction<PostCategoryActionType
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message,
+        })
       )
     }
-  } 
+  }
 }
 
 

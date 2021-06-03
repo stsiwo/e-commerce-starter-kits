@@ -1,15 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { UserPhoneCriteria } from "domain/user/types";
-import { authActions, messageActions, PutAuthPhoneActionType } from "reducers/slices/app";
-import { putAuthPhoneFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
+import { messageActions } from "reducers/slices/app";
+import { putUserPhoneFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
+import { PutUserPhoneActionType, userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { PutUserPhoneActionType, userActions } from "reducers/slices/domain/user";
-import { putUserPhoneFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 
 /**
  * a worker (generator)    
@@ -60,22 +58,32 @@ export function* putUserPhoneWorker(action: PayloadAction<PutUserPhoneActionType
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "PUT",
-        url: apiUrl,
-        data: {
-          phoneNumber: action.payload.phoneNumber,
-          countryCode: action.payload.countryCode,
-          isSelected: action.payload.isSelected,
-          phoneId: action.payload.phoneId
-        } as UserPhoneCriteria
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "PUT",
+      url: apiUrl,
+      data: {
+        phoneNumber: action.payload.phoneNumber,
+        countryCode: action.payload.countryCode,
+        isSelected: action.payload.isSelected,
+        phoneId: action.payload.phoneId
+      } as UserPhoneCriteria
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      putUserPhoneFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update this domain in state
        *
@@ -88,13 +96,6 @@ export function* putUserPhoneWorker(action: PayloadAction<PutUserPhoneActionType
       )
 
       /**
-       * update fetch status sucess
-       **/
-      yield put(
-        putUserPhoneFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
-
-      /**
        * update message
        **/
       yield put(
@@ -102,12 +103,12 @@ export function* putUserPhoneWorker(action: PayloadAction<PutUserPhoneActionType
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "updated successfully.",
-        }) 
+        })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
       /**
        * update fetch status failed
@@ -123,8 +124,8 @@ export function* putUserPhoneWorker(action: PayloadAction<PutUserPhoneActionType
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
     }
   } else {

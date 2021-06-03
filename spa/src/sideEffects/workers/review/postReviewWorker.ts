@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { ReviewCriteria } from "domain/review/type";
 import { messageActions } from "reducers/slices/app";
@@ -62,38 +61,41 @@ export function* postReviewWorker(action: PayloadAction<PostReviewActionType>) {
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "POST",
-        url: apiUrl,
-        data: {
-          reviewTitle: action.payload.reviewTitle,
-          reviewDescription: action.payload.reviewDescription,
-          isVerified: false, // when creating, always false
-          note: action.payload.note,
-          userId: action.payload.userId,
-          productId: action.payload.productId,
-          reviewPoint: action.payload.reviewPoint,
-        } as ReviewCriteria
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "POST",
+      url: apiUrl,
+      data: {
+        reviewTitle: action.payload.reviewTitle,
+        reviewDescription: action.payload.reviewDescription,
+        isVerified: false, // when creating, always false
+        note: action.payload.note,
+        userId: action.payload.userId,
+        productId: action.payload.productId,
+        reviewPoint: action.payload.reviewPoint,
+      } as ReviewCriteria
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      postReviewFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update review domain in state
        *
        **/
       yield put(
         reviewActions.append(response.data)
-      )
-
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        postReviewFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -104,11 +106,11 @@ export function* postReviewWorker(action: PayloadAction<PostReviewActionType>) {
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
-        }) 
+        })
       )
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
       /**
        * update fetch status failed
@@ -124,8 +126,8 @@ export function* postReviewWorker(action: PayloadAction<PostReviewActionType>) {
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
     }
   } else {

@@ -319,3 +319,34 @@ export const deleteSingleOrderEventFetchStatusSlice = createSlice({
 export const deleteSingleOrderEventFetchStatusSliceReducer = deleteSingleOrderEventFetchStatusSlice.reducer
 export const deleteSingleOrderEventFetchStatusActions = deleteSingleOrderEventFetchStatusSlice.actions
 
+/**
+ * app.fetchStatus.orderEvent.post state Slice
+ **/
+export type postSessionTimeoutOrderEventFetchStatusActionType = PayloadAction<FetchStatusEnum>
+
+export const postSessionTimeoutOrderEventFetchStatusSlice = createSlice({
+  name: "app/fetchStatus/order/event/post", // a name used in action type
+  initialState: {},
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+    update: (state: FetchStatusEnum, action: postSessionTimeoutOrderEventFetchStatusActionType) => action.payload,
+    clear: (state: FetchStatusEnum) => FetchStatusEnum.INITIAL
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   **/
+})
+
+export const postSessionTimeoutOrderEventFetchStatusSliceReducer = postSessionTimeoutOrderEventFetchStatusSlice.reducer
+export const postSessionTimeoutOrderEventFetchStatusActions = postSessionTimeoutOrderEventFetchStatusSlice.actions
+

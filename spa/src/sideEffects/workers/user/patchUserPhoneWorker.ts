@@ -1,13 +1,12 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { messageActions } from "reducers/slices/app";
+import { patchUserPhoneFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
+import { PatchUserPhoneActionType, userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { PatchUserPhoneActionType, userActions } from "reducers/slices/domain/user";
-import { patchUserPhoneFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 
 /**
  * a worker (generator)    
@@ -58,16 +57,26 @@ export function* patchUserPhoneWorker(action: PayloadAction<PatchUserPhoneAction
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "PATCH",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "PATCH",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      patchUserPhoneFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+    )
 
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update this domain in state
        *
@@ -80,13 +89,6 @@ export function* patchUserPhoneWorker(action: PayloadAction<PatchUserPhoneAction
       )
 
       /**
-       * update fetch status sucess
-       **/
-      yield put(
-        patchUserPhoneFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
-
-      /**
        * update message
        **/
       yield put(
@@ -94,12 +96,12 @@ export function* patchUserPhoneWorker(action: PayloadAction<PatchUserPhoneAction
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "switched primary successfully.",
-        }) 
+        })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
       /**
        * update fetch status failed
@@ -115,8 +117,8 @@ export function* patchUserPhoneWorker(action: PayloadAction<PatchUserPhoneAction
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
     }
   } else {

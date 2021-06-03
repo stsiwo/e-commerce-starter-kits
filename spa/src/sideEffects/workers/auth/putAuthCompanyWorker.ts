@@ -1,13 +1,12 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { UserCriteria, UserCompanyCriteria } from "domain/user/types";
-import { authActions, PutAuthActionType, messageActions, PutAuthCompanyActionType } from "reducers/slices/app";
+import { UserCompanyCriteria } from "domain/user/types";
+import { authActions, messageActions, PutAuthCompanyActionType } from "reducers/slices/app";
+import { putAuthCompanyFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
+import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { putAuthCompanyFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
 
 /**
  * a worker (generator)    
@@ -60,16 +59,26 @@ export function* putAuthCompanyWorker(action: PayloadAction<PutAuthCompanyAction
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "PUT",
-        url: apiUrl,
-        data: action.payload as UserCompanyCriteria
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "PUT",
+      url: apiUrl,
+      data: action.payload as UserCompanyCriteria
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      putAuthCompanyFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       /**
        * update this domain in state
@@ -79,12 +88,6 @@ export function* putAuthCompanyWorker(action: PayloadAction<PutAuthCompanyAction
         authActions.updateCompany(response.data)
       )
 
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        putAuthCompanyFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
 
       /**
        * update message
@@ -94,12 +97,12 @@ export function* putAuthCompanyWorker(action: PayloadAction<PutAuthCompanyAction
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "updated successfully.",
-        }) 
+        })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
       /**
        * update fetch status failed
@@ -115,8 +118,8 @@ export function* putAuthCompanyWorker(action: PayloadAction<PutAuthCompanyAction
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message,
+        })
       )
     }
   } else {

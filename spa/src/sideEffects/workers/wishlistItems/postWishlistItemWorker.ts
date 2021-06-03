@@ -1,15 +1,14 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { filterSingleVariant } from "domain/product";
 import { WishlistItemCriteria, WishlistItemType } from "domain/wishlist/types";
+import { messageActions } from "reducers/slices/app";
 import { postWishlistItemFetchStatusActions } from "reducers/slices/app/fetchStatus/wishlistItem";
 import { PostWishlistItemActionType, wishlistItemActions } from "reducers/slices/domain/wishlistItem";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
+import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { messageActions } from "reducers/slices/app";
 
 /**
  * a worker (generator)    
@@ -78,19 +77,29 @@ export function* postWishlistItemWorker(action: PayloadAction<PostWishlistItemAc
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "POST",
-        url: apiUrl,
-        data: {
-          variantId: action.payload.variantId,
-        } as WishlistItemCriteria
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "POST",
+      url: apiUrl,
+      data: {
+        variantId: action.payload.variantId,
+      } as WishlistItemCriteria
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      postWishlistItemFetchStatusActions.update(response.fetchStatus)
+    )
 
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update categories domain in state
        *
@@ -102,13 +111,6 @@ export function* postWishlistItemWorker(action: PayloadAction<PostWishlistItemAc
       )
 
       /**
-       * update fetch status sucess
-       **/
-      yield put(
-        postWishlistItemFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
-
-      /**
        * update message
        **/
       yield put(
@@ -116,12 +118,12 @@ export function* postWishlistItemWorker(action: PayloadAction<PostWishlistItemAc
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
-        }) 
+        })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
       /**
        * update fetch status failed
@@ -137,8 +139,8 @@ export function* postWishlistItemWorker(action: PayloadAction<PostWishlistItemAc
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
     }
 

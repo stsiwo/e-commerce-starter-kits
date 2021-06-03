@@ -1,14 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
+import { OrderEventCriteria } from "domain/order/types";
 import { messageActions } from "reducers/slices/app";
 import { putOrderEventFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
-import { PutOrderEventActionType, orderActions } from "reducers/slices/domain/order";
+import { orderActions, PutOrderEventActionType } from "reducers/slices/domain/order";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { OrderEventCriteria } from "domain/order/types";
 
 /**
  * a worker (generator)    
@@ -63,19 +62,29 @@ export function* putOrderEventWorker(action: PayloadAction<PutOrderEventActionTy
     /**
      * fetch data
      **/
-    try {
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "PUT",
-        url: apiUrl,
-        data: { 
-          orderEventId: action.payload.orderEventId,
-          note: action.payload.note,
-          userId: curAuth.user.userId,
-        } as OrderEventCriteria
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "PUT",
+      url: apiUrl,
+      data: {
+        orderEventId: action.payload.orderEventId,
+        note: action.payload.note,
+        userId: curAuth.user.userId,
+      } as OrderEventCriteria
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      putOrderEventFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update product domain in state
        *
@@ -92,13 +101,6 @@ export function* putOrderEventWorker(action: PayloadAction<PutOrderEventActionTy
       )
 
       /**
-       * update fetch status sucess
-       **/
-      yield put(
-        putOrderEventFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
-
-      /**
        * update message
        **/
       yield put(
@@ -106,18 +108,11 @@ export function* putOrderEventWorker(action: PayloadAction<PutOrderEventActionTy
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "updated successfully.",
-        }) 
+        })
       )
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        putOrderEventFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      console.log(response.fetchStatus)
 
       /**
        * update message
@@ -126,11 +121,11 @@ export function* putOrderEventWorker(action: PayloadAction<PutOrderEventActionTy
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.fetchStatus
+        })
       )
     }
-  } 
+  }
 }
 
 

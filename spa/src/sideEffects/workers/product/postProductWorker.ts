@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { productFormDataGenerator } from "domain/product/formData";
 import { NormalizedProductType } from "domain/product/types";
@@ -68,20 +67,30 @@ export function* postProductWorker(action: PayloadAction<PostProductActionType>)
     /**
      * fetch data
      **/
-    try {
 
-      // prep form data
-      const formData = productFormDataGenerator(action.payload)
+    // prep form data
+    const formData = productFormDataGenerator(action.payload)
 
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "POST",
-        url: apiUrl,
-        data: formData, 
-        headers: { "Content-Type": "multipart/form-data" },
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "POST",
+      url: apiUrl,
+      data: formData,
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      postProductFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       console.log("posted product")
       console.log(response.data)
       /**
@@ -104,13 +113,6 @@ export function* postProductWorker(action: PayloadAction<PostProductActionType>)
       )
 
       /**
-       * update fetch status sucess
-       **/
-      yield put(
-        postProductFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
-
-      /**
        * update message
        **/
       yield put(
@@ -118,18 +120,11 @@ export function* postProductWorker(action: PayloadAction<PostProductActionType>)
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
-        }) 
+        })
       )
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        postProductFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      console.log(response.message)
 
       /**
        * update message
@@ -138,11 +133,11 @@ export function* postProductWorker(action: PayloadAction<PostProductActionType>)
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
     }
-  } 
+  }
 }
 
 

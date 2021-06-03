@@ -65,15 +65,25 @@ export function* deleteCartItemWorker(action: PayloadAction<CartItemType>) {
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "DELETE",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "DELETE",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      deleteCartItemFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       /**
        * update categories domain in state
@@ -85,25 +95,12 @@ export function* deleteCartItemWorker(action: PayloadAction<CartItemType>) {
         cartItemActions.clear()
       )
 
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        deleteCartItemFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        deleteCartItemFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
     }
-
 
   } else if (curAuth.userType === UserTypeEnum.GUEST) {
 

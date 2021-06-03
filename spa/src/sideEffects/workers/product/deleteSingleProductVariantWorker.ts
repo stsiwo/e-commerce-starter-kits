@@ -1,10 +1,8 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { ProductVariantCriteria } from "domain/product/types";
 import { messageActions } from "reducers/slices/app";
 import { deleteSingleProductVariantFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
-import { productActions, DeleteSingleProductVariantActionType } from "reducers/slices/domain/product";
+import { DeleteSingleProductVariantActionType, productActions } from "reducers/slices/domain/product";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
@@ -63,13 +61,23 @@ export function* deleteSingleProductVariantWorker(action: PayloadAction<DeleteSi
     /**
      * fetch data
      **/
-    try {
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "DELETE",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "DELETE",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      deleteSingleProductVariantFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       console.log("puted product")
       console.log(response.data)
@@ -85,13 +93,6 @@ export function* deleteSingleProductVariantWorker(action: PayloadAction<DeleteSi
       )
 
       /**
-       * update fetch status sucess
-       **/
-      yield put(
-        deleteSingleProductVariantFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
-
-      /**
        * update message
        **/
       yield put(
@@ -99,11 +100,11 @@ export function* deleteSingleProductVariantWorker(action: PayloadAction<DeleteSi
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
-        }) 
+        })
       )
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
       /**
        * update fetch status failed
@@ -119,10 +120,10 @@ export function* deleteSingleProductVariantWorker(action: PayloadAction<DeleteSi
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
     }
-  } 
+  }
 }
 

@@ -107,6 +107,7 @@ export const initialState: StateType = {
         postEvent: FetchStatusEnum.INITIAL,
         deleteSingleEvent: FetchStatusEnum.INITIAL,
         putEvent: FetchStatusEnum.INITIAL,
+        postSessionTimeoutEvent: FetchStatusEnum.INITIAL,
       },
       users: {
         get: FetchStatusEnum.INITIAL,
@@ -269,6 +270,9 @@ export const initialState: StateType = {
         totalElements: 0,
       },
       curItems: [],
+    },
+    checkout: {
+      order: null,
     }
   },
   // never persist

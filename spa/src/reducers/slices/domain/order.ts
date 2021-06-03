@@ -1,7 +1,7 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import merge from "lodash/merge";
 import remove from 'lodash/remove';
-import { OrderType, OrderEventType, OrderSortEnum, OrderEventCriteria, OrderCriteria } from "domain/order/types";
+import { OrderType, OrderEventType, OrderSortEnum, OrderEventCriteria, OrderCriteria, SessionTimeoutOrderEventCriteria } from "domain/order/types";
 
 /**
  * redux-sage actions (side effects)
@@ -50,6 +50,10 @@ export declare type DeleteSingleOrderEventActionType = { orderEventId: string, o
 export const deleteSingleOrderEventActionCreator = createAction<DeleteSingleOrderEventActionType>("saga/domain/order/event/deleteSingle")
 export const deleteSingleOrderEventActionTypeName = deleteSingleOrderEventActionCreator().type
 
+// for POST (add a new session timeout order event) request
+export declare type PostSessionTimeoutOrderEventActionType = SessionTimeoutOrderEventCriteria & { orderId: string } 
+export const postSessionTimeoutOrderEventActionCreator = createAction<PostSessionTimeoutOrderEventActionType>("saga/domain/order/event/session-timeout/post")
+export const postSessionTimeoutOrderEventActionTypeName = postSessionTimeoutOrderEventActionCreator().type
 /**
  *
  * domain.orders state Slice (no side effects)

@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { CartItemType } from "domain/cart/types";
 import { postCartItemFetchStatusActions } from "reducers/slices/app/fetchStatus/cartItem";
@@ -76,16 +75,27 @@ export function* postCartItemWorker(action: PayloadAction<CartItemType>) {
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "POST",
-        url: apiUrl,
-        data: action.payload
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "POST",
+      url: apiUrl,
+      data: action.payload
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      postCartItemFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       /**
        * update categories domain in state
@@ -94,28 +104,14 @@ export function* postCartItemWorker(action: PayloadAction<CartItemType>) {
        *
        **/
       yield put(
-        cartItemActions.updateOne(response.data.data)
+        cartItemActions.updateOne(response.data)
       )
 
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        postCartItemFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-    } catch (error) {
+      console.log(response.message)
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        postCartItemFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
     }
-
 
   } else if (curAuth.userType === UserTypeEnum.GUEST) {
 

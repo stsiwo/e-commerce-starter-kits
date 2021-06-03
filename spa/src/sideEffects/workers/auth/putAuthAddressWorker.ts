@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { UserAddressCriteria } from "domain/user/types";
 import { authActions, messageActions, PutAuthAddressActionType } from "reducers/slices/app";
@@ -60,16 +59,29 @@ export function* putAuthAddressWorker(action: PayloadAction<PutAuthAddressAction
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "PUT",
-        url: apiUrl,
-        data: action.payload as UserAddressCriteria
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "PUT",
+      url: apiUrl,
+      data: action.payload as UserAddressCriteria
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      putAuthAddressFetchStatusActions.update(response.fetchStatus)
+    )
+
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
+
 
       /**
        * update this domain in state
@@ -80,13 +92,6 @@ export function* putAuthAddressWorker(action: PayloadAction<PutAuthAddressAction
       )
 
       /**
-       * update fetch status sucess
-       **/
-      yield put(
-        putAuthAddressFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
-
-      /**
        * update message
        **/
       yield put(
@@ -94,12 +99,12 @@ export function* putAuthAddressWorker(action: PayloadAction<PutAuthAddressAction
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
-        }) 
+        })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
       /**
        * update fetch status failed
@@ -115,8 +120,8 @@ export function* putAuthAddressWorker(action: PayloadAction<PutAuthAddressAction
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message,
+        })
       )
     }
   } else {

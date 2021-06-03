@@ -9,10 +9,12 @@ import CustomerContactForm from 'components/common/Checkout/CustomerContactForm'
 import Payment from 'components/common/Checkout/Payment';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { mSelector } from 'src/selectors/selector';
+import { mSelector, rsSelector } from 'src/selectors/selector';
 import FinalConfirmForm from 'components/common/Checkout/FinalConfirmForm';
 import Button from '@material-ui/core/Button';
 import OrderItemForm from 'components/common/Checkout/OrderItemForm';
+import { postSessionTimeoutOrderEventActionCreator } from 'reducers/slices/domain/order';
+import { FetchStatusEnum } from 'src/app';
 
 export enum CheckoutStepEnum {
   CUSTOMER_BASIC_INFORMATION = 0,
@@ -42,7 +44,6 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
 
   const auth = useSelector(mSelector.makeAuthSelector())
 
-
   /**
    * steps:
    *  0: customer basic information
@@ -67,6 +68,51 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
   }
 
   const dispatch = useDispatch()
+
+  /**
+   * session time out stuff.
+   *
+   * if the customer does not finsih payment in CHECKOUT_SESSION_TIMEOUT, we cancel the final confirm and make the customer start over again. just click the final confirm again though.
+   *
+   * - this is because to prevent the customer occupies the product stock and make it avaible to the other customers.
+   *
+   **/
+  const curCheckoutOrder = useSelector(rsSelector.domain.getCheckoutOrder);
+
+  const handleSessionTimeout = () => {
+    // if timeout, get the customer back to final confirm section.
+    setActiveStep(CheckoutStepEnum.ORDER_ITEMS)
+
+    dispatch(
+      postSessionTimeoutOrderEventActionCreator({
+        orderId: curCheckoutOrder.orderId,
+        orderNumber: curCheckoutOrder.orderNumber,
+      })
+
+    );
+  }
+
+  const sessionTime: number = parseInt(CHECKOUT_SESSION_TIMEOUT)
+  const curPostOrderFetchStatus = useSelector(rsSelector.app.getPostOrderFetchStatus);
+  React.useEffect(() => {
+
+    let timer: ReturnType<typeof setTimeout>;
+
+    console.log("current checkout step: " + activeStep)
+
+    if (curPostOrderFetchStatus === FetchStatusEnum.SUCCESS) {
+      console.log("start session")
+      //setTimeout(handleSessionTimeout, sessionTime)
+      timer = setTimeout(handleSessionTimeout, 1000)
+    }
+
+    return () => {
+      clearTimeout(timer);
+    }
+  }, [
+      curPostOrderFetchStatus
+    ])
+
 
   return (
     <React.Fragment>

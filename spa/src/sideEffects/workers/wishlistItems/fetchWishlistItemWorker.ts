@@ -1,9 +1,8 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { messageActions } from "reducers/slices/app";
 import { getWishlistItemFetchStatusActions } from "reducers/slices/app/fetchStatus/wishlistItem";
-import { wishlistItemActions, wishlistItemPaginationPageActions, wishlistItemPaginationTotalPagesActions, wishlistItemPaginationTotalElementsActions } from "reducers/slices/domain/wishlistItem";
+import { wishlistItemActions, wishlistItemPaginationPageActions, wishlistItemPaginationTotalElementsActions, wishlistItemPaginationTotalPagesActions } from "reducers/slices/domain/wishlistItem";
 import { all, call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
@@ -63,16 +62,26 @@ export function* fetchWishlistItemWorker(action: PayloadAction<{}>) {
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "GET",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "GET",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, content: response.data.content, pageable: response.data.pageable, totalPages: response.data.totalPages, totalElements: response.data.totalElements }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      getWishlistItemFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update domain in state
        *
@@ -81,14 +90,7 @@ export function* fetchWishlistItemWorker(action: PayloadAction<{}>) {
       console.log("wishlist item dto response data")
       console.log(response.data)
       yield put(
-        wishlistItemActions.update(response.data.content)
-      )
-
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        getWishlistItemFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+        wishlistItemActions.update(response.content)
       )
 
       /**
@@ -129,15 +131,15 @@ export function* fetchWishlistItemWorker(action: PayloadAction<{}>) {
        **/
 
 
-      console.log(response.data.pageable)
+      console.log(response.pageable)
 
       console.log("total pages")
-      console.log(response.data.totalPages)
+      console.log(response.totalPages)
 
       yield all([
-        put(wishlistItemPaginationPageActions.update(response.data.pageable.pageNumber)),
-        put(wishlistItemPaginationTotalPagesActions.update(response.data.totalPages)),
-        put(wishlistItemPaginationTotalElementsActions.update(response.data.totalElements)),
+        put(wishlistItemPaginationPageActions.update(response.pageable.pageNumber)),
+        put(wishlistItemPaginationTotalPagesActions.update(response.totalPages)),
+        put(wishlistItemPaginationTotalElementsActions.update(response.totalElements)),
       ])
 
       /**
@@ -147,20 +149,13 @@ export function* fetchWishlistItemWorker(action: PayloadAction<{}>) {
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
-          message: "fetched successfully.", 
-        }) 
+          message: "fetched successfully.",
+        })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        getWishlistItemFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      console.log(response.message)
 
       /**
        * update message
@@ -169,8 +164,8 @@ export function* fetchWishlistItemWorker(action: PayloadAction<{}>) {
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
     }
   }

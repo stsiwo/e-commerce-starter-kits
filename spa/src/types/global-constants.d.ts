@@ -17,6 +17,8 @@ declare const TEST_MEMBER_EMAIL: string
 
 declare const TEST_USER_PASSWORD: string
 
+declare const CHECKOUT_SESSION_TIMEOUT: string
+
 /**
  * typeScript Error: 
  *  - create below module declaration.

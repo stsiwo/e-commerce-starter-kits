@@ -1,13 +1,12 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { messageActions } from "reducers/slices/app";
+import { deleteUserPhoneFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
+import { DeleteUserPhoneActionType, userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { DeleteUserPhoneActionType, userActions } from "reducers/slices/domain/user";
-import { deleteUserPhoneFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 
 /**
  * a worker (generator)    
@@ -58,32 +57,35 @@ export function* deleteUserPhoneWorker(action: PayloadAction<DeleteUserPhoneActi
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "DELETE",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "DELETE",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      deleteUserPhoneFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update this domain in state
        *
        **/
       yield put(
-        userActions.removePhone({ 
-          phoneId : action.payload.phoneId,
+        userActions.removePhone({
+          phoneId: action.payload.phoneId,
           userId: action.payload.userId
         })
-      )
-
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        deleteUserPhoneFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -94,12 +96,12 @@ export function* deleteUserPhoneWorker(action: PayloadAction<DeleteUserPhoneActi
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "deleted successfully.",
-        }) 
+        })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
       /**
        * update fetch status failed
@@ -115,8 +117,8 @@ export function* deleteUserPhoneWorker(action: PayloadAction<DeleteUserPhoneActi
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
     }
   } else {

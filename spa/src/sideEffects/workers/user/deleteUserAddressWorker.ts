@@ -1,13 +1,12 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { messageActions } from "reducers/slices/app";
+import { deleteUserAddressFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
+import { DeleteUserAddressActionType, userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { DeleteUserAddressActionType, userActions } from "reducers/slices/domain/user";
-import { deleteUserAddressFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 
 /**
  * a worker (generator)    
@@ -58,32 +57,35 @@ export function* deleteUserAddressWorker(action: PayloadAction<DeleteUserAddress
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "DELETE",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "DELETE",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      deleteUserAddressFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update this domain in state
        *
        **/
       yield put(
-        userActions.removeAddress({ 
-          addressId : action.payload.addressId,
+        userActions.removeAddress({
+          addressId: action.payload.addressId,
           userId: action.payload.userId,
         })
-      )
-
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        deleteUserAddressFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -94,12 +96,12 @@ export function* deleteUserAddressWorker(action: PayloadAction<DeleteUserAddress
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "deleted successfully.",
-        }) 
+        })
       )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
       /**
        * update fetch status failed
@@ -115,8 +117,8 @@ export function* deleteUserAddressWorker(action: PayloadAction<DeleteUserAddress
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
     }
   } else {

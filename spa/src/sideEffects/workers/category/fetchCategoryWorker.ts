@@ -1,10 +1,9 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { NormalizedCategoryType } from "domain/product/types";
 import { normalize } from "normalizr";
 import { getCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
-import { categoryActions, categoryPaginationPageActions, categoryPaginationTotalPagesActions, categoryPaginationTotalElementsActions } from "reducers/slices/domain/category";
+import { categoryActions, categoryPaginationPageActions, categoryPaginationTotalElementsActions, categoryPaginationTotalPagesActions } from "reducers/slices/domain/category";
 import { all, call, put, select } from "redux-saga/effects";
 import { FetchStatusEnum } from "src/app";
 import { mSelector } from "src/selectors/selector";
@@ -70,23 +69,33 @@ export function* fetchCategoryWorker(action: PayloadAction<{}>) {
   /**
    * fetch data
    **/
-  try {
 
-    // prep keyword if necessary
+  // prep keyword if necessary
 
-    // start fetching
-    const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-      method: "GET",
-      url: apiUrl,
-    })
+  // start fetching
+  const response = yield call(() => api({
+    method: "GET",
+    url: apiUrl,
+  })
+    .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, content: response.data.content, pageable: response.data.pageable, totalPages: response.data.totalPages, totalElements: response.data.totalElements }))
+    .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+  )
 
+  /**
+   * update fetch status sucess
+   **/
+  yield put(
+    getCategoryFetchStatusActions.update(response.fetchStatus)
+  )
+
+  if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
     /**
      * normalize response data
      *
      *  - TODO: make sure response structure with remote api
      **/
     console.log(response) // pageable response
-    const normalizedData = normalize(response.data.content, categorySchemaArray)
+    const normalizedData = normalize(response.content, categorySchemaArray)
 
     /**
      * update categories domain in state
@@ -96,12 +105,6 @@ export function* fetchCategoryWorker(action: PayloadAction<{}>) {
       categoryActions.update(normalizedData.entities.categories as NormalizedCategoryType)
     )
 
-    /**
-     * update fetch status sucess
-     **/
-    yield put(
-      getCategoryFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-    )
 
     /**
      * update pagination.
@@ -141,29 +144,22 @@ export function* fetchCategoryWorker(action: PayloadAction<{}>) {
      **/
 
 
-    console.log(response.data.pageable)
+    console.log(response.pageable)
 
     console.log("total pages")
-    console.log(response.data.totalPages)
+    console.log(response.totalPages)
 
     yield all([
-      put(categoryPaginationPageActions.update(response.data.pageable.pageNumber)),
-      put(categoryPaginationTotalPagesActions.update(response.data.totalPages)),
-      put(categoryPaginationTotalElementsActions.update(response.data.totalElements)),
+      put(categoryPaginationPageActions.update(response.pageable.pageNumber)),
+      put(categoryPaginationTotalPagesActions.update(response.totalPages)),
+      put(categoryPaginationTotalElementsActions.update(response.totalElements)),
     ])
 
-  } catch (error) {
+  } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-    console.log(error)
+    console.log(response.message)
 
-    /**
-     * update fetch status failed
-     **/
-    yield put(
-      getCategoryFetchStatusActions.update(FetchStatusEnum.FAILED)
-    )
   }
-  // }
 }
 
 

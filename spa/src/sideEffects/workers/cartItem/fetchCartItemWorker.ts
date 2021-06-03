@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { getCartItemFetchStatusActions } from "reducers/slices/app/fetchStatus/cartItem";
 import { cartItemActions } from "reducers/slices/domain/cartItem";
@@ -54,15 +53,26 @@ export function* fetchCartItemWorker(action: PayloadAction<{}>) {
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "GET",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "GET",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
+
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      getCartItemFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
       /**
        * update cartItem domain in state
@@ -74,23 +84,11 @@ export function* fetchCartItemWorker(action: PayloadAction<{}>) {
         cartItemActions.update(response.data)
       )
 
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        getCartItemFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        getCartItemFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
     }
   }
 }

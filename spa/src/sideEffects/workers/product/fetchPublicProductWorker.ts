@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { NormalizedProductType } from "domain/product/types";
 import { normalize } from "normalizr";
@@ -69,23 +68,33 @@ export function* fetchPublicProductWorker(action: PayloadAction<{}>) {
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "GET",
-        url: apiUrl,
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "GET",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, content: response.data.content, pageable: response.data.pageable, totalPages: response.data.totalPages, totalElements: response.data.totalElements }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      getPublicProductFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * normalize response data
        *
        *  - TODO: make sure response structure with remote api
        **/
       console.log(response) // pageable response
-      const normalizedData = normalize(response.data.content, productSchemaArray)
+      const normalizedData = normalize(response.content, productSchemaArray)
 
       /**
        * update product domain in state
@@ -95,13 +104,6 @@ export function* fetchPublicProductWorker(action: PayloadAction<{}>) {
        **/
       yield put(
         productActions.update(normalizedData.entities.products as NormalizedProductType)
-      )
-
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        getPublicProductFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -142,27 +144,21 @@ export function* fetchPublicProductWorker(action: PayloadAction<{}>) {
        **/
 
 
-      console.log(response.data.pageable)
+      console.log(response.pageable)
 
       console.log("total pages")
-      console.log(response.data.totalPages)
+      console.log(response.totalPages)
 
       yield all([
-        put(productPaginationPageActions.update(response.data.pageable.pageNumber)),
-        put(productPaginationTotalPagesActions.update(response.data.totalPages)),
-        put(productPaginationTotalElementsActions.update(response.data.totalElements)),
+        put(productPaginationPageActions.update(response.pageable.pageNumber)),
+        put(productPaginationTotalPagesActions.update(response.totalPages)),
+        put(productPaginationTotalElementsActions.update(response.totalElements)),
       ])
 
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
+      console.log(response.message)
 
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        getPublicProductFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
     }
   } else {
     console.log("permission denied. your product type: " + curAuth.userType)

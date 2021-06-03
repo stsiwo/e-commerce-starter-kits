@@ -1,10 +1,9 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { ReviewCriteria } from "domain/review/type";
 import { messageActions } from "reducers/slices/app";
-import { postReviewFetchStatusActions, putReviewFetchStatusActions } from "reducers/slices/app/fetchStatus/review";
-import { PostReviewActionType, reviewActions, PutReviewActionType } from "reducers/slices/domain/review";
+import { putReviewFetchStatusActions } from "reducers/slices/app/fetchStatus/review";
+import { PutReviewActionType, reviewActions } from "reducers/slices/domain/review";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
@@ -62,37 +61,40 @@ export function* putReviewWorker(action: PayloadAction<PutReviewActionType>) {
     /**
      * fetch data
      **/
-    try {
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
-        method: "PUT",
-        url: apiUrl,
-        data: {
-          reviewId: action.payload.reviewId,
-          reviewTitle: action.payload.reviewTitle,
-          reviewDescription: action.payload.reviewDescription,
-          isVerified: action.payload.isVerified, // when member, this should be false. and when admin, this should be true 
-          note: action.payload.note, // this should be only displayed on admin page
-          reviewPoint: action.payload.reviewPoint,
-        } as ReviewCriteria
-      })
+    // start fetching
+    const response = yield call(() => api({
+      method: "PUT",
+      url: apiUrl,
+      data: {
+        reviewId: action.payload.reviewId,
+        reviewTitle: action.payload.reviewTitle,
+        reviewDescription: action.payload.reviewDescription,
+        isVerified: action.payload.isVerified, // when member, this should be false. and when admin, this should be true 
+        note: action.payload.note, // this should be only displayed on admin page
+        reviewPoint: action.payload.reviewPoint,
+      } as ReviewCriteria
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      putReviewFetchStatusActions.update(response.fetchStatus)
+    )
+
+    if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update review domain in state
        *
        **/
       yield put(
         reviewActions.updateOne(response.data)
-      )
-
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        putReviewFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
       /**
@@ -103,18 +105,11 @@ export function* putReviewWorker(action: PayloadAction<PutReviewActionType>) {
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "updated successfully.",
-        }) 
+        })
       )
-    } catch (error) {
+    } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(error)
-
-      /**
-       * update fetch status failed
-       **/
-      yield put(
-        putReviewFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      console.log(response.message)
 
       /**
        * update message
@@ -123,8 +118,8 @@ export function* putReviewWorker(action: PayloadAction<PutReviewActionType>) {
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: error.message, 
-        }) 
+          message: response.message
+        })
       )
     }
   } else {
