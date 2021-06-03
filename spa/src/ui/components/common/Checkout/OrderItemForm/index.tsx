@@ -7,7 +7,6 @@ import { CheckoutStepComponentPropsType } from 'components/pages/Checkout/checko
 import { calcSubTotalPriceAmount } from 'domain/cart';
 import { CartItemType } from 'domain/cart/types';
 import { UserType } from 'domain/user/types';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';

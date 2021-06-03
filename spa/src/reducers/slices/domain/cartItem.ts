@@ -88,6 +88,22 @@ export const cartItemSlice = createSlice({
       return state
     },
 
+    deleteSelectedItemsByProduct: (state: CartItemType[], action: PayloadAction<{ productId: string, productVariantId: string }[]>) => {
+      // remove if condition met (2nd arg)
+      remove(state, (cartItem: CartItemType) => { 
+        // condition 
+        return action.payload.find((ele) => {
+          return cartItem.isSelected && cartItem.product.productId == ele.productId && cartItem.product.variants[0].variantId == ele.productVariantId
+        })
+      })
+      return state
+    },
+
+    deleteSelectedItems: (state: CartItemType[]) => {
+      remove(state, (cartItem: CartItemType) => cartItem.isSelected)
+      return state
+    },
+
     clear: (state: CartItemType[]) => [],
   },
   /**

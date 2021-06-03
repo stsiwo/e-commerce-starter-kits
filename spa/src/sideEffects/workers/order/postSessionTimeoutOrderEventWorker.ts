@@ -19,9 +19,9 @@ import { getNanoId } from "src/utils";
  *
  *  - (UserType)
  *
- *      - (Guest): N/A (permission denied) 
- *      - (Member): N/A (permission denied) 
- *      - (Admin): OK
+ *      - (Guest): OK
+ *      - (Member): OK
+ *      - (Admin): N/A 
  *
  *  - steps:
  *

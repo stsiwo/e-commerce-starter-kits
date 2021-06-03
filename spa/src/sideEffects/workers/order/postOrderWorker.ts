@@ -97,6 +97,13 @@ export function* postOrderWorker(action: PayloadAction<PostOrderActionType>) {
        * - NOTE: TO checkout/order (not domain/orders)
        *
        **/
+
+      console.log("order and clientSecret in response")
+
+      console.log(response);
+      
+
+
       yield put(
         checkoutOrderActions.update(response.order)
       )

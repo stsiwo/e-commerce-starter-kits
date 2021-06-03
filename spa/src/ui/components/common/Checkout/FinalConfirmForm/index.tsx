@@ -18,6 +18,7 @@ import { getNanoId } from 'src/utils';
 import CartItemConfirmCard from './CartItemConfirmCard';
 import CustomerBasicConfirm from './CustomerBasicConfirm';
 import CustomerContactConfirm from './CustomerContactConfirm';
+import { postOrderFetchStatusActions } from 'reducers/slices/app/fetchStatus/order';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

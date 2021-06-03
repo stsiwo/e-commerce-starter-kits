@@ -7,15 +7,12 @@ import { calcSubTotalPriceAmount, calcSubTotalProductNumbers, validateCartItemsF
 import { CartItemType } from 'domain/cart/types';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link as RRLink } from "react-router-dom";
-import { fetchCartItemActionCreator } from 'reducers/slices/domain/cartItem';
-import { UserTypeEnum, MessageTypeEnum } from 'src/app';
-import { mSelector } from 'src/selectors/selector';
-import { generateCartItemList } from 'tests/data/cart';
-import { cadCurrencyFormat, getNanoId } from 'src/utils';
 import { useHistory } from 'react-router';
-import { useSnackbar } from 'notistack';
 import { messageActions } from 'reducers/slices/app';
+import { fetchCartItemActionCreator } from 'reducers/slices/domain/cartItem';
+import { MessageTypeEnum, UserTypeEnum } from 'src/app';
+import { mSelector } from 'src/selectors/selector';
+import { cadCurrencyFormat, getNanoId } from 'src/utils';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -32,11 +29,15 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+declare type CartBoxPropsType = {
+  toggleDrawer?: (nextOpen: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void
+}
+
 /**
  * member & guest
  *
  **/
-const CartBox: React.FunctionComponent<{}> = (props) => {
+const CartBox: React.FunctionComponent<CartBoxPropsType> = (props) => {
 
   const classes = useStyles();
 
@@ -70,6 +71,10 @@ const CartBox: React.FunctionComponent<{}> = (props) => {
   const handleCheckoutClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (validateCartItemsForCheckout(curCartItems)) {
       history.push("/checkout");
+
+      if (props.toggleDrawer) {
+        props.toggleDrawer(false)(e);
+      }
     } else {
       dispatch(
         messageActions.update({

@@ -80,7 +80,7 @@ const CartDrawer: React.FunctionComponent<{}> = (props) => {
       <Typography variant="h5" component="h5" align="center" className={classes.title} >
         {"Cart"}
       </Typography>
-      <CartBox />
+      <CartBox toggleDrawer={toggleDrawer}/>
       <IconButton onClick={toggleDrawer(false)} className={classes.closeBtn}>
         <CancelIcon />
       </IconButton>

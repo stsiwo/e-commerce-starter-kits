@@ -44,7 +44,11 @@ export function toPhoneStringWithoutSpace(phone: UserPhoneType): string {
   return `${phone.countryCode}${phone.phoneNumber}`
 }
 
-export function toFullNameString(user: UserType): string {
+export function toFullNameStringOfUser(user: UserType): string {
   return `${user.firstName} ${user.lastName}`
+}
+
+export function toFullNameString(firstName: string, lastName: string): string {
+  return `${firstName} ${lastName}`
 }
 

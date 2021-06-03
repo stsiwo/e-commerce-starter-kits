@@ -22,6 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 declare type PaymentPropsType = {
   user: UserType
+  setPaymentAttempt: React.Dispatch<React.SetStateAction<boolean>>
 } & CheckoutStepComponentPropsType
 
 /**
@@ -44,7 +45,7 @@ const Payment: React.FunctionComponent<PaymentPropsType> = (props) => {
   return (
     <Box className={classes.root}>
       <Elements stripe={stripePromise}>
-        <StripePaymentForm />
+        <StripePaymentForm goToStep={props.goToStep} setPaymentAttempt={props.setPaymentAttempt} />
       </Elements>
     </Box>
   )

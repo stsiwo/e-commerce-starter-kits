@@ -3,12 +3,20 @@ import Button from '@material-ui/core/Button';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { calcSubTotalPriceAmount } from 'domain/cart';
-import { toFullNameString, toPhoneString } from 'domain/user';
-import { useSnackbar } from 'notistack';
+import { toPhoneString, toFullNameString } from 'domain/user';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { mSelector } from 'src/selectors/selector';
-import { cadCurrencyFormat } from 'src/utils';
+import { mSelector, rsSelector } from 'src/selectors/selector';
+import { cadCurrencyFormat, getNanoId } from 'src/utils';
+import { messageActions } from 'reducers/slices/app';
+import { MessageTypeEnum } from 'src/app';
+import { useHistory } from 'react-router';
+import { stripeClientSecretActions } from 'reducers/slices/sensitive';
+import { calcOrderTotalCost } from 'domain/order';
+import { checkoutOrderActions } from 'reducers/slices/domain/checkout';
+import { CheckoutStepEnum } from 'components/pages/Checkout';
+import { postOrderFetchStatusActions } from 'reducers/slices/app/fetchStatus/order';
+import { cartItemActions } from 'reducers/slices/domain/cartItem';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -30,6 +38,8 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 declare type StripePaymentFormPropsType = {
+  goToStep: (step: CheckoutStepEnum) => void
+  setPaymentAttempt: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 /**
@@ -46,25 +56,14 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
   // dispatch
   const dispatch = useDispatch()
 
-  // auth (customer)
-  const auth = useSelector(mSelector.makeAuthSelector());
+  // history
+  const history = useHistory()
 
-  // selected phone
-  const selectedPhone = useSelector(mSelector.makeAuthSelectedPhoneSelector())
-
-  // shipping & billing address
-  const shippingAddress = useSelector(mSelector.makeAuthShippingAddressSelector())
-  const billingAddress = useSelector(mSelector.makeAuthBillingAddressSelector())
-
-  // selected cart items
-  const selectedCartItems = useSelector(mSelector.makeSelectedCartItemSelector())
-
+  // cur checkout order
+  const curCheckoutOrder = useSelector(rsSelector.domain.getCheckoutOrder)
 
   // client_secret state (redux store)
   const stripeClientSecret = useSelector(mSelector.makeStipeClientSecretSelector())
-
-  // snakbar stuff when no phone & addresses are selected
-  const { enqueueSnackbar } = useSnackbar();
 
   // stripe stuff
   const stripe = useStripe();
@@ -84,26 +83,73 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
       payment_method: {
         card: elements.getElement(CardElement),
         billing_details: {
-          name: toFullNameString(auth.user),
+          name: toFullNameString(curCheckoutOrder.orderFirstName, curCheckoutOrder.orderLastName),
           address: {
-            line1: billingAddress.address1,
-            line2: billingAddress.address2,
-            city: billingAddress.city,
-            state: billingAddress.province,
-            country: billingAddress.country,
-            postal_code: billingAddress.postalCode,
+            line1: curCheckoutOrder.billingAddress.address1,
+            line2: curCheckoutOrder.billingAddress.address2,
+            city: curCheckoutOrder.billingAddress.city,
+            state: curCheckoutOrder.billingAddress.province,
+            country: curCheckoutOrder.billingAddress.country,
+            postal_code: curCheckoutOrder.billingAddress.postalCode,
           },
-          email: auth.user.email,
-          phone: toPhoneString(selectedPhone),
+          email: curCheckoutOrder.orderEmail,
+          phone: curCheckoutOrder.orderPhone,
         },
       }
     });
 
+    // payment done 
+
+    /**
+     * make sure to delete clientSecret. it is sensitive data and should be deleted as soon as you used.
+     *
+     * also, cur order too.
+     * also, post order fetch status too
+     **/
+    dispatch(
+      stripeClientSecretActions.clear()
+    );
+
+    dispatch(
+      checkoutOrderActions.clear()
+    );
+
+    dispatch(
+      postOrderFetchStatusActions.clear()
+    )
+
+    // prepare for the next payment if failed
+    props.setPaymentAttempt(true);
+
+    /**
+     * Payment Failed
+     **/
     if (result.error) {
       // Show error to your customer (e.g., insufficient funds)
       console.log(result.error.message);
-      enqueueSnackbar("payment failed: " + result.error.message)
+
+      /**
+       * update message
+       **/
+      dispatch(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.ERROR,
+          message: "sorry, we failed to process your payment. please start over again. (reason: " + result.error.message + ")",
+        })
+      )
+      // reload instead of steping back to the fist section.
+      // to reset all state (e.g., session timeout)
+      // this does not work since error message does not show since this reloading.
+      //window.location.reload();
+
+      props.goToStep(CheckoutStepEnum.CUSTOMER_BASIC_INFORMATION);
+
     } else {
+    /**
+     * Payment Succeeded
+     **/
+
       // The payment has been processed!
       if (result.paymentIntent.status === 'succeeded') {
         // Show a success message to your customer
@@ -111,10 +157,25 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
         // execution. Set up a webhook or plugin to listen for the
         // payment_intent.succeeded event that handles any business critical
         // post-payment actions.
-        enqueueSnackbar("payment success:")
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.SUCCESS,
+            message: "thank you for your purchase. we will send the confirmation email soon.",
+          })
+        )
       }
+
+      // remove purchased product from cart.
+      dispatch(
+        cartItemActions.deleteSelectedItems()
+      )
+
+      history.push("/");
     }
   }
+
+  const totalCost = curCheckoutOrder ? cadCurrencyFormat(calcOrderTotalCost(curCheckoutOrder)) : cadCurrencyFormat(0)
 
   return (
     <Box component="div" className={classes.root}>
@@ -127,7 +188,7 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
           onClick={handleMakePaymentClick}
           className={classes.btn}
         >
-          Make Payment (<b>$ {cadCurrencyFormat(calcSubTotalPriceAmount(selectedCartItems))} </b>)
+          Make Payment (<b>$ {totalCost} </b>)
         </Button>
       </Box>
     </Box>

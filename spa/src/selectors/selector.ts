@@ -7,7 +7,7 @@ import { denormalize } from "normalizr";
 import { categorySchemaArray, productSchemaArray } from "states/state";
 import { StateType } from "states/types";
 import { WishlistItemType } from "domain/wishlist/types";
-import { OrderType, OrderCriteria } from "domain/order/types";
+import { OrderType, OrderCriteria, OrderDetailType } from "domain/order/types";
 import { toPhoneStringWithoutSpace } from "domain/user";
 import { toOrderAddress, toOrderDetailCriteriaList } from "domain/order";
 import { UserTypeEnum } from "src/app";
@@ -1529,4 +1529,16 @@ export const mSelector = {
     )
   },
 
+  // get productIds which is selected in cart.
+  // use case: delete those cartItems after checkout
+  makeProductAndVariantIdsFromCurCheckoutOrderSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getCheckoutOrder
+      ],
+      (checkoutOrder) => {
+        return checkoutOrder.orderDetails.map((orderDetail: OrderDetailType) => ({ productId: orderDetail.product.productId, productVariantId: orderDetail.productVariant.variantId }))
+      },
+    )
+  },
 }

@@ -80,38 +80,65 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
   const curCheckoutOrder = useSelector(rsSelector.domain.getCheckoutOrder);
 
   const handleSessionTimeout = () => {
-    // if timeout, get the customer back to final confirm section.
-    setActiveStep(CheckoutStepEnum.ORDER_ITEMS)
 
     dispatch(
       postSessionTimeoutOrderEventActionCreator({
         orderId: curCheckoutOrder.orderId,
         orderNumber: curCheckoutOrder.orderNumber,
       })
-
     );
+
+    // if timeout, get the customer back to final confirm section.
+    setActiveStep(CheckoutStepEnum.CUSTOMER_BASIC_INFORMATION)
   }
 
   const sessionTime: number = parseInt(CHECKOUT_SESSION_TIMEOUT)
   const curPostOrderFetchStatus = useSelector(rsSelector.app.getPostOrderFetchStatus);
+  // add flag to make sure the sessiontimeout only sent once
+  const isSessionTimeoutSent = React.useRef<boolean>(false);
+  let timer: ReturnType<typeof setTimeout>;
+
   React.useEffect(() => {
 
-    let timer: ReturnType<typeof setTimeout>;
 
-    console.log("current checkout step: " + activeStep)
+    if (!isSessionTimeoutSent.current && curCheckoutOrder && curPostOrderFetchStatus === FetchStatusEnum.SUCCESS) {
+      timer = setTimeout(handleSessionTimeout, sessionTime)
 
-    if (curPostOrderFetchStatus === FetchStatusEnum.SUCCESS) {
-      console.log("start session")
-      //setTimeout(handleSessionTimeout, sessionTime)
-      timer = setTimeout(handleSessionTimeout, 1000)
+      isSessionTimeoutSent.current = true;
+
+      // don't forget to cancel timer.
+      return () => {
+        clearTimeout(timer);
+      }
     }
 
-    return () => {
+  }, [
+      curPostOrderFetchStatus,
+      JSON.stringify(curCheckoutOrder),
+    ])
+
+  // reset session timeout if payment has done regardless of the result.
+  // the above useEffect cancel the timer if this component is unmounted (e.g., payment succeeded and redirected to another page).
+  // but if payment failed and the customer want to try one more time, we need to reset session timeout and use it again.
+  const [isPaymentAttempt, setPaymentAttempt] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    
+    if (isPaymentAttempt) {
+
+      console.log("make sure this is called after payment done.")
+
+      // reset variables after payment attempt
       clearTimeout(timer);
+      isSessionTimeoutSent.current = false;
+
+      // finally set this back to false again for the next payment attempt
+      setPaymentAttempt(false);
+
     }
   }, [
-      curPostOrderFetchStatus
-    ])
+    isPaymentAttempt 
+  ])
 
 
   return (
@@ -177,6 +204,7 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
           <StepLabel>{"Payment"}</StepLabel>
           <StepContent>
             <Payment
+              setPaymentAttempt={setPaymentAttempt}
               goToNextStep={goToNextStep}
               goToPrevStep={goToPrevStep}
               goToStep={goToStep}
