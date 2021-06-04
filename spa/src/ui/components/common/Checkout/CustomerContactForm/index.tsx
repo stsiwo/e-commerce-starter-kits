@@ -5,10 +5,13 @@ import { CheckoutStepComponentPropsType } from 'components/pages/Checkout/checko
 import { UserType } from 'domain/user/types';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
 import CustomerAddressesForm from './CustomerAddressesForm';
 import CustomerPhonesForm from './CustomerPhonesForm';
+import { messageActions } from 'reducers/slices/app';
+import { getNanoId } from 'src/utils';
+import { MessageTypeEnum } from 'src/app';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -42,8 +45,7 @@ const CustomerContactForm: React.FunctionComponent<CustomerContactFormPropsType>
   // mui: makeStyles
   const classes = useStyles();
 
-  // snakbar stuff when no phone & addresses are selected
-  const { enqueueSnackbar } = useSnackbar();
+  const dispatch = useDispatch();
 
   const curPrimaryPhone = useSelector(mSelector.makeAuthSelectedPhoneSelector())
   const curBillingAddress = useSelector(mSelector.makeAuthBillingAddressSelector())
@@ -58,9 +60,14 @@ const CustomerContactForm: React.FunctionComponent<CustomerContactFormPropsType>
       props.goToNextStep()
     } else {
       // validation failed.
-      enqueueSnackbar("Please select phone, shipping address, and billing address", {
-        variant: 'error',
-      })
+      
+      dispatch(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.ERROR,
+          message: "please select phone, shipping address, and billing address."  
+        })
+      )
     }
   }
 

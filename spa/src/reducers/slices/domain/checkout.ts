@@ -1,5 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { OrderType } from "domain/order/types";
+import { resetCheckoutStateActionTypeName } from "../common";
 
 /**
  *
@@ -33,6 +34,9 @@ export const checkoutOrderSlice = createSlice({
    * You can respond to other action types besides the types it has generated. 
    *
    **/
+  extraReducers: {
+    [resetCheckoutStateActionTypeName]: (state: OrderType) => null 
+  },
 }) 
 
 export const checkoutOrderSliceReducer = checkoutOrderSlice.reducer

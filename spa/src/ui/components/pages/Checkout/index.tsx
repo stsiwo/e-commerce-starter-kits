@@ -15,6 +15,8 @@ import Button from '@material-ui/core/Button';
 import OrderItemForm from 'components/common/Checkout/OrderItemForm';
 import { postSessionTimeoutOrderEventActionCreator } from 'reducers/slices/domain/order';
 import { FetchStatusEnum } from 'src/app';
+import { resetCheckoutStateActionCreator } from 'reducers/slices/common';
+import { putAuthFetchStatusActions } from 'reducers/slices/app/fetchStatus/auth';
 
 export enum CheckoutStepEnum {
   CUSTOMER_BASIC_INFORMATION = 0,
@@ -138,6 +140,58 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
     }
   }, [
     isPaymentAttempt 
+  ])
+
+  // reset fetch status which affect validating the current section.
+  // this is necessary since the customer might come back to the specific section again and again.
+  // every time the customer come back, we need to reset the previous state.
+  React.useEffect(() => {
+
+    // you only need to reset if fetch status which affect validation to the next step.
+    // ex) 
+    /**
+     * // if member, we need to make sure the request (update) succeeded or not. if yes, they can go next.
+     * const curPutAuthFetchStatus = useSelector(rsSelector.app.getPutAuthFetchStatus);
+     * React.useEffect(() => {
+     *   if (curPutAuthFetchStatus === FetchStatusEnum.SUCCESS) {
+     *     props.goToNextStep();
+     *   }
+     *   return () => {
+     *     // reset fetch status in the case where the other component needs this.
+     *     dispatch(
+     *       putAuthFetchStatusActions.clear()
+     *     )
+     *   }
+     * }, [])
+     **/
+    dispatch(
+      putAuthFetchStatusActions.clear() 
+    )
+  
+  }, [
+    activeStep 
+  ])
+
+  // if the customer abort (e.g., go to another page) during payment section, we need to reset the checkout state
+  /**
+   * currently, this action (resetCheckoutStatus) is caught by following case reducers:
+   *
+      - stripeClientSecretActions
+      - checkoutOrderActions
+      - postOrderFetchStatusActions
+   *
+   *
+   **/
+  React.useEffect(() => {
+  
+    // unmount only
+    return () => {
+      dispatch(
+        resetCheckoutStateActionCreator() 
+      )
+    }
+  }, [
+  
   ])
 
 

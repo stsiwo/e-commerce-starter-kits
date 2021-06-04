@@ -60,23 +60,23 @@ export function* putAuthWorker(action: PayloadAction<PutAuthActionType>) {
      * fetch data
      **/
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
+    // start fetching
     const response = yield call(() => api({
-        method: "PUT",
-        url: apiUrl,
-        data: action.payload as UserCriteria
-      })
+      method: "PUT",
+      url: apiUrl,
+      data: action.payload as UserCriteria
+    })
       .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
       .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
     )
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        putAuthFetchStatusActions.update(response.fetchStatus)
-      )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      putAuthFetchStatusActions.update(response.fetchStatus)
+    )
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
@@ -99,7 +99,7 @@ export function* putAuthWorker(action: PayloadAction<PutAuthActionType>) {
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
-        }) 
+        })
       )
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
@@ -113,12 +113,24 @@ export function* putAuthWorker(action: PayloadAction<PutAuthActionType>) {
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: response.message 
-        }) 
+          message: response.message
+        })
       )
     }
-  } else {
-    console.log("permission denied: you are " + curAuth.userType)
+  } else if (curAuth.userType === UserTypeEnum.GUEST) {
+
+    yield put(
+      authActions.update({
+        ...curAuth,
+        user: {
+          ...curAuth.user,
+          firstName: action.payload.firstName,
+          lastName: action.payload.lastName,
+          email: action.payload.email,
+        },
+      })
+    );
+
   }
 }
 

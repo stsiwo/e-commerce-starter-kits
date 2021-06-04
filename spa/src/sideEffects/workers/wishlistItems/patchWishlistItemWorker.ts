@@ -94,7 +94,7 @@ export function* patchWishlistItemWorker(action: PayloadAction<PatchWishlistItem
      * update fetch status sucess
      **/
     yield put(
-      patchWishlistItemFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+      patchWishlistItemFetchStatusActions.update(response.fetchStatus)
     )
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {

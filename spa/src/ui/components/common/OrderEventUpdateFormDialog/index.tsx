@@ -11,7 +11,7 @@ import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { postOrderEventActionCreator, putOrderEventActionCreator } from 'reducers/slices/domain/order';
-import { AuthType } from 'src/app';
+import { AuthType, UserTypeEnum } from 'src/app';
 import { mSelector } from 'src/selectors/selector';
 
 interface OrderEventUpdateFormDialogPropsType {
@@ -39,14 +39,6 @@ const useStyles = makeStyles((theme: Theme) =>
 const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDialogPropsType> = (props) => {
 
   const classes = useStyles();
-
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
-
-  // order bag item
-  const lastOrderEvent = props.order.latestOrderEvent;
-  const lastOrderStatusBag = orderStatusBagList[lastOrderEvent.orderStatus]
 
   const dispatch = useDispatch()
 
@@ -122,6 +114,20 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
       orderStatus: nextOrderStatus
     }));
   }
+  
+  // next addable option based on user type
+  const nextOrderEventOptions = React.useMemo(() => {
+    if (auth.userType === UserTypeEnum.MEMBER) {
+      console.log("next addable optons: member")
+      // member
+      return props.order.nextMemberOrderEventOptions
+    } else {
+      // admin
+      console.log("next addable optons: admin")
+      return props.order.nextAdminOrderEventOptions
+    }
+  }, [JSON.stringify(props.order)])
+
 
   return (
     <Dialog open={props.open} onClose={props.onClose} aria-labelledby="order-event-update-dialog">
@@ -142,7 +148,7 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
                 {curOrderEventState.orderStatus}
               </MenuItem>
             )}
-            {(props.order.nextAdminOrderEventOptions.map((orderStatus: OrderStatusEnum) => (
+            {(nextOrderEventOptions.map((orderStatus: OrderStatusEnum) => (
                 <MenuItem key={orderStatus} value={orderStatus}>
                   {orderStatus}
                 </MenuItem>

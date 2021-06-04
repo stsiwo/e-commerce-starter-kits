@@ -1,4 +1,5 @@
 import { PayloadAction, createSlice, createAction } from "@reduxjs/toolkit";
+import { resetCheckoutStateActionTypeName } from "../common";
 
 /**
  * IMPORTANT NOTE:
@@ -45,6 +46,9 @@ export const stripeClientSecretSlice = createSlice({
    *
    * You can respond to other action types besides the types it has generated.
    **/
+  extraReducers: {
+    [resetCheckoutStateActionTypeName]: (state: string) => "", 
+  },
 })
 
 export const stripeClientSecretSliceReducer = stripeClientSecretSlice.reducer

@@ -1,12 +1,11 @@
+import Box from '@material-ui/core/Box';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { OrderType } from 'domain/order/types';
 import * as React from 'react';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
-import InputAdornment from '@material-ui/core/InputAdornment';
 
-interface AdminOrderDetailPropsType {
+interface OrderDetailPropsType {
   order: OrderType
 }
 
@@ -27,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
 /**
  * order detail component
  **/
-const AdminOrderDetail: React.FunctionComponent<AdminOrderDetailPropsType> = ({ order }) => {
+const OrderDetail: React.FunctionComponent<OrderDetailPropsType> = ({ order }) => {
 
   const classes = useStyles();
 
@@ -78,4 +77,4 @@ const AdminOrderDetail: React.FunctionComponent<AdminOrderDetailPropsType> = ({ 
   )
 }
 
-export default AdminOrderDetail
+export default OrderDetail

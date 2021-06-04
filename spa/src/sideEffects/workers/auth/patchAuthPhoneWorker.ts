@@ -59,22 +59,22 @@ export function* patchAuthPhoneWorker(action: PayloadAction<PatchAuthPhoneAction
     /**
      * fetch data
      **/
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
+    // start fetching
     const response = yield call(() => api({
-        method: "PATCH",
-        url: apiUrl,
-      })
+      method: "PATCH",
+      url: apiUrl,
+    })
       .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
       .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
     )
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        patchAuthPhoneFetchStatusActions.update(response.fetchStatus)
-      )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      patchAuthPhoneFetchStatusActions.update(response.fetchStatus)
+    )
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
@@ -94,7 +94,7 @@ export function* patchAuthPhoneWorker(action: PayloadAction<PatchAuthPhoneAction
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "switched primary successfully.",
-        }) 
+        })
       )
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
@@ -108,12 +108,17 @@ export function* patchAuthPhoneWorker(action: PayloadAction<PatchAuthPhoneAction
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: response.message, 
-        }) 
+          message: response.message,
+        })
       )
     }
-  } else {
-    console.log("permission denied: you are " + curAuth.userType)
+  } else if (curAuth.userType === UserTypeEnum.GUEST) {
+
+    yield put(
+      authActions.switchPrimaryPhone({ 
+        phoneId: action.payload.phoneId
+      })
+    )
   }
 }
 

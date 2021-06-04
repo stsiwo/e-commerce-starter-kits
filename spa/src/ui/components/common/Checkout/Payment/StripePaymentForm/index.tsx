@@ -2,21 +2,21 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import { calcSubTotalPriceAmount } from 'domain/cart';
-import { toPhoneString, toFullNameString } from 'domain/user';
+import { CheckoutStepEnum } from 'components/pages/Checkout';
+import { calcOrderTotalCost } from 'domain/order';
+import { toFullNameString } from 'domain/user';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { mSelector, rsSelector } from 'src/selectors/selector';
-import { cadCurrencyFormat, getNanoId } from 'src/utils';
-import { messageActions } from 'reducers/slices/app';
-import { MessageTypeEnum } from 'src/app';
 import { useHistory } from 'react-router';
-import { stripeClientSecretActions } from 'reducers/slices/sensitive';
-import { calcOrderTotalCost } from 'domain/order';
-import { checkoutOrderActions } from 'reducers/slices/domain/checkout';
-import { CheckoutStepEnum } from 'components/pages/Checkout';
+import { messageActions } from 'reducers/slices/app';
 import { postOrderFetchStatusActions } from 'reducers/slices/app/fetchStatus/order';
 import { cartItemActions } from 'reducers/slices/domain/cartItem';
+import { checkoutOrderActions } from 'reducers/slices/domain/checkout';
+import { stripeClientSecretActions } from 'reducers/slices/sensitive';
+import { MessageTypeEnum } from 'src/app';
+import { mSelector, rsSelector } from 'src/selectors/selector';
+import { cadCurrencyFormat, getNanoId } from 'src/utils';
+import { resetCheckoutStateActionCreator } from 'reducers/slices/common';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -105,17 +105,19 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
      *
      * also, cur order too.
      * also, post order fetch status too
+     *
+     **/
+    /**
+     * currently, this action (resetCheckoutStatus) is caught by following case reducers:
+     *
+        - stripeClientSecretActions
+        - checkoutOrderActions
+        - postOrderFetchStatusActions
+     *
+     *
      **/
     dispatch(
-      stripeClientSecretActions.clear()
-    );
-
-    dispatch(
-      checkoutOrderActions.clear()
-    );
-
-    dispatch(
-      postOrderFetchStatusActions.clear()
+      resetCheckoutStateActionCreator()
     )
 
     // prepare for the next payment if failed
@@ -136,6 +138,7 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
           message: "sorry, we failed to process your payment. please start over again. (reason: " + result.error.message + ")",
+          persist: true,
         })
       )
       // reload instead of steping back to the fist section.
@@ -146,9 +149,9 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
       props.goToStep(CheckoutStepEnum.CUSTOMER_BASIC_INFORMATION);
 
     } else {
-    /**
-     * Payment Succeeded
-     **/
+      /**
+       * Payment Succeeded
+       **/
 
       // The payment has been processed!
       if (result.paymentIntent.status === 'succeeded') {

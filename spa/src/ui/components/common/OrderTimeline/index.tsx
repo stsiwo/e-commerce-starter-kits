@@ -21,10 +21,12 @@ import TimelineSeparator from '@material-ui/lab/TimelineSeparator';
 import { OrderEventType, orderStatusBagList, OrderType } from 'domain/order/types';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { deleteSingleOrderEventActionCreator } from 'reducers/slices/domain/order';
 import { toDateString } from 'src/utils';
 import OrderEventUpdateFormDialog from '../OrderEventUpdateFormDialog';
+import { mSelector } from 'src/selectors/selector';
+import { UserTypeEnum } from 'src/app';
 
 /**
  * TODO: review this when test data is available.
@@ -76,9 +78,7 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({ order 
 
   const dispatch = useDispatch()
 
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
+  const auth = useSelector(mSelector.makeAuthSelector())
 
   // cur selected orderEvent item
   const [curOrderEvent, setOrderEvent] = React.useState<OrderEventType>(null);
@@ -134,7 +134,7 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({ order 
       deleteSingleOrderEventActionCreator({
         orderEventId: curOrderEvent.orderEventId,
         orderId: order.orderId,
-      }) 
+      })
     )
   }
 
@@ -144,9 +144,21 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({ order 
     setFormOpen(true);
   }
 
+  // next addable option based on user type
+  const nextOrderEventOptions = React.useMemo(() => {
+    if (auth.userType === UserTypeEnum.MEMBER) {
+      console.log("next addable optons: member")
+      // member
+      return order.nextMemberOrderEventOptions
+    } else {
+      // admin
+      console.log("next addable optons: admin")
+      return order.nextAdminOrderEventOptions
+    }
+  }, [JSON.stringify(order)])
+
   const renderTimelineContent: (orderEvent: OrderEventType, latestOrderEvent: OrderEventType) => React.ReactNode = (orderEvent, latestOrderEvent) => {
 
-    
     const OrderStatusIcon = orderStatusBagList[orderEvent.orderStatus].icon
     const orderStatusObj = orderStatusBagList[orderEvent.orderStatus]
 
@@ -181,10 +193,12 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({ order 
             </Typography>
             <Divider />
             <Box>
-              <IconButton onClick={(e) => handleEditClick(e, orderEvent.orderEventId)}>
-                <EditIcon />
-              </IconButton>
-              {(orderEvent.undoable && orderEvent.orderEventId === latestOrderEvent.orderEventId && 
+              {(auth.userType === UserTypeEnum.ADMIN &&
+                <IconButton onClick={(e) => handleEditClick(e, orderEvent.orderEventId)}>
+                  <EditIcon />
+                </IconButton>
+              )}
+              {(orderEvent.undoable && orderEvent.orderEventId === latestOrderEvent.orderEventId &&
                 <IconButton onClick={(e) => handleDeleteClick(e, orderEvent.orderEventId)}>
                   <RemoveCircleIcon />
                 </IconButton>
@@ -207,9 +221,9 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({ order 
       <Timeline align="alternate" className={classes.root}>
         {renderTimeline()}
         <Box className={classes.btnBox}>
-          <Button 
-            className={classes.addBtn} 
-            disabled={!order.nextAdminOrderEventOptions || order.nextAdminOrderEventOptions.length === 0} 
+          <Button
+            className={classes.addBtn}
+            disabled={!nextOrderEventOptions || nextOrderEventOptions.length === 0}
             onClick={(e) => handleAddNewClick(e)}
           >
             {"Add New Order Event"}

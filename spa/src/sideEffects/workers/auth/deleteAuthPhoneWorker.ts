@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { authActions, DeleteAuthPhoneActionType, messageActions } from "reducers/slices/app";
 import { deleteAuthPhoneFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
@@ -60,22 +59,22 @@ export function* deleteAuthPhoneWorker(action: PayloadAction<DeleteAuthPhoneActi
      * fetch data
      **/
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
+    // start fetching
     const response = yield call(() => api({
-        method: "DELETE",
-        url: apiUrl,
+      method: "DELETE",
+      url: apiUrl,
     })
       .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS }))
       .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
     )
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        deleteAuthPhoneFetchStatusActions.update(response.fetchStatus)
-      )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      deleteAuthPhoneFetchStatusActions.update(response.fetchStatus)
+    )
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
@@ -84,7 +83,7 @@ export function* deleteAuthPhoneWorker(action: PayloadAction<DeleteAuthPhoneActi
        *
        **/
       yield put(
-        authActions.deletePhone({ phoneId : action.payload.phoneId })
+        authActions.deletePhone({ phoneId: action.payload.phoneId })
       )
 
       /**
@@ -95,7 +94,7 @@ export function* deleteAuthPhoneWorker(action: PayloadAction<DeleteAuthPhoneActi
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
-        }) 
+        })
       )
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
@@ -109,12 +108,17 @@ export function* deleteAuthPhoneWorker(action: PayloadAction<DeleteAuthPhoneActi
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: response.message, 
-        }) 
+          message: response.message,
+        })
       )
     }
-  } else {
-    console.log("permission denied: you are " + curAuth.userType)
+  } else if (curAuth.userType === UserTypeEnum.GUEST) {
+
+    yield put(
+      authActions.deletePhone({
+        phoneId: action.payload.phoneId
+      })
+    )
   }
 }
 

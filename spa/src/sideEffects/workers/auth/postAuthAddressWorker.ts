@@ -66,7 +66,17 @@ export function* postAuthAddressWorker(action: PayloadAction<PostAuthAddressActi
     const response = yield call(() => api({
       method: "POST",
       url: apiUrl,
-      data: action.payload as UserAddressCriteria
+      data: {
+        // don't put addressId
+        address1: action.payload.address1,
+        address2: action.payload.address2,
+        city: action.payload.city,
+        province: action.payload.province,
+        country: action.payload.country,
+        postalCode: action.payload.postalCode,
+        isBillingAddress: action.payload.isBillingAddress,
+        isShippingAddress: action.payload.isShippingAddress,
+      } as UserAddressCriteria
     })
       .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
       .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
@@ -123,8 +133,11 @@ export function* postAuthAddressWorker(action: PayloadAction<PostAuthAddressActi
         })
       )
     }
-  } else {
-    console.log("permission denied: you are " + curAuth.userType)
+  } else if (curAuth.userType === UserTypeEnum.GUEST) {
+
+    yield put(
+      authActions.appendAddress(action.payload)
+    )
   }
 }
 

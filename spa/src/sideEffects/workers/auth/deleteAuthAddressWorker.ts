@@ -1,7 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { UserAddressCriteria } from "domain/user/types";
 import { authActions, DeleteAuthAddressActionType, messageActions } from "reducers/slices/app";
 import { deleteAuthAddressFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
 import { call, put, select } from "redux-saga/effects";
@@ -61,23 +59,23 @@ export function* deleteAuthAddressWorker(action: PayloadAction<DeleteAuthAddress
      * fetch data
      **/
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-      const response = yield call(() => api({
-        method: "DELETE",
-        url: apiUrl,
-      })
-        .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS }))
-        .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
-      )
+    // start fetching
+    const response = yield call(() => api({
+      method: "DELETE",
+      url: apiUrl,
+    })
+      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS }))
+      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
+    )
 
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        deleteAuthAddressFetchStatusActions.update(response.fetchStatus)
-      )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      deleteAuthAddressFetchStatusActions.update(response.fetchStatus)
+    )
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
@@ -85,7 +83,7 @@ export function* deleteAuthAddressWorker(action: PayloadAction<DeleteAuthAddress
        *
        **/
       yield put(
-        authActions.deleteAddress({ addressId : action.payload.addressId })
+        authActions.deleteAddress({ addressId: action.payload.addressId })
       )
 
       /**
@@ -96,7 +94,7 @@ export function* deleteAuthAddressWorker(action: PayloadAction<DeleteAuthAddress
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
-        }) 
+        })
       )
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
@@ -110,12 +108,15 @@ export function* deleteAuthAddressWorker(action: PayloadAction<DeleteAuthAddress
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: response.message, 
-        }) 
+          message: response.message,
+        })
       )
     }
-  } else {
-    console.log("permission denied: you are " + curAuth.userType)
+  } else if (curAuth.userType === UserTypeEnum.GUEST) {
+
+    yield put(
+      authActions.deleteAddress({ addressId: action.payload.addressId })
+    )
   }
 }
 

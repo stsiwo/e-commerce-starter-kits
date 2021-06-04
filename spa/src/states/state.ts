@@ -167,6 +167,7 @@ export const initialState: StateType = {
         postAvatarImage: FetchStatusEnum.INITIAL,
         deleteAvatarImage: FetchStatusEnum.INITIAL,
         putCompany: FetchStatusEnum.INITIAL,
+        fetchOrder: FetchStatusEnum.INITIAL,
       },
     },
   },

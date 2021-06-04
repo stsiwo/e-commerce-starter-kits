@@ -15,6 +15,7 @@ import { Link as RRLink } from "react-router-dom";
 import { messageActions } from 'reducers/slices/app';
 import { getNanoId } from 'src/utils';
 import { MessageTypeEnum } from 'src/app';
+import Switch from '@material-ui/core/Switch';
 
 /**
  * currently not used
@@ -106,6 +107,16 @@ const OrderItemForm: React.FunctionComponent<OrderItemFormPropsType> = (props) =
             xs={12}
             md={6}
           >
+            <Typography variant="subtitle2" component="p" align="left" gutterBottom >
+              you purchase only selected items e.g., 
+            <Switch
+              edge="end"
+              readOnly
+              checked={true}
+              inputProps={{ 'aria-labelledby': 'switch-list-label-selected-cart-item' }}
+              size="small"
+            />
+            </Typography>
             {renderCartItems()}
           </Grid>
           <Grid

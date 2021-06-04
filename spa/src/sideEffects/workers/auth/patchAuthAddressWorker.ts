@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { authActions, messageActions, PatchAuthAddressActionType } from "reducers/slices/app";
 import { patchAuthAddressFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
@@ -60,24 +59,24 @@ export function* patchAuthAddressWorker(action: PayloadAction<PatchAuthAddressAc
      * fetch data
      **/
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
+    // start fetching
     const response = yield call(() => api({
-        method: "PATCH",
-        url: apiUrl,
-        data: { type: action.payload.type }
-      })
+      method: "PATCH",
+      url: apiUrl,
+      data: { type: action.payload.type }
+    })
       .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
       .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
     )
 
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        patchAuthAddressFetchStatusActions.update(response.fetchStatus)
-      )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      patchAuthAddressFetchStatusActions.update(response.fetchStatus)
+    )
 
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
@@ -97,7 +96,7 @@ export function* patchAuthAddressWorker(action: PayloadAction<PatchAuthAddressAc
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "switched primary successfully.",
-        }) 
+        })
       )
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
@@ -111,12 +110,25 @@ export function* patchAuthAddressWorker(action: PayloadAction<PatchAuthAddressAc
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: response.message, 
-        }) 
+          message: response.message,
+        })
       )
     }
-  } else {
-    console.log("permission denied: you are " + curAuth.userType)
+  } else if (curAuth.userType === UserTypeEnum.GUEST) {
+
+    if (action.payload.type === "shipping") {
+      yield put(
+        authActions.switchShippingAddress({
+          addressId: action.payload.addressId
+        })
+      )
+    } else {
+      yield put(
+        authActions.switchBillingAddress({
+          addressId: action.payload.addressId
+        })
+      )
+    }
   }
 }
 

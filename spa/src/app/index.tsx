@@ -50,4 +50,5 @@ export declare type MessageStateType = {
   id: string
   type: MessageTypeEnum
   message: string
+  persist?: boolean
 }

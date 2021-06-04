@@ -9,11 +9,11 @@ import UserCard from 'components/common/UserCard';
 import { OrderDetailType, OrderType } from 'domain/order/types';
 import * as React from 'react';
 import { UserTypeEnum } from 'src/app';
-import AddressCard from './AddressCard';
-import PhoneCard from './PhoneCard';
 import OrderDetail from 'components/common/OrderDetail';
+import PhoneCard from 'components/pages/Admin/AdminOrder/AdminOrderForm/PhoneCard';
+import AddressCard from 'components/pages/Admin/AdminOrder/AdminOrderForm/AddressCard';
 
-interface AdminOrderFormPropsType {
+interface OrderFormPropsType {
   order: OrderType
 }
 
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  *    - 6. display result popup message
  **/
-const AdminOrderForm: React.FunctionComponent<AdminOrderFormPropsType> = (props) => {
+const OrderForm: React.FunctionComponent<OrderFormPropsType> = (props) => {
 
   // mui: makeStyles
   const classes = useStyles();
@@ -144,5 +144,6 @@ const AdminOrderForm: React.FunctionComponent<AdminOrderFormPropsType> = (props)
   )
 }
 
-export default AdminOrderForm
+export default OrderForm
+
 

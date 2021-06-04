@@ -1,5 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { FetchStatusEnum } from "src/app";
+import { resetCheckoutStateActionTypeName } from "reducers/slices/common";
 
 /**
  * app.fetchStatus.order.get state Slice
@@ -89,6 +90,9 @@ export const postOrderFetchStatusSlice = createSlice({
    *
    * You can respond to other action types besides the types it has generated.
    **/
+  extraReducers: {
+    [resetCheckoutStateActionTypeName]: (state: FetchStatusEnum) => FetchStatusEnum.INITIAL
+  },
 })
 
 export const postOrderFetchStatusSliceReducer = postOrderFetchStatusSlice.reducer

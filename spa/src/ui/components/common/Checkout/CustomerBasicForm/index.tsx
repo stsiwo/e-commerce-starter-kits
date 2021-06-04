@@ -2,18 +2,17 @@ import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import { CheckoutStepComponentPropsType } from 'components/pages/Checkout/checkoutSteps';
+import { defaultUserBasicAccountData, defaultUserBasicAccountValidationData, UserBasicAccountDataType, UserBasicAccountValidationDataType, UserType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { userAccountSchema } from 'hooks/validation/rules';
-import * as React from 'react';
-import { UserType, UserBasicAccountDataType, defaultUserBasicAccountData, UserBasicAccountValidationDataType, defaultUserBasicAccountValidationData } from 'domain/user/types';
-import { CheckoutStepComponentPropsType } from 'components/pages/Checkout/checkoutSteps';
-import { api } from 'configs/axiosConfig';
-import { useSelector, useDispatch } from 'react-redux';
-import { mSelector } from 'src/selectors/selector';
-import { UserTypeEnum } from 'src/app';
 import { useSnackbar } from 'notistack';
-import { authActions } from 'reducers/slices/app';
-import { AxiosError } from 'axios';
+import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { putAuthActionCreator } from 'reducers/slices/app';
+import { putAuthFetchStatusActions } from 'reducers/slices/app/fetchStatus/auth';
+import { FetchStatusEnum, UserTypeEnum } from 'src/app';
+import { mSelector, rsSelector } from 'src/selectors/selector';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -134,50 +133,41 @@ const CustomerBasicForm: React.FunctionComponent<CustomerBasicFormPropsType> = (
       // pass 
       console.log("passed")
 
-      if (auth.userType === UserTypeEnum.MEMBER) {
-        // request
-        api.request({
-          method: 'POST',
-          url: API1_URL + `/users/${auth.user.userId}`,
-          data: curUserAccountState,
-        }).then((data) => {
-
-          /**
-           * update auth state 
-           **/
-          const updatedUser = data.data;
-          dispatch(authActions.update({
-            ...auth,
-            user: updatedUser,
-          }));
-
-          enqueueSnackbar("updated successfully.", { variant: "success" })
-
-          props.goToNextStep()
-
-        }).catch((error: AxiosError) => {
-          enqueueSnackbar(error.message, { variant: "error" })
+      dispatch(
+        putAuthActionCreator({
+          userId: auth.user.userId,
+          firstName: curUserAccountState.firstName,
+          lastName: curUserAccountState.lastName,
+          email: curUserAccountState.email,
         })
-      } else if (auth.userType === UserTypeEnum.GUEST) {
+      );
 
-        // if guest user, only update redux store for future reference.
-        dispatch(authActions.update({
-          ...auth,
-          user: {
-            ...auth.user,
-            firstName: curUserAccountState.firstName,
-            lastName: curUserAccountState.lastName,
-            email: curUserAccountState.email,
-          },
-        }));
-
-        props.goToNextStep()
+      if (auth.userType === UserTypeEnum.GUEST) {
+        props.goToNextStep();
       }
 
     } else {
       updateAllValidation()
     }
   }
+
+  // if member, we need to make sure the request (update) succeeded or not. if yes, they can go next.
+  const curPutAuthFetchStatus = useSelector(rsSelector.app.getPutAuthFetchStatus);
+  React.useEffect(() => {
+    if (curPutAuthFetchStatus === FetchStatusEnum.SUCCESS) {
+      props.goToNextStep();
+    }
+
+    return () => {
+      // reset fetch status in the case where the other component needs this.
+      dispatch(
+        putAuthFetchStatusActions.clear()
+      )
+    }
+  }, [
+    curPutAuthFetchStatus 
+  ])
+
 
   return (
     <form className={classes.form} noValidate autoComplete="off">

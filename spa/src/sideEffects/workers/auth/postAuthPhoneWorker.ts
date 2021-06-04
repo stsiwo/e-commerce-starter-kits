@@ -61,23 +61,28 @@ export function* postAuthPhoneWorker(action: PayloadAction<PostAuthPhoneActionTy
      * fetch data
      **/
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
+    // start fetching
     const response = yield call(() => api({
-        method: "POST",
-        url: apiUrl,
-        data: action.payload as UserPhoneCriteria
-      })
+      method: "POST",
+      url: apiUrl,
+      data: {
+        // don't send phoneId when post
+        phoneNumber: action.payload.phoneNumber,
+        countryCode: action.payload.countryCode,
+        isSelected: action.payload.isSelected
+      } as UserPhoneCriteria
+    })
       .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
       .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
     )
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        postAuthPhoneFetchStatusActions.update(response.fetchStatus)
-      )
+    /**
+     * update fetch status sucess
+     **/
+    yield put(
+      postAuthPhoneFetchStatusActions.update(response.fetchStatus)
+    )
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
@@ -99,7 +104,7 @@ export function* postAuthPhoneWorker(action: PayloadAction<PostAuthPhoneActionTy
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
-        }) 
+        })
       )
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
@@ -120,12 +125,16 @@ export function* postAuthPhoneWorker(action: PayloadAction<PostAuthPhoneActionTy
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: response.message, 
-        }) 
+          message: response.message,
+        })
       )
     }
-  } else {
-    console.log("permission denied: you are " + curAuth.userType)
+  } else if (curAuth.userType === UserTypeEnum.GUEST) {
+
+    yield put(
+      authActions.appendPhone(action.payload)
+    );
+
   }
 }
 

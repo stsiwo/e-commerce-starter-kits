@@ -24,6 +24,7 @@ import Contact from 'components/pages/Contact';
 import Order from 'components/pages/Order';
 import AccountVerify from 'components/pages/AccountVerify';
 import ResetPassword from 'components/pages/ResetPassword';
+import Orders from 'components/pages/Orders';
 
 // route data
 export declare type RouteDataType = {
@@ -77,6 +78,10 @@ export const routesData: RoutesDataType = {
     },
     {
       url: "/orders",
+      component: withBasePage(Orders),
+    },
+    {
+      url: "/orders/:orderId",
       component: withBasePage(Order),
     },
     {

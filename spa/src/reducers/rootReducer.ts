@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import { authSliceReducer, messageSliceReducer, previousUrlSliceReducer, requestTrackerSliceReducer, searchKeywordSliceReducer } from './slices/app';
-import { deleteAuthAddressFetchStatusSliceReducer, deleteAuthAvatarImageFetchStatusSliceReducer, deleteAuthPhoneFetchStatusSliceReducer, getSingleAuthFetchStatusSliceReducer, patchAuthAddressFetchStatusSliceReducer, patchAuthPhoneFetchStatusSliceReducer, postAuthAddressFetchStatusSliceReducer, postAuthAvatarImageFetchStatusSliceReducer, postAuthPhoneFetchStatusSliceReducer, putAuthAddressFetchStatusSliceReducer, putAuthCompanyFetchStatusSliceReducer, putAuthFetchStatusSliceReducer, putAuthPhoneFetchStatusSliceReducer } from './slices/app/fetchStatus/auth';
+import { deleteAuthAddressFetchStatusSliceReducer, deleteAuthAvatarImageFetchStatusSliceReducer, deleteAuthPhoneFetchStatusSliceReducer, getSingleAuthFetchStatusSliceReducer, patchAuthAddressFetchStatusSliceReducer, patchAuthPhoneFetchStatusSliceReducer, postAuthAddressFetchStatusSliceReducer, postAuthAvatarImageFetchStatusSliceReducer, postAuthPhoneFetchStatusSliceReducer, putAuthAddressFetchStatusSliceReducer, putAuthCompanyFetchStatusSliceReducer, putAuthFetchStatusSliceReducer, putAuthPhoneFetchStatusSliceReducer, fetchAuthOrderFetchStatusSliceReducer } from './slices/app/fetchStatus/auth';
 import { deleteCartItemFetchStatusSliceReducer, deleteSingleCartItemFetchStatusSliceReducer, getCartItemFetchStatusSliceReducer, postCartItemFetchStatusSliceReducer, putCartItemFetchStatusSliceReducer } from './slices/app/fetchStatus/cartItem';
 import { deleteSingleCategoryFetchStatusSliceReducer, getCategoryFetchStatusSliceReducer, postCategoryFetchStatusSliceReducer, putCategoryFetchStatusSliceReducer } from './slices/app/fetchStatus/category';
 import { deleteSingleOrderEventFetchStatusSliceReducer, deleteSingleOrderFetchStatusSliceReducer, getOrderFetchStatusSliceReducer, getSingleOrderFetchStatusSliceReducer, postOrderEventFetchStatusSliceReducer, postOrderFetchStatusSliceReducer, putOrderEventFetchStatusSliceReducer, putOrderFetchStatusSliceReducer, postSessionTimeoutOrderEventFetchStatusSliceReducer } from './slices/app/fetchStatus/order';
@@ -120,6 +120,7 @@ export const rootReducer = combineReducers({
         postAvatarImage: postAuthAvatarImageFetchStatusSliceReducer,
         deleteAvatarImage: deleteAuthAvatarImageFetchStatusSliceReducer,
         putCompany: putAuthCompanyFetchStatusSliceReducer,
+        fetchOrder: fetchAuthOrderFetchStatusSliceReducer,
       }),
     }),
   }),

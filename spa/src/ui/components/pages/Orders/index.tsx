@@ -1,10 +1,7 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import OrderList from 'components/common/OrderList';
 import * as React from 'react';
-import { useSelector } from 'react-redux';
-import { useParams } from 'react-router';
-import { mSelector } from 'src/selectors/selector';
-import OrderForm from './OrderForm';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -22,31 +19,25 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 /**
- * guest & member orderdetail page
+ * guest & member order page
  *
  **/
-const Order: React.FunctionComponent<{}> = (props) => {
+const Orders: React.FunctionComponent<{}> = (props) => {
 
 
   const classes = useStyles();
 
-  const { orderId } = useParams();
-
-  const curOrder = useSelector(mSelector.makeOrderByIdSelector(orderId))
-
   return (
     <React.Fragment>
       <Typography variant="h5" component="h5" align="center" className={classes.title} >
-        {"Order"}
+        {"Orders"}
       </Typography>
-      <OrderForm order={curOrder} />
+      <OrderList />
     </React.Fragment>
   )
 }
 
-export default Order
-
-
+export default Orders
 
 
 

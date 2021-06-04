@@ -1,4 +1,4 @@
-import { deleteAuthAddressActionTypeName, deleteAuthAvatarImageActionTypeName, deleteAuthPhoneActionTypeName, patchAuthAddressActionTypeName, patchAuthPhoneActionTypeName, postAuthAddressActionTypeName, postAuthAvatarImageActionTypeName, postAuthPhoneActionTypeName, putAuthActionTypeName, putAuthAddressActionTypeName, putAuthCompanyActionTypeName, putAuthPhoneActionTypeName } from 'reducers/slices/app';
+import { deleteAuthAddressActionTypeName, deleteAuthAvatarImageActionTypeName, deleteAuthPhoneActionTypeName, patchAuthAddressActionTypeName, patchAuthPhoneActionTypeName, postAuthAddressActionTypeName, postAuthAvatarImageActionTypeName, postAuthPhoneActionTypeName, putAuthActionTypeName, putAuthAddressActionTypeName, putAuthCompanyActionTypeName, putAuthPhoneActionTypeName, fetchAuthOrderActionTypeName } from 'reducers/slices/app';
 import { deleteCartItemActionTypeName, deleteSingleCartItemActionTypeName, fetchCartItemActionTypeName, postCartItemActionTypeName, putCartItemActionTypeName } from 'reducers/slices/domain/cartItem';
 import { deleteSingleCategoryActionTypeName, fetchCategoryActionTypeName, fetchCategoryWithCacheActionTypeName, postCategoryActionTypeName, putCategoryActionTypeName } from 'reducers/slices/domain/category';
 import { deleteSingleOrderEventActionTypeName, fetchOrderActionTypeName, fetchSingleOrderActionTypeName, postOrderActionTypeName, postOrderEventActionTypeName, postSessionTimeoutOrderEventActionTypeName, putOrderActionTypeName, putOrderEventActionTypeName } from 'reducers/slices/domain/order';
@@ -72,6 +72,7 @@ import { deleteWishlistItemWorker } from 'sideEffects/workers/wishlistItems/dele
 import { fetchWishlistItemWorker } from 'sideEffects/workers/wishlistItems/fetchWishlistItemWorker';
 import { patchWishlistItemWorker } from 'sideEffects/workers/wishlistItems/patchWishlistItemWorker';
 import { postWishlistItemWorker } from 'sideEffects/workers/wishlistItems/postWishlistItemWorker';
+import { fetchAuthOrderWorker } from 'sideEffects/workers/auth/fetchAuthOrderWorker';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -523,6 +524,12 @@ export function* putAuthCompanyWatcher() {
   )
 }
 
+export function* fetchAuthOrderWatcher() {
+  yield takeLatest(
+    fetchAuthOrderActionTypeName,
+    fetchAuthOrderWorker,
+  )
+}
 
 // cache
 export function* fetchProductWithCacheWatcher() {

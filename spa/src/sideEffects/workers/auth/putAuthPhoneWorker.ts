@@ -66,7 +66,12 @@ export function* putAuthPhoneWorker(action: PayloadAction<PutAuthPhoneActionType
     const response = yield call(() => api({
       method: "PUT",
       url: apiUrl,
-      data: action.payload as UserPhoneCriteria
+      data: {
+        phoneId: action.payload.phoneId,
+        phoneNumber: action.payload.phoneNumber,
+        countryCode: action.payload.countryCode,
+        isSelected: action.payload.isSelected
+      } as UserPhoneCriteria
     })
       .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
       .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
@@ -114,8 +119,14 @@ export function* putAuthPhoneWorker(action: PayloadAction<PutAuthPhoneActionType
         })
       )
     }
-  } else {
-    console.log("permission denied: you are " + curAuth.userType)
+  } else if (curAuth.userType === UserTypeEnum.GUEST) {
+          /**
+           * update auth only redux store
+           **/
+    yield put(
+      authActions.updatePhone(action.payload)
+    )
+
   }
 }
 

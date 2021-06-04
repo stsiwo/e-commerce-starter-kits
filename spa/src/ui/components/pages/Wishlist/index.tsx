@@ -1,20 +1,16 @@
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Pagination from '@material-ui/lab/Pagination/Pagination';
-import { AxiosError } from 'axios';
 import WishlistItem from 'components/common/WishlistItem';
-import { api } from 'configs/axiosConfig';
+import WishlistItemSearchController from 'components/common/WishlistItemSearchController';
 import { WishlistItemType } from 'domain/wishlist/types';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchWishlistItemActionCreator, wishlistItemActions, wishlistItemPaginationPageActions, deleteWishlistItemActionCreator, deleteSingleWishlistItemActionCreator, patchWishlistItemActionCreator } from 'reducers/slices/domain/wishlistItem';
+import { deleteSingleWishlistItemActionCreator, fetchWishlistItemActionCreator, patchWishlistItemActionCreator, wishlistItemPaginationPageActions } from 'reducers/slices/domain/wishlistItem';
 import { mSelector } from 'src/selectors/selector';
-import { MessageTypeEnum } from 'src/app';
-import WishlistItemSearchController from 'components/common/WishlistItemSearchController';
-import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -57,18 +53,12 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
 
-  const auth = useSelector(mSelector.makeAuthSelector());
-
   const dispatch = useDispatch()
 
   const curWishlistItems = useSelector(mSelector.makeWishlistItemSelector())
 
   const curQueryString = useSelector(mSelector.makeWishlistItemQueryStringSelector())
   const pagination = useSelector(mSelector.makeWishlistItemPaginationSelector())
-
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
 
   // fetch wishlistItems
   React.useEffect(() => {
@@ -111,10 +101,10 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
   };
   return (
     <React.Fragment>
-      <WishlistItemSearchController />
       <Typography variant="h5" component="h5" align="center" className={classes.title} >
         {"Wishlist"}
       </Typography>
+      <WishlistItemSearchController />
       {(curWishlistItems.length === 0 &&
         <React.Fragment>
           <Typography variant="body1" component="p" align="center">

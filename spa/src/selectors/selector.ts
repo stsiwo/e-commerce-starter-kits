@@ -41,6 +41,7 @@ export const rsSelector = {
     getSearchKeyword: (state: StateType) => state.app.searchKeyword,
     getRequestTracker: (state: StateType) => state.app.requestTracker,
 
+    getPutAuthFetchStatus: (state: StateType) => state.app.fetchStatus.auth.put,
     getPostSessionTimeoutOrderEventFetchStatus: (state: StateType) => state.app.fetchStatus.orders.postSessionTimeoutEvent,
     getPostOrderFetchStatus: (state: StateType) => state.app.fetchStatus.orders.post,
     getFetchReviewFetchStatus: (state: StateType) => state.app.fetchStatus.reviews.get,

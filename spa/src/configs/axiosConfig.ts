@@ -25,28 +25,28 @@ axios.defaults.transformResponse = [].concat(
      **/
 
     /**
+     * response must be object.
+     *
+     * if the backend return string as resposne, this will complain about this (json parse error).
+
+    /**
      * convert date string (response) to Date object (js) for all response
      *
      * - https://stackoverflow.com/questions/14488745/javascript-json-date-deserialization
      **/
 
     /**
-     * TODO: fix this regex since this is not working.
+     * date regex: 
      *
-     *  - does not detect any date string format
+     * ref: https://stackoverflow.com/questions/3143070/javascript-regex-iso-datetime
      *
-     *  - ref: https://stackoverflow.com/questions/3143070/javascript-regex-iso-datetime
-     *  - ref: https://regex101.com/
      **/
-
-    //const ISORegex = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*))(?:Z|(\+|-)([\d|:]*))?$/;
-    const ISORegex1 = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
-    const ISORegex2 = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+/;
+    const ISORegex1 = /(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/;
+    const ISORegex2 = /(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+)|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d)|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d)/;
     if (data) {
-      console.log("before json parse")
+      console.log("raw json string response")
       console.log(data)
-
-      const updated = JSON.parse(data, (key: string, value: any) => {
+      return JSON.parse(data, (key: string, value: any) => {
         if (typeof value === 'string') {
           const a = ISORegex1.exec(value);
           const b = ISORegex2.exec(value);
@@ -56,14 +56,10 @@ axios.defaults.transformResponse = [].concat(
         }
         return value
       });
-      console.log("after json parse")
-      console.log(updated)
 
-      return updated
     }
     return data
   },
-  axios.defaults.transformResponse,
 )
 
 // set default 'withCredential'

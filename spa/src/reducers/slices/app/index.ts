@@ -76,6 +76,11 @@ export declare type PutAuthCompanyActionType = UserCompanyCriteria
 export const putAuthCompanyActionCreator = createAction<PutAuthCompanyActionType>("saga/domain/auth/company/put")
 export const putAuthCompanyActionTypeName = putAuthCompanyActionCreator().type
 
+// for GET (fetch auth order) request
+export declare type FetchAuthOrderActionType = { userId: string } 
+export const fetchAuthOrderActionCreator = createAction<FetchAuthOrderActionType>("saga/domain/auth/order/fetch")
+export const fetchAuthOrderActionTypeName = fetchAuthOrderActionCreator().type
+
 
 /**
  * app.auth state Slice
@@ -118,7 +123,7 @@ export const authSlice = createSlice({
       return state
     },
 
-    switchPrimaryPhone: (state: AuthType, action: PayloadAction<UserPhoneType>) => {
+    switchPrimaryPhone: (state: AuthType, action: PayloadAction<{phoneId: string}>) => {
       state.user.phones = state.user.phones.map((phone: UserPhoneType) => {
         if (phone.phoneId == action.payload.phoneId) {
           phone.isSelected = true
@@ -155,7 +160,7 @@ export const authSlice = createSlice({
       return state
     },
 
-    switchShippingAddress: (state: AuthType, action: PayloadAction<UserAddressType>) => {
+    switchShippingAddress: (state: AuthType, action: PayloadAction<{ addressId: string }>) => {
       state.user.addresses = state.user.addresses.map((address: UserAddressType) => {
         if (address.addressId == action.payload.addressId) {
           address.isShippingAddress = true
@@ -167,7 +172,7 @@ export const authSlice = createSlice({
       return state
     },
 
-    switchBillingAddress: (state: AuthType, action: PayloadAction<UserAddressType>) => {
+    switchBillingAddress: (state: AuthType, action: PayloadAction<{ addressId: string }>) => {
       state.user.addresses = state.user.addresses.map((address: UserAddressType) => {
         if (address.addressId == action.payload.addressId) {
           address.isBillingAddress = true
