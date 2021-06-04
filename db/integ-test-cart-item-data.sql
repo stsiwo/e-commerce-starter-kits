@@ -8,7 +8,7 @@ VALUES ('c7081519-16e5-4f92-ac50-1834001f12b9', '5', '1');
 
 -- item 2 
 INSERT INTO `ec-schema`.`cart_items` (`user_id`, `variant_id`, `quantity`)
-VALUES ('c7081519-16e5-4f92-ac50-1834001f12b9', '9', '1'); 
+VALUES ('c7081519-16e5-4f92-ac50-1834001f12b9', '10', '1'); 
 
 -- item 3 
 INSERT INTO `ec-schema`.`cart_items` (`user_id`, `variant_id`, `quantity`)
