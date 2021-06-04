@@ -9,6 +9,8 @@ endpoint change:
     - properties:
     
       - (order) totalCost: prevent front-end from calculating (single source of truth)
+      
+      - (order) mainImagePath: from the first order detail's product main image (for order list page of member)
 
   - (impl) /reviews
   
