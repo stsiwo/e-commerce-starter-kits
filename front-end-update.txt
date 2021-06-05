@@ -1,0 +1,49 @@
+- (IMPL) add contact page
+  
+  - recapcha for security
+  
+- (IMPL) order page:
+
+  - make sure how to handle 'return/cancel' for purchase.
+  
+- (IMPL) popup for signup 
+
+  - esp when the guest user purchases.
+  
+    - if the guest user decide to signup, we need to save cart items to the backend.
+    
+    - flow
+    
+      1. the guest user signup
+      2. if succeeded, also send POST request to cartItem endpoint to create the guest user's cart info.
+      3. get the user back to the checkout page.
+  
+- (testing) admin endpoints request testing (products, orders, categories, customers, and so on)
+
+- (implementation) add product variant to cart request ??? what is it? cartItem object only contain product?? the product in domain/cartItem only contains a selected product variant. so is it ok?
+
+ - (fix) add caption or small explanation on input (esp path). it must be unique.
+ 
+ - (implementation) add logo image upload at admin 
+ 
+ - (refactor) refactor snackbar and spinner : need to make sure the logic
+ 
+ - (bug) productDetail page: duplicated size option (e.g., list same size twice)
+ 
+ - carts
+ 
+  - when you merge cart items of guest user to the cart items of the member user when the guest user signs up, make sure that don't send 'cartItemId' to the backend. 
+  
+    - cart items of guest users have temp cart item id for each temporarly.
+    
+  - should I set max cart item numbers? like 5.
+  
+ - phones:
+ 
+  - set max phone like 3
+  
+  - orders
+ 
+    - change product with only selected variant to product with all variant and selectedvariant.
+    
+    
