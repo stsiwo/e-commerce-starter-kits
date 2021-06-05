@@ -1,4 +1,4 @@
-import { deleteAuthAddressActionTypeName, deleteAuthAvatarImageActionTypeName, deleteAuthPhoneActionTypeName, patchAuthAddressActionTypeName, patchAuthPhoneActionTypeName, postAuthAddressActionTypeName, postAuthAvatarImageActionTypeName, postAuthPhoneActionTypeName, putAuthActionTypeName, putAuthAddressActionTypeName, putAuthCompanyActionTypeName, putAuthPhoneActionTypeName, fetchAuthOrderActionTypeName } from 'reducers/slices/app';
+import { deleteAuthAddressActionTypeName, deleteAuthAvatarImageActionTypeName, deleteAuthPhoneActionTypeName, patchAuthAddressActionTypeName, patchAuthPhoneActionTypeName, postAuthAddressActionTypeName, postAuthAvatarImageActionTypeName, postAuthPhoneActionTypeName, putAuthActionTypeName, putAuthAddressActionTypeName, putAuthCompanyActionTypeName, putAuthPhoneActionTypeName, fetchAuthOrderActionTypeName, postAuthOrderEventActionTypeName, fetchSingleAuthOrderActionTypeName } from 'reducers/slices/app';
 import { deleteCartItemActionTypeName, deleteSingleCartItemActionTypeName, fetchCartItemActionTypeName, postCartItemActionTypeName, putCartItemActionTypeName } from 'reducers/slices/domain/cartItem';
 import { deleteSingleCategoryActionTypeName, fetchCategoryActionTypeName, fetchCategoryWithCacheActionTypeName, postCategoryActionTypeName, putCategoryActionTypeName } from 'reducers/slices/domain/category';
 import { deleteSingleOrderEventActionTypeName, fetchOrderActionTypeName, fetchSingleOrderActionTypeName, postOrderActionTypeName, postOrderEventActionTypeName, postSessionTimeoutOrderEventActionTypeName, putOrderActionTypeName, putOrderEventActionTypeName } from 'reducers/slices/domain/order';
@@ -73,6 +73,8 @@ import { fetchWishlistItemWorker } from 'sideEffects/workers/wishlistItems/fetch
 import { patchWishlistItemWorker } from 'sideEffects/workers/wishlistItems/patchWishlistItemWorker';
 import { postWishlistItemWorker } from 'sideEffects/workers/wishlistItems/postWishlistItemWorker';
 import { fetchAuthOrderWorker } from 'sideEffects/workers/auth/fetchAuthOrderWorker';
+import { postAuthOrderEventWorker } from 'sideEffects/workers/auth/postAuthOrderEventWorker';
+import { fetchSingleAuthOrderWorker } from 'sideEffects/workers/auth/fetchSingleAuthOrderWorker';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -528,6 +530,20 @@ export function* fetchAuthOrderWatcher() {
   yield takeLatest(
     fetchAuthOrderActionTypeName,
     fetchAuthOrderWorker,
+  )
+}
+
+export function* fetchSingleAuthOrderWatcher() {
+  yield takeLatest(
+    fetchSingleAuthOrderActionTypeName,
+    fetchSingleAuthOrderWorker,
+  )
+}
+
+export function* postAuthOrderEventWatcher() {
+  yield takeLatest(
+    postAuthOrderEventActionTypeName,
+    postAuthOrderEventWorker,
   )
 }
 

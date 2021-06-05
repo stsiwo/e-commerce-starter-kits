@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { postOrderEventActionCreator, putOrderEventActionCreator } from 'reducers/slices/domain/order';
 import { AuthType, UserTypeEnum } from 'src/app';
 import { mSelector } from 'src/selectors/selector';
+import { postAuthOrderEventActionCreator } from 'reducers/slices/app';
 
 interface OrderEventUpdateFormDialogPropsType {
   open: boolean
@@ -61,8 +62,8 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
       setOrderEventState(defaultOrderEventData)
     }
   }, [
-    JSON.stringify(props.orderEvent) 
-  ])
+      JSON.stringify(props.orderEvent)
+    ])
 
   /**
    * update btn click event handler
@@ -73,30 +74,46 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
      * skip validation since there is less fields to validate (overkill)
      *
      **/
-
-    if (isNew) {
-      console.log("new order event creation")
-      // request
-      dispatch(
-        postOrderEventActionCreator({
-          orderStatus: curOrderEventState.orderStatus,
-          orderId: props.order.orderId,
-          note: curOrderEventState.note,
-          userId: auth.user.userId,
-        }) 
-      )
+    if (auth.userType === UserTypeEnum.ADMIN) {
+      // admin
+      if (isNew) {
+        console.log("new order event creation")
+        // request
+        dispatch(
+          postOrderEventActionCreator({
+            orderStatus: curOrderEventState.orderStatus,
+            orderId: props.order.orderId,
+            note: curOrderEventState.note,
+            userId: auth.user.userId,
+          })
+        )
+      } else {
+        console.log("update order event")
+        // request
+        dispatch(
+          putOrderEventActionCreator({
+            orderEventId: curOrderEventState.orderEventId,
+            orderId: props.order.orderId,
+            note: curOrderEventState.note,
+            userId: auth.user.userId,
+          })
+        )
+      }
     } else {
-      console.log("update order event")
-      // request
-      dispatch(
-        putOrderEventActionCreator({
-          orderEventId: curOrderEventState.orderEventId,
-          orderId: props.order.orderId,
-          note: curOrderEventState.note,
-          userId: auth.user.userId,
-        }) 
-      )
+      // member
+      if (isNew) {
+        // request
+        dispatch(
+          postAuthOrderEventActionCreator({
+            orderStatus: curOrderEventState.orderStatus,
+            orderId: props.order.orderId,
+            note: curOrderEventState.note,
+            userId: auth.user.userId,
+          })
+        )
+      }
     }
+
   }
 
   const handleNoteInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
@@ -108,13 +125,13 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
   }
 
   const handleOrderStatusInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextOrderStatus = e.target.value as OrderStatusEnum; 
+    const nextOrderStatus = e.target.value as OrderStatusEnum;
     setOrderEventState((prev: OrderEventType) => ({
       ...prev,
       orderStatus: nextOrderStatus
     }));
   }
-  
+
   // next addable option based on user type
   const nextOrderEventOptions = React.useMemo(() => {
     if (auth.userType === UserTypeEnum.MEMBER) {
@@ -149,10 +166,10 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
               </MenuItem>
             )}
             {(nextOrderEventOptions.map((orderStatus: OrderStatusEnum) => (
-                <MenuItem key={orderStatus} value={orderStatus}>
-                  {orderStatus}
-                </MenuItem>
-              )))}
+              <MenuItem key={orderStatus} value={orderStatus}>
+                {orderStatus}
+              </MenuItem>
+            )))}
           </TextField>
           <TextField
             id="order-event-note"

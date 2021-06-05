@@ -2,6 +2,7 @@ import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { defaultUser, UserAddressType, UserCriteria, UserPhoneType, UserType, UserPhoneCriteria, UserAddressCriteria, UserCompanyCriteria, AdminCompanyType } from "domain/user/types";
 import { AuthType, MessageStateType, MessageTypeEnum, RequestTrackerType, UserTypeEnum } from "src/app";
 import { getNanoId } from "src/utils";
+import { OrderEventCriteria } from "domain/order/types";
 
 /**
  * common reducer action type
@@ -80,6 +81,16 @@ export const putAuthCompanyActionTypeName = putAuthCompanyActionCreator().type
 export declare type FetchAuthOrderActionType = { userId: string } 
 export const fetchAuthOrderActionCreator = createAction<FetchAuthOrderActionType>("saga/domain/auth/order/fetch")
 export const fetchAuthOrderActionTypeName = fetchAuthOrderActionCreator().type
+
+// for GET (fetch single auth order) request
+export declare type FetchSingleAuthOrderActionType = { userId: string, orderId: string } 
+export const fetchSingleAuthOrderActionCreator = createAction<FetchSingleAuthOrderActionType>("saga/domain/auth/order/fetchSingle")
+export const fetchSingleAuthOrderActionTypeName = fetchSingleAuthOrderActionCreator().type
+
+// for POST (post auth order event) request
+export declare type PostAuthOrderEventActionType = OrderEventCriteria & { orderId: string } 
+export const postAuthOrderEventActionCreator = createAction<PostAuthOrderEventActionType>("saga/domain/auth/order/fetch")
+export const postAuthOrderEventActionTypeName = postAuthOrderEventActionCreator().type
 
 
 /**

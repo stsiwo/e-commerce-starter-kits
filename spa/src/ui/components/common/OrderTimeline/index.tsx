@@ -198,7 +198,7 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({ order 
                   <EditIcon />
                 </IconButton>
               )}
-              {(orderEvent.undoable && orderEvent.orderEventId === latestOrderEvent.orderEventId &&
+              {(auth.userType === UserTypeEnum.ADMIN && orderEvent.undoable && orderEvent.orderEventId === latestOrderEvent.orderEventId &&
                 <IconButton onClick={(e) => handleDeleteClick(e, orderEvent.orderEventId)}>
                   <RemoveCircleIcon />
                 </IconButton>

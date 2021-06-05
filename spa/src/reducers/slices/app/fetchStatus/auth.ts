@@ -460,3 +460,70 @@ export const fetchAuthOrderFetchStatusSlice = createSlice({
 export const fetchAuthOrderFetchStatusSliceReducer = fetchAuthOrderFetchStatusSlice.reducer
 export const fetchAuthOrderFetchStatusActions = fetchAuthOrderFetchStatusSlice.actions
 
+
+/**
+ * app.fetchStatus.auth.fetch.order.single state Slice
+ *
+ *  - update auth data of the same id
+ **/
+export type fetchSingleAuthOrderFetchStatusActionType = PayloadAction<FetchStatusEnum>
+
+export const fetchSingleAuthOrderFetchStatusSlice = createSlice({
+  name: "app/fetchStatus/auth/order/fetchSingle", // a name used in action type
+  initialState: {},
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+    update: (state: FetchStatusEnum, action: fetchSingleAuthOrderFetchStatusActionType) => action.payload,
+    clear: (state: FetchStatusEnum) => FetchStatusEnum.INITIAL
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   **/
+})
+
+export const fetchSingleAuthOrderFetchStatusSliceReducer = fetchSingleAuthOrderFetchStatusSlice.reducer
+export const fetchSingleAuthOrderFetchStatusActions = fetchSingleAuthOrderFetchStatusSlice.actions
+
+/**
+ * app.fetchStatus.auth.post.order.event state Slice
+ *
+ *  - update auth data of the same id
+ **/
+export type postAuthOrderEventFetchStatusActionType = PayloadAction<FetchStatusEnum>
+
+export const postAuthOrderEventFetchStatusSlice = createSlice({
+  name: "app/fetchStatus/auth/order/event/post", // a name used in action type
+  initialState: {},
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+    update: (state: FetchStatusEnum, action: postAuthOrderEventFetchStatusActionType) => action.payload,
+    clear: (state: FetchStatusEnum) => FetchStatusEnum.INITIAL
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   **/
+})
+
+export const postAuthOrderEventFetchStatusSliceReducer = postAuthOrderEventFetchStatusSlice.reducer
+export const postAuthOrderEventFetchStatusActions = postAuthOrderEventFetchStatusSlice.actions
+

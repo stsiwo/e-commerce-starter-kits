@@ -105,6 +105,8 @@ export declare type AppStateType = {
       deleteAvatarImage: FetchStatusEnum
       putCompany: FetchStatusEnum
       fetchOrder: FetchStatusEnum
+      fetchSingleOrder: FetchStatusEnum
+      postOrderEvent: FetchStatusEnum
     },
   },
 }
