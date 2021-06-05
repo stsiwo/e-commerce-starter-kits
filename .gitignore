@@ -29,6 +29,9 @@ node_modules/
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
+# compiled
+*/target/*
+
 # Package Files #
 *.jar
 *.war
