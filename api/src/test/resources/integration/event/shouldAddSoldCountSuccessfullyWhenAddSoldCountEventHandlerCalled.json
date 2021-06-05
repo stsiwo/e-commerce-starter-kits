@@ -1,0 +1,42 @@
+{
+  "orderId": "c8f8591c-bb83-4fd1-a098-3fac8d40e450", 
+  "orderNumber": "order_w0vDYZvqy_Y", 
+  "productCost": 123.00, 
+  "taxCost": 10.00,
+  "shippingCost": 10.00,
+  "shippingAddress": {
+    "orderAddressId": "1",
+    "address1": "shippingAddress1",
+    "address2": "shippingAddress2",
+    "city": "shippingCity",
+    "province": "shippingProvince",
+    "country": "shippingCountry",
+    "postalCode": "shippingPostalCode"
+  },
+  "billingAddress": {
+    "orderAddressId": "1",
+    "address1": "billingAddress1",
+    "address2": "billingAddress2",
+    "city": "billingCity",
+    "province": "billingProvince",
+    "country": "billingCountry",
+    "postalCode": "billingPostalCode"
+  },
+  "orderFirstName": "firstName",
+  "orderLastName": "lastName",
+  "orderEmail": "email",
+  "orderPhone": "phone",
+  "stripePaymentIntentId": "stripePaymentIntentId",
+  "orderDetails": [ 
+    {
+      "orderDetailId": "1",
+      "productQuantity": "3",
+      "productUnitPrice": "10.00",
+      "productColor": "white",
+      "productSize": "XS",
+      "productName": "Name"
+    }
+  ] 
+}
+
+

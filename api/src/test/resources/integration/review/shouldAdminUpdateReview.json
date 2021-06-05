@@ -1,0 +1,11 @@
+{
+  "reviewId": "100", 
+  "reviewTitle": "new review title",
+  "reviewDescription": "new review description",
+  "reviewPoint": 4.3,
+  "note": "admin only note",
+  "productId": "9e3e67ca-d058-41f0-aad5-4f09c956a81f",
+  "userId": "c7081519-16e5-4f92-ac50-1834001f12b9" ,
+  "isVerified": true
+}
+

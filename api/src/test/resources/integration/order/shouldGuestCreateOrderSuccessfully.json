@@ -1,0 +1,40 @@
+{
+  "orderFirstName": "Satoshi",
+  "orderLastName": "Iwao",
+  "orderEmail": "test@test.com",
+  "orderPhone": "+11234567890",
+  "shippingAddress": {
+    "address1": "4352 ATLIN ST",  
+    "address2": "",  
+    "city": "Vancouver",  
+    "province": "BC",  
+    "country": "CA",  
+    "postalCode": "123 132"  
+  },
+  "billingAddress": {
+    "address1": "4352 ATLIN ST",  
+    "address2": "",  
+    "city": "Vancouver",  
+    "province": "BC",  
+    "country": "CA",  
+    "postalCode": "123 132"  
+  },
+  "orderDetails": [
+    {
+      "productQuantity": "1", 
+      "productId": "9e3e67ca-d058-41f0-aad5-4f09c956a81f", 
+      "productVariantId": "3" 
+    },
+    {
+      "productQuantity": "1", 
+      "productId": "773f1fc7-c037-447a-a5b2-f790ea2302e5", 
+      "productVariantId": "6" 
+    },
+    {
+      "productQuantity": "1", 
+      "productId": "a362bbc3-5c70-4e82-96d3-5fa1e3103332", 
+      "productVariantId": "11" 
+    }
+  ],
+  "currency": "cad"
+}

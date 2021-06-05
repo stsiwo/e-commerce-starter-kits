@@ -1,0 +1,17 @@
+{
+  "productName": "new_product_name",
+  "productDescription": "new_product_desc",
+  "productPath": "new_product_path",
+  "productBaseUnitPrice": 13.32,
+  "isDiscount": false,
+  "isPublic": false,
+  "category":  {
+    "categoryId": 1,
+    "categoryName": "category_name_1",
+    "categoryDescription": "category_desc_1",
+    "categoryPath": "category_path_1" 
+  },
+  "releaseDate": "2012-04-23T18:25:43.511Z",
+  "note": "new_note"
+}
+
