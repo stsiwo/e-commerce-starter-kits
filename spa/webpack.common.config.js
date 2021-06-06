@@ -26,16 +26,10 @@ module.exports = {
       ]
     }),
     //new FaviconsWebpackPlugin('./static/ryohei_kato_logo_face.svg'), // svg works too!
-    //new BundleAnalyzerPlugin({
-    //  analyzerPort: 8889,
-    //  analyzerMode: "static",
-    //}),
-    // https://github.com/kensnyder/quill-image-resize-module/issues/7
-    // to prevent error: Uncaught TypeError: Cannot read property 'imports' of undefined (caused by quill-image-xxxx libarary)
-    //new webpack.ProvidePlugin({
-    //  'window.Quill': 'quill',
-    //  'Quill': 'quill/dist/quill.js',
-    //})
+    new BundleAnalyzerPlugin({
+      analyzerPort: 8889,
+      analyzerMode: "static",
+    }),
   ],
   resolve: {
     mainFiles: ['index'],

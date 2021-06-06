@@ -18,6 +18,7 @@ public class CorsConfig {
 
   private String headers;
 
+  private Boolean credentials;
 }
 
 

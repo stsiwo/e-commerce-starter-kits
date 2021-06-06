@@ -1,4 +1,4 @@
-import { ProductType, CategoryType, ProductImageType, ProductVariantType } from "domain/product/types";
+import { ProductType, CategoryType, ProductImageType, ProductVariantType, productVariantSizeObj } from "domain/product/types";
 import faker from "../faker";
 
 export const generateCategoryList: (count?: number) => CategoryType[] = (count = 1) => {
@@ -29,34 +29,6 @@ export const generateProductImageList: (count?: number) => ProductImageType[] = 
   return list
 }
 
-export const testProductVariantSizeObj = {
-  xs: {
-    productSizeId: "1",
-    productSizeName: "XS",
-    productSizeDescription: "",
-  },
-  s: {
-    productSizeId: "2",
-    productSizeName: "S",
-    productSizeDescription: "",
-  },
-  m: {
-    productSizeId: "3",
-    productSizeName: "M",
-    productSizeDescription: "",
-  },
-  l: {
-    productSizeId: "4",
-    productSizeName: "L",
-    productSizeDescription: "",
-  },
-  xl: {
-    productSizeId: "5",
-    productSizeName: "XL",
-    productSizeDescription: "",
-  },
-}
-
 // n = 5, last = 4
 const productSizeArray = [
   "xs", "s", "m", "l", "xl"
@@ -82,7 +54,7 @@ export const generateProductVariantList: (count?: number) => ProductVariantType[
       note: faker.random.words(200),
       soldCount: faker.random.number(20),
       variantColor: faker.commerce.color(),
-      productSize: testProductVariantSizeObj[productSizeArray[faker.random.number(4)] as keyof typeof testProductVariantSizeObj], 
+      productSize: productVariantSizeObj[productSizeArray[faker.random.number(4)] as keyof typeof productVariantSizeObj], 
       variantStock: faker.random.number(3),
       variantUnitPrice: parseFloat(faker.commerce.price()),
       ...(isDiscount && { variantDiscountPrice: parseFloat(faker.commerce.price()) }),

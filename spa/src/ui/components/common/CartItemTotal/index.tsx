@@ -1,21 +1,15 @@
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import CartItem from 'components/common/CartItem';
-import { CartItemType } from 'domain/cart/types';
-import { UserType } from 'domain/user/types';
-import * as React from 'react';
 import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
-import { generateCartItemList } from 'tests/data/cart';
-import { calcSubTotalPriceAmount, calcSubTotalProductNumbers, calcTotalWeight } from 'domain/cart';
 import Divider from '@material-ui/core/Divider';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import { AxiosError } from 'axios';
+import { api } from 'configs/axiosConfig';
+import { calcSubTotalPriceAmount, calcSubTotalProductNumbers, calcTotalWeight } from 'domain/cart';
+import { useSnackbar } from 'notistack';
+import * as React from 'react';
 import { useSelector } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
-import { api } from 'configs/axiosConfig';
-import { AxiosError } from 'axios';
-import { useSnackbar } from 'notistack';
-import { cadCurrencyFormat, generateQueryString } from 'src/utils';
+import { cadCurrencyFormat } from 'src/utils';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

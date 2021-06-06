@@ -5,19 +5,14 @@ import Switch from '@material-ui/core/Switch';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Rating from '@material-ui/lab/Rating';
-import { AxiosError } from 'axios';
 import ProductHorizontalCard from 'components/common/ProductCard/ProductHorizontalCard';
 import UserCard from 'components/common/UserCard';
-import { api } from 'configs/axiosConfig';
 import { defaultReviewValidationData, ReviewDataType, ReviewType, ReviewValidationDataType } from 'domain/review/type';
 import { useValidation } from 'hooks/validation';
 import { reviewSchema } from 'hooks/validation/rules';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchReviewActionCreator, putReviewActionCreator } from 'reducers/slices/domain/review';
-import { mSelector } from 'src/selectors/selector';
-import { testMemberUser } from 'tests/data/user';
+import { useDispatch } from 'react-redux';
+import { putReviewActionCreator } from 'reducers/slices/domain/review';
 
 interface AdminReviewFormPropsType {
   review: ReviewType
@@ -181,11 +176,11 @@ const AdminReviewForm = React.forwardRef<any, AdminReviewFormPropsType>((props, 
           {"Reviewing Customer"}
         </Typography>
         <UserCard
-          firstName={testMemberUser.firstName}
-          lastName={testMemberUser.lastName}
-          email={testMemberUser.email}
-          userType={testMemberUser.userType.userType}
-          avatarImagePath={testMemberUser.avatarImagePath}
+          firstName={curReviewState.user.firstName}
+          lastName={curReviewState.user.lastName}
+          email={curReviewState.user.email}
+          userType={curReviewState.user.userType.userType}
+          avatarImagePath={curReviewState.user.avatarImagePath}
         />
       </Grid>
       <Grid

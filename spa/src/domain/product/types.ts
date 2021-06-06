@@ -339,3 +339,32 @@ export const defaultCategoryValidationData: CategoryValidationDataType = {
   categoryPath: ""
 }
 
+// variant size
+// this must match with the backend 'product_size' table
+export const productVariantSizeObj = {
+  xs: {
+    productSizeId: "1",
+    productSizeName: "XS",
+    productSizeDescription: "",
+  },
+  s: {
+    productSizeId: "2",
+    productSizeName: "S",
+    productSizeDescription: "",
+  },
+  m: {
+    productSizeId: "3",
+    productSizeName: "M",
+    productSizeDescription: "",
+  },
+  l: {
+    productSizeId: "4",
+    productSizeName: "L",
+    productSizeDescription: "",
+  },
+  xl: {
+    productSizeId: "5",
+    productSizeName: "XL",
+    productSizeDescription: "",
+  },
+}

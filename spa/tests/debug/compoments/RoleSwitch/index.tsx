@@ -21,39 +21,39 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const mockUserGenerator: (userType: UserTypeEnum, user?: UserType) => AuthType = (userType, user?) => {
-  return {
-    isLoggedIn: userType !== UserTypeEnum.GUEST ? true : false, 
-    ...(userType !== UserTypeEnum.GUEST && {user: user}),
-    userType: userType
-  } as AuthType
-}
-
-const RoleSwitch: React.FunctionComponent<{}> = (props) => {
-
-  const dispatch = useDispatch()
-
-  const classes = useStyles();
-
-  const handleGuestRoleClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    dispatch(authActions.login(mockUserGenerator(UserTypeEnum.GUEST, defaultUser)))
-  }
-
-  const handleMemberRoleClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    dispatch(authActions.login(mockUserGenerator(UserTypeEnum.MEMBER, testMemberUser )))
-  }
-  
-  const handleAdminRoleClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    dispatch(authActions.login(mockUserGenerator(UserTypeEnum.ADMIN, testAdminUser)))
-  }
-
-  return (
-    <Box component="div" className={classes.box}>
-      <Button onClick={handleGuestRoleClickEvent}>Guest</Button>
-      <Button onClick={handleMemberRoleClickEvent}>Member</Button>
-      <Button onClick={handleAdminRoleClickEvent}>Admin</Button>
-    </Box>
-  )
-}
-
-export default RoleSwitch
+//const mockUserGenerator: (userType: UserTypeEnum, user?: UserType) => AuthType = (userType, user?) => {
+//  return {
+//    isLoggedIn: userType !== UserTypeEnum.GUEST ? true : false, 
+//    ...(userType !== UserTypeEnum.GUEST && {user: user}),
+//    userType: userType
+//  } as AuthType
+//}
+//
+//const RoleSwitch: React.FunctionComponent<{}> = (props) => {
+//
+//  const dispatch = useDispatch()
+//
+//  const classes = useStyles();
+//
+//  const handleGuestRoleClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+//    dispatch(authActions.login(mockUserGenerator(UserTypeEnum.GUEST, defaultUser)))
+//  }
+//
+//  const handleMemberRoleClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+//    dispatch(authActions.login(mockUserGenerator(UserTypeEnum.MEMBER, testMemberUser )))
+//  }
+//  
+//  const handleAdminRoleClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+//    dispatch(authActions.login(mockUserGenerator(UserTypeEnum.ADMIN, testAdminUser)))
+//  }
+//
+//  return (
+//    <Box component="div" className={classes.box}>
+//      <Button onClick={handleGuestRoleClickEvent}>Guest</Button>
+//      <Button onClick={handleMemberRoleClickEvent}>Member</Button>
+//      <Button onClick={handleAdminRoleClickEvent}>Admin</Button>
+//    </Box>
+//  )
+//}
+//
+//export default RoleSwitch

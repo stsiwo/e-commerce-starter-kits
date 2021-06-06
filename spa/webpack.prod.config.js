@@ -2,7 +2,6 @@ const webpack = require('webpack');
 const path = require('path');
 const merge = require('webpack-merge');
 const common = require('./webpack.common.config.js');
-const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = merge(common, {
   mode: 'production',
@@ -13,20 +12,17 @@ module.exports = merge(common, {
   output: {
     filename: '[name].[contenthash].js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/reactjs-redux-saga-reselect-starterkits/',
   },
   plugins: [
-    new webpack.HashedModuleIdsPlugin(),
     new webpack.DefinePlugin({
       NODE_ENV: JSON.stringify("production"),
       CHECKOUT_SESSION_TIMEOUT: JSON.stringify("600000"), // 10 mins
-      //OWNER_BUCKET_NAME: JSON.stringify("bactivityhair.com-bucket"),
-      //API1_URL: JSON.stringify("https://api.bactivityhair.com"),
-      //PUBLIC_IMAGE_PATH: JSON.stringify("/images/"),
+      API1_URL: JSON.stringify("http://localhost:8080"),
     })
   ],
   optimization: {
     runtimeChunk: 'single',
+    moduleIds: 'deterministic',
     splitChunks: {
       chunks: 'all',
     },

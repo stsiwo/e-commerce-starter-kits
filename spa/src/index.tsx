@@ -1,14 +1,13 @@
-import loadable from '@loadable/component';
 import { ThemeProvider } from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Content from 'components/pages/Content';
 import { store } from 'configs/storeConfig';
+import { SnackbarProvider } from 'notistack';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { theme } from 'ui/css/theme';
-import { SnackbarProvider } from 'notistack';
 
 /**
  * dev env only

@@ -6,10 +6,9 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import MenuItem from '@material-ui/core/MenuItem';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { AxiosError } from 'axios';
-import { api } from 'configs/axiosConfig';
-import { defaultProductVariantData, defaultProductVariantValidationData, ProductVariantDataType, ProductVariantSizeType, ProductVariantType, ProductVariantValidationDataType } from 'domain/product/types';
+import { defaultProductVariantData, defaultProductVariantValidationData, ProductVariantDataType, ProductVariantSizeType, ProductVariantType, ProductVariantValidationDataType, productVariantSizeObj } from 'domain/product/types';
 import { useValidation } from 'hooks/validation';
 import { productVariantSchema } from 'hooks/validation/rules';
 import { useSnackbar } from 'notistack';
@@ -17,11 +16,8 @@ import * as React from 'react';
 import { ChromePicker, ColorResult } from 'react-color';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
-import { productActions, postProductVariantActionCreator, putProductVariantActionCreator } from 'reducers/slices/domain/product';
+import { postProductVariantActionCreator, putProductVariantActionCreator } from 'reducers/slices/domain/product';
 import { mSelector } from 'src/selectors/selector';
-import { testProductVariantSizeObj } from 'tests/data/product';
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
 
 interface AdminProductVariantFormPropsType {
   productVariant: ProductVariantType
@@ -161,7 +157,7 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
 
   // test product variant size list
   // #TODO: replace with real one when you are ready
-  const testProductVariantSizeList = Object.values(testProductVariantSizeObj)
+  const productVariantSizeList = Object.values(productVariantSizeObj)
 
   // event handlers
   const handleProductVariantUnitPriceInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
@@ -179,7 +175,7 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
     /**
      * DON'T user 'e.currentTarget' for select
      **/
-    const nextVariantSize = testProductVariantSizeList.find((size: ProductVariantSizeType) => e.target.value === size.productSizeId)
+    const nextVariantSize = productVariantSizeList.find((size: ProductVariantSizeType) => e.target.value === size.productSizeId)
     // must not be null
     updateValidationAt("productSize", e.currentTarget.value);
     setProductVariantState((prev: ProductVariantDataType) => ({
@@ -373,7 +369,7 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
         helperText={curProductVariantValidationState.productSize}
         error={curProductVariantValidationState.productSize !== ""}
       >
-        {testProductVariantSizeList.map((size: ProductVariantSizeType) => (
+        {productVariantSizeList.map((size: ProductVariantSizeType) => (
           <MenuItem key={size.productSizeId} value={size.productSizeId}>
             {size.productSizeName}
           </MenuItem>

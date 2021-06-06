@@ -1003,6 +1003,9 @@
     - command) javap <YOUR_COMPILED_FILE>.class
       - you can't see the class file directly via ide
 
+  - build docker image of your project.
+    - command) mvn spring-boot:build-image
+
 # Design Issue
 
   - how to deal with soft delete of users??

@@ -8,7 +8,7 @@ import * as React from 'react';
 import IconButton from '@material-ui/core/IconButton';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
-import AdminProductAndVariantForm from '../AdminProductAndVariantForm';
+//import AdminProductAndVariantForm from '../AdminProductAndVariantForm';
 
 declare type AdminProductNewCardPropsType = {
 }
@@ -74,9 +74,9 @@ const AdminProductNewCard: React.FunctionComponent<AdminProductNewCardPropsType>
       <CardContent
         className={classes.cardContentBox}
       >
-        {(curFormOpen &&
+        {/**(curFormOpen &&
           <AdminProductAndVariantForm />
-        )}
+        )**/}
       </CardContent>
       <CardActions disableSpacing>
         {/**(curFormOpen &&
