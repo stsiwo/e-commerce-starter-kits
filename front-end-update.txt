@@ -46,4 +46,7 @@
  
     - change product with only selected variant to product with all variant and selectedvariant.
     
+ - (performance)
+  - tree shaking is not working (material ui). maybe.
+    
     
