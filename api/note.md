@@ -1004,7 +1004,7 @@
       - you can't see the class file directly via ide
 
   - build docker image of your project.
-    - command) mvn spring-boot:build-image
+    - command) mvn spring-boot:build-image -Dmaven.test.skip=true
 
 # Design Issue
 

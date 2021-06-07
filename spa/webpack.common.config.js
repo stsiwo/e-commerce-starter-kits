@@ -26,10 +26,10 @@ module.exports = {
       ]
     }),
     //new FaviconsWebpackPlugin('./static/ryohei_kato_logo_face.svg'), // svg works too!
-    new BundleAnalyzerPlugin({
-      analyzerPort: 8889,
-      analyzerMode: "static",
-    }),
+    //new BundleAnalyzerPlugin({
+    //  analyzerPort: 8889,
+    //  analyzerMode: "static",
+    //}),
   ],
   resolve: {
     mainFiles: ['index'],
