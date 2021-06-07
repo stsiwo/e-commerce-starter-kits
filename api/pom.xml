@@ -308,10 +308,6 @@
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
         </plugin>
-        <plugin>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-maven-plugin</artifactId>
-        </plugin>
 
         <!-- you need to define this otherwise, you get following error when compile 'rating.xsd' and 'discovery.xsd' together -->
         <!-- error: DTD factory class org.apache.xerces.impl.dv.dtd.DTDDVFactoryImpl does not extend from DTDDVFactory. -->
@@ -321,6 +317,9 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>jaxb2-maven-plugin</artifactId>
           <version>${org.codehaus.mojo.jaxb2.version}</version>
+          <configuration>
+            <mainClass>com.iwaodev.Application</mainClass>
+          </configuration>
           <dependencies>
               <dependency>
                   <groupId>xerces</groupId>
@@ -356,6 +355,18 @@
     </pluginManagement>
     <!-- you need to define <plugins> like below when you want to generate pojos from xsd (esp, after <pluginManagement> -->
     <plugins>
+      <!-- you need to put this outside <pluginManagement> otherwise, you got 'no manifest attribute error' -->
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+              <goals>
+                  <goal>repackage</goal>
+              </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jaxb2-maven-plugin</artifactId>

@@ -1006,6 +1006,9 @@
   - build docker image of your project.
     - command) mvn spring-boot:build-image -Dmaven.test.skip=true
 
+  - compile (e.g., create .jar file) without test
+    - command) mvn package -Dmaven.test.skip=true 
+
 # Design Issue
 
   - how to deal with soft delete of users??
