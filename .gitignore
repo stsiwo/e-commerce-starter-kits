@@ -45,4 +45,5 @@ node_modules/
 hs_err_pid*
 
 # production 
-prod/
+# make repo private so I can put this in my repo
+# prod/

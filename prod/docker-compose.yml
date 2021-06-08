@@ -1,0 +1,51 @@
+version: '3.8'
+services:
+  spa: 
+    image: stsiwo/ec-spa:latest
+    restart: always
+    container_name: spa 
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - api
+    networks: 
+      - frontend
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+  api:
+    image: stsiwo/ec-api:latest
+    restart: always
+    container_name: api 
+    # ssl
+    #ports:
+    #  - "8443:8443"
+    # http
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      - db
+    networks: 
+      - frontend
+      - backend 
+  db: 
+    image: stsiwo/ec-db:latest 
+    restart: always
+    container_name: db  
+    networks: 
+      - backend 
+
+  db-backup:
+    image: databack/mysql-backup
+    restart: always
+    container_name: db-backup  
+    depends_on:
+      - api
+    networks: 
+      - backend 
+networks:
+  frontend:
+  backend:
+
