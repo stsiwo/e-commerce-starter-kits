@@ -42,6 +42,7 @@ sudo systemctl restart incron.service
 
 ### install SSL with Let's Encrypt (optional)
 #### need to set '-n' (e.g., non-interactive) with plugins (e.g., --dns-route53) to achieve to automate this process. 
+#### ref: https://certbot.eff.org/docs/using.html#certbot-command-line-options
 #### 1
 docker run -it --rm --name certbot \
     -v "/etc/letsencrypt:/etc/letsencrypt" \
