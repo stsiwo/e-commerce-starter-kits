@@ -2,6 +2,9 @@
 
 ### variables
 user="ubuntu"
+domain1="iwaodev.com"
+domain2="api.iwaodev.com"
+email="satoshi@iwaodev.com"
 
 ### create necessary directories
 mkdir prod/
@@ -27,7 +30,6 @@ newgrp docker
 sudo curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 
-
 ### install incron
 ## it's working:) 
 sudo apt-get update
@@ -37,3 +39,27 @@ echo 'root' | sudo tee -a /etc/incron.allow
 
 ## restart incron service
 sudo systemctl restart incron.service
+
+### install SSL with Let's Encrypt (optional)
+#### need to set '-n' (e.g., non-interactive) with plugins (e.g., --dns-route53) to achieve to automate this process. 
+#### 1
+docker run -it --rm --name certbot \
+    -v "/etc/letsencrypt:/etc/letsencrypt" \
+    -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
+    certbot/dns-route53 certonly \
+    -n \
+    --dns-route53 \
+    -d $domain1 \
+    -m $email \
+    --agree-tos
+
+#### 2
+docker run -it --rm --name certbot \
+    -v "/etc/letsencrypt:/etc/letsencrypt" \
+    -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
+    certbot/dns-route53 certonly \
+    -n \
+    --dns-route53 \
+    -d $domain2 \
+    -m $email \
+    --agree-tos
