@@ -12,6 +12,11 @@ chown -R $user:$user prod/
 
 ### update package 
 sudo apt-get update            
+
+##
+# BETTER APPROACH:
+#  - it might be efficient to use SSM (System Manager) when you want to install docker and docker
+##
   
 ### install docker             
 sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
@@ -40,10 +45,10 @@ echo 'root' | sudo tee -a /etc/incron.allow
 ## restart incron service
 sudo systemctl restart incron.service
 
-### install SSL with Let's Encrypt (optional)
-#### need to set '-n' (e.g., non-interactive) with plugins (e.g., --dns-route53) to achieve to automate this process. 
-#### ref: https://certbot.eff.org/docs/using.html#certbot-command-line-options
-#### 1
+## install SSL with Let's Encrypt (optional)
+### need to set '-n' (e.g., non-interactive) with plugins (e.g., --dns-route53) to achieve to automate this process. 
+### ref: https://certbot.eff.org/docs/using.html#certbot-command-line-options
+### 1
 docker run -it --rm --name certbot \
     -v "/etc/letsencrypt:/etc/letsencrypt" \
     -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
@@ -54,7 +59,7 @@ docker run -it --rm --name certbot \
     -m $email \
     --agree-tos
 
-#### 2
+### 2
 docker run -it --rm --name certbot \
     -v "/etc/letsencrypt:/etc/letsencrypt" \
     -v "/var/lib/letsencrypt:/var/lib/letsencrypt" \
@@ -64,3 +69,9 @@ docker run -it --rm --name certbot \
     -d $domain2 \
     -m $email \
     --agree-tos
+
+## for renew, use cloudwatch event rule
+### exmaple command
+### docker run -it --rm --name certbot -v "/etc/letsencrypt:/etc/letsencrypt" -v "/var/lib/letsencrypt:/var/lib/letsencrypt" certbot/dns-route53 renew -n --dns-route53 -d iwaodev.com -m satoshi@iwaodev.com --agree-tos
+### 
+### docker run -it --rm --name certbot -v "/etc/letsencrypt:/etc/letsencrypt" -v "/var/lib/letsencrypt:/var/lib/letsencrypt" certbot/dns-route53 renew -n --dns-route53 -d api.iwaodev.com -m satoshi@iwaodev.com --agree-tos
