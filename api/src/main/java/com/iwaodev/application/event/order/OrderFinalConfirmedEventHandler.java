@@ -12,16 +12,15 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
-public class OrderFinalConfirmedEventHandler implements ApplicationListener<OrderFinalConfirmedEvent> {
+public class OrderFinalConfirmedEventHandler{
 
   private static final Logger logger = LoggerFactory.getLogger(OrderFinalConfirmedEventHandler.class);
 
   @Autowired
   private OrderRepository orderRepository;
 
-  @Override
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-  public void onApplicationEvent(OrderFinalConfirmedEvent event) {
+  public void handleEvent(OrderFinalConfirmedEvent event) {
     logger.info("test event is triggered");
     logger.info(Thread.currentThread().getName());
 

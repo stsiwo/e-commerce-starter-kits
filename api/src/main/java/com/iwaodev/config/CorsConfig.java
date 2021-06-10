@@ -14,10 +14,6 @@ public class CorsConfig {
 
   private String origins;
 
-  private String methods;
-
-  private String headers;
-
   private Boolean credentials;
 }
 

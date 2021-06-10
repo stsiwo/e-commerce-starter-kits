@@ -13,7 +13,11 @@ import { resetPasswordSchema } from 'hooks/validation/rules';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
-import { useLocation } from 'react-router';
+import { useLocation, useHistory } from 'react-router';
+import { messageActions } from 'reducers/slices/app';
+import { getNanoId } from 'src/utils';
+import { MessageTypeEnum } from 'src/app';
+import { Link as RRLink } from "react-router-dom";
 
 export declare type ResetPasswordDataType = {
   confirm: string
@@ -79,7 +83,9 @@ const ResetPassword: React.FunctionComponent<{}> = (props) => {
   const classes = useStyles();
 
   const query = useQuery()
-  
+
+  const history = useHistory()
+
   // reset password token (get from forgotten password link
   const forgotPasswordToken = query.get("forgot-password-token")
 
@@ -140,9 +146,26 @@ const ResetPassword: React.FunctionComponent<{}> = (props) => {
           token: forgotPasswordToken,
         },
       }).then((data) => {
-        enqueueSnackbar("password was successfully reset.", { variant: "success" })
+
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.SUCCESS,
+            message: "password was successfully reset.",
+          })
+        )
+
+        history.push("/")
+
+
       }).catch((error: AxiosError) => {
-        enqueueSnackbar(error.message, { variant: "error" })
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.ERROR,
+            message: error.response.data.message, 
+          })
+        )
       })
     } else {
       updateAllValidation()
@@ -186,6 +209,9 @@ const ResetPassword: React.FunctionComponent<{}> = (props) => {
         <Box component="div" className={classes.actionBox}>
           <Button onClick={handleUserAccountSaveClickEvent}>
             Reset Password
+          </Button>
+          <Button component={RRLink} to="/login">
+            Send Reset Password Email Again
           </Button>
         </Box>
       </form>

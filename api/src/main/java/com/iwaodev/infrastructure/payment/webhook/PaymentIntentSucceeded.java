@@ -1,7 +1,5 @@
 package com.iwaodev.infrastructure.payment.webhook;
 
-import com.iwaodev.application.irepository.OrderRepository;
-import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.domain.order.event.PaymentSucceededEvent;
 import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;
@@ -11,12 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class PaymentIntentSucceeded implements PaymentWebhookHandler, ApplicationEventPublisherAware {
+public class PaymentIntentSucceeded implements PaymentWebhookHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(PaymentIntentSucceeded.class);
   /**
@@ -25,17 +22,7 @@ public class PaymentIntentSucceeded implements PaymentWebhookHandler, Applicatio
   private final String type = "payment_intent.succeeded";
 
   @Autowired
-  private UserRepository userRepository;
-
-  @Autowired
-  private OrderRepository orderRepository;
-
   private ApplicationEventPublisher publisher;
-
-  @Override
-  public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
-    this.publisher = publisher;
-  }
 
 	@Override
   @Transactional

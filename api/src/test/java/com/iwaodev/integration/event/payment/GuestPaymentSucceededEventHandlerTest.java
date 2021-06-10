@@ -140,7 +140,7 @@ public class GuestPaymentSucceededEventHandlerTest {
     
 
     // act & assert
-    this.handler.onApplicationEvent(new PaymentSucceededEvent(this, dummyPaymentIntentId, null));
+    this.handler.handleEvent(new PaymentSucceededEvent(this, dummyPaymentIntentId, null));
 
     logger.info("after finish the event handler");
     /**

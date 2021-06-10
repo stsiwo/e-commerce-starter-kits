@@ -8,10 +8,15 @@ import Typography from '@material-ui/core/Typography';
 import SentimentSatisfiedOutlinedIcon from '@material-ui/icons/SentimentSatisfiedOutlined';
 import { AxiosError } from 'axios';
 import { api } from 'configs/axiosConfig';
-import { useSnackbar } from 'notistack';
+import { UserType } from 'domain/user/types';
 import * as React from 'react';
-import { useDispatch } from 'react-redux';
-import { useLocation } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useHistory } from 'react-router';
+import { authActions, messageActions } from 'reducers/slices/app';
+import { mSelector } from 'src/selectors/selector';
+import { Link as RRLink } from "react-router-dom";
+import { getNanoId } from 'src/utils';
+import { MessageTypeEnum } from 'src/app';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -92,13 +97,12 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
   const classes = useStyles();
 
   const query = useQuery()
+  const history = useHistory()
+
+  const auth = useSelector(mSelector.makeAuthSelector())
 
   // dispatch
   const dispatch = useDispatch();
-
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
 
   const verificationToken = query.get("account-verify-token")
 
@@ -116,14 +120,14 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
   React.useEffect(() => {
 
     // make sure it is sent only once
-    if (curStatus === AccountVerifyStatusEnum.PROCESSING) {
+    if (auth.isLoggedIn && curStatus === AccountVerifyStatusEnum.PROCESSING) {
 
       console.log("make sure this only called once!")
 
       // request
       api.request({
         method: 'GET',
-        url: API1_URL + `/account-verify?account-verify-token=${verificationToken}`,
+        url: API1_URL + `/users/${auth.user.userId}/account-verify?account-verify-token=${verificationToken}`,
       }).then((data) => {
         /**
          *  verification sueceeded.
@@ -131,9 +135,11 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
         setStatus(AccountVerifyStatusEnum.SUCCEEDED)
 
         /**
-         * TODO: return updated user so dispatch an action to update auth.user
+         *  updated verified user status
          **/
-        enqueueSnackbar("verified successfully.", { variant: "success" })
+        const loggedVerifiedInUser: UserType = data.data;
+        dispatch(authActions.loginWithUser(loggedVerifiedInUser))
+
       }).catch((error: AxiosError) => {
 
         /**
@@ -148,11 +154,50 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
         } else {
           setStatus(AccountVerifyStatusEnum.FAILED_SINCE_OTHER_REASON)
         }
-
-        enqueueSnackbar(error.message, { variant: "error" })
       })
-
     }
+  }, [])
+
+  // reissue verification token event handler
+  const handleReissueToken = (e: React.MouseEvent<HTMLButtonElement>) => {
+
+    api.request({
+      method: 'POST',
+      url: API1_URL + `/users/${auth.user.userId}/reissue-account-verify`,
+    }).then((data) => {
+
+      /**
+       * update message
+       **/
+      dispatch(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.SUCCESS,
+          message: "we sent the verification email successfuly. please check your email box.",
+        })
+      )
+
+    }).catch((error: AxiosError) => {
+      /**
+       * update message
+       **/
+      dispatch(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.SUCCESS,
+          message: "sorry, we failed to send the verification email. please try again.",
+        })
+      )
+    })
+  }
+
+  // redirect if the user does not login.
+  React.useEffect(() => {
+
+    if (!auth.isLoggedIn) {
+      setStatus(AccountVerifyStatusEnum.FAILED_SINCE_NO_LOGIN)
+    }
+
   }, [])
 
   return (
@@ -181,7 +226,7 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
           <Typography variant="subtitle1" component="p" align="center" className={classes.title} >
             {"verified your account successfully."}
           </Typography>
-          <Button>
+          <Button component={RRLink} to="/">
             {"Visit Home"}
           </Button>
         </Box>
@@ -191,7 +236,7 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
           <Typography variant="subtitle1" component="p" align="center" className={classes.title} >
             {"seems like you are not logged in. please login first and click the link again."}
           </Typography>
-          <Button>
+          <Button component={RRLink} to="/login">
             {"Go to Login Page"}
           </Button>
         </Box>
@@ -201,8 +246,8 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
           <Typography variant="subtitle1" component="p" align="center" className={classes.title} >
             {"your verification token is invalid (e.g., expired or wrong value). please re-issue the token again. we will send the verification email again."}
           </Typography>
-          <Button>
-            {"Issue the Token Again"}
+          <Button onClick={handleReissueToken}>
+            {"Send the Verification Email Again"}
           </Button>
         </Box>
       )}
@@ -211,7 +256,7 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
           <Typography variant="subtitle1" component="p" align="center" className={classes.title} >
             {"we failed to process your request. please contact to our customer service."}
           </Typography>
-          <Button>
+          <Button component={RRLink} to="/contact">
             {"Go to Contact Form"}
           </Button>
         </Box>

@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -26,7 +27,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 @Service
-public class SendVerificationEmailEventHandler implements ApplicationListener<GeneratedVerificationTokenEvent> {
+public class SendVerificationEmailEventHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(SendVerificationEmailEventHandler.class);
 
@@ -47,9 +48,9 @@ public class SendVerificationEmailEventHandler implements ApplicationListener<Ge
     this.clientSpaConfig = clientSpaConfig;
   }
 
-  @Override
-  @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-  public void onApplicationEvent(GeneratedVerificationTokenEvent event) {
+  @Async
+  @TransactionalEventListener
+  public void handleEvent(GeneratedVerificationTokenEvent event) {
 
     logger.info("start handleSendVerificationEmailEventHandler");
     logger.info(Thread.currentThread().getName());
@@ -90,6 +91,5 @@ public class SendVerificationEmailEventHandler implements ApplicationListener<Ge
       logger.info(e.getMessage());
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
-
   }
 }

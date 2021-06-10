@@ -17,7 +17,7 @@ module.exports = merge(common, {
     new webpack.DefinePlugin({
       NODE_ENV: JSON.stringify("production"),
       CHECKOUT_SESSION_TIMEOUT: JSON.stringify("600000"), // 10 mins
-      API1_URL: JSON.stringify("http://localhost:8080"),
+      API1_URL: JSON.stringify("https://api.iwaodev.com"),
     })
   ],
   optimization: {

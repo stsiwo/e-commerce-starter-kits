@@ -145,7 +145,7 @@ public class GuestPaymentFailedEventHandlerTest {
     
 
     // act & assert
-    this.handler.onApplicationEvent(new PaymentFailedEvent(this, dummyPaymentIntentId));
+    this.handler.handleEvent(new PaymentFailedEvent(this, dummyPaymentIntentId));
 
     logger.info("after finish the event handler");
     /**

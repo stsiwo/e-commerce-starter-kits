@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import com.iwaodev.domain.user.UserActiveEnum;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -24,6 +26,8 @@ public class UserDTO {
   private String avatarImagePath;
 
   private UserTypeDTO userType;
+
+  private UserActiveEnum active;
 }
 
 

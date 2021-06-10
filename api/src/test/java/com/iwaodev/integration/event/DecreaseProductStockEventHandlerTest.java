@@ -149,7 +149,7 @@ public class DecreaseProductStockEventHandlerTest {
     };
 
     // act & assert
-    this.handler.onApplicationEvent(new OrderFinalConfirmedEvent(this, dummyOrder, dummyCustomerId, UserTypeEnum.MEMBER));
+    this.handler.handleEvent(new OrderFinalConfirmedEvent(this, dummyOrder, dummyCustomerId, UserTypeEnum.MEMBER));
 
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.
@@ -183,7 +183,7 @@ public class DecreaseProductStockEventHandlerTest {
 
     // act & assert
     assertThatThrownBy(() -> {
-      this.handler.onApplicationEvent(new OrderFinalConfirmedEvent(this, dummyOrder, dummyCustomerId, UserTypeEnum.MEMBER));
+      this.handler.handleEvent(new OrderFinalConfirmedEvent(this, dummyOrder, dummyCustomerId, UserTypeEnum.MEMBER));
     }).isInstanceOf(ResponseStatusException.class);
 
     /**

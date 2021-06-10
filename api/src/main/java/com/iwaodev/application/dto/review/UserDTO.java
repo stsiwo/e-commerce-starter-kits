@@ -2,6 +2,8 @@ package com.iwaodev.application.dto.review;
 
 import java.util.UUID;
 
+import com.iwaodev.domain.user.UserActiveEnum;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -22,6 +24,8 @@ public class UserDTO {
   private String avatarImagePath;
 
   private UserTypeDTO userType;
+
+  private UserActiveEnum active;
 }
 
 

@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificationExecutor<User> {
+public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificationExecutor<User>, AdvanceUserRepository {
 
   /**
    * - nativeQuery: use row SQL statement. (not JPQL)
@@ -21,6 +21,10 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
 
   @Query(value = "SELECT * FROM users u WHERE u.email = ?1", nativeQuery = true)
   User findByEmail(String email);
+
+  // use this instead of above
+  @Query(value = "SELECT u FROM users u WHERE u.email = ?1")
+  Optional<User> getByEmail(String email);
 
   @Query(value = "SELECT ut.user_type FROM user_types ut INNER JOIN users u ON u.user_type_id = ut.user_type_id WHERE u.email = ?1", nativeQuery = true)
   String getUserRole(String email);

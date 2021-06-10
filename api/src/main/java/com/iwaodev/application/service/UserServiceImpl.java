@@ -26,17 +26,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
-public class UserServiceImpl implements UserService, ApplicationEventPublisherAware {
+@Transactional
+public class UserServiceImpl implements UserService {
 
   private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
@@ -50,6 +51,7 @@ public class UserServiceImpl implements UserService, ApplicationEventPublisherAw
 
   private String avatarImageName;
 
+  @Autowired
   private ApplicationEventPublisher publisher;
 
   @Autowired
@@ -61,11 +63,6 @@ public class UserServiceImpl implements UserService, ApplicationEventPublisherAw
     this.fileService = fileService;
     this.userFilePath = userFilePath;
     this.avatarImageName = avatarImageName;
-  }
-
-  @Override
-  public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
-    this.publisher = publisher;
   }
 
   public Page<UserDTO> getAll(UserQueryStringCriteria criteria, Integer page, Integer limit, UserSortEnum sort) {

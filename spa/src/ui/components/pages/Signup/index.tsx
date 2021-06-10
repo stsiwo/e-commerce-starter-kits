@@ -15,9 +15,12 @@ import { api } from 'configs/axiosConfig';
 import { useDispatch } from 'react-redux';
 import { useSnackbar } from 'notistack';
 import { UserType } from 'domain/user/types';
-import { authActions } from 'reducers/slices/app';
+import { authActions, messageActions } from 'reducers/slices/app';
 import { AxiosError } from 'axios';
 import omit from 'lodash/omit';
+import { useHistory } from 'react-router';
+import { getNanoId } from 'src/utils';
+import { MessageTypeEnum } from 'src/app';
 
 export declare type MemberSignupDataType = {
   firstName: string
@@ -89,9 +92,8 @@ const Signup: React.FunctionComponent<{}> = (props) => {
   // dispatch
   const dispatch = useDispatch();
 
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
+  // history
+  const history = useHistory();
 
   // temp user account state
   const [curMemberSignupState, setMemberSignupState] = React.useState<MemberSignupDataType>(defaultMemberSignupData);
@@ -176,15 +178,29 @@ const Signup: React.FunctionComponent<{}> = (props) => {
         url: API1_URL + `/signup`,
         data: omit(curMemberSignupState, "confirm"),
       }).then((data) => {
+        console.log("signup success response");
+        console.log(data)
+        console.log(data.data.user)
         /**
          *  add new phone
          **/
-        const loggedInUser: UserType = data.data;
+        const loggedInUser: UserType = data.data.user;
         dispatch(authActions.loginWithUser(loggedInUser))
 
-        enqueueSnackbar("added successfully.", { variant: "success" })
+        // move to email verification page
+        history.push("/email-verification")
+
       }).catch((error: AxiosError) => {
-        enqueueSnackbar(error.message, { variant: "error" })
+        /**
+         * update message
+         **/
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.ERROR,
+            message: "sorry, we failed to sign you up. please try again.",
+          })
+        )
       })
 
     } else {

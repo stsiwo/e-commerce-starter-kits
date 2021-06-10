@@ -22,7 +22,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
-public class AddSoldCountEventHandler implements ApplicationListener<CompletedOrderPaymentEvent> {
+public class AddSoldCountEventHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(AddSoldCountEventHandler.class);
 
@@ -33,9 +33,8 @@ public class AddSoldCountEventHandler implements ApplicationListener<CompletedOr
     this.productRepository = productRepository;
   }
 
-  @Override
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-  public void onApplicationEvent(CompletedOrderPaymentEvent event) {
+  public void handleEvent(CompletedOrderPaymentEvent event) {
 
     logger.info("start handleAddSoldCountEventHandler");
     logger.info(Thread.currentThread().getName());

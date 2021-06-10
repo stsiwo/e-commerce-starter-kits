@@ -24,7 +24,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
-public class DecreaseProductStockEventHandler implements ApplicationListener<OrderFinalConfirmedEvent> {
+public class DecreaseProductStockEventHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(DecreaseProductStockEventHandler.class);
 
@@ -34,9 +34,8 @@ public class DecreaseProductStockEventHandler implements ApplicationListener<Ord
   @Autowired
   private ExceptionMessenger ExceptionMessenger;
 
-  @Override
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-  public void onApplicationEvent(OrderFinalConfirmedEvent event) {
+  public void handleEvent(OrderFinalConfirmedEvent event) {
 
     logger.info("start handleOrderFinalConfirmedEventHandler");
     logger.info(Thread.currentThread().getName());

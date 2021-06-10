@@ -1,12 +1,17 @@
 package com.iwaodev;
 
+import java.util.Properties;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
+import com.iwaodev.config.MailConfig;
 import com.iwaodev.infrastructure.shipping.ShippingApiRequestInterceptor;
 import com.stripe.Stripe;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -17,6 +22,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.event.EventListener;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.client.RestTemplate;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
@@ -27,11 +34,16 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
 // "classpath:myapp-${environment.type}.properties")
 public class Application {
 
+  private static final Logger logger = LoggerFactory.getLogger(Application.class);
+
   @Value("${stripe.apiKey}")
   private String stripeApiKey;
 
   @Autowired
   private ShippingApiRequestInterceptor shippingApiRequestInterceptor;
+
+  @Autowired
+  private MailConfig mailConfig;
 
   public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
@@ -133,7 +145,10 @@ public class Application {
   /**
    * email template resolver (HTML)
    *
-   * put @Primary since 'No qualifying bean of type 'org.thymeleaf.templateresolver.ITemplateResolver' available: expected single matching bean but found 2: thymeleafTemplateResolver,defaultTemplateResolver'.
+   * put @Primary since 'No qualifying bean of type
+   * 'org.thymeleaf.templateresolver.ITemplateResolver' available: expected single
+   * matching bean but found 2:
+   * thymeleafTemplateResolver,defaultTemplateResolver'.
    *
    **/
   @Bean
@@ -198,4 +213,29 @@ public class Application {
 
   // };
   // }
+
+  /**
+   * mail
+   **/
+  @Bean
+  public JavaMailSender getJavaMailSender() {
+    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+
+    logger.info("mail service config");
+    logger.info("smtp name: " + this.mailConfig.getHost());
+    logger.info("is starttls enable: " + this.mailConfig.getIsStartTlsEnable());
+
+    mailSender.setHost(this.mailConfig.getHost());
+    mailSender.setPort(this.mailConfig.getPort());
+    mailSender.setUsername(this.mailConfig.getUserName());
+    mailSender.setPassword(this.mailConfig.getPassword());
+
+    Properties props = mailSender.getJavaMailProperties();
+    props.put("mail.transport.protocol", "smtp");
+    props.put("mail.smtp.auth", this.mailConfig.getIsSmtpAuth());
+    props.put("mail.smtp.starttls.enable", this.mailConfig.getIsStartTlsEnable());
+    props.put("mail.debug", "true");
+
+    return mailSender;
+  }
 }

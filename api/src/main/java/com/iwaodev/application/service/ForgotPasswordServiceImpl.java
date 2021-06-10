@@ -12,10 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
@@ -23,7 +23,8 @@ import org.springframework.web.server.ResponseStatusException;
  **/
 
 @Service
-public class ForgotPasswordServiceImpl implements ForgotPasswordService, ApplicationEventPublisherAware {
+@Transactional
+public class ForgotPasswordServiceImpl implements ForgotPasswordService {
 
   private static final Logger logger = LoggerFactory.getLogger(ForgotPasswordServiceImpl.class);
 
@@ -33,25 +34,28 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService, Applica
   @Autowired
   private PasswordEncoder passwordEncoder;
 
+  @Autowired
   private ApplicationEventPublisher publisher;
-
-  @Override
-  public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
-    this.publisher = publisher;
-  }
 
   @Override
   public void requestForgotPassword(String email) {
 
     // find the user by this email
-    User targetUser = this.userRepository.findByEmail(email);
+    Optional<User> targetUserOption = this.userRepository.getByEmail(email);
 
-    if (targetUser != null) {
+    logger.info("forgot password user? null?");
+    logger.info("" + targetUserOption.isEmpty());
+
+    if (!targetUserOption.isEmpty()) {
+      logger.info("target forgot password user exist");
+
+      User targetUser = targetUserOption.get();
 
       targetUser.refreshForgotPasswordToken();
 
       User savedUser = this.userRepository.save(targetUser);
 
+      logger.info("publish forgot password event");
       this.publisher.publishEvent(new GeneratedForgotPasswordTokenEvent(this, savedUser));
     }
   }
@@ -63,6 +67,10 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService, Applica
     Optional<User> targetUserOption = this.userRepository.findByForgotPasswordToken(criteria.getToken());
 
     if (targetUserOption.isEmpty()) {
+      /**
+       * true message is 'the given user does not exist' but to improve the security, we hide the message and return the below message instead.
+       * 
+       **/
       logger.info("the reset password token is not valid.");
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the reset password token is not valid.");
     }

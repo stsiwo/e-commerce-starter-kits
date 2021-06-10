@@ -7,8 +7,8 @@ import com.stripe.model.StripeObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
  **/
 
 @Component
-public class PaymentIntentPaymentFailed implements PaymentWebhookHandler, ApplicationEventPublisherAware {
+public class PaymentIntentPaymentFailed implements PaymentWebhookHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(PaymentIntentPaymentFailed.class);
   /**
@@ -28,12 +28,8 @@ public class PaymentIntentPaymentFailed implements PaymentWebhookHandler, Applic
    **/
   private final String type = "payment_intent.payment_failed";
 
+  @Autowired
   private ApplicationEventPublisher publisher;
-
-  @Override
-  public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
-    this.publisher = publisher;
-  }
 
   @Override
   @Transactional

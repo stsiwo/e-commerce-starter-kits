@@ -1,22 +1,5 @@
 package com.iwaodev.unit.application.event.order;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import com.iwaodev.application.irepository.OrderRepository;
-import com.iwaodev.domain.order.event.OrderFinalConfirmedEvent;
-import com.iwaodev.infrastructure.model.Order;
-
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.test.context.ActiveProfiles;
-
 //@SpringBootTest
 //@ActiveProfiles("unittest")
 //public class OrderFinalConfirmedEventHandlerTest {

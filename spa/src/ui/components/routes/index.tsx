@@ -25,6 +25,7 @@ import Order from 'components/pages/Order';
 import AccountVerify from 'components/pages/AccountVerify';
 import ResetPassword from 'components/pages/ResetPassword';
 import Orders from 'components/pages/Orders';
+import EmailVerification from 'components/pages/EmailVerification';
 
 // route data
 export declare type RouteDataType = {
@@ -85,8 +86,14 @@ export const routesData: RoutesDataType = {
       component: withBasePage(Order),
     },
     {
+      // page after temp user click the link from verification email 
       url: "/account-verify",
       component: withBasePage(AccountVerify),
+    },
+    {
+      // page for after signup to let the user know that verification is sent
+      url: "/email-verification",
+      component: withBasePage(EmailVerification),
     },
   ],
   // define admin only page

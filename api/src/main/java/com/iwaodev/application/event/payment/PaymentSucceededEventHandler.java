@@ -28,7 +28,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
-public class PaymentSucceededEventHandler implements ApplicationListener<PaymentSucceededEvent> {
+public class PaymentSucceededEventHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(PaymentSucceededEventHandler.class);
 
@@ -46,9 +46,8 @@ public class PaymentSucceededEventHandler implements ApplicationListener<Payment
    *
    * 1. add an order event with PAID status.
    **/
-  @Override
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-  public void onApplicationEvent(PaymentSucceededEvent event) {
+  public void handleEvent(PaymentSucceededEvent event) {
     logger.info("PaymentSucceededEventHandler called.");
     logger.info(Thread.currentThread().getName());
 

@@ -19,7 +19,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
-public class CreateCartItemEventHandler implements ApplicationListener<MovedWishlistItemToCartItemEvent> {
+public class CreateCartItemEventHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(CreateCartItemEventHandler.class);
 
@@ -33,9 +33,8 @@ public class CreateCartItemEventHandler implements ApplicationListener<MovedWish
     this.userCartItemService = userCartItemService;
   }
 
-  @Override
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-  public void onApplicationEvent(MovedWishlistItemToCartItemEvent event) {
+  public void handleEvent(MovedWishlistItemToCartItemEvent event) {
 
     logger.info(Thread.currentThread().getName());
 

@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import com.iwaodev.domain.user.UserActiveEnum;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -29,6 +31,8 @@ public class UserDTO {
 
   private UserTypeDTO userType;
 
+  private UserActiveEnum active;
+
   private LocalDateTime createdAt;
 
   private LocalDateTime updatedAt;
@@ -48,4 +52,8 @@ public class UserDTO {
   // private List<OrderDTO> orders;
 
   private List<CompanyDTO> companies;
+
+  private LocalDateTime verificationTokenExpiryDate;
+
+  private LocalDateTime forgotPasswordTokenExpiryDate;
 }

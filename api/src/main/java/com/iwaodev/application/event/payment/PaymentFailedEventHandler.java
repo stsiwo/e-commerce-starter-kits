@@ -30,7 +30,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
-public class PaymentFailedEventHandler implements ApplicationListener<PaymentFailedEvent> {
+public class PaymentFailedEventHandler{
 
   private static final Logger logger = LoggerFactory.getLogger(PaymentFailedEventHandler.class);
 
@@ -58,9 +58,8 @@ public class PaymentFailedEventHandler implements ApplicationListener<PaymentFai
    * 1. add an order event with PAYMENT_FAILED status.
    * 2. restore the product stock.
    **/
-  @Override
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-  public void onApplicationEvent(PaymentFailedEvent event) {
+  public void handleEvent(PaymentFailedEvent event) {
     logger.info("start handling PaymentFailedEventHandler");
     logger.info(Thread.currentThread().getName());
 

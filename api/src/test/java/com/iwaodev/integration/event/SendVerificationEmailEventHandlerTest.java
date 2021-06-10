@@ -146,7 +146,7 @@ public class SendVerificationEmailEventHandlerTest {
     User dummyUser = dummyUserOption.get();
 
     // act & assert
-    this.handler.onApplicationEvent(new GeneratedVerificationTokenEvent(this, dummyUser));
+    this.handler.handleEvent(new GeneratedVerificationTokenEvent(this, dummyUser));
 
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.

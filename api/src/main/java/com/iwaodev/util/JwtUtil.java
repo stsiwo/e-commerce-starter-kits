@@ -48,6 +48,12 @@ public class JwtUtil {
     return createToken(claims, userDetails.getUsername());
   }
 
+  public String generateToken(String userName) {
+    Map<String, Object> claims = new HashMap<>();
+    // use getUsername to retrieve the email address of the user
+    return createToken(claims, userName);
+  }
+
   private String createToken(Map<String, Object> claims, String subject) {
     return Jwts.builder()
       .setClaims(claims)

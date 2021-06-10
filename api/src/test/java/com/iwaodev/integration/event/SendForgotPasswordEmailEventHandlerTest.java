@@ -144,7 +144,7 @@ public class SendForgotPasswordEmailEventHandlerTest {
     User dummyUser = dummyUserOption.get();
 
     // act & assert
-    this.handler.onApplicationEvent(new GeneratedForgotPasswordTokenEvent(this, dummyUser));
+    this.handler.handleEvent(new GeneratedForgotPasswordTokenEvent(this, dummyUser));
 
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.

@@ -50,7 +50,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -60,7 +59,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
-public class OrderServiceImpl implements OrderService, ApplicationEventPublisherAware {
+@Transactional
+public class OrderServiceImpl implements OrderService {
 
   private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
@@ -76,6 +76,7 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
 
   private OrderSpecificationFactory specificationFactory;
 
+  @Autowired
   private ApplicationEventPublisher publisher;
 
   private ExceptionMessenger exceptionMessenger;
@@ -95,11 +96,6 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
     this.specificationFactory = specificationFactory;
     this.exceptionMessenger = exceptionMessenger;
     this.orderEventService = orderEventService;
-  }
-
-  @Override
-  public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
-    this.publisher = publisher;
   }
 
   @Override
@@ -193,7 +189,6 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
    *
    **/
   @Override
-  @Transactional
   public PaymentIntentResponse createForMember(OrderCriteria criteria, UUID authUserId) {
 
     // prep input for the requst for stripe
@@ -284,7 +279,6 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
   }
 
   @Override
-  @Transactional
   public PaymentIntentResponse createForGuest(OrderCriteria criteria) {
     // prep input for the requst for stripe
     Order order = OrderMapper.INSTANCE.toOrderEntityFromOrderCriteria(criteria);
@@ -389,7 +383,6 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
   }
 
   @Override
-  @Transactional
   public OrderDTO addSessionTimeoutOrderEvent(UUID orderId, String orderNumber, UUID userId) {
 
     Order order = this.orderRepository.findByOrderIdAndOrderNumber(orderId, orderNumber)
@@ -708,7 +701,6 @@ public class OrderServiceImpl implements OrderService, ApplicationEventPublisher
      **/
   }
 
-  @Transactional
   @Override
   public void testEvent() {
     Order order = new Order();

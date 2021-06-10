@@ -32,13 +32,19 @@ const PageRoute: React.FunctionComponent<{}> = (props) => {
    *
    **/
   const history = useHistory()
-  const [curUrl, setUrl] = React.useState<string>("");
+  /**
+   * use 'location.pathname' for teh initial landing page. does not necessarily "/" if users visit another url.
+   *
+   **/
+  console.log("location variable")
+  console.log(location)
+  const [curUrl, setUrl] = React.useState<string>(location.pathname + location.search);
   const dispatch = useDispatch();
 
   React.useEffect(() => {
 
     return history.listen((location) => {
-      setUrl(location.pathname)
+      setUrl(location.pathname + location.search)
     })
 
   }, [history])

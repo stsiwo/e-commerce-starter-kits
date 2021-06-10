@@ -143,7 +143,7 @@ public class AssignStripeCustomerIdEventHandlerTest {
     String dummyStripeCustomerId = "dummy stripe customer id";
 
     // act & assert
-    this.handler.onApplicationEvent(new OrderFinalConfirmedEvent(this, dummyOrder, dummyStripeCustomerId, UserTypeEnum.MEMBER));
+    this.handler.handleEvent(new OrderFinalConfirmedEvent(this, dummyOrder, dummyStripeCustomerId, UserTypeEnum.MEMBER));
 
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.
@@ -173,7 +173,7 @@ public class AssignStripeCustomerIdEventHandlerTest {
     String dummyStripeCustomerId = "dummy stripe customer id";
 
     // act & assert
-    this.handler.onApplicationEvent(new OrderFinalConfirmedEvent(this, dummyOrder, dummyStripeCustomerId, UserTypeEnum.GUEST));
+    this.handler.handleEvent(new OrderFinalConfirmedEvent(this, dummyOrder, dummyStripeCustomerId, UserTypeEnum.GUEST));
 
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.

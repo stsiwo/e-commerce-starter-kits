@@ -65,4 +65,28 @@ public class UserTest {
       }
     }
   }
+
+  @Test
+  public void shouldNotExpiredVerificationToken() throws Exception {
+
+    // arrange
+    User dummyUser = new User("dummy", "dummy", "dummy@dummy.com", "dummy");
+    dummyUser.setVerificationTokenExpiryDate(LocalDateTime.now());
+
+    // act
+    // assert
+    assertThat(dummyUser.isVerificationTokenExpired()).isTrue();
+  }
+
+  @Test
+  public void shouldExpiredVerificationToken() throws Exception {
+
+    // arrange
+    User dummyUser = new User("dummy", "dummy", "dummy@dummy.com", "dummy");
+    dummyUser.setVerificationTokenExpiryDate(LocalDateTime.now().plusHours(1));
+
+    // act
+    // assert
+    assertThat(dummyUser.isVerificationTokenExpired()).isFalse();
+  }
 }

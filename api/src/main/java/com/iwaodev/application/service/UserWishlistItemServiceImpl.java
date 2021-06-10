@@ -32,16 +32,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
-public class UserWishlistItemServiceImpl implements UserWishlistItemService, ApplicationEventPublisherAware {
+@Transactional
+public class UserWishlistItemServiceImpl implements UserWishlistItemService {
 
   private static final Logger logger = LoggerFactory.getLogger(UserWishlistItemServiceImpl.class);
 
@@ -59,11 +60,6 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService, App
 
   @Autowired
   private ApplicationEventPublisher publisher;
-
-  @Override
-  public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
-    this.publisher = publisher;
-  }
 
   public Page<WishlistItemDTO> getAll(WishlistItemQueryStringCriteria criteria, Integer page, Integer limit,
       ProductSortEnum sort) {

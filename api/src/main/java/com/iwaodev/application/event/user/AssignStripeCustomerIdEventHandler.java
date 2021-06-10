@@ -14,7 +14,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
-public class AssignStripeCustomerIdEventHandler implements ApplicationListener<OrderFinalConfirmedEvent> {
+public class AssignStripeCustomerIdEventHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(AssignStripeCustomerIdEventHandler.class);
 
@@ -25,9 +25,8 @@ public class AssignStripeCustomerIdEventHandler implements ApplicationListener<O
     this.userRepository = userRepository;
   }
 
-  @Override
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-  public void onApplicationEvent(OrderFinalConfirmedEvent event) {
+  public void handleEvent(OrderFinalConfirmedEvent event) {
 
     logger.info("start handleOrderFinalConfirmedEventHandler");
     logger.info(Thread.currentThread().getName());

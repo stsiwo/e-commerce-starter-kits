@@ -158,6 +158,12 @@
 
     - ref: https://stackoverflow.com/questions/21800726/using-spring-mvc-test-to-unit-test-multipart-post-request
 
+  ## Spring Events (ApplicationEventPublisher & ApplicationEvent & @EventListener/@TransctionalEventListener)
+
+    ### IMPORTANT NOTE
+
+      - must wrap with @Transactional for the calling function (e.g., serviceImpl) if you use @TransactionalEventListener.
+
 # Spring Security
 
   - WebSecurityConfigurerAdapter class

@@ -1,7 +1,5 @@
 package com.iwaodev.application.service;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 import com.iwaodev.application.dto.user.UserDTO;
@@ -9,35 +7,36 @@ import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.iservice.UserSignupService;
 import com.iwaodev.application.mapper.UserMapper;
 import com.iwaodev.domain.user.UserActiveEnum;
+import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.domain.user.event.GeneratedVerificationTokenEvent;
 import com.iwaodev.infrastructure.model.User;
+import com.iwaodev.infrastructure.model.UserType;
 import com.iwaodev.ui.criteria.UserSignupCriteria;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
-public class UserSignupServiceImpl implements UserSignupService, ApplicationEventPublisherAware {
+public class UserSignupServiceImpl implements UserSignupService {
 
   private static final Logger logger = LoggerFactory.getLogger(UserSignupServiceImpl.class);
 
   @Autowired
   private UserRepository repository;
 
-  private ApplicationEventPublisher publisher;
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
-  @Override
-  public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
-    this.publisher = publisher;
-  }
+  @Autowired
+  private ApplicationEventPublisher publisher;
 
   public UserDTO signup(UserSignupCriteria criteria) {
 
@@ -53,6 +52,13 @@ public class UserSignupServiceImpl implements UserSignupService, ApplicationEven
 
     // map request criteria to entity
     User targetEntity = UserMapper.INSTANCE.toUserEntityFromUserSignupCriteria(criteria);
+
+    // assign user type
+    UserType memberType = this.repository.findUserType(UserTypeEnum.MEMBER).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "user type not found (type: MEMBER)"));
+    targetEntity.setUserType(memberType);
+
+    // set bcrypted password
+    targetEntity.setPassword(this.passwordEncoder.encode(criteria.getPassword()));
 
     // set active to temp'
     targetEntity.setActive(UserActiveEnum.TEMP);
@@ -78,9 +84,12 @@ public class UserSignupServiceImpl implements UserSignupService, ApplicationEven
   @Override
   public UserDTO verifyAccount(UUID userId, String verificationToken) {
 
-    Optional<User> targetUserOption = this.repository.findById(userId);
+    User targetUser = this.repository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "the user not found (id: " + userId.toString() + ")"));
 
-    User targetUser = targetUserOption.get();
+    if (targetUser.isActive()) {
+      logger.info("your account is already verified.");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "your account is already verified.");
+    }
 
     if (!targetUser.verifyVerificationToken(verificationToken)) {
       logger.info("verification token is invalid because of wrong value or expired.");
@@ -98,9 +107,8 @@ public class UserSignupServiceImpl implements UserSignupService, ApplicationEven
   @Override
   public UserDTO reissueVerification(UUID userId) {
 
-    Optional<User> targetUserOption = this.repository.findById(userId);
 
-    User targetUser = targetUserOption.get();
+    User targetUser = this.repository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "the user not found (id: " + userId.toString() + ")"));
 
     if (targetUser.isActive()) {
       logger.info("your account is already verified.");

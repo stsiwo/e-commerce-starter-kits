@@ -134,7 +134,7 @@ public class AddSoldCountEventHandlerTest {
     Order dummyOrder = dummyOrderOption.get();
 
     // act & assert
-    this.handler.onApplicationEvent(new CompletedOrderPaymentEvent(this, dummyOrder));
+    this.handler.handleEvent(new CompletedOrderPaymentEvent(this, dummyOrder));
 
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.

@@ -18,7 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -27,7 +29,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 @Service
-public class SendForgotPasswordEmailEventHandler implements ApplicationListener<GeneratedForgotPasswordTokenEvent> {
+public class SendForgotPasswordEmailEventHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(SendForgotPasswordEmailEventHandler.class);
 
@@ -48,9 +50,9 @@ public class SendForgotPasswordEmailEventHandler implements ApplicationListener<
     this.clientSpaConfig = clientSpaConfig;
   }
 
-  @Override
-  @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-  public void onApplicationEvent(GeneratedForgotPasswordTokenEvent event) {
+  @Async
+  @TransactionalEventListener
+  public void handleEvent(GeneratedForgotPasswordTokenEvent event) {
 
     logger.info("start handleSendForgotPasswordEmailEventHandler");
     logger.info(Thread.currentThread().getName());

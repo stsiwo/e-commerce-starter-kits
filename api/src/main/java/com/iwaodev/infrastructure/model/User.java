@@ -471,6 +471,9 @@ public class User {
     // 1 hour
     LocalDateTime oneHourAfterDateTime = LocalDateTime.now().plusHours(1L);
 
+    logger.info("verification token expiry date: ");
+    logger.info(oneHourAfterDateTime.toString());
+
     this.setVerificationToken(token);
     this.setVerificationTokenExpiryDate(oneHourAfterDateTime);
   }
