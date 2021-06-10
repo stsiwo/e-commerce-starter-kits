@@ -1,6 +1,7 @@
 import Grid from '@material-ui/core/Grid';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import ReceiptIcon from '@material-ui/icons/Receipt';
 import OrderTimeline from 'components/common/OrderTimeline';
@@ -12,6 +13,12 @@ import { UserTypeEnum } from 'src/app';
 import OrderDetail from 'components/common/OrderDetail';
 import PhoneCard from 'components/pages/Admin/AdminOrder/AdminOrderForm/PhoneCard';
 import AddressCard from 'components/pages/Admin/AdminOrder/AdminOrderForm/AddressCard';
+import { useSelector } from 'react-redux';
+import { mSelector } from 'src/selectors/selector';
+import IconButton from '@material-ui/core/IconButton';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import { useHistory } from 'react-router';
 
 interface OrderFormPropsType {
   order: OrderType
@@ -50,6 +57,30 @@ const OrderForm: React.FunctionComponent<OrderFormPropsType> = (props) => {
 
   // mui: makeStyles
   const classes = useStyles();
+
+  const auth = useSelector(mSelector.makeAuthSelector())
+
+  const history = useHistory()
+
+  /**
+   * account menu stuff
+   **/
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleMenuOpenClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  /**
+   * review management stuff
+   **/
+  const handleReviewClick = (e: React.MouseEvent<HTMLElement>, productId: string, userId: string) => {
+    history.push(`/review?productId=${productId}&userId=${userId}`)
+  }
 
   return (
     <Grid
@@ -127,7 +158,28 @@ const OrderForm: React.FunctionComponent<OrderFormPropsType> = (props) => {
         </Typography>
         {
           props.order.orderDetails.map((orderDetail: OrderDetailType, index: number) => (
-            <ProductHorizontalCard orderDetail={orderDetail} key={index} />
+            <ProductHorizontalCard 
+              orderDetail={orderDetail} 
+              product={orderDetail.product} 
+              key={index} 
+              // order detail might not have product since product already removed.
+              menu={ orderDetail.product ?
+                <React.Fragment>
+                  <IconButton aria-label="settings" onClick={handleMenuOpenClick}>
+                    <MoreVertIcon />
+                  </IconButton>
+                  <Menu
+                    id="product-horizontal-card-more-menu"
+                    anchorEl={anchorEl}
+                    keepMounted
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                  >
+                    <MenuItem onClick={(e) => handleReviewClick(e, orderDetail.product.productId, auth.user.userId)}>Manage Review</MenuItem>
+                  </Menu>
+                </React.Fragment>
+              : null}
+            />
           ))
         }
       </Grid>

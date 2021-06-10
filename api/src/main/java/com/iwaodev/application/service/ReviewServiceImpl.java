@@ -1,49 +1,35 @@
 package com.iwaodev.application.service;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 
-import com.iwaodev.application.dto.product.ProductDTO;
+import com.iwaodev.application.dto.review.FindReviewDTO;
 import com.iwaodev.application.dto.review.ReviewDTO;
 import com.iwaodev.application.irepository.ProductRepository;
 import com.iwaodev.application.irepository.ReviewRepository;
 import com.iwaodev.application.irepository.UserRepository;
-import com.iwaodev.application.iservice.FileService;
-import com.iwaodev.application.iservice.ProductService;
 import com.iwaodev.application.iservice.ReviewService;
 import com.iwaodev.application.mapper.ProductMapper;
 import com.iwaodev.application.mapper.ReviewMapper;
-import com.iwaodev.application.specification.factory.ProductSpecificationFactory;
+import com.iwaodev.application.mapper.UserMapper;
 import com.iwaodev.application.specification.factory.ReviewSpecificationFactory;
-import com.iwaodev.domain.product.ProductSortEnum;
 import com.iwaodev.domain.review.ReviewSortEnum;
-import com.iwaodev.infrastructure.model.Phone;
 import com.iwaodev.infrastructure.model.Product;
-import com.iwaodev.infrastructure.model.ProductImage;
 import com.iwaodev.infrastructure.model.Review;
 import com.iwaodev.infrastructure.model.User;
-import com.iwaodev.ui.criteria.ProductCriteria;
-import com.iwaodev.ui.criteria.ProductImageCriteria;
-import com.iwaodev.ui.criteria.UserDeleteTempCriteria;
 import com.iwaodev.ui.criteria.review.ReviewCriteria;
 import com.iwaodev.ui.criteria.review.ReviewQueryStringCriteria;
-import com.iwaodev.ui.criteria.ProductQueryStringCriteria;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -61,19 +47,15 @@ public class ReviewServiceImpl implements ReviewService {
   private ReviewSpecificationFactory specificationFactory;
 
   @Autowired
-  public ReviewServiceImpl(ReviewRepository repository, 
-      UserRepository userRepository,
-      ProductRepository productRepository,
-      ReviewSpecificationFactory specificationFactory
-      ) {
+  public ReviewServiceImpl(ReviewRepository repository, UserRepository userRepository,
+      ProductRepository productRepository, ReviewSpecificationFactory specificationFactory) {
     this.repository = repository;
     this.userRepository = userRepository;
     this.productRepository = productRepository;
     this.specificationFactory = specificationFactory;
   }
 
-  public Page<ReviewDTO> getAll(ReviewQueryStringCriteria criteria, Integer page, Integer limit,
-      ReviewSortEnum sort) {
+  public Page<ReviewDTO> getAll(ReviewQueryStringCriteria criteria, Integer page, Integer limit, ReviewSortEnum sort) {
 
     // get result with repository
     // and map entity to dto with MapStruct
@@ -97,7 +79,7 @@ public class ReviewServiceImpl implements ReviewService {
       return Sort.by("createdAt").ascending();
     } else if (sortEnum == ReviewSortEnum.REVIEW_POINT_ASC) {
       return Sort.by("reviewPoint").ascending();
-    } else { 
+    } else {
       return Sort.by("reviewPoint").descending();
     }
   }
@@ -121,7 +103,8 @@ public class ReviewServiceImpl implements ReviewService {
   @Override
   public ReviewDTO create(ReviewCriteria criteria) {
 
-    // if the review already exist, reject. (must be unique about user_id & product_id combination)
+    // if the review already exist, reject. (must be unique about user_id &
+    // product_id combination)
     if (!this.repository.isExist(criteria.getUserId(), criteria.getProductId()).isEmpty()) {
       // user not found so return error
       logger.info("the given review already exist.");
@@ -201,5 +184,34 @@ public class ReviewServiceImpl implements ReviewService {
       this.repository.delete(targetEntity);
     }
   }
-}
 
+  @Override
+  public FindReviewDTO findByUserIdAndProductId(UUID userId, UUID productId) {
+
+    logger.info("before user find");
+
+    User user = this.userRepository.findById(userId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found."));
+
+    Product product = this.productRepository.findById(productId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "product not found."));
+
+    logger.info("before user find");
+    Optional<Review> reviewOption = this.repository.isExist(userId, productId);
+
+    FindReviewDTO findReviewDTO = new FindReviewDTO();
+
+    if (!reviewOption.isEmpty()) {
+      findReviewDTO.setIsExist(true);
+      findReviewDTO.setReview(ReviewMapper.INSTANCE.toReviewDTO(reviewOption.get()));
+    } else {
+      findReviewDTO.setIsExist(false);
+    }
+
+    findReviewDTO.setProduct(ReviewMapper.INSTANCE.toProductDTO(product));
+    findReviewDTO.setUser(ReviewMapper.INSTANCE.toUserDTO(user));
+
+    return findReviewDTO;
+
+  }
+}

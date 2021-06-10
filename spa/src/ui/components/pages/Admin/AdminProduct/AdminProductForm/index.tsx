@@ -104,13 +104,6 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
   // mui: makeStyles
   const classes = useStyles();
 
-  // auth
-  const auth = useSelector(mSelector.makeAuthSelector())
-
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
-
   const dispatch = useDispatch()
 
   /**

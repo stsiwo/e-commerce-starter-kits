@@ -6,8 +6,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import com.iwaodev.application.dto.order.OrderDTO;
+import com.iwaodev.application.dto.review.FindReviewDTO;
+import com.iwaodev.application.dto.review.ReviewDTO;
 import com.iwaodev.application.dto.user.UserDTO;
 import com.iwaodev.application.iservice.OrderService;
+import com.iwaodev.application.iservice.ReviewService;
 import com.iwaodev.application.iservice.UserService;
 import com.iwaodev.config.SpringSecurityUser;
 import com.iwaodev.domain.order.OrderSortEnum;
@@ -17,6 +20,7 @@ import com.iwaodev.ui.criteria.UserDeleteTempCriteria;
 import com.iwaodev.ui.criteria.UserQueryStringCriteria;
 import com.iwaodev.ui.criteria.order.OrderEventCriteria;
 import com.iwaodev.ui.criteria.order.OrderQueryStringCriteria;
+import com.iwaodev.ui.criteria.review.ReviewCriteria;
 import com.iwaodev.ui.response.BaseResponse;
 import com.iwaodev.ui.response.ImagePathResponse;
 
@@ -37,6 +41,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,6 +55,9 @@ public class UserController {
   private UserService service;
 
   private OrderService orderService;
+
+  @Autowired
+  private ReviewService reviewService;
 
   @Autowired
   public UserController(UserService service, OrderService orderService) {
@@ -168,11 +177,8 @@ public class UserController {
    **/
   @GetMapping("/users/{id}/orders/{orderId}")
   @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
-  public ResponseEntity<OrderDTO> getWithId(
-      @PathVariable(value = "id") UUID id,
-      @PathVariable(value = "orderId") UUID orderId,
-      @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+  public ResponseEntity<OrderDTO> getWithId(@PathVariable(value = "id") UUID id,
+      @PathVariable(value = "orderId") UUID orderId, @AuthenticationPrincipal SpringSecurityUser authUser) {
     return new ResponseEntity<>(this.orderService.getByIdAndUserId(orderId, id), HttpStatus.OK);
   }
 
@@ -197,5 +203,67 @@ public class UserController {
       @AuthenticationPrincipal SpringSecurityUser authUser) {
 
     return new ResponseEntity<>(this.orderService.addOrderEventByMember(orderId, criteria), HttpStatus.OK);
+  }
+
+  /**
+   * find review of this user with productId
+   *
+   * - use to manage a review of a member user
+   *
+   * - need to return its user and product if the review does not exist.
+   *
+   **/
+  @GetMapping(value = "/users/{id}/review")
+  @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
+  public ResponseEntity<FindReviewDTO> findReviewByUserIdAndProductId(@PathVariable(value = "id") UUID id,
+      @RequestParam(value = "productId", required = true) UUID productId,
+      @AuthenticationPrincipal SpringSecurityUser authUser) {
+
+      logger.info("userId " + id.toString());
+      logger.info("productId " + productId.toString());
+
+    return new ResponseEntity<>(this.reviewService.findByUserIdAndProductId(id, productId), HttpStatus.OK);
+  }
+
+  /**
+   * create/update review
+   * 
+   **/
+  // create a new review
+  @RequestMapping(value = "/users/{id}/reviews", method = RequestMethod.POST)
+  @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
+  public ResponseEntity<ReviewDTO> post(
+      @PathVariable(value = "id") UUID id,
+      @Valid @RequestBody ReviewCriteria criteria,
+      @AuthenticationPrincipal SpringSecurityUser authUser
+      ) {
+    logger.info("start handling at /reviews POST");
+    return new ResponseEntity<>(this.reviewService.create(criteria), HttpStatus.OK);
+  }
+
+  // update/replace a new review
+  @RequestMapping(value = "/users/{id}/reviews/{reviewId}", method = RequestMethod.PUT)
+  @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
+  public ResponseEntity<ReviewDTO> put(
+      @PathVariable(value = "id") UUID id,
+      @PathVariable(value = "reviewId") Long reviewId,
+      @Valid @RequestBody ReviewCriteria criteria,
+      @AuthenticationPrincipal SpringSecurityUser authUser
+      ) {
+    logger.info("start handling at /reviews PUT");
+    return new ResponseEntity<>(this.reviewService.update(criteria, reviewId), HttpStatus.OK);
+  }
+
+  // delete a new review
+  @DeleteMapping("/users/{id}/reviews/{reviewId}")
+  @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
+  public ResponseEntity<BaseResponse> delete(
+      @PathVariable(value = "id") UUID id,
+      @PathVariable(value = "reviewId") Long reviewId,
+      @AuthenticationPrincipal SpringSecurityUser authUser
+      ) {
+    logger.info("start handling at /reviews DELETE");
+    this.reviewService.delete(reviewId);
+    return new ResponseEntity<>(new BaseResponse("successfuly deleted."), HttpStatus.OK);
   }
 }

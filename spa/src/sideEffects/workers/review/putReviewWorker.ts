@@ -75,6 +75,8 @@ export function* putReviewWorker(action: PayloadAction<PutReviewActionType>) {
         isVerified: action.payload.isVerified, // when member, this should be false. and when admin, this should be true 
         note: action.payload.note, // this should be only displayed on admin page
         reviewPoint: action.payload.reviewPoint,
+        productId: action.payload.productId,
+        userId: action.payload.userId,
       } as ReviewCriteria
     })
       .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))

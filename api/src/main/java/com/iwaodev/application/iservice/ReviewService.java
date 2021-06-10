@@ -2,6 +2,7 @@ package com.iwaodev.application.iservice;
 
 import java.util.UUID;
 
+import com.iwaodev.application.dto.review.FindReviewDTO;
 import com.iwaodev.application.dto.review.ReviewDTO;
 import com.iwaodev.domain.review.ReviewSortEnum;
 import com.iwaodev.ui.criteria.review.ReviewCriteria;
@@ -20,6 +21,8 @@ public interface ReviewService {
   public ReviewDTO update(ReviewCriteria criteria, Long id);
 
   public void delete(Long id);
+
+  public FindReviewDTO findByUserIdAndProductId(UUID userId, UUID productId);
 }
 
 

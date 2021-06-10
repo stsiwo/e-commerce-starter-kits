@@ -75,7 +75,7 @@ public class ReviewController {
 
   // create a new review
   @RequestMapping(value = "/reviews", method = RequestMethod.POST)
-  @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
+  @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #criteria.getUserId()") // to prevent a member from accessing another
   public ResponseEntity<ReviewDTO> post(
       @Valid @RequestBody ReviewCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
@@ -86,7 +86,7 @@ public class ReviewController {
 
   // update/replace a new review
   @RequestMapping(value = "/reviews/{id}", method = RequestMethod.PUT)
-  @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
+  @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #criteria.getUserId()") // to prevent a member from accessing another
   public ResponseEntity<ReviewDTO> put(
       @PathVariable(value = "id") Long id,
       @Valid @RequestBody ReviewCriteria criteria,
@@ -96,9 +96,17 @@ public class ReviewController {
     return new ResponseEntity<>(this.service.update(criteria, id), HttpStatus.OK);
   }
 
+  /**
+   * this does not work for member since no way to authenticate '@PreAuthorize'.
+   *
+   * it does not have any userId as criteria/input from client.
+   *
+   * workaround is to move this to userController. 
+   *
+   **/
   // delete a new review
   @DeleteMapping("/reviews/{id}")
-  @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
+  @PreAuthorize("hasRole('ROLE_ADMIN')") // to prevent a member from accessing another
   public ResponseEntity<BaseResponse> delete(
       @PathVariable(value = "id") Long id,
       @AuthenticationPrincipal SpringSecurityUser authUser

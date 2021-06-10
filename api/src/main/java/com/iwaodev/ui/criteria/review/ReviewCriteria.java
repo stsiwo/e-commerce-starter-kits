@@ -32,8 +32,10 @@ public class ReviewCriteria {
 
   private String note;
 
+  @NotNull(message = "product id can not be null.")
   private UUID productId;
 
+  @NotNull(message = "user id can not be null.")
   private UUID userId;
 }
 

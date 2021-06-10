@@ -11,6 +11,11 @@ import { OrderDetailType } from 'domain/order/types';
 import ColorCell from '../GridData/ColorCell';
 import SizeCell from '../GridData/SizeCell';
 import Box from '@material-ui/core/Box';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import { useSelector } from 'react-redux';
+import { mSelector } from 'src/selectors/selector';
+import { useHistory } from 'react-router';
 
 /**
  * need 'orderDetail' or 'product/variant'
@@ -20,6 +25,7 @@ interface ProductHorizontalCardPropsType {
   orderDetail?: OrderDetailType
   product?: ProductType
   variant?: ProductVariantType
+  menu?: React.ReactElement 
 }
 
 
@@ -58,16 +64,21 @@ const useStyles = makeStyles((theme: Theme) =>
 /**
  * member or admin account management component
  **/
-const ProductHorizontalCard: React.FunctionComponent<ProductHorizontalCardPropsType> = ({ orderDetail, product, variant }) => {
+const ProductHorizontalCard: React.FunctionComponent<ProductHorizontalCardPropsType> = ({ orderDetail, product, variant, menu }) => {
 
   // mui: makeStyles
   const classes = useStyles();
+
+  const history = useHistory()
+
+  const auth = useSelector(mSelector.makeAuthSelector());
 
   const productName = (product) ? product.productName : orderDetail.productName
   const productBaseUnitPrice = (product) ? product.productBaseUnitPrice : orderDetail.productUnitPrice
   const productColor = (variant) ? variant.variantColor : orderDetail.productColor
   const productSize = (variant) ? variant.productSize.productSizeName : orderDetail.productSize
 
+  console.log(menu)
 
   return (
     <Card className={`${classes.card} ${classes.root}`}>
@@ -80,9 +91,7 @@ const ProductHorizontalCard: React.FunctionComponent<ProductHorizontalCardPropsT
           <Box component="div" className={classes.actionBox}>
             <ColorCell value={productColor} />
             <SizeCell value={productSize} />
-            <IconButton aria-label="settings">
-              <MoreVertIcon />
-            </IconButton>
+            {menu}
           </Box>
         }
       >
