@@ -42,7 +42,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     // session filter (e.g., @Filter/@FilterDef) - reviews entity
     Session session = this.entityManager.unwrap(Session.class);
-    session.enableFilter("recipientIdFilter").setParameter("recipientId", userId);
+    session.enableFilter("recipientIdFilter").setParameter("recipientId", userId.toString());
 
     // get result with repository
     // and map entity to dto with MapStruct

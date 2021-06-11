@@ -4,11 +4,13 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+import com.iwaodev.infrastructure.model.listener.NotificationValidationListener;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Filter;
@@ -22,10 +24,11 @@ import lombok.ToString;
 
 @Data
 @ToString
+@EntityListeners(NotificationValidationListener.class)
 //@NoArgsConstructor // use custom noargsconstructor to assign nanoId
 @FilterDef(
     name = "recipientIdFilter",
-    parameters = @ParamDef(name = "recipientId", type = "UUID")
+    parameters = @ParamDef(name = "recipientId", type = "string")
 )
 @Filter(
     name = "recipientIdFilter",

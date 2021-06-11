@@ -36,11 +36,11 @@ public class NotificationType {
 
   @ManyToOne
   @JoinColumn(name = "issuer_type_id", insertable = true, updatable = true)
-  private UserType issuer;
+  private UserType issuerType;
 
   @ManyToOne
   @JoinColumn(name = "recipient_type_id", insertable = true, updatable = true)
-  private UserType recipient;
+  private UserType recipientType;
 
 }
 

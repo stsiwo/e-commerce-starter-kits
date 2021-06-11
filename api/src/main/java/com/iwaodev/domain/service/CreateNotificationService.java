@@ -8,10 +8,13 @@ import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.exception.DomainException;
 import com.iwaodev.exception.NotFoundException;
 import com.iwaodev.infrastructure.model.Notification;
+import com.iwaodev.infrastructure.model.User;
 
 public interface CreateNotificationService {
 
   public Notification create(NotificationTypeEnum notificationType, String description, UUID issuerId, UUID recipientId, String link, String note) throws DomainException, NotFoundException;
+
+  public Notification create(NotificationTypeEnum notificationType, String description, User issuer, User recipient, String link, String note) throws DomainException, NotFoundException;
 
   /**
    * batch creation of notification for a given user type.

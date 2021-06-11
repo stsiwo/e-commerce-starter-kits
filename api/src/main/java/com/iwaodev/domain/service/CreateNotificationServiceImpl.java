@@ -47,6 +47,7 @@ public class CreateNotificationServiceImpl implements CreateNotificationService 
 
   }
 
+  @Override
   public Notification create(NotificationTypeEnum notificationType, String description, User issuer, User recipient, String link, String note)
       throws DomainException, NotFoundException {
     // create notification
@@ -72,6 +73,7 @@ public class CreateNotificationServiceImpl implements CreateNotificationService 
 
     return notification;
   }
+
   @Override
   public List<Notification> createBatch(NotificationTypeEnum notificationType, String description, UUID issuerId, UserTypeEnum recipientType, String link,
       String note) throws DomainException, NotFoundException {
@@ -82,6 +84,8 @@ public class CreateNotificationServiceImpl implements CreateNotificationService 
     // get all user of the given user type
     List<User> recipientList = this.userRepository.findAvailableAllByType(recipientType);
 
+    logger.info("number of available user: " + recipientList.size());
+
     // get issuer reference
     User issuer = this.userRepository.findById(issuerId).orElseThrow(() -> new NotFoundException("issuer not found"));
 
@@ -90,7 +94,5 @@ public class CreateNotificationServiceImpl implements CreateNotificationService 
     }
 
     return notificationList;
-
   }
-
 }
