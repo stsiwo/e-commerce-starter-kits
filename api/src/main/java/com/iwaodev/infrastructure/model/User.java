@@ -154,6 +154,16 @@ public class User {
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
   private List<OrderEvent> orderEvents = new ArrayList<>();
 
+  // ignore this setter since need to customize for bidirectional relationship
+  @Setter( value = AccessLevel.NONE)
+  @OneToMany(mappedBy = "issuer", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Notification> issuedNotifications = new ArrayList<>();
+
+  // ignore this setter since need to customize for bidirectional relationship
+  @Setter( value = AccessLevel.NONE)
+  @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Notification> receivedNotifications = new ArrayList<>();
+
   // constructor
   public User(String firstName, String lastName, String email, String password) {
     this.firstName = firstName;
@@ -379,6 +389,42 @@ public class User {
   public void removeOrderEvent(OrderEvent orderEvent) {
     this.orderEvents.remove(orderEvent);
     orderEvent.setUser(null);
+  }
+
+  public void setIssuedNotifications(List<Notification> issuedNotifications) {
+    this.issuedNotifications = issuedNotifications;
+
+    for (Notification issuedNotification : issuedNotifications) {
+      issuedNotification.setIssuer(this);
+    }
+  }
+
+  public void addIssuedNotification(Notification issuedNotification) {
+    this.issuedNotifications.add(issuedNotification);
+    issuedNotification.setIssuer(this);
+  }
+
+  public void removeIssuedNotification(Notification issuedNotification) {
+    this.issuedNotifications.remove(issuedNotification);
+    issuedNotification.setIssuer(null);
+  }
+
+  public void setReceivedNotifications(List<Notification> receivedNotifications) {
+    this.receivedNotifications = receivedNotifications;
+
+    for (Notification receivedNotification : receivedNotifications) {
+      receivedNotification.setRecipient(this);
+    }
+  }
+
+  public void addReceivedNotification(Notification receivedNotification) {
+    this.receivedNotifications.add(receivedNotification);
+    receivedNotification.setRecipient(this);
+  }
+
+  public void removeReceivedNotification(Notification receivedNotification) {
+    this.receivedNotifications.remove(receivedNotification);
+    receivedNotification.setRecipient(null);
   }
 
   public boolean hasStripeCustomerId() {

@@ -1,8 +1,10 @@
 package com.iwaodev.application.irepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.infrastructure.model.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -45,6 +47,16 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
   // assuming there is only single admin user.
   @Query(value = "SELECT u FROM users u WHERE u.forgotPasswordToken = ?1")
   Optional<User> findByForgotPasswordToken(String token);
+
+  /**
+   * find all available users.
+   *
+   *  - 'is_deleted': false
+   *  - 'active': ACTIVE
+   *
+   **/
+  @Query(value = "SELECT u FROM users u INNER JOIN u.userType ut WHERE u.isDeleted = 0 and u.active = 'ACTIVE' and ut.userType = ?1")
+  List<User> findAvailableAllByType(UserTypeEnum userType);
 }
 
 
