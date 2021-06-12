@@ -20,6 +20,8 @@ import { AxiosError } from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import { mSelector } from 'src/selectors/selector';
+import { fetchNotificationActionCreator, incrementNotificationCurIndexActionCreator } from 'reducers/slices/domain/notification';
+import Badge from '@material-ui/core/Badge';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -51,7 +53,7 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
 
   // cart icon click
   const dispatch = useDispatch();
-  
+
   // history 
   const history = useHistory();
 
@@ -79,7 +81,7 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
     api.request({
       method: 'post',
       url: API1_URL + `/logout`,
-      data: null 
+      data: null
     }).then((data) => {
 
       // fetch again
@@ -95,6 +97,40 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
 
     handleMenuClose()
   }
+
+  /**
+   * notification feature.
+   **/
+  const curNotificationPagination = useSelector(mSelector.makeNotificationPaginationSelector())
+
+  // fetch notifcation for this member.
+  // - initial fetch (replace)
+  // - the next consecutive fetchs (concat)
+  const isInitial = React.useRef<boolean>(true);
+  React.useEffect(() => {
+    console.log("start fetching notification...")
+    if (isInitial.current) {
+      console.log("initial notification fetch with 'update'")
+      dispatch(
+        fetchNotificationActionCreator({ type: "update" })
+      )
+      isInitial.current = false
+    } else {
+      console.log("initial notification fetch with 'concat'")
+      dispatch(
+        fetchNotificationActionCreator({ type: "concat" })
+      )
+    }
+  }, [
+      curNotificationPagination.page
+    ])
+
+  const handleNotificationClick = (e: React.MouseEvent<HTMLElement>) => {
+    dispatch(
+      incrementNotificationCurIndexActionCreator()
+    )
+  }
+
 
   return (
     <AppBar position="sticky" className={classes.appBar}>
@@ -112,15 +148,20 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
             </Link>
           </Grid>
           <Grid item className={classes.gridItemRight}>
-            <Link color="inherit" component={RRLink} to="/">
-              <IconButton edge="start" color="inherit" aria-label="admin-menu-search">
+            <IconButton 
+              edge="start" 
+              color="inherit" 
+              aria-label="admin-menu-search"
+              onClick={handleNotificationClick}
+            >
+              <Badge badgeContent={curNotificationPagination.totalElements} color="error">
                 <NotificationsIcon />
-              </IconButton>
-            </Link>
-            <Avatar 
-              alt="Satoshi Iwao" 
+              </Badge>
+            </IconButton>
+            <Avatar
+              alt="Satoshi Iwao"
               className={classes.pointer}
-              src={auth.user.avatarImagePath ? API1_URL + auth.user.avatarImagePath : null} 
+              src={auth.user.avatarImagePath ? API1_URL + auth.user.avatarImagePath : null}
               onClick={handleMenuOpenClick}
             />
             <Menu

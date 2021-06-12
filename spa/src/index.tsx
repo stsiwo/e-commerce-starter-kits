@@ -18,21 +18,21 @@ const Index = (props: any) => {
 
   return (
     <React.Fragment>
-      <ThemeProvider theme={theme}>
-        {/** SnackbarProvider must be a child of ThemeProvider **/}
-        <SnackbarProvider maxSnack={3}>
-          <CssBaseline>
-            <Provider store={store}>
-              <Router>
+      <Router>
+        <ThemeProvider theme={theme}>
+          {/** SnackbarProvider must be a child of ThemeProvider **/}
+          <SnackbarProvider maxSnack={3}>
+            <CssBaseline>
+              <Provider store={store}>
                 <Content />
                 {/**(RoleSwitch &&
                   <RoleSwitch />
                 )**/}
-              </Router>
-            </Provider>
-          </CssBaseline>
-        </SnackbarProvider>
-      </ThemeProvider>
+              </Provider>
+            </CssBaseline>
+          </SnackbarProvider>
+        </ThemeProvider>
+      </Router>
     </React.Fragment>
   );
 };

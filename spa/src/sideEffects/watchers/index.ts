@@ -75,6 +75,10 @@ import { postWishlistItemWorker } from 'sideEffects/workers/wishlistItems/postWi
 import { fetchAuthOrderWorker } from 'sideEffects/workers/auth/fetchAuthOrderWorker';
 import { postAuthOrderEventWorker } from 'sideEffects/workers/auth/postAuthOrderEventWorker';
 import { fetchSingleAuthOrderWorker } from 'sideEffects/workers/auth/fetchSingleAuthOrderWorker';
+import { fetchNotificationActionTypeName, patchNotificationActionTypeName, incrementNotificationCurIndexActionTypeName } from 'reducers/slices/domain/notification';
+import { fetchNotificationWorker } from 'sideEffects/workers/notification/fetchNotificationWorker';
+import { patchNotificationWorker } from 'sideEffects/workers/notification/patchNotificationWorker';
+import { incrementNotificationCurIndexWorker } from 'sideEffects/workers/notification/incrementNotificationCurIndexWorker';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -546,6 +550,29 @@ export function* postAuthOrderEventWatcher() {
     postAuthOrderEventWorker,
   )
 }
+
+// notification
+export function* fetchNotificationWatcher() {
+  yield takeLatest(
+    fetchNotificationActionTypeName,
+    fetchNotificationWorker,
+  )
+}
+
+export function* patchNotificationWatcher() {
+  yield takeLatest(
+    patchNotificationActionTypeName,
+    patchNotificationWorker,
+  )
+}
+
+export function* incrementNotificationCurIndexWatcher() {
+  yield takeLatest(
+    incrementNotificationCurIndexActionTypeName,
+    incrementNotificationCurIndexWorker,
+  )
+}
+
 
 // cache
 export function* fetchProductWithCacheWatcher() {

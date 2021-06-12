@@ -1,5 +1,5 @@
 import { all, call, spawn } from 'redux-saga/effects';
-import { deleteAuthAddressWatcher, deleteAuthAvatarImageWatcher, deleteAuthPhoneWatcher, deleteCartItemWatcher, deleteSingleCartItemWatcher, deleteSingleCategoryWatcher, deleteSingleOrderEventWatcher, deleteSingleProductVariantWatcher, deleteSingleProductWatcher, deleteSingleReviewWatcher, deleteSingleUserWatcher, deleteSingleWishlistItemWatcher, deleteUserAddressWatcher, deleteUserAvatarImageWatcher, deleteUserPhoneWatcher, deleteWishlistItemWatcher, fetchCartItemWatcher, fetchCategoryWatcher, fetchCategoryWithCacheWatcher, fetchOrderWatcher, fetchProductWatcher, fetchProductWithCacheWatcher, fetchPublicProductWatcher, fetchReviewWatcher, fetchSingleOrderWatcher, fetchSingleProductWatcher, fetchSingleUserWatcher, fetchUserWatcher, fetchWishlistItemWatcher, leftNavMenuWatcher, patchAuthAddressWatcher, patchAuthPhoneWatcher, patchUserAddressWatcher, patchUserPhoneWatcher, patchWishlistItemWatcher, postAuthAddressWatcher, postAuthAvatarImageWatcher, postAuthPhoneWatcher, postCartItemWatcher, postCategoryWatcher, postOrderEventWatcher, postOrderWatcher, postProductVariantWatcher, postProductWatcher, postReviewWatcher, postUserAddressWatcher, postUserAvatarImageWatcher, postUserPhoneWatcher, postWishlistItemWatcher, putAuthAddressWatcher, putAuthCompanyWatcher, putAuthPhoneWatcher, putAuthWatcher, putCartItemWatcher, putCategoryWatcher, putOrderEventWatcher, putOrderWatcher, putProductVariantWatcher, putProductWatcher, putReviewWatcher, putUserAddressWatcher, putUserPhoneWatcher, putUserWatcher, postSessionTimeoutOrderEventWatcher, fetchAuthOrderWatcher, postAuthOrderEventWatcher, fetchSingleAuthOrderWatcher } from './watchers';
+import { deleteAuthAddressWatcher, deleteAuthAvatarImageWatcher, deleteAuthPhoneWatcher, deleteCartItemWatcher, deleteSingleCartItemWatcher, deleteSingleCategoryWatcher, deleteSingleOrderEventWatcher, deleteSingleProductVariantWatcher, deleteSingleProductWatcher, deleteSingleReviewWatcher, deleteSingleUserWatcher, deleteSingleWishlistItemWatcher, deleteUserAddressWatcher, deleteUserAvatarImageWatcher, deleteUserPhoneWatcher, deleteWishlistItemWatcher, fetchCartItemWatcher, fetchCategoryWatcher, fetchCategoryWithCacheWatcher, fetchOrderWatcher, fetchProductWatcher, fetchProductWithCacheWatcher, fetchPublicProductWatcher, fetchReviewWatcher, fetchSingleOrderWatcher, fetchSingleProductWatcher, fetchSingleUserWatcher, fetchUserWatcher, fetchWishlistItemWatcher, leftNavMenuWatcher, patchAuthAddressWatcher, patchAuthPhoneWatcher, patchUserAddressWatcher, patchUserPhoneWatcher, patchWishlistItemWatcher, postAuthAddressWatcher, postAuthAvatarImageWatcher, postAuthPhoneWatcher, postCartItemWatcher, postCategoryWatcher, postOrderEventWatcher, postOrderWatcher, postProductVariantWatcher, postProductWatcher, postReviewWatcher, postUserAddressWatcher, postUserAvatarImageWatcher, postUserPhoneWatcher, postWishlistItemWatcher, putAuthAddressWatcher, putAuthCompanyWatcher, putAuthPhoneWatcher, putAuthWatcher, putCartItemWatcher, putCategoryWatcher, putOrderEventWatcher, putOrderWatcher, putProductVariantWatcher, putProductWatcher, putReviewWatcher, putUserAddressWatcher, putUserPhoneWatcher, putUserWatcher, postSessionTimeoutOrderEventWatcher, fetchAuthOrderWatcher, postAuthOrderEventWatcher, fetchSingleAuthOrderWatcher, fetchNotificationWatcher, patchNotificationWatcher, incrementNotificationCurIndexWatcher } from './watchers';
 
 export function* rootSaga() {
 
@@ -97,6 +97,11 @@ export function* rootSaga() {
     putProductVariantWatcher,
     deleteSingleProductVariantWatcher,
 
+    /// notification
+    fetchNotificationWatcher,
+    patchNotificationWatcher,
+    incrementNotificationCurIndexWatcher,
+
     /// cache
     fetchProductWithCacheWatcher,
     fetchCategoryWithCacheWatcher,
@@ -119,5 +124,4 @@ export function* rootSaga() {
       }
     }))
   );
-
 }

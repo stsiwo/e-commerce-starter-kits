@@ -15,6 +15,8 @@ import com.iwaodev.infrastructure.model.listener.NotificationValidationListener;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.FilterDefs;
+import org.hibernate.annotations.Filters;
 import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -25,15 +27,15 @@ import lombok.ToString;
 @Data
 @ToString
 @EntityListeners(NotificationValidationListener.class)
-//@NoArgsConstructor // use custom noargsconstructor to assign nanoId
-@FilterDef(
-    name = "recipientIdFilter",
-    parameters = @ParamDef(name = "recipientId", type = "string")
-)
-@Filter(
-    name = "recipientIdFilter",
-    condition = "recipient_id = :recipientId"
-)
+// @NoArgsConstructor // use custom noargsconstructor to assign nanoId
+@FilterDefs({ 
+    @FilterDef(name = "recipientIdFilter", parameters = @ParamDef(name = "recipientId", type = "string")),
+    @FilterDef(name = "isReadFilter", parameters = @ParamDef(name = "isRead", type = "boolean"))
+})
+@Filters({ 
+  @Filter(name = "recipientIdFilter", condition = "recipient_id = :recipientId"),
+  @Filter(name = "isReadFilter", condition = "is_read = :isRead"),
+})
 @Entity(name = "notifications")
 public class Notification {
 
@@ -44,10 +46,10 @@ public class Notification {
   @Column(name = "notification_id")
   private String notificationId;
 
-  @Column(name="notification_title")
+  @Column(name = "notification_title")
   private String notificationTitle;
 
-  @Column(name="notification_description")
+  @Column(name = "notification_description")
   private String notificationDescription;
 
   @ManyToOne
@@ -58,13 +60,13 @@ public class Notification {
   @JoinColumn(name = "recipient_id", insertable = true, updatable = true)
   private User recipient;
 
-  @Column(name="is_read")
+  @Column(name = "is_read")
   private Boolean isRead;
 
-  @Column(name="link")
+  @Column(name = "link")
   private String link;
 
-  @Column(name="note")
+  @Column(name = "note")
   private String note;
 
   @ManyToOne
@@ -81,7 +83,8 @@ public class Notification {
 
   // constructor
   public Notification() {
-    this.notificationId = "ntf_" + NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 11); 
+    this.notificationId = "ntf_"
+        + NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 11);
   }
 
   // custom setters & getters
@@ -90,9 +93,5 @@ public class Notification {
   public void turnReadTrue() {
     this.setIsRead(true);
   }
-  
 
 }
-
-
-

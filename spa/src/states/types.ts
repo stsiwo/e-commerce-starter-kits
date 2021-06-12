@@ -5,6 +5,7 @@ import { WishlistItemType, WishlistItemSortEnum } from "domain/wishlist/types";
 import { UserType, UserSortEnum } from "domain/user/types";
 import { OrderType, OrderSortEnum } from "domain/order/types";
 import { ReviewType, ReviewSortEnum } from "domain/review/type";
+import { NotificationType } from "domain/notification/types";
 
 //import { NormalizedBlogType } from "domain/blog";
 //import { NormalizedCategoryType } from "domain/category";
@@ -108,6 +109,10 @@ export declare type AppStateType = {
       fetchSingleOrder: FetchStatusEnum
       postOrderEvent: FetchStatusEnum
     },
+    notifications: {
+      get: FetchStatusEnum
+      patch: FetchStatusEnum
+    }
   },
 }
 
@@ -116,6 +121,7 @@ export declare type DomainPaginationType = {
   limit: number
   totalPages: number
   totalElements: number
+  last?: boolean // last page or not
 }
 
 export declare type DomainStateSubType<D extends Record<string, any>> = {
@@ -196,6 +202,11 @@ export declare type DomainStateType = {
   },
   checkout: {
     order: OrderType,
+  },
+  notifications: {
+    data: NotificationType[], 
+    pagination: DomainPaginationType,
+    curIndex: number,
   }
 }
 

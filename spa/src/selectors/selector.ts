@@ -11,6 +11,7 @@ import { OrderType, OrderCriteria, OrderDetailType } from "domain/order/types";
 import { toPhoneStringWithoutSpace } from "domain/user";
 import { toOrderAddress, toOrderDetailCriteriaList } from "domain/order";
 import { UserTypeEnum } from "src/app";
+import { NotificationType } from "domain/notification/types";
 
 export const rsSelector = {
   /**
@@ -111,6 +112,11 @@ export const rsSelector = {
     getProductCurItems: (state: StateType) => state.domain.products.curItems,
 
     getCheckoutOrder: (state: StateType) => state.domain.checkout.order,
+
+    getNotification: (state: StateType) => state.domain.notifications.data,
+    getNotificationPagination: (state: StateType) => state.domain.notifications.pagination,
+    getNotificationCurIndex: (state: StateType) => state.domain.notifications.curIndex,
+
   },
 
   senstive: {
@@ -1539,6 +1545,103 @@ export const mSelector = {
       ],
       (checkoutOrder) => {
         return checkoutOrder.orderDetails.map((orderDetail: OrderDetailType) => ({ productId: orderDetail.product.productId, productVariantId: orderDetail.productVariant.variantId }))
+      },
+    )
+  },
+
+  // domain.notifications
+  makeNotificationSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getNotification,
+      ],
+      (notifications) => {
+        return notifications
+      },
+    )
+  },
+
+  // domain.notifications (isRead: false)
+  makeNotificationUnReadSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getNotification,
+      ],
+      (notifications) => {
+        return notifications.filter((notification: NotificationType) => !notification.isRead)
+      },
+    )
+  },
+
+  // domain.notifications.pagination
+  makeNotificationPaginationSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getNotificationPagination
+      ],
+      (pagination) => {
+        return pagination
+      },
+    )
+  },
+
+  // domain.notifications.queryString
+  makeNotificationQueryStringSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getNotificationPagination
+      ],
+      (pagination) => {
+        return merge({}, { page: pagination.page, limit: pagination.limit })
+      },
+    )
+  },
+
+  // domain.notifications.curIndex
+  makeNotificationCurIndexSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getNotificationCurIndex
+      ],
+      (curIndex) => {
+        return curIndex
+      },
+    )
+  },
+
+  // domain.notifications.curIndex
+  makeNotificationSizeSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getNotification
+      ],
+      (notification) => {
+        return notification.length
+      },
+    )
+  },
+
+  // domain.notifications.curIndex
+  makeNotificationByCurIndexSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getNotification,
+        rsSelector.domain.getNotificationCurIndex
+      ],
+      (notification, curIndex) => {
+        return notification[curIndex]
+      },
+    )
+  },
+
+  // domain.notifications.curIndex
+  makeNotificationByIndexSelector: (index: number) => {
+    return createSelector(
+      [
+        rsSelector.domain.getNotification,
+      ],
+      (notifications) => {
+        return notifications[index]
       },
     )
   },

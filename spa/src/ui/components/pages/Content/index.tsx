@@ -2,10 +2,12 @@ import PageRoute from 'components/routes/PageRoute';
 import * as React from 'react';
 import { useSnackbar } from 'notistack';
 import { useSelector } from 'react-redux';
-import { mSelector } from 'src/selectors/selector';
+import { mSelector, rsSelector } from 'src/selectors/selector';
 import { MessageTypeEnum } from 'src/app';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import IconButton from '@material-ui/core/IconButton';
+import Notification from 'components/common/Notification';
+import { NotificationType } from 'domain/notification/types';
 
 const Content: React.FunctionComponent<{}> = (props) => {
 
@@ -28,6 +30,21 @@ const Content: React.FunctionComponent<{}> = (props) => {
         });
     }
   }, [curMessage.id])
+
+  const curNotification = useSelector(mSelector.makeNotificationByCurIndexSelector())
+  const curNotificationIndex = useSelector(rsSelector.domain.getNotificationCurIndex)
+  React.useEffect(() => {
+    if (curNotification) {
+      enqueueSnackbar(
+        curNotification, 
+        { 
+          variant: "info", 
+          content: (key, message: NotificationType) => (
+           <Notification id={key} message={message} />   
+          )
+        });
+    }
+  }, [curNotificationIndex])
 
   return (
     <React.Fragment>

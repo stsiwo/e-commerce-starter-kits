@@ -7,6 +7,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { createStyles, makeStyles, Theme, useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import NotificationsIcon from '@material-ui/icons/Notifications';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import { AxiosError } from 'axios';
 import { api } from 'configs/axiosConfig';
@@ -15,6 +16,7 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link as RRLink } from "react-router-dom";
 import { authActions } from 'reducers/slices/app';
+import { fetchNotificationActionCreator, incrementNotificationCurIndexActionCreator } from 'reducers/slices/domain/notification';
 import { cartModalActions } from 'reducers/slices/ui';
 import { mSelector } from 'src/selectors/selector';
 
@@ -100,9 +102,8 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
     api.request({
       method: 'post',
       url: API1_URL + `/logout`,
-      data: null 
+      data: null
     }).then((data) => {
-
       // fetch again
       dispatch(authActions.logout())
 
@@ -110,6 +111,39 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
     }).catch((error: AxiosError) => {
       enqueueSnackbar(error.message, { variant: "error" })
     })
+  }
+
+  /**
+   * notification feature.
+   **/
+  const curNotificationPagination = useSelector(mSelector.makeNotificationPaginationSelector())
+
+  // fetch notifcation for this member.
+  // - initial fetch (replace)
+  // - the next consecutive fetchs (concat)
+  const isInitial = React.useRef<boolean>(true);
+  React.useEffect(() => {
+    console.log("start fetching notification...")
+    if (isInitial.current) {
+      console.log("initial notification fetch with 'update'")
+      dispatch(
+        fetchNotificationActionCreator({ type: "update" })
+      )
+      isInitial.current = false
+    } else {
+      console.log("initial notification fetch with 'concat'")
+      dispatch(
+        fetchNotificationActionCreator({ type: "concat" })
+      )
+    }
+  }, [
+    curNotificationPagination.page  
+  ])
+
+  const handleNotificationClick = (e: React.MouseEvent<HTMLElement>) => {
+    dispatch(
+      incrementNotificationCurIndexActionCreator()
+    )
   }
 
   // rendering stuff
@@ -155,6 +189,12 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
       <IconButton onClick={handleCartModalOpenClick}>
         <Badge badgeContent={curNumberOfCartItems} color="error">
           <ShoppingCartIcon />
+        </Badge>
+      </IconButton>
+      <IconButton onClick={handleNotificationClick}>
+        {/** use totalElements to display total number of notifications **/}
+        <Badge badgeContent={curNotificationPagination.totalElements} color="error">
+          <NotificationsIcon />
         </Badge>
       </IconButton>
       {(isMdUp &&

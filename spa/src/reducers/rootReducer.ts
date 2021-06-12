@@ -18,6 +18,8 @@ import { wishlistItemPaginationLimitSliceReducer, wishlistItemPaginationPageSlic
 import { stripeClientSecretSliceReducer } from './slices/sensitive';
 import { cartModalSliceReducer, leftNavMenuSliceReducer, rightNavMenuSliceReducer, searchModalSliceReducer } from './slices/ui';
 import { checkoutOrderSliceReducer } from './slices/domain/checkout';
+import { getNotificationFetchStatusSliceReducer, patchNotificationFetchStatusSliceReducer } from './slices/app/fetchStatus/notification';
+import { notificationSliceReducer, notificationPaginationSliceReducer, notificationCurIndexSliceReducer } from './slices/domain/notification';
 
 // ** REFACTOR to new approach **/
 
@@ -124,6 +126,10 @@ export const rootReducer = combineReducers({
         fetchSingleOrder: fetchSingleAuthOrderFetchStatusSliceReducer,
         postOrderEvent: postAuthOrderEventFetchStatusSliceReducer,
       }),
+      notifications: combineReducers({
+        get: getNotificationFetchStatusSliceReducer,
+        patch: patchNotificationFetchStatusSliceReducer,
+      })
     }),
   }),
   domain: combineReducers({
@@ -229,6 +235,11 @@ export const rootReducer = combineReducers({
     }),
     checkout: combineReducers({
       order: checkoutOrderSliceReducer
+    }),
+    notifications: combineReducers({
+      data: notificationSliceReducer,
+      pagination: notificationPaginationSliceReducer,
+      curIndex: notificationCurIndexSliceReducer,
     }),
   }),
   sensitive: combineReducers({

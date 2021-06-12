@@ -171,6 +171,10 @@ export const initialState: StateType = {
         fetchSingleOrder: FetchStatusEnum.INITIAL,
         postOrderEvent: FetchStatusEnum.INITIAL,
       },
+      notifications: {
+        get: FetchStatusEnum.INITIAL,
+        patch: FetchStatusEnum.INITIAL,
+      }
     },
   },
   domain: {
@@ -276,7 +280,18 @@ export const initialState: StateType = {
     },
     checkout: {
       order: null,
-    }
+    },
+    notifications: {
+      data: [],
+      pagination: {
+        page: 0, // start from 0 (not 1)
+        limit: 5,
+        totalPages: 1,
+        totalElements: 0,
+        last: true,
+      },
+      curIndex: -1,
+    },
   },
   // never persist
   sensitive: {
