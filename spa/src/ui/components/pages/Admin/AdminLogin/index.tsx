@@ -19,6 +19,7 @@ import { Link as RRLink } from "react-router-dom";
 import { authActions } from 'reducers/slices/app';
 import { mSelector } from 'src/selectors/selector';
 import { useHistory } from 'react-router';
+import ForgotPasswordDialog from 'components/common/ForgotPasswordDialog';
 
 
 export declare type AdminLoginDataType = {
@@ -72,6 +73,9 @@ const useStyles = makeStyles((theme: Theme) =>
       textAlign: "center",
       margin: theme.spacing(2, 0, 2, 0),
     },
+    cursorLink: {
+      cursor: "pointer",
+    }
   }),
 );
 
@@ -128,6 +132,19 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
       password: nextPassword
     }));
   }
+
+  /**
+   * forgot password stuff
+   **/
+
+  // forgot password dialog
+  const [curForgotPasswordDialogOpen, setForgotPasswordDialogOpen] = React.useState<boolean>(false);
+
+  // event handler for forgot password link click
+  const handleForgotPasswordClick: React.EventHandler<React.MouseEvent<HTMLAnchorElement>> = (e) => {
+    setForgotPasswordDialogOpen(true);
+  }
+
 
   // event handler to submit
   const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
@@ -216,7 +233,7 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
         />
         <Box component="div" className={classes.forgetPasswordBox} >
           <Typography variant="body2" component="p">
-            <Link component={RRLink} to="/admin/forget-password">
+            <Link onClick={handleForgotPasswordClick} className={classes.cursorLink}>
               forget your password?
             </Link>
           </Typography>
@@ -227,6 +244,10 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
             </Button>
         </Box>
       </form>
+      <ForgotPasswordDialog 
+        curFormOpen={curForgotPasswordDialogOpen}  
+        setFormOpen={setForgotPasswordDialogOpen}
+      />
     </Grid>
   )
 }
