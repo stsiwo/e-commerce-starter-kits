@@ -68,15 +68,6 @@ public class User {
   @Column(name = "avatar_image_path")
   private String avatarImagePath;
 
-  @Column(name = "is_deleted")
-  private Boolean isDeleted;
-
-  @Column(name = "deleted_account_date")
-  private LocalDateTime deletedAccountDate;
-
-  @Column(name = "deleted_account_reason")
-  private String deletedAccountReason;
-
   @ManyToOne
   @JoinColumn(name = "user_type_id", foreignKey = @ForeignKey(name = "FK_users__user_types"), insertable = true, updatable = false)
   private UserType userType;
@@ -95,6 +86,9 @@ public class User {
   @Enumerated(EnumType.STRING)
   @Column(name = "active")
   private UserActiveEnum active;
+
+  @Column(name = "active_note")
+  private String activeNote;
 
   @Column(name = "verification_token")
   private String verificationToken;

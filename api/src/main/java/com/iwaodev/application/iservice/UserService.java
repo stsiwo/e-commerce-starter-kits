@@ -7,6 +7,7 @@ import com.iwaodev.domain.user.UserSortEnum;
 import com.iwaodev.ui.criteria.UserCriteria;
 import com.iwaodev.ui.criteria.UserDeleteTempCriteria;
 import com.iwaodev.ui.criteria.UserQueryStringCriteria;
+import com.iwaodev.ui.criteria.user.UserStatusCriteria;
 
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.User;
@@ -19,6 +20,8 @@ public interface UserService {
   public UserDTO getById(UUID id);
 
   public UserDTO update(UserCriteria criteria, UUID id);
+
+  public UserDTO updateStatus(UserStatusCriteria criteria);
 
   public void delete(UUID id);
 

@@ -182,7 +182,7 @@ const Login: React.FunctionComponent<{}> = (props) => {
 
         enqueueSnackbar("logged in successfully.", { variant: "success" })
       }).catch((error: AxiosError) => {
-        enqueueSnackbar(error.message, { variant: "error" })
+        enqueueSnackbar(error.response.data.message, { variant: "error" })
       })
     } else {
       updateAllValidation()

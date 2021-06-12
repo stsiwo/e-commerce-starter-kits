@@ -21,6 +21,7 @@ import com.iwaodev.ui.criteria.UserQueryStringCriteria;
 import com.iwaodev.ui.criteria.order.OrderEventCriteria;
 import com.iwaodev.ui.criteria.order.OrderQueryStringCriteria;
 import com.iwaodev.ui.criteria.review.ReviewCriteria;
+import com.iwaodev.ui.criteria.user.UserStatusCriteria;
 import com.iwaodev.ui.response.BaseResponse;
 import com.iwaodev.ui.response.ImagePathResponse;
 
@@ -99,6 +100,16 @@ public class UserController {
       @AuthenticationPrincipal User authUser, @Valid @RequestBody UserCriteria criteria) {
 
     return new ResponseEntity<>(this.service.update(criteria, id), HttpStatus.OK);
+  }
+
+  @PatchMapping("/users/{id}/status")
+  @PreAuthorize("hasRole('ROLE_ADMIN')") // to prevent a member from accessing another
+                                                                     // user's data
+  public ResponseEntity<UserDTO> patchStatus(@PathVariable(value = "id") UUID id,
+      @AuthenticationPrincipal User authUser, @Valid @RequestBody UserStatusCriteria criteria) {
+    return new ResponseEntity<>(
+        this.service.updateStatus(criteria),
+        HttpStatus.OK);
   }
 
   @PatchMapping("/users/{id}")

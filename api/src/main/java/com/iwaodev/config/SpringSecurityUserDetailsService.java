@@ -32,10 +32,9 @@ public class SpringSecurityUserDetailsService implements UserDetailsService {
      * find the user with userRepo (hibernate)
      **/
     /**
-     * #TODO: replace findByEmail with findByActiveByEmail.
-     *  - this only retrieve active user (e.g., is_deleted = false)
+     * - only 'ACTIVE'/'TEMP'  
      **/
-    com.iwaodev.infrastructure.model.User loginUser = this.userRepository.findByEmail(email);
+    com.iwaodev.infrastructure.model.User loginUser = this.userRepository.findActiveOrTempByEmail(email);
 
     /**
      * if the user is not found

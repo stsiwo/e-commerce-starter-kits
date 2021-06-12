@@ -376,7 +376,7 @@ public class MemberUserEndpointTest {
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
     JSONObject dummyFormJson = new JSONObject();
-    dummyFormJson.put("deletedAccountReason", "some reason.");
+    dummyFormJson.put("activeNote", "some reason.");
 
     // act
     ResultActions resultActions = mvc.perform(
@@ -404,7 +404,7 @@ public class MemberUserEndpointTest {
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
     JSONObject dummyFormJson = new JSONObject();
-    dummyFormJson.put("deletedAccountReason", "");
+    dummyFormJson.put("activeNote", "");
 
     // act
     ResultActions resultActions = mvc.perform(

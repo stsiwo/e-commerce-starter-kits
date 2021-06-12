@@ -23,15 +23,11 @@ public class OrderUserDTO {
 
   private String avatarImagePath;
 
-  private Boolean isDeleted;
-
-  private LocalDateTime deletedAccountDate;
-
-  private String deletedAccountReason;
-
   private UserTypeDTO userType;
 
   private UserActiveEnum active;
+
+  private String activeNote;
 
   private LocalDateTime createdAt;
 

@@ -8,6 +8,7 @@ import AdminCustomerBasicForm from './AdminCustomerBasicForm';
 import AdminCustomerPhoneForm from './AdminCustomerPhoneForm';
 import AdminCustomerAvatarForm from './AdminCustomerAvatarForm';
 import TextField from '@material-ui/core/TextField';
+import AdminCustomerStatusForm from './AdminCustomerStatusForm';
 
 interface AdminCustomerFormPropsType {
   user: UserType
@@ -108,6 +109,13 @@ const AdminCustomerForm: React.FunctionComponent<AdminCustomerFormPropsType> = (
         md={6}
       >
         <AdminCustomerAddressForm addresses={props.user.addresses}  userId={props.user.userId} />
+      </Grid>
+      <Grid
+        item
+        xs={12}
+        md={6}
+      >
+        <AdminCustomerStatusForm user={props.user} />
       </Grid>
     </Grid>
   )

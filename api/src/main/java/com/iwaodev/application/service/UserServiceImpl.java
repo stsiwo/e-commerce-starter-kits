@@ -2,6 +2,8 @@ package com.iwaodev.application.service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,12 +16,14 @@ import com.iwaodev.application.iservice.FileService;
 import com.iwaodev.application.iservice.UserService;
 import com.iwaodev.application.mapper.UserMapper;
 import com.iwaodev.application.specification.factory.UserSpecificationFactory;
+import com.iwaodev.domain.user.UserActiveEnum;
 import com.iwaodev.domain.user.UserSortEnum;
 import com.iwaodev.infrastructure.model.Phone;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.UserCriteria;
 import com.iwaodev.ui.criteria.UserDeleteTempCriteria;
 import com.iwaodev.ui.criteria.UserQueryStringCriteria;
+import com.iwaodev.ui.criteria.user.UserStatusCriteria;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,6 +151,24 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  public UserDTO updateStatus(UserStatusCriteria criteria) {
+
+    User user = this.repository.findById(criteria.getUserId())
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+            "user not found (id: " + criteria.getUserId().toString() + ")"));
+
+    user.setActive(criteria.getActive());
+    if (criteria.getActiveNote() != null && !criteria.getActiveNote().isEmpty()) {
+      user.setActiveNote(criteria.getActiveNote());
+    }
+
+    User savedEntity = this.repository.save(user);
+
+    // map entity to dto
+    return UserMapper.INSTANCE.toUserDTO(savedEntity);
+  }
+
+  @Override
   public void tempDelete(UserDeleteTempCriteria criteria, UUID id) {
     // not delete the record, but update 'isDeleted' column
 
@@ -160,9 +182,9 @@ public class UserServiceImpl implements UserService {
     User targetEntity = targetEntityOption.get();
 
     // update related properties
-    targetEntity.setIsDeleted(true);
-    targetEntity.setDeletedAccountDate(LocalDateTime.now());
-    targetEntity.setDeletedAccountReason(criteria.getDeletedAccountReason());
+    targetEntity.setActive(UserActiveEnum.CUSTOMER_DELETED);
+    targetEntity.setActiveNote("the customer requested for the deletion of the account ("
+        + LocalDateTime.now().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)) + ")");
 
     this.repository.save(targetEntity);
   }

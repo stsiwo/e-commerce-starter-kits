@@ -8,6 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import UserAccountAvatarManagement from 'components/common/UserAccountAvatarManagement';
 import { useSelector } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
+import UserAccountRemovalManagement from 'components/common/UserAccountRemovalManagement';
 
 
 /**
@@ -71,7 +72,7 @@ const Account: React.FunctionComponent<{}> = (props) => {
           md={6}
           className={classes.gridItem}
         >
-          <UserAccountPhoneManagement phones={[]}/>
+          <UserAccountPhoneManagement phones={auth.user.phones}/>
         </Grid>
         <Grid 
           item
@@ -79,7 +80,15 @@ const Account: React.FunctionComponent<{}> = (props) => {
           md={6}
           className={classes.gridItem}
         >
-          <UserAccountAddressManagement addresses={[]}/>
+          <UserAccountAddressManagement addresses={auth.user.addresses}/>
+        </Grid>
+        <Grid 
+          item
+          xs={12}
+          md={6}
+          className={classes.gridItem}
+        >
+          <UserAccountRemovalManagement user={auth.user}/>
         </Grid>
       </Grid>
     </React.Fragment>

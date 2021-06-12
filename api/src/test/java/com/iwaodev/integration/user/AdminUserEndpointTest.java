@@ -425,6 +425,47 @@ public class AdminUserEndpointTest {
   }
 
   @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldAdminUserUpdateStatus.sql" })
+  public void shouldAdminUserUpdateStatus(@Value("classpath:/integration/user/shouldAdminUserUpdateStatus.json") Resource dummyFormJsonFile) throws Exception {
+
+    // make sure id path matches with sql !!!!
+
+    // dummy form json 
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978";
+    String dummyUserPath = "/" + dummyUserIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/status";
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .patch(targetUrl)
+        .content(dummyFormJsonString)
+        .contentType(MediaType.APPLICATION_JSON)
+        .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    UserDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, UserDTO.class);
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+
+    assertThat(responseBody.getUserId().toString()).isEqualTo("29c845ad-54b1-430a-8a71-5caba98d5978");
+    assertThat(responseBody.getActive().toString()).isEqualTo(dummyFormJson.get("active").asText());
+    assertThat(responseBody.getActiveNote()).isEqualTo(dummyFormJson.get("activeNote").asText());
+
+  }
+  @Test
   public void shouldAdminUserTempDeleteItsOwnAccount() throws Exception {
 
     // dummy form json 
@@ -433,7 +474,7 @@ public class AdminUserEndpointTest {
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
     JSONObject dummyFormJson = new JSONObject();
-    dummyFormJson.put("deletedAccountReason", "");
+    dummyFormJson.put("activeNote", "");
 
     // act
     ResultActions resultActions = mvc.perform(
@@ -463,7 +504,7 @@ public class AdminUserEndpointTest {
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
     JSONObject dummyFormJson = new JSONObject();
-    dummyFormJson.put("deletedAccountReason", "");
+    dummyFormJson.put("activeNote", "");
 
     // act
     ResultActions resultActions = mvc.perform(
@@ -492,7 +533,7 @@ public class AdminUserEndpointTest {
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
     JSONObject dummyFormJson = new JSONObject();
-    dummyFormJson.put("deletedAccountReason", "");
+    dummyFormJson.put("activeNote", "");
 
     // act
     ResultActions resultActions = mvc.perform(

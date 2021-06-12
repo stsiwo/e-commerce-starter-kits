@@ -5,5 +5,6 @@ public enum UserActiveEnum {
   TEMP,
   ACTIVE,
   BLACKLIST,
+  CUSTOMER_DELETED
 }
 

@@ -1,13 +1,5 @@
 package com.iwaodev.ui.criteria;
 
-import java.util.List;
-import java.util.UUID;
-
-import javax.validation.Valid;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
-
 import org.springframework.validation.annotation.Validated;
 
 import lombok.Data;
@@ -20,6 +12,6 @@ import lombok.ToString;
 @Validated
 public class UserDeleteTempCriteria {
 
-  private String deletedAccountReason;
+  private String activeNote;
   
 }

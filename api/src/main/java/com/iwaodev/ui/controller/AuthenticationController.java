@@ -16,10 +16,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class AuthenticationController {
@@ -55,7 +57,8 @@ public class AuthenticationController {
     final UserDetails userDetails = this.userDetailsService.loadUserByUsername(criteria.getEmail());
 
     //
-    AuthenticationResponse authResponse = this.authenticationService.login(userDetails.getUsername(), criteria.getEmail(), response);
+    AuthenticationResponse authResponse = this.authenticationService.login(userDetails.getUsername(),
+        criteria.getEmail(), response);
 
     return new ResponseEntity<>(authResponse, HttpStatus.OK);
 

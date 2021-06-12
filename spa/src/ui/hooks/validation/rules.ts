@@ -32,6 +32,11 @@ export const userAccountPhoneSchema = yup.object().shape({
   countryCode: yup.string().required(),
 })
 
+export const userActiveStatusAccountSchema = yup.object().shape({
+  active: yup.string().required(),
+  activeNote: yup.string().optional(),
+})
+
 export const userAccountAddressSchema = yup.object().shape({
   address1: yup.string().required(),
   address2: yup.string().optional().nullable(),

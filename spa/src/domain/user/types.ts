@@ -4,6 +4,24 @@ import { OrderType } from "domain/order/types";
 import { CartItemType } from "domain/cart/types";
 import { getNanoId } from "src/utils";
 
+export enum UserActiveEnum {
+  TEMP = "TEMP",
+  ACTIVE = "ACTIVE",
+  BLACKLIST = "BLACKLIST",
+  CUSTOMER_DELETED = "CUSTOMER_DELETED",
+}
+
+export declare type UserActiveLabelListType = {
+  [key in UserActiveEnum]: string
+}
+
+export const userActiveLabelList: UserActiveLabelListType = {
+  [UserActiveEnum.TEMP]: "Temporary (Not Email Verified)",
+  [UserActiveEnum.ACTIVE]: "Active (Email Verified)",
+  [UserActiveEnum.BLACKLIST]: "Blacklist",
+  [UserActiveEnum.CUSTOMER_DELETED]: "Deleted By Customer",
+}
+
 export declare type UserPhoneType = {
   phoneId?: string
   phoneNumber: string
@@ -52,6 +70,8 @@ export declare type UserType = {
   firstName: string
   lastName: string
   email: string
+  active: UserActiveEnum
+  activeNote?: string
   avatarImagePath: string
   addresses: UserAddressType[]
   phones: UserPhoneType[]
@@ -113,6 +133,8 @@ export const defaultUser: UserType = {
   lastName: "",
   email: "",
   avatarImagePath: "",
+  active: UserActiveEnum.TEMP,
+  activeNote: "",
   addresses: [],
   phones: [],
   reviews: [],
@@ -152,6 +174,33 @@ export const defaultUserBasicAccountValidationData = {
   email: "",
   password: "",
   confirm: ""
+}
+
+// customer status
+export declare type UserStatusAccountDataType = {
+  active: UserActiveEnum
+  activeNote: string
+}
+
+export declare type UserStatusAccountValidationDataType = {
+  active: string
+  activeNote: string
+}
+
+export const defaultUserStatusAccountData = {
+  active: UserActiveEnum.TEMP,
+  activeNote: "",
+}
+
+export const defaultUserStatusAccountValidationData = {
+  active: "",
+  activeNote: "",
+}
+
+export declare type UserStatusCriteria = {
+  active: string
+  activeNote: string
+  userId: string
 }
 
 // customer phone
