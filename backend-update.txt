@@ -46,6 +46,8 @@ endpoint change:
     
     - disable cart icon (on header) when checkout page (don't need to cart drawer at this page)
     
+    - implement limit login attempts. (see: https://mail.codejava.net/frameworks/spring-boot/spring-security-limit-login-attempts-example)
+    
   - unit test
     - addable next order event status
     
