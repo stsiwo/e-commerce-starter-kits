@@ -44,7 +44,7 @@ server {
     error_log /var/log/nginx/iwaodev.com.error.log info;
   
     # cache control            
-    location ~* \.(?:ico|css|js|gif|jpe?g|png)$ {
+    location ~* \.(?:ico|css|js|gif|jpe?g|png|svg)$ {
         root   /var/www;       
   
         expires 30d;           

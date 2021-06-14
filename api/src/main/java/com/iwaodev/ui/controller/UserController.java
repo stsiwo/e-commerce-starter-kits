@@ -158,14 +158,14 @@ public class UserController {
 
   // get user avatar image
   @GetMapping(value = "/users/{id}/avatar-image/{imageName}", produces = "image/*")
-  @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
-                                                                     // user's data
   public ResponseEntity<byte[]> getAvatarImage(@PathVariable(value = "id") UUID id,
       @AuthenticationPrincipal SpringSecurityUser authUser, @PathVariable(value = "imageName") String imageName,
       HttpServletResponse response) {
 
     // disable content sniffing to prevent content sniffing exploit
     response.addHeader("X-Content-Type-Options", "nosniff");
+    // cache this image for one year
+    response.addHeader("Cache-Control", "max-age=31536000, must-revalidate, no-transform");
 
     return new ResponseEntity<byte[]>(this.service.getAvatarImage(id, imageName), HttpStatus.OK);
   }

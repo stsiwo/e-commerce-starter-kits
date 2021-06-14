@@ -149,9 +149,12 @@ public class ProductController {
 
     // disable content sniffing to prevent content sniffing exploit
     response.addHeader("X-Content-Type-Options", "nosniff");
+    // cache this image for one year
+    response.addHeader("Cache-Control", "max-age=31536000, must-revalidate, no-transform");
 
     return new ResponseEntity<byte[]>(
         this.service.getProductImage(id, imageName),
-        HttpStatus.OK);
+        HttpStatus.OK)
+      ;
   }
 }
