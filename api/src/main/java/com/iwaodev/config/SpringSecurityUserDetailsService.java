@@ -3,7 +3,10 @@ package com.iwaodev.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.iwaodev.application.irepository.UserRepository;
+import com.iwaodev.config.service.LoginAttemptService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,15 +27,27 @@ public class SpringSecurityUserDetailsService implements UserDetailsService {
   @Autowired
   private UserRepository userRepository;
 
+  /**
+   * DON'T throw 'UsernameNotFoundException' since it is converted to 'BadCredentialException'. I don't know why.
+   *
+   * - this is because 'hideUserNotFoundExceptions' property. that's why it converts to 'badCredentialException'. 
+   *
+   *   - need to enable it if you want to display it.
+   *
+   *   - ref: https://github.com/spring-projects/spring-security/blob/main/core/src/main/java/org/springframework/security/authentication/dao/AbstractUserDetailsAuthenticationProvider.java
+   *
+   * instead, use 'RunTimeException' so that it is caught by 'authenticationEntryPoint' handler (see SpringSecurityConfig.java).
+   **/
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
+    logger.info("start load user by user name");
 
     /**
      * find the user with userRepo (hibernate)
      **/
     /**
-     * - only 'ACTIVE'/'TEMP'  
+     * - only 'ACTIVE'/'TEMP'
      **/
     com.iwaodev.infrastructure.model.User loginUser = this.userRepository.findActiveOrTempByEmail(email);
 
@@ -40,8 +55,9 @@ public class SpringSecurityUserDetailsService implements UserDetailsService {
      * if the user is not found
      **/
     if (loginUser == null) {
-      throw new UsernameNotFoundException("the user with email of " + email + " is not found");
-    } 
+      logger.info("target user not found by findActiveOrTempByEmail");
+      throw new UsernameNotFoundException("NOT_FOUND");
+    }
 
     logger.info("this user tries to login: " + loginUser.getEmail());
 
@@ -65,12 +81,8 @@ public class SpringSecurityUserDetailsService implements UserDetailsService {
     /**
      * construct UserDetails for return
      **/
-    UserDetails userDetails = new SpringSecurityUser(
-        loginUser.getUserId(),
-        loginUser.getEmail(), 
-        loginUser.getPassword(), 
-        grantList 
-        );
+    UserDetails userDetails = new SpringSecurityUser(loginUser.getUserId(), loginUser.getEmail(),
+        loginUser.getPassword(), grantList);
 
     logger.info("start returning this userDetails");
 

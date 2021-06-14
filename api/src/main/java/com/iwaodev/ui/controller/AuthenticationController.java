@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,10 +49,15 @@ public class AuthenticationController {
     logger.info("received credentials: " + criteria.getEmail() + " and " + criteria.getPassword());
 
     try {
-      this.authenticationManager
+      Authentication authentication = this.authenticationManager
           .authenticate(new UsernamePasswordAuthenticationToken(criteria.getEmail(), criteria.getPassword()));
+
+
+
+    } catch (UsernameNotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the email is not registered.", e);
     } catch (BadCredentialsException e) {
-      throw new Exception("Incorrect User Email or Password", e);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "incorrect password", e);
     }
 
     final UserDetails userDetails = this.userDetailsService.loadUserByUsername(criteria.getEmail());

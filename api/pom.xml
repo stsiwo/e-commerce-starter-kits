@@ -67,6 +67,15 @@
       <version>${org.springframework.boot.version}</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+    <!-- Guava By Google -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>30.1.1-jre</version>
+    </dependency>
+
+
     <!-- jwt stuff -->
     <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
     <dependency>
