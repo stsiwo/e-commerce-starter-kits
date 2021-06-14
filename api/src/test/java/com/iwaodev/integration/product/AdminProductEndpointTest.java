@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.Cookie;
 
@@ -265,6 +266,7 @@ public class AdminProductEndpointTest {
     assertThat(responseBody.getProductName()).isEqualTo(dummyFormJson.get("productName").asText());
     assertThat(responseBody.getCategory().getCategoryId().toString()).isEqualTo(dummyFormJson.get("category").get("categoryId").asText());
 
+
     List<ProductImageDTO> productImages = responseBody.getProductImages();
 
     for (int i = 0; i < productImages.size(); i++) {
@@ -274,13 +276,13 @@ public class AdminProductEndpointTest {
       if (i == 0 || i == 1 || i == 3) {
         if (i == 0) {
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-0");  
-          assertThat(productImages.get(i).getProductImagePath()).isEqualTo("/products/" + responseBody.getProductId().toString() + "/images/product-image-0.jpeg");  
+          assertThat(productImages.get(i).getProductImagePath()).matches("/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.jpeg");  
         } else if (i == 1) {
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-1");  
-          assertThat(productImages.get(i).getProductImagePath()).isEqualTo("/products/" + responseBody.getProductId().toString() + "/images/product-image-1.png");  
+          assertThat(productImages.get(i).getProductImagePath()).matches("/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");  
         } else if (i == 3) {
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-3");  
-          assertThat(productImages.get(i).getProductImagePath()).isEqualTo("/products/" + responseBody.getProductId().toString() + "/images/product-image-3.jpeg");  
+          assertThat(productImages.get(i).getProductImagePath()).matches("/products/" + responseBody.getProductId().toString() + "/images/product-image-3-.+.jpeg");  
         }
       } else {
         assertThat(productImages.get(i).getProductImagePath()).isEqualTo("");  
@@ -292,13 +294,13 @@ public class AdminProductEndpointTest {
 
     // assert the files are saved to directory
     String localDirectory = this.fileProductPath + "/" + responseBody.getProductId().toString() + "/images";
-    Path pathForZero = Paths.get(localDirectory + "/product-image-0.jpeg");
-    Path pathForFirst = Paths.get(localDirectory + "/product-image-1.png");
-    Path pathForThird = Paths.get(localDirectory + "/product-image-3.jpeg");
+    String pattern = "product-image-0-.+.jpeg|product-image-1-.+.png|product-image-3-.+.jpeg";
 
-    assertThat(Files.exists(pathForZero)).isTrue();
-    assertThat(Files.exists(pathForFirst)).isTrue();
-    assertThat(Files.exists(pathForThird)).isTrue();
+    // check the files exist in the target directory with regex
+    List<Path> paths = Files.find(Paths.get(localDirectory), Integer.MAX_VALUE,
+        (path, basicFileAttributes) -> path.toFile().getName().matches(pattern)).collect(Collectors.toList());
+
+    assertThat(paths.size()).isEqualTo(3);
   }
 
   // 400 bad request (bad input) testing
@@ -323,9 +325,9 @@ public class AdminProductEndpointTest {
     // - must match with input json script
     String localDirectory = this.fileProductPath + "/" + dummyProductId + "/images";
     Files.createDirectories(Paths.get(localDirectory));
-    Path pathForZero = Paths.get(localDirectory + "/product-image-0.png");
-    Path pathForFirst = Paths.get(localDirectory + "/product-image-1.png");
-    Path pathForThird = Paths.get(localDirectory + "/product-image-3.png");
+    Path pathForZero = Paths.get(localDirectory + "/product-image-0-xxxx.png");
+    Path pathForFirst = Paths.get(localDirectory + "/product-image-1-yyyy.png");
+    Path pathForThird = Paths.get(localDirectory + "/product-image-3-zzzz.png");
 
     MockMultipartFile fileAtZeroIndex = new MockMultipartFile("files", "product-image-0.png", "image/png", "some png".getBytes());
     MockMultipartFile fileAtFirstIndex = new MockMultipartFile("files", "product-image-1.png", "image/png", "some png".getBytes());
@@ -383,12 +385,15 @@ public class AdminProductEndpointTest {
 
       if (i == 0 || i == 1 || i == 3) {
         if (i == 0) {
+          // update
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-0");  
-          assertThat(productImages.get(i).getProductImagePath()).isEqualTo("/products/" + responseBody.getProductId().toString() + "/images/product-image-0.svg");  
+          assertThat(productImages.get(i).getProductImagePath()).matches("/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.svg");  
         } else if (i == 1) {
+          // unchange
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-1");  
-          assertThat(productImages.get(i).getProductImagePath()).isEqualTo("/products/" + responseBody.getProductId().toString() + "/images/product-image-1.png");  
+          assertThat(productImages.get(i).getProductImagePath()).matches("/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");  
         } else if (i == 3) {
+          // remove
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-3");  
           assertThat(productImages.get(i).getProductImagePath()).isEqualTo("");  
         }
@@ -401,16 +406,20 @@ public class AdminProductEndpointTest {
       assertThat(variantDTO.getVariantId()).isNotNull();  
     }
     
-    // assert the files are saved to directory
-    Path newPathForZero = Paths.get(localDirectory + "/product-image-0.svg");
-    Path prevPathForZero = Paths.get(localDirectory + "/product-image-0.png"); // previous one should be removed
-    Path newPathForFirst = Paths.get(localDirectory + "/product-image-1.png");
-    Path prevPathForThird = Paths.get(localDirectory + "/product-image-3.png"); // previous one should be removed
 
-    assertThat(Files.exists(newPathForZero)).isTrue();
-    assertThat(Files.exists(newPathForFirst)).isTrue();
-    assertThat(Files.exists(prevPathForZero)).isFalse();
-    assertThat(Files.exists(prevPathForThird)).isFalse();
+    // check old files are deleted 
+    String pattern = "product-image-0-.+.png|product-image-3-.+.png";
+    List<Path> paths = Files.find(Paths.get(localDirectory), Integer.MAX_VALUE,
+        (path, basicFileAttributes) -> path.toFile().getName().matches(pattern)).collect(Collectors.toList());
+
+    assertThat(paths.size()).isEqualTo(0);
+
+    // check new files are saved 
+    String pattern1 = "product-image-0-.+.svg|product-image-1-.+.png";
+    List<Path> paths1 = Files.find(Paths.get(localDirectory), Integer.MAX_VALUE,
+        (path, basicFileAttributes) -> path.toFile().getName().matches(pattern1)).collect(Collectors.toList());
+
+    assertThat(paths1.size()).isEqualTo(2);
   }
 
   @Test

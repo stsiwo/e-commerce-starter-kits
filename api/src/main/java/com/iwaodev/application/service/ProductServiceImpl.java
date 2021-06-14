@@ -243,6 +243,9 @@ public class ProductServiceImpl implements ProductService {
       newEntity.setProductImageName(criteria.getProductImageName());
 
       Optional<MultipartFile> fileOption = files.stream().filter(file -> {
+
+
+
         /**
          * 'getOriginalFilename()': file name 'getName()': key name for multipart form
          * data
@@ -266,12 +269,15 @@ public class ProductServiceImpl implements ProductService {
           throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only image files are acceptable.");
         }
 
+        // generate unique (including hash for cache) file name
+        String newFileName = this.fileService.generateHashedFileName(file.getOriginalFilename());
+
         logger.info("create local directory and public path");
 
         // construct path
         String localDirectory = this.getProductLocalDirectory(productId);
-        String publicPath = this.getPublicPath(file.getOriginalFilename(), productId.toString());
-        String localDirectoryWithFile = localDirectory + "/" + file.getOriginalFilename();
+        String publicPath = this.getPublicPath(newFileName, productId.toString());
+        String localDirectoryWithFile = localDirectory + "/" + newFileName;
 
         logger.info("local Directory: " + localDirectory + " and public path: " + publicPath);
 
@@ -412,10 +418,13 @@ public class ProductServiceImpl implements ProductService {
           logger.info("only image files are acceptable.");
           throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only image files are acceptable.");
         }
+        
+        // generate unique (including hash for cache) file name
+        String newFileName = this.fileService.generateHashedFileName(file.getOriginalFilename());
 
         // construct path
-        String publicPath = this.getPublicPath(file.getOriginalFilename(), productId.toString());
-        String localDirectoryWithFile = localDirectory + "/" + file.getOriginalFilename();
+        String publicPath = this.getPublicPath(newFileName, productId.toString());
+        String localDirectoryWithFile = localDirectory + "/" + newFileName;
 
         // try to save teh file
         try {

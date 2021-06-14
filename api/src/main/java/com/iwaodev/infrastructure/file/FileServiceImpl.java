@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.iwaodev.application.iservice.FileService;
 
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -121,6 +122,15 @@ public class FileServiceImpl implements FileService {
   @Override
   public String extractFileNameFromPath(String path) {
     return Paths.get(path).getFileName().toString();
+  }
+
+  @Override
+  public String generateHashedFileName(String originalFileName) {
+    String fileName = com.google.common.io.Files.getNameWithoutExtension(originalFileName);
+    String extension = this.getExtension(originalFileName);
+    String hashCode = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 11);
+
+    return fileName + "-" + hashCode + "." + extension;
   }
 
 }

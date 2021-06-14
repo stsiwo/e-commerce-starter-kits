@@ -18,6 +18,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.event.EventListener;
@@ -32,6 +33,7 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
 @SpringBootApplication
 // @ConfigurationProperties(locations =
 // "classpath:myapp-${environment.type}.properties")
+@EnableCaching
 public class Application {
 
   private static final Logger logger = LoggerFactory.getLogger(Application.class);
@@ -81,6 +83,19 @@ public class Application {
 
     return objectMapper;
   }
+
+  /**
+   * cache feature.
+   *
+   * mainly for image cache. don't use too much. it takes a lot of memory.
+   *
+   * if you spring boot, you don't need to create this bean.
+   *
+   **/
+  //@Bean
+  //public CacheManager cacheManager() {
+  //  return new ConcurrentMapCacheManager("addresses");
+  //}
 
   /**
    * jackson xml mapper.

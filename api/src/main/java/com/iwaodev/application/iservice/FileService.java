@@ -22,6 +22,8 @@ public interface FileService {
   public String getExtension(String fileName);
 
   public String extractFileNameFromPath(String path);
+
+  public String generateHashedFileName(String originalFileName);
 }
 
 

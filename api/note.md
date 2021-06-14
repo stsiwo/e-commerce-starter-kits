@@ -1015,6 +1015,9 @@
   - compile (e.g., create .jar file) without test
     - command) mvn package -Dmaven.test.skip=true 
 
+  - display dep tree
+    - command) mvn dependency:tree
+
 # Design Issue
 
   - how to deal with soft delete of users??

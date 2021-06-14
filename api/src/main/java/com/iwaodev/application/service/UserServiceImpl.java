@@ -239,13 +239,16 @@ public class UserServiceImpl implements UserService {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only image files are acceptable.");
     }
 
+    // generate unique (including hash for cache) file name
+    String newFileName = this.fileService.generateHashedFileName(file.getOriginalFilename());
+
     // construct path
     String directoryPath = getDirectoryPath(userId.toString());
-    String fileName = updateFileName(file.getOriginalFilename());
-    String path = directoryPath + "/" + fileName;
+    String fileName = updateFileName(newFileName);
+    String path = directoryPath + "/" + newFileName;
 
     logger.info("directory path: " + directoryPath);
-    logger.info("file name: " + fileName);
+    logger.info("file name: " + newFileName);
     logger.info("path to this file: " + path);
 
     // try to save teh file
@@ -259,7 +262,7 @@ public class UserServiceImpl implements UserService {
     // update the user
     User targetEntity = targetEntityOption.get();
 
-    String publicPath = getPublicDirectoryPath(targetEntity.getUserId().toString()) + "/" + fileName;
+    String publicPath = getPublicDirectoryPath(targetEntity.getUserId().toString()) + "/" + newFileName;
 
     logger.info("public path: " + publicPath);
 
