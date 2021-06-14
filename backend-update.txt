@@ -12,10 +12,6 @@ endpoint change:
       
       - (order) mainImagePath: from the first order detail's product main image (for order list page of member)
 
-  - (impl) /reviews
-  
-    - customer review logic review & flow checking
-    
   - /products (GET) 
   
     - isDiscount query does not work correctly. it return empty result even if some variants have discounts.
@@ -34,10 +30,6 @@ endpoint change:
   
     - identify N+1 sql using logging & monitor.
     
-  - /users (esp admin)
-  
-    - create user status mange form (e.g., active, blacklist and its reason)
-    
   - security: 
   
     - trim all string input from client.
@@ -45,6 +37,8 @@ endpoint change:
     - cross site request forgery enable. research on this subject since we use cookie (httpOnly&secure).
     
     - disable cart icon (on header) when checkout page (don't need to cart drawer at this page)
+    
+    - implement limit login attempts. (see: https://mail.codejava.net/frameworks/spring-boot/spring-security-limit-login-attempts-example)
     
   - unit test
     - addable next order event status
