@@ -11,6 +11,8 @@ endpoint change:
       - (order) totalCost: prevent front-end from calculating (single source of truth)
       
       - (order) mainImagePath: from the first order detail's product main image (for order list page of member)
+        
+      - (product) discountEndDate if it is discount to display at front end.
 
   - /products (GET) 
   
@@ -18,21 +20,13 @@ endpoint change:
     
     - min/maxPrice: something is wrong. when 0 (min) - 50 (max), return nothing.
     
-    - validations:
-    
-      - only return products which are 'public' & have at least one variant.
-    
-  - avatar-image
-  
-    - add cache feature (hasing file name or something)
-  
   - performance:
   
     - identify N+1 sql using logging & monitor.
     
   - security: 
   
-    - trim all string input from client.
+    - trim all string input from client. (need to test)
     
     - cross site request forgery enable. research on this subject since we use cookie (httpOnly&secure).
     
@@ -49,6 +43,8 @@ endpoint change:
     
   - hibernate association testing
     - make sure if product is deleted, its associated orders are not deleted and so on.
+
+  
     
       
     
