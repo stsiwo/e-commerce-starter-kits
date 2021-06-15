@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
@@ -21,6 +22,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.iwaodev.domain.user.UserActiveEnum;
+import com.iwaodev.infrastructure.model.listener.UserValidationListener;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -37,6 +39,7 @@ import lombok.ToString;
 @Data
 @ToString
 @NoArgsConstructor
+@EntityListeners(UserValidationListener.class)
 @Entity(name = "users")
 public class User {
 

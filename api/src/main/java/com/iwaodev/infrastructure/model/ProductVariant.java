@@ -8,6 +8,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,6 +16,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+
+import com.iwaodev.infrastructure.model.listener.ProductVariantValidationListener;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Filter;
@@ -31,6 +34,7 @@ import lombok.NoArgsConstructor;
 @Data
 @ToString
 @NoArgsConstructor
+@EntityListeners(ProductVariantValidationListener.class)
 @Entity(name = "product_variants")
 @FilterDef(
     name = "selectedVariantFilter",
@@ -76,16 +80,16 @@ public class ProductVariant {
   private String variantColor;
 
   @Column(name = "variant_weight")
-  private Double variantWeight; // kg
+  private Double variantWeight = 0.5; // kg
 
   @Column(name = "variant_height")
-  private Double variantHeight; // cm
+  private Double variantHeight = 5.0; // cm
 
   @Column(name = "variant_length")
-  private Double variantLength; // cm
+  private Double variantLength = 5.0; // cm
 
   @Column(name = "variant_width")
-  private Double variantWidth; // cm
+  private Double variantWidth = 5.0; // cm
 
   @CreationTimestamp
   @Column(name = "created_at")

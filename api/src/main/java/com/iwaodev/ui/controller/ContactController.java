@@ -4,7 +4,7 @@ import javax.validation.Valid;
 
 import com.iwaodev.application.iservice.ContactService;
 import com.iwaodev.config.SpringSecurityUser;
-import com.iwaodev.ui.criteria.ContactCriteria;
+import com.iwaodev.ui.criteria.contact.ContactCriteria;
 import com.iwaodev.ui.response.BaseResponse;
 
 import org.slf4j.Logger;

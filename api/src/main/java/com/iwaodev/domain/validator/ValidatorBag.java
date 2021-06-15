@@ -4,5 +4,5 @@ import com.iwaodev.exception.DomainValidationException;
 
 public interface ValidatorBag<D> {
 
-  public boolean validateAll(D domain) throws DomainValidationException;
+  public boolean validateAll(D domain, String when) throws DomainValidationException;
 }

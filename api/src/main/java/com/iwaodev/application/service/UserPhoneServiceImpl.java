@@ -13,7 +13,7 @@ import com.iwaodev.application.iservice.UserPhoneService;
 import com.iwaodev.application.mapper.PhoneMapper;
 import com.iwaodev.infrastructure.model.Phone;
 import com.iwaodev.infrastructure.model.User;
-import com.iwaodev.ui.criteria.UserPhoneCriteria;
+import com.iwaodev.ui.criteria.user.UserPhoneCriteria;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

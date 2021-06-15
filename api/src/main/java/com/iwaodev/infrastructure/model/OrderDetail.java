@@ -5,12 +5,15 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
+
+import com.iwaodev.infrastructure.model.listener.OrderDetailValidationListener;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Formula;
@@ -28,6 +31,7 @@ import lombok.ToString;
 @Entity(name = "orderDetails")
 @Data
 @NoArgsConstructor
+@EntityListeners(OrderDetailValidationListener.class)
 @ToString
 public class OrderDetail {
 

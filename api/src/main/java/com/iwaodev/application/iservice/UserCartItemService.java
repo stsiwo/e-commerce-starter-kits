@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.iwaodev.application.dto.cartItem.CartItemDTO;
 import com.iwaodev.application.dto.product.ProductDTO;
-import com.iwaodev.ui.criteria.CartItemCriteria;
+import com.iwaodev.ui.criteria.cartItem.CartItemCriteria;
 
 public interface UserCartItemService {
 

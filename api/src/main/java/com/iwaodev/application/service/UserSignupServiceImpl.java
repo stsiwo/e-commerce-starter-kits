@@ -11,7 +11,7 @@ import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.domain.user.event.GeneratedVerificationTokenEvent;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.infrastructure.model.UserType;
-import com.iwaodev.ui.criteria.UserSignupCriteria;
+import com.iwaodev.ui.criteria.user.UserSignupCriteria;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

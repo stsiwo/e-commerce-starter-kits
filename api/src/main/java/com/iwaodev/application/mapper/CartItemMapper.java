@@ -4,7 +4,7 @@ import com.iwaodev.application.dto.cartItem.CartItemDTO;
 import com.iwaodev.application.dto.product.ProductDTO;
 import com.iwaodev.infrastructure.model.CartItem;
 import com.iwaodev.infrastructure.model.ProductVariant;
-import com.iwaodev.ui.criteria.CartItemCriteria;
+import com.iwaodev.ui.criteria.cartItem.CartItemCriteria;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

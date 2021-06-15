@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iwaodev.application.mapper.UserMapper;
 import com.iwaodev.infrastructure.model.User;
-import com.iwaodev.ui.criteria.UserCriteria;
+import com.iwaodev.ui.criteria.user.UserCriteria;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;

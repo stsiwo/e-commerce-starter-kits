@@ -10,8 +10,8 @@ import com.iwaodev.application.mapper.CategoryMapper;
 import com.iwaodev.application.specification.factory.CategorySpecificationFactory;
 import com.iwaodev.domain.category.CategorySortEnum;
 import com.iwaodev.infrastructure.model.Category;
-import com.iwaodev.ui.criteria.CategoryCriteria;
-import com.iwaodev.ui.criteria.CategoryQueryStringCriteria;
+import com.iwaodev.ui.criteria.category.CategoryCriteria;
+import com.iwaodev.ui.criteria.category.CategoryQueryStringCriteria;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

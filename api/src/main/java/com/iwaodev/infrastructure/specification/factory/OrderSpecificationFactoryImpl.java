@@ -6,7 +6,7 @@ import com.iwaodev.infrastructure.model.Order;
 import com.iwaodev.infrastructure.model.Product;
 import com.iwaodev.infrastructure.specification.OrderSpecifications;
 import com.iwaodev.infrastructure.specification.ProductSpecifications;
-import com.iwaodev.ui.criteria.ProductQueryStringCriteria;
+import com.iwaodev.ui.criteria.product.ProductQueryStringCriteria;
 import com.iwaodev.ui.criteria.order.OrderQueryStringCriteria;
 
 import org.springframework.beans.factory.annotation.Autowired;

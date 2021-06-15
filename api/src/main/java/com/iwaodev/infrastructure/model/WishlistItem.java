@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -12,6 +13,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+
+import com.iwaodev.infrastructure.model.listener.WishlistItemValidationListener;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -28,6 +31,7 @@ import lombok.ToString;
 @Data
 @ToString
 @NoArgsConstructor
+@EntityListeners(WishlistItemValidationListener.class)
 @Entity(name = "wishlistItems")
 @Table(name = "wishlist_items", uniqueConstraints = @UniqueConstraint(columnNames = { "user_id", "variant_id" }))
 public class WishlistItem implements Serializable {

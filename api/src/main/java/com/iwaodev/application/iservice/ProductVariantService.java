@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.iwaodev.application.dto.productVariant.ProductVariantDTO;
-import com.iwaodev.ui.criteria.ProductVariantCriteria;
+import com.iwaodev.ui.criteria.product.ProductVariantCriteria;
 
 public interface ProductVariantService {
 

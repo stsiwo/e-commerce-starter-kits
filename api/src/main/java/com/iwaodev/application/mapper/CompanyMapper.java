@@ -2,7 +2,7 @@ package com.iwaodev.application.mapper;
 
 import com.iwaodev.application.dto.company.CompanyDTO;
 import com.iwaodev.infrastructure.model.Company;
-import com.iwaodev.ui.criteria.UserCompanyCriteria;
+import com.iwaodev.ui.criteria.user.UserCompanyCriteria;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

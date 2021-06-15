@@ -8,6 +8,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import com.iwaodev.config.MailConfig;
 import com.iwaodev.infrastructure.shipping.ShippingApiRequestInterceptor;
+import com.iwaodev.util.TrimStringModule;
 import com.stripe.Stripe;
 
 import org.slf4j.Logger;
@@ -47,6 +48,11 @@ public class Application {
   @Autowired
   private MailConfig mailConfig;
 
+  @Autowired
+  private TrimStringModule trimStringModule;
+
+
+
   public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
   }
@@ -80,6 +86,13 @@ public class Application {
      **/
 
     objectMapper.findAndRegisterModules();
+
+    /**
+     * trim leading/trailing space of any value.
+     *
+     * ref: https://stackoverflow.com/questions/6852213/can-jackson-be-configured-to-trim-leading-trailing-whitespace-from-all-string-pr
+     **/
+    objectMapper.registerModule(this.trimStringModule);
 
     return objectMapper;
   }

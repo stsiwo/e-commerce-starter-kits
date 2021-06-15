@@ -5,8 +5,8 @@ import javax.validation.Valid;
 import com.iwaodev.application.dto.category.CategoryDTO;
 import com.iwaodev.application.iservice.CategoryService;
 import com.iwaodev.domain.category.CategorySortEnum;
-import com.iwaodev.ui.criteria.CategoryCriteria;
-import com.iwaodev.ui.criteria.CategoryQueryStringCriteria;
+import com.iwaodev.ui.criteria.category.CategoryCriteria;
+import com.iwaodev.ui.criteria.category.CategoryQueryStringCriteria;
 import com.iwaodev.ui.response.BaseResponse;
 
 import org.slf4j.Logger;

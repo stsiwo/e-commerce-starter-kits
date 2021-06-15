@@ -11,7 +11,7 @@ import com.iwaodev.application.iservice.AuthenticationService;
 import com.iwaodev.application.iservice.UserSignupService;
 import com.iwaodev.config.ApiTokenCookieConfig;
 import com.iwaodev.config.SpringSecurityUser;
-import com.iwaodev.ui.criteria.UserSignupCriteria;
+import com.iwaodev.ui.criteria.user.UserSignupCriteria;
 import com.iwaodev.ui.response.AuthenticationResponse;
 import com.iwaodev.ui.response.BaseResponse;
 import com.iwaodev.util.JwtUtil;

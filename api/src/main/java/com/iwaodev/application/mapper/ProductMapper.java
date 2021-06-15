@@ -2,7 +2,7 @@ package com.iwaodev.application.mapper;
 
 import com.iwaodev.application.dto.product.ProductDTO;
 import com.iwaodev.infrastructure.model.Product;
-import com.iwaodev.ui.criteria.ProductCriteria;
+import com.iwaodev.ui.criteria.product.ProductCriteria;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

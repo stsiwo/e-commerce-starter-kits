@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
@@ -29,6 +30,7 @@ import com.iwaodev.domain.order.event.CompletedOrderPaymentEvent;
 import com.iwaodev.domain.order.event.OrderFinalConfirmedEvent;
 import com.iwaodev.domain.order.event.ReceivedCancelRequestEvent;
 import com.iwaodev.domain.order.event.ReceivedReturnRequestEvent;
+import com.iwaodev.infrastructure.model.listener.OrderValidationListener;
 import com.iwaodev.ui.criteria.order.OrderEventCriteria;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -52,6 +54,7 @@ import lombok.ToString;
 
 @ToString
 @Data
+@EntityListeners(OrderValidationListener.class)
 @Entity(name = "orders")
 public class Order {
 
@@ -593,32 +596,4 @@ public class Order {
 
     return event;
   }
-
-  /**
-   * switch from AggregateRoot Event to Spring Events.
-   *
-   * see note.md more detail.
-   *
-   **/
-
-  // domain events
-  // public Order completeFinalConfirm(String stripeCustomerId) {
-  // this.registerEvent(new OrderFinalConfirmedEvent(this, stripeCustomerId));
-  // return this;
-  // }
-
-  // public Order completePayment() {
-  // this.registerEvent(new CompletedOrderPaymentEvent(this));
-  // return this;
-  // }
-
-  // public Order receiveReturnRequest() {
-  // this.registerEvent(new ReceivedReturnRequestEvent(this));
-  // return this;
-  // }
-
-  // public Order receiveCancelRequest() {
-  // this.registerEvent(new ReceivedCancelRequestEvent(this));
-  // return this;
-  // }
 }

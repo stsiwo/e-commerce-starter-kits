@@ -17,12 +17,21 @@ public class NotificationValidatorBag implements ValidatorBag<Notification> {
   private List<Validator<Notification>> validators;
 
 	@Override
-	public boolean validateAll(Notification domain) throws DomainValidationException {
+	public boolean validateAll(Notification domain, String when) throws DomainValidationException {
 
     boolean result = false;
 
     for (Validator<Notification> validator : this.validators) {
-      result = validator.validate(domain);
+      result = validator.validateWhenBoth(domain);
+
+      // run only if @PrePersist
+      if (when.equals("create")) {
+        result = validator.validateWhenCreate(domain);
+      }
+      // run only if @PreUpdate
+      if (when.equals("update")) {
+        result = validator.validateWhenUpdate(domain);
+      }
     }
 
     return result;

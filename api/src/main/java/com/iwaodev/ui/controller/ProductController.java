@@ -9,8 +9,8 @@ import javax.validation.Valid;
 import com.iwaodev.application.dto.product.ProductDTO;
 import com.iwaodev.application.iservice.ProductService;
 import com.iwaodev.domain.product.ProductSortEnum;
-import com.iwaodev.ui.criteria.ProductCriteria;
-import com.iwaodev.ui.criteria.ProductQueryStringCriteria;
+import com.iwaodev.ui.criteria.product.ProductCriteria;
+import com.iwaodev.ui.criteria.product.ProductQueryStringCriteria;
 import com.iwaodev.ui.response.BaseResponse;
 
 import org.slf4j.Logger;

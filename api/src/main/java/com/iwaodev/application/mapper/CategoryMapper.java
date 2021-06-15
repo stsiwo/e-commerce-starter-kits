@@ -5,7 +5,7 @@ import java.util.List;
 import com.iwaodev.application.dto.category.CategoryDTO;
 import com.iwaodev.infrastructure.model.Category;
 import com.iwaodev.infrastructure.model.Product;
-import com.iwaodev.ui.criteria.CategoryCriteria;
+import com.iwaodev.ui.criteria.category.CategoryCriteria;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

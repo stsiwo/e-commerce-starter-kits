@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.iwaodev.application.dto.user.PhoneDTO;
-import com.iwaodev.ui.criteria.UserPhoneCriteria;
+import com.iwaodev.ui.criteria.user.UserPhoneCriteria;
 
 public interface UserPhoneService {
 

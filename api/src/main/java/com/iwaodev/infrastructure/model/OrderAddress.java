@@ -4,25 +4,25 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+import com.iwaodev.infrastructure.model.listener.OrderAddressValidationListener;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 @Data
 @ToString
+@EntityListeners(OrderAddressValidationListener.class)
 @Entity(name = "orderAddresses")
 public class OrderAddress {
 

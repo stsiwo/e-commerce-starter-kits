@@ -2,7 +2,6 @@ package com.iwaodev.ui.criteria.order;
 
 import java.util.UUID;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import com.iwaodev.domain.order.OrderStatusEnum;

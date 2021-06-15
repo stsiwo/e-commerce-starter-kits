@@ -6,9 +6,6 @@ import java.util.UUID;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
-import com.iwaodev.domain.order.OrderStatusEnum;
-import com.iwaodev.infrastructure.model.OrderEvent;
-
 import org.springframework.validation.annotation.Validated;
 
 import lombok.Data;
@@ -37,16 +34,16 @@ public class OrderCriteria {
    **/
   private String note;
 
-  @NotEmpty(message = "first name of the customer must not be null.")
+  @NotEmpty(message = "first name of the customer can not be null.")
   private String orderFirstName;
 
-  @NotEmpty(message = "last name of the customer must not be null.")
+  @NotEmpty(message = "last name of the customer can not be null.")
   private String orderLastName;
 
-  @NotEmpty(message = "email of the customer must not be null.")
+  @NotEmpty(message = "email of the customer can not be null.")
   private String orderEmail;
 
-  @NotEmpty(message = "phone of the customer must not be null.")
+  @NotEmpty(message = "phone of the customer can not be null.")
   private String orderPhone;
 
   @Valid

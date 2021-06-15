@@ -3,7 +3,7 @@ package com.iwaodev.infrastructure.specification.factory;
 import com.iwaodev.application.specification.factory.ProductSpecificationFactory;
 import com.iwaodev.infrastructure.model.Product;
 import com.iwaodev.infrastructure.specification.ProductSpecifications;
-import com.iwaodev.ui.criteria.ProductQueryStringCriteria;
+import com.iwaodev.ui.criteria.product.ProductQueryStringCriteria;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;

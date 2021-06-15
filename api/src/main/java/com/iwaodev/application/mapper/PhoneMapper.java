@@ -2,7 +2,7 @@ package com.iwaodev.application.mapper;
 
 import com.iwaodev.application.dto.user.PhoneDTO;
 import com.iwaodev.infrastructure.model.Phone;
-import com.iwaodev.ui.criteria.UserPhoneCriteria;
+import com.iwaodev.ui.criteria.user.UserPhoneCriteria;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

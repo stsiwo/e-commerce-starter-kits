@@ -8,7 +8,7 @@ import javax.validation.Valid;
 import com.iwaodev.application.dto.company.CompanyDTO;
 import com.iwaodev.application.iservice.CompanyService;
 import com.iwaodev.config.SpringSecurityUser;
-import com.iwaodev.ui.criteria.UserCompanyCriteria;
+import com.iwaodev.ui.criteria.user.UserCompanyCriteria;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

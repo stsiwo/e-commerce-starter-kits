@@ -10,7 +10,7 @@ import com.iwaodev.application.dto.cartItem.CartItemDTO;
 import com.iwaodev.application.dto.product.ProductDTO;
 import com.iwaodev.application.iservice.UserCartItemService;
 import com.iwaodev.config.SpringSecurityUser;
-import com.iwaodev.ui.criteria.CartItemCriteria;
+import com.iwaodev.ui.criteria.cartItem.CartItemCriteria;
 import com.iwaodev.ui.response.BaseResponse;
 
 import org.slf4j.Logger;

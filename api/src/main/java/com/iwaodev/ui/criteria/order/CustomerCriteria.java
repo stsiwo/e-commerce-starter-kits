@@ -23,17 +23,17 @@ import lombok.ToString;
 @Validated
 public class CustomerCriteria {
 
-  @NotEmpty(message = "user id must not be null.")
+  @NotEmpty(message = "user id can not be null.")
   private UUID userId;
   
-  @NotEmpty(message = "first name must not be null.")
+  @NotEmpty(message = "first name can not be null.")
   private String firstName;
 
-  @NotEmpty(message = "last name must not be null.")
+  @NotEmpty(message = "last name can not be null.")
   private String lastName;
 
-  @NotEmpty(message = "email must not be null.")
-  @Email(message = "email must be valid format.")
+  @NotEmpty(message = "email can not be null.")
+  @Email(message = "email can be valid format.")
   private String email;
 
 }

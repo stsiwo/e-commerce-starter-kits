@@ -8,7 +8,7 @@ import javax.validation.Valid;
 import com.iwaodev.application.dto.user.PhoneDTO;
 import com.iwaodev.application.iservice.UserPhoneService;
 import com.iwaodev.config.SpringSecurityUser;
-import com.iwaodev.ui.criteria.UserPhoneCriteria;
+import com.iwaodev.ui.criteria.user.UserPhoneCriteria;
 import com.iwaodev.ui.response.BaseResponse;
 
 import org.slf4j.Logger;

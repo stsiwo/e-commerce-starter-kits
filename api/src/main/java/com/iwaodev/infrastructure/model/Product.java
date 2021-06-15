@@ -256,40 +256,30 @@ public class Product {
    *  - price logic
    *
    *    - if variant discount price available, return this
-   *    - else if variant unit price is set, return this
    *    - else if product discount price available, return this
+   *    - else if variant unit price is set, return this
    *    - else return product base unit price.
    * 
    **/
   public BigDecimal getCurrentPriceOfVariant(Long variantId) throws NotFoundException {
 
-    logger.info("before find");
-
     ProductVariant variant = this.findVariantById(variantId);
-
-    logger.info("after find");
 
     if (variant == null) {
       throw new NotFoundException("the target variant does not exist. (variant id: " + variantId + ")");
     }
 
-    logger.info("before variant discount price");
-
     if (variant.getIsDiscount()) {
       return variant.getVariantDiscountPrice();
     } 
 
-    logger.info("before variant unit price");
+    if (this.getIsDiscount()) {
+      return this.getProductBaseDiscountPrice();
+    }
 
     if (variant.getVariantUnitPrice() != null) {
       return variant.getVariantUnitPrice();
     } 
-
-    logger.info("after variant unit price");
-
-    if (this.getIsDiscount()) {
-      return this.getProductBaseDiscountPrice();
-    }
 
     return this.getProductBaseUnitPrice();
   }

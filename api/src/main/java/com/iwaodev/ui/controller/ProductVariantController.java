@@ -11,9 +11,9 @@ import com.iwaodev.application.dto.productVariant.ProductVariantDTO;
 import com.iwaodev.application.iservice.ProductService;
 import com.iwaodev.application.iservice.ProductVariantService;
 import com.iwaodev.domain.product.ProductSortEnum;
-import com.iwaodev.ui.criteria.ProductCriteria;
-import com.iwaodev.ui.criteria.ProductQueryStringCriteria;
-import com.iwaodev.ui.criteria.ProductVariantCriteria;
+import com.iwaodev.ui.criteria.product.ProductCriteria;
+import com.iwaodev.ui.criteria.product.ProductQueryStringCriteria;
+import com.iwaodev.ui.criteria.product.ProductVariantCriteria;
 import com.iwaodev.ui.response.BaseResponse;
 
 import org.slf4j.Logger;

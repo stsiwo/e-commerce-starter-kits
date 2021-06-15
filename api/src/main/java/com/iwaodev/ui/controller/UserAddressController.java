@@ -10,7 +10,7 @@ import javax.validation.constraints.NotEmpty;
 import com.iwaodev.application.dto.user.AddressDTO;
 import com.iwaodev.application.iservice.UserAddressService;
 import com.iwaodev.config.SpringSecurityUser;
-import com.iwaodev.ui.criteria.UserAddressCriteria;
+import com.iwaodev.ui.criteria.user.UserAddressCriteria;
 import com.iwaodev.ui.response.BaseResponse;
 
 import org.slf4j.Logger;

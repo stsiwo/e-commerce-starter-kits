@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -13,6 +14,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import com.iwaodev.infrastructure.model.listener.CartItemValidationListener;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -20,15 +23,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-/**
- * #TODO: rename this class to CartItemList or CartItems
- *
- * - also id to cartItemId
- *
- **/
 @Data
 @ToString
 @NoArgsConstructor
+@EntityListeners(CartItemValidationListener.class)
 @Entity(name = "cartItems")
 @Table(name = "cart_items", uniqueConstraints = @UniqueConstraint(columnNames = { "user_id", "variant_id" }))
 public class CartItem implements Serializable {

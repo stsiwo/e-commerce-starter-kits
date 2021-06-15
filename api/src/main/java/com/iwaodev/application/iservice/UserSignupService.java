@@ -3,7 +3,7 @@ package com.iwaodev.application.iservice;
 import java.util.UUID;
 
 import com.iwaodev.application.dto.user.UserDTO;
-import com.iwaodev.ui.criteria.UserSignupCriteria;
+import com.iwaodev.ui.criteria.user.UserSignupCriteria;
 
 public interface UserSignupService {
 

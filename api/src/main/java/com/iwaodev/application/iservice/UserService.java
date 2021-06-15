@@ -4,9 +4,9 @@ import java.util.UUID;
 
 import com.iwaodev.application.dto.user.UserDTO;
 import com.iwaodev.domain.user.UserSortEnum;
-import com.iwaodev.ui.criteria.UserCriteria;
-import com.iwaodev.ui.criteria.UserDeleteTempCriteria;
-import com.iwaodev.ui.criteria.UserQueryStringCriteria;
+import com.iwaodev.ui.criteria.user.UserCriteria;
+import com.iwaodev.ui.criteria.user.UserDeleteTempCriteria;
+import com.iwaodev.ui.criteria.user.UserQueryStringCriteria;
 import com.iwaodev.ui.criteria.user.UserStatusCriteria;
 
 import org.springframework.data.domain.Page;

@@ -3,7 +3,7 @@ package com.iwaodev.infrastructure.specification.factory;
 import com.iwaodev.application.specification.factory.UserSpecificationFactory;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.infrastructure.specification.UserSpecifications;
-import com.iwaodev.ui.criteria.UserQueryStringCriteria;
+import com.iwaodev.ui.criteria.user.UserQueryStringCriteria;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;

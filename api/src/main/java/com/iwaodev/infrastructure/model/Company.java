@@ -2,12 +2,15 @@ package com.iwaodev.infrastructure.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+
+import com.iwaodev.infrastructure.model.listener.UserCompanyValidationListener;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +19,7 @@ import lombok.ToString;
 @Data
 @ToString
 @NoArgsConstructor
+@EntityListeners(UserCompanyValidationListener.class)
 @Entity(name="companies")
 public class Company {
 

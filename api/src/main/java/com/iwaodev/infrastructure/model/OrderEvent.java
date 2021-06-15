@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
@@ -13,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import com.iwaodev.domain.order.OrderStatusEnum;
+import com.iwaodev.infrastructure.model.listener.OrderEventValidationListener;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -23,6 +25,7 @@ import lombok.ToString;
 @Data
 @ToString
 @NoArgsConstructor
+@EntityListeners(OrderEventValidationListener.class)
 @Entity(name = "orderEvents")
 public class OrderEvent {
 

@@ -17,6 +17,8 @@ public @interface Password {
 
   String message() default "{Password.invalid}";
 
+  boolean optional() default true;
+
   Class<?>[] groups() default { };
 
   Class<? extends Payload>[] payload() default { };

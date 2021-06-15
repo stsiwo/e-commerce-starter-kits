@@ -13,7 +13,7 @@ import com.iwaodev.application.iservice.UserAddressService;
 import com.iwaodev.application.mapper.AddressMapper;
 import com.iwaodev.infrastructure.model.Address;
 import com.iwaodev.infrastructure.model.User;
-import com.iwaodev.ui.criteria.UserAddressCriteria;
+import com.iwaodev.ui.criteria.user.UserAddressCriteria;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

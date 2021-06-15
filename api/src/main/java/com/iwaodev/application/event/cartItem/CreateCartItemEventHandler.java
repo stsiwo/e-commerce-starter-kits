@@ -6,7 +6,7 @@ import com.iwaodev.application.iservice.UserCartItemService;
 import com.iwaodev.domain.order.event.OrderFinalConfirmedEvent;
 import com.iwaodev.domain.wishlistItem.event.MovedWishlistItemToCartItemEvent;
 import com.iwaodev.infrastructure.model.User;
-import com.iwaodev.ui.criteria.CartItemCriteria;
+import com.iwaodev.ui.criteria.cartItem.CartItemCriteria;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

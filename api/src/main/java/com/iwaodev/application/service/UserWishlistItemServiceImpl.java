@@ -26,7 +26,7 @@ import com.iwaodev.infrastructure.model.Product;
 import com.iwaodev.infrastructure.model.ProductVariant;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.infrastructure.model.WishlistItem;
-import com.iwaodev.ui.criteria.WishlistItemQueryStringCriteria;
+import com.iwaodev.ui.criteria.wishlistItem.WishlistItemQueryStringCriteria;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

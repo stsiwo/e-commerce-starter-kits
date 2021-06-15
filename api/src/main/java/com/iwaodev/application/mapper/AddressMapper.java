@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.iwaodev.application.dto.user.AddressDTO;
 import com.iwaodev.infrastructure.model.Address;
-import com.iwaodev.ui.criteria.UserAddressCriteria;
+import com.iwaodev.ui.criteria.user.UserAddressCriteria;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

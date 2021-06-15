@@ -21,7 +21,7 @@ import com.iwaodev.infrastructure.model.CartItem;
 import com.iwaodev.infrastructure.model.Product;
 import com.iwaodev.infrastructure.model.ProductVariant;
 import com.iwaodev.infrastructure.model.User;
-import com.iwaodev.ui.criteria.CartItemCriteria;
+import com.iwaodev.ui.criteria.cartItem.CartItemCriteria;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -4,7 +4,7 @@ import com.iwaodev.application.dto.wishlistItem.WishlistItemDTO;
 import com.iwaodev.application.dto.product.ProductDTO;
 import com.iwaodev.infrastructure.model.WishlistItem;
 import com.iwaodev.infrastructure.model.ProductVariant;
-import com.iwaodev.ui.criteria.WishlistItemCriteria;
+import com.iwaodev.ui.criteria.wishlistItem.WishlistItemCriteria;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

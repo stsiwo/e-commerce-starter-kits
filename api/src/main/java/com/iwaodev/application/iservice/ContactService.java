@@ -2,7 +2,8 @@ package com.iwaodev.application.iservice;
 
 import java.util.UUID;
 
-import com.iwaodev.ui.criteria.ContactCriteria;
+import com.iwaodev.ui.criteria.contact.ContactCriteria;
+
 
 public interface ContactService {
 

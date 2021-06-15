@@ -10,8 +10,8 @@ import com.iwaodev.application.dto.wishlistItem.WishlistItemDTO;
 import com.iwaodev.application.iservice.UserWishlistItemService;
 import com.iwaodev.config.SpringSecurityUser;
 import com.iwaodev.domain.product.ProductSortEnum;
-import com.iwaodev.ui.criteria.WishlistItemCriteria;
-import com.iwaodev.ui.criteria.WishlistItemQueryStringCriteria;
+import com.iwaodev.ui.criteria.wishlistItem.WishlistItemCriteria;
+import com.iwaodev.ui.criteria.wishlistItem.WishlistItemQueryStringCriteria;
 import com.iwaodev.ui.response.BaseResponse;
 
 import org.slf4j.Logger;

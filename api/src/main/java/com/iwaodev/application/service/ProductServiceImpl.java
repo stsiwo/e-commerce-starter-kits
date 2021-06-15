@@ -21,10 +21,10 @@ import com.iwaodev.domain.product.ProductSortEnum;
 import com.iwaodev.infrastructure.model.Phone;
 import com.iwaodev.infrastructure.model.Product;
 import com.iwaodev.infrastructure.model.ProductImage;
-import com.iwaodev.ui.criteria.ProductCriteria;
-import com.iwaodev.ui.criteria.ProductImageCriteria;
-import com.iwaodev.ui.criteria.UserDeleteTempCriteria;
-import com.iwaodev.ui.criteria.ProductQueryStringCriteria;
+import com.iwaodev.ui.criteria.product.ProductCriteria;
+import com.iwaodev.ui.criteria.product.ProductImageCriteria;
+import com.iwaodev.ui.criteria.user.UserDeleteTempCriteria;
+import com.iwaodev.ui.criteria.product.ProductQueryStringCriteria;
 
 import org.hibernate.Filter;
 import org.hibernate.Session;

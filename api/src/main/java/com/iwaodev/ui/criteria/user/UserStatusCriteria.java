@@ -2,7 +2,6 @@ package com.iwaodev.ui.criteria.user;
 
 import java.util.UUID;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.iwaodev.domain.user.UserActiveEnum;

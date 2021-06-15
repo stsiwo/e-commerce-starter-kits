@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import com.iwaodev.application.dto.product.ProductDTO;
 import com.iwaodev.domain.product.ProductSortEnum;
-import com.iwaodev.ui.criteria.ProductCriteria;
-import com.iwaodev.ui.criteria.ProductQueryStringCriteria;
+import com.iwaodev.ui.criteria.product.ProductCriteria;
+import com.iwaodev.ui.criteria.product.ProductQueryStringCriteria;
 
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;

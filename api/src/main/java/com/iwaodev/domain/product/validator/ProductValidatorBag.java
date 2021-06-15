@@ -17,12 +17,21 @@ public class ProductValidatorBag implements ValidatorBag<Product> {
   private List<Validator<Product>> validators;
 
 	@Override
-	public boolean validateAll(Product domain) throws DomainValidationException {
+	public boolean validateAll(Product domain, String when) throws DomainValidationException {
 
     boolean result = false;
 
     for (Validator<Product> validator : this.validators) {
-      result = validator.validate(domain);
+      result = validator.validateWhenBoth(domain);
+
+      // run only if @PrePersist
+      if (when.equals("create")) {
+        result = validator.validateWhenCreate(domain);
+      }
+      // run only if @PreUpdate
+      if (when.equals("update")) {
+        result = validator.validateWhenUpdate(domain);
+      }
     }
 
     return result;

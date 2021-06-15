@@ -13,7 +13,7 @@ import com.iwaodev.application.iservice.CompanyService;
 import com.iwaodev.application.mapper.CompanyMapper;
 import com.iwaodev.infrastructure.model.Company;
 import com.iwaodev.infrastructure.model.User;
-import com.iwaodev.ui.criteria.UserCompanyCriteria;
+import com.iwaodev.ui.criteria.user.UserCompanyCriteria;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

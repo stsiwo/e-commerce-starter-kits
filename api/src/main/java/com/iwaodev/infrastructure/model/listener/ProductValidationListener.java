@@ -25,16 +25,26 @@ public class ProductValidationListener {
   private ValidatorBag<Product> validatorBag;
 
   @PrePersist
-  @PreUpdate
-  private void beforeAnyUpdate(Product product) {
+  private void beforeCreate(Product product) {
     logger.info("start validating product domain...");
     try {
-      this.validatorBag.validateAll(product);
+      this.validatorBag.validateAll(product, "create");
     } catch (DomainValidationException e) {
       logger.info(e.getMessage());
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
     logger.info("the product domain passed all validation:)");
   }
-
+  
+  @PreUpdate
+  private void beforeUpdate(Product product) {
+    logger.info("start validating product domain...");
+    try {
+      this.validatorBag.validateAll(product, "update");
+    } catch (DomainValidationException e) {
+      logger.info(e.getMessage());
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+    logger.info("the product domain passed all validation:)");
+  }
 }

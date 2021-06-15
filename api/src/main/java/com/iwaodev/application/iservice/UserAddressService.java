@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.iwaodev.application.dto.user.AddressDTO;
-import com.iwaodev.ui.criteria.UserAddressCriteria;
+import com.iwaodev.ui.criteria.user.UserAddressCriteria;
 
 public interface UserAddressService {
 

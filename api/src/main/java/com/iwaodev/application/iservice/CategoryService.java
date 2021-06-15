@@ -2,8 +2,8 @@ package com.iwaodev.application.iservice;
 
 import com.iwaodev.application.dto.category.CategoryDTO;
 import com.iwaodev.domain.category.CategorySortEnum;
-import com.iwaodev.ui.criteria.CategoryCriteria;
-import com.iwaodev.ui.criteria.CategoryQueryStringCriteria;
+import com.iwaodev.ui.criteria.category.CategoryCriteria;
+import com.iwaodev.ui.criteria.category.CategoryQueryStringCriteria;
 
 import org.springframework.data.domain.Page;
 

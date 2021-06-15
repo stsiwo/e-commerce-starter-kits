@@ -12,7 +12,7 @@ import com.iwaodev.application.iservice.ContactService;
 import com.iwaodev.application.iservice.EmailService;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.infrastructure.model.User;
-import com.iwaodev.ui.criteria.ContactCriteria;
+import com.iwaodev.ui.criteria.contact.ContactCriteria;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

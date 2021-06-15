@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import com.iwaodev.application.dto.wishlistItem.WishlistItemDTO;
 import com.iwaodev.domain.product.ProductSortEnum;
-import com.iwaodev.ui.criteria.WishlistItemQueryStringCriteria;
+import com.iwaodev.ui.criteria.wishlistItem.WishlistItemQueryStringCriteria;
 
 import org.springframework.data.domain.Page;
 

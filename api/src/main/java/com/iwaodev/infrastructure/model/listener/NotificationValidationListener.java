@@ -25,16 +25,26 @@ public class NotificationValidationListener {
   private ValidatorBag<Notification> validatorBag;
 
   @PrePersist
-  @PreUpdate
-  private void beforeAnyUpdate(Notification notification) {
+  private void beforeCreate(Notification notification) {
     logger.info("start validating notification domain...");
     try {
-      this.validatorBag.validateAll(notification);
+      this.validatorBag.validateAll(notification, "create");
     } catch (DomainValidationException e) {
       logger.info(e.getMessage());
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
     logger.info("the notification domain passed all validation:)");
   }
-
+  
+  @PreUpdate
+  private void beforeUpdate(Notification notification) {
+    logger.info("start validating notification domain...");
+    try {
+      this.validatorBag.validateAll(notification, "update");
+    } catch (DomainValidationException e) {
+      logger.info(e.getMessage());
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+    logger.info("the notification domain passed all validation:)");
+  }
 }

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.iwaodev.application.dto.company.CompanyDTO;
-import com.iwaodev.ui.criteria.UserCompanyCriteria;
+import com.iwaodev.ui.criteria.user.UserCompanyCriteria;
 
 public interface CompanyService {
 

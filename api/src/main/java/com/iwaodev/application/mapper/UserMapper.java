@@ -2,8 +2,8 @@ package com.iwaodev.application.mapper;
 
 import com.iwaodev.application.dto.user.UserDTO;
 import com.iwaodev.infrastructure.model.User;
-import com.iwaodev.ui.criteria.UserCriteria;
-import com.iwaodev.ui.criteria.UserSignupCriteria;
+import com.iwaodev.ui.criteria.user.UserCriteria;
+import com.iwaodev.ui.criteria.user.UserSignupCriteria;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

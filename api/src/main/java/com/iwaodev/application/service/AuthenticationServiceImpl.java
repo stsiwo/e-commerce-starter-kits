@@ -18,8 +18,8 @@ import com.iwaodev.config.ApiTokenCookieConfig;
 import com.iwaodev.domain.category.CategorySortEnum;
 import com.iwaodev.infrastructure.model.Category;
 import com.iwaodev.infrastructure.model.User;
-import com.iwaodev.ui.criteria.CategoryCriteria;
-import com.iwaodev.ui.criteria.CategoryQueryStringCriteria;
+import com.iwaodev.ui.criteria.category.CategoryCriteria;
+import com.iwaodev.ui.criteria.category.CategoryQueryStringCriteria;
 import com.iwaodev.ui.response.AuthenticationResponse;
 import com.iwaodev.util.JwtUtil;
 

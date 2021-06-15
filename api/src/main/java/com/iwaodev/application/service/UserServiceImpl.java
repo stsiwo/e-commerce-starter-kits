@@ -20,9 +20,9 @@ import com.iwaodev.domain.user.UserActiveEnum;
 import com.iwaodev.domain.user.UserSortEnum;
 import com.iwaodev.infrastructure.model.Phone;
 import com.iwaodev.infrastructure.model.User;
-import com.iwaodev.ui.criteria.UserCriteria;
-import com.iwaodev.ui.criteria.UserDeleteTempCriteria;
-import com.iwaodev.ui.criteria.UserQueryStringCriteria;
+import com.iwaodev.ui.criteria.user.UserCriteria;
+import com.iwaodev.ui.criteria.user.UserDeleteTempCriteria;
+import com.iwaodev.ui.criteria.user.UserQueryStringCriteria;
 import com.iwaodev.ui.criteria.user.UserStatusCriteria;
 
 import org.slf4j.Logger;
