@@ -47,6 +47,9 @@ endpoint change:
   - notification 
     - complete notification (e.g., adding notification type and publish the event to create a new notification, scheduling tasks to delete read notification)
     
+  - hibernate association testing
+    - make sure if product is deleted, its associated orders are not deleted and so on.
+    
       
     
 
