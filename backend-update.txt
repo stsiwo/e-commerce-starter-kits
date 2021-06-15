@@ -43,6 +43,9 @@ endpoint change:
     
   - hibernate association testing
     - make sure if product is deleted, its associated orders are not deleted and so on.
+    
+  - category
+    - cateogry name must be unique => implement at app service.
 
   
     
