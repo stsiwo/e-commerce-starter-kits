@@ -2,10 +2,6 @@
   
   - recapcha for security
   
-- (IMPL) order page:
-
-  - make sure how to handle 'return/cancel' for purchase.
-  
 - (IMPL) popup for signup 
 
   - esp when the guest user purchases.
@@ -20,19 +16,16 @@
   
 - (testing) admin endpoints request testing (products, orders, categories, customers, and so on)
 
-- (implementation) add product variant to cart request ??? what is it? cartItem object only contain product?? the product in domain/cartItem only contains a selected product variant. so is it ok?
-
  - (fix) add caption or small explanation on input (esp path). it must be unique.
  
  - (implementation) add logo image upload at admin 
  
  - (refactor) refactor snackbar and spinner : need to make sure the logic
+
+ - guest user data transition when he becomes member:
+   - carts
  
- - (bug) productDetail page: duplicated size option (e.g., list same size twice)
- 
- - carts
- 
-  - when you merge cart items of guest user to the cart items of the member user when the guest user signs up, make sure that don't send 'cartItemId' to the backend. 
+    - when you merge cart items of guest user to the cart items of the member user when the guest user signs up, make sure that don't send 'cartItemId' to the backend. 
   
     - cart items of guest users have temp cart item id for each temporarly.
     
@@ -49,4 +42,9 @@
  - (performance)
   - tree shaking is not working (material ui). maybe.
     
+- address
+
+  - add select input for country (currently only canada) and province.
+  
+    - country must be 2 chars
     
