@@ -46,6 +46,9 @@ endpoint change:
     
   - category
     - cateogry name must be unique => implement at app service.
+    
+  - async testing 
+    - make sure how to handle async event handler at test
 
   
     
