@@ -15,6 +15,8 @@ import com.iwaodev.application.mapper.ReviewMapper;
 import com.iwaodev.application.mapper.UserMapper;
 import com.iwaodev.application.specification.factory.ReviewSpecificationFactory;
 import com.iwaodev.domain.review.ReviewSortEnum;
+import com.iwaodev.domain.review.event.NewReviewWasSubmittedEvent;
+import com.iwaodev.domain.review.event.ReviewWasVerifiedByAdminEvent;
 import com.iwaodev.infrastructure.model.Product;
 import com.iwaodev.infrastructure.model.Review;
 import com.iwaodev.infrastructure.model.User;
@@ -24,6 +26,7 @@ import com.iwaodev.ui.criteria.review.ReviewQueryStringCriteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -45,6 +48,10 @@ public class ReviewServiceImpl implements ReviewService {
   private ProductRepository productRepository;
 
   private ReviewSpecificationFactory specificationFactory;
+
+  @Autowired
+  private ApplicationEventPublisher publisher;
+
 
   @Autowired
   public ReviewServiceImpl(ReviewRepository repository, UserRepository userRepository,
@@ -143,6 +150,9 @@ public class ReviewServiceImpl implements ReviewService {
     // save it
     Review savedEntity = this.repository.save(newEntity);
 
+    // publish event
+    this.publisher.publishEvent(new NewReviewWasSubmittedEvent(this, savedEntity));
+
     // map entity to dto and return it.
     return ReviewMapper.INSTANCE.toReviewDTO(savedEntity);
   }
@@ -170,6 +180,10 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     Review updatedEntity = this.repository.save(oldEntity);
+
+    if (updatedEntity.getIsVerified()) {
+      this.publisher.publishEvent(new ReviewWasVerifiedByAdminEvent(this, updatedEntity));
+    }
 
     return ReviewMapper.INSTANCE.toReviewDTO(updatedEntity);
   }

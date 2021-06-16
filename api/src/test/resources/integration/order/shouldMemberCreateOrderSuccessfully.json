@@ -2,7 +2,7 @@
   "orderFirstName": "Satoshi",
   "orderLastName": "Iwao",
   "orderEmail": "test@test.com",
-  "orderPhone": "+11234567890",
+  "orderPhone": "+1 1234567890",
   "userId": "c7081519-16e5-4f92-ac50-1834001f12b9",
   "shippingAddress": {
     "address1": "4352 ATLIN ST",  
@@ -10,7 +10,7 @@
     "city": "Vancouver",  
     "province": "BC",  
     "country": "CA",  
-    "postalCode": "123 132"  
+    "postalCode": "V5R 2C2"
   },
   "billingAddress": {
     "address1": "4352 ATLIN ST",  
@@ -18,7 +18,7 @@
     "city": "Vancouver",  
     "province": "BC",  
     "country": "CA",  
-    "postalCode": "123 132"  
+    "postalCode": "V5R 2C2"
   },
   "orderDetails": [
     {

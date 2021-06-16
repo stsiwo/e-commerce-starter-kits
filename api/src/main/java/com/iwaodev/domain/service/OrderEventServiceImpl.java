@@ -26,22 +26,41 @@ public class OrderEventServiceImpl implements OrderEventService {
   private UserRepository userRepository;
 
   @Override
-  public void add(Order order, OrderStatusEnum orderStatus, String note, UUID userId) throws DomainException, NotFoundException {
+  public void add(Order order, OrderStatusEnum orderStatus, String note, UUID userId)
+      throws DomainException, NotFoundException {
+
+     if (userId == null) {
+       // guest
+       this.add(order, orderStatus, note, (User)null);
+     }  else {
+       // member
+      User user = this.userRepository.findById(userId)
+          .orElseThrow(() -> new NotFoundException(String.format("user not found (id: %s", userId.toString())));
+
+       this.add(order, orderStatus, note, user);
+     }
+  }
+
+  @Override
+  public void add(Order order, OrderStatusEnum orderStatus, String note, User user)
+      throws DomainException, NotFoundException {
 
     // check a given order status is addable as next.
-    if (!order.isAddableAsNextForAdmin(orderStatus, order.getLatestOrderEventStatus())) {
-      throw new DomainException(String.format("the order status is not addable as next one (target status: %s and latest status: %s).", orderStatus, order.getLatestOrderEventStatus()));
+  // if there is no previous order event, skip this validation
+    if (order.retrieveLatestOrderEvent() != null && !order.isAddableAsNextForAdmin(orderStatus, order.retrieveLatestOrderEvent().getOrderStatus())) {
+      throw new DomainException(
+          String.format("the order status is not addable as next one (target status: %s and latest status: %s).",
+              orderStatus, order.getLatestOrderEventStatus()));
     }
 
     OrderEvent orderEvent = order.createOrderEvent(orderStatus, note);
 
-    // admin
-    if (userId != null) {
-      // the customer
-      User user = this.userRepository.findById(userId)
-          .orElseThrow(() -> new NotFoundException(String.format("user not found (id: %s", userId.toString())));
-
+    if (user != null) {
       orderEvent.setUser(user);
+      orderEvent.setIsGuest(false);
+    } else {
+      // guest
+      orderEvent.setIsGuest(true);
     }
 
     order.addOrderEvent(orderEvent);

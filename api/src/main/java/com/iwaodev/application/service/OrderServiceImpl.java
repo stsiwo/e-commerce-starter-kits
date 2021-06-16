@@ -23,9 +23,11 @@ import com.iwaodev.config.SpringSecurityUser;
 import com.iwaodev.domain.order.OrderRule;
 import com.iwaodev.domain.order.OrderSortEnum;
 import com.iwaodev.domain.order.OrderStatusEnum;
+import com.iwaodev.domain.order.event.OrderEventWasAddedByMemberEvent;
+import com.iwaodev.domain.order.event.OrderEventWasAddedEvent;
 import com.iwaodev.domain.order.event.OrderFinalConfirmedEvent;
-import com.iwaodev.domain.order.event.ReceivedCancelRequestEvent;
-import com.iwaodev.domain.order.event.ReceivedReturnRequestEvent;
+import com.iwaodev.domain.order.event.OrderCanceledEvent;
+import com.iwaodev.domain.order.event.OrderReturnedEvent;
 import com.iwaodev.domain.service.OrderEventService;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.exception.DomainException;
@@ -64,39 +66,32 @@ public class OrderServiceImpl implements OrderService {
 
   private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
+  @Autowired
   private OrderRepository orderRepository;
 
+  @Autowired
   private UserRepository userRepository;
 
+  @Autowired
   private ProductRepository productRepository;
 
+  @Autowired
   private PaymentService paymentService;
 
+  @Autowired
   private OrderRule orderRule;
 
+  @Autowired
   private OrderSpecificationFactory specificationFactory;
 
   @Autowired
   private ApplicationEventPublisher publisher;
 
+  @Autowired
   private ExceptionMessenger exceptionMessenger;
 
-  private OrderEventService orderEventService;
-
   @Autowired
-  public OrderServiceImpl(OrderRepository orderRepository, UserRepository userRepository,
-      ProductRepository productRepository, PaymentService paymentService, OrderRule orderRule,
-      OrderSpecificationFactory specificationFactory, ExceptionMessenger exceptionMessenger,
-      OrderEventService orderEventService) {
-    this.orderRepository = orderRepository;
-    this.userRepository = userRepository;
-    this.productRepository = productRepository;
-    this.paymentService = paymentService;
-    this.orderRule = orderRule;
-    this.specificationFactory = specificationFactory;
-    this.exceptionMessenger = exceptionMessenger;
-    this.orderEventService = orderEventService;
-  }
+  private OrderEventService orderEventService;
 
   @Override
   public Page<OrderDTO> getAll(OrderQueryStringCriteria criteria, Integer page, Integer limit, OrderSortEnum sort) {
@@ -200,6 +195,7 @@ public class OrderServiceImpl implements OrderService {
             this.exceptionMessenger.getNotFoundMessage("user", authUserId.toString())));
 
     order.setUser(customer);
+    order.setIsGuest(false);
 
     // if customer already has customerId for stripe, get customerId from db and
     // assign to 'setCustomer' for the request
@@ -226,8 +222,13 @@ public class OrderServiceImpl implements OrderService {
     this.assignOrderDetails(criteria, order);
 
     // create order events
-    OrderEvent orderEvent = order.createOrderEvent(OrderStatusEnum.DRAFT, "");
-    order.addOrderEvent(orderEvent);
+    try {
+      this.orderEventService.add(order, OrderStatusEnum.DRAFT, "", customer);
+    } catch (DomainException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    } catch (NotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    }
 
     // finally, request to create payment intent
     PaymentIntentCreateParams createParams = new PaymentIntentCreateParams.Builder().setCustomer(stripeCustomerId)
@@ -249,6 +250,8 @@ public class OrderServiceImpl implements OrderService {
 
     // assign payment intent id to this order
     order.setStripePaymentIntentId(intent.getId());
+
+    Order savedOrder = this.orderRepository.save(order);
     /**
      * bug.
      *
@@ -267,8 +270,7 @@ public class OrderServiceImpl implements OrderService {
      * https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
      *
      **/
-
-    Order savedOrder = this.orderRepository.save(order);
+    this.orderRepository.flush();
 
     this.publisher.publishEvent(new OrderFinalConfirmedEvent(this, savedOrder, stripeCustomerId, UserTypeEnum.MEMBER));
 
@@ -283,8 +285,8 @@ public class OrderServiceImpl implements OrderService {
     // prep input for the requst for stripe
     Order order = OrderMapper.INSTANCE.toOrderEntityFromOrderCriteria(criteria);
 
-    logger.info("order address");
-    logger.info(order.getShippingAddress().getOrderAddressId().toString());
+    // set isGuest true
+    order.setIsGuest(true);
 
     // assign address explicitly
     order.setBillingAddress(order.getShippingAddress());
@@ -293,8 +295,14 @@ public class OrderServiceImpl implements OrderService {
     this.assignOrderDetails(criteria, order);
 
     // create order events
-    OrderEvent orderEvent = order.createOrderEvent(OrderStatusEnum.DRAFT, "");
-    order.addOrderEvent(orderEvent);
+    try {
+      this.orderEventService.add(order, OrderStatusEnum.DRAFT, "", (User)null);
+    } catch (DomainException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    } catch (NotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    }
+
 
     // finally, request to create payment intent
     PaymentIntentCreateParams createParams = new PaymentIntentCreateParams.Builder()
@@ -320,8 +328,28 @@ public class OrderServiceImpl implements OrderService {
     order.setStripePaymentIntentId(intent.getId());
 
     Order savedOrder = this.orderRepository.save(order);
+    /**
+     * bug.
+     *
+     * hibernate return the same child entity twice in child list. e.g, orderEvents:
+     * [ { 101 } , { 102 }, { 102 } ] <- 102 is duplicate.
+     *
+     * workaround: use 'flush'.
+     *
+     * otherwise, you might got an error 'object references an unsaved transient
+     * instance – save the transient instance beforeQuery flushing'.
+     *
+     * - this is because hibernate recognize that the entity change its state again
+     * by calling 'parent.getChildren().size()' wihtout flushing, so be careful!!!!
+     *
+     * ref:
+     * https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
+     *
+     **/
+    this.orderRepository.flush();
 
-    this.publisher.publishEvent(new OrderFinalConfirmedEvent(this, savedOrder, null, UserTypeEnum.GUEST));
+
+    this.publisher.publishEvent(new OrderFinalConfirmedEvent(this, savedOrder, null, UserTypeEnum.ANONYMOUS));
 
     // set any transient property up. DON'T FOREGET TO CALL
     savedOrder.setUpCalculatedProperties();
@@ -424,50 +452,50 @@ public class OrderServiceImpl implements OrderService {
     return OrderMapper.INSTANCE.toOrderDTO(savedOrder);
   }
 
+  /**
+   * add an order event by admin.
+   **/
   @Override
   public OrderDTO addOrderEvent(UUID orderId, OrderEventCriteria criteria) {
 
-    Optional<Order> orderOption = this.orderRepository.findById(orderId);
+    Order order = this.orderRepository.findById(orderId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "the given order does not exist."));
 
-    if (orderOption.isEmpty()) {
-      // order not found so return error
-      logger.info("the given order does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given order does not exist.");
+    try {
+      this.orderEventService.add(order, criteria.getOrderStatus(), criteria.getNote(), criteria.getUserId());
+    } catch (DomainException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    } catch (NotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     }
-
-    Order order = orderOption.get();
-
-    // check a given order status is addable as next.
-    if (!order.isAddableAsNextForAdmin(criteria.getOrderStatus(), order.getLatestOrderEventStatus())) {
-      logger.info("the given order status is not addable as next.");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the given order status is not addable as next.");
-    }
-
-    OrderEvent orderEvent = order.createOrderEvent(criteria.getOrderStatus(), criteria.getNote());
-
-    // admin
-    if (criteria.getUserId() != null) {
-      // the customer
-      User customer = this.userRepository.findById(criteria.getUserId())
-          .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-              this.exceptionMessenger.getNotFoundMessage("user", criteria.getUserId().toString())));
-
-      orderEvent.setUser(customer);
-    }
-
-    order.addOrderEvent(orderEvent);
-
-    logger.info("size of order:");
-    logger.info("" + order.getOrderEvents().size());
 
     Order savedOrder = this.orderRepository.save(order);
+    /**
+     * bug.
+     *
+     * hibernate return the same child entity twice in child list. e.g, orderEvents:
+     * [ { 101 } , { 102 }, { 102 } ] <- 102 is duplicate.
+     *
+     * workaround: use 'flush'.
+     *
+     * otherwise, you might got an error 'object references an unsaved transient
+     * instance – save the transient instance beforeQuery flushing'.
+     *
+     * - this is because hibernate recognize that the entity change its state again
+     * by calling 'parent.getChildren().size()' wihtout flushing, so be careful!!!!
+     *
+     * ref:
+     * https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
+     *
+     **/
+    this.orderRepository.flush();
 
-    for (OrderEvent event : savedOrder.getOrderEvents()) {
-      logger.info("order event id: " + event.getOrderEventId().toString());
-    }
 
     // set any transient property up. DON'T FOREGET TO CALL
     savedOrder.setUpCalculatedProperties();
+
+    // publish event.
+    this.publisher.publishEvent(new OrderEventWasAddedEvent(this, savedOrder));
 
     return OrderMapper.INSTANCE.toOrderDTO(savedOrder);
   }
@@ -475,57 +503,14 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public OrderDTO addOrderEventByMember(UUID orderId, OrderEventCriteria criteria) {
 
-    Optional<Order> orderOption = this.orderRepository.findById(orderId);
+    Order targetOrder = this.orderRepository.findById(orderId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "the given order does not exist."));
 
-    if (orderOption.isEmpty()) {
-      logger.info("the given order does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given order does not exist.");
-    }
-
-    Order targetOrder = orderOption.get();
-
-    // check a given order status is addable as next.
-    if (!targetOrder.isAddableAsNextForMember(criteria.getOrderStatus(), targetOrder.getLatestOrderEventStatus())) {
-      logger.info("the given order status is not addable as next.");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the given order status is not addable as next.");
-    }
-
-    /**
-     * TODO: refactor this below since don't need any more. teh above
-     * isAddableAsNextForMember' cover all of cases except 'refund period' stuff.
-     **/
-
-    // check if new order event is either REQUEST_RETURN or REQUEST_CANCEL
-    // otherwise, reject.
-    if (!criteria.getOrderStatus().equals(OrderStatusEnum.RETURN_REQUEST)
-        && !criteria.getOrderStatus().equals(OrderStatusEnum.CANCEL_REQUEST)) {
-      logger.info("the member only allows to add 'CANCEL_REQUEST' or 'RETURN_REQUEST'.");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-          "the member only allows to add 'CANCEL_REQUEST' or 'RETURN_REQUEST'.");
-    }
-
-    // if the new order event is 'cancel-request'
-    if (criteria.getOrderStatus().equals(OrderStatusEnum.CANCEL_REQUEST)) {
-
-      if (targetOrder.isReceivedCancelRequest()) {
-        logger.info("sorry. we already receieved cancel request from you before.");
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-            "sorry. we already receieved cancel request from you before.");
-      }
-
-      if (!targetOrder.isCancellable()) {
-        logger.info("sorry. this order is not cancellable.");
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "sorry. this order is not cancellable.");
-      }
-
-    } else {
-      // if the new order event is 'return-request'
-      if (targetOrder.isReceivedReturnRequest()) {
-        logger.info("sorry. we already receieved return request from you before.");
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-            "sorry. we already receieved return request from you before.");
-      }
-
+    // if return request, check the eligibility to refund
+    // this only apply for members so if admin want to add either
+    // 'return_request'/'cancel_request', he can do so by using 'careateOrderEvent'
+    // service function above.
+    if (criteria.getOrderStatus().equals(OrderStatusEnum.RETURN_REQUEST)) {
       LocalDateTime curDateTime = LocalDateTime.now();
       if (!targetOrder.isEligibleToRefund(curDateTime, this.orderRule.getEligibleDays())) {
         logger.info("sorry. this order is not eligible to return.");
@@ -533,26 +518,61 @@ public class OrderServiceImpl implements OrderService {
       }
     }
 
-    // all conditions passed so save it to db
-    OrderEvent newOrderEvent = targetOrder.createOrderEvent(criteria.getOrderStatus(), criteria.getNote());
-
-    // get customer
-    User user = this.userRepository.findById(criteria.getUserId())
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-            this.exceptionMessenger.getNotFoundMessage("user", criteria.getUserId().toString())));
-
-    newOrderEvent.setUser(user);
-
-    targetOrder.addOrderEvent(newOrderEvent);
+    try {
+      this.orderEventService.add(targetOrder, criteria.getOrderStatus(), criteria.getNote(), criteria.getUserId());
+    } catch (DomainException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    } catch (NotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    }
 
     Order savedOrder = this.orderRepository.save(targetOrder);
+    /**
+     * bug.
+     *
+     * hibernate return the same child entity twice in child list. e.g, orderEvents:
+     * [ { 101 } , { 102 }, { 102 } ] <- 102 is duplicate.
+     *
+     * workaround: use 'flush'.
+     *
+     * otherwise, you might got an error 'object references an unsaved transient
+     * instance – save the transient instance beforeQuery flushing'.
+     *
+     * - this is because hibernate recognize that the entity change its state again
+     * by calling 'parent.getChildren().size()' wihtout flushing, so be careful!!!!
+     *
+     * ref:
+     * https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
+     *
+     **/
+    this.orderRepository.flush();
+
 
     // set any transient property up. DON'T FOREGET TO CALL
     savedOrder.setUpCalculatedProperties();
 
+    // publish event.
+    this.publisher.publishEvent(new OrderEventWasAddedByMemberEvent(this, savedOrder));
+
     return OrderMapper.INSTANCE.toOrderDTO(savedOrder);
   }
 
+  /**
+   * send a refund request to stripe api to refund the payment.
+   *
+   * make sure this is called when admin received the returned item from the
+   * customer so that admin can safely refund the item.
+   *
+   * or if admin does not want to receive the return item any more, he can use
+   * thsi endpoint right after he received the return request from the customer.
+   *
+   * also, RECEIVED_RETURN_REQUEST should be added before this function is called.
+   *
+   * flow:
+   *  1. the customer requests for the return.
+   *  2. the admin confirm and add 'RECEIVED_RETURN_REQUEST' order event at the management console.
+   *  3. the admin 
+   **/
   @Override
   public void refundOrderAfterShipment(UUID orderId) {
 
@@ -560,26 +580,27 @@ public class OrderServiceImpl implements OrderService {
      * get target order
      * 
      **/
-    Optional<Order> orderOption = this.orderRepository.findById(orderId);
-
-    if (orderOption.isEmpty()) {
-      // user not found so return error
-      logger.info("the target order does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given order does not exist.");
-    }
-
-    Order order = orderOption.get();
+    Order order = this.orderRepository.findById(orderId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "the given order does not exist."));
 
     /**
      * check eligibility
      *
+     * - disable this in the case of if admin have to redund even if not eligible to
+     * refund.
+     *
+     * - i guess admin can add any order event as long as it is included
+     * 'nextAddableOrderEventForAdmin' so even if the member can not add
+     * 'return_request', the admin can do so.
+     *
      **/
-    LocalDateTime curDateTime = LocalDateTime.now();
-    if (!order.isEligibleToRefund(curDateTime, this.orderRule.getEligibleDays())) {
-      logger.info("sorry, you are not eligible to refund for this order.");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-          "sorry, you are not eligible to refund for this order.");
-    }
+    // LocalDateTime curDateTime = LocalDateTime.now();
+    // if (!order.isEligibleToRefund(curDateTime, this.orderRule.getEligibleDays()))
+    // {
+    // logger.info("sorry, you are not eligible to refund for this order.");
+    // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+    // "sorry, you are not eligible to refund for this order.");
+    // }
 
     /**
      * prep refund request to stripe
@@ -605,17 +626,44 @@ public class OrderServiceImpl implements OrderService {
      *
      * - use RETURNED since the shipment already made.
      **/
-    OrderEvent orderEvent = order.createOrderEvent(OrderStatusEnum.RETURNED, "");
 
-    order.addOrderEvent(orderEvent);
+    User admin = this.userRepository.getAdmin().orElseThrow(
+        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
+    try {
+      this.orderEventService.add(order, OrderStatusEnum.RETURNED, "", admin);
+    } catch (DomainException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    } catch (NotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    }
 
     Order savedOrder = this.orderRepository.save(order);
+    /**
+     * bug.
+     *
+     * hibernate return the same child entity twice in child list. e.g, orderEvents:
+     * [ { 101 } , { 102 }, { 102 } ] <- 102 is duplicate.
+     *
+     * workaround: use 'flush'.
+     *
+     * otherwise, you might got an error 'object references an unsaved transient
+     * instance – save the transient instance beforeQuery flushing'.
+     *
+     * - this is because hibernate recognize that the entity change its state again
+     * by calling 'parent.getChildren().size()' wihtout flushing, so be careful!!!!
+     *
+     * ref:
+     * https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
+     *
+     **/
+    this.orderRepository.flush();
+
 
     /**
      * TODO: change this event name. this is misnomer. it should be 'ReturnedEvent'
      * or something
      **/
-    this.publisher.publishEvent(new ReceivedReturnRequestEvent(this, savedOrder));
+    this.publisher.publishEvent(new OrderReturnedEvent(this, savedOrder));
 
     /**
      * domain event.
@@ -636,26 +684,19 @@ public class OrderServiceImpl implements OrderService {
      * get target order
      * 
      **/
-    Optional<Order> orderOption = this.orderRepository.findById(orderId);
-
-    if (orderOption.isEmpty()) {
-      // user not found so return error
-      logger.info("the target order does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given order does not exist.");
-    }
-
-    Order order = orderOption.get();
+    Order order = this.orderRepository.findById(orderId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "the given order does not exist."));
 
     /**
      * check eligibility
      *
      **/
-    LocalDateTime curDateTime = LocalDateTime.now();
-    if (!order.isEligibleToRefund(curDateTime, this.orderRule.getEligibleDays())) {
-      logger.info("sorry, you are not eligible to refund for this order.");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-          "sorry, you are not eligible to refund for this order.");
-    }
+    //LocalDateTime curDateTime = LocalDateTime.now();
+    //if (!order.isEligibleToRefund(curDateTime, this.orderRule.getEligibleDays())) {
+    //  logger.info("sorry, you are not eligible to refund for this order.");
+    //  throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+    //      "sorry, you are not eligible to refund for this order.");
+    //}
 
     /**
      * prep refund request to stripe
@@ -681,17 +722,43 @@ public class OrderServiceImpl implements OrderService {
      *
      * - use CANCELED since there is no involvement with customer
      **/
-    OrderEvent orderEventForCanceled = order.createOrderEvent(OrderStatusEnum.CANCELED, "");
-
-    order.addOrderEvent(orderEventForCanceled);
+    User admin = this.userRepository.getAdmin().orElseThrow(
+        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
+    try {
+      this.orderEventService.add(order, OrderStatusEnum.CANCELED, "", admin);
+    } catch (DomainException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    } catch (NotFoundException e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+    }
 
     Order savedOrder = this.orderRepository.save(order);
+    /**
+     * bug.
+     *
+     * hibernate return the same child entity twice in child list. e.g, orderEvents:
+     * [ { 101 } , { 102 }, { 102 } ] <- 102 is duplicate.
+     *
+     * workaround: use 'flush'.
+     *
+     * otherwise, you might got an error 'object references an unsaved transient
+     * instance – save the transient instance beforeQuery flushing'.
+     *
+     * - this is because hibernate recognize that the entity change its state again
+     * by calling 'parent.getChildren().size()' wihtout flushing, so be careful!!!!
+     *
+     * ref:
+     * https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
+     *
+     **/
+    this.orderRepository.flush();
+
 
     /**
      * TODO: change this event name. this is misnomer. it should be 'CanceledEvent'
      * or something
      **/
-    this.publisher.publishEvent(new ReceivedCancelRequestEvent(this, savedOrder));
+    this.publisher.publishEvent(new OrderCanceledEvent(this, savedOrder));
 
     /**
      * domain event handlers
@@ -739,6 +806,26 @@ public class OrderServiceImpl implements OrderService {
     order.removeOrderEvent(lastOrderEvent);
 
     Order savedOrder = this.orderRepository.save(order);
+    /**
+     * bug.
+     *
+     * hibernate return the same child entity twice in child list. e.g, orderEvents:
+     * [ { 101 } , { 102 }, { 102 } ] <- 102 is duplicate.
+     *
+     * workaround: use 'flush'.
+     *
+     * otherwise, you might got an error 'object references an unsaved transient
+     * instance – save the transient instance beforeQuery flushing'.
+     *
+     * - this is because hibernate recognize that the entity change its state again
+     * by calling 'parent.getChildren().size()' wihtout flushing, so be careful!!!!
+     *
+     * ref:
+     * https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
+     *
+     **/
+    this.orderRepository.flush();
+
 
     // set any transient property up.
     savedOrder.setUpCalculatedProperties();

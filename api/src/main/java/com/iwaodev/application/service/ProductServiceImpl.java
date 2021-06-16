@@ -223,9 +223,16 @@ public class ProductServiceImpl implements ProductService {
 
     newEntity.setProductImages(productImages);
 
+    logger.info("new product image size");
+    logger.info("" + newEntity.getProductImages().size());
+
+    logger.info("new product name");
+    logger.info("" + newEntity.getProductName());
     // save it
     Product savedEntity = this.repository.save(newEntity);
 
+    logger.info("new product image size afer saved");
+    logger.info("" + savedEntity.getProductImages().size());
     // map entity to dto and return it.
     return ProductMapper.INSTANCE.toProductDTO(savedEntity);
   }

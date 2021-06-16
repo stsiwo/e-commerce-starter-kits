@@ -40,6 +40,10 @@ public class OrderEvent {
   @Column(name = "note")
   private String note;
 
+  // user is guest or not for this order event
+  @Column(name = "is_guest")
+  private Boolean isGuest;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "order_status")
   private OrderStatusEnum orderStatus;
@@ -64,5 +68,12 @@ public class OrderEvent {
 
   public OrderEvent(OrderStatusEnum orderStatus) {
     this.orderStatus = orderStatus;
+  }
+
+  public boolean isAddableByMember() {
+    if (this.orderStatus.equals(OrderStatusEnum.CANCEL_REQUEST) || this.orderStatus.equals(OrderStatusEnum.RETURN_REQUEST)) {
+      return true;
+    }
+    return false;
   }
 }

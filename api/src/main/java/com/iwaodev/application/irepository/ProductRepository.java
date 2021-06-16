@@ -58,5 +58,8 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
 
   @Query( value = "SELECT p FROM products p INNER JOIN p.variants v WHERE v.variantId IN :variantIds")
   List<Product> findAllByVariantIds(@Param("variantIds") List<Long> variantIds);
- 
+
+  @Query( value = "SELECT p FROM products p WHERE DATE(p.release_date) = CURDATE()", nativeQuery = true)
+  List<Product> findAllNewProducts();
+
 }

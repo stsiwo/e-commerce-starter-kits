@@ -69,7 +69,7 @@ public class ContactServiceImpl implements ContactService {
     // prep variables for tmeplate html
     Map<String, Object> templateModel = new HashMap<String, Object>();
     templateModel.put("sender", criteria);
-    templateModel.put("userType", UserTypeEnum.GUEST);
+    templateModel.put("userType", UserTypeEnum.ANONYMOUS);
     templateModel.put("recipient", adminRecipient);
     Context thymeleafContext = new Context();
     thymeleafContext.setVariables(templateModel);
@@ -99,7 +99,7 @@ public class ContactServiceImpl implements ContactService {
     // prep variables for tmeplate html
     Map<String, Object> templateModel = new HashMap<String, Object>();
     templateModel.put("sender", criteria);
-    templateModel.put("userType", UserTypeEnum.GUEST);
+    templateModel.put("userType", UserTypeEnum.ANONYMOUS);
     templateModel.put("recipient", adminRecipient);
     Context thymeleafContext = new Context();
     thymeleafContext.setVariables(templateModel);

@@ -169,6 +169,10 @@ public class User {
     this.password = password;
   }
 
+  public String getFullName() {
+    return String.format("%S %s", this.firstName, this.lastName);
+  }
+
   public Phone findPhone(Long phoneId) {
     return this.phones.stream().filter(phone -> {
       return phone.getPhoneId().equals(phoneId);

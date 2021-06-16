@@ -20,9 +20,12 @@ public class PaymentFailedEvent extends ApplicationEvent {
 
   private String paymentIntentId;
 
-  public PaymentFailedEvent(Object source, String paymentIntentId) {
+  private String stripeCustomerId; 
+
+  public PaymentFailedEvent(Object source, String paymentIntentId, String stripeCustomerId) {
     super(source);
     this.paymentIntentId = paymentIntentId;
+    this.stripeCustomerId = stripeCustomerId;
   }
 
 }

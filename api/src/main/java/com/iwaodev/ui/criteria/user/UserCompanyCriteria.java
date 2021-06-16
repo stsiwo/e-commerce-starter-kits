@@ -34,7 +34,7 @@ public class UserCompanyCriteria {
   private String phoneNumber;
 
   @NotEmpty(message = "company country code can not be empty.")
-  @Pattern( regexp = "^+(?:[0-9] ?){6,14}[0-9]$", message = "invalid phone country code format.")
+  @Pattern( regexp = "^(\\+?\\d{1,3}|\\d{1,4})$", message = "invalid phone country code format.")
   private String countryCode;
 
   @NotEmpty(message = "company address 1 can not be empty.")

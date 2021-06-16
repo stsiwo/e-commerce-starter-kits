@@ -100,8 +100,8 @@ VALUES ('c7081519-16e5-4f92-ac50-1834001f12b9', '7', '1', '0'); -- non selected
 
 
 -- target order
-INSERT INTO `orders` (`order_id`, `order_number`, `product_cost`, `tax_cost`, `shipping_cost`, `order_first_name`, `order_last_name`, `order_email`, `order_phone`, `stripe_payment_intent_id`)
-VALUES ('c8f8591c-bb83-4fd1-a098-3fac8d40e450', 'order_w0vDYZvqy_Y', '123.00', '2.00', '10.00', 'first name', 'last name', 'test_order@email.com', '+12342342345', 'sample_stripe_payment_intent_id'); -- target order
+INSERT INTO `orders` (`order_id`, `order_number`, `product_cost`, `tax_cost`, `shipping_cost`, `order_first_name`, `order_last_name`, `order_email`, `order_phone`, `stripe_payment_intent_id`, `is_guest`)
+VALUES ('c8f8591c-bb83-4fd1-a098-3fac8d40e450', 'order_w0vDYZvqy_Y', '123.00', '2.00', '10.00', 'first name', 'last name', 'test_order@email.com', '+12342342345', 'sample_stripe_payment_intent_id', '1'); -- target order
 
 INSERT INTO `order_addresses` (`order_address_id`, `address_1`, `address_2`, `city`, `province`, `country`, `postal_code`, `shipping_order_id`, `billing_order_id`)
 VALUES ('1', 'shipping_address_1', 'shipping_address_2', 'shipping_city', 'shipping_province', 'shipping_country', 'shipping_postal_code', 'c8f8591c-bb83-4fd1-a098-3fac8d40e450', NULL);
@@ -118,8 +118,5 @@ INSERT INTO `order_details` (`order_detail_id`, `product_quantity`, `product_uni
 VALUES ('3', '1', '3.00', 'white', 'XS', 'sample product name 3', 'c8f8591c-bb83-4fd1-a098-3fac8d40e450', '13', 'a362bbc3-5c70-4e82-96d3-5fa1e3103332');-- make sure quantity match with test
 
 -- order event
-INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`)
-VALUES ('56', 'c8f8591c-bb83-4fd1-a098-3fac8d40e450', 'DRAFT', '0', NULL);
-
-INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`)
-VALUES ('57', 'c8f8591c-bb83-4fd1-a098-3fac8d40e450', 'ORDERED', '0', NULL);
+INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
+VALUES ('56', 'c8f8591c-bb83-4fd1-a098-3fac8d40e450', 'DRAFT', '0', NULL, '1');

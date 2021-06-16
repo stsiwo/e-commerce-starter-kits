@@ -3,7 +3,12 @@ package com.iwaodev.ui.validator.password;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 class PasswordValidator implements ConstraintValidator<Password, String> {
+
+  private static final Logger logger = LoggerFactory.getLogger(PasswordValidator.class);
 
   private boolean optional;
 
@@ -45,7 +50,7 @@ class PasswordValidator implements ConstraintValidator<Password, String> {
       return false;
     }
 
-    if (!value.equals(value.toLowerCase()) || !value.equals(value.toUpperCase())) {
+    if (value.equals(value.toLowerCase()) || value.equals(value.toUpperCase())) {
       return false;
     }
 

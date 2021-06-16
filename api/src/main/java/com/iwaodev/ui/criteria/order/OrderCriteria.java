@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 
 import org.springframework.validation.annotation.Validated;
 
@@ -44,6 +45,7 @@ public class OrderCriteria {
   private String orderEmail;
 
   @NotEmpty(message = "phone of the customer can not be null.")
+  @Pattern( regexp = "^\\+(?:[0-9] ?){6,14}[0-9]$", message = "invalid phone format.")
   private String orderPhone;
 
   @Valid

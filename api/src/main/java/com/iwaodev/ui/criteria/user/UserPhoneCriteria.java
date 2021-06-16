@@ -27,7 +27,7 @@ public class UserPhoneCriteria {
   //@Size(min = 4, max = 4)
   //private String extension;
 
-  @Pattern( regexp = "^+(?:[0-9] ?){6,14}[0-9]$", message = "invalid phone country code format.")
+  @Pattern( regexp = "^(\\+?\\d{1,3}|\\d{1,4})$", message = "invalid phone country code format.")
   private String countryCode;
 
   private Boolean isSelected;

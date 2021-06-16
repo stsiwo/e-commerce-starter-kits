@@ -18,7 +18,7 @@ public class NotificationValidator implements Validator<Notification> {
   @Override
   public boolean validateWhenBoth(Notification domain) throws DomainValidationException {
 
-    logger.info("start IssuerAndRecipientTypeMustMatchWithNotificationType");
+    logger.info("start NotificationValidator");
 
     // title
     if (domain.getNotificationTitle() == null) {
@@ -35,25 +35,31 @@ public class NotificationValidator implements Validator<Notification> {
       throw new DomainValidationException(String.format("notification type cannot be null."));
     }
 
+    logger.info("where is my bug?");
+
     // issuer - not null if issuer is admin/member
     NotificationTypeEnum actualNotificationType = domain.getNotificationType().getNotificationType();
 
-    UserTypeEnum expectedIssuerType = domain.getNotificationType().getIssuerType().getUserType();
-    if (!expectedIssuerType.equals(UserTypeEnum.GUEST) && domain.getIssuer() == null) {
-      throw new DomainValidationException(String.format("issuer cannot be null."));
+    if (domain.isGuestIssuerByTypeOf(actualNotificationType) && domain.getIssuer() != null) {
+      throw new DomainValidationException(String.format("issuer must be null. (type: %s)", actualNotificationType));
     }
 
-    // issuer - null if issuer is guest
-    if (expectedIssuerType.equals(UserTypeEnum.GUEST) && domain.getIssuer() != null) {
-      throw new DomainValidationException(String.format("issuer should be null because of it is guest."));
+    if (!domain.isGuestIssuerByTypeOf(actualNotificationType) && domain.getIssuer() == null) {
+      throw new DomainValidationException(String.format("issuer cannot be null. (type: %s)", actualNotificationType));
     }
 
-    // issuer - match with issuer type
-    UserTypeEnum actualIssuerType = domain.getIssuer().getUserType().getUserType();
-    if (!actualIssuerType.equals(expectedIssuerType)) {
-      throw new DomainValidationException(
-          String.format("the issuer must be %s for the notification (your type: %s and notification type; %s)",
-              expectedIssuerType, actualIssuerType, actualNotificationType));
+    logger.info("where is my bug?");
+
+    // if issuer exist
+    if (domain.getIssuer() != null) {
+      // issuer - match with issuer type
+      UserTypeEnum expectedIssuerType = domain.getNotificationType().getIssuerType().getUserType();
+      UserTypeEnum actualIssuerType = domain.getIssuer().getUserType().getUserType();
+      if (!actualIssuerType.equals(expectedIssuerType)) {
+        throw new DomainValidationException(
+            String.format("the issuer must be %s for the notification (your type: %s and notification type; %s)",
+                expectedIssuerType, actualIssuerType, actualNotificationType));
+      }
     }
 
     // recipient - not null
@@ -61,6 +67,7 @@ public class NotificationValidator implements Validator<Notification> {
       throw new DomainValidationException(String.format("recipient cannot be null."));
     }
 
+    logger.info("where is my bug?");
     // recipient - match with recipient type
     UserTypeEnum expectedRecipientType = domain.getNotificationType().getRecipientType().getUserType();
     UserTypeEnum actualRecipientType = domain.getRecipient().getUserType().getUserType();

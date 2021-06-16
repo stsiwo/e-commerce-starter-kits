@@ -103,7 +103,7 @@ public class GuestUserSignupEnpointTest {
     String dummyFirstName = "Kaoru";
     String dummyLastName = "Iwao";
     String dummyEmail = "kaoru@gmail.com";
-    String dummyPassword = "kaoru_password"; // min(8)
+    String dummyPassword = "kaoru_PASSWORD";  // lower and upper & min(8) & no space
     JSONObject dummyUserSignupForm = new JSONObject();
     dummyUserSignupForm.put("firstName", dummyFirstName);
     dummyUserSignupForm.put("lastName", dummyLastName);
@@ -168,7 +168,7 @@ public class GuestUserSignupEnpointTest {
     String dummyFirstName = ""; // <- this
     String dummyLastName = "Iwao";
     String dummyEmail = "kaoru@gmail.com";
-    String dummyPassword = "kaoru_password"; // min(8)
+    String dummyPassword = "kaoru_PASSWORD";  // lower and upper & min(8) & no space
     JSONObject dummyUserSignupForm = new JSONObject();
     dummyUserSignupForm.put("firstName", dummyFirstName);
     dummyUserSignupForm.put("lastName", dummyLastName);
@@ -193,7 +193,7 @@ public class GuestUserSignupEnpointTest {
     String dummyFirstName = "Kaoru";
     String dummyLastName = "Iwao";
     String dummyEmail = "kaoru@gmail.com";
-    String dummyPassword = "kaoru_password"; // min(8)
+    String dummyPassword = "kaoru_PASSWORD";  // lower and upper & min(8) & no space
     JSONObject dummyUserSignupForm = new JSONObject();
     dummyUserSignupForm.put("firstName", dummyFirstName);
     dummyUserSignupForm.put("lastName", dummyLastName);

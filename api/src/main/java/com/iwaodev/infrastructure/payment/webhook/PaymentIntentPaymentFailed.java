@@ -42,10 +42,10 @@ public class PaymentIntentPaymentFailed implements PaymentWebhookHandler {
     String paymentIntentId = paymentIntent.getId();
 
     // customer if exists
-    //String stripeCustomerId = paymentIntent.getCustomer(); // assuming this is id
+    String stripeCustomerId = paymentIntent.getCustomer(); // assuming this is id
 
     // dispatch event
-    this.publisher.publishEvent(new PaymentFailedEvent(this, paymentIntentId));
+    this.publisher.publishEvent(new PaymentFailedEvent(this, paymentIntentId, stripeCustomerId));
 
   }
 

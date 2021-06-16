@@ -56,7 +56,7 @@ public class OrderValidator implements Validator<Order> {
       throw new DomainValidationException(String.format("order phone cannot be null."));
     }
 
-    if (!domain.getOrderPhone().matches("^+(?:[0-9] ?){6,14}[0-9]$")) {
+    if (!domain.getOrderPhone().matches("^\\+(?:[0-9] ?){6,14}[0-9]$")) {
       throw new DomainValidationException(
           String.format("invalid order phone format (phone: %s", domain.getOrderPhone()));
     }
@@ -103,15 +103,19 @@ public class OrderValidator implements Validator<Order> {
       throw new DomainValidationException(String.format("order details must have at least one detail."));
     }
 
+    // isGuest 
+    if (domain.getIsGuest() == null) {
+      throw new DomainValidationException(String.format("order is guest boolean cannot be null."));
+    }
+
     // user guest
-    List<UserTypeEnum> curAuthUserTypeList = this.curAuthentication.getRole();
-    if (curAuthUserTypeList.contains(UserTypeEnum.GUEST) && domain.getUser() != null) {
+    if (domain.getIsGuest() && domain.getUser() != null) {
       throw new DomainValidationException(String.format("order user should be null since this is guest user."));
     }
 
     // user member
-    if (curAuthUserTypeList.contains(UserTypeEnum.MEMBER) && domain.getUser() == null) {
-      throw new DomainValidationException(String.format("order user cannot be null."));
+    if (!domain.getIsGuest() && domain.getUser() == null) {
+      throw new DomainValidationException(String.format("order user cannot be null since this is member user."));
     }
 
     return true;

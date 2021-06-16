@@ -213,7 +213,7 @@ public class OrderController {
    *
    * Called by only admin. once the admin make sure the request from the customer, he can send a request to this endpoint.
    *
-   * Firstly, the customer send a request for return (e.g., adding an order event of 'RETURN_REQUEST'). then the admin confirm the request and process for the return. once the admin is ready to return, he can send a request to this endpoint. 
+   * Firstly, the customer send a request for return (e.g., adding an order event of 'Return_REQUEST'). then the admin confirm the request and click the refund button (only visible if order status is received_return_request) for the return. once the admin is ready to return, he can send a request to this endpoint. 
    *
    * Add 'RETURNED' order event internally.
    *
@@ -241,11 +241,13 @@ public class OrderController {
    *
    * Called by only admin. once the admin make sure the request from the customer, he can send a request to this endpoint.
    *
-   * Firstly, the customer send a request for cancel (e.g., adding an order event of 'Cancel_REQUEST'). then the admin confirm the request and process for the cancel. once the admin is ready to cancel, he can send a request to this endpoint. 
+   * Firstly, the customer send a request for cancel (e.g., adding an order event of 'Cancel_REQUEST'). then the admin confirm the request and click the refund button (only visible if order status is received_cancel_request) for the cancel. once the admin is ready to cancel, he can send a request to this endpoint. 
    *
    * Add 'CANCELED' order event internally.
    *
    * So, Call this after "RECEIVED_CANCEL_REQUEST" event.
+   *
+   *
    **/
   @PostMapping("/orders/{orderId}/refund-before-shipment")
   @PreAuthorize("hasRole('ROLE_ADMIN')") // admin only

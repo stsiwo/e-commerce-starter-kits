@@ -66,13 +66,16 @@ public class UserValidator implements Validator<User> {
       throw new DomainValidationException(String.format("user active cannot be null."));
     }
 
+    logger.info("total address size");
+    logger.info("" + domain.getAddresses().size());
+
     // address max 3
-    if (domain.getAddresses().size() < 4) {
+    if (domain.getAddresses().size() > 3) {
       throw new DomainValidationException(String.format("user addresses must be less than or equal to 3."));
     }
 
     // phones max 3
-    if (domain.getPhones().size() < 4) {
+    if (domain.getPhones().size() > 3) {
       throw new DomainValidationException(String.format("user phones must be less than or equal to 3."));
     }
 

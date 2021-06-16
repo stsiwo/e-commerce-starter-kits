@@ -33,8 +33,8 @@ public class CreateNotificationServiceImpl implements CreateNotificationService 
   private UserRepository userRepository;
 
   @Override
-  public Notification create(NotificationTypeEnum notificationType, String description, UUID issuerId, UUID recipientId, String link, String note)
-      throws DomainException, NotFoundException {
+  public Notification create(NotificationTypeEnum notificationType, String description, UUID issuerId, UUID recipientId,
+      String link, String note) throws NotFoundException {
 
     // get issuer reference
     User issuer = this.userRepository.findById(issuerId).orElseThrow(() -> new NotFoundException("issuer not found"));
@@ -48,8 +48,8 @@ public class CreateNotificationServiceImpl implements CreateNotificationService 
   }
 
   @Override
-  public Notification create(NotificationTypeEnum notificationType, String description, User issuer, User recipient, String link, String note)
-      throws DomainException, NotFoundException {
+  public Notification create(NotificationTypeEnum notificationType, String description, User issuer, User recipient,
+      String link, String note) throws NotFoundException {
     // create notification
     Notification notification = new Notification();
 
@@ -75,8 +75,8 @@ public class CreateNotificationServiceImpl implements CreateNotificationService 
   }
 
   @Override
-  public List<Notification> createBatch(NotificationTypeEnum notificationType, String description, UUID issuerId, UserTypeEnum recipientType, String link,
-      String note) throws DomainException, NotFoundException {
+  public List<Notification> createBatch(NotificationTypeEnum notificationType, String description, UUID issuerId,
+      UserTypeEnum recipientType, String link, String note) throws NotFoundException {
 
     // crete a list
     List<Notification> notificationList = new ArrayList<>();
@@ -88,6 +88,24 @@ public class CreateNotificationServiceImpl implements CreateNotificationService 
 
     // get issuer reference
     User issuer = this.userRepository.findById(issuerId).orElseThrow(() -> new NotFoundException("issuer not found"));
+
+    for (User recipient : recipientList) {
+      notificationList.add(this.create(notificationType, description, issuer, recipient, link, note));
+    }
+
+    return notificationList;
+  }
+
+  @Override
+  public List<Notification> createBatch(NotificationTypeEnum notificationType, String description, User issuer,
+      UserTypeEnum recipientType, String link, String note) throws NotFoundException {
+    // crete a list
+    List<Notification> notificationList = new ArrayList<>();
+
+    // get all user of the given user type
+    List<User> recipientList = this.userRepository.findAvailableAllByType(recipientType);
+
+    logger.info("number of available user: " + recipientList.size());
 
     for (User recipient : recipientList) {
       notificationList.add(this.create(notificationType, description, issuer, recipient, link, note));

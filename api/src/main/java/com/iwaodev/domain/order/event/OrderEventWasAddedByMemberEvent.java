@@ -16,14 +16,15 @@ import lombok.Getter;
  *
  **/
 @Getter
-public class ReceivedReturnRequestEvent extends ApplicationEvent {
+public class OrderEventWasAddedByMemberEvent extends ApplicationEvent {
 
   private static final long serialVersionUID = 1L;
 
   private Order order;
 
-  public ReceivedReturnRequestEvent(Object source, Order order) {
+  public OrderEventWasAddedByMemberEvent(Object source, Order order) {
     super(source);
     this.order = order;
   }
 }
+

@@ -26,6 +26,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
@@ -35,6 +36,7 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
 // @ConfigurationProperties(locations =
 // "classpath:myapp-${environment.type}.properties")
 @EnableCaching
+@EnableScheduling
 public class Application {
 
   private static final Logger logger = LoggerFactory.getLogger(Application.class);

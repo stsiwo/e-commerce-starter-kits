@@ -1,6 +1,6 @@
-package com.iwaodev.domain.order.event;
+package com.iwaodev.domain.review.event;
 
-import com.iwaodev.infrastructure.model.Order;
+import com.iwaodev.infrastructure.model.Review;
 
 import org.springframework.context.ApplicationEvent;
 
@@ -16,15 +16,16 @@ import lombok.Getter;
  *
  **/
 @Getter
-public class ReceivedCancelRequestEvent extends ApplicationEvent {
+public class NewReviewWasSubmittedEvent extends ApplicationEvent {
 
   private static final long serialVersionUID = 1L;
 
-  private Order order;
+  private Review review;
 
-  public ReceivedCancelRequestEvent(Object source, Order order) {
+  public NewReviewWasSubmittedEvent(Object source, Review review) {
     super(source);
-    this.order = order;
+    this.review = review;
   }
-
 }
+
+

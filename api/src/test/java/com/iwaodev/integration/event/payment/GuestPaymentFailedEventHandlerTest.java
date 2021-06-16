@@ -145,7 +145,7 @@ public class GuestPaymentFailedEventHandlerTest {
     
 
     // act & assert
-    this.handler.handleEvent(new PaymentFailedEvent(this, dummyPaymentIntentId));
+    this.handler.handleEvent(new PaymentFailedEvent(this, dummyPaymentIntentId, null));
 
     logger.info("after finish the event handler");
     /**
@@ -170,6 +170,8 @@ public class GuestPaymentFailedEventHandlerTest {
       assertThat(expectedBag.get(orderDetail.getProductVariant().getVariantId())).isEqualTo(orderDetail.getProductVariant().getVariantStock());
     }
   }
+
+  // TODO: add for member
 }
 
 

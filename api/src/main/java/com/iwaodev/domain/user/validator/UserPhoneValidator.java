@@ -49,7 +49,7 @@ public class UserPhoneValidator implements Validator<Phone> {
     }
 
     // countryCode
-    if (!domain.getCountryCode().matches("^+(?:[0-9] ?){6,14}[0-9]$")) {
+    if (!domain.getCountryCode().matches("^(\\+?\\d{1,3}|\\d{1,4})$")) {
       throw new DomainValidationException(String.format("phone country code is invalid format."));
     }
 

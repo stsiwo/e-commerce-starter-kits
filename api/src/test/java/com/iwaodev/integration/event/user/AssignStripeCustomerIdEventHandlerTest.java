@@ -163,7 +163,7 @@ public class AssignStripeCustomerIdEventHandlerTest {
    **/
   @Test
   //@Sql(scripts = { "classpath:/integration/event/user/shouldAssignStripeCustomerIdWhenEventHandlerCalled.sql" })
-  public void shouldNotGuestAssignStripeCustomerIdWhenEventHandlerCalled(/**@Value("classpath:/integration/event/shouldAddSoldCountSuccessfullyWhenAddSoldCountEventHandlerCalled.json") Resource dummyFormJsonFile**/) throws Exception {
+  public void shouldNotAnonymousAssignStripeCustomerIdWhenEventHandlerCalled(/**@Value("classpath:/integration/event/shouldAddSoldCountSuccessfullyWhenAddSoldCountEventHandlerCalled.json") Resource dummyFormJsonFile**/) throws Exception {
 
     // make sure user_id in the sql match test admin user id
 
@@ -173,7 +173,7 @@ public class AssignStripeCustomerIdEventHandlerTest {
     String dummyStripeCustomerId = "dummy stripe customer id";
 
     // act & assert
-    this.handler.handleEvent(new OrderFinalConfirmedEvent(this, dummyOrder, dummyStripeCustomerId, UserTypeEnum.GUEST));
+    this.handler.handleEvent(new OrderFinalConfirmedEvent(this, dummyOrder, dummyStripeCustomerId, UserTypeEnum.ANONYMOUS));
 
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.

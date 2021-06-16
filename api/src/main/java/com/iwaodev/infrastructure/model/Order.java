@@ -28,8 +28,8 @@ import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.iwaodev.domain.order.OrderStatusEnum;
 import com.iwaodev.domain.order.event.CompletedOrderPaymentEvent;
 import com.iwaodev.domain.order.event.OrderFinalConfirmedEvent;
-import com.iwaodev.domain.order.event.ReceivedCancelRequestEvent;
-import com.iwaodev.domain.order.event.ReceivedReturnRequestEvent;
+import com.iwaodev.domain.order.event.OrderCanceledEvent;
+import com.iwaodev.domain.order.event.OrderReturnedEvent;
 import com.iwaodev.infrastructure.model.listener.OrderValidationListener;
 import com.iwaodev.ui.criteria.order.OrderEventCriteria;
 
@@ -163,6 +163,10 @@ public class Order {
   @Column(name = "currency")
   private String currency;
 
+  // user is guest or not for this order
+  @Column(name = "is_guest")
+  private Boolean isGuest;
+
   @OneToOne(mappedBy = "shippingOrder", cascade = CascadeType.ALL, orphanRemoval = true)
   @Setter(value = AccessLevel.NONE)
   private OrderAddress shippingAddress;
@@ -222,6 +226,10 @@ public class Order {
 
   public Order() {
     this.orderNumber = "order_" + NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 11);
+  }
+
+  public String getFullName() {
+    return String.format("%s %s", this.orderFirstName, this.orderLastName);
   }
 
   public void setShippingAddress(OrderAddress shippingAddrss) {
@@ -361,6 +369,10 @@ public class Order {
     logger.info("try to get latest event");
     logger.info("total event size: " + this.orderEvents.size());
     logger.info("total event size: " + this.getOrderEvents().size());
+
+    if (this.orderEvents.size() == 0) {
+      return null;
+    }
     return this.orderEvents.get(this.orderEvents.size() - 1);
   }
 
@@ -576,11 +588,17 @@ public class Order {
     }
   }
 
+  public boolean isAddableByMember(OrderEvent orderEvent) {
+    return orderEvent.isAddableByMember();
+  }
+
   /**
    * use this when you need to create OrderEvent. don't initialize OrderEvent
    * object directly.
    *
    * we need to assign 'undoable' for each order status.
+   *
+   * don't use this directly. use "AddOrderEventService" instead. 
    *
    **/
   public OrderEvent createOrderEvent(OrderStatusEnum orderStatus, String note) {

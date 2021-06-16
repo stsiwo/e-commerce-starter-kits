@@ -10,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+import com.iwaodev.domain.notification.NotificationTypeEnum;
 import com.iwaodev.infrastructure.model.listener.NotificationValidationListener;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -92,6 +93,13 @@ public class Notification {
   // domain behaviors
   public void turnReadTrue() {
     this.setIsRead(true);
+  }
+
+  public boolean isGuestIssuerByTypeOf(NotificationTypeEnum type) {
+    if (type.equals(NotificationTypeEnum.ORDER_WAS_PLACED_BY_ANONYMOUS)) {
+      return true;
+    }
+    return false;
   }
 
 }

@@ -33,6 +33,10 @@ public class ProductValidator implements Validator<Product> {
   public boolean validateWhenBoth(Product domain) throws DomainValidationException {
 
     logger.info("start ProductValidator");
+    logger.info("product name ");
+    logger.info("" + domain.getProductName());
+    logger.info("product images");
+    logger.info("" + domain.getProductImages().size());
 
     // name
     if (domain.getProductName() == null) {
@@ -68,21 +72,37 @@ public class ProductValidator implements Validator<Product> {
     if (domain.getReleaseDate() == null) {
       throw new DomainValidationException(String.format("product release date cannot be null."));
     }
+    logger.info("product images");
+    logger.info("" + domain.getProductImages().size());
+    logger.info("product category ");
+    logger.info("" + domain.getCategory().getCategoryName());
+
+    /**
+     * bug?
+     *
+     * getProductIMages().size() already return 0.
+     *
+     * even if it returns proper number (e.g., 5) at ProductServiceIMpl.
+     *
+     * for now just disable and create ProductImageValidator instread.
+     *
+     * but need to fix this otherwise, we cannot check the primary image size > 0.
+     **/
 
     // productImages
-    if (domain.getProductImages() == null || domain.getProductImages().size() == 0) {
-      throw new DomainValidationException(String.format("product product images cannot be null."));
-    }
+    //if (domain.getProductImages() == null || domain.getProductImages().size() == 0) {
+    //  throw new DomainValidationException(String.format("product images cannot be null."));
+    //}
 
     // productImages: primary image cannot be null.
-    for (ProductImage productImage : domain.getProductImages()) {
-      // this is primary image
-      if (productImage.getProductImageName().contains("0")) {
-        if (productImage.getProductImagePath().isEmpty()) {
-          throw new DomainValidationException(String.format("product primary image cannot be null."));
-        }
-      }
-    }
+    //for (ProductImage productImage : domain.getProductImages()) {
+    //  // this is primary image
+    //  if (productImage.getProductImageName().contains("0")) {
+    //    if (productImage.getProductImagePath().isEmpty()) {
+    //      throw new DomainValidationException(String.format("product primary image cannot be null."));
+    //    }
+    //  }
+    //}
 
     // if public: true only if the product has variant at least one and release date
     // passed.

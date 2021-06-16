@@ -145,14 +145,9 @@ public class AdminOrderEndpointTest {
     // assert
     assertThat(responseBody.getOrderId()).isNotNull();
     assertThat(responseBody.getOrderEvents().size()).isEqualTo(2);
-    assertThat(responseBody.getLatestOrderEvent().getOrderStatus()).isEqualTo(OrderStatusEnum.ORDERED);
+    assertThat(responseBody.getLatestOrderEvent().getOrderStatus()).isEqualTo(OrderStatusEnum.ERROR);
     assertThat(responseBody.getLatestOrderEvent().getUser().getUserId().toString()).isEqualTo(adminUserId);
-
-    for (OrderEventDTO orderEventDTO : responseBody.getOrderEvents()) {
-      logger.info(orderEventDTO.toString());
-      assertThat(orderEventDTO.getOrderEventId()).isNotNull();
-      assertThat(orderEventDTO.getUndoable()).isEqualTo(false);
-    }
+    assertThat(responseBody.getLatestOrderEvent().getUndoable()).isEqualTo(true);
 
   }
 
