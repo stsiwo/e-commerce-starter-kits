@@ -24,6 +24,10 @@ endpoint change:
   
     - identify N+1 sql using logging & monitor.
     
+      - product GET endpoint has the problem
+      
+      - paymentFailedEventHandler has a long sql so it might be n+1.
+    
   - security: 
   
     - trim all string input from client. (need to test)
@@ -46,6 +50,9 @@ endpoint change:
     
   - category
     - cateogry name must be unique => implement at app service.
+    
+  - async testing 
+    - make sure how to handle async event handler at test
 
   
     
