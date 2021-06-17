@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.config.auth.CurAuthentication;
 import com.iwaodev.config.auth.CurAuthenticationImpl;
 import com.iwaodev.domain.user.UserTypeEnum;
@@ -28,6 +29,9 @@ public class UserValidator implements Validator<User> {
   @Autowired
   private CurAuthentication curAuthentication;
 
+  @Autowired
+  private UserRepository userRepository;;
+
   @Override
   public boolean validateWhenBoth(User domain) throws DomainValidationException {
 
@@ -46,6 +50,11 @@ public class UserValidator implements Validator<User> {
     // email
     if (domain.getEmail() == null) {
       throw new DomainValidationException(String.format("user email cannot be null."));
+    }
+
+    // unique
+    if (this.userRepository.getByEmail(domain.getEmail()).isPresent()) {
+      throw new DomainValidationException(String.format("user email already taken."));
     }
 
     // password

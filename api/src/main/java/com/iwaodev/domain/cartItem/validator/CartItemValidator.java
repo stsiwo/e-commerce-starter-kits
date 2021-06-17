@@ -1,5 +1,8 @@
 package com.iwaodev.domain.cartItem.validator;
 
+import java.util.UUID;
+
+import com.iwaodev.application.irepository.CartItemRepository;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.domain.validator.Validator;
 import com.iwaodev.exception.DomainValidationException;
@@ -7,6 +10,7 @@ import com.iwaodev.infrastructure.model.CartItem;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,6 +23,9 @@ import org.springframework.stereotype.Component;
 public class CartItemValidator implements Validator<CartItem> {
 
   private static final Logger logger = LoggerFactory.getLogger(CartItemValidator.class);
+
+  @Autowired
+  private CartItemRepository cartItemRepository;
 
   @Override
   public boolean validateWhenBoth(CartItem domain) throws DomainValidationException {
@@ -51,6 +58,12 @@ public class CartItemValidator implements Validator<CartItem> {
 
   @Override
   public boolean validateWhenCreate(CartItem domain) throws DomainValidationException {
+
+    UUID userId = domain.getUser().getUserId();
+    if (this.cartItemRepository.getAllByUserId(userId).size() > 4) {
+      throw new DomainValidationException(String.format("exceed the max cart items size."));
+    }
+
     return true;
   }
 
@@ -60,6 +73,7 @@ public class CartItemValidator implements Validator<CartItem> {
     if (domain.getCartItemId() == null) {
       throw new DomainValidationException(String.format("cart item id cannot be null."));
     }
+
     return true;
   }
 }

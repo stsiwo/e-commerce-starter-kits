@@ -172,8 +172,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         .cors();
 
     // insert jwt cookie request filter
+    security.addFilterBefore(this.limitLoginAttemptFilter, UsernamePasswordAuthenticationFilter.class);
     security.addFilterBefore(this.jwtCookieRequestFilter, UsernamePasswordAuthenticationFilter.class);
-    security.addFilterBefore(this.limitLoginAttemptFilter, JwtCookieRequestFilter.class);
 
   }
 

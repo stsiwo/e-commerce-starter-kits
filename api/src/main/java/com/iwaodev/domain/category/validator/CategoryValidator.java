@@ -1,5 +1,6 @@
 package com.iwaodev.domain.category.validator;
 
+import com.iwaodev.application.irepository.CategoryRepository;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.domain.validator.Validator;
 import com.iwaodev.exception.DomainValidationException;
@@ -7,6 +8,7 @@ import com.iwaodev.infrastructure.model.Category;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,6 +21,9 @@ import org.springframework.stereotype.Component;
 public class CategoryValidator implements Validator<Category> {
 
   private static final Logger logger = LoggerFactory.getLogger(CategoryValidator.class);
+
+  @Autowired
+  private CategoryRepository categoryRepository;
 
   @Override
   public boolean validateWhenBoth(Category domain) throws DomainValidationException {
@@ -39,7 +44,17 @@ public class CategoryValidator implements Validator<Category> {
       throw new DomainValidationException(String.format("category path can not be null."));
     }
 
-    // unique validation is at app service class.
+    // unique name
+    if (this.categoryRepository.findByCategoryName(domain.getCategoryName()).isPresent()) {
+      throw new DomainValidationException(
+          String.format("category name must be unique (name: %s).", domain.getCategoryName()));
+    }
+
+    // unique path
+    if (this.categoryRepository.findByCategoryPath(domain.getCategoryPath()).isPresent()) {
+      throw new DomainValidationException(
+          String.format("category path must be unique (path: %s).", domain.getCategoryPath()));
+    }
 
     return true;
   }

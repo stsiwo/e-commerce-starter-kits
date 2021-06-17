@@ -755,6 +755,35 @@
 
                   - you can use EntityGraph & specification (without @query) to achieve eager loading with specifciation. (easy but im not sure it works.)
 
+  ## Injecting Spring Managed Bean (e.g., @Service, @Repository...) into JPA
+
+    - this apply for EntityListener and Entity.
+
+      - if you use Hibernate (>5.3) which has SpringBeanContainer feature, you can use this out of box. HOWEVER, in my case, it does not work. i tried several Hibernate version. but noen of them work.
+
+      - if you use earlier version of Hibernate, implement below:
+
+        - assuing you use EntityListener for an Entity.
+
+          1. add @Component to the EntityLister class
+          2. make the field 'static'
+            ```
+            static private EvenementPliRepository evenementPliRepository;
+            ```
+          3. create 'init' function like below:
+
+            ```
+              @Autowired
+              public void init(EvenementPliRepository evenementPliRepository) 
+              {
+                  MyListenerClass.evenementPliRepository = evenementPliRepository;
+                  logger.info("Initializing with dependency ["+ evenementPliRepository +"]"); 
+              }
+            ```
+          * don't use above for any nested autowired beans, it only works on the top level bean.
+
+        - ref: https://stackoverflow.com/questions/12155632/injecting-a-spring-dependency-into-a-jpa-entitylistener
+
   ## EntityGraph:
 
     - runtime swiching of eager/lazy loading. 

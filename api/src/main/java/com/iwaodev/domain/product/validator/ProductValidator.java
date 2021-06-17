@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.iwaodev.application.irepository.ProductRepository;
 import com.iwaodev.config.auth.CurAuthentication;
 import com.iwaodev.config.auth.CurAuthenticationImpl;
 import com.iwaodev.domain.user.UserTypeEnum;
@@ -29,6 +30,9 @@ public class ProductValidator implements Validator<Product> {
   @Autowired
   private CurAuthentication curAuthentication;
 
+  @Autowired
+  private ProductRepository productRepository;
+
   @Override
   public boolean validateWhenBoth(Product domain) throws DomainValidationException {
 
@@ -51,6 +55,10 @@ public class ProductValidator implements Validator<Product> {
     // path
     if (domain.getProductPath() == null) {
       throw new DomainValidationException(String.format("product path cannot be null."));
+    }
+
+    if (this.productRepository.findByPath(domain.getProductPath()).isPresent()) {
+      throw new DomainValidationException(String.format("product path must be unique (path: %s).", domain.getProductPath()));
     }
 
     // baseUnitPrice

@@ -8,8 +8,8 @@
     - description
     - path
 
-  - categoryName must be unique.
-  - categoryPath must be unique. 
+  - categoryName must be unique. -> useRepository
+  - categoryPath must be unique. -> useRepository
 
 ## Notification
 
@@ -44,8 +44,6 @@
   - orderDetails > 0
   - note can be modified by only admin
 
-  // for now, do not validate below. i'm not sure this is really necessary or not.
-  
   - status must be addable as next event (see Order domain to know which event is when addable.)
     -> do i need to validate this?  
   - undoable must depends on the event.
@@ -94,7 +92,7 @@
 
   - public can be true only if the product has variant at least one and releaseDate passed.
   - price must be greater than or equal $1
-  - path must be unqiue --> validate at app service.
+  - path must be unqiue --> use repository 
   - if isDiscount = true
     - discount price is not null
     - disount start date and before end date.
@@ -115,7 +113,7 @@
   - if isDiscount = true
     - discount price is not null
     - disount start date and before end date.
-  - color & size combination must be unique  -> validate at app service
+  - color & size combination must be unique  -> use repository
 
   // price logic (no relation to validation)
 
@@ -147,6 +145,8 @@
     - must be 2 chars
     - currently only support domestic (canada only)
 
+  - email unique
+
   - and address & phone validation (see its criteria class)
 
   - max phone & address number is 3
@@ -161,6 +161,7 @@
     - quantity
 
   - The quantity must be greater than or equal 1
+  - max cartItems = 5
 
 ## Wishlist (Member Only)
 
@@ -187,13 +188,42 @@
 
   - see criteria and follow the validation
 
-# Note
+## Note
 
   ## How to Validate Uniqueness with DB
 
     - there is no pre-defined way (e.g., annotation) to validate this.
     - you need to create function with the repository and check it already exist or not.
 
+    -> workaround: use repository (autowired) and check the uniqueness.
+
   ## How to Validate Auto-Increment Id
 
     - we don't have an id before persist. esp creating.
+
+    -> workaround: use 'validateWhenUpdate' to make sure it has id.
+
+# Email Implementation
+
+  ## When to Send Email
+
+    - user signup email.
+    - forgot-password email.
+    - email verification email.
+    - order completed email.
+      - (guest)
+        - the admin contact via contact@domain.com directly. and the admin need to update the order status.
+        - e.g.,) if the guest customer wants to cancel the order, the admin must add 'cancel_request' on behalf of the guest user since all guest user cannot access order management console.
+      - (member)
+        - the member can user order management or contact via contact@domain.com
+        - if the member forget to update athe status, the admin can do that on behalf of the member.
+
+    - order shipped email
+    - order cancel request received email
+    - order return request received email
+    - order canceled email (refund)
+    - order returned email (refund)
+    - please review email (after delivery)
+
+
+  

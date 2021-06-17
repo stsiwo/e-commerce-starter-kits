@@ -61,5 +61,4 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
 
   @Query( value = "SELECT p FROM products p WHERE DATE(p.release_date) = CURDATE()", nativeQuery = true)
   List<Product> findAllNewProducts();
-
 }

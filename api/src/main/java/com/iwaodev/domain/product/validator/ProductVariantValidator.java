@@ -3,7 +3,9 @@ package com.iwaodev.domain.product.validator;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
+import com.iwaodev.application.irepository.ProductRepository;
 import com.iwaodev.config.auth.CurAuthentication;
 import com.iwaodev.config.auth.CurAuthenticationImpl;
 import com.iwaodev.domain.user.UserTypeEnum;
@@ -27,6 +29,9 @@ public class ProductVariantValidator implements Validator<ProductVariant> {
    **/
   @Autowired
   private CurAuthentication curAuthentication;
+
+  //@Autowired
+  //private ProductRepository productRepository;
 
   @Override
   public boolean validateWhenBoth(ProductVariant domain) throws DomainValidationException {
@@ -121,6 +126,15 @@ public class ProductVariantValidator implements Validator<ProductVariant> {
       }
     }
 
+    // unique
+    //UUID productId = domain.getProduct().getProductId();
+    //logger.info("where is bug");
+    //if (this.productRepository
+    //    .findVariantByColorAndSize(productId, domain.getVariantColor(), domain.getProductSize().getProductSizeName())
+    //    .isPresent()) {
+    //  throw new DomainValidationException(String.format("duplicated color and size combination not allowed."));
+    //}
+
     return true;
   }
 
@@ -131,6 +145,7 @@ public class ProductVariantValidator implements Validator<ProductVariant> {
 
   @Override
   public boolean validateWhenUpdate(ProductVariant domain) throws DomainValidationException {
+    logger.info("start validating product variant for update");
     return true;
   }
 }

@@ -33,8 +33,6 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
 @SpringBootApplication
-// @ConfigurationProperties(locations =
-// "classpath:myapp-${environment.type}.properties")
 @EnableCaching
 @EnableScheduling
 public class Application {
