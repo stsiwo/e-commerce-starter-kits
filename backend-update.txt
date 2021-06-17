@@ -35,25 +35,19 @@ endpoint change:
     - cross site request forgery enable. research on this subject since we use cookie (httpOnly&secure).
     
     - disable cart icon (on header) when checkout page (don't need to cart drawer at this page)
-    
-  - unit test
-    - addable next order event status
-    
+
   - refund/cancel/return integration with payment system.
     - make sure it works.
-    
-  - notification 
-    - complete notification (e.g., adding notification type and publish the event to create a new notification, scheduling tasks to delete read notification)
-    
+
   - hibernate association testing
     - make sure if product is deleted, its associated orders are not deleted and so on.
-    
-  - category
-    - cateogry name must be unique => implement at app service.
     
   - async testing 
     - make sure how to handle async event handler at test
 
+  - complete email implementation.
+   
+  - email verification propt  if user still temp user.
   
     
       
