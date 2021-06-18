@@ -7,7 +7,7 @@ import { deleteSingleReviewActionTypeName, fetchReviewActionTypeName, postReview
 import { deleteSingleUserActionTypeName, deleteUserAddressActionTypeName, deleteUserAvatarImageActionTypeName, deleteUserPhoneActionTypeName, fetchSingleUserActionTypeName, fetchUserActionTypeName, patchUserAddressActionTypeName, patchUserPhoneActionTypeName, postUserAddressActionTypeName, postUserAvatarImageActionTypeName, postUserPhoneActionTypeName, putUserActionTypeName, putUserAddressActionTypeName, putUserPhoneActionTypeName } from 'reducers/slices/domain/user';
 import { deleteSingleWishlistItemActionTypeName, deleteWishlistItemActionTypeName, fetchWishlistItemActionTypeName, patchWishlistItemActionTypeName, postWishlistItemActionTypeName } from 'reducers/slices/domain/wishlistItem';
 import { toggleLeftNavMenuActionTypeName } from 'reducers/slices/ui';
-import { takeEvery, takeLatest } from 'redux-saga/effects';
+import { takeEvery, takeLatest, throttle, debounce } from 'redux-saga/effects';
 import { deleteAuthAddressWorker } from 'sideEffects/workers/auth/deleteAuthAddressWorker';
 import { deleteAuthAvatarImageWorker } from 'sideEffects/workers/auth/deleteAuthAvatarImageWorker';
 import { deleteAuthPhoneWorker } from 'sideEffects/workers/auth/deleteAuthPhoneWorker';
@@ -83,7 +83,8 @@ import { incrementNotificationCurIndexWorker } from 'sideEffects/workers/notific
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
  * takeLatest: cancel pending when there is a new one.
- * throttle: type ahead stuff.
+ * throttle: don't use for type ahead. does nto work. 
+ * debounce: use this for type ahead.
 /**
  *  watcher
  **/
@@ -383,7 +384,8 @@ export function* postSessionTimeoutOrderEventWatcher() {
 
 // product
 export function* fetchProductWatcher() {
-  yield takeLatest(
+  yield debounce(
+    500,
     fetchProductActionTypeName,
     fetchProductWorker,
   )

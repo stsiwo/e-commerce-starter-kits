@@ -121,7 +121,7 @@ public class ProductVariantValidator implements Validator<ProductVariant> {
       }
 
       // base discount date: start < end
-      if (domain.getVariantDiscountEndDate().isAfter(domain.getVariantDiscountStartDate())) {
+      if (domain.getVariantDiscountEndDate().isBefore(domain.getVariantDiscountStartDate())) {
         throw new DomainValidationException(String.format("variant discount start date must be before the end date."));
       }
     }

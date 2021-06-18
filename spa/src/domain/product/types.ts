@@ -1,5 +1,34 @@
 import { NormalizedDomainType } from "domain/types";
 
+// variant size
+// this must match with the backend 'product_size' table
+export const productVariantSizeObj = {
+  xs: {
+    productSizeId: "1",
+    productSizeName: "XS",
+    productSizeDescription: "",
+  },
+  s: {
+    productSizeId: "2",
+    productSizeName: "S",
+    productSizeDescription: "",
+  },
+  m: {
+    productSizeId: "3",
+    productSizeName: "M",
+    productSizeDescription: "",
+  },
+  l: {
+    productSizeId: "4",
+    productSizeName: "L",
+    productSizeDescription: "",
+  },
+  xl: {
+    productSizeId: "5",
+    productSizeName: "XL",
+    productSizeDescription: "",
+  },
+}
 export declare type CategoryType = {
   categoryId: string
   categoryName: string
@@ -141,10 +170,10 @@ export declare type ProductVariantDataType = {
 }
 
 export const defaultProductVariantData: ProductVariantDataType = {
-  productSize: null,
+  productSize: productVariantSizeObj.xs,
   variantColor: "#fff",
-  variantUnitPrice: 0,
-  variantDiscountPrice: 0,
+  variantUnitPrice: 1,
+  variantDiscountPrice: 1,
   variantDiscountStartDate: new Date(),
   variantDiscountEndDate: new Date(),
   variantStock: 0,
@@ -215,8 +244,8 @@ export const defaultProductData: ProductDataType = {
   productPath: "",
   productImageFiles: Array(5).fill(null),
   productImages: Array(5).fill(null),
-  productBaseUnitPrice: 0,
-  productBaseDiscountPrice: 0,
+  productBaseUnitPrice: 1,
+  productBaseDiscountPrice: 1,
   productBaseDiscountStartDate: new Date(),
   productBaseDiscountEndDate: new Date(),
   isDiscount: false,
@@ -261,8 +290,8 @@ export const defaultProductOnlyData: ProductDataType = {
       isChange: true,
     },
   ],
-  productBaseUnitPrice: 0,
-  productBaseDiscountPrice: 0,
+  productBaseUnitPrice: 1,
+  productBaseDiscountPrice: 1,
   productBaseDiscountStartDate: new Date(),
   productBaseDiscountEndDate: new Date(),
   isDiscount: false,
@@ -339,32 +368,3 @@ export const defaultCategoryValidationData: CategoryValidationDataType = {
   categoryPath: ""
 }
 
-// variant size
-// this must match with the backend 'product_size' table
-export const productVariantSizeObj = {
-  xs: {
-    productSizeId: "1",
-    productSizeName: "XS",
-    productSizeDescription: "",
-  },
-  s: {
-    productSizeId: "2",
-    productSizeName: "S",
-    productSizeDescription: "",
-  },
-  m: {
-    productSizeId: "3",
-    productSizeName: "M",
-    productSizeDescription: "",
-  },
-  l: {
-    productSizeId: "4",
-    productSizeName: "L",
-    productSizeDescription: "",
-  },
-  xl: {
-    productSizeId: "5",
-    productSizeName: "XL",
-    productSizeDescription: "",
-  },
-}

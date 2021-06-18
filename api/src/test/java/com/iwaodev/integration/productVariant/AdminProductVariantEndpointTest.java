@@ -172,6 +172,30 @@ public class AdminProductVariantEndpointTest {
   }
 
   // 400 bad request (bad input) testing
+  @Test
+  @Sql(scripts = { "classpath:/integration/productVariant/shouldNotAdminUserCreateNewProductVariantSinceDiscountStartDateIsAfterEndDate.sql" })
+  public void shouldNotAdminUserCreateNewProductVariantSinceDiscountStartDateIsAfterEndDate(
+      @Value("classpath:/integration/productVariant/shouldNotAdminUserCreateNewProductVariantSinceDiscountStartDateIsAfterEndDate.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId);
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+        .post(targetUrl) // create
+        .content(dummyFormJsonString)
+        .contentType(MediaType.APPLICATION_JSON)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
 
   @Test
   @Sql(scripts = { "classpath:/integration/productVariant/shouldAdminUserUpdateProductVariant.sql" })

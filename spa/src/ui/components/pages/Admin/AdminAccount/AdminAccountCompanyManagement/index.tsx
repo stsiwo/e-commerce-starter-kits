@@ -10,11 +10,12 @@ import Typography from '@material-ui/core/Typography';
 import { AdminCompanyFormDataType, AdminCompanyFormValidationDataType, defaultAdminCompanyFormValidationData } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { companySchema } from 'hooks/validation/rules';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { putAuthCompanyActionCreator } from 'reducers/slices/app';
 import { mSelector } from 'src/selectors/selector';
+import { getProvinceList, getCountryList } from 'src/utils';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -67,15 +68,10 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
 
   const dispatch = useDispatch()
 
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
-
   // temp user account state
   const [curAdminCompanyFormState, setAdminCompanyFormState] = React.useState<AdminCompanyFormDataType>(
-    auth.user.companies[0] 
+    auth.user.companies[0]
   );
-
 
   // validation logic (should move to hooks)
   const [curAdminCompanyFormValidationState, setAdminCompanyFormValidationState] = React.useState<AdminCompanyFormValidationDataType>(defaultAdminCompanyFormValidationData);
@@ -88,11 +84,10 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
     defaultValidationDomain: defaultAdminCompanyFormValidationData,
   })
 
-
   // event handlers
   const handleCompanyNameInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCompanyName = e.currentTarget.value
-    updateValidationAt("companyName", e.currentTarget.value);
+    const nextCompanyName = e.target.value
+    updateValidationAt("companyName", e.target.value);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
       companyName: nextCompanyName
@@ -101,8 +96,8 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
   }
 
   const handleDescriptionInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextDescription = e.currentTarget.value
-    updateValidationAt("companyDescription", e.currentTarget.value);
+    const nextDescription = e.target.value
+    updateValidationAt("companyDescription", e.target.value);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
       companyDescription: nextDescription
@@ -112,8 +107,8 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
 
 
   const handleCompanyEmailInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCompanyEmail = e.currentTarget.value
-    updateValidationAt("companyEmail", e.currentTarget.value);
+    const nextCompanyEmail = e.target.value
+    updateValidationAt("companyEmail", e.target.value);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
       companyEmail: nextCompanyEmail
@@ -123,8 +118,8 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
 
 
   const handlePhoneNumberInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextPhoneNumber = e.currentTarget.value
-    updateValidationAt("phoneNumber", e.currentTarget.value);
+    const nextPhoneNumber = e.target.value
+    updateValidationAt("phoneNumber", e.target.value);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
       phoneNumber: nextPhoneNumber
@@ -134,8 +129,8 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
 
 
   const handleCountryCodeInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCountryCode = e.currentTarget.value
-    updateValidationAt("countryCode", e.currentTarget.value);
+    const nextCountryCode = e.target.value
+    updateValidationAt("countryCode", nextCountryCode);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
       countryCode: nextCountryCode
@@ -144,8 +139,8 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
   }
 
   const handleAddress1InputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextAddress1 = e.currentTarget.value
-    updateValidationAt("address1", e.currentTarget.value);
+    const nextAddress1 = e.target.value
+    updateValidationAt("address1", e.target.value);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
       address1: nextAddress1
@@ -154,8 +149,8 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
   }
 
   const handleAddress2InputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextAddress2 = e.currentTarget.value
-    updateValidationAt("address2", e.currentTarget.value);
+    const nextAddress2 = e.target.value
+    updateValidationAt("address2", e.target.value);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
       address2: nextAddress2
@@ -164,8 +159,9 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
   }
 
   const handleCityInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCity = e.currentTarget.value
-    updateValidationAt("city", e.currentTarget.value);
+    // don't use 'currentTarget' for select (esp with material ui)
+    const nextCity = e.target.value
+    updateValidationAt("city", nextCity);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
       city: nextCity
@@ -174,8 +170,9 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
   }
 
   const handleProvinceInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextProvince = e.currentTarget.value
-    updateValidationAt("province", e.currentTarget.value);
+    // don't use 'currentTarget' for select (esp with material ui)
+    const nextProvince = e.target.value
+    updateValidationAt("province", nextProvince);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
       province: nextProvince
@@ -184,8 +181,9 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
   }
 
   const handleCountryInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCountry = e.currentTarget.value
-    updateValidationAt("country", e.currentTarget.value);
+    // don't use 'currentTarget' for select (esp material-ui)
+    const nextCountry = e.target.value
+    updateValidationAt("country", nextCountry);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
       country: nextCountry
@@ -194,7 +192,8 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
   }
 
   const handlePostalCodeInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextPostalCode = e.currentTarget.value
+    // don't use 'currentTarget' for select (esp material-ui)
+    const nextPostalCode = e.target.value
     updateValidationAt("postalCode", e.currentTarget.value);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
@@ -216,8 +215,8 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
 
       dispatch(
         putAuthCompanyActionCreator({
-          companyId: curAdminCompanyFormState.companyId, 
-          companyName: curAdminCompanyFormState.companyName, 
+          companyId: curAdminCompanyFormState.companyId,
+          companyName: curAdminCompanyFormState.companyName,
           companyDescription: curAdminCompanyFormState.companyDescription,
           companyEmail: curAdminCompanyFormState.companyEmail,
           phoneNumber: curAdminCompanyFormState.phoneNumber,
@@ -228,13 +227,14 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
           province: curAdminCompanyFormState.province,
           country: curAdminCompanyFormState.country,
           postalCode: curAdminCompanyFormState.postalCode
-        }) 
+        })
       );
 
     } else {
       updateAllValidation()
     }
   }
+
 
   return (
     <Card className={classes.root}>
@@ -310,6 +310,7 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
               <TextField
                 id="country-code"
                 label="Country Code"
+                disabled
                 className={classes.formControl}
                 value={curAdminCompanyFormState.countryCode}
                 onChange={handleCountryCodeInputChangeEvent}
@@ -356,21 +357,36 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
               <TextField
                 id="province"
                 label="Province"
+                select
                 className={classes.formControl}
                 value={curAdminCompanyFormState.province}
                 onChange={handleProvinceInputChangeEvent}
                 helperText={curAdminCompanyFormValidationState.province}
                 error={curAdminCompanyFormValidationState.province !== ""}
-              />
+              >
+                {getProvinceList().map((province) => (
+                  <MenuItem key={province} value={province}>
+                    {province}
+                  </MenuItem>
+                ))}
+              </TextField>
               <TextField
                 id="country"
                 label="Country"
+                select
+                disabled
                 className={classes.formControl}
                 value={curAdminCompanyFormState.country}
                 onChange={handleCountryInputChangeEvent}
                 helperText={curAdminCompanyFormValidationState.country}
                 error={curAdminCompanyFormValidationState.country !== ""}
-              />
+              >
+                {Object.keys(getCountryList()).map((country2Alpha: string) => (
+                  <MenuItem key={country2Alpha} value={country2Alpha}>
+                    {getCountryList()[country2Alpha]}
+                  </MenuItem>
+                ))}
+              </TextField>
               <TextField
                 id="postal-code"
                 label="Postal Code"

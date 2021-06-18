@@ -20,11 +20,12 @@ import { getBillingAddressId, getShippingAddressId, toAddressString } from 'doma
 import { CustomerAddressesFormDataType, CustomerAddressesFormValidationDataType, defaultUserAccountValidationAddressData, generateDefaultCustomerAddressesFormData, UserAddressType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { userAccountAddressSchema } from 'hooks/validation/rules';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteAuthAddressActionCreator, patchAuthAddressActionCreator, postAuthAddressActionCreator, putAuthAddressActionCreator } from 'reducers/slices/app';
 import { mSelector } from 'src/selectors/selector';
+import { getCountryList, getProvinceList } from 'src/utils';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -95,15 +96,14 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   // mui: makeStyles
   const classes = useStyles();
 
+  // max size
+  const maxSize = 3;
+
   // dispatch
   const dispatch = useDispatch();
 
   // auth
   const auth = useSelector(mSelector.makeAuthSelector())
-
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
 
   // temp user account state
   const [curUserAccountAddressState, setUserAccountAddressState] = React.useState<CustomerAddressesFormDataType>(generateDefaultCustomerAddressesFormData());
@@ -121,8 +121,8 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
 
   // event handlers
   const handleAddress1InputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextAddress1 = e.currentTarget.value
-    updateValidationAt("address1", e.currentTarget.value);
+    const nextAddress1 = e.target.value
+    updateValidationAt("address1", e.target.value);
     setUserAccountAddressState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       address1: nextAddress1
@@ -131,8 +131,8 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   }
 
   const handleAddress2InputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextAddress2 = e.currentTarget.value
-    updateValidationAt("address2", e.currentTarget.value);
+    const nextAddress2 = e.target.value
+    updateValidationAt("address2", e.target.value);
     setUserAccountAddressState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       address2: nextAddress2
@@ -141,8 +141,8 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   }
 
   const handleCityInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCity = e.currentTarget.value
-    updateValidationAt("city", e.currentTarget.value);
+    const nextCity = e.target.value
+    updateValidationAt("city", e.target.value);
     setUserAccountAddressState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       city: nextCity
@@ -150,8 +150,8 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   }
 
   const handleProvinceInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextProvince = e.currentTarget.value
-    updateValidationAt("province", e.currentTarget.value);
+    const nextProvince = e.target.value
+    updateValidationAt("province", e.target.value);
     setUserAccountAddressState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       province: nextProvince
@@ -159,8 +159,8 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   }
 
   const handleCountryInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCountry = e.currentTarget.value
-    updateValidationAt("country", e.currentTarget.value);
+    const nextCountry = e.target.value
+    updateValidationAt("country", e.target.value);
     setUserAccountAddressState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       country: nextCountry
@@ -168,8 +168,8 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
   }
 
   const handlePostalCodeInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextPostalCode = e.currentTarget.value
-    updateValidationAt("postalCode", e.currentTarget.value);
+    const nextPostalCode = e.target.value
+    updateValidationAt("postalCode", e.target.value);
     setUserAccountAddressState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       postalCode: nextPostalCode
@@ -377,7 +377,10 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
           </List>
         )}
         <Box component="div" className={classes.actionBox}>
-          <Button onClick={handleAddNewAddressBtnClickEvent}>
+          <Button 
+            onClick={handleAddNewAddressBtnClickEvent}
+            disabled={auth.user.addresses.length === maxSize}
+          >
             Add New Address
         </Button>
         </Box>
@@ -421,21 +424,36 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
           <TextField
             id="province"
             label="Province"
+            select
             className={classes.formControl}
             value={curUserAccountAddressState.province}
             onChange={handleProvinceInputChangeEvent}
             helperText={curUserAccountAddressValidationState.province}
             error={curUserAccountAddressValidationState.province !== ""}
-          />
+          >
+            {getProvinceList().map((province) => (
+              <MenuItem key={province} value={province}>
+                {province}
+              </MenuItem>
+            ))}
+          </TextField>
           <TextField
             id="country"
             label="Country"
+            select
+            disabled
             className={classes.formControl}
             value={curUserAccountAddressState.country}
             onChange={handleCountryInputChangeEvent}
             helperText={curUserAccountAddressValidationState.country}
             error={curUserAccountAddressValidationState.country !== ""}
-          />
+          >
+            {Object.keys(getCountryList()).map((country2Alpha: string) => (
+              <MenuItem key={country2Alpha} value={country2Alpha}>
+                {getCountryList()[country2Alpha]}
+              </MenuItem>
+            ))}
+          </TextField>
           <TextField
             id="postal-code"
             label="Postal Code"

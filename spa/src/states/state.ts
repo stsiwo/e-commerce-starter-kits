@@ -180,6 +180,9 @@ export const initialState: StateType = {
   domain: {
     categories: {
       data: {},
+      query: {
+        searchQuery: "",
+      },
       pagination: {
         page: 0, // start from 0 (not 1)
         limit: 10,

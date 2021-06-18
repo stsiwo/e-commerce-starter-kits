@@ -30,7 +30,7 @@ public class UserValidator implements Validator<User> {
   private CurAuthentication curAuthentication;
 
   @Autowired
-  private UserRepository userRepository;;
+  private UserRepository userRepository;
 
   @Override
   public boolean validateWhenBoth(User domain) throws DomainValidationException {
@@ -52,8 +52,16 @@ public class UserValidator implements Validator<User> {
       throw new DomainValidationException(String.format("user email cannot be null."));
     }
 
+    /**
+     * TODO: this causes 'stackoverflow' error. 
+     *
+     * this repository is curplit but could not figure out why. 
+     *
+     * categoryRepository also causes the same problems. 
+     *
+     **/
     // unique
-    if (this.userRepository.getByEmail(domain.getEmail()).isPresent()) {
+    if (this.userRepository.findByEmail(domain.getEmail()).isPresent()) {
       throw new DomainValidationException(String.format("user email already taken."));
     }
 

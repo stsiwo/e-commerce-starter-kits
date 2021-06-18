@@ -1,8 +1,10 @@
+import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -14,16 +16,15 @@ import { DataGrid, GridCellParams, GridColDef, GridPageChangeParams, GridRowsPro
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import EditIcon from '@material-ui/icons/Edit';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import SearchForm from 'components/common/SearchForm';
 import { CategoryType } from 'domain/product/types';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { categoryPaginationPageActions, deleteSingleCategoryActionCreator, fetchCategoryActionCreator } from 'reducers/slices/domain/category';
+import { categoryPaginationPageActions, categoryQuerySearchQueryActions, deleteSingleCategoryActionCreator, fetchCategoryActionCreator } from 'reducers/slices/domain/category';
+import { FetchStatusEnum } from 'src/app';
 import { mSelector } from 'src/selectors/selector';
 import AdminCategoryFormDialog from '../AdminCategoryFormDialog';
-import { FetchStatusEnum } from 'src/app';
-import Box from '@material-ui/core/Box';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import { useLocation } from 'react-router';
 
 declare type AdminCategoryGridViewPropsType = {
 }
@@ -43,6 +44,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     actionBox: {
       textAlign: "center"
+    },
+    searchBox: {
+      display: "flex",
+      justifyContent: "flex-end",
     },
     cardContentBox: {
       height: "70vh",
@@ -87,6 +92,11 @@ const generateColumns: (onEdit: React.EventHandler<React.MouseEvent<HTMLButtonEl
   ];
 }
 
+// A custom hook that builds on useLocation to parse
+// the query string for you.
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
 /**
  * admin category management component
  *
@@ -101,10 +111,6 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
 
   const dispatch = useDispatch()
 
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
-
   // domain cur item
   const curCategoryList = useSelector(mSelector.makeCategoryWithoutCacheSelector())
 
@@ -113,9 +119,25 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
 
   const pagination = useSelector(mSelector.makeProductPaginationSelector())
 
+  const curQueryString = useSelector(mSelector.makeCategoryQuerySelector())
+
   // fetch category
   React.useEffect(() => {
     dispatch(fetchCategoryActionCreator())
+  }, [
+      JSON.stringify(curQueryString),
+      pagination.page
+    ])
+
+  // spa url query string 
+  const query = useQuery()
+  const searchQuery = query.get("searchQuery")
+  React.useEffect(() => {
+    if (searchQuery) {
+      dispatch(
+        categoryQuerySearchQueryActions.update(searchQuery)
+      )
+    }
   }, [])
 
   const [curFormOpen, setFormOpen] = React.useState<boolean>(false);
@@ -137,8 +159,8 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
     // request
     dispatch(
       deleteSingleCategoryActionCreator({
-        categoryId: curCategory.categoryId, 
-      }) 
+        categoryId: curCategory.categoryId,
+      })
     )
   }
 
@@ -172,24 +194,18 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
     dispatch(categoryPaginationPageActions.update(nextPage))
   }
 
+  /**
+   * search query stuffs
+   **/
+  const handleSearchChange = (value: string) => {
+    dispatch(
+      categoryQuerySearchQueryActions.update(value)
+    )
+  }
+
   // fetch result
   // fetch order fetching result
   const curFetchCategoryStatus = useSelector(mSelector.makeFetchCategoryFetchStatusSelector())
-  if (curFetchCategoryStatus === FetchStatusEnum.FETCHING) {
-    return (
-      <Box className={classes.loadingBox}>
-        <CircularProgress />
-      </Box>
-    )
-  } else if (curFetchCategoryStatus === FetchStatusEnum.FAILED) {
-    return (
-      <Box className={classes.loadingBox}>
-        <Typography variant="body1" component="h2" >
-          {"failed to fetch data... please try again..."}
-        </Typography>
-      </Box>
-    )
-  }
   return (
     <Card className={classes.root}>
       <CardHeader
@@ -209,15 +225,32 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
       <CardContent
         className={classes.cardContentBox}
       >
-        <DataGrid
-          rows={generateRows(curCategoryList)}
-          columns={generateColumns(handleEditClick, handleDeleteClick)}
-          page={pagination.page} // don't forget to increment when display
-          pageSize={pagination.limit}
-          rowCount={pagination.totalElements}
-          onPageChange={handlePageChange}
+        <Box className={classes.searchBox}>
+          <SearchForm searchQuery={curQueryString.searchQuery} onChange={handleSearchChange} label={"keyword search here..."} />
+        </Box>
+        {(curFetchCategoryStatus === FetchStatusEnum.FETCHING &&
+          <Box className={classes.loadingBox}>
+            <CircularProgress />
+          </Box>
+        )}
+        {(curFetchCategoryStatus === FetchStatusEnum.SUCCESS &&
+          <DataGrid
+            rows={generateRows(curCategoryList)}
+            columns={generateColumns(handleEditClick, handleDeleteClick)}
+            page={pagination.page} // don't forget to increment when display
+            pageSize={pagination.limit}
+            rowCount={pagination.totalElements}
+            onPageChange={handlePageChange}
           // not gonna use pagination of this DataGrid
-        />
+          />
+        )}
+        {(curFetchCategoryStatus === FetchStatusEnum.FAILED &&
+          <Box className={classes.loadingBox}>
+            <Typography variant="body1" component="h2" >
+              {"failed to fetch data... please try again..."}
+            </Typography>
+          </Box>
+        )}
       </CardContent>
       <CardActions disableSpacing>
       </CardActions>
@@ -244,9 +277,9 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
             Category Name: <b>{curCategory && curCategory.categoryName}</b>
           </Typography><br />
           {(curCategory && curCategory.totalProductCount > 0 &&
-          <Typography variant="body2" component="p" align="left" color={"error"} className={null} >
-            {"Oops, this category holds several products. come back here after you change the category of those products if you want to delete this category."}
-          </Typography>
+            <Typography variant="body2" component="p" align="left" color={"error"} className={null} >
+              {"Oops, this category holds several products. come back here after you change the category of those products if you want to delete this category."}
+            </Typography>
           )}
         </DialogContent>
         <DialogActions>

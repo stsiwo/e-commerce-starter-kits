@@ -10,6 +10,7 @@ import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.infrastructure.model.UserType;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -32,5 +33,12 @@ public class AdvanceUserRepositoryImpl implements AdvanceUserRepository {
       .getResultList()
       .stream()
       .findFirst();
+	}
+
+	@Override
+	public Boolean isDuplicateEmail(String email) {
+		return this.entityManager.createQuery("select case when (count(u) > 0)  then true else false end from users u where u.email = :email", Boolean.class)
+      .setParameter("email", email)
+      .getSingleResult();
 	}
 }

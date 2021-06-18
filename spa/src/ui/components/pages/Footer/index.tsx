@@ -158,7 +158,9 @@ const Footer: React.FunctionComponent<{}> = (props) => {
           <Typography variant="body2" component="p" className={classes.parag} >
             {"Let's explore our products."}
           </Typography>
+          {/**
           <SearchForm />
+          **/}
         </Grid>
       </Grid>
       <Box className={classes.bottom}>

@@ -8,4 +8,6 @@ import com.iwaodev.infrastructure.model.UserType;
 public interface AdvanceUserRepository {
 
   public Optional<UserType> findUserType(UserTypeEnum type);
+
+  public Boolean isDuplicateEmail(String email);
 }

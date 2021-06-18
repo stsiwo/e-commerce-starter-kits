@@ -19,11 +19,13 @@ import { getStatus } from 'domain/review';
 import { ReviewType } from 'domain/review/type';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteSingleReviewActionCreator, fetchReviewActionCreator, reviewPaginationPageActions } from 'reducers/slices/domain/review';
+import { deleteSingleReviewActionCreator, fetchReviewActionCreator, reviewPaginationPageActions, reviewQuerySearchQueryActions } from 'reducers/slices/domain/review';
 import { FetchStatusEnum } from 'src/app';
 import { mSelector } from 'src/selectors/selector';
 import AdminReviewFormDialog from '../AdminReviewFormDialog';
 import AdminReviewSearchController from '../AdminReviewSearchController';
+import SearchForm from 'components/common/SearchForm';
+import { useLocation } from 'react-router';
 
 declare type AdminReviewGridViewPropsType = {
 }
@@ -42,6 +44,10 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: "center",
     },
     media: {
+    },
+    searchBox: {
+      display: "flex",
+      justifyContent: "flex-end",
     },
     actionBox: {
       textAlign: "center"
@@ -94,6 +100,11 @@ const generateColumns: (onEdit: React.EventHandler<React.MouseEvent<HTMLButtonEl
   ];
 }
 
+// A custom hook that builds on useLocation to parse
+// the query string for you.
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
 /**
  * admin product management component
  *
@@ -102,7 +113,7 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
 
   // mui: makeStyles
   const classes = useStyles();
-  
+
   const dispatch = useDispatch()
 
   // domain cur item
@@ -120,10 +131,20 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
     console.log("this is called?")
     dispatch(fetchReviewActionCreator())
   }, [
-    JSON.stringify(curQueryString),
-    pagination.page 
-  ])
+      JSON.stringify(curQueryString),
+      pagination.page
+    ])
 
+  // spa url query string 
+  const query = useQuery()
+  const searchQuery = query.get("searchQuery")
+  React.useEffect(() => {
+    if (searchQuery) {
+      dispatch(
+        reviewQuerySearchQueryActions.update(searchQuery)
+      )
+    }
+  }, [])
 
   const [curFormOpen, setFormOpen] = React.useState<boolean>(false);
 
@@ -138,7 +159,7 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
 
     // request
     dispatch(
-      deleteSingleReviewActionCreator({ reviewId: curReviewId }) 
+      deleteSingleReviewActionCreator({ reviewId: curReviewId })
     )
   }
 
@@ -170,25 +191,18 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
     dispatch(reviewPaginationPageActions.update(nextPage))
   }
 
-  
+  /**
+   * search query stuffs
+   **/
+  const handleSearchChange = (value: string) => {
+    dispatch(
+      reviewQuerySearchQueryActions.update(value)
+    )
+  }
+
   // fetch result
   // fetch order fetching result
   const curFetchReviewStatus = useSelector(mSelector.makeFetchReviewFetchStatusSelector())
-  if (curFetchReviewStatus === FetchStatusEnum.FETCHING) {
-    return (
-      <Box className={classes.loadingBox}>
-        <CircularProgress />
-      </Box>
-    )
-  } else if (curFetchReviewStatus === FetchStatusEnum.FAILED) {
-    return (
-      <Box className={classes.loadingBox}>
-        <Typography variant="body1" component="h2" >
-          {"failed to fetch data... please try again..."}
-        </Typography>
-      </Box>
-    )
-  }
 
   return (
     <Card className={classes.root}>
@@ -204,15 +218,34 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
       <CardContent
         className={classes.cardContentBox}
       >
+        <Box className={classes.searchBox}>
+          <SearchForm searchQuery={curQueryString.searchQuery} onChange={handleSearchChange} label={"keyword search here..."} />
+        </Box>
         <AdminReviewSearchController />
-        <DataGrid
-          rows={generateRows(curReviewList)}
-          columns={generateColumns(handleEditClick, handleDeleteClick)}
-          page={pagination.page} // don't forget to increment when display
-          pageSize={pagination.limit}
-          rowCount={pagination.totalElements}
-          onPageChange={handlePageChange}
-        />
+        {(curFetchReviewStatus === FetchStatusEnum.FETCHING &&
+          <Box className={classes.loadingBox}>
+            <CircularProgress />
+          </Box>
+        )}
+        {(curFetchReviewStatus === FetchStatusEnum.SUCCESS &&
+          <React.Fragment>
+            <DataGrid
+              rows={generateRows(curReviewList)}
+              columns={generateColumns(handleEditClick, handleDeleteClick)}
+              page={pagination.page} // don't forget to increment when display
+              pageSize={pagination.limit}
+              rowCount={pagination.totalElements}
+              onPageChange={handlePageChange}
+            />
+          </React.Fragment>
+        )}
+        {(curFetchReviewStatus === FetchStatusEnum.FAILED &&
+          <Box className={classes.loadingBox}>
+            <Typography variant="body1" component="h2" >
+              {"failed to fetch data... please try again..."}
+            </Typography>
+          </Box>
+        )}
       </CardContent>
       <CardActions disableSpacing>
       </CardActions>

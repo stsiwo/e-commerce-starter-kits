@@ -42,7 +42,7 @@ public class UserSignupServiceImpl implements UserSignupService {
 
     logger.info("target criteria user name: " + criteria.toString());
 
-    if (this.repository.findByEmail(criteria.getEmail()) != null) {
+    if (this.repository.findByEmail(criteria.getEmail()).isPresent()) {
       logger.info("the given user already exisxts");
       throw new ResponseStatusException(HttpStatus.CONFLICT, "the given user already exists.");
     }

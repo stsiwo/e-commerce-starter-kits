@@ -1,6 +1,5 @@
 import Grid from '@material-ui/core/Grid';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 import { UserType } from 'domain/user/types';
 import * as React from 'react';
 import AdminCustomerAddressForm from './AdminCustomerAddressForm';

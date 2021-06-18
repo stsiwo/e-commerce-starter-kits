@@ -20,9 +20,8 @@ import { CustomerPhonesFormDataType, CustomerPhonesFormValidationDataType, defau
 import { useValidation } from 'hooks/validation';
 import { userAccountPhoneSchema } from 'hooks/validation/rules';
 import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { deleteUserPhoneActionCreator, patchUserPhoneActionCreator, postUserPhoneActionCreator, putUserPhoneActionCreator } from 'reducers/slices/domain/user';
-import { mSelector } from 'src/selectors/selector';
 import { getPrimaryPhoneId } from 'domain/user';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -98,6 +97,9 @@ const AdminCustomerPhoneForm: React.FunctionComponent<AdminCustomerPhoneFormProp
   // dispatch
   const dispatch = useDispatch();
 
+  // max size
+  const maxSize = 3;
+
   // temp user account state
   const [curAdminCustomerPhoneState, setAdminCustomerPhoneState] = React.useState<CustomerPhonesFormDataType>(generateDefaultCustomerPhonesFormData());
 
@@ -114,8 +116,8 @@ const AdminCustomerPhoneForm: React.FunctionComponent<AdminCustomerPhoneFormProp
 
   // event handlers
   const handlePhoneInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextPhoneNumber = e.currentTarget.value
-    updateValidationAt("phoneNumber", e.currentTarget.value);
+    const nextPhoneNumber = e.target.value
+    updateValidationAt("phoneNumber", e.target.value);
     setAdminCustomerPhoneState((prev: CustomerPhonesFormDataType) => ({
       ...prev,
       phoneNumber: nextPhoneNumber
@@ -124,8 +126,8 @@ const AdminCustomerPhoneForm: React.FunctionComponent<AdminCustomerPhoneFormProp
   }
 
   const handleCountryCodeInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCountryCode = e.currentTarget.value
-    updateValidationAt("countryCode", e.currentTarget.value);
+    const nextCountryCode = e.target.value
+    updateValidationAt("countryCode", e.target.value);
     setAdminCustomerPhoneState((prev: CustomerPhonesFormDataType) => ({
       ...prev,
       countryCode: nextCountryCode
@@ -301,7 +303,10 @@ const AdminCustomerPhoneForm: React.FunctionComponent<AdminCustomerPhoneFormProp
           </RadioGroup>
         )}
         <Box component="div" className={classes.actionBox}>
-          <Button onClick={handleAddNewPhoneBtnClickEvent}>
+          <Button 
+            onClick={handleAddNewPhoneBtnClickEvent}
+            disabled={phones.length === maxSize}
+          >
             Add New Phone
         </Button>
         </Box>
@@ -326,6 +331,7 @@ const AdminCustomerPhoneForm: React.FunctionComponent<AdminCustomerPhoneFormProp
           <TextField
             id="country-code"
             label="Country Code"
+            disabled
             className={classes.formControl}
             value={curAdminCustomerPhoneState.countryCode}
             onChange={handleCountryCodeInputChangeEvent}

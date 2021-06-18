@@ -19,13 +19,15 @@ import { ProductType } from 'domain/product/types';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link as RRLink } from "react-router-dom";
-import { deleteSingleProductActionCreator, fetchProductActionCreator, productPaginationPageActions } from 'reducers/slices/domain/product';
+import { deleteSingleProductActionCreator, fetchProductActionCreator, productPaginationPageActions, productQuerySearchQueryActions } from 'reducers/slices/domain/product';
 import { mSelector } from 'src/selectors/selector';
 import AdminProductFormDialog from '../AdminProductFormDialog';
 import AdminProductSearchController from '../ADminProductSearchController';
 import { FetchStatusEnum } from 'src/app';
 import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import SearchForm from 'components/common/SearchForm';
+import { useLocation } from 'react-router';
 
 declare type AdminProductGridViewPropsType = {
 }
@@ -46,6 +48,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     actionBox: {
       textAlign: "center"
+    },
+    searchBox: {
+      display: "flex",
+      justifyContent: "flex-end",
     },
     cardContentBox: {
       height: "70vh",
@@ -116,6 +122,12 @@ const generateColumns: (onEdit: React.EventHandler<React.MouseEvent<HTMLButtonEl
   ]
 }
 
+// A custom hook that builds on useLocation to parse
+// the query string for you.
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
+
 /**
  * admin product management component
  *
@@ -140,10 +152,20 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
   React.useEffect(() => {
     dispatch(fetchProductActionCreator())
   }, [
-    JSON.stringify(curQueryString),
-    pagination.page
-  ])
+      JSON.stringify(curQueryString),
+      pagination.page
+    ])
 
+  // spa url query string 
+  const query = useQuery()
+  const searchQuery = query.get("searchQuery")
+  React.useEffect(() => {
+    if (searchQuery) {
+      dispatch(
+        productQuerySearchQueryActions.update(searchQuery)
+      )
+    }
+  }, [])
 
   const [curFormOpen, setFormOpen] = React.useState<boolean>(false);
 
@@ -162,7 +184,7 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
 
     // request
     dispatch(
-      deleteSingleProductActionCreator({ productId: curProduct.productId }) 
+      deleteSingleProductActionCreator({ productId: curProduct.productId })
     )
   }
 
@@ -196,25 +218,18 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
     dispatch(productPaginationPageActions.update(nextPage))
   }
 
-  // fetch result
-  // fetch order fetching result
-  const curFetchProductStatus = useSelector(mSelector.makeFetchProductFetchStatusSelector())
-  if (curFetchProductStatus === FetchStatusEnum.FETCHING) {
-    return (
-      <Box className={classes.loadingBox}>
-        <CircularProgress />
-      </Box>
-    )
-  } else if (curFetchProductStatus === FetchStatusEnum.FAILED) {
-    return (
-      <Box className={classes.loadingBox}>
-        <Typography variant="body1" component="h2" >
-          {"failed to fetch data... please try again..."}
-        </Typography>
-      </Box>
+  /**
+   * search query stuffs
+   **/
+  const handleSearchChange = (value: string) => {
+    dispatch(
+      productQuerySearchQueryActions.update(value)
     )
   }
 
+  // fetch result
+  // fetch order fetching result
+  const curFetchProductStatus = useSelector(mSelector.makeFetchProductFetchStatusSelector())
 
   return (
     <Card className={classes.root}>
@@ -235,16 +250,33 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
       <CardContent
         className={classes.cardContentBox}
       >
-        <AdminProductSearchController />        
-        <DataGrid
-          rows={generateRows(curProductList)}
-          columns={generateColumns(handleEditClick, handleDeleteClick)}
-          page={pagination.page} // don't forget to increment when display
-          pageSize={pagination.limit}
-          rowCount={pagination.totalElements}
-          onPageChange={handlePageChange}
+        <Box className={classes.searchBox}>
+          <SearchForm searchQuery={curQueryString.searchQuery} onChange={handleSearchChange} label={"keyword search here..."} />
+        </Box>
+        <AdminProductSearchController />
+        {(curFetchProductStatus === FetchStatusEnum.FETCHING &&
+          <Box className={classes.loadingBox}>
+            <CircularProgress />
+          </Box>
+        )}
+        {(curFetchProductStatus === FetchStatusEnum.SUCCESS &&
+          <DataGrid
+            rows={generateRows(curProductList)}
+            columns={generateColumns(handleEditClick, handleDeleteClick)}
+            page={pagination.page} // don't forget to increment when display
+            pageSize={pagination.limit}
+            rowCount={pagination.totalElements}
+            onPageChange={handlePageChange}
           // not gonna use pagination of this DataGrid
-        />
+          />
+        )}
+        {(curFetchProductStatus === FetchStatusEnum.FAILED &&
+          <Box className={classes.loadingBox}>
+            <Typography variant="body1" component="h2" >
+              {"failed to fetch data... please try again..."}
+            </Typography>
+          </Box>
+        )}
       </CardContent>
       <CardActions disableSpacing>
       </CardActions>

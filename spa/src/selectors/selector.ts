@@ -55,6 +55,8 @@ export const rsSelector = {
   domain: {
     getCategory: (state: StateType) => state.domain.categories.data,
     getCategoryPagination: (state: StateType) => state.domain.categories.pagination,
+    getCategoryQuery: (state: StateType) => state.domain.categories.query,
+    getCategoryQuerySearchQuery: (state: StateType) => state.domain.categories.query.searchQuery,
 
     getReview: (state: StateType) => state.domain.reviews.data,
     getReviewPagination: (state: StateType) => state.domain.reviews.pagination,
@@ -496,6 +498,33 @@ export const mSelector = {
         console.log(denormalizedEntities)
 
         return denormalizedEntities
+      },
+    )
+  },
+
+  // domain.categories.query
+  makeCategoryQuerySelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getCategoryQuerySearchQuery,
+
+      ],
+      (searchQuery) => {
+
+        return {
+          searchQuery: searchQuery,
+        }
+      },
+    )
+  },
+
+  makeCategoryQuerySearchQuerySelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getCategoryQuerySearchQuery
+      ],
+      (searchQuery) => {
+        return searchQuery
       },
     )
   },

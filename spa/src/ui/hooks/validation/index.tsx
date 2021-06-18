@@ -24,6 +24,7 @@ export const useValidation = <D extends Record<string, unknown>>(input: UseValid
         })
       }).catch((error: yup.ValidationError) => {
         console.log("still error")
+        console.log(error)
         input.setValidationDomain((prev: DomainValidationType<D>) => {
           return set(tempValidationData, path, error.errors[0])
         })

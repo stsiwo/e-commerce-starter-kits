@@ -15,11 +15,11 @@ import EditIcon from '@material-ui/icons/Edit';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import { AxiosError } from 'axios';
 import { api } from 'configs/axiosConfig';
-import { UserType } from 'domain/user/types';
+import { UserType, userActiveLabelList } from 'domain/user/types';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUserActionCreator, userPaginationPageActions } from 'reducers/slices/domain/user';
+import { fetchUserActionCreator, userPaginationPageActions, userQuerySearchQueryActions } from 'reducers/slices/domain/user';
 import { mSelector } from 'src/selectors/selector';
 import AdminCustomerFormDrawer from '../AdminCustomerFormDrawer';
 import AdminUserSearchController from '../AdminCustomerSearchController';
@@ -27,6 +27,8 @@ import Avatar from '@material-ui/core/Avatar';
 import { FetchStatusEnum } from 'src/app';
 import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import SearchForm from 'components/common/SearchForm';
+import { useLocation } from 'react-router';
 
 
 declare type AdminCustomerGridViewPropsType = {
@@ -46,6 +48,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     media: {
     },
+    searchBox: {
+      display: "flex",
+      justifyContent: "flex-end",
+    },
     actionBox: {
       textAlign: "center"
     },
@@ -63,7 +69,7 @@ const generateRows: (domains: UserType[]) => GridRowsProp = (domains) => {
       name: domain.firstName + " " + domain.lastName,
       email: domain.email,
       type: domain.userType.userType,
-      status: domain.userType,
+      status: userActiveLabelList[domain.active],
       //orders: domain.orders.length,
       //reviews: domain.reviews.length,
       actions: domain.userId,
@@ -115,6 +121,11 @@ const generateColumns: (onEdit: React.EventHandler<React.MouseEvent<HTMLButtonEl
   ];
 }
 
+// A custom hook that builds on useLocation to parse
+// the query string for you.
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
 /**
  * admin product management component
  *
@@ -151,6 +162,16 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
     pagination.page 
   ])
 
+  // spa url query string 
+  const query = useQuery()
+  const searchQuery = query.get("searchQuery")
+  React.useEffect(() => {
+    if (searchQuery) {
+      dispatch(
+        userQuerySearchQueryActions.update(searchQuery)
+      )
+    }
+  }, [])
   const [curFormOpen, setFormOpen] = React.useState<boolean>(false);
 
   // deletion dialog stuff
@@ -201,25 +222,17 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
     dispatch(userPaginationPageActions.update(nextPage))
   }
 
+  /**
+   * search query stuffs
+   **/
+  const handleSearchChange = (value: string) => {
+    dispatch(
+      userQuerySearchQueryActions.update(value)
+    )
+  }
   // fetch result
   // fetch order fetching result
   const curFetchCustomerStatus = useSelector(mSelector.makeFetchUserFetchStatusSelector())
-  if (curFetchCustomerStatus === FetchStatusEnum.FETCHING) {
-    return (
-      <Box className={classes.loadingBox}>
-        <CircularProgress />
-      </Box>
-    )
-  } else if (curFetchCustomerStatus === FetchStatusEnum.FAILED) {
-    return (
-      <Box className={classes.loadingBox}>
-        <Typography variant="body1" component="h2" >
-          {"failed to fetch data... please try again..."}
-        </Typography>
-      </Box>
-    )
-  }
-
   return (
     <Card className={classes.root}>
       <CardHeader
@@ -234,7 +247,16 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
       <CardContent
         className={classes.cardContentBox}
       >
+        <Box className={classes.searchBox}>
+          <SearchForm searchQuery={curQueryString.searchQuery} onChange={handleSearchChange} label={"keyword search here..."} />
+        </Box>
         <AdminUserSearchController />
+        {(curFetchCustomerStatus === FetchStatusEnum.FETCHING &&
+          <Box className={classes.loadingBox}>
+            <CircularProgress />
+          </Box>
+        )}
+        {(curFetchCustomerStatus === FetchStatusEnum.SUCCESS &&
         <DataGrid
           rows={generateRows(curUserList)}
           columns={generateColumns(handleEditClick, handleDeleteClick)}
@@ -243,6 +265,14 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
           rowCount={pagination.totalElements}
           onPageChange={handlePageChange}
         />
+        )}
+        {(curFetchCustomerStatus === FetchStatusEnum.FAILED &&
+          <Box className={classes.loadingBox}>
+            <Typography variant="body1" component="h2" >
+              {"failed to fetch data... please try again..."}
+            </Typography>
+          </Box>
+        )}
       </CardContent>
       <CardActions disableSpacing>
       </CardActions>

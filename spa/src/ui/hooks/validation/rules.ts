@@ -1,9 +1,18 @@
 import * as yup from 'yup';
+import { get2AlphaCountryCodeRegex, getProvinceList } from 'src/utils';
 
 /**
  * note:
  *
  *  - if props are optional and might have null value, use 'nullable()'
+ *
+ *  - to access another property from a property validation, 
+ *
+ *    - use regular function 'function' not arrow function (e.g.,  () => ) in order to use 'this' inside the function.
+ *      - the arrow function does not have 'binding' so you cannot use 'this' if you use arrow function.
+ *
+ *    - use 'this.parent' to access another field value.
+ *      - 'yup.ref()' does not work as you expected.
  *
  **/
 
@@ -12,24 +21,32 @@ export const userAccountSchema = yup.object().shape({
   lastName: yup.string().required(),
   email: yup.string().required().email(),
   /**
-   * conditional required password and confirm: if password/confirm is null, it is optional
+   * password.
+   * 
+   * - conditional required password and confirm: if password/confirm is null, it is optional
+   *
+   * - following rules:
+   *   - min 8
+   *   - at least one lowercase and uppercase
+   *   - no space
+   *
    **/
-  password: yup.lazy((value) => value ? yup.string().min(4, "password must be at least 4 characters").required("password is required") : yup.string().notRequired()), 
+  password: yup.lazy((value) => value ? yup.string().min(8, "password must be at least 8 characters").matches(/^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/, "cannot include space and must include at least one upper case and lowercase char.").required("password is required") : yup.string().notRequired()),
   confirm: yup.lazy((cf) => {
-      return yup.string().when('password', {
-        is: (pw: string) => pw || (!pw && cf),
-        then: yup.string().oneOf([yup.ref('password'), null], 'confirm must match with password'),
-        otherwise: yup.string().notRequired()
-      })
+    return yup.string().when('password', {
+      is: (pw: string) => pw || (!pw && cf),
+      then: yup.string().oneOf([yup.ref('password'), null], 'confirm must match with password'),
+      otherwise: yup.string().notRequired()
     })
-  
+  })
+
   //yup.string().oneOf([yup.ref('password'), null], "password must match")
 })
 
 
 export const userAccountPhoneSchema = yup.object().shape({
-  phoneNumber: yup.string().required(),
-  countryCode: yup.string().required(),
+  phoneNumber: yup.string().matches(/^[0-9]{10}$/, "invalid format. please enter only number (no '-', '(', ')')").required(),
+  countryCode: yup.string().matches(/^(\+?\d{1,3}|\\d{1,4})$/, "invalid format. proper format: '+1', '+12'").required(),
 })
 
 export const userActiveStatusAccountSchema = yup.object().shape({
@@ -41,27 +58,38 @@ export const userAccountAddressSchema = yup.object().shape({
   address1: yup.string().required(),
   address2: yup.string().optional().nullable(),
   city: yup.string().required(),
-  province: yup.string().required(),
-  country: yup.string().required(),
-  postalCode: yup.string().required(),
+  province: yup.string().test(
+    'province-list-contain',
+    'province does not exist.',
+    /** 
+     * ref: https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object 
+     * - the first file object exists and not empty object
+     **/
+    (value) => {
+      const provinceList = getProvinceList();
+      return provinceList.indexOf(value) !== -1 ? true : false;
+    }
+  ).required(),
+  country: yup.string().matches(get2AlphaCountryCodeRegex()).required(),
+  postalCode: yup.string().matches(/^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9]$/, "invalid format. proper format: 'A1A 2B2'").required(),
 })
 
 export const adminLoginSchema = yup.object().shape({
   email: yup.string().required().email(),
-  password: yup.string().required(),
+  password: yup.string().min(8, "password must be at least 8 characters").matches(/^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/, "cannot include space and must include at least one upper case and lowercase char.").required("password is required"),
 })
 
 export const memberSignupSchema = yup.object().shape({
   firstName: yup.string().required(),
   lastName: yup.string().required(),
   email: yup.string().required().email(),
-  password: yup.string().required(),
+  password: yup.string().min(8, "password must be at least 8 characters").matches(/^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/, "cannot include space and must include at least one upper case and lowercase char.").required("password is required"),
   confirm: yup.string().required().oneOf([yup.ref('password'), null], "password must match")
 })
 
 export const memberLoginSchema = yup.object().shape({
   email: yup.string().required().email(),
-  password: yup.string().required(),
+  password: yup.string().min(8, "password must be at least 8 characters").matches(/^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/, "cannot include space and must include at least one upper case and lowercase char.").required("password is required"),
 })
 
 // products
@@ -76,17 +104,17 @@ export const productVariantSchema = yup.object().shape({
    **/
   productSize: yup.object().nullable(),
   variantColor: yup.string().required(),
-  variantUnitPrice: yup.string().optional().nullable(),
-  variantDiscountPrice: yup.number().optional().nullable(),
-  variantDiscountStartDate: yup.string().optional().nullable(),
-  variantDiscountEndDate: yup.string().optional().nullable(),
-  variantStock: yup.number().required(),
-  isDiscount: yup.string().optional().nullable(),
+  variantUnitPrice: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/, "invalid currency format. please enter currency (e.g., 3.12, 12.00, and so on)").optional().nullable(),
+  variantDiscountPrice: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/, "invalid currency format. please enter currency (e.g., 3.12, 12.00, and so on)").optional().nullable(),
+  variantDiscountStartDate: yup.date().max(yup.ref('variantDiscountEndDate'), "start date must be before the end date.").required(),
+  variantDiscountEndDate: yup.date().min(yup.ref('variantDiscountStartDate'), "end date must be after the start date.").required(),
+  variantStock: yup.number().min(0).required(),
+  isDiscount: yup.bool().optional().nullable(),
   note: yup.string().optional().nullable(),
-  variantWeight: yup.number().required(),
-  variantHeight: yup.number().required(),
-  variantLength: yup.number().required(),
-  variantWidth: yup.number().required(),
+  variantWeight: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,3})?$/, "invalid kg format. please enter currency (e.g., 3.120, 12.000, and so on)").required(),
+  variantHeight: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,3})?$/, "invalid cm format. please enter currency (e.g., 3.120, 12.000, and so on)").required(),
+  variantLength: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,3})?$/, "invalid cm format. please enter currency (e.g., 3.120, 12.000, and so on)").required(),
+  variantWidth: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,3})?$/, "invalid cm format. please enter currency (e.g., 3.120, 12.000, and so on)").required(),
 })
 
 export const productSchema = yup.object().shape({
@@ -94,7 +122,7 @@ export const productSchema = yup.object().shape({
   productDescription: yup.string().required(),
   productPath: yup.string().required(),
   productImages: yup.array().test(
-    'has-first-element', 
+    'has-first-element',
     'the primary product image (1st image) is required.',
     /** 
      * ref: https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object 
@@ -108,27 +136,45 @@ export const productSchema = yup.object().shape({
       return value[0].productImagePath != ""
     }
   ),
-  productBaseUnitPrice: yup.string().required(),
-  productBaseDiscountPrice: yup.string().required(),
-  productBaseDiscountStartDate: yup.string().required(),
-  productBaseDiscountEndDate: yup.string().required(),
-  isDiscount: yup.string().required(),
-  isPublic: yup.string().test(
+  productBaseUnitPrice: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/, "invalid currency format. please enter currency (e.g., 3.12, 12.00, and so on)").required(),
+  productBaseDiscountPrice: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/, "invalid currency format. please enter currency (e.g., 3.12, 12.00, and so on)").required(),
+  productBaseDiscountStartDate: yup.date().max(yup.ref('productBaseDiscountEndDate'), "start date must be before the end date.").required(),
+  productBaseDiscountEndDate: yup.date().min(yup.ref('productBaseDiscountStartDate'), "end date must be after the start date.").required(),
+  isDiscount: yup.bool().required(),
+  releaseDate: yup.date().default(() => new Date()).required().nullable(),
+  isPublic: yup.bool().test(
     'has-at-least-one-varaint',
     'Oops. you need to have at least one variant. come back here after you create variants.',
-    (value) => {
+    function(value) {
       /**
        * be careful this 'value' is string which contains 'true'/'false' as string so you need to convert it to boolean first.
+       *  -> you need to use 'bool()'. don't use 'string()' for boolean variable.
        **/
-      const isPublic = (value === 'true');
+      const isPublic = value
       if (isPublic) {
-        const variants = yup.ref("productVariants")
+        const variants = this.parent.productVariants; 
         return variants && (variants as unknown as any[]).length > 0
       }
       return true
     }
+  ).test(
+    'must-be-after-release-date',
+    "Oops. need to be after release date to publish this product. Don't worry, we automatically publish this product at the release date.",
+    function(value) {
+      /**
+       * be careful this 'value' is string which contains 'true'/'false' as string so you need to convert it to boolean first.
+       *
+       *  -> you need to use 'bool()'. don't use 'string()' for boolean variable.
+       **/
+      const isPublic = value
+      if (isPublic) {
+        const releaseDate = this.parent.releaseDate 
+        const curDate = new Date()
+        return curDate.getDate() >= (releaseDate as unknown as Date).getDate()
+      }
+      return true
+    }
   ),
-  releaseDate: yup.string().optional().nullable(),
   /**
    * cateogry object validation not working.
    *
@@ -138,7 +184,7 @@ export const productSchema = yup.object().shape({
    *
    **/
   category: yup.object().shape({
-    categoryId: yup.string().required() 
+    categoryId: yup.string().required()
   }).nullable(),
   productVariants: yup.array().of(productVariantSchema),
   note: yup.string().optional().nullable(),
@@ -153,7 +199,7 @@ export const categorySchema = yup.object().shape({
 
 // reviews
 export const reviewSchema = yup.object().shape({
-  reviewPoint: yup.number().required(),
+  reviewPoint: yup.number().min(0).max(5).required(),
   reviewTitle: yup.string().required(),
   reviewDescription: yup.string().required(),
   isVerified: yup.bool().required(),
@@ -174,14 +220,26 @@ export const companySchema = yup.object().shape({
   companyName: yup.string().required(),
   companyDescription: yup.string().required(),
   companyEmail: yup.string().required().email(),
-  phoneNumber: yup.string().required(),
-  countryCode: yup.string().required(),
+  phoneNumber: yup.string().matches(/^[0-9]{10}$/, "invalid format. please enter only number (no '-', '(', ')')").required(),
+  countryCode: yup.string().matches(/^(\+?\d{1,3}|\\d{1,4})$/, "invalid format. proper format: '+1', '+12'").required(),
   address1: yup.string().required(),
   address2: yup.string().optional().nullable(),
   city: yup.string().required(),
-  province: yup.string().required(),
-  country: yup.string().required(),
-  postalCode: yup.string().required(),
+  province: yup.string().test(
+    'province-list-contain',
+    'province does not exist. please choose from available option.',
+    /** 
+     * ref: https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object 
+     * - the first file object exists and not empty object
+     **/
+    (value) => {
+      const provinceList = getProvinceList();
+      console.log(value);
+      return provinceList.indexOf(value) !== -1 ? true : false;
+    }
+  ).required(),
+  country: yup.string().matches(get2AlphaCountryCodeRegex(), "invalid country format. please choose from available option.").required(),
+  postalCode: yup.string().matches(/^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9]$/, "invalid format. proper format: 'A1A 2B2'").required(),
 })
 
 // forgot password 
@@ -191,7 +249,7 @@ export const forgotPasswordSchema = yup.object().shape({
 
 // reset password
 export const resetPasswordSchema = yup.object().shape({
-  password: yup.string().required(),
+  password: yup.string().min(8, "password must be at least 8 characters").matches(/^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/, "cannot include space and must include at least one upper case and lowercase char.").required("password is required"),
   confirm: yup.string().required().oneOf([yup.ref('password'), null], "password must match")
 })
 

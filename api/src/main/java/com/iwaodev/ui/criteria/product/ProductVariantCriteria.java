@@ -39,7 +39,7 @@ public class ProductVariantCriteria {
   private LocalDateTime variantDiscountEndDate;
 
   @NotNull(message = "product variant stock must not be null.")
-  @Min(value = 1, message = "the price must be greater than or equal 1")
+  @Min(value = 0, message = "the price must be greater than or equal 0")
   private Integer variantStock;
 
   private Boolean isDiscount;

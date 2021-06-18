@@ -89,6 +89,9 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
   // mui: makeStyles
   const classes = useStyles();
 
+  // max size
+  const maxSize = 3;
+
   // auth
   const auth = useSelector(mSelector.makeAuthSelector())
 
@@ -119,8 +122,8 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
 
   // event handlers
   const handlePhoneNumberInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextPhoneNumber = e.currentTarget.value
-    updateValidationAt("phoneNumber", e.currentTarget.value);
+    const nextPhoneNumber = e.target.value
+    updateValidationAt("phoneNumber", e.target.value);
     setCustomerPhonesFormState((prev: CustomerPhonesFormDataType) => ({
       ...prev,
       phoneNumber: nextPhoneNumber
@@ -128,8 +131,8 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
   }
 
   const handleCountryCodeInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCountryCode = e.currentTarget.value
-    updateValidationAt("countryCode", e.currentTarget.value);
+    const nextCountryCode = e.target.value
+    updateValidationAt("countryCode", e.target.value);
     setCustomerPhonesFormState((prev: CustomerPhonesFormDataType) => ({
       ...prev,
       countryCode: nextCountryCode
@@ -264,7 +267,10 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
           </RadioGroup>
         )}
         <Box component="div" className={classes.actionBox}>
-          <Button onClick={handleAddNewPhoneBtnClickEvent}>
+          <Button 
+            onClick={handleAddNewPhoneBtnClickEvent}
+            disabled={props.phones.length === maxSize}
+          >
             Add New Phone
           </Button>
         </Box>
@@ -289,6 +295,7 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
           <TextField
             id="country-code"
             label="Country Code"
+            disabled
             className={classes.formControl}
             value={curCustomerPhonesFormState.countryCode}
             onChange={handleCountryCodeInputChangeEvent}

@@ -34,7 +34,7 @@ const defaultAdminLoginData: AdminLoginDataType = {
 
 if (NODE_ENV !== "production") {
   defaultAdminLoginData.email = "test_admin@test.com"
-  defaultAdminLoginData.password = "test_password"
+  defaultAdminLoginData.password = "test_PASSWORD"
 }
 
 export declare type AdminLoginValidationDataType = {

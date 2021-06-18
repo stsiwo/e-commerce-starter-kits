@@ -13,7 +13,6 @@ import { useValidation } from 'hooks/validation';
 import { productSchema } from 'hooks/validation/rules';
 import cloneDeep from 'lodash/cloneDeep';
 import merge from 'lodash/merge';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCategoryActionCreator } from 'reducers/slices/domain/category';
@@ -127,7 +126,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
     curValidationDomain: curProductValidationState,
     schema: productSchema,
     setValidationDomain: setProductValidationState,
-    defaultValidationDomain: defaultProductValidationData,  
+    defaultValidationDomain: defaultProductValidationData,
   })
 
   // test category list
@@ -147,15 +146,15 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
         category: categoryList[0],
       }))
     }
-    
+
   }, [
-    categoryList.length 
-  ])
+      categoryList.length
+    ])
 
   // event handlers
   const handleProductNameInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextProductName = e.currentTarget.value
-    updateValidationAt("productName", e.currentTarget.value);
+    updateValidationAt("productName", nextProductName);
     setProductState((prev: ProductDataType) => ({
       ...prev,
       productName: nextProductName
@@ -164,7 +163,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
 
   const handleProductDescriptionInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextProductDescription = e.currentTarget.value
-    updateValidationAt("productDescription", e.currentTarget.value);
+    updateValidationAt("productDescription", nextProductDescription);
     setProductState((prev: ProductDataType) => ({
       ...prev,
       productDescription: nextProductDescription
@@ -173,7 +172,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
 
   const handleProductPathInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextProductPath = e.currentTarget.value
-    updateValidationAt("productPath", e.currentTarget.value);
+    updateValidationAt("productPath", nextProductPath);
     setProductState((prev: ProductDataType) => ({
       ...prev,
       productPath: nextProductPath
@@ -187,7 +186,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
 
     const nextCategory = categoryList.find((category: CategoryType) => nextCategoryId === category.categoryId)
     // must not be null
-    updateValidationAt("category", e.currentTarget.value);
+    updateValidationAt("category", nextCategory);
     setProductState((prev: ProductDataType) => ({
       ...prev,
       category: nextCategory
@@ -195,6 +194,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
   }
 
   const handleProductReleaseDateChange = (date: Date | null) => {
+    updateValidationAt("releaseDate", date);
     setProductState((prev: ProductDataType) => ({
       ...prev,
       releaseDate: date
@@ -202,9 +202,9 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
   };
 
   const handleProductBaseUnitPriceInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextProductBaseUnitPrice = e.currentTarget.value
+    const nextProductBaseUnitPrice = e.target.value
     console.log("product base unit price")
-    updateValidationAt("productBaseUnitPrice", e.currentTarget.value);
+    updateValidationAt("productBaseUnitPrice", nextProductBaseUnitPrice);
     setProductState((prev: ProductDataType) => ({
       ...prev,
       productBaseUnitPrice: parseFloat(nextProductBaseUnitPrice)
@@ -213,7 +213,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
 
   const handleProductBaseDiscountChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextProductBaseDiscount: boolean = e.currentTarget.checked
-    updateValidationAt("isDiscount", e.currentTarget.value);
+    updateValidationAt("isDiscount", nextProductBaseDiscount);
     setProductState((prev: ProductDataType) => ({
       ...prev,
       isDiscount: nextProductBaseDiscount,
@@ -221,8 +221,8 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
   }
 
   const handleProductBaseDiscountPriceInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextProductBaseDiscountPrice = e.currentTarget.value
-    updateValidationAt("productBaseDiscountPrice", e.currentTarget.value);
+    const nextProductBaseDiscountPrice = e.target.value
+    updateValidationAt("productBaseDiscountPrice", nextProductBaseDiscountPrice);
     setProductState((prev: ProductDataType) => ({
       ...prev,
       productBaseDiscountPrice: parseFloat(nextProductBaseDiscountPrice)
@@ -230,6 +230,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
   }
 
   const handleProductBaseDiscountStartDateChange = (date: Date | null) => {
+    updateValidationAt("productBaseDiscountStartDate", date);
     setProductState((prev: ProductDataType) => ({
       ...prev,
       productBaseDiscountStartDate: date
@@ -237,6 +238,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
   };
 
   const handleProductBaseDiscountEndDateChange = (date: Date | null) => {
+    updateValidationAt("productBaseDiscountEndDate", date);
     setProductState((prev: ProductDataType) => ({
       ...prev,
       productBaseDiscountEndDate: date
@@ -245,7 +247,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
 
   const handleProductNoteInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextProductNote = e.currentTarget.value
-    updateValidationAt("note", e.currentTarget.value);
+    updateValidationAt("note", nextProductNote);
     setProductState((prev: ProductDataType) => ({
       ...prev,
       note: nextProductNote
@@ -254,7 +256,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
 
   const handleProductPublicChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextProductPublic: boolean = e.currentTarget.checked
-    updateValidationAt("isPublic", e.currentTarget.value);
+    updateValidationAt("isPublic", nextProductPublic);
     setProductState((prev: ProductDataType) => ({
       ...prev,
       isPublic: nextProductPublic,
@@ -266,7 +268,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
 
     const nextState = cloneDeep(curProductState)
     const renamedFile = renameFile(file, curProductState.productImages[index].productImageName);
-    nextState.productImageFiles[index] = renamedFile 
+    nextState.productImageFiles[index] = renamedFile
     nextState.productImages[index].productImagePath = path
     nextState.productImages[index].isChange = true
 
@@ -342,7 +344,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
               note: curProductState.note,
               productImageFiles: curProductState.productImageFiles,
               productImages: curProductState.productImages,
-            }) 
+            })
           )
 
         } else {
@@ -365,9 +367,9 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
               note: curProductState.note,
               productImageFiles: curProductState.productImageFiles,
               productImages: curProductState.productImages,
-            }) 
+            })
           )
-          
+
         }
       } else {
         console.log("failed")
@@ -492,6 +494,8 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
           value={curProductState.productBaseDiscountStartDate}
           onChange={handleProductBaseDiscountStartDateChange}
           disabled={!curProductState.isDiscount}
+          helperText={curProductValidationState.productBaseDiscountStartDate}
+          error={curProductValidationState.productBaseDiscountStartDate !== ""}
           KeyboardButtonProps={{
             'aria-label': 'change date',
           }}
@@ -505,6 +509,8 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
           disabled={!curProductState.isDiscount}
           value={curProductState.productBaseDiscountEndDate}
           onChange={handleProductBaseDiscountEndDateChange}
+          helperText={curProductValidationState.productBaseDiscountEndDate}
+          error={curProductValidationState.productBaseDiscountEndDate !== ""}
           KeyboardButtonProps={{
             'aria-label': 'change date',
           }}
@@ -544,7 +550,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
         Publish
       </Typography>
       <Typography variant="body2" component="p" color="textSecondary" align="left" className={classes.subtitle}>
-        To publish this product, you need to add at least one variant. You can add as many variants as you want at its management page. Click the link at 'Variants' column of your target product. 
+        To publish this product, you need to add at least one variant. You can add as many variants as you want at its management page. Click the link at 'Variants' column of your target product.
       </Typography>
       <Box className={classes.errorMsg}>
         {curProductValidationState.isPublic}

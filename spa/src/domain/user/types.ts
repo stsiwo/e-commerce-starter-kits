@@ -215,7 +215,7 @@ export const generateDefaultCustomerPhonesFormData: () => CustomerPhonesFormData
   return {
     phoneId: getNanoId(),
     phoneNumber: "",
-    countryCode: "",
+    countryCode: "+1",
     isSelected: false,
   }
 }
@@ -254,7 +254,7 @@ export const generateDefaultCustomerAddressesFormData: () => CustomerAddressesFo
     address2: "",
     city: "",
     province: "",
-    country: "",
+    country: "CA",
     postalCode: "",
     isBillingAddress: false,
     isShippingAddress: false,
@@ -338,12 +338,12 @@ export const generateDefaultAdminCompanyFormData: () => AdminCompanyFormDataType
     companyDescription: "",
     companyEmail: "",
     phoneNumber: "",
-    countryCode: "",
+    countryCode: "+1",
     address1: "",
     address2: "",
     city: "",
     province: "",
-    country: "",
+    country: "CA",
     postalCode: "",
   }
 }

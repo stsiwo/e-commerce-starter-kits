@@ -120,7 +120,7 @@ const AdminOrderForm: React.FunctionComponent<AdminOrderFormPropsType> = (props)
       <Grid
         item
         xs={12}
-        md={12}
+        md={6}
       >
         <Typography variant="subtitle1" component="h6" className={classes.title}>
           {"Products"}
@@ -134,6 +134,7 @@ const AdminOrderForm: React.FunctionComponent<AdminOrderFormPropsType> = (props)
       <Grid
         item
         xs={12}
+        md={6}
       >
         <Typography variant="subtitle1" component="h6" className={classes.title}>
           {"Status"}

@@ -425,6 +425,35 @@ public class AdminUserEndpointTest {
   }
 
   @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldNotAdminUserUpdateOtherOwnDataSinceEmailDuplcation.sql" })
+  public void shouldNotAdminUserUpdateOtherOwnDataSinceEmailDuplcation(@Value("classpath:/integration/user/shouldNotAdminUserUpdateOtherOwnDataSinceEmailDuplcation.json") Resource dummyFormJsonFile) throws Exception {
+
+    // make sure email is duplciated (the admin's email address) !!!!
+
+    // dummy form json 
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978";
+    String dummyUserPath = "/" + dummyUserIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .put(targetUrl)
+        .content(dummyFormJsonString)
+        .contentType(MediaType.APPLICATION_JSON)
+        .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
   @Sql(scripts = { "classpath:/integration/user/shouldAdminUserUpdateStatus.sql" })
   public void shouldAdminUserUpdateStatus(@Value("classpath:/integration/user/shouldAdminUserUpdateStatus.json") Resource dummyFormJsonFile) throws Exception {
 

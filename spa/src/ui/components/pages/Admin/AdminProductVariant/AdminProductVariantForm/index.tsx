@@ -11,7 +11,6 @@ import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/picker
 import { defaultProductVariantData, defaultProductVariantValidationData, ProductVariantDataType, ProductVariantSizeType, ProductVariantType, ProductVariantValidationDataType, productVariantSizeObj } from 'domain/product/types';
 import { useValidation } from 'hooks/validation';
 import { productVariantSchema } from 'hooks/validation/rules';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { ChromePicker, ColorResult } from 'react-color';
 import { useDispatch, useSelector } from 'react-redux';
@@ -110,10 +109,6 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
   // auth
   const auth = useSelector(mSelector.makeAuthSelector())
 
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
-
   const dispatch = useDispatch()
 
   // update/create logic for product
@@ -161,9 +156,9 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
 
   // event handlers
   const handleProductVariantUnitPriceInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextVariantUnitPrice = e.currentTarget.value
+    const nextVariantUnitPrice = e.target.value
     // must not be null
-    updateValidationAt("variantUnitPrice", e.currentTarget.value);
+    updateValidationAt("variantUnitPrice", nextVariantUnitPrice);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
       variantUnitPrice: parseInt(nextVariantUnitPrice)
@@ -177,7 +172,7 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
      **/
     const nextVariantSize = productVariantSizeList.find((size: ProductVariantSizeType) => e.target.value === size.productSizeId)
     // must not be null
-    updateValidationAt("productSize", e.currentTarget.value);
+    updateValidationAt("productSize", e.target.value);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
       productSize: nextVariantSize
@@ -194,9 +189,9 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
 
   // event handlers
   const handleProductVariantStockInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextVariantStock = e.currentTarget.value
+    const nextVariantStock = e.target.value
     // must not be null
-    updateValidationAt("variantStock", e.currentTarget.value);
+    updateValidationAt("variantStock", nextVariantStock);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
       variantStock: parseInt(nextVariantStock)
@@ -204,42 +199,42 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
   }
 
   const handleProductVariantWeightInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextVariantWeight = e.currentTarget.value
+    const nextVariantWeight = e.target.value
     // must not be null
-    updateValidationAt("variantWeight", e.currentTarget.value);
+    updateValidationAt("variantWeight", nextVariantWeight);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
-      variantWeight: parseInt(nextVariantWeight)
+      variantWeight: parseFloat(nextVariantWeight)
     }));
   }
 
   const handleProductVariantLengthInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextVariantLength = e.currentTarget.value
+    const nextVariantLength = e.target.value
     // must not be null
-    updateValidationAt("variantLength", e.currentTarget.value);
+    updateValidationAt("variantLength", nextVariantLength);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
-      variantLength: parseInt(nextVariantLength)
+      variantLength: parseFloat(nextVariantLength)
     }));
   }
 
   const handleProductVariantWidthInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextVariantWidth = e.currentTarget.value
+    const nextVariantWidth = e.target.value
     // must not be null
-    updateValidationAt("variantWidth", e.currentTarget.value);
+    updateValidationAt("variantWidth", nextVariantWidth);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
-      variantWidth: parseInt(nextVariantWidth)
+      variantWidth: parseFloat(nextVariantWidth)
     }));
   }
 
   const handleProductVariantHeightInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextVariantHeight = e.currentTarget.value
+    const nextVariantHeight = e.target.value
     // must not be null
-    updateValidationAt("variantHeight", e.currentTarget.value);
+    updateValidationAt("variantHeight", nextVariantHeight);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
-      variantHeight: parseInt(nextVariantHeight)
+      variantHeight: parseFloat(nextVariantHeight)
     }));
   }
 
@@ -252,8 +247,8 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
   }
 
   const handleProductVariantDiscountPriceInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextProductVariantDiscountPrice = e.currentTarget.value
-    //updateValidationAt("productBaseDiscountPrice", e.currentTarget.value);
+    const nextProductVariantDiscountPrice = e.target.value
+    updateValidationAt("variantDiscountPrice", nextProductVariantDiscountPrice);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
       variantDiscountPrice: parseFloat(nextProductVariantDiscountPrice),
@@ -261,6 +256,7 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
   }
 
   const handleProductVariantDiscountStartDateChange = (date: Date | null) => {
+    updateValidationAt("variantDiscountStartDate", date);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
       variantDiscountStartDate: date,
@@ -268,6 +264,7 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
   };
 
   const handleProductVariantDiscountEndDateChange = (date: Date | null) => {
+    updateValidationAt("variantDiscountEndDate", date);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
       variantDiscountEndDate: date,
@@ -300,7 +297,7 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
             postProductVariantActionCreator({
               ...curProductVariantState,
               productId: targetProductId,
-            }) 
+            })
           )
 
         } else {
@@ -310,7 +307,7 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
             putProductVariantActionCreator({
               ...curProductVariantState,
               productId: targetProductId,
-            }) 
+            })
           )
         }
       } else {
@@ -471,6 +468,8 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
           value={curProductVariantState.variantDiscountStartDate}
           onChange={handleProductVariantDiscountStartDateChange}
           disabled={!curProductVariantState.isDiscount}
+          helperText={curProductVariantValidationState.variantDiscountStartDate}
+          error={curProductVariantValidationState.variantDiscountStartDate !== ""}
           KeyboardButtonProps={{
             'aria-label': 'change date',
           }}
@@ -484,6 +483,8 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
           value={curProductVariantState.variantDiscountEndDate}
           onChange={handleProductVariantDiscountEndDateChange}
           disabled={!curProductVariantState.isDiscount}
+          helperText={curProductVariantValidationState.variantDiscountEndDate}
+          error={curProductVariantValidationState.variantDiscountEndDate !== ""}
           KeyboardButtonProps={{
             'aria-label': 'change date',
           }}

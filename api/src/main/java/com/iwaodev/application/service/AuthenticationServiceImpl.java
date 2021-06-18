@@ -61,7 +61,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     /**
      * find the user for response
      **/
-    User user = this.userRepository.findByEmail(email);
+    User user = this.userRepository.findActiveOrTempByEmail(email);
 
     /**
      * fetch its child entities manually because of lazy loading.

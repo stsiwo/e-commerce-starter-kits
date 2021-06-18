@@ -93,6 +93,9 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
   // mui: makeStyles
   const classes = useStyles();
 
+  // max size
+  const maxSize = 3;
+
   // dispatch
   const dispatch = useDispatch();
 
@@ -119,8 +122,8 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
 
   // event handlers
   const handlePhoneInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextPhoneNumber = e.currentTarget.value
-    updateValidationAt("phoneNumber", e.currentTarget.value);
+    const nextPhoneNumber = e.target.value
+    updateValidationAt("phoneNumber", e.target.value);
     setUserAccountPhoneState((prev: CustomerPhonesFormDataType) => ({
       ...prev,
       phoneNumber: nextPhoneNumber
@@ -129,8 +132,8 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
   }
 
   const handleCountryCodeInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCountryCode = e.currentTarget.value
-    updateValidationAt("countryCode", e.currentTarget.value);
+    const nextCountryCode = e.target.value
+    updateValidationAt("countryCode", e.target.value);
     setUserAccountPhoneState((prev: CustomerPhonesFormDataType) => ({
       ...prev,
       countryCode: nextCountryCode
@@ -301,7 +304,10 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
           </RadioGroup>
         )}
         <Box component="div" className={classes.actionBox}>
-          <Button onClick={handleAddNewPhoneBtnClickEvent}>
+          <Button 
+            onClick={handleAddNewPhoneBtnClickEvent}
+            disabled={phones.length === maxSize}
+          >
             Add New Phone
         </Button>
         </Box>
@@ -326,6 +332,7 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
           <TextField
             id="country-code"
             label="Country Code"
+            disabled
             className={classes.formControl}
             value={curUserAccountPhoneState.countryCode}
             onChange={handleCountryCodeInputChangeEvent}

@@ -21,8 +21,8 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
    * - don't return different entity rather than the main entity (e.g., User)
    **/
 
-  @Query(value = "SELECT * FROM users u WHERE u.email = ?1", nativeQuery = true)
-  User findByEmail(String email);
+  @Query(value = "SELECT u FROM users u WHERE u.email = ?1")
+  Optional<User> findByEmail(String email);
 
   // use this instead of above
   @Query(value = "SELECT u FROM users u WHERE u.email = ?1")

@@ -4,6 +4,7 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { OrderType } from 'domain/order/types';
 import * as React from 'react';
+import { cadCurrencyFormat } from 'src/utils';
 
 interface OrderDetailPropsType {
   order: OrderType
@@ -46,7 +47,7 @@ const OrderDetail: React.FunctionComponent<OrderDetailPropsType> = ({ order }) =
           id="order-product-cost"
           label="Product Cost"
           className={`${classes.textField}`}
-          value={order.productCost}
+          value={cadCurrencyFormat(order.productCost)}
           inputProps={{
             readOnly: true,
             startAdornment: <InputAdornment position="start">$</InputAdornment>,
@@ -56,7 +57,17 @@ const OrderDetail: React.FunctionComponent<OrderDetailPropsType> = ({ order }) =
           id="order-tax-cost"
           label="Tax Cost"
           className={`${classes.textField}`}
-          value={order.taxCost}
+          value={cadCurrencyFormat(order.taxCost)}
+          inputProps={{
+            readOnly: true,
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+          }}
+        />
+        <TextField
+          id="order-shipping-cost"
+          label="Shipping Cost"
+          className={`${classes.textField}`}
+          value={cadCurrencyFormat(order.shippingCost)}
           inputProps={{
             readOnly: true,
             startAdornment: <InputAdornment position="start">$</InputAdornment>,
@@ -66,7 +77,7 @@ const OrderDetail: React.FunctionComponent<OrderDetailPropsType> = ({ order }) =
           id="order-total-cost"
           label="Total Cost"
           className={`${classes.textField}`}
-          value={order.taxCost + order.productCost}
+          value={cadCurrencyFormat(order.taxCost + order.productCost + order.shippingCost)}
           inputProps={{
             readOnly: true,
             startAdornment: <InputAdornment position="start">$</InputAdornment>,

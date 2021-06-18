@@ -132,6 +132,9 @@ export declare type DomainStateSubType<D extends Record<string, any>> = {
 export declare type DomainStateType = {
   categories: {  
     data: NormalizedCategoryType,
+    query: {
+      searchQuery: string,
+    },
     pagination: DomainPaginationType,
   },
   cartItems: CartItemType[] // don't need to normalized

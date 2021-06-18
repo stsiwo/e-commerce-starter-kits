@@ -151,3 +151,29 @@
     - DON'T use 'currentTarget'!!! does not work!!
 
     - use 'target' instead.
+
+## JS stuffs
+
+  ### Arrow Functions vs 'function' Functions
+
+    - the arrow function does not have 'binding' and 'arguments'.
+
+      - so 'this' does not imply the surrounding object (see below example) and you cannot use 'argument' to access inputs like regular function.
+
+    - e.g., 
+
+    ```
+      console.log(this == window); // true
+
+      var object = {
+        name: "Satoshi",
+        a: () => console.log(this == window),
+        f: function() { console.log(this == window) },
+      }
+
+      object.a(); // true
+      object.f(); // no
+
+    ```
+
+      - arrow function does not bind 'this' to surrounding object. so 'this == window' = true.

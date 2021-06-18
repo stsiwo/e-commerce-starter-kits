@@ -19,11 +19,12 @@ import { toAddressString } from 'domain/user';
 import { CustomerAddressesFormDataType, CustomerAddressesFormValidationDataType, defaultUserAccountValidationAddressData, generateDefaultCustomerAddressesFormData, UserAddressType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { userAccountAddressSchema } from 'hooks/validation/rules';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteAuthAddressActionCreator, patchAuthAddressActionCreator, postAuthAddressActionCreator, putAuthAddressActionCreator } from 'reducers/slices/app';
 import { mSelector } from 'src/selectors/selector';
+import { getCountryList, getProvinceList } from 'src/utils';
+import MenuItem from '@material-ui/core/MenuItem';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -91,6 +92,9 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
   // mui: makeStyles
   const classes = useStyles();
 
+  // max size
+  const maxSize = 3;
+
   // auth
   const auth = useSelector(mSelector.makeAuthSelector())
 
@@ -117,8 +121,8 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
 
   // event handlers
   const handleAddress1InputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextAddress1 = e.currentTarget.value
-    updateValidationAt("address1", e.currentTarget.value);
+    const nextAddress1 = e.target.value
+    updateValidationAt("address1", e.target.value);
     setCustomerAddressesFormState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       address1: nextAddress1
@@ -127,8 +131,8 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
   }
 
   const handleAddress2InputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextAddress2 = e.currentTarget.value
-    updateValidationAt("address2", e.currentTarget.value);
+    const nextAddress2 = e.target.value
+    updateValidationAt("address2", e.target.value);
     setCustomerAddressesFormState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       address2: nextAddress2
@@ -137,8 +141,8 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
   }
 
   const handleCityInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCity = e.currentTarget.value
-    updateValidationAt("city", e.currentTarget.value);
+    const nextCity = e.target.value
+    updateValidationAt("city", e.target.value);
     setCustomerAddressesFormState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       city: nextCity
@@ -146,8 +150,8 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
   }
 
   const handleProvinceInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextProvince = e.currentTarget.value
-    updateValidationAt("province", e.currentTarget.value);
+    const nextProvince = e.target.value
+    updateValidationAt("province", e.target.value);
     setCustomerAddressesFormState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       province: nextProvince
@@ -155,8 +159,8 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
   }
 
   const handleCountryInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCountry = e.currentTarget.value
-    updateValidationAt("country", e.currentTarget.value);
+    const nextCountry = e.target.value
+    updateValidationAt("country", e.target.value);
     setCustomerAddressesFormState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       country: nextCountry
@@ -164,8 +168,8 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
   }
 
   const handlePostalCodeInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextPostalCode = e.currentTarget.value
-    updateValidationAt("postalCode", e.currentTarget.value);
+    const nextPostalCode = e.target.value
+    updateValidationAt("postalCode", e.target.value);
     setCustomerAddressesFormState((prev: CustomerAddressesFormDataType) => ({
       ...prev,
       postalCode: nextPostalCode
@@ -201,7 +205,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
         console.log("this one is to create new one")
 
         dispatch(
-          postAuthAddressActionCreator(curCustomerAddressesFormState) 
+          postAuthAddressActionCreator(curCustomerAddressesFormState)
         )
 
         setModalOpen(false);
@@ -210,7 +214,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
         console.log("this one is to update existing one")
 
         dispatch(
-          putAuthAddressActionCreator(curCustomerAddressesFormState) 
+          putAuthAddressActionCreator(curCustomerAddressesFormState)
         )
 
         setModalOpen(false);
@@ -233,8 +237,8 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
     console.log("delete an existing address event triggered")
     dispatch(
       deleteAuthAddressActionCreator({
-        addressId: curCustomerAddressesFormState.addressId 
-      }) 
+        addressId: curCustomerAddressesFormState.addressId
+      })
     )
   }
 
@@ -259,7 +263,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
       patchAuthAddressActionCreator({
         addressId: targetAddressId,
         type: "shipping",
-      }) 
+      })
     )
   }
 
@@ -271,7 +275,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
       patchAuthAddressActionCreator({
         addressId: targetAddressId,
         type: "billing",
-      }) 
+      })
     )
   }
 
@@ -352,7 +356,10 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
           </List>
         )}
         <Box component="div" className={classes.actionBox}>
-          <Button onClick={handleAddNewAddressBtnClickEvent}>
+          <Button 
+            onClick={handleAddNewAddressBtnClickEvent}
+            disabled={props.addresses.length === maxSize}
+          >
             Add New Address
         </Button>
         </Box>
@@ -396,21 +403,36 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
           <TextField
             id="province"
             label="Province"
+            select
             className={classes.formControl}
             value={curCustomerAddressesFormState.province}
             onChange={handleProvinceInputChangeEvent}
             helperText={curCustomerAddressesFormValidationState.province}
             error={curCustomerAddressesFormValidationState.province !== ""}
-          />
+          >
+            {getProvinceList().map((province) => (
+              <MenuItem key={province} value={province}>
+                {province}
+              </MenuItem>
+            ))}
+          </TextField>
           <TextField
             id="country"
             label="Country"
+            select
+            disabled
             className={classes.formControl}
             value={curCustomerAddressesFormState.country}
             onChange={handleCountryInputChangeEvent}
             helperText={curCustomerAddressesFormValidationState.country}
             error={curCustomerAddressesFormValidationState.country !== ""}
-          />
+          >
+            {Object.keys(getCountryList()).map((country2Alpha: string) => (
+              <MenuItem key={country2Alpha} value={country2Alpha}>
+                {getCountryList()[country2Alpha]}
+              </MenuItem>
+            ))}
+          </TextField>
           <TextField
             id="postal-code"
             label="Postal Code"

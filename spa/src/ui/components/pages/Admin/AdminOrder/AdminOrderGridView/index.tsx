@@ -13,11 +13,13 @@ import { getCurOrderStatus } from 'domain/order';
 import { OrderType } from 'domain/order/types';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchOrderActionCreator, orderPaginationPageActions } from 'reducers/slices/domain/order';
+import { fetchOrderActionCreator, orderPaginationPageActions, orderQuerySearchQueryActions } from 'reducers/slices/domain/order';
 import { FetchStatusEnum } from 'src/app';
 import { mSelector } from 'src/selectors/selector';
 import AdminOrderFormDrawer from '../AdminOrderFormDrawer';
 import AdminOrderSearchController from '../AdminOrderSearchController';
+import SearchForm from 'components/common/SearchForm';
+import { useLocation } from 'react-router';
 
 declare type AdminOrderGridViewPropsType = {
 }
@@ -35,6 +37,10 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: "center",
     },
     media: {
+    },
+    searchBox: {
+      display: "flex",
+      justifyContent: "flex-end",
     },
     actionBox: {
       textAlign: "center"
@@ -78,6 +84,11 @@ const generateColumns: (onEdit: React.EventHandler<React.MouseEvent<HTMLButtonEl
   ];
 }
 
+// A custom hook that builds on useLocation to parse
+// the query string for you.
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
 /**
  * admin product management component
  *
@@ -120,6 +131,16 @@ const AdminOrderGridView: React.FunctionComponent<AdminOrderGridViewPropsType> =
       pagination.page
     ])
 
+  // spa url query string 
+  const query = useQuery()
+  const searchQuery = query.get("searchQuery")
+  React.useEffect(() => {
+    if (searchQuery) {
+      dispatch(
+        orderQuerySearchQueryActions.update(searchQuery)
+      )
+    }
+  }, [])
   const [curFormOpen, setFormOpen] = React.useState<boolean>(false);
 
   // grid event handler stuff
@@ -139,23 +160,14 @@ const AdminOrderGridView: React.FunctionComponent<AdminOrderGridViewPropsType> =
     dispatch(orderPaginationPageActions.update(nextPage))
   }
 
-  // fetch result
-  if (curFetchOrderStatus === FetchStatusEnum.FETCHING) {
-    return (
-      <Box className={classes.loadingBox}>
-        <CircularProgress />
-      </Box>
-    )
-  } else if (curFetchOrderStatus === FetchStatusEnum.FAILED) {
-    return (
-      <Box className={classes.loadingBox}>
-        <Typography variant="body1" component="h2" >
-          {"failed to fetch data... please try again..."}
-        </Typography>
-      </Box>
+  /**
+   * search query stuffs
+   **/
+  const handleSearchChange = (value: string) => {
+    dispatch(
+      orderQuerySearchQueryActions.update(value)
     )
   }
-
 
   return (
     <Card className={classes.root}>
@@ -171,15 +183,32 @@ const AdminOrderGridView: React.FunctionComponent<AdminOrderGridViewPropsType> =
       <CardContent
         className={classes.cardContentBox}
       >
+        <Box className={classes.searchBox}>
+          <SearchForm searchQuery={curQueryString.searchQuery} onChange={handleSearchChange} label={"keyword search here..."} />
+        </Box>
         <AdminOrderSearchController />
-        <DataGrid
-          rows={generateRows(curOrderList)}
-          columns={generateColumns(handleEditClick)}
-          page={pagination.page} // don't forget to increment when display
-          pageSize={pagination.limit}
-          rowCount={pagination.totalElements}
-          onPageChange={handlePageChange}
-        />
+        {(curFetchOrderStatus === FetchStatusEnum.FETCHING &&
+          <Box className={classes.loadingBox}>
+            <CircularProgress />
+          </Box>
+        )}
+        {(curFetchOrderStatus === FetchStatusEnum.SUCCESS &&
+          <DataGrid
+            rows={generateRows(curOrderList)}
+            columns={generateColumns(handleEditClick)}
+            page={pagination.page} // don't forget to increment when display
+            pageSize={pagination.limit}
+            rowCount={pagination.totalElements}
+            onPageChange={handlePageChange}
+          />
+        )}
+        {(curFetchOrderStatus === FetchStatusEnum.FAILED &&
+          <Box className={classes.loadingBox}>
+            <Typography variant="body1" component="h2" >
+              {"failed to fetch data... please try again..."}
+            </Typography>
+          </Box>
+        )}
       </CardContent>
       <CardActions disableSpacing>
       </CardActions>

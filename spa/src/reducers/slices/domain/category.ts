@@ -81,6 +81,42 @@ export const categoryActions = categorySlice.actions
 
 /**
  *
+ * domain.categories.query.searchQuery state Slice (no side effects)
+ *
+ **/
+// action type             
+export type CategoryQuerySearchQueryActionType = PayloadAction<string> 
+
+export const categoryQuerySearchQuerySlice = createSlice({ 
+  name: "domain/categories/query/searchQuery", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: CategoryQuerySearchQueryActionType) => action.payload,
+    clear: (state: string) => "",
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const categoryQuerySearchQuerySliceReducer = categoryQuerySearchQuerySlice.reducer
+export const categoryQuerySearchQueryActions = categoryQuerySearchQuerySlice.actions
+/**
+ *
  * domain.categories.pagination.page state Slice (no side effects)
  *
  **/
