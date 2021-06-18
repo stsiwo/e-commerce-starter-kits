@@ -55,3 +55,5 @@
 
 - enable review only after the item is delivered.
     
+- create search input for each entity at admin management.
+  - also, accept query string to land the page with specific entity with the url.

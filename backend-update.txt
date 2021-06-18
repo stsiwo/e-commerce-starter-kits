@@ -46,6 +46,7 @@ endpoint change:
     - make sure how to handle async event handler at test
 
   - complete email implementation.
+    - need to release the limit of aws ses to use 'no-reply'@domain
    
   - email verification propt  if user still temp user.
   
