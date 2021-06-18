@@ -167,6 +167,9 @@ public class Order {
   @Column(name = "is_guest")
   private Boolean isGuest;
 
+  @Column(name = "estimated_delivery_date")
+  private LocalDateTime estimatedDeliveryDate;
+
   @OneToOne(mappedBy = "shippingOrder", cascade = CascadeType.ALL, orphanRemoval = true)
   @Setter(value = AccessLevel.NONE)
   private OrderAddress shippingAddress;
@@ -613,5 +616,13 @@ public class Order {
     }
 
     return event;
+  }
+
+  public String displayShippingAddress() {
+    return this.shippingAddress.displayAddress();
+  }
+
+  public String displayBillingAddress() {
+    return this.billingAddress.displayAddress();
   }
 }

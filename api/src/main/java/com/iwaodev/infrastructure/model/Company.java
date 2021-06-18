@@ -70,6 +70,13 @@ public class Company {
     updatable = true
     )
   private User user;
+
+  /**
+   * extract domain from companyEmail field.
+   **/
+  public String getDomain() {
+    return this.companyEmail.substring(this.companyEmail.indexOf("@") + 1);
+  }
 }
 
 

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  </head>
+  <body>
+    <!-- 
+        admin
+        review
+        link: admin order management
+    -->
+    <p th:text="${'Hi Admin ' + admin.firstName + ' ' + admin.lastName}"></p><br />
+
+    <p>The following product's review was updated by a customer. Please check the review to verify.</p><br />
+    
+    <h5>Review</h5>
+    <p>Review #: <b th:text="${review.reviewId}"></b></p>
+    <p>Title: <b th:text="${review.reviewTitle}"></b></p>
+    <p>Description: <b th:text="${review.reviewDescription}"></b></p>
+    <p>Point: <b th:text="${review.reviewPoint}"></b></p>
+    <p>Status: <b th:text="${review.isVerified} ? 'Verified' : 'Pending' "></b></p>
+
+    <h6>Item</h6>
+    <p>Product #: <b th:text="${review.product.productId}"></b></p>
+    <p>Name: <b th:text="${review.product.productName}"></b></p>
+
+    <h6>Customer</h6>
+    <p>Customer #: <b th:text="${review.user.userId}"></b></p>
+    <p>Name: <b th:text="${review.user.fistName + " " + review.user.lastName}"></b></p>
+
+    <p th:if="${order.isGuest}">Please visit <a th:href="@{link})}">the review managment page</a> to verify your review.</p>
+
+    <p>Thanks,</p>
+  </body>
+</html>
+

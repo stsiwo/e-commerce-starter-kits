@@ -36,4 +36,16 @@ public class EmailServiceImpl implements EmailService {
     emailSender.send(message);
   }
 
+  @Override
+  public void send(String to, String from, String[] bcc, String subject, String htmlBody) throws MessagingException {
+    MimeMessage message = emailSender.createMimeMessage();
+    MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+    helper.setFrom(from);
+    helper.setTo(to);
+    helper.setSubject(subject);
+    helper.setText(htmlBody, true);
+    helper.setBcc(bcc);
+    emailSender.send(message);
+  }
+
 }

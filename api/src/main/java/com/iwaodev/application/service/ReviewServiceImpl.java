@@ -14,9 +14,12 @@ import com.iwaodev.application.mapper.ProductMapper;
 import com.iwaodev.application.mapper.ReviewMapper;
 import com.iwaodev.application.mapper.UserMapper;
 import com.iwaodev.application.specification.factory.ReviewSpecificationFactory;
+import com.iwaodev.config.auth.CurAuthentication;
 import com.iwaodev.domain.review.ReviewSortEnum;
 import com.iwaodev.domain.review.event.NewReviewWasSubmittedEvent;
+import com.iwaodev.domain.review.event.ReviewWasUpdatedByMemberEvent;
 import com.iwaodev.domain.review.event.ReviewWasVerifiedByAdminEvent;
+import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.infrastructure.model.Product;
 import com.iwaodev.infrastructure.model.Review;
 import com.iwaodev.infrastructure.model.User;
@@ -41,26 +44,23 @@ public class ReviewServiceImpl implements ReviewService {
 
   private static final Logger logger = LoggerFactory.getLogger(ReviewServiceImpl.class);
 
+  @Autowired
   private ReviewRepository repository;
 
+  @Autowired
   private UserRepository userRepository;
 
+  @Autowired
   private ProductRepository productRepository;
 
+  @Autowired
   private ReviewSpecificationFactory specificationFactory;
 
   @Autowired
   private ApplicationEventPublisher publisher;
 
-
   @Autowired
-  public ReviewServiceImpl(ReviewRepository repository, UserRepository userRepository,
-      ProductRepository productRepository, ReviewSpecificationFactory specificationFactory) {
-    this.repository = repository;
-    this.userRepository = userRepository;
-    this.productRepository = productRepository;
-    this.specificationFactory = specificationFactory;
-  }
+  private CurAuthentication curAuthentication;
 
   public Page<ReviewDTO> getAll(ReviewQueryStringCriteria criteria, Integer page, Integer limit, ReviewSortEnum sort) {
 
@@ -151,7 +151,10 @@ public class ReviewServiceImpl implements ReviewService {
     Review savedEntity = this.repository.save(newEntity);
 
     // publish event
+    // I leave this event here for any future reference.
     this.publisher.publishEvent(new NewReviewWasSubmittedEvent(this, savedEntity));
+    // this send review-was-updated-email to admin
+    this.publisher.publishEvent(new ReviewWasUpdatedByMemberEvent(this, savedEntity));
 
     // map entity to dto and return it.
     return ReviewMapper.INSTANCE.toReviewDTO(savedEntity);
@@ -185,7 +188,12 @@ public class ReviewServiceImpl implements ReviewService {
       this.publisher.publishEvent(new ReviewWasVerifiedByAdminEvent(this, updatedEntity));
     }
 
+    if (this.curAuthentication.getRole().equals(UserTypeEnum.MEMBER)) {
+      this.publisher.publishEvent(new ReviewWasUpdatedByMemberEvent(this, updatedEntity));
+    }
+
     return ReviewMapper.INSTANCE.toReviewDTO(updatedEntity);
+
   }
 
   @Override

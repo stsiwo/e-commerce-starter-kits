@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  </head>
+  <body>
+    <p th:text="${'Hi ' + order.firstName + ' ' + order.lastName}"></p><br />
+
+    <p>We would like you to review the following items you purchased.</p><br />
+    
+    <h5>Items Information</h5>
+    <table>
+     <thead>
+         <tr>
+             <th>Name</th>
+             <th>Color</th>
+             <th>Size</th>
+         </tr>
+     </thead>
+     <tbody>
+         <tr th:each="orderDetail : *{order.orderDetails}">
+            <td><span th:text="${orderDetail.productName}"></span></td>
+            <td><span th:text="${orderDetail.productColor}"></span></td>
+            <td><span th:text="${orderDetail.productSize}"></span></td>
+         </tr>
+     </tbody>
+    </table>
+    <p th:if="${order.isGuest}">Please visit <a th:href="@{link})}">your order managment page</a> to write your review.</p>
+
+    <h5>Note</h5>
+    <p>If you have any inquery about our purchase, please contact us: <b th:text="${company.companyEmail}"></b>.</p>
+    <p>Thanks,</p>
+  </body>
+</html>
+

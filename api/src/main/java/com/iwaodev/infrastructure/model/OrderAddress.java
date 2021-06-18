@@ -83,6 +83,10 @@ public class OrderAddress {
   @JoinColumn(name = "billing_order_id", nullable = true)
   private Order billingOrder;
 
+  public String displayAddress() {
+    return String.format("%s %s %s %s %s %s", this.address1, this.address2, this.city, this.province, this.country, this.postalCode);
+  }
+
 
 }
 

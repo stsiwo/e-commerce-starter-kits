@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  </head>
+  <body>
+    <p th:text="${'Hi ' + order.firstName + ' ' + order.lastName}"></p><br />
+
+    <p>Your order items have been shipped today. Please refer to the detail below:</p><br />
+    
+    <h5>Customer Information</h5>
+    <p>Name: <b th:text="${order.firstName + ' ' + order.lastName}"></b></p>
+    <p>User Type: <b th:text="${order.isGuest} ? 'Guest' : 'Member'"></b></p> 
+    <p>Email: <b th:text="${order.orderEmail}"></b></p>
+    <p>Phone: <b th:text="${order.orderPhone}"></b></p>
+    <p>Shipping Address: <b th:text="${order.displayShippingAddress()}"></b></p>
+    <p>Billing Address: <b th:text="${order.displayBillingAddress()}"></b></p>
+
+
+    <h5>Items Information</h5>
+    <p>Order #: <b th:text="${order.orderNumber}"></b></p>
+    <p>Estimated Delivery Date: <b th:text="${order.estimatedDeliveryDate?}">N/A</b></p>
+    <table>
+     <thead>
+         <tr>
+             <th>Name</th>
+             <th>Color</th>
+             <th>Size</th>
+             <th>Price</th>
+             <th>Qty</th>
+         </tr>
+     </thead>
+     <tbody>
+         <tr th:each="orderDetail : *{order.orderDetails}">
+            <td><span th:text="${orderDetail.productName}"></span></td>
+            <td><span th:text="${orderDetail.productColor}"></span></td>
+            <td><span th:text="${orderDetail.productSize}"></span></td>
+            <td><span th:text="${orderDetail.productUnitPrice}"></span></td>
+            <td><span th:text="${orderDetail.productQuantity}"></span></td>
+         </tr>
+     </tbody>
+    </table>
+    <div style="display: flex; justify-content: flex-end;">
+       <p>Subtotal Cost: $<b th:text="${order.getProductCost()}"></b></p>
+       <p>Tax Cost: $<b th:text="${order.taxCost}"></b></p>
+       <p>Shipping Cost: $<b th:text="${order.shippingCost}"></b></p>
+       <h6>Total Cost: $<b th:text="${order.getTotalCost()}"></b></p>
+    </div>
+    <p th:if="${order.isGuest}">Please visit <a th:href="@{link})}">your order managment page</a> for more details.</p>
+
+    <h5>Note</h5>
+    <p>If you have any inquery about our purchase, please contact us: <b th:text="${company.companyEmail}"></b>.</p>
+    <p>Thanks,</p>
+  </body>
+</html>
+

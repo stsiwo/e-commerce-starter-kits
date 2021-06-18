@@ -203,27 +203,3 @@
 
     -> workaround: use 'validateWhenUpdate' to make sure it has id.
 
-# Email Implementation
-
-  ## When to Send Email
-
-    - user signup email.
-    - forgot-password email.
-    - email verification email.
-    - order completed email.
-      - (guest)
-        - the admin contact via contact@domain.com directly. and the admin need to update the order status.
-        - e.g.,) if the guest customer wants to cancel the order, the admin must add 'cancel_request' on behalf of the guest user since all guest user cannot access order management console.
-      - (member)
-        - the member can user order management or contact via contact@domain.com
-        - if the member forget to update athe status, the admin can do that on behalf of the member.
-
-    - order shipped email
-    - order cancel request received email
-    - order return request received email
-    - order canceled email (refund)
-    - order returned email (refund)
-    - please review email (after delivery)
-
-
-  
