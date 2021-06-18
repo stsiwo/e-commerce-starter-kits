@@ -50,6 +50,10 @@ endpoint change:
    
   - email verification propt  if user still temp user.
   
+  - file directory backup
+  
+  - phone & address max validation not working.
+  
     
       
     

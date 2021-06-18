@@ -15,13 +15,6 @@
       3. get the user back to the checkout page.
   
 - (testing) admin endpoints request testing (products, orders, categories, customers, and so on)
-
- - (fix) add caption or small explanation on input (esp path). it must be unique.
-   - path: unique (product, category)
-   - password (min(8), lower/upper, and no space)
- 
- - (validation)
-  - review the validation for each entity
  
  - (implementation) add logo image upload at admin 
  
@@ -35,25 +28,12 @@
     - cart items of guest users have temp cart item id for each temporarly.
     
   - should I set max cart item numbers? like 5.
-  
- - phones:
- 
-  - set max phone like 3
+
   
  - (performance)
   - tree shaking is not working (material ui). maybe.
-    
-- address
 
-  - add select input for country (currently only canada) and province.
-  
-    - country must be 2 chars
-    
-    - disable country input or hide
     
 - email verification prompt if the user still temp
 
 - enable review only after the item is delivered.
-    
-- create search input for each entity at admin management.
-  - also, accept query string to land the page with specific entity with the url.
