@@ -27,6 +27,8 @@
   
     - cart items of guest users have temp cart item id for each temporarly.
     
+    solution: add user and cartItems to AuthenticationCriteria (e.g., email & password) then publish the event to persist the user and the cartItems.
+    
   - should I set max cart item numbers? like 5.
 
   
