@@ -13,6 +13,10 @@ endpoint change:
       - (order) mainImagePath: from the first order detail's product main image (for order list page of member)
         
       - (product) discountEndDate if it is discount to display at front end.
+      
+      - (orderDetail) isReviewable: if the customer can review the product with the following conditions:
+          - the order events include 'DELIVERED'
+          - the product exists (orderDetail.product is not null)
 
   - /products (GET) 
   
