@@ -27,7 +27,11 @@
   
     - cart items of guest users have temp cart item id for each temporarly.
     
+    solution: add user and cartItems to AuthenticationCriteria (e.g., email & password) then publish the event to persist the user and the cartItems.
+    
   - should I set max cart item numbers? like 5.
+  
+    - should i restrict teh selection of cartItems or price??
 
   
  - (performance)
@@ -36,4 +40,4 @@
     
 - email verification prompt if the user still temp
 
-- enable review only after the item is delivered.
+- enable review only after the item is delivered. => create @Format isReadyReview to check the order events inlcude delivered.
