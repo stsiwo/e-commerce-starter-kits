@@ -30,6 +30,8 @@
     solution: add user and cartItems to AuthenticationCriteria (e.g., email & password) then publish the event to persist the user and the cartItems.
     
   - should I set max cart item numbers? like 5.
+  
+    - should i restrict teh selection of cartItems or price??
 
   
  - (performance)
