@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: theme.breakpoints.values.lg, 
       position: "absolute",
       backgroundColor: "#f5f5f5",
+      zIndex: 1,
       width: "100%",
     }
   }),

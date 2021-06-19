@@ -97,7 +97,8 @@ export function* leftNavMenuWatcher() {
 
 // review
 export function* fetchReviewWatcher() {
-  yield takeLatest(
+  yield debounce(
+    500,
     fetchReviewActionTypeName,
     fetchReviewWorker,
   )
@@ -162,7 +163,8 @@ export function* deleteCartItemWatcher() {
 
 // wishlist
 export function* fetchWishlistItemWatcher() {
-  yield takeLatest(
+  yield debounce(
+    500,
     fetchWishlistItemActionTypeName,
     fetchWishlistItemWorker,
   )
@@ -198,7 +200,8 @@ export function* deleteWishlistItemWatcher() {
 
 // category
 export function* fetchCategoryWatcher() {
-  yield takeLatest(
+  yield debounce(
+    500,
     fetchCategoryActionTypeName,
     fetchCategoryWorker,
   )
@@ -227,7 +230,8 @@ export function* deleteSingleCategoryWatcher() {
 
 // user
 export function* fetchUserWatcher() {
-  yield takeLatest(
+  yield debounce(
+    500,
     fetchUserActionTypeName,
     fetchUserWorker,
   )
@@ -327,7 +331,8 @@ export function* deleteUserAddressWatcher() {
 
 // order
 export function* fetchOrderWatcher() {
-  yield takeLatest(
+  yield debounce(
+    500,
     fetchOrderActionTypeName,
     fetchOrderWorker,
   )
@@ -392,7 +397,8 @@ export function* fetchProductWatcher() {
 }
 
 export function* fetchPublicProductWatcher() {
-  yield takeLatest(
+  yield debounce(
+    500,
     fetchPublicProductActionTypeName,
     fetchPublicProductWorker,
   )

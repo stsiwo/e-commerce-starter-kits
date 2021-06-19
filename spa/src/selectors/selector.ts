@@ -47,6 +47,7 @@ export const rsSelector = {
     getPostOrderFetchStatus: (state: StateType) => state.app.fetchStatus.orders.post,
     getFetchReviewFetchStatus: (state: StateType) => state.app.fetchStatus.reviews.get,
     getFetchProductFetchStatus: (state: StateType) => state.app.fetchStatus.products.get,
+    getFetchPublicProductFetchStatus: (state: StateType) => state.app.fetchStatus.products.getPublic,
     getFetchCategoryFetchStatus: (state: StateType) => state.app.fetchStatus.categories.get,
     getFetchOrderFetchStatus: (state: StateType) => state.app.fetchStatus.orders.get,
     getFetchUserFetchStatus: (state: StateType) => state.app.fetchStatus.users.get,
@@ -376,6 +377,18 @@ export const mSelector = {
     return createSelector(
       [
         rsSelector.app.getFetchProductFetchStatus
+      ],
+      (fetchStatus) => {
+        return fetchStatus
+      },
+    )
+  },
+
+  // app.fetchStatus.products.get
+  makeFetchPublicProductFetchStatusSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getFetchPublicProductFetchStatus
       ],
       (fetchStatus) => {
         return fetchStatus
