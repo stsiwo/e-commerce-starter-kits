@@ -74,7 +74,7 @@ const Product: React.FunctionComponent<{}> = (props) => {
 
       api.request({
         method: 'GET',
-        url: API1_URL + `/products/${productPath}`,
+        url: API1_URL + `/products/public/${productPath}`,
       }).then((data) => {
 
         const targetProduct: ProductType = data.data;

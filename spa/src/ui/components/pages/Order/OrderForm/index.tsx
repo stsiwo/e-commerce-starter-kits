@@ -162,8 +162,7 @@ const OrderForm: React.FunctionComponent<OrderFormPropsType> = (props) => {
               orderDetail={orderDetail} 
               product={orderDetail.product} 
               key={index} 
-              // order detail might not have product since product already removed.
-              menu={ orderDetail.product ?
+              menu={( orderDetail.isReviewable &&  
                 <React.Fragment>
                   <IconButton aria-label="settings" onClick={handleMenuOpenClick}>
                     <MoreVertIcon />
@@ -178,7 +177,7 @@ const OrderForm: React.FunctionComponent<OrderFormPropsType> = (props) => {
                     <MenuItem onClick={(e) => handleReviewClick(e, orderDetail.product.productId, auth.user.userId)}>Manage Review</MenuItem>
                   </Menu>
                 </React.Fragment>
-              : null}
+              )}
             />
           ))
         }

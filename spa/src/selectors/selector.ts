@@ -762,6 +762,17 @@ export const mSelector = {
     )
   },
 
+  makeIsExceedMaxNumberOfCartItemSelector: () => {
+    return createSelector(
+      [
+        mSelector.makeNumberOfCartItemSelector(), 
+      ],
+      (curLength) => {
+        return curLength > 5 
+      },
+    )
+  },
+
   // domain.wishlistItem
   makeWishlistItemSelector: () => {
     return createSelector(

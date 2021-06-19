@@ -203,6 +203,7 @@ export declare type OrderDetailType = {
   productName: string
   productVariant: ProductVariantType // selected variant
   product?: ProductType // if still the product exist
+  isReviewable?: boolean
 }
 
 export declare type OrderType = {
