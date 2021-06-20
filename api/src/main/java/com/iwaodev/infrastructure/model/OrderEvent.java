@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
@@ -12,9 +11,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 
 import com.iwaodev.domain.order.OrderStatusEnum;
-import com.iwaodev.infrastructure.model.listener.OrderEventValidationListener;
+import com.iwaodev.domain.order.validator.OrderEventValidation;
+import com.iwaodev.infrastructure.model.validator.OnCreate;
+import com.iwaodev.infrastructure.model.validator.OnUpdate;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -22,28 +26,34 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+@OrderEventValidation()
 @Data
 @ToString
 @NoArgsConstructor
-@EntityListeners(OrderEventValidationListener.class)
+//@EntityListeners(OrderEventValidationListener.class)
 @Entity(name = "orderEvents")
 public class OrderEvent {
 
+  @Null(message = "{orderEvent.id.null}", groups = OnCreate.class)
+  @NotNull(message = "{orderEvent.id.notnull}", groups = OnUpdate.class)
   @Id
   @Column(name = "order_event_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long orderEventId;
 
+  @NotNull(message = "{orderEvent.undoable.notnull}")
   @Column(name = "undoable")
   private Boolean undoable;
 
   @Column(name = "note")
   private String note;
 
+  @NotNull(message = "{orderEvent.isGuest.notnull}")
   // user is guest or not for this order event
   @Column(name = "is_guest")
   private Boolean isGuest;
 
+  @NotNull(message = "{orderEvent.orderStatus.notnull}")
   @Enumerated(EnumType.STRING)
   @Column(name = "order_status")
   private OrderStatusEnum orderStatus;
@@ -52,6 +62,7 @@ public class OrderEvent {
   @Column(name = "created_at")
   private LocalDateTime createdAt;
 
+  @NotNull(message = "{orderEvent.order.notnull}")
   @ManyToOne
   @JoinColumn(name = "order_id")
   private Order order;

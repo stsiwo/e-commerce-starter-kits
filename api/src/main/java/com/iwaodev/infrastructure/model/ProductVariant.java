@@ -8,7 +8,6 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,8 +15,16 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 
-import com.iwaodev.infrastructure.model.listener.ProductVariantValidationListener;
+import com.iwaodev.domain.product.validator.ProductVariantValidation;
+import com.iwaodev.infrastructure.model.validator.OnCreate;
+import com.iwaodev.infrastructure.model.validator.OnUpdate;
+import com.iwaodev.ui.validator.optional.digit.OptionalDigit;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Filter;
@@ -25,16 +32,17 @@ import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import lombok.Setter;
-import lombok.ToString;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@ProductVariantValidation()
 @Data
 @ToString
 @NoArgsConstructor
-@EntityListeners(ProductVariantValidationListener.class)
+//@EntityListeners(ProductVariantValidationListener.class)
 @Entity(name = "product_variants")
 @FilterDef(
     name = "selectedVariantFilter",
@@ -46,17 +54,21 @@ import lombok.NoArgsConstructor;
 )
 public class ProductVariant {
 
+  @Null(message = "{productVariant.id.null}", groups = OnCreate.class)
+  @NotNull(message = "{productVariant.id.notnull}", groups = OnUpdate.class)
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "variant_id")
   private Long variantId;
 
-  // if the price is not null, the price takes precedence over the product base price
+  // optional 
+  @OptionalDigit(integer = 6, fraction = 2, message = "{productVariant.variantUnitPrice.invalidformat}")
   @Column(name = "variant_unit_price")
-  private BigDecimal variantUnitPrice;
+  private BigDecimal variantUnitPrice = new BigDecimal("1");
 
+  @OptionalDigit(integer = 6, fraction = 2, message = "{productVariant.variantDiscountPrice.invalidformat}")
   @Column(name = "variant_discount_price")
-  private BigDecimal variantDiscountPrice;
+  private BigDecimal variantDiscountPrice = new BigDecimal("1");
 
   @Column(name = "variant_discount_start_date")
   private LocalDateTime variantDiscountStartDate;
@@ -64,30 +76,43 @@ public class ProductVariant {
   @Column(name = "variant_discount_end_date")
   private LocalDateTime variantDiscountEndDate;
 
+  @NotNull(message = "{productVariant.variantStock.notnull}")
+  @Min(value = 0, message = "{productVariant.variantStock.min0}")
   @Column(name = "variant_stock")
   private Integer variantStock = 0;
 
+  @NotNull(message = "{productVariant.isDiscount.notnull}")
   @Column(name = "is_discount")
   private Boolean isDiscount = false;
 
+  @NotNull(message = "{productVariant.soldCount.notnull}")
   @Column(name = "sold_count")
   private Integer soldCount = 0;
 
   @Column(name = "note")
   private String note;
 
+  @NotEmpty(message = "{productVariant.variantColor.notempty}")
   @Column(name = "variant_color")
   private String variantColor;
 
+  @NotNull(message = "{productVariant.variantWeight.notnull}")
+  @Digits(integer = 6, fraction = 3, message = "{productVariant.variantWeight.invalidformat}")
   @Column(name = "variant_weight")
   private Double variantWeight = 0.5; // kg
 
+  @NotNull(message = "{productVariant.variantHeight.notnull}")
+  @Digits(integer = 6, fraction = 3, message = "{productVariant.variantHeight.invalidformat}")
   @Column(name = "variant_height")
   private Double variantHeight = 5.0; // cm
 
+  @NotNull(message = "{productVariant.variantLength.notnull}")
+  @Digits(integer = 6, fraction = 3, message = "{productVariant.variantLength.invalidformat}")
   @Column(name = "variant_length")
   private Double variantLength = 5.0; // cm
 
+  @NotNull(message = "{productVariant.variantWidth.notnull}")
+  @Digits(integer = 6, fraction = 3, message = "{productVariant.variantWidth.invalidformat}")
   @Column(name = "variant_width")
   private Double variantWidth = 5.0; // cm
 
@@ -99,10 +124,12 @@ public class ProductVariant {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
+  @NotNull(message = "{productVariant.product.notnull}")
   @ManyToOne
   @JoinColumn(name = "product_id", foreignKey = @ForeignKey(name = "FK_product_variants__products"), insertable = true, updatable = true) // insert & update when parent try to update this child entity
   private Product product;
 
+  @NotNull(message = "{productVariant.productSize.notnull}")
   @ManyToOne
   @JoinColumn(name = "product_size_id", foreignKey = @ForeignKey(name = "FK_product_variants__product_sizes"), insertable = false, updatable = false) // NOT insert & update when parent try to update this child entity
   private ProductSize productSize;

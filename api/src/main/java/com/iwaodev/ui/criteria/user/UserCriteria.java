@@ -4,8 +4,10 @@ import java.util.UUID;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.iwaodev.domain.user.validator.UserEmailUnique;
 import com.iwaodev.ui.validator.password.Password;
 
 import org.springframework.validation.annotation.Validated;
@@ -20,16 +22,18 @@ import lombok.ToString;
 @Validated
 public class UserCriteria {
 
+  @NotNull(message = "{user.id.notnull}")
   private UUID userId;
   
-  @NotEmpty(message = "first name can not be null.")
+  @NotEmpty(message = "{user.firstName.notempty}")
   private String firstName;
 
-  @NotEmpty(message = "last name can not be null.")
+  @NotEmpty(message = "{user.lastName.notempty}")
   private String lastName;
 
-  @NotEmpty(message = "email can not be null.")
-  @Email(message = "email must be valid format.")
+  @UserEmailUnique()
+  @NotEmpty(message = "{user.email.notempty}")
+  @Email(message = "{user.email.invalidformat}")
   private String email;
 
   /**
@@ -41,7 +45,6 @@ public class UserCriteria {
    *  - no space (leading/trailing/middle)
    * 
    **/
-  @Password(message = "invalid password format")
-  @Size(min = 8, message = "password must be greater than or equal to 8") 
+  @Password(message = "{user.password.invalidformat}")
   private String password;
 }

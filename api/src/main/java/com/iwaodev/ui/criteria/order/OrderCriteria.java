@@ -4,8 +4,14 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
+
+import com.iwaodev.infrastructure.model.validator.OnCreate;
+import com.iwaodev.infrastructure.model.validator.OnUpdate;
 
 import org.springframework.validation.annotation.Validated;
 
@@ -28,6 +34,8 @@ public class OrderCriteria {
   /**
    * don't need orderId. since we not gonna update.
    **/
+  @NotNull(message = "{order.id.notnull}", groups = OnUpdate.class)
+  @Null(message = "{order.id.null}", groups = OnCreate.class)
   private UUID orderId;
 
   /**
@@ -35,17 +43,18 @@ public class OrderCriteria {
    **/
   private String note;
 
-  @NotEmpty(message = "first name of the customer can not be null.")
+  @NotEmpty(message = "{order.orderFirstName.notempty}")
   private String orderFirstName;
 
-  @NotEmpty(message = "last name of the customer can not be null.")
+  @NotEmpty(message = "{order.orderLastName.notempty}")
   private String orderLastName;
 
-  @NotEmpty(message = "email of the customer can not be null.")
+  @NotEmpty(message = "{order.email.notempty}")
+  @Email(message = "{order.email.invalidformat}")
   private String orderEmail;
 
-  @NotEmpty(message = "phone of the customer can not be null.")
-  @Pattern( regexp = "^\\+(?:[0-9] ?){6,14}[0-9]$", message = "invalid phone format.")
+  @NotEmpty(message = "{order.orderPhone.notempty}")
+  @Pattern( regexp = "^\\+(?:[0-9] ?){6,14}[0-9]$", message = "{order.orderPhone.invalidformat}")
   private String orderPhone;
 
   @Valid

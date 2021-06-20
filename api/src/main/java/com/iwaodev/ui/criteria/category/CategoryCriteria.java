@@ -3,6 +3,8 @@ package com.iwaodev.ui.criteria.category;
 import javax.validation.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.iwaodev.domain.category.validator.CategoryNameUnique;
+import com.iwaodev.domain.category.validator.CategoryPathUnique;
 
 import org.springframework.validation.annotation.Validated;
 
@@ -23,13 +25,15 @@ public class CategoryCriteria {
 
   private Long categoryId;
   
-  @NotEmpty(message = "category name can not be null.")
+  @CategoryNameUnique()
+  @NotEmpty(message = "{category.name.notempty}")
   private String categoryName;
 
-  @NotEmpty(message = "category description can not be null.")
+  @NotEmpty(message = "{category.description.notempty}")
   private String categoryDescription;
 
-  @NotEmpty(message = "category path can not be null.")
+  @CategoryPathUnique()
+  @NotEmpty(message = "{category.path.notempty}")
   private String categoryPath;
 
 }

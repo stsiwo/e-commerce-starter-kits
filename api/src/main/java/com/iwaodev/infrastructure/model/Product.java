@@ -6,28 +6,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 
+import com.iwaodev.domain.product.validator.ProductValidation;
 import com.iwaodev.exception.NotFoundException;
 import com.iwaodev.exception.OutOfStockException;
-import com.iwaodev.infrastructure.model.listener.ProductValidationListener;
+import com.iwaodev.infrastructure.model.validator.OnCreate;
+import com.iwaodev.infrastructure.model.validator.OnUpdate;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterJoinTable;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -36,37 +36,43 @@ import org.slf4j.LoggerFactory;
 
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+@ProductValidation()
 @ToString()
 @Data
-@EntityListeners(ProductValidationListener.class)
+//@EntityListeners(ProductValidationListener.class)
 @Entity(name = "products")
 public class Product {
 
   private static final Logger logger = LoggerFactory.getLogger(Product.class);
 
+  @NotNull(message = "{product.id.notnull}")
   @Id
   @Column(name = "product_id")
   @Type(type = "uuid-char")
   private UUID productId;
 
+  @NotEmpty(message = "{product.productName.notempty}")
   @Column(name = "product_name")
   private String productName;
 
+  @NotEmpty(message = "{product.productDescription.notempty}")
   @Column(name = "product_description")
   private String productDescription;
 
+  @NotEmpty(message = "{product.productPath.notempty}")
   @Column(name = "product_path", unique = true)
   private String productPath;
 
+  @NotNull(message = "{product.productBaseUnitPrice.notnull}")
+  @DecimalMin(value = "1.0", message = "{product.productBaseUnitPrice.min1}")
   @Column(name = "product_base_unit_price")
-  private BigDecimal productBaseUnitPrice = new BigDecimal(0);
+  private BigDecimal productBaseUnitPrice = new BigDecimal(1);
 
   @Column(name = "product_base_discount_price")
-  private BigDecimal productBaseDiscountPrice = new BigDecimal(0);
+  private BigDecimal productBaseDiscountPrice = new BigDecimal(1);
 
   @Column(name = "product_base_discount_start_date")
   private LocalDateTime productBaseDiscountStartDate;
@@ -74,9 +80,11 @@ public class Product {
   @Column(name = "product_base_discount_end_date")
   private LocalDateTime productBaseDiscountEndDate;
 
+  @NotNull(message = "{product.isDiscount.notnull}")
   @Column(name = "is_discount")
   private Boolean isDiscount = false;
 
+  @NotNull(message = "{product.isPublic.notnull}")
   @Column(name = "is_public")
   private Boolean isPublic = false;
 
@@ -93,6 +101,7 @@ public class Product {
   @Formula("(select exists (select 1 from products p inner join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id and (pv.is_discount = 1 or p.is_discount = 1)))")
   private Boolean isDiscountAvailable;
 
+  @NotNull(message = "{product.category.notnull}")
   @ManyToOne
   @JoinColumn(name = "category_id", foreignKey = @ForeignKey(name = "FK_products__categories"),
       // add category_id with its value when you try to create Product object and
@@ -109,6 +118,7 @@ public class Product {
       updatable = false)
   private Category category;
 
+  @NotNull(message = "{product.releaseDate.notnull}")
   @Column(name = "release_date")
   private LocalDateTime releaseDate;
 

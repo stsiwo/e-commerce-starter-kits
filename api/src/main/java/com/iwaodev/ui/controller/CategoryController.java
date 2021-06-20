@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import com.iwaodev.application.dto.category.CategoryDTO;
 import com.iwaodev.application.iservice.CategoryService;
 import com.iwaodev.domain.category.CategorySortEnum;
+import com.iwaodev.domain.category.validator.CategoryPathUniqueValidator;
 import com.iwaodev.ui.criteria.category.CategoryCriteria;
 import com.iwaodev.ui.criteria.category.CategoryQueryStringCriteria;
 import com.iwaodev.ui.response.BaseResponse;
@@ -32,6 +33,10 @@ public class CategoryController {
 
   @Autowired
   private CategoryService service;
+
+  @Autowired
+  private CategoryPathUniqueValidator validator;
+
 
   /**
    * if clients want to get all products belongs to a given category, use
@@ -64,6 +69,9 @@ public class CategoryController {
   @PostMapping("/categories")
   @PreAuthorize("hasRole('ROLE_ADMIN')") // admin only
   public ResponseEntity<CategoryDTO> post(@Valid @RequestBody CategoryCriteria criteria) {
+
+    logger.info("hope this not null.");
+    logger.info("" + this.validator);
 
     return new ResponseEntity<>(this.service.create(criteria), HttpStatus.OK);
   }

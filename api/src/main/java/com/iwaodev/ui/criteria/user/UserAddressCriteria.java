@@ -1,8 +1,13 @@
 package com.iwaodev.ui.criteria.user;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+
+import com.iwaodev.infrastructure.model.validator.OnCreate;
+import com.iwaodev.infrastructure.model.validator.OnUpdate;
 
 import org.springframework.validation.annotation.Validated;
 
@@ -17,25 +22,28 @@ import lombok.ToString;
 public class UserAddressCriteria {
 
   // nullable. use this when update
+  
+  @Null(message = "{address.id.null}", groups = OnCreate.class)
+  @NotNull(message = "{address.id.notnull}", groups = OnUpdate.class)
   private Long addressId;
 
-  @NotEmpty(message = "address 1 can not be null.")
+  @NotEmpty(message = "{address.address1.notempty}")
   private String address1;
 
   private String address2;
 
-  @NotEmpty(message = "city can not be null.")
+  @NotEmpty(message = "{address.city.notempty}")
   private String city;
 
-  @NotEmpty(message = "province can not be null.")
+  @NotEmpty(message = "{address.province.notempty}")
   private String province;
 
-  @NotEmpty(message = "country can not be null.")
-  @Size( max = 2, min = 2, message = "company address country must be exact 2 characters.")
+  @NotEmpty(message = "{address.country.notempty}")
+  @Size( max = 2, min = 2, message = "{address.country.size2}")
   private String country;
 
-  @NotEmpty(message = "postal code can not be null.")
-  @Pattern( regexp = "^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9]$", message = "invalid postal code format.")
+  @NotEmpty(message = "{address.postalCode.notempty}")
+  @Pattern( regexp = "^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9]$", message = "{address.postalCode.invalidformat}")
   private String postalCode;
 
   private Boolean isBillingAddress;

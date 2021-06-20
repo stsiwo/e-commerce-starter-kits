@@ -163,6 +163,8 @@
   - The quantity must be greater than or equal 1
   - max cartItems = 5
 
+  - combination of user & variant must be unique in this user. 
+
 ## Wishlist (Member Only)
 
   - not null
@@ -190,12 +192,18 @@
 
 ## Note
 
+  ## Change
+
+    - EntityListener -> javax.validation.
+
   ## How to Validate Uniqueness with DB
 
     - there is no pre-defined way (e.g., annotation) to validate this.
     - you need to create function with the repository and check it already exist or not.
 
-    -> workaround: use repository (autowired) and check the uniqueness.
+    -> workaround: use repository (autowired) and check the uniqueness. => this does not work.
+
+    -> use custom validator from javax.validation. but don't use the anotation inside Entity class. only use for Criteria at ui.
 
   ## How to Validate Auto-Increment Id
 

@@ -5,6 +5,8 @@ import java.util.UUID;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import com.iwaodev.infrastructure.model.validator.OnCreate;
+
 import org.springframework.validation.annotation.Validated;
 
 import lombok.Data;
@@ -26,14 +28,14 @@ public class OrderDetailCriteria {
   // nullable for new order use case
   private String orderDetailId;
 
-  @NotNull(message = "product quantity can not be null.")
-  @Min(value = 1, message = "The value must be greater than or equal 1")
+  @NotNull(message = "{orderDetail.productQuantity.notnull}")
+  @Min(value = 1, message = "{orderDetail.productQuantity.min1}")
   private Integer productQuantity;
 
-  @NotNull(message = "product id can not be null.")
+  @NotNull(message = "{orderDetail.product.notnull}", groups = OnCreate.class)
   private UUID productId;
 
-  @NotNull(message = "product variant id can not be null.")
+  @NotNull(message = "{orderDetail.productVariant.notnull}", groups = OnCreate.class)
   private Long productVariantId;
 
 }

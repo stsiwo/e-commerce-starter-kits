@@ -7,13 +7,16 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 
-import com.iwaodev.infrastructure.model.listener.CategoryValidationListener;
+import com.iwaodev.infrastructure.model.validator.OnCreate;
+import com.iwaodev.infrastructure.model.validator.OnUpdate;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -25,21 +28,28 @@ import lombok.ToString;
 @ToString
 @Data
 @NoArgsConstructor
-@EntityListeners(CategoryValidationListener.class)
+//@EntityListeners(CategoryValidationListener.class)
 @Entity(name = "categories")
 public class Category {
 
+  @Null(message = "{category.id.null}", groups = OnCreate.class)
+  @NotNull(message = "{category.id.notnull}", groups = OnUpdate.class)
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "category_id")
   private Long categoryId;
 
-  @Column(name = "category_name")
+  // unique validation at service layer
+  @NotEmpty(message = "{category.name.notempty}")
+  @Column(name = "category_name", unique = true)
   private String categoryName;
 
+  @NotEmpty(message = "{category.description.notempty}")
   @Column(name = "category_description")
   private String categoryDescription;
 
+  // unique validation at service layer
+  @NotEmpty(message = "{category.path.notempty}")
   @Column(name = "category_path", unique = true)
   private String categoryPath;
 

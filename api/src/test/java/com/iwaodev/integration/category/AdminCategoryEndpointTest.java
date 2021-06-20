@@ -29,6 +29,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -69,7 +70,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(isolation = Isolation.READ_UNCOMMITTED)
 @ActiveProfiles("integtest")
 /**
- * use mvcMock 
+ * use mvcMock
  **/
 @AutoConfigureMockMvc
 public class AdminCategoryEndpointTest {
@@ -77,6 +78,9 @@ public class AdminCategoryEndpointTest {
   private static final Logger logger = LoggerFactory.getLogger(AdminCategoryEndpointTest.class);
 
   private static final String targetPath = "/categories";
+
+  @Autowired
+  private ApplicationContext applicationContext;
 
   @LocalServerPort
   private int port;
@@ -102,6 +106,7 @@ public class AdminCategoryEndpointTest {
   private Cookie authCookie;
 
   private AuthenticationInfo authInfo;
+
   /**
    * insert base test data into mysql database
    *
@@ -115,11 +120,7 @@ public class AdminCategoryEndpointTest {
     this.baseDatabaseSetup.setup(this.entityManager);
 
     // send authentication request before testing
-   this.authInfo = this.authenticateTestUser.setup(
-       this.entityManager, 
-       this.mvc, 
-       UserTypeEnum.ADMIN,
-       this.port);
+    this.authInfo = this.authenticateTestUser.setup(this.entityManager, this.mvc, UserTypeEnum.ADMIN, this.port);
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
   }
@@ -131,20 +132,16 @@ public class AdminCategoryEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath;
 
     // act & assert
-    mvc.perform(
-        MockMvcRequestBuilders
-          .get(targetUrl)
-          .cookie(this.authCookie)
-          .accept(MediaType.APPLICATION_JSON)
-          )
-      .andDo(print())
-      .andExpect(status().isOk());
+    mvc.perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
   }
 
   @Test
-  public void shouldAdminCreateNewCategory(@Value("classpath:/integration/category/shouldAdminCreateNewCategory.json") Resource dummyFormJsonFile) throws Exception {
+  public void shouldAdminCreateNewCategory(
+      @Value("classpath:/integration/category/shouldAdminCreateNewCategory.json") Resource dummyFormJsonFile)
+      throws Exception {
 
-    // dummy form json 
+    // dummy form json
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
 
@@ -152,17 +149,9 @@ public class AdminCategoryEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath;
 
     // act & assert
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-          .post(targetUrl) // create
-          .content(dummyFormJsonString)
-          .contentType(MediaType.APPLICATION_JSON)
-          .cookie(this.authCookie)
-          .accept(MediaType.APPLICATION_JSON)
-          )
-      .andDo(print())
-      .andExpect(status().isOk());
-
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.post(targetUrl) // create
+        .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -175,39 +164,68 @@ public class AdminCategoryEndpointTest {
   }
 
   @Test
-  @Sql(scripts = { "classpath:/integration/category/shouldAdminUpdateCategory.sql" })
-  public void shouldAdminUpdateCategory(@Value("classpath:/integration/category/shouldAdminUpdateCategory.json") Resource dummyFormJsonFile) throws Exception {
+  @Sql(scripts = { "classpath:/integration/category/shouldNotAdminCreateNewCategorySinceNameDuplication.sql" })
+  public void shouldNotAdminCreateNewCategorySinceNameDuplication(
+      @Value("classpath:/integration/category/shouldNotAdminCreateNewCategorySinceNameDuplication.json") Resource dummyFormJsonFile)
+      throws Exception {
 
-    // make sure categoryId match the one in sql and json
-
-    // dummy form json 
+    // dummy form json
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
 
     // arrange
-    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyFormJson.get("categoryId").asText();
+    String targetUrl = "http://localhost:" + this.port + this.targetPath;
 
     // act & assert
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-          .put(targetUrl) // update/replace
-          .content(dummyFormJsonString)
-          .contentType(MediaType.APPLICATION_JSON)
-          .cookie(this.authCookie)
-          .accept(MediaType.APPLICATION_JSON)
-          )
-      .andDo(print())
-      .andExpect(status().isOk());
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.post(targetUrl) // create
+        .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
+  }
 
+  @Test
+  @Sql(scripts = { "classpath:/integration/category/shouldNotAdminCreateNewCategorySincePathDuplication.sql" })
+  public void shouldNotAdminCreateNewCategorySincePathDuplication(
+      @Value("classpath:/integration/category/shouldNotAdminCreateNewCategorySincePathDuplication.json") Resource dummyFormJsonFile)
+      throws Exception {
 
-    MvcResult result = resultActions.andReturn();
+    String[] allBeanNames = this.applicationContext.getBeanDefinitionNames();
+    for (String beanName : allBeanNames) {
+      System.out.println(beanName);
+    }
 
-    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
-    CategoryDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, CategoryDTO.class);
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
 
-    assertThat(result.getResponse().getStatus()).isEqualTo(200);
-    assertThat(responseBody.getCategoryId()).isEqualTo(dummyFormJson.get("categoryId").asLong());
-    assertThat(responseBody.getCategoryName()).isEqualTo(dummyFormJson.get("categoryName").asText());
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.post(targetUrl) // create
+        .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/category/shouldAdminUpdateCategory.sql" })
+  public void shouldAdminUpdateCategory(
+      @Value("classpath:/integration/category/shouldAdminUpdateCategory.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+    // make sure categoryId match the one in sql and json
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/"
+        + dummyFormJson.get("categoryId").asText();
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.put(targetUrl) // update/replace
+        .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
   }
 
   @Test
@@ -221,19 +239,11 @@ public class AdminCategoryEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyCategoryId.toString();
 
     // act & assert
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-          .delete(targetUrl) // delete 
-          .cookie(this.authCookie)
-          .accept(MediaType.APPLICATION_JSON)
-          )
-      .andDo(print())
-      .andExpect(status().isOk());
-
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.delete(targetUrl) // delete
+        .cookie(this.authCookie).accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
   }
 }
-

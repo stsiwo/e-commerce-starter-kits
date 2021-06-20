@@ -1,7 +1,11 @@
 package com.iwaodev.ui.criteria.user;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+
+import com.iwaodev.infrastructure.model.validator.OnCreate;
+import com.iwaodev.infrastructure.model.validator.OnUpdate;
 
 import org.springframework.validation.annotation.Validated;
 
@@ -15,10 +19,11 @@ import lombok.ToString;
 @Validated
 public class UserPhoneCriteria {
 
+  @Null(message = "{phone.id.null}", groups = OnCreate.class)
+  @NotNull(message = "{phone.id.notnull}", groups = OnUpdate.class)
   private Long phoneId;
   
-  @Size(min = 10, max = 10)
-  @Pattern( regexp = "^[0-9]{10}$", message = "invalid phone number format. please enter only number without any special characater.")
+  @Pattern( regexp = "^[0-9]{10}$", message = "{phone.phoneNumber.invalidformat}")
   private String phoneNumber;
 
   /**
@@ -27,7 +32,7 @@ public class UserPhoneCriteria {
   //@Size(min = 4, max = 4)
   //private String extension;
 
-  @Pattern( regexp = "^(\\+?\\d{1,3}|\\d{1,4})$", message = "invalid phone country code format.")
+  @Pattern( regexp = "^(\\+?\\d{1,3}|\\d{1,4})$", message = "{phone.countryCode.invalidformat}")
   private String countryCode;
 
   private Boolean isSelected;

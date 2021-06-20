@@ -2,6 +2,10 @@ package com.iwaodev;
 
 import java.util.Properties;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -11,22 +15,30 @@ import com.iwaodev.infrastructure.shipping.ShippingApiRequestInterceptor;
 import com.iwaodev.util.TrimStringModule;
 import com.stripe.Stripe;
 
+import org.hibernate.validator.HibernateValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.event.EventListener;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
+import org.springframework.validation.beanvalidation.SpringConstraintValidatorFactory;
 import org.springframework.web.client.RestTemplate;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
@@ -51,10 +63,18 @@ public class Application {
   @Autowired
   private TrimStringModule trimStringModule;
 
-
+  private static ApplicationContext applicationContext;
 
   public static void main(String[] args) {
-    SpringApplication.run(Application.class, args);
+    applicationContext = SpringApplication.run(Application.class, args);
+    displayAllBeans();
+  }
+
+  public static void displayAllBeans() {
+    String[] allBeanNames = applicationContext.getBeanDefinitionNames();
+    for (String beanName : allBeanNames) {
+      System.out.println(beanName);
+    }
   }
 
   /**
@@ -90,7 +110,8 @@ public class Application {
     /**
      * trim leading/trailing space of any value.
      *
-     * ref: https://stackoverflow.com/questions/6852213/can-jackson-be-configured-to-trim-leading-trailing-whitespace-from-all-string-pr
+     * ref:
+     * https://stackoverflow.com/questions/6852213/can-jackson-be-configured-to-trim-leading-trailing-whitespace-from-all-string-pr
      **/
     objectMapper.registerModule(this.trimStringModule);
 
@@ -105,10 +126,10 @@ public class Application {
    * if you spring boot, you don't need to create this bean.
    *
    **/
-  //@Bean
-  //public CacheManager cacheManager() {
-  //  return new ConcurrentMapCacheManager("addresses");
-  //}
+  // @Bean
+  // public CacheManager cacheManager() {
+  // return new ConcurrentMapCacheManager("addresses");
+  // }
 
   /**
    * jackson xml mapper.
@@ -265,5 +286,20 @@ public class Application {
     props.put("mail.debug", "true");
 
     return mailSender;
+  }
+
+  @Bean
+  public MessageSource messageSource() {
+    ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+    messageSource.setBasename("classpath:messages");
+    messageSource.setDefaultEncoding("UTF-8");
+    return messageSource;
+  }
+
+  @Bean
+  public LocalValidatorFactoryBean getValidator() {
+    LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
+    bean.setValidationMessageSource(messageSource());
+    return bean;
   }
 }

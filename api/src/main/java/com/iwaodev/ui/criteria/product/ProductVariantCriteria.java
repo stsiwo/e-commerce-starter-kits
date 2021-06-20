@@ -4,12 +4,16 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 
+import com.iwaodev.domain.product.validator.VariantColorAndSizeUnique;
+import com.iwaodev.infrastructure.model.validator.OnCreate;
+import com.iwaodev.infrastructure.model.validator.OnUpdate;
 import com.iwaodev.ui.validator.optional.digit.OptionalDigit;
-import com.iwaodev.ui.validator.optional.doubletype.OptionalDoubleType;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
@@ -18,18 +22,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+@VariantColorAndSizeUnique()
 @ToString
 @Data
 @NoArgsConstructor
 @Validated
 public class ProductVariantCriteria {
 
+  @Null(message = "{productVariant.id.null}", groups = OnCreate.class)
+  @NotNull(message = "{productVariant.id.notnull}", groups = OnUpdate.class)
   private Long variantId;
 
-  @OptionalDigit(integer = 6, fraction = 2, message = "optional but if you specifiy, must be greater than or equal to 1.00")
+  @OptionalDigit(integer = 6, fraction = 2, message = "{productVariant.variantUnitPrice.invalidformat}")
   private BigDecimal variantUnitPrice;
 
-  @OptionalDigit(integer = 6, fraction = 2, message = "optional but if you specifiy, must be greater than or equal to 1.00")
+  @OptionalDigit(integer = 6, fraction = 2, message = "{productVariant.variantDiscountPrice.invalidformat}")
   private BigDecimal variantDiscountPrice;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -38,30 +45,36 @@ public class ProductVariantCriteria {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime variantDiscountEndDate;
 
-  @NotNull(message = "product variant stock must not be null.")
-  @Min(value = 0, message = "the price must be greater than or equal 0")
+  @NotNull(message = "{productVariant.variantStock.notnull}")
+  @Min(value = 0, message = "{productVariant.variantStock.min0}")
   private Integer variantStock;
 
+  @NotNull(message = "{productVariant.isDiscount.notnull}")
   private Boolean isDiscount;
 
   private String note;
 
-  @NotEmpty(message = "product color must not be null.")
+  @NotEmpty(message = "{productVariant.variantColor.notempty}")
   private String variantColor;
 
   @Valid
+  @NotNull(message = "{productVariant.productSize.notnull}")
   private ProductSizeCriteria productSize;
 
-  @OptionalDoubleType
+  @NotNull(message = "{productVariant.variantWeight.notnull}")
+  @Digits(integer = 6, fraction = 3, message = "{productVariant.variantWeight.notnull}")
   private Double variantWeight;
 
-  @OptionalDoubleType
+  @NotNull(message = "{productVariant.variantHeight.notnull}")
+  @Digits(integer = 6, fraction = 3, message = "{productVariant.variantHeight.notnull}")
   private Double variantHeight;
 
-  @OptionalDoubleType
+  @NotNull(message = "{productVariant.variantLength.notnull}")
+  @Digits(integer = 6, fraction = 3, message = "{productVariant.variantLength.notnull}")
   private Double variantWidth;
 
-  @OptionalDoubleType
+  @NotNull(message = "{productVariant.variantWidth.notnull}")
+  @Digits(integer = 6, fraction = 3, message = "{productVariant.variantWidth.notnull}")
   private Double variantLength;
 }
 

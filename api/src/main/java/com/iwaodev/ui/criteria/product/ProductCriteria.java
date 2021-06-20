@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import com.iwaodev.domain.product.validator.ProductPathUnique;
 import com.iwaodev.ui.criteria.category.CategoryCriteria;
 import com.iwaodev.ui.validator.optional.digit.OptionalDigit;
 
@@ -28,19 +28,21 @@ import lombok.ToString;
 @Validated
 public class ProductCriteria {
 
+  @NotNull(message = "{product.id.notnull}")
   private UUID productId;
   
-  @NotEmpty(message = "product name can not be null.")
+  @NotEmpty(message = "{product.productName.notempty}")
   private String productName;
 
-  @NotEmpty(message = "product description can not be null.")
+  @NotEmpty(message = "{product.productDescription.notempty}")
   private String productDescription;
 
-  @NotEmpty(message = "product path can not be null.")
+  @ProductPathUnique()
+  @NotEmpty(message = "{product.productPath.notempty}")
   private String productPath;
 
-  @NotNull(message = "product base unit price can not be null.")
-  @Min(value = 1, message = "the price must be greater than or equal 1.00")
+  @NotNull(message = "{product.productBaseUnitPrice.notnull}")
+  @DecimalMin(value = "1.0", message = "{product.productBaseUnitPrice.min1}")
   private BigDecimal productBaseUnitPrice;
 
   @OptionalDigit(integer = 6, fraction = 2, message = "optional but if you specifiy, must be greater than or equal to 1.00")
@@ -52,16 +54,20 @@ public class ProductCriteria {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime productBaseDiscountEndDate;
 
+  @NotNull(message = "{product.isDiscount.notnull}")
   private Boolean isDiscount;
 
+  @NotNull(message = "{product.isPublic.notnull}")
   private Boolean isPublic;
 
   @Valid 
+  @NotNull(message = "{product.category.notnull}")
   private List<ProductImageCriteria> productImages;
 
   @Valid 
   private CategoryCriteria category;
 
+  @NotNull(message = "{product.releaseDate.notnull}")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime releaseDate;
   

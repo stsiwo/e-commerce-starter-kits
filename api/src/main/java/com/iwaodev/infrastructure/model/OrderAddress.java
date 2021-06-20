@@ -4,13 +4,15 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
-import com.iwaodev.infrastructure.model.listener.OrderAddressValidationListener;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -22,33 +24,41 @@ import lombok.ToString;
 
 @Data
 @ToString
-@EntityListeners(OrderAddressValidationListener.class)
+//@EntityListeners(OrderAddressValidationListener.class)
 @Entity(name = "orderAddresses")
 public class OrderAddress {
 
   /**
    * use nanoId
    **/
+  @NotNull(message = "{address.id.notnull}")
   @Id
   @Setter(value = AccessLevel.NONE)
   @Column(name = "order_address_id")
   private String orderAddressId;
 
+  @NotEmpty(message = "{address.address1.notempty}")
   @Column(name="address_1")
   private String address1;
 
   @Column(name="address_2")
   private String address2;
 
+  @NotEmpty(message = "{address.city.notempty}")
   @Column(name="city")
   private String city;
 
+  @NotEmpty(message = "{address.province.notempty}")
   @Column(name="province")
   private String province;
 
+  @NotEmpty(message = "{address.country.notempty}")
+  @Size( max = 2, min = 2, message = "{address.country.size2}")
   @Column(name="country")
   private String country; // is there any type for country like Locale
 
+  @NotEmpty(message = "{address.postalCode.notempty}")
+  @Pattern( regexp = "^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9]$", message = "{address.postalCode.invalidformat}")
   @Column(name="postal_code")
   private String postalCode;
 

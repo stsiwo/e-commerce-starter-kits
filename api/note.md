@@ -784,6 +784,16 @@
 
         - ref: https://stackoverflow.com/questions/12155632/injecting-a-spring-dependency-into-a-jpa-entitylistener
 
+      - basically this is discouraged since all cases I tried causes errors:
+
+        - try to validate uniquenss with repository inside entityListener => stackoverflow error: this repository.anymethod cause the trigger entitylistener again.
+
+        - try to validate uniqueness with repository inside javax.validation (e..g, ConstraintValidator) => HHH000099: an assertion failure occurred (this may indicate a bug in Hibernate, but is more likely due to unsafe use of the session): org.hibernate.AssertionFailure: null id in com.iwaodev.infrastructure.model.Category entry (don't flush the Session after an exception occurs) error.
+
+        => don't use repository insode entity or any classes triggered by entity class (e.g., entitylistner or custom validtion on entity field/class)
+
+        => to check the uniquenss, do inside application service layer.
+
   ## EntityGraph:
 
     - runtime swiching of eager/lazy loading. 

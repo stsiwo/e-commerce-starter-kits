@@ -10,19 +10,20 @@ import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import com.iwaodev.domain.user.UserActiveEnum;
-import com.iwaodev.infrastructure.model.listener.UserValidationListener;
+import com.iwaodev.domain.user.validator.UserValidation;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -36,29 +37,37 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+@UserValidation()
 @Data
 @ToString
 @NoArgsConstructor
-@EntityListeners(UserValidationListener.class)
+//@EntityListeners(UserValidationListener.class)
 @Entity(name = "users")
 public class User {
 
   private static final Logger logger = LoggerFactory.getLogger(User.class);
+
+  @NotNull(message = "{user.id.notnull}")
   @Id
   @Column(name = "user_id")
   @GeneratedValue
   @Type(type = "uuid-char")
   private UUID userId;
 
+  @NotEmpty(message = "{user.firstName.notempty}")
   @Column(name = "first_name")
   private String firstName;
 
+  @NotEmpty(message = "{user.lastName.notempty}")
   @Column(name = "last_name")
   private String lastName;
 
+  @NotEmpty(message = "{user.email.notempty}")
+  @Email(message = "{user.email.invalidformat}")
   @Column(name = "email")
   private String email;
 
+  @NotEmpty(message = "{user.password.notempty}")
   @Column(name = "password")
   /**
    * use Spring Security instead
@@ -71,6 +80,7 @@ public class User {
   @Column(name = "avatar_image_path")
   private String avatarImagePath;
 
+  @NotNull(message = "{user.userType.notnull}")
   @ManyToOne
   @JoinColumn(name = "user_type_id", foreignKey = @ForeignKey(name = "FK_users__user_types"), insertable = true, updatable = false)
   private UserType userType;
@@ -86,6 +96,7 @@ public class User {
   @Column(name = "stripe_customer_id")
   private String stripeCustomerId;
 
+  @NotNull(message = "{user.active.notnull}")
   @Enumerated(EnumType.STRING)
   @Column(name = "active")
   private UserActiveEnum active;

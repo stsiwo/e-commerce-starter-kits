@@ -37,9 +37,9 @@ public class OrderEventCriteria {
   private OrderStatusEnum orderStatus;
 
   /**
-   * only member/admin can use this order history system.
+   * only member/admin can use this order history system for this criteria.
    **/
-  @NotNull(message = "user id can not be null.")
+  @NotNull(message = "{orderEvent.user.notnull}")
   private UUID userId;
 
   // optional

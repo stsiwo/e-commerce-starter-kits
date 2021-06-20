@@ -183,6 +183,28 @@ public class GuestUserSignupEnpointTest {
   }
 
   @Test
+  public void shouldGuestUserSignupButGot400SinceInvalidPassword() throws Exception {
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath;
+    String dummyFirstName = "Kaoru"; // <- this
+    String dummyLastName = "Iwao";
+    String dummyEmail = "kaoru@gmail.com";
+    String dummyPassword = "kaoru_password";  // invalid password 
+    JSONObject dummyUserSignupForm = new JSONObject();
+    dummyUserSignupForm.put("firstName", dummyFirstName);
+    dummyUserSignupForm.put("lastName", dummyLastName);
+    dummyUserSignupForm.put("email", dummyEmail);
+    dummyUserSignupForm.put("password", dummyPassword);
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.post(targetUrl).contentType(MediaType.APPLICATION_JSON)
+            .content(dummyUserSignupForm.toString()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
   @Sql(scripts = { "classpath:/integration/signup/shouldNotGuestUserSignupSinceDuplicated.sql" })
   public void shouldNotGuestUserSignupSinceDuplicated() throws Exception {
 

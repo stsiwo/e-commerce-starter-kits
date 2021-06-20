@@ -3,8 +3,12 @@ package com.iwaodev.ui.criteria.cartItem;
 import java.util.UUID;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+
+import com.iwaodev.domain.cartItem.validator.UserAndVariantMustBeUnique;
+import com.iwaodev.infrastructure.model.validator.OnCreate;
+import com.iwaodev.infrastructure.model.validator.OnUpdate;
 
 import org.springframework.validation.annotation.Validated;
 
@@ -16,22 +20,25 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @Validated
+@UserAndVariantMustBeUnique()
 public class CartItemCriteria {
 
+  @Null(message = "{cartItem.id.null}", groups = OnCreate.class)
+  @NotNull(message = "{cartItem.id.notnull}", groups = OnUpdate.class)
   private Long cartItemId;
 
-  @NotNull(message = "user id can not be null.")
+  @NotNull(message = "{cartItem.user.notnull}")
   private UUID userId; 
   
-  @NotNull(message = "variant id name can not be null.")
+  @NotNull(message = "{cartItem.variant.notnull}")
   private Long variantId;
 
+  @NotNull(message = "{cartItem.isSelected.notnull}")
   private Boolean isSelected;
 
-  @NotNull(message = "quantity can not be null.")
-  @Min(value = 1, message = "The quantity must be greater than or equal 1")
+  @NotNull(message = "{cartItem.quantity.notnull}")
+  @Min(value = 1, message = "{cartItem.quantity.min1}")
   private Integer quantity;
-
 }
 
 

@@ -4,14 +4,16 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.iwaodev.domain.notification.NotificationTypeEnum;
-import com.iwaodev.infrastructure.model.listener.NotificationValidationListener;
+import com.iwaodev.domain.notification.validator.IssuerValidation;
+import com.iwaodev.domain.notification.validator.RecipientValidation;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Filter;
@@ -22,12 +24,13 @@ import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+@IssuerValidation
+@RecipientValidation
 @Data
 @ToString
-@EntityListeners(NotificationValidationListener.class)
+//@EntityListeners(NotificationValidationListener.class)
 // @NoArgsConstructor // use custom noargsconstructor to assign nanoId
 @FilterDefs({ 
     @FilterDef(name = "recipientIdFilter", parameters = @ParamDef(name = "recipientId", type = "string")),
@@ -43,13 +46,16 @@ public class Notification {
   /**
    * use nanoId
    **/
+  @NotNull(message = "{notification.id.notnull}")
   @Id
   @Column(name = "notification_id")
   private String notificationId;
 
+  @NotEmpty(message = "{notification.title.notempty}")
   @Column(name = "notification_title")
   private String notificationTitle;
 
+  @NotEmpty(message = "{notification.description.notempty}")
   @Column(name = "notification_description")
   private String notificationDescription;
 
@@ -61,6 +67,7 @@ public class Notification {
   @JoinColumn(name = "recipient_id", insertable = true, updatable = true)
   private User recipient;
 
+  @NotNull(message = "{notification.isRead.notnull}")
   @Column(name = "is_read")
   private Boolean isRead;
 
@@ -70,6 +77,7 @@ public class Notification {
   @Column(name = "note")
   private String note;
 
+  @NotNull(message = "{notification.notificationType.notnull}")
   @ManyToOne
   @JoinColumn(name = "notification_type_id", insertable = true, updatable = true)
   private NotificationType notificationType;
@@ -78,7 +86,6 @@ public class Notification {
   @Column(name = "created_at")
   private LocalDateTime createdAt;
 
-  @UpdateTimestamp
   @Column(name = "readAt")
   private LocalDateTime readAt;
 

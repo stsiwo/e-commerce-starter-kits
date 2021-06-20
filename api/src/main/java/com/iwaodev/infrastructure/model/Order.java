@@ -7,12 +7,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
@@ -23,38 +21,38 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Transient;
+import javax.validation.Valid;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.Pattern;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.iwaodev.domain.order.OrderStatusEnum;
-import com.iwaodev.domain.order.event.CompletedOrderPaymentEvent;
-import com.iwaodev.domain.order.event.OrderFinalConfirmedEvent;
-import com.iwaodev.domain.order.event.OrderCanceledEvent;
-import com.iwaodev.domain.order.event.OrderReturnedEvent;
-import com.iwaodev.infrastructure.model.listener.OrderValidationListener;
+import com.iwaodev.domain.order.validator.OrderValidation;
+import com.iwaodev.infrastructure.model.validator.OnCreate;
+import com.iwaodev.infrastructure.model.validator.OnUpdate;
 import com.iwaodev.ui.criteria.order.OrderEventCriteria;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Formula;
-import org.hibernate.annotations.JoinColumnOrFormula;
-import org.hibernate.annotations.JoinFormula;
-import org.hibernate.annotations.JoinColumnsOrFormulas;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.AbstractAggregateRoot;
 
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+@OrderValidation()
 @ToString
 @Data
-@EntityListeners(OrderValidationListener.class)
+//@EntityListeners(OrderValidationListener.class)
 @Entity(name = "orders")
 public class Order {
 
@@ -65,6 +63,8 @@ public class Order {
       OrderStatusEnum.DELIVERED, OrderStatusEnum.RETURN_REQUEST, OrderStatusEnum.RECEIVED_RETURN_REQUEST,
       OrderStatusEnum.RETURNED, OrderStatusEnum.SHIPPED, OrderStatusEnum.ERROR, };
 
+  @NotNull(message = "{order.id.notnull}", groups = OnUpdate.class)
+  @Null(message = "{order.id.null}", groups = OnCreate.class)
   @Id
   @Column(name = "order_id")
   @GeneratedValue
@@ -75,35 +75,47 @@ public class Order {
    * #TODO: find a way to generate short uuid for this order number (not too long
    * one)
    **/
+  @NotEmpty(message = "{order.orderNumber.notempty}")
   @Column(name = "order_number")
   private String orderNumber;
 
   // ignore this setter since need to customize for bidirectional relationship
+  @NotNull(message = "{order.productCost.notnull}")
+  @DecimalMin(value = "1.0", message = "{order.productCost.min1}")
   @Getter(value = AccessLevel.NONE)
   @Column(name = "product_cost")
-  private BigDecimal productCost = new BigDecimal(0);
+  private BigDecimal productCost = new BigDecimal(1);
 
+  @NotNull(message = "{order.taxCost.notnull}")
   @Column(name = "tax_cost")
   private BigDecimal taxCost = new BigDecimal(0);
 
+  @NotNull(message = "{order.shippingCost.notnull}")
   @Column(name = "shipping_cost")
   private BigDecimal shippingCost = new BigDecimal(0);
 
   @Column(name = "note")
   private String note;
 
+  @NotEmpty(message = "{order.orderFirstName.notempty}")
   @Column(name = "order_first_name")
   private String orderFirstName;
 
+  @NotEmpty(message = "{order.orderLastName.notempty}")
   @Column(name = "order_last_name")
   private String orderLastName;
 
+  @NotEmpty(message = "{order.email.notempty}")
+  @Email(message = "{order.email.invalidformat}")
   @Column(name = "order_email")
   private String orderEmail;
 
+  @NotEmpty(message = "{order.orderPhone.notempty}")
+  @Pattern( regexp = "^\\+(?:[0-9] ?){6,14}[0-9]$", message = "{order.orderPhone.invalidformat}")
   @Column(name = "order_phone")
   private String orderPhone;
 
+  @NotEmpty(message = "{order.stripePaymentIntentId.notempty}")
   @Column(name = "stripe_payment_intent_id")
   private String stripePaymentIntentId;
 
@@ -160,20 +172,26 @@ public class Order {
   @Column(name = "auth_return_original_response")
   private LocalDateTime authReturnOriginalResponse;
 
+  @NotEmpty(message = "{order.currency.notempty}")
   @Column(name = "currency")
   private String currency;
 
   // user is guest or not for this order
+  @NotNull(message = "{order.isGuest.notnull}")
   @Column(name = "is_guest")
   private Boolean isGuest;
 
   @Column(name = "estimated_delivery_date")
   private LocalDateTime estimatedDeliveryDate;
 
+  @Valid
+  @NotNull(message = "{order.shippingAddress.notnull}")
   @OneToOne(mappedBy = "shippingOrder", cascade = CascadeType.ALL, orphanRemoval = true)
   @Setter(value = AccessLevel.NONE)
   private OrderAddress shippingAddress;
 
+  @Valid
+  @NotNull(message = "{order.billingAddress.notnull}")
   @Setter(value = AccessLevel.NONE)
   @OneToOne(mappedBy = "billingOrder", cascade = CascadeType.ALL, orphanRemoval = true)
   private OrderAddress billingAddress;
@@ -200,12 +218,16 @@ public class Order {
    * - should work according to this: https://stackoverflow.com/questions/2302802/how-to-fix-the-hibernate-object-references-an-unsaved-transient-instance-save/2302814#2302814
    *
    **/
+  @Valid
+  @NotNull(message = "{order.orderEvents.notnull}")
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("created_at ASC")
   private List<OrderEvent> orderEvents = new ArrayList<>();
 
   // ignore this setter since need to customize for bidirectional relationship
   @Setter(value = AccessLevel.NONE)
+  @Valid
+  @NotNull(message = "{order.orderDetails.notnull}")
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("created_at ASC")
   private List<OrderDetail> orderDetails = new ArrayList<>();
@@ -625,4 +647,256 @@ public class Order {
   public String displayBillingAddress() {
     return this.billingAddress.displayAddress();
   }
+
+public static Logger getLogger() {
+	return logger;
+}
+
+public static OrderStatusEnum[] getDeletableorderstatuslist() {
+	return deletableOrderStatusList;
+}
+
+public UUID getOrderId() {
+	return orderId;
+}
+
+public void setOrderId(UUID orderId) {
+	this.orderId = orderId;
+}
+
+public String getOrderNumber() {
+	return orderNumber;
+}
+
+public void setOrderNumber(String orderNumber) {
+	this.orderNumber = orderNumber;
+}
+
+public void setProductCost(BigDecimal productCost) {
+	this.productCost = productCost;
+}
+
+public BigDecimal getTaxCost() {
+	return taxCost;
+}
+
+public void setTaxCost(BigDecimal taxCost) {
+	this.taxCost = taxCost;
+}
+
+public BigDecimal getShippingCost() {
+	return shippingCost;
+}
+
+public void setShippingCost(BigDecimal shippingCost) {
+	this.shippingCost = shippingCost;
+}
+
+public String getNote() {
+	return note;
+}
+
+public void setNote(String note) {
+	this.note = note;
+}
+
+public String getOrderFirstName() {
+	return orderFirstName;
+}
+
+public void setOrderFirstName(String orderFirstName) {
+	this.orderFirstName = orderFirstName;
+}
+
+public String getOrderLastName() {
+	return orderLastName;
+}
+
+public void setOrderLastName(String orderLastName) {
+	this.orderLastName = orderLastName;
+}
+
+public String getOrderEmail() {
+	return orderEmail;
+}
+
+public void setOrderEmail(String orderEmail) {
+	this.orderEmail = orderEmail;
+}
+
+public String getOrderPhone() {
+	return orderPhone;
+}
+
+public void setOrderPhone(String orderPhone) {
+	this.orderPhone = orderPhone;
+}
+
+public String getStripePaymentIntentId() {
+	return stripePaymentIntentId;
+}
+
+public void setStripePaymentIntentId(String stripePaymentIntentId) {
+	this.stripePaymentIntentId = stripePaymentIntentId;
+}
+
+public String getShipmentId() {
+	return shipmentId;
+}
+
+public void setShipmentId(String shipmentId) {
+	this.shipmentId = shipmentId;
+}
+
+public String getTrackingPin() {
+	return trackingPin;
+}
+
+public void setTrackingPin(String trackingPin) {
+	this.trackingPin = trackingPin;
+}
+
+public String getRefundLink() {
+	return refundLink;
+}
+
+public void setRefundLink(String refundLink) {
+	this.refundLink = refundLink;
+}
+
+public String getAuthReturnTrackingPin() {
+	return authReturnTrackingPin;
+}
+
+public void setAuthReturnTrackingPin(String authReturnTrackingPin) {
+	this.authReturnTrackingPin = authReturnTrackingPin;
+}
+
+public LocalDateTime getAuthReturnExpiryDate() {
+	return authReturnExpiryDate;
+}
+
+public void setAuthReturnExpiryDate(LocalDateTime authReturnExpiryDate) {
+	this.authReturnExpiryDate = authReturnExpiryDate;
+}
+
+public LocalDateTime getAuthReturnUrl() {
+	return authReturnUrl;
+}
+
+public void setAuthReturnUrl(LocalDateTime authReturnUrl) {
+	this.authReturnUrl = authReturnUrl;
+}
+
+public OrderStatusEnum getLatestOrderEventStatus() {
+	return latestOrderEventStatus;
+}
+
+public void setLatestOrderEventStatus(OrderStatusEnum latestOrderEventStatus) {
+	this.latestOrderEventStatus = latestOrderEventStatus;
+}
+
+public LocalDateTime getShipmentOriginalResponse() {
+	return shipmentOriginalResponse;
+}
+
+public void setShipmentOriginalResponse(LocalDateTime shipmentOriginalResponse) {
+	this.shipmentOriginalResponse = shipmentOriginalResponse;
+}
+
+public LocalDateTime getAuthReturnOriginalResponse() {
+	return authReturnOriginalResponse;
+}
+
+public void setAuthReturnOriginalResponse(LocalDateTime authReturnOriginalResponse) {
+	this.authReturnOriginalResponse = authReturnOriginalResponse;
+}
+
+public String getCurrency() {
+	return currency;
+}
+
+public void setCurrency(String currency) {
+	this.currency = currency;
+}
+
+public Boolean getIsGuest() {
+	return isGuest;
+}
+
+public void setIsGuest(Boolean isGuest) {
+	this.isGuest = isGuest;
+}
+
+public LocalDateTime getEstimatedDeliveryDate() {
+	return estimatedDeliveryDate;
+}
+
+public void setEstimatedDeliveryDate(LocalDateTime estimatedDeliveryDate) {
+	this.estimatedDeliveryDate = estimatedDeliveryDate;
+}
+
+public OrderAddress getShippingAddress() {
+	return shippingAddress;
+}
+
+public OrderAddress getBillingAddress() {
+	return billingAddress;
+}
+
+public LocalDateTime getCreatedAt() {
+	return createdAt;
+}
+
+public void setCreatedAt(LocalDateTime createdAt) {
+	this.createdAt = createdAt;
+}
+
+public LocalDateTime getUpdatedAt() {
+	return updatedAt;
+}
+
+public void setUpdatedAt(LocalDateTime updatedAt) {
+	this.updatedAt = updatedAt;
+}
+
+public User getUser() {
+	return user;
+}
+
+public void setUser(User user) {
+	this.user = user;
+}
+
+public List<OrderEvent> getOrderEvents() {
+	return orderEvents;
+}
+
+public List<OrderDetail> getOrderDetails() {
+	return orderDetails;
+}
+
+public List<OrderStatusEnum> getNextAdminOrderEventOptions() {
+	return nextAdminOrderEventOptions;
+}
+
+public void setNextAdminOrderEventOptions(List<OrderStatusEnum> nextAdminOrderEventOptions) {
+	this.nextAdminOrderEventOptions = nextAdminOrderEventOptions;
+}
+
+public List<OrderStatusEnum> getNextMemberOrderEventOptions() {
+	return nextMemberOrderEventOptions;
+}
+
+public void setNextMemberOrderEventOptions(List<OrderStatusEnum> nextMemberOrderEventOptions) {
+	this.nextMemberOrderEventOptions = nextMemberOrderEventOptions;
+}
+
+public OrderEvent getLatestOrderEvent() {
+	return latestOrderEvent;
+}
+
+public void setLatestOrderEvent(OrderEvent latestOrderEvent) {
+	this.latestOrderEvent = latestOrderEvent;
+}
 }

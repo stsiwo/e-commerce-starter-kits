@@ -2,8 +2,8 @@ package com.iwaodev.ui.criteria.user;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 
+import com.iwaodev.domain.user.validator.UserEmailUnique;
 import com.iwaodev.ui.validator.password.Password;
 
 import org.springframework.validation.annotation.Validated;
@@ -18,17 +18,18 @@ import lombok.ToString;
 @Validated
 public class UserSignupCriteria {
 
-  @NotEmpty(message = "first name can not be null.")
+  @NotEmpty(message = "{user.firstName.notempty}")
   private String firstName;
 
-  @NotEmpty(message = "last name can not be null.")
+  @NotEmpty(message = "{user.lastName.notempty}")
   private String lastName;
 
-  @NotEmpty(message = "email can not be null.")
-  @Email(message = "email must be valid format.")
+  @UserEmailUnique()
+  @NotEmpty(message = "{user.email.notempty}")
+  @Email(message = "{user.email.invalidformat}")
   private String email;
 
-  @Password(optional = false, message = "invalid password.")
+  @Password(optional = false, message = "{user.password.invalidformat}")
   private String password;
 
 }
