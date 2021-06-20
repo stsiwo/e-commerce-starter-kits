@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  *
  **/
 // if this is used by another package, don't forget to add 'public' otherwise, they cannot access.
-@Component
+@Component(value = "cartItemUserAndVariantMustBeUniqueValidator")
 public class UserAndVariantMustBeUniqueValidator implements ConstraintValidator<UserAndVariantMustBeUnique, CartItem> {
 
   private static final Logger logger = LoggerFactory.getLogger(UserAndVariantMustBeUniqueValidator.class);
@@ -29,7 +29,7 @@ public class UserAndVariantMustBeUniqueValidator implements ConstraintValidator<
   @Override
   public boolean isValid(CartItem domain, ConstraintValidatorContext context) {
 
-    if (this.cartItemRepository.findByVariantIdAndUserId(domain.getVariantId(), domain.getUserId()).isPresent()) {
+    if (this.cartItemRepository.findByVariantIdAndUserId(domain.getVariant().getVariantId(), domain.getUser().getUserId()).isPresent()) {
       return false;
     }
 

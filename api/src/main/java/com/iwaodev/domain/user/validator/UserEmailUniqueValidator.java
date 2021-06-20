@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 // if this is used by another package, don't forget to add 'public' otherwise, they cannot access.
+// //
 @Component
 public class UserEmailUniqueValidator implements ConstraintValidator<UserEmailUnique, String> {
 

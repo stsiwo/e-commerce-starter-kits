@@ -15,6 +15,7 @@ import javax.validation.Payload;
 @Documented
 public @interface ProductPathUnique {
 
+  //
   String message() default "{product.path.unique}";
 
   boolean optional() default true;

@@ -15,6 +15,7 @@ import javax.validation.Payload;
 @Documented
 public @interface UserEmailUnique {
 
+  //
   String message() default "{user.email.unique}";
 
   boolean optional() default true;
