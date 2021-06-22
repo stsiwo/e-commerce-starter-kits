@@ -25,6 +25,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
 import com.iwaodev.domain.user.UserActiveEnum;
+import com.iwaodev.domain.user.validator.PhoneValidation;
 import com.iwaodev.domain.user.validator.UserValidation;
 import com.iwaodev.infrastructure.model.listener.UserValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;

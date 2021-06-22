@@ -3,7 +3,7 @@ package com.iwaodev.domain.user.validator;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import com.iwaodev.infrastructure.model.User;
+import com.iwaodev.infrastructure.model.Address;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,16 +15,19 @@ import org.springframework.stereotype.Component;
  **/
 // if this is used by another package, don't forget to add 'public' otherwise, they cannot access.
 @Component
-public class UserValidationValidator implements ConstraintValidator<UserValidation, User> {
+public class AddressValidationValidator implements ConstraintValidator<AddressValidation, Address> {
 
-  private static final Logger logger = LoggerFactory.getLogger(UserValidationValidator.class);
+  private static final Logger logger = LoggerFactory.getLogger(AddressValidationValidator.class);
 
   @Override
-  public boolean isValid(User domain, ConstraintValidatorContext context) {
+  public boolean isValid(Address domain, ConstraintValidatorContext context) {
 
-    // address max 3
-    if (domain.getAddresses().size() > 3) {
-      //throw new DomainValidationException(String.format("user addresses must be less than or equal to 3."));
+    logger.info("start validating custom address ....");
+    logger.info("size of addresss: " + domain.getUser().getAddresses().size());
+
+    // addresss max 3
+    if (domain.getUser().getAddresses().size() > 3) {
+      //throw new DomainValidationException(String.format("address addresss must be less than or equal to 3."));
       context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate("{order.address.max3}")
             .addConstraintViolation();

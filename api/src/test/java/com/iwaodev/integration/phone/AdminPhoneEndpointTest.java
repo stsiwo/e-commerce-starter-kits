@@ -331,6 +331,30 @@ public class AdminPhoneEndpointTest {
   }
 
   @Test
+  @Sql(scripts = { "classpath:/integration/phone/shouldNotAdminCreateNewPhoneSinceExceedMax.sql" })
+  public void shouldNotAdminCreateNewPhoneSinceExceedMax(@Value("classpath:/integration/phone/shouldNotAdminCreateNewPhoneSinceExceedMax.json") Resource dummyFormJsonFile) throws Exception {
+
+    // dummy form json 
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString());
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+          .post(targetUrl)
+          .content(dummyFormJsonString)
+          .contentType(MediaType.APPLICATION_JSON)
+          .cookie(this.authCookie)
+          .accept(MediaType.APPLICATION_JSON)
+          )
+      .andDo(print())
+      .andExpect(status().isBadRequest());
+  }
+
+  @Test
   //@Sql(scripts = { "classpath:/integration/phone/shouldAdminCreateNewPhoneOfOtherUser.sql" })
   public void shouldNotAdminCreateNewPhoneOfOtherUserSinceNoTargetUser(@Value("classpath:/integration/phone/shouldNotAdminCreateNewPhoneOfOtherUserSinceNoTargetUser.json") Resource dummyFormJsonFile) throws Exception {
 

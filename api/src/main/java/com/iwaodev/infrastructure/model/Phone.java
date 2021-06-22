@@ -16,6 +16,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
 
+import com.iwaodev.domain.user.validator.PhoneValidation;
 import com.iwaodev.infrastructure.model.listener.PhoneValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
@@ -27,6 +28,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+@PhoneValidation()
 @Data
 @ToString
 @NoArgsConstructor

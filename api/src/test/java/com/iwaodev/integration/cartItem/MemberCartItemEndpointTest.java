@@ -278,6 +278,35 @@ public class MemberCartItemEndpointTest {
   // add test for error handling when add same variant
   
   @Test
+  @Sql(scripts = { "classpath:/integration/cartItem/shouldNotMemberUserAddProductInCartSinceExcceedMax5.sql" })
+  public void shouldNotMemberUserAddProductInCartSinceExcceedMax5() throws Exception {
+
+    // make sure product, variant, user id match with sql script
+
+    // arrange
+    String dummyVariantId = "7";
+    String dummyProductId = "39dbf162-92c5-4528-bbda-e498ac3aa802";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString());
+    JSONObject dummyFormJson = new JSONObject();
+    dummyFormJson.put("variantId", dummyVariantId);
+    dummyFormJson.put("userId", this.authInfo.getAuthUser().getUserId().toString());
+    dummyFormJson.put("quantity", 3);
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .post(targetUrl)
+        .content(dummyFormJson.toString())
+        .contentType(MediaType.APPLICATION_JSON)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isBadRequest());
+
+  }
+
+  @Test
   @Sql(scripts = { "classpath:/integration/cartItem/shouldMemberUserPutSingleProductInCart.sql" })
   public void shouldMemberUserPutSingleProductInCart() throws Exception {
 

@@ -17,6 +17,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
+import com.iwaodev.domain.cartItem.validator.CartItemValidation;
 import com.iwaodev.infrastructure.model.listener.CartItemValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
@@ -28,6 +29,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+@CartItemValidation()
 @Data
 @ToString
 @NoArgsConstructor

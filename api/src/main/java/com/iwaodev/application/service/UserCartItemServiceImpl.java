@@ -131,6 +131,11 @@ public class UserCartItemServiceImpl implements UserCartItemService {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "target cart item already exist.");
     }
 
+    // check exceed max 5
+    if (targetUserOption.get().getCartItems().size() == 5) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cart items reaches max size (5 items).");
+    }
+
     CartItem newCartItem = new CartItem();
     newCartItem.setUser(targetUserOption.get());
     newCartItem.setVariant(targetProductOption.get().findVariantById(criteria.getVariantId()));

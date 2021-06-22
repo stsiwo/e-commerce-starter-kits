@@ -346,6 +346,30 @@ public class AdminAddressEndpointTest {
   }
 
   @Test
+  @Sql(scripts = { "classpath:/integration/address/shouldNotAdminCreateNewAddressSinceExceedMax.sql" })
+  public void shouldNotAdminCreateNewAddressSinceExceedMax(@Value("classpath:/integration/address/shouldNotAdminCreateNewAddressSinceExceedMax.json") Resource dummyFormJsonFile) throws Exception {
+
+    // dummy form json 
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString());
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+          .post(targetUrl)
+          .content(dummyFormJsonString)
+          .contentType(MediaType.APPLICATION_JSON)
+          .cookie(this.authCookie)
+          .accept(MediaType.APPLICATION_JSON)
+          )
+      .andDo(print())
+      .andExpect(status().isBadRequest());
+  }
+
+  @Test
   //@Sql(scripts = { "classpath:/integration/address/shouldAdminCreateNewAddressOfOtherUser.sql" })
   public void shouldNotAdminCreateNewAddressOfOtherUserSinceNoTargetUser(@Value("classpath:/integration/address/shouldNotAdminCreateNewAddressOfOtherUserSinceNoTargetUser.json") Resource dummyFormJsonFile) throws Exception {
 

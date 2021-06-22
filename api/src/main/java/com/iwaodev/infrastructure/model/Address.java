@@ -17,6 +17,7 @@ import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.iwaodev.domain.user.validator.AddressValidation;
 import com.iwaodev.infrastructure.model.listener.AddressValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
@@ -28,6 +29,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+@AddressValidation()
 @Data
 @ToString
 @NoArgsConstructor
