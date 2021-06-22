@@ -41,3 +41,7 @@
 - email verification prompt if the user still temp
 
 - enable review only after the item is delivered. => create @Format isReadyReview to check the order events inlcude delivered.
+
+- disable cart icon (on header) when checkout page (don't need to cart drawer at this page)
+
+
