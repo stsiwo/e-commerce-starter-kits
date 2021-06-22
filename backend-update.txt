@@ -11,6 +11,8 @@ endpoint change:
       - (order) totalCost: prevent front-end from calculating (single source of truth)
       
       - (order) mainImagePath: from the first order detail's product main image (for order list page of member)
+      
+      - isReviewable: not working correctly. it's always returning true.
         
   - /products (GET) 
   
