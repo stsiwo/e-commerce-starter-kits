@@ -51,4 +51,6 @@
             
 - scroll top when page changes.
 
+- company info at footer
+
 
