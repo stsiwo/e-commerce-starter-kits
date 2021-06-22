@@ -12,12 +12,6 @@ endpoint change:
       
       - (order) mainImagePath: from the first order detail's product main image (for order list page of member)
         
-      - (product) discountEndDate if it is discount to display at front end.
-      
-      - (orderDetail) isReviewable: if the customer can review the product with the following conditions:
-          - the order events include 'DELIVERED'
-          - the product exists (orderDetail.product is not null)
-
   - /products (GET) 
   
     - isDiscount query does not work correctly. it return empty result even if some variants have discounts.
@@ -27,10 +21,9 @@ endpoint change:
   - performance:
   
     - identify N+1 sql using logging & monitor.
-    
-      - product GET endpoint has the problem
-      
-      - paymentFailedEventHandler has a long sql so it might be n+1.
+
+      - almost done, but when try to join fetch a deep nested entity such as order.orderDetail.product or variants
+        => this will complains about "MultipleBagsException".
     
   - security: 
   
@@ -38,8 +31,6 @@ endpoint change:
     
     - cross site request forgery enable. research on this subject since we use cookie (httpOnly&secure).
     
-    - disable cart icon (on header) when checkout page (don't need to cart drawer at this page)
-
   - refund/cancel/return integration with payment system.
     - make sure it works.
 
@@ -55,8 +46,6 @@ endpoint change:
   - email verification propt  if user still temp user.
   
   - file directory backup
-  
-  - phone & address max validation not working.
   
     
       
