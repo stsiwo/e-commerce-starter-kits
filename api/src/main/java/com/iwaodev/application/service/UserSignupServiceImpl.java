@@ -47,7 +47,6 @@ public class UserSignupServiceImpl implements UserSignupService {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "the given user already exists.");
     }
 
-
     // user does not exist, so create new one.
 
     // map request criteria to entity

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -13,6 +14,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+import com.iwaodev.infrastructure.model.listener.OrderAddressValidationListener;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -24,7 +26,7 @@ import lombok.ToString;
 
 @Data
 @ToString
-//@EntityListeners(OrderAddressValidationListener.class)
+@EntityListeners(OrderAddressValidationListener.class)
 @Entity(name = "orderAddresses")
 public class OrderAddress {
 

@@ -28,10 +28,11 @@ public class ProductImageValidationValidator implements ConstraintValidator<Prod
      **/
     if (domain.getProductImageName().contains("0")) {
       if (domain.getProductImagePath().isEmpty()) {
-        //throw new DomainValidationException(String.format("product primary image cannot be null."));
+        // throw new DomainValidationException(String.format("product primary image
+        // cannot be null."));
         context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate("{productImage.primary.notnull}")
-            .addConstraintViolation();
+        context.buildConstraintViolationWithTemplate("{productImage.primary.notnull}").addConstraintViolation();
+        return false;
       }
     }
     // if pass all of them,

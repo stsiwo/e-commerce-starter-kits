@@ -70,6 +70,7 @@ export declare type ProductVariantType = {
   variantHeight: number
   variantWidth: number
   variantLength: number
+  productId?: string
 }
 
 

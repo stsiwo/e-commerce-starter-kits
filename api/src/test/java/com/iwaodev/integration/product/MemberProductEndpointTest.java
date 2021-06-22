@@ -211,6 +211,7 @@ public class MemberProductEndpointTest {
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
 
+    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("files", "product-image-0.jpeg", "image/jpeg", "some jpg".getBytes());
     MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json", dummyFormJsonString.getBytes());
 
     // arrange
@@ -220,6 +221,7 @@ public class MemberProductEndpointTest {
     mvc.perform(
         MockMvcRequestBuilders
           .multipart(targetUrl) // create
+          .file(fileAtZeroIndex)
           .file(jsonFile)
           .contentType(MediaType.MULTIPART_FORM_DATA)
           .cookie(this.authCookie)

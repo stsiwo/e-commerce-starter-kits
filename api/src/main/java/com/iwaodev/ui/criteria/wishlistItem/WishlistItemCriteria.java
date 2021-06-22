@@ -5,7 +5,6 @@ import java.util.UUID;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
-import com.iwaodev.domain.wishlistItem.validator.UserAndVariantMustBeUnique;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
 
@@ -15,7 +14,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@UserAndVariantMustBeUnique()
 @ToString
 @Data
 @NoArgsConstructor

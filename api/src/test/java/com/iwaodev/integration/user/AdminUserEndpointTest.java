@@ -106,6 +106,7 @@ public class AdminUserEndpointTest {
   private Cookie authCookie;
 
   private AuthenticationInfo authInfo;
+
   /**
    * insert base test data into mysql database
    *
@@ -119,11 +120,7 @@ public class AdminUserEndpointTest {
     this.baseDatabaseSetup.setup(this.entityManager);
 
     // send authentication request before testing
-   this.authInfo = this.authenticateTestUser.setup(
-       this.entityManager, 
-       this.mvc, 
-       UserTypeEnum.ADMIN,
-       this.port);
+    this.authInfo = this.authenticateTestUser.setup(this.entityManager, this.mvc, UserTypeEnum.ADMIN, this.port);
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
   }
@@ -143,14 +140,31 @@ public class AdminUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath;
 
     // act & assert
-    mvc.perform(
-        MockMvcRequestBuilders
-          .get(targetUrl)
-          .cookie(this.authCookie)
-          .accept(MediaType.APPLICATION_JSON)
-          )
-      .andDo(print())
-      .andExpect(status().isOk());
+    mvc.perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldAdminGetAllUsers.sql" })
+  public void shouldAdminGetAllUsers() throws Exception {
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath;
+
+    // act & assert
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    UserDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), UserDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (UserDTO userDto : responseBody) {
+      assertThat(userDto.getUserId()).isNotNull();
+    }
   }
 
   /**
@@ -169,14 +183,9 @@ public class AdminUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + startDateQueryString;
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .get(targetUrl)
-        .cookie(this.authCookie)
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -201,20 +210,14 @@ public class AdminUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + endDateQueryString;
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .get(targetUrl)
-        .cookie(this.authCookie)
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     UserDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), UserDTO[].class);
-
 
     // assert
     assertThat(responseBody.length).isGreaterThan(0);
@@ -234,14 +237,9 @@ public class AdminUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQueryQueryString;
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .get(targetUrl)
-        .cookie(this.authCookie)
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -271,14 +269,9 @@ public class AdminUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .get(targetUrl)
-        .cookie(this.authCookie)
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -301,14 +294,9 @@ public class AdminUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .get(targetUrl)
-        .cookie(this.authCookie)
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isNotFound());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isNotFound());
 
     MvcResult result = resultActions.andReturn();
 
@@ -317,29 +305,33 @@ public class AdminUserEndpointTest {
   }
 
   @Test
-  public void shouldAdminUserUpdateItsOwnData(@Value("classpath:/integration/user/shouldAdminUserUpdateItsOwnData.json") Resource dummyFormJsonFile) throws Exception {
+  public void shouldAdminUserUpdateItsOwnData(/**
+                                               * @Value("classpath:/integration/user/shouldAdminUserUpdateItsOwnData.json")
+                                               * Resource dummyFormJsonFile
+                                               **/
+  ) throws Exception {
 
-    // dummy form json 
-    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
-
-    String dummyFormJsonString = dummyFormJson.toString();
+    // dummy form json
+    // JsonNode dummyFormJson =
+    // this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    // String dummyFormJsonString = dummyFormJson.toString();
 
     // arrange
     String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
 
+    JSONObject dummyUserSignupForm = new JSONObject();
+    dummyUserSignupForm.put("userId", dummyUserIdString);
+    dummyUserSignupForm.put("firstName", "updated first name");
+    dummyUserSignupForm.put("lastName", "updated last name");
+    dummyUserSignupForm.put("email", "update_email@test.com");
+    dummyUserSignupForm.put("password", "test_PASSWORD");
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .put(targetUrl)
-        .content(dummyFormJsonString)
-        .contentType(MediaType.APPLICATION_JSON)
-        .cookie(this.authCookie)
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyUserSignupForm.toString())
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -350,36 +342,38 @@ public class AdminUserEndpointTest {
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
 
     assertThat(responseBody.getUserId().toString()).isEqualTo(this.authInfo.getAuthUser().getUserId().toString());
-    assertThat(responseBody.getLastName()).isEqualTo(dummyFormJson.get("lastName").asText());
+    assertThat(responseBody.getLastName()).isEqualTo(dummyUserSignupForm.get("lastName"));
   }
 
   @Test
   @Sql(scripts = { "classpath:/integration/user/shouldAdminUserUpdateOtherOwnData.sql" })
-  public void shouldAdminUserUpdateOtherOwnData(@Value("classpath:/integration/user/shouldAdminUserUpdateOtherOwnData.json") Resource dummyFormJsonFile) throws Exception {
+  public void shouldAdminUserUpdateOtherOwnData(
+      /**@Value("classpath:/integration/user/shouldAdminUserUpdateOtherOwnData.json") Resource dummyFormJsonFile**/)
+      throws Exception {
 
     // make sure id path matches with sql !!!!
 
-    // dummy form json 
-    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    // dummy form json
+    //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
 
-    String dummyFormJsonString = dummyFormJson.toString();
+    //String dummyFormJsonString = dummyFormJson.toString();
 
     // arrange
     String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978";
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
 
+    JSONObject dummyUserSignupForm = new JSONObject();
+    dummyUserSignupForm.put("userId", dummyUserIdString);
+    dummyUserSignupForm.put("firstName", "updated first name");
+    dummyUserSignupForm.put("lastName", "updated last name");
+    dummyUserSignupForm.put("email", "update_email@test.com");
+    dummyUserSignupForm.put("password", "test_PASSWORD");
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .put(targetUrl)
-        .content(dummyFormJsonString)
-        .contentType(MediaType.APPLICATION_JSON)
-        .cookie(this.authCookie)
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyUserSignupForm.toString())
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -390,33 +384,35 @@ public class AdminUserEndpointTest {
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
 
     assertThat(responseBody.getUserId().toString()).isEqualTo("29c845ad-54b1-430a-8a71-5caba98d5978");
-    assertThat(responseBody.getLastName()).isEqualTo(dummyFormJson.get("lastName").asText());
+    assertThat(responseBody.getLastName()).isEqualTo(dummyUserSignupForm.get("lastName"));
 
   }
 
   @Test
-  public void shouldAdminUserUpdateSinceNoTargetUser(@Value("classpath:/integration/user/shouldAdminUserUpdateSinceNoTargetUser.json") Resource dummyFormJsonFile) throws Exception {
+  public void shouldAdminUserUpdateSinceNoTargetUser(
+      /**@Value("classpath:/integration/user/shouldAdminUserUpdateSinceNoTargetUser.json") Resource dummyFormJsonFile**/)
+      throws Exception {
 
-    // dummy form json 
-    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
-    String dummyFormJsonString = dummyFormJson.toString();
+    // dummy form json
+    //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    //String dummyFormJsonString = dummyFormJson.toString();
 
     // arrange
     String dummyUserIdString = "6be8c838-8bf7-40c9-bd2d-bd38f90a0c02"; // does not exist
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
 
+    JSONObject dummyUserSignupForm = new JSONObject();
+    dummyUserSignupForm.put("userId", dummyUserIdString);
+    dummyUserSignupForm.put("firstName", "updated first name");
+    dummyUserSignupForm.put("lastName", "updated last name");
+    dummyUserSignupForm.put("email", "update_email@test.com");
+    dummyUserSignupForm.put("password", "test_PASSWORD");
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .put(targetUrl)
-        .content(dummyFormJsonString)
-        .contentType(MediaType.APPLICATION_JSON)
-        .cookie(this.authCookie)
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isNotFound());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyUserSignupForm.toString())
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isNotFound());
 
     MvcResult result = resultActions.andReturn();
 
@@ -426,11 +422,13 @@ public class AdminUserEndpointTest {
 
   @Test
   @Sql(scripts = { "classpath:/integration/user/shouldNotAdminUserUpdateOtherOwnDataSinceEmailDuplcation.sql" })
-  public void shouldNotAdminUserUpdateOtherOwnDataSinceEmailDuplcation(@Value("classpath:/integration/user/shouldNotAdminUserUpdateOtherOwnDataSinceEmailDuplcation.json") Resource dummyFormJsonFile) throws Exception {
+  public void shouldNotAdminUserUpdateOtherOwnDataSinceEmailDuplcation(
+      @Value("classpath:/integration/user/shouldNotAdminUserUpdateOtherOwnDataSinceEmailDuplcation.json") Resource dummyFormJsonFile)
+      throws Exception {
 
     // make sure email is duplciated (the admin's email address) !!!!
 
-    // dummy form json 
+    // dummy form json
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
 
     String dummyFormJsonString = dummyFormJson.toString();
@@ -441,25 +439,21 @@ public class AdminUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .put(targetUrl)
-        .content(dummyFormJsonString)
-        .contentType(MediaType.APPLICATION_JSON)
-        .cookie(this.authCookie)
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isBadRequest());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyFormJsonString)
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
   }
 
   @Test
   @Sql(scripts = { "classpath:/integration/user/shouldAdminUserUpdateStatus.sql" })
-  public void shouldAdminUserUpdateStatus(@Value("classpath:/integration/user/shouldAdminUserUpdateStatus.json") Resource dummyFormJsonFile) throws Exception {
+  public void shouldAdminUserUpdateStatus(
+      @Value("classpath:/integration/user/shouldAdminUserUpdateStatus.json") Resource dummyFormJsonFile)
+      throws Exception {
 
     // make sure id path matches with sql !!!!
 
-    // dummy form json 
+    // dummy form json
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
 
     String dummyFormJsonString = dummyFormJson.toString();
@@ -470,16 +464,10 @@ public class AdminUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/status";
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .patch(targetUrl)
-        .content(dummyFormJsonString)
-        .contentType(MediaType.APPLICATION_JSON)
-        .cookie(this.authCookie)
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.patch(targetUrl).content(dummyFormJsonString)
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -494,28 +482,23 @@ public class AdminUserEndpointTest {
     assertThat(responseBody.getActiveNote()).isEqualTo(dummyFormJson.get("activeNote").asText());
 
   }
+
   @Test
   public void shouldAdminUserTempDeleteItsOwnAccount() throws Exception {
 
-    // dummy form json 
+    // dummy form json
     // arrange
-    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString(); 
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
     JSONObject dummyFormJson = new JSONObject();
     dummyFormJson.put("activeNote", "");
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .patch(targetUrl)
-        .content(dummyFormJson.toString())
-        .contentType(MediaType.APPLICATION_JSON)
-        .cookie(this.authCookie)
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.patch(targetUrl).content(dummyFormJson.toString())
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -527,25 +510,19 @@ public class AdminUserEndpointTest {
   @Sql(scripts = { "classpath:/integration/user/shouldAdminUserTempDeleteOtherUserAccount.sql" })
   public void shouldAdminUserTempDeleteOtherUserAccount() throws Exception {
 
-    // dummy form json 
+    // dummy form json
     // arrange
-    String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978"; 
+    String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978";
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
     JSONObject dummyFormJson = new JSONObject();
     dummyFormJson.put("activeNote", "");
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .patch(targetUrl)
-        .content(dummyFormJson.toString())
-        .contentType(MediaType.APPLICATION_JSON)
-        .cookie(this.authCookie)
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.patch(targetUrl).content(dummyFormJson.toString())
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -556,25 +533,19 @@ public class AdminUserEndpointTest {
   @Test
   public void shouldNotAdminUserTempDeleteSinceNoTargetUser() throws Exception {
 
-    // dummy form json 
+    // dummy form json
     // arrange
-    String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978"; 
+    String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978";
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
     JSONObject dummyFormJson = new JSONObject();
     dummyFormJson.put("activeNote", "");
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .patch(targetUrl)
-        .content(dummyFormJson.toString())
-        .contentType(MediaType.APPLICATION_JSON)
-        .cookie(this.authCookie)
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isNotFound());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.patch(targetUrl).content(dummyFormJson.toString())
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isNotFound());
 
     MvcResult result = resultActions.andReturn();
 
@@ -585,21 +556,16 @@ public class AdminUserEndpointTest {
   @Test
   public void shouldAdminUserDeleteItsOwnAccountCompletely() throws Exception {
 
-    // dummy form json 
+    // dummy form json
     // arrange
-    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString(); 
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .delete(targetUrl)
-        .cookie(this.authCookie)
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.delete(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -611,21 +577,16 @@ public class AdminUserEndpointTest {
   @Sql(scripts = { "classpath:/integration/user/shouldAdminUserDeleteOtheruserAccountCompletely.sql" })
   public void shouldAdminUserDeleteOtheruserAccountCompletely() throws Exception {
 
-    // dummy form json 
+    // dummy form json
     // arrange
-    String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978"; 
+    String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978";
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .delete(targetUrl)
-        .cookie(this.authCookie)
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.delete(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 

@@ -14,7 +14,7 @@
     <p>A new order was place by a customer. Please refer to the detail below:</p><br />
     
     <h5>Customer Information</h5>
-    <p>Name: <b th:text="${order.firstName + ' ' + order.lastName}"></b></p>
+    <p>Name: <b th:text="${order.orderFirstName + ' ' + order.orderLastName}"></b></p>
     <p>User Type: <b th:text="${order.isGuest} ? 'Guest' : 'Member'"></b></p> 
     <p>Email: <b th:text="${order.orderEmail}"></b></p>
     <p>Phone: <b th:text="${order.orderPhone}"></b></p>
@@ -53,7 +53,7 @@
 
     <h5>Management Console</h5>
 
-    <p>Please visit to <a th:href="@{link})}">your order managment page</a> to manage this order.</p>
+    <p>Please visit to <a th:href="@{{link} (link=${link})}">your order managment page</a> to manage this order.</p>
 
     <p>Thanks,</p>
   </body>

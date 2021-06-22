@@ -89,9 +89,7 @@ public class SendOrderSucceededEmailEventHandler {
 
     Map<String, Object> templateModel = new HashMap<String, Object>();
 
-    if (isGuest) {
-
-    } else {
+    if (!isGuest) {
       // member
       templateModel.put("link", this.clientSpaConfig.getUrl() + "/orders/" + order.getOrderId().toString());
     }

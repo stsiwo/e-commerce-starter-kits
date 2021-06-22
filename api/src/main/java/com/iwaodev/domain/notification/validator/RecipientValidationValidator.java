@@ -5,7 +5,6 @@ import javax.validation.ConstraintValidatorContext;
 
 import com.iwaodev.application.irepository.CartItemRepository;
 import com.iwaodev.application.irepository.CategoryRepository;
-import com.iwaodev.domain.category.validator.CategoryPathUnique;
 import com.iwaodev.domain.notification.NotificationTypeEnum;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.infrastructure.model.CartItem;

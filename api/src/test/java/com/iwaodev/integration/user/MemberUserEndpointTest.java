@@ -261,23 +261,29 @@ public class MemberUserEndpointTest {
 
   @Test
   //@Sql(scripts = { "classpath:/integration/user/shouldMemberUserUpdateItsOwnData.sql" })
-  public void shouldMemberUserUpdateItsOwnData(@Value("classpath:/integration/user/shouldMemberUserUpdateItsOwnData.json") Resource dummyFormJsonFile) throws Exception {
+  public void shouldMemberUserUpdateItsOwnData(/**@Value("classpath:/integration/user/shouldMemberUserUpdateItsOwnData.json") Resource dummyFormJsonFile**/) throws Exception {
 
     // dummy form json 
-    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
 
-    String dummyFormJsonString = dummyFormJson.toString();
+    //String dummyFormJsonString = dummyFormJson.toString();
 
     // arrange
     String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
 
+    JSONObject dummyUserSignupForm = new JSONObject();
+    dummyUserSignupForm.put("userId", dummyUserIdString);
+    dummyUserSignupForm.put("firstName", "updated first name");
+    dummyUserSignupForm.put("lastName", "updated last name");
+    dummyUserSignupForm.put("email", "update_email@test.com");
+    dummyUserSignupForm.put("password", "test_PASSWORD");
     // act
     ResultActions resultActions = mvc.perform(
         MockMvcRequestBuilders
         .put(targetUrl)
-        .content(dummyFormJsonString)
+        .content(dummyUserSignupForm.toString())
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
         .accept(MediaType.APPLICATION_JSON)
@@ -294,29 +300,36 @@ public class MemberUserEndpointTest {
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
 
     assertThat(responseBody.getUserId().toString()).isEqualTo(this.authInfo.getAuthUser().getUserId().toString());
-    assertThat(responseBody.getLastName()).isEqualTo(dummyFormJson.get("lastName").asText());
+    assertThat(responseBody.getLastName()).isEqualTo(dummyUserSignupForm.get("lastName"));
 
   }
 
   @Test
   //@Sql(scripts = { "classpath:/integration/user/shouldMemberUserUpdateOnlyNotNullProperty.sql" })
-  public void shouldMemberUserUpdateOnlyNotNullProperty(@Value("classpath:/integration/user/shouldMemberUserUpdateOnlyNotNullProperty.json") Resource dummyFormJsonFile) throws Exception {
+  public void shouldMemberUserUpdateOnlyNotNullProperty(/**@Value("classpath:/integration/user/shouldMemberUserUpdateOnlyNotNullProperty.json") Resource dummyFormJsonFile**/) throws Exception {
 
     // dummy form json 
-    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
 
-    String dummyFormJsonString = dummyFormJson.toString();
+    //String dummyFormJsonString = dummyFormJson.toString();
 
     // arrange
     String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
 
+    JSONObject dummyUserSignupForm = new JSONObject();
+    dummyUserSignupForm.put("userId", dummyUserIdString);
+    dummyUserSignupForm.put("firstName", "updated first name");
+    dummyUserSignupForm.put("lastName", "updated last name");
+    dummyUserSignupForm.put("email", "update_email@test.com");
+    dummyUserSignupForm.put("password", "test_PASSWORD");
     // act
     ResultActions resultActions = mvc.perform(
         MockMvcRequestBuilders
         .put(targetUrl)
-        .content(dummyFormJsonString)
+        .content(dummyUserSignupForm.toString())
+        .contentType(MediaType.APPLICATION_JSON)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
         .accept(MediaType.APPLICATION_JSON)
@@ -333,28 +346,36 @@ public class MemberUserEndpointTest {
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
 
     assertThat(responseBody.getUserId().toString()).isEqualTo(this.authInfo.getAuthUser().getUserId().toString());
-    assertThat(responseBody.getLastName()).isEqualTo(dummyFormJson.get("lastName").asText());
+    assertThat(responseBody.getLastName()).isEqualTo(dummyUserSignupForm.get("lastName"));
+
 
   }
   @Test
   @Sql(scripts = { "classpath:/integration/user/shouldNotMemberUserUpdateOtherOwnData.sql" })
-  public void shouldNotMemberUserUpdateOtherOwnData(@Value("classpath:/integration/user/shouldMemberUserUpdateItsOwnData.json") Resource dummyFormJsonFile) throws Exception {
+  public void shouldNotMemberUserUpdateOtherOwnData(/**@Value("classpath:/integration/user/shouldMemberUserUpdateItsOwnData.json") Resource dummyFormJsonFile**/) throws Exception {
 
     // dummy form json 
-    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
 
-    String dummyFormJsonString = dummyFormJson.toString();
+    //String dummyFormJsonString = dummyFormJson.toString();
 
     // arrange
     String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978";
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
 
+    JSONObject dummyUserSignupForm = new JSONObject();
+    dummyUserSignupForm.put("userId", dummyUserIdString);
+    dummyUserSignupForm.put("firstName", "updated first name");
+    dummyUserSignupForm.put("lastName", "updated last name");
+    dummyUserSignupForm.put("email", "update_email@test.com");
+    dummyUserSignupForm.put("password", "test_PASSWORD");
     // act
     ResultActions resultActions = mvc.perform(
         MockMvcRequestBuilders
         .put(targetUrl)
-        .content(dummyFormJsonString)
+        .content(dummyUserSignupForm.toString())
+        .contentType(MediaType.APPLICATION_JSON)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
         .accept(MediaType.APPLICATION_JSON)

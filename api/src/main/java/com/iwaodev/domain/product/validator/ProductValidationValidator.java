@@ -27,6 +27,8 @@ public class ProductValidationValidator implements ConstraintValidator<ProductVa
   @Override
   public boolean isValid(Product domain, ConstraintValidatorContext context) {
 
+    logger.info("start validating custom product logic...");
+
     /**
      * bug?
      *
@@ -39,7 +41,13 @@ public class ProductValidationValidator implements ConstraintValidator<ProductVa
      * but need to fix this otherwise, we cannot check the primary image size > 0.
      **/
 
+    logger.info("" + domain.getProductImages().size());
+
     // productImages: primary image cannot be null.
+    if (domain.getProductImages().size() == 0) {
+      context.disableDefaultConstraintViolation();
+      context.buildConstraintViolationWithTemplate("{product.productImages.primarynotnull}").addConstraintViolation();
+    }
     for (ProductImage productImage : domain.getProductImages()) {
       // this is primary image
       if (productImage.getProductImageName().contains("0")) {
@@ -49,7 +57,9 @@ public class ProductValidationValidator implements ConstraintValidator<ProductVa
           // chage default message to this message to set different message inside this
           // function.
           context.disableDefaultConstraintViolation();
-          context.buildConstraintViolationWithTemplate("{product.productImages.primarynotnull}").addConstraintViolation();
+          context.buildConstraintViolationWithTemplate("{product.productImages.primarynotnull}")
+              .addConstraintViolation();
+          return false;
         }
       }
     }
@@ -59,64 +69,83 @@ public class ProductValidationValidator implements ConstraintValidator<ProductVa
     // category
     if (domain.getIsPublic()) {
       if (domain.getVariants().size() == 0 && domain.getReleaseDate().isBefore(LocalDateTime.now())) {
-        //throw new DomainValidationException(String
-        //    .format("product need to have at least one variant and must be after the release date to be publish."));
-          // cannot be null."));
-          // chage default message to this message to set different message inside this
-          // function.
-          context.disableDefaultConstraintViolation();
-          context.buildConstraintViolationWithTemplate("{product.isPublic.onevariantandafterreleasedate}").addConstraintViolation();
+        // throw new DomainValidationException(String
+        // .format("product need to have at least one variant and must be after the
+        // release date to be publish."));
+        // cannot be null."));
+        // chage default message to this message to set different message inside this
+        // function.
+        context.disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate("{product.isPublic.onevariantandafterreleasedate}")
+            .addConstraintViolation();
+        return false;
       }
     }
+
+    logger.info("is discount: " + domain.getIsDiscount());
 
     // if isDiscount = true
     if (domain.getIsDiscount()) {
 
       // base discount price
       if (domain.getProductBaseDiscountPrice() == null) {
-        //throw new DomainValidationException(
-        //    String.format("base discount price can not be null if you are enable discount."));
-          // chage default message to this message to set different message inside this
-          // function.
-          context.disableDefaultConstraintViolation();
-          context.buildConstraintViolationWithTemplate("{product.baseDiscountPrice.notnull}").addConstraintViolation();
+        // throw new DomainValidationException(
+        // String.format("base discount price can not be null if you are enable
+        // discount."));
+        // chage default message to this message to set different message inside this
+        // function.
+        context.disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate("{product.baseDiscountPrice.notnull}").addConstraintViolation();
+        return false;
       }
 
       if (domain.getProductBaseDiscountPrice().compareTo(new BigDecimal("1")) < 0) {
-        //throw new DomainValidationException(
-            //String.format("base discount unit price must be greater than or equal 1. (the current discount price: %s)",
-                //domain.getProductBaseDiscountPrice()));
-          // chage default message to this message to set different message inside this
-          // function.
-          context.disableDefaultConstraintViolation();
-          context.buildConstraintViolationWithTemplate("{product.baseDiscountPrice.min1}").addConstraintViolation();
+        // throw new DomainValidationException(
+        // String.format("base discount unit price must be greater than or equal 1. (the
+        // current discount price: %s)",
+        // domain.getProductBaseDiscountPrice()));
+        // chage default message to this message to set different message inside this
+        // function.
+        context.disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate("{product.baseDiscountPrice.min1}").addConstraintViolation();
+        return false;
       }
 
       // base discount date
       if (domain.getProductBaseDiscountStartDate() == null) {
-        //throw new DomainValidationException(
-            //String.format("base discount start date can not be null if you are enable discount."));
-          // chage default message to this message to set different message inside this
-          // function.
-          context.disableDefaultConstraintViolation();
-          context.buildConstraintViolationWithTemplate("{product.baseDiscountStartDate.notnull}").addConstraintViolation();
+        // throw new DomainValidationException(
+        // String.format("base discount start date can not be null if you are enable
+        // discount."));
+        // chage default message to this message to set different message inside this
+        // function.
+        context.disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate("{product.baseDiscountStartDate.notnull}")
+            .addConstraintViolation();
+        return false;
       }
 
       // base discount date
       if (domain.getProductBaseDiscountEndDate() == null) {
-        //throw new DomainValidationException(
-          //  String.format("base discount end date can not be null if you are enable discount."));
-          // chage default message to this message to set different message inside this
-          // function.
-          context.disableDefaultConstraintViolation();
-          context.buildConstraintViolationWithTemplate("{product.baseDiscountEndDate.notnull}").addConstraintViolation();
+        // throw new DomainValidationException(
+        // String.format("base discount end date can not be null if you are enable
+        // discount."));
+        // chage default message to this message to set different message inside this
+        // function.
+        context.disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate("{product.baseDiscountEndDate.notnull}").addConstraintViolation();
+        return false;
       }
+
+      logger.info("start date and end date comparison: ");
+      logger.info("" + domain.getProductBaseDiscountEndDate().isBefore(domain.getProductBaseDiscountStartDate()));
 
       // base discount date: start < end
       if (domain.getProductBaseDiscountEndDate().isBefore(domain.getProductBaseDiscountStartDate())) {
-        //throw new DomainValidationException(String.format("base discount start date must be before the end date."));
-          context.disableDefaultConstraintViolation();
-          context.buildConstraintViolationWithTemplate("{product.discountDate.startbeforeend}").addConstraintViolation();
+        // throw new DomainValidationException(String.format("base discount start date
+        // must be before the end date."));
+        context.disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate("{product.discountDate.startbeforeend}").addConstraintViolation();
+        return false;
       }
     }
     // if pass all of them,

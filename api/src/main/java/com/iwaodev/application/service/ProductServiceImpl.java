@@ -71,12 +71,13 @@ public class ProductServiceImpl implements ProductService {
     // get result with repository
     // and map entity to dto with MapStruct
     return this.repository
-        .findAll(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
+        .findAllToAvoidNPlusOne(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
         .map(new Function<Product, ProductDTO>() {
 
           @Override
           public ProductDTO apply(Product product) {
-            return ProductMapper.INSTANCE.toProductDTO(product);
+            ProductDTO dto =  ProductMapper.INSTANCE.toProductDTO(product);
+            return dto;
           }
 
         });
@@ -93,13 +94,10 @@ public class ProductServiceImpl implements ProductService {
     Session session = this.entityManager.unwrap(Session.class);
     session.enableFilter("verifiedFilter").setParameter("isVerified", true);
 
-
-    logger.info("product exists (pagination)");
-
     // get result with repository
     // and map entity to dto with MapStruct
     return this.repository
-        .findAll(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
+        .findAllToAvoidNPlusOne(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
         .map(new Function<Product, ProductDTO>() {
 
           @Override
@@ -218,6 +216,11 @@ public class ProductServiceImpl implements ProductService {
     newEntity.setProductId(UUID.randomUUID());
 
     logger.info("new product id: " + newEntity.getProductId());
+
+    // duplication
+    if (this.repository.isOthersHavePath(newEntity.getProductId(), criteria.getProductPath())) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the product path already taken.");
+    }
 
     List<ProductImage> productImages = this.createImages(newEntity.getProductId(), files, criteria.getProductImages());
 
@@ -338,6 +341,11 @@ public class ProductServiceImpl implements ProductService {
 
     // create new one
     Product newEntity = ProductMapper.INSTANCE.toProductEntityFromProductCriteria(criteria);
+
+    // duplication
+    if (this.repository.isOthersHavePath(newEntity.getProductId(), criteria.getProductPath())) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the product path already taken.");
+    }
 
     // update product images
     this.updateImages(id, files, oldEntity.getProductImages(), newEntity.getProductImages());

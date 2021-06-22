@@ -137,6 +137,55 @@ public class AdminCategoryEndpointTest {
   }
 
   @Test
+  @Sql(scripts = { "classpath:/integration/category/shouldAdminGetAllCategories.sql" })
+  public void shouldAdminGetAllCategories() throws Exception {
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    CategoryDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), CategoryDTO[].class);
+
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (CategoryDTO categoryDto : responseBody) {
+      assertThat(categoryDto.getCategoryId()).isNotNull();
+    }
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/category/shouldAdminGetAllCategoriesWithSearchQueryFilter.sql" })
+  public void shouldAdminGetAllCategoriesWithSearchQueryFilter() throws Exception {
+
+    // arrange
+    String dummySearchQueryString = "game"; // make sure this match with sql
+    String searchQuery = "?searchQuery=" + dummySearchQueryString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQuery;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    CategoryDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), CategoryDTO[].class);
+
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (CategoryDTO categoryDto : responseBody) {
+      assertThat(
+      categoryDto.getCategoryName().contains(dummySearchQueryString) || categoryDto.getCategoryDescription().contains(dummySearchQueryString)
+      ).isTrue();
+      assertThat(categoryDto.getCategoryId()).isNotNull();
+    }
+  }
+
+  @Test
   public void shouldAdminCreateNewCategory(
       @Value("classpath:/integration/category/shouldAdminCreateNewCategory.json") Resource dummyFormJsonFile)
       throws Exception {
@@ -225,7 +274,20 @@ public class AdminCategoryEndpointTest {
     // act & assert
     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.put(targetUrl) // update/replace
         .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie)
-        .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
+        .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    CategoryDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, CategoryDTO.class);
+
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.getCategoryId().toString()).isEqualTo(dummyFormJson.get("categoryId").asText());
+    assertThat(responseBody.getCategoryName()).isEqualTo(dummyFormJson.get("categoryName").asText());
+    assertThat(responseBody.getCategoryDescription()).isEqualTo(dummyFormJson.get("categoryDescription").asText());
+    assertThat(responseBody.getCategoryPath()).isEqualTo(dummyFormJson.get("categoryPath").asText());
+
+
   }
 
   @Test

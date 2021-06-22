@@ -28,6 +28,7 @@ public class UserValidationValidator implements ConstraintValidator<UserValidati
       context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate("{order.address.max3}")
             .addConstraintViolation();
+      return false;
     }
 
     // phones max 3
@@ -36,6 +37,7 @@ public class UserValidationValidator implements ConstraintValidator<UserValidati
       context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate("{order.phone.max3}")
             .addConstraintViolation();
+      return false;
     }
 
     // if pass all of them,

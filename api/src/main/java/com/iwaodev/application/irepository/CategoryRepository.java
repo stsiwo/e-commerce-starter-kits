@@ -9,20 +9,18 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+/**
+ * - nativeQuery: use row SQL statement. (not JPQL)
+ *
+ * - don't return different entity rather than the main entity (e.g., Category)
+ **/
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, Long>, JpaSpecificationExecutor<Category> {
+public interface CategoryRepository
+    extends JpaRepository<Category, Long>, JpaSpecificationExecutor<Category>, AdvanceCategoryRepository {
 
-  /**
-   * - nativeQuery: use row SQL statement. (not JPQL)
-   *
-   * - don't return different entity rather than the main entity (e.g., Category)
-   **/
   @Query(value = "SELECT c FROM categories c WHERE c.categoryName = ?1")
   Optional<Category> findByCategoryName(String categoryName);
 
   @Query(value = "SELECT c FROM categories c WHERE c.categoryPath = ?1")
   Optional<Category> findByCategoryPath(String categoryPath);
 }
-
-
-

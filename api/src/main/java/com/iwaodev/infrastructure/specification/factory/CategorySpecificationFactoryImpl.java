@@ -22,7 +22,7 @@ public class CategorySpecificationFactoryImpl implements CategorySpecificationFa
 	@Override
 	public Specification<Category> build(CategoryQueryStringCriteria criteria) {
     return this.specifications.searchQueryByCategoryName(criteria.getSearchQuery())
-      .or(this.specifications.searchQueryByCategoryName(criteria.getSearchQuery()));
+      .or(this.specifications.searchQueryByCategoryDescription(criteria.getSearchQuery()));
 	}
 }
 

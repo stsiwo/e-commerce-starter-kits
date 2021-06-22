@@ -10,8 +10,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 
-import com.iwaodev.domain.product.validator.ProductPathUnique;
+import com.iwaodev.infrastructure.model.validator.OnCreate;
+import com.iwaodev.infrastructure.model.validator.OnUpdate;
 import com.iwaodev.ui.criteria.category.CategoryCriteria;
 import com.iwaodev.ui.validator.optional.digit.OptionalDigit;
 
@@ -28,7 +30,8 @@ import lombok.ToString;
 @Validated
 public class ProductCriteria {
 
-  @NotNull(message = "{product.id.notnull}")
+  @Null(message = "{product.id.null}", groups = OnCreate.class)
+  @NotNull(message = "{product.id.notnull}", groups = OnUpdate.class)
   private UUID productId;
   
   @NotEmpty(message = "{product.productName.notempty}")
@@ -37,7 +40,6 @@ public class ProductCriteria {
   @NotEmpty(message = "{product.productDescription.notempty}")
   private String productDescription;
 
-  @ProductPathUnique()
   @NotEmpty(message = "{product.productPath.notempty}")
   private String productPath;
 
@@ -61,10 +63,12 @@ public class ProductCriteria {
   private Boolean isPublic;
 
   @Valid 
-  @NotNull(message = "{product.category.notnull}")
+  // this does not work. even if this is not null, it will complain about it is null.
+  //@NotNull(message = "{product.productImages.notnull}")
   private List<ProductImageCriteria> productImages;
 
   @Valid 
+  @NotNull(message = "{product.category.notnull}")
   private CategoryCriteria category;
 
   @NotNull(message = "{product.releaseDate.notnull}")

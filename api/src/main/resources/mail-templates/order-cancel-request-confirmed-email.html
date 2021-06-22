@@ -4,12 +4,12 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   </head>
   <body>
-    <p th:text="${'Hi ' + order.firstName + ' ' + order.lastName}"></p><br />
+    <p th:text="${'Hi ' + order.orderFirstName + ' ' + order.orderLastName}"></p><br />
 
     <p>Your cancel request was confirmed. Please be patient until we process the cacellation for following order:</p><br />
     
     <h5>Customer Information</h5>
-    <p>Name: <b th:text="${order.firstName + ' ' + order.lastName}"></b></p>
+    <p>Name: <b th:text="${order.orderFirstName + ' ' + order.orderLastName}"></b></p>
     <p>User Type: <b th:text="${order.isGuest} ? 'Guest' : 'Member'"></b></p> 
     <p>Email: <b th:text="${order.orderEmail}"></b></p>
     <p>Phone: <b th:text="${order.orderPhone}"></b></p>
@@ -19,7 +19,7 @@
 
     <h5>Items Information</h5>
     <p>Order #: <b th:text="${order.orderNumber}"></b></p>
-    <p>Estimated Delivery Date: <b th:text="${order.estimatedDeliveryDate?}">N/A</b></p>
+    <p th:if="${order.estimatedDeliveryDate != null}">Estimated Delivery Date: <b th:text="${order.estimatedDeliveryDate}">N/A</b></p>
     <table>
      <thead>
          <tr>
@@ -46,7 +46,7 @@
        <p>Shipping Cost: $<b th:text="${order.shippingCost}"></b></p>
        <h6>Total Cost: $<b th:text="${order.getTotalCost()}"></b></p>
     </div>
-    <p th:if="${order.isGuest}">Please visit <a th:href="@{link})}">your order managment page</a> for more details.</p>
+    <p th:if="${order.isGuest}">Please visit <a th:href="@{{link} (link=${link})}">your order managment page</a> for more details.</p>
 
     <h5>Note</h5>
     <p>We will notify you when we process the cancellation.</b>.</p>

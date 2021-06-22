@@ -1,10 +1,12 @@
 package com.iwaodev.infrastructure.model.listener;
 
+import java.util.Set;
+
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 
-import com.iwaodev.domain.validator.ValidatorBag;
-import com.iwaodev.exception.DomainValidationException;
 import com.iwaodev.infrastructure.model.CartItem;
 
 import org.slf4j.Logger;
@@ -26,52 +28,49 @@ import org.springframework.web.server.ResponseStatusException;
  * listener. so stop using this.
  * 
  **/
-//@Component
-//public class CartItemValidationListener {
-//
-//  private static final Logger logger = LoggerFactory.getLogger(CartItemValidationListener.class);
-//
-//  /**
-//   * injecting spring managed bean into JPA issue. see:
-//   * https://stackoverflow.com/questions/12155632/injecting-a-spring-dependency-into-a-jpa-entitylistener
-//   *
-//   * - this works but using repository causes stackoverflow error inside this
-//   * listener. so stop using this.
-//   **/
-//  // private static ValidatorBag<CartItem> validatorBag;
-//
-//  // @Autowired
-//  // public void init(ValidatorBag<CartItem> validatorBag) {
-//  // CartItemValidationListener.validatorBag = validatorBag;
-//  // logger.info("Initializing with dependency [" + validatorBag + "]");
-//  // }
-//
-//  @PrePersist
-//  private void beforeCreate(CartItem cartitem) {
-//    logger.info("start validating cartitem domain for create...");
-//    try {
-//      logger.info("" + this.validatorBag);
-//      logger.info("validatorBag is not null");
-//      this.validatorBag.validateAll(cartitem, "create");
-//    } catch (DomainValidationException e) {
-//      logger.info(e.getMessage());
-//      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-//    }
-//    logger.info("the cartitem domain passed all validation:)");
-//  }
-//
-//  @PreUpdate
-//  private void beforeUpdate(CartItem cartitem) {
-//    logger.info("start validating cartitem domain for update...");
-//    try {
-//      logger.info("" + this.validatorBag);
-//      logger.info("validatorBag is not null");
-//      this.validatorBag.validateAll(cartitem, "update");
-//    } catch (DomainValidationException e) {
-//      logger.info(e.getMessage());
-//      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-//    }
-//    logger.info("the cartitem domain passed all validation:)");
-//  }
-//
-//}
+@Component
+public class CartItemValidationListener {
+
+  private static final Logger logger = LoggerFactory.getLogger(CartItemValidationListener.class);
+
+  /**
+   * injecting spring managed bean into JPA issue. see:
+   * https://stackoverflow.com/questions/12155632/injecting-a-spring-dependency-into-a-jpa-entitylistener
+   *
+   * - this works but using repository causes stackoverflow error inside this
+   * listener. so stop using this.
+   **/
+  // private static ValidatorBag<CartItem> validatorBag;
+
+  // @Autowired
+  // public void init(ValidatorBag<CartItem> validatorBag) {
+  // CartItemValidationListener.validatorBag = validatorBag;
+  // logger.info("Initializing with dependency [" + validatorBag + "]");
+  // }
+
+  @Autowired
+  private Validator validator;
+
+  @PrePersist
+  private void beforeCreate(CartItem domain) {
+    logger.info("start validating domain for create...");
+    Set<ConstraintViolation<CartItem>> constraintViolations = this.validator.validate(domain);
+
+    if (constraintViolations.size() > 0) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
+    }
+  }
+
+  @PreUpdate
+  private void beforeUpdate(CartItem domain) {
+    logger.info("start validating domain for update...");
+    Set<ConstraintViolation<CartItem>> constraintViolations = this.validator.validate(domain);
+
+    if (constraintViolations.size() > 0) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
+    }
+    logger.info("the domain passed all validation:)");
+  }
+
+}
+

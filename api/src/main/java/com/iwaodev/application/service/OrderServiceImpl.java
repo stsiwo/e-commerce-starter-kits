@@ -96,7 +96,7 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public Page<OrderDTO> getAll(OrderQueryStringCriteria criteria, Integer page, Integer limit, OrderSortEnum sort) {
     return this.orderRepository
-        .findAll(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
+        .findAllToAvoidNPlusOne(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
         .map(new Function<Order, OrderDTO>() {
 
           @Override
@@ -294,6 +294,9 @@ public class OrderServiceImpl implements OrderService {
     // create order details from orderDetailCriteria (mapping is not supported)
     this.assignOrderDetails(criteria, order);
 
+    logger.info("size of order details");
+    logger.info("" + order.getOrderDetails().size());
+
     // create order events
     try {
       this.orderEventService.add(order, OrderStatusEnum.DRAFT, "", (User)null);
@@ -313,7 +316,7 @@ public class OrderServiceImpl implements OrderService {
     logger.info("" + order.getTotalCost().toString());
 
     logger.info("debug create params for stripe: ");
-    // logger.info("" + createParams.toString());
+    logger.info("" + createParams.getAmount());
     PaymentIntent intent;
 
     try {

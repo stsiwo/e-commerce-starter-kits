@@ -727,15 +727,35 @@
 
     - FETCHING STRATEGIES:
 
+      - I created query to avoid N+1 problem based on this ref.
+      - ref: https://thorben-janssen.com/fix-multiplebagfetchexception-hibernate/
+    
       - don't use 'eager loading'.
 
         - easier to cause Cartesian Product issue. also, hibernate prohibits you from more than 1 eager loading of child entity on a single parent entity.
+
+          -> Cartisian Product issue:  (every time you use 'join fetch' this include duplicate if the association has multiple.)
+
+            - if you use 'join fetch', the result included the duplicated records e.g,.:
+
+                - product (parent) and reviews (children)
+
+                result)
+                  1, product A, review 1
+                  2, product A, review 2
+                  3, product A, review 3
+                  4, product B, review 12,
+                  ....
+
+                  - this ends up a lot of redundancy and negative influence on performance. 
+
+                  - also, Hibernate & Spring? does not allow to do if you try to do a lot of 'join fetch' (e.g., MultipleBagsException)
 
         - fetch children entities manually. BUT you should be careful about N+1 problem. (e.g., foreach each child entity)
 
           - in order to avoid N+1 problem, you need to fetch all of children entities simultaneously:
 
-            - 1. use trick like 'parent.getChildren().size()', or
+            - 1. use trick like 'parent.getChildren().size()' (this only apply when you want to fetch a single entity. if you try to do this like 'findAll', this is also repeated N times), or 
 
               - ref: https://stackoverflow.com/questions/2192242/what-is-lazy-loading-in-hibernate
 
@@ -754,6 +774,23 @@
                   - you need to override Repository interface to accept EntityGraph & Specification, (difficult to implement but flexible) or
 
                   - you can use EntityGraph & specification (without @query) to achieve eager loading with specifciation. (easy but im not sure it works.)
+
+                    -> this will complains about "MultipleBagsException"
+
+                - final solution: 
+
+                  - to use custom query with your advanceRepository.
+
+                  - process is a littgle bit completed but works fine.
+
+                      - don't use built-in specificaiton function (e.g., findAll(Specification<T> spec, pageable))
+                      - separate query to avoid "multipleBagsException" if you have a multiple associations.
+                      - use TypedQuery and CriteriaQuery
+                        1. use CriteriaQuery fisrt. this is to assign JPA specification expliclty and sort.
+                        2. use TypedQuery (you need to convert CriteriaQuery to TypedQuery). this is to assign pageable.
+                      - use 'query.setHint(QueryHints.PASS_DISTINCT_THROUGH, false);' if you use TypedQuery for this.
+
+                      => check one of the implementation (e.g., 'findAllToAvoidNPlusOne' at AdvanceRepository)
 
   ## Injecting Spring Managed Bean (e.g., @Service, @Repository...) into JPA
 

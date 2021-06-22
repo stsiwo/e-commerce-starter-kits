@@ -5,9 +5,7 @@ import java.util.UUID;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
-import com.iwaodev.domain.user.validator.UserEmailUnique;
 import com.iwaodev.ui.validator.password.Password;
 
 import org.springframework.validation.annotation.Validated;
@@ -31,7 +29,6 @@ public class UserCriteria {
   @NotEmpty(message = "{user.lastName.notempty}")
   private String lastName;
 
-  @UserEmailUnique()
   @NotEmpty(message = "{user.email.notempty}")
   @Email(message = "{user.email.invalidformat}")
   private String email;

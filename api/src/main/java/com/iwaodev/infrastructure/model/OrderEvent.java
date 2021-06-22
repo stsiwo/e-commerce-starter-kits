@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
@@ -17,6 +18,7 @@ import javax.validation.constraints.Null;
 
 import com.iwaodev.domain.order.OrderStatusEnum;
 import com.iwaodev.domain.order.validator.OrderEventValidation;
+import com.iwaodev.infrastructure.model.listener.OrderEventValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
 
@@ -30,7 +32,7 @@ import lombok.ToString;
 @Data
 @ToString
 @NoArgsConstructor
-//@EntityListeners(OrderEventValidationListener.class)
+@EntityListeners(OrderEventValidationListener.class)
 @Entity(name = "orderEvents")
 public class OrderEvent {
 

@@ -154,7 +154,7 @@ public class GuestUserAuthenticationEndpointTest {
 
     // arrange
     String dummyEmail = "test_member@test.com"; // must match test user 
-    String dummyPassword = "test_password"; // must match test user 
+    String dummyPassword = "test_PASSWORD"; // must match test user 
     JSONObject dummyUserSignupForm = new JSONObject();
     dummyUserSignupForm.put("email", dummyEmail);
     dummyUserSignupForm.put("password", dummyPassword);

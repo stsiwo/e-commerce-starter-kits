@@ -86,6 +86,9 @@ public class SendReviewWasUpdatedEmailEventHandler {
 
     Map<String, Object> templateModel = new HashMap<String, Object>();
 
+    logger.info("review user");
+    logger.info(review.getUser().getFirstName());
+
     // set model variables
     templateModel.put("review", review);
     templateModel.put("admin", admin);

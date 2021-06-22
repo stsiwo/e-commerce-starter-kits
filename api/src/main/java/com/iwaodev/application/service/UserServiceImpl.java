@@ -72,18 +72,11 @@ public class UserServiceImpl implements UserService {
     // get result with repository
     // and map entity to dto with MapStruct
     return this.repository
-        .findAll(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
+        .findAllToAvoidNPlusOne(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
         .map(new Function<User, UserDTO>() {
 
           @Override
           public UserDTO apply(User user) {
-
-            // lazy loading.. this cause n+1 problem.
-            // TODO: fix this.
-            user.getAddresses();
-            user.getPhones();
-            user.getOrders();
-            user.getReviews();
 
             return UserMapper.INSTANCE.toUserDTO(user);
           }
@@ -129,6 +122,14 @@ public class UserServiceImpl implements UserService {
 
     targetEntity.setFirstName(criteria.getFirstName());
     targetEntity.setLastName(criteria.getLastName());
+
+    /**
+     * email duplication
+     **/
+    if (this.repository.isOthersHaveEmail(criteria.getUserId(), criteria.getEmail())) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "this email already taken.");
+    }
+
     targetEntity.setEmail(criteria.getEmail());
 
     /**

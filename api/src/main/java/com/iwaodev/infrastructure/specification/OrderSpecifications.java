@@ -64,6 +64,19 @@ public class OrderSpecifications {
     };
   }
 
+  public static Specification<Order> searchQueryByOrderId(String searchQuery) {
+    return (root, query, builder) -> {
+      if (searchQuery == null) {
+        /**
+         * if paramter is null, we still want to chain specificiation so use
+         * 'conjunction()'
+         **/
+        return builder.conjunction();
+      }
+      return builder.equal(root.get(Order_.orderId), UUID.fromString(searchQuery));
+    };
+  }
+
   public static Specification<Order> searchQueryByOrderFirstName(String searchQuery) {
     return (root, query, builder) -> {
       if (searchQuery == null) {

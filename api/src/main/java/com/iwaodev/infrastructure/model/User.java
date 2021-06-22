@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.ForeignKey;
@@ -21,9 +22,13 @@ import javax.persistence.OneToMany;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 
 import com.iwaodev.domain.user.UserActiveEnum;
 import com.iwaodev.domain.user.validator.UserValidation;
+import com.iwaodev.infrastructure.model.listener.UserValidationListener;
+import com.iwaodev.infrastructure.model.validator.OnCreate;
+import com.iwaodev.infrastructure.model.validator.OnUpdate;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -41,13 +46,14 @@ import lombok.ToString;
 @Data
 @ToString
 @NoArgsConstructor
-//@EntityListeners(UserValidationListener.class)
+@EntityListeners(UserValidationListener.class)
 @Entity(name = "users")
 public class User {
 
   private static final Logger logger = LoggerFactory.getLogger(User.class);
 
-  @NotNull(message = "{user.id.notnull}")
+  @Null(message = "{user.id.null}", groups = OnCreate.class)
+  @NotNull(message = "{user.id.notnull}", groups = OnUpdate.class)
   @Id
   @Column(name = "user_id")
   @GeneratedValue

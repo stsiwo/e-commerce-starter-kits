@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,6 +17,7 @@ import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.iwaodev.infrastructure.model.listener.AddressValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
 
@@ -29,7 +31,7 @@ import lombok.ToString;
 @Data
 @ToString
 @NoArgsConstructor
-//@EntityListeners(UserAddressValidationListener.class)
+@EntityListeners(AddressValidationListener.class)
 @Entity(name="addresses")
 public class Address {
 
@@ -65,11 +67,11 @@ public class Address {
   @Column(name="postal_code")
   private String postalCode;
 
-  @NotEmpty(message = "{address.isBillingAddress.notempty}")
+  @NotNull(message = "{address.isBillingAddress.notnull}")
   @Column(name="is_billing_address")
   private Boolean isBillingAddress;
 
-  @NotEmpty(message = "{address.isShippingAddress.notempty}")
+  @NotNull(message = "{address.isShippingAddress.notnull}")
   @Column(name="is_shipping_address")
   private Boolean isShippingAddress;
 

@@ -4,11 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 
 import com.iwaodev.application.irepository.NotificationRepository;
 import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.domain.notification.NotificationTypeEnum;
+import com.iwaodev.domain.notification.validator.IssuerValidationValidator;
+import com.iwaodev.domain.notification.validator.RecipientValidationValidator;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.exception.DomainException;
 import com.iwaodev.exception.NotFoundException;
@@ -19,7 +25,9 @@ import com.iwaodev.infrastructure.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class CreateNotificationServiceImpl implements CreateNotificationService {
@@ -31,6 +39,9 @@ public class CreateNotificationServiceImpl implements CreateNotificationService 
 
   @Autowired
   private UserRepository userRepository;
+
+  @Autowired
+  private Validator validator ;
 
   @Override
   public Notification create(NotificationTypeEnum notificationType, String description, UUID issuerId, UUID recipientId,
@@ -70,6 +81,12 @@ public class CreateNotificationServiceImpl implements CreateNotificationService 
     notification.setIsRead(false);
     notification.setLink(link);
     notification.setNote(note);
+
+    //Set<ConstraintViolation<Notification>> constraintViolations = this.validator.validate(notification);
+
+    //if (constraintViolations.size() > 0) {
+    //  throw new ResponseStatusException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
+    //}
 
     return notification;
   }

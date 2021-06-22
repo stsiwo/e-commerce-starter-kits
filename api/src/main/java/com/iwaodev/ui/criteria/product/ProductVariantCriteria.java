@@ -2,6 +2,7 @@ package com.iwaodev.ui.criteria.product;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Digits;
@@ -10,7 +11,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
-import com.iwaodev.domain.product.validator.VariantColorAndSizeUnique;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
 import com.iwaodev.ui.validator.optional.digit.OptionalDigit;
@@ -22,7 +22,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@VariantColorAndSizeUnique()
 @ToString
 @Data
 @NoArgsConstructor
@@ -76,6 +75,9 @@ public class ProductVariantCriteria {
   @NotNull(message = "{productVariant.variantWidth.notnull}")
   @Digits(integer = 6, fraction = 3, message = "{productVariant.variantWidth.notnull}")
   private Double variantLength;
+
+  @NotNull(message = "{productVariant.productId.notnull}")
+  private UUID productId;
 }
 
 

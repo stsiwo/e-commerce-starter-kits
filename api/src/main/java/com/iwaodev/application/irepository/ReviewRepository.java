@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<Review, Long>, JpaSpecificationExecutor<Review> {
+public interface ReviewRepository extends JpaRepository<Review, Long>, JpaSpecificationExecutor<Review>, AdvanceReviewRepository {
 
   /**
    * - nativeQuery: use row SQL statement. (not JPQL)

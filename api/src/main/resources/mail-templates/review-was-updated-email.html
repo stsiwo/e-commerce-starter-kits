@@ -26,9 +26,9 @@
 
     <h6>Customer</h6>
     <p>Customer #: <b th:text="${review.user.userId}"></b></p>
-    <p>Name: <b th:text="${review.user.fistName + " " + review.user.lastName}"></b></p>
+    <p>Name: <b th:text="${review.user.firstName + ' ' + review.user.lastName}"></b></p>
 
-    <p th:if="${order.isGuest}">Please visit <a th:href="@{link})}">the review managment page</a> to verify your review.</p>
+    <p>Please visit <a th:href="@{{link} (link=${link})}">the review managment page</a> to verify your review.</p>
 
     <p>Thanks,</p>
   </body>

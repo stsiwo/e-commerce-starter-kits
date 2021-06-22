@@ -84,6 +84,7 @@ export function* putProductVariantWorker(action: PayloadAction<PutProductVariant
         variantWidth: action.payload.variantWidth,
         note: action.payload.note,
         variantStock: action.payload.variantStock,
+        productId: action.payload.productId,
       } as ProductVariantCriteria,
     })
       .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))

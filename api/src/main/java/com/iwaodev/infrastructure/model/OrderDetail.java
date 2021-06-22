@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,10 +17,12 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
+import com.iwaodev.infrastructure.model.listener.OrderDetailValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Formula;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,7 +31,7 @@ import lombok.ToString;
 @Entity(name = "orderDetails")
 @Data
 @NoArgsConstructor
-//@EntityListeners(OrderDetailValidationListener.class)
+@EntityListeners(OrderDetailValidationListener.class)
 @ToString
 public class OrderDetail {
 
@@ -85,6 +88,11 @@ public class OrderDetail {
   @CreationTimestamp
   @Column(name = "created_at")
   private LocalDateTime createdAt;
+
+  // use SQL (not HQL/JPQL) everything is sql even if ref id
+  @Formula("(select case when (count(*) > 0) then true else false end from orders o inner join order_details od inner join order_events oe where oe.order_status = 'DELIVERED' and od.product_id is not null and od.order_detail_id = order_detail_id)")
+  private Boolean isReviewable;
+
 
   public OrderDetail(Integer productQuantity, BigDecimal productUnitPrice, String productColor, String productSize, String productName, ProductVariant productVariant, Product product, Order order) {
     this.productQuantity = productQuantity;

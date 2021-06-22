@@ -3,7 +3,7 @@ package com.iwaodev.ui.validator.optional.doubletype;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-class OptionalDoubleTypeValidator implements ConstraintValidator<OptionalDoubleType, Double> {
+public class OptionalDoubleTypeValidator implements ConstraintValidator<OptionalDoubleType, Double> {
 
   @Override
   public boolean isValid(Double value, ConstraintValidatorContext context) {

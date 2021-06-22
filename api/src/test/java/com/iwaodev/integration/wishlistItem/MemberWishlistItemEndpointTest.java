@@ -208,6 +208,7 @@ public class MemberWishlistItemEndpointTest {
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString());
     JSONObject dummyFormJson = new JSONObject();
     dummyFormJson.put("variantId", dummyVariantId);
+    dummyFormJson.put("userId", this.authInfo.getAuthUser().getUserId().toString());
 
     // act
     ResultActions resultActions = mvc.perform(
@@ -244,6 +245,8 @@ public class MemberWishlistItemEndpointTest {
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString());
     JSONObject dummyFormJson = new JSONObject();
     dummyFormJson.put("variantId", dummyVariantId);
+    dummyFormJson.put("userId", this.authInfo.getAuthUser().getUserId().toString());
+
 
     // act
     ResultActions resultActions = mvc.perform(

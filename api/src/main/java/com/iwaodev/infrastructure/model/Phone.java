@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,6 +16,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
 
+import com.iwaodev.infrastructure.model.listener.PhoneValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
 
@@ -28,7 +30,7 @@ import lombok.ToString;
 @Data
 @ToString
 @NoArgsConstructor
-//@EntityListeners(UserPhoneValidationListener.class)
+@EntityListeners(PhoneValidationListener.class)
 @Entity(name = "phones")
 public class Phone {
 

@@ -67,7 +67,7 @@ public class ReviewServiceImpl implements ReviewService {
     // get result with repository
     // and map entity to dto with MapStruct
     return this.repository
-        .findAll(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
+        .findAllToAvoidNPlusOne(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
         .map(new Function<Review, ReviewDTO>() {
 
           @Override

@@ -37,7 +37,7 @@ public class UserDTO {
 
   private List<AddressDTO> addresses;
 
-  private List<ReviewDTO> reviews;
+  //private List<ReviewDTO> reviews;
 
   /**
    * should I include this orderdto also??

@@ -11,6 +11,7 @@ import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
@@ -32,6 +33,7 @@ import javax.validation.constraints.Pattern;
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.iwaodev.domain.order.OrderStatusEnum;
 import com.iwaodev.domain.order.validator.OrderValidation;
+import com.iwaodev.infrastructure.model.listener.OrderValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
 import com.iwaodev.ui.criteria.order.OrderEventCriteria;
@@ -52,7 +54,7 @@ import lombok.ToString;
 @OrderValidation()
 @ToString
 @Data
-//@EntityListeners(OrderValidationListener.class)
+@EntityListeners(OrderValidationListener.class)
 @Entity(name = "orders")
 public class Order {
 
@@ -111,7 +113,7 @@ public class Order {
   private String orderEmail;
 
   @NotEmpty(message = "{order.orderPhone.notempty}")
-  @Pattern( regexp = "^\\+(?:[0-9] ?){6,14}[0-9]$", message = "{order.orderPhone.invalidformat}")
+  @Pattern(regexp = "^\\+(?:[0-9] ?){6,14}[0-9]$", message = "{order.orderPhone.invalidformat}")
   @Column(name = "order_phone")
   private String orderPhone;
 
@@ -213,9 +215,12 @@ public class Order {
   /**
    * TODO: ?? bug??
    *
-   * when include CascadeType.MERGE and try to save a new child, it causes 'object references an unsaved transient instance - save the transient instance before flushing'.
+   * when include CascadeType.MERGE and try to save a new child, it causes 'object
+   * references an unsaved transient instance - save the transient instance before
+   * flushing'.
    *
-   * - should work according to this: https://stackoverflow.com/questions/2302802/how-to-fix-the-hibernate-object-references-an-unsaved-transient-instance-save/2302814#2302814
+   * - should work according to this:
+   * https://stackoverflow.com/questions/2302802/how-to-fix-the-hibernate-object-references-an-unsaved-transient-instance-save/2302814#2302814
    *
    **/
   @Valid
@@ -250,7 +255,8 @@ public class Order {
   private OrderEvent latestOrderEvent;
 
   public Order() {
-    this.orderNumber = "order_" + NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 11);
+    this.orderNumber = "order_"
+        + NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 11);
   }
 
   public String getFullName() {
@@ -305,27 +311,23 @@ public class Order {
 
   // business behaviors
   public void calculateProductCost() {
-
+    BigDecimal tempTotalCost = new BigDecimal("0");
     for (OrderDetail orderDetail : this.orderDetails) {
       logger.info("detail unit price cost: " + orderDetail.getProductUnitPrice());
-      this.productCost = this.productCost
+      tempTotalCost = tempTotalCost
           .add(BigDecimal.valueOf(orderDetail.getProductQuantity()).multiply(orderDetail.getProductUnitPrice()));
     }
-
+    this.productCost = tempTotalCost;
   }
 
   public BigDecimal getProductCost() {
-    if (this.productCost == null || this.productCost.compareTo(BigDecimal.ZERO) == 0) {
-      this.calculateProductCost();
-    }
+    this.calculateProductCost();
     return this.productCost;
   }
 
   public BigDecimal getTotalCost() {
 
-    if (this.productCost == null || this.productCost.compareTo(BigDecimal.ZERO) == 0) {
-      this.calculateProductCost();
-    }
+    this.calculateProductCost();
 
     logger.info("product cost: " + this.productCost);
     logger.info("tax cost: " + this.taxCost);
@@ -459,19 +461,17 @@ public class Order {
 
     if (latestEvent == null) {
       logger.info("latest event is null");
-    } 
+    }
     logger.info("" + latestEvent.getOrderEventId());
     logger.info("" + latestEvent.getOrderStatus());
 
-
-
-      logger.info("before setlatestorderevent");
+    logger.info("before setlatestorderevent");
     this.setLatestOrderEvent(latestEvent);
-      logger.info("before setnextadminorder");
+    logger.info("before setnextadminorder");
     this.setNextAdminOrderEventOptions(this.getNextAddableOrderEventStatusForAdmin(latestEvent.getOrderStatus()));
-      logger.info("before setnextmemberorder");
+    logger.info("before setnextmemberorder");
     this.setNextMemberOrderEventOptions(this.getNextAddableOrderEventStatusForMember(latestEvent.getOrderStatus()));
-      logger.info("done");
+    logger.info("done");
   }
 
   public boolean isAddableAsNextForAdmin(OrderStatusEnum curOrderStatus, OrderStatusEnum latestOrderStatus) {
@@ -623,7 +623,7 @@ public class Order {
    *
    * we need to assign 'undoable' for each order status.
    *
-   * don't use this directly. use "AddOrderEventService" instead. 
+   * don't use this directly. use "AddOrderEventService" instead.
    *
    **/
   public OrderEvent createOrderEvent(OrderStatusEnum orderStatus, String note) {
@@ -648,255 +648,255 @@ public class Order {
     return this.billingAddress.displayAddress();
   }
 
-public static Logger getLogger() {
-	return logger;
-}
+  public static Logger getLogger() {
+    return logger;
+  }
 
-public static OrderStatusEnum[] getDeletableorderstatuslist() {
-	return deletableOrderStatusList;
-}
+  public static OrderStatusEnum[] getDeletableorderstatuslist() {
+    return deletableOrderStatusList;
+  }
 
-public UUID getOrderId() {
-	return orderId;
-}
+  public UUID getOrderId() {
+    return orderId;
+  }
 
-public void setOrderId(UUID orderId) {
-	this.orderId = orderId;
-}
+  public void setOrderId(UUID orderId) {
+    this.orderId = orderId;
+  }
 
-public String getOrderNumber() {
-	return orderNumber;
-}
+  public String getOrderNumber() {
+    return orderNumber;
+  }
 
-public void setOrderNumber(String orderNumber) {
-	this.orderNumber = orderNumber;
-}
+  public void setOrderNumber(String orderNumber) {
+    this.orderNumber = orderNumber;
+  }
 
-public void setProductCost(BigDecimal productCost) {
-	this.productCost = productCost;
-}
+  public void setProductCost(BigDecimal productCost) {
+    this.productCost = productCost;
+  }
 
-public BigDecimal getTaxCost() {
-	return taxCost;
-}
+  public BigDecimal getTaxCost() {
+    return taxCost;
+  }
 
-public void setTaxCost(BigDecimal taxCost) {
-	this.taxCost = taxCost;
-}
+  public void setTaxCost(BigDecimal taxCost) {
+    this.taxCost = taxCost;
+  }
 
-public BigDecimal getShippingCost() {
-	return shippingCost;
-}
+  public BigDecimal getShippingCost() {
+    return shippingCost;
+  }
 
-public void setShippingCost(BigDecimal shippingCost) {
-	this.shippingCost = shippingCost;
-}
+  public void setShippingCost(BigDecimal shippingCost) {
+    this.shippingCost = shippingCost;
+  }
 
-public String getNote() {
-	return note;
-}
+  public String getNote() {
+    return note;
+  }
 
-public void setNote(String note) {
-	this.note = note;
-}
+  public void setNote(String note) {
+    this.note = note;
+  }
 
-public String getOrderFirstName() {
-	return orderFirstName;
-}
+  public String getOrderFirstName() {
+    return orderFirstName;
+  }
 
-public void setOrderFirstName(String orderFirstName) {
-	this.orderFirstName = orderFirstName;
-}
+  public void setOrderFirstName(String orderFirstName) {
+    this.orderFirstName = orderFirstName;
+  }
 
-public String getOrderLastName() {
-	return orderLastName;
-}
+  public String getOrderLastName() {
+    return orderLastName;
+  }
 
-public void setOrderLastName(String orderLastName) {
-	this.orderLastName = orderLastName;
-}
+  public void setOrderLastName(String orderLastName) {
+    this.orderLastName = orderLastName;
+  }
 
-public String getOrderEmail() {
-	return orderEmail;
-}
+  public String getOrderEmail() {
+    return orderEmail;
+  }
 
-public void setOrderEmail(String orderEmail) {
-	this.orderEmail = orderEmail;
-}
+  public void setOrderEmail(String orderEmail) {
+    this.orderEmail = orderEmail;
+  }
 
-public String getOrderPhone() {
-	return orderPhone;
-}
+  public String getOrderPhone() {
+    return orderPhone;
+  }
 
-public void setOrderPhone(String orderPhone) {
-	this.orderPhone = orderPhone;
-}
+  public void setOrderPhone(String orderPhone) {
+    this.orderPhone = orderPhone;
+  }
 
-public String getStripePaymentIntentId() {
-	return stripePaymentIntentId;
-}
+  public String getStripePaymentIntentId() {
+    return stripePaymentIntentId;
+  }
 
-public void setStripePaymentIntentId(String stripePaymentIntentId) {
-	this.stripePaymentIntentId = stripePaymentIntentId;
-}
+  public void setStripePaymentIntentId(String stripePaymentIntentId) {
+    this.stripePaymentIntentId = stripePaymentIntentId;
+  }
 
-public String getShipmentId() {
-	return shipmentId;
-}
+  public String getShipmentId() {
+    return shipmentId;
+  }
 
-public void setShipmentId(String shipmentId) {
-	this.shipmentId = shipmentId;
-}
+  public void setShipmentId(String shipmentId) {
+    this.shipmentId = shipmentId;
+  }
 
-public String getTrackingPin() {
-	return trackingPin;
-}
+  public String getTrackingPin() {
+    return trackingPin;
+  }
 
-public void setTrackingPin(String trackingPin) {
-	this.trackingPin = trackingPin;
-}
+  public void setTrackingPin(String trackingPin) {
+    this.trackingPin = trackingPin;
+  }
 
-public String getRefundLink() {
-	return refundLink;
-}
+  public String getRefundLink() {
+    return refundLink;
+  }
 
-public void setRefundLink(String refundLink) {
-	this.refundLink = refundLink;
-}
+  public void setRefundLink(String refundLink) {
+    this.refundLink = refundLink;
+  }
 
-public String getAuthReturnTrackingPin() {
-	return authReturnTrackingPin;
-}
+  public String getAuthReturnTrackingPin() {
+    return authReturnTrackingPin;
+  }
 
-public void setAuthReturnTrackingPin(String authReturnTrackingPin) {
-	this.authReturnTrackingPin = authReturnTrackingPin;
-}
+  public void setAuthReturnTrackingPin(String authReturnTrackingPin) {
+    this.authReturnTrackingPin = authReturnTrackingPin;
+  }
 
-public LocalDateTime getAuthReturnExpiryDate() {
-	return authReturnExpiryDate;
-}
+  public LocalDateTime getAuthReturnExpiryDate() {
+    return authReturnExpiryDate;
+  }
 
-public void setAuthReturnExpiryDate(LocalDateTime authReturnExpiryDate) {
-	this.authReturnExpiryDate = authReturnExpiryDate;
-}
+  public void setAuthReturnExpiryDate(LocalDateTime authReturnExpiryDate) {
+    this.authReturnExpiryDate = authReturnExpiryDate;
+  }
 
-public LocalDateTime getAuthReturnUrl() {
-	return authReturnUrl;
-}
+  public LocalDateTime getAuthReturnUrl() {
+    return authReturnUrl;
+  }
 
-public void setAuthReturnUrl(LocalDateTime authReturnUrl) {
-	this.authReturnUrl = authReturnUrl;
-}
+  public void setAuthReturnUrl(LocalDateTime authReturnUrl) {
+    this.authReturnUrl = authReturnUrl;
+  }
 
-public OrderStatusEnum getLatestOrderEventStatus() {
-	return latestOrderEventStatus;
-}
+  public OrderStatusEnum getLatestOrderEventStatus() {
+    return latestOrderEventStatus;
+  }
 
-public void setLatestOrderEventStatus(OrderStatusEnum latestOrderEventStatus) {
-	this.latestOrderEventStatus = latestOrderEventStatus;
-}
+  public void setLatestOrderEventStatus(OrderStatusEnum latestOrderEventStatus) {
+    this.latestOrderEventStatus = latestOrderEventStatus;
+  }
 
-public LocalDateTime getShipmentOriginalResponse() {
-	return shipmentOriginalResponse;
-}
+  public LocalDateTime getShipmentOriginalResponse() {
+    return shipmentOriginalResponse;
+  }
 
-public void setShipmentOriginalResponse(LocalDateTime shipmentOriginalResponse) {
-	this.shipmentOriginalResponse = shipmentOriginalResponse;
-}
+  public void setShipmentOriginalResponse(LocalDateTime shipmentOriginalResponse) {
+    this.shipmentOriginalResponse = shipmentOriginalResponse;
+  }
 
-public LocalDateTime getAuthReturnOriginalResponse() {
-	return authReturnOriginalResponse;
-}
+  public LocalDateTime getAuthReturnOriginalResponse() {
+    return authReturnOriginalResponse;
+  }
 
-public void setAuthReturnOriginalResponse(LocalDateTime authReturnOriginalResponse) {
-	this.authReturnOriginalResponse = authReturnOriginalResponse;
-}
+  public void setAuthReturnOriginalResponse(LocalDateTime authReturnOriginalResponse) {
+    this.authReturnOriginalResponse = authReturnOriginalResponse;
+  }
 
-public String getCurrency() {
-	return currency;
-}
+  public String getCurrency() {
+    return currency;
+  }
 
-public void setCurrency(String currency) {
-	this.currency = currency;
-}
+  public void setCurrency(String currency) {
+    this.currency = currency;
+  }
 
-public Boolean getIsGuest() {
-	return isGuest;
-}
+  public Boolean getIsGuest() {
+    return isGuest;
+  }
 
-public void setIsGuest(Boolean isGuest) {
-	this.isGuest = isGuest;
-}
+  public void setIsGuest(Boolean isGuest) {
+    this.isGuest = isGuest;
+  }
 
-public LocalDateTime getEstimatedDeliveryDate() {
-	return estimatedDeliveryDate;
-}
+  public LocalDateTime getEstimatedDeliveryDate() {
+    return estimatedDeliveryDate;
+  }
 
-public void setEstimatedDeliveryDate(LocalDateTime estimatedDeliveryDate) {
-	this.estimatedDeliveryDate = estimatedDeliveryDate;
-}
+  public void setEstimatedDeliveryDate(LocalDateTime estimatedDeliveryDate) {
+    this.estimatedDeliveryDate = estimatedDeliveryDate;
+  }
 
-public OrderAddress getShippingAddress() {
-	return shippingAddress;
-}
+  public OrderAddress getShippingAddress() {
+    return shippingAddress;
+  }
 
-public OrderAddress getBillingAddress() {
-	return billingAddress;
-}
+  public OrderAddress getBillingAddress() {
+    return billingAddress;
+  }
 
-public LocalDateTime getCreatedAt() {
-	return createdAt;
-}
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
 
-public void setCreatedAt(LocalDateTime createdAt) {
-	this.createdAt = createdAt;
-}
+  public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
 
-public LocalDateTime getUpdatedAt() {
-	return updatedAt;
-}
+  public LocalDateTime getUpdatedAt() {
+    return updatedAt;
+  }
 
-public void setUpdatedAt(LocalDateTime updatedAt) {
-	this.updatedAt = updatedAt;
-}
+  public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
+  }
 
-public User getUser() {
-	return user;
-}
+  public User getUser() {
+    return user;
+  }
 
-public void setUser(User user) {
-	this.user = user;
-}
+  public void setUser(User user) {
+    this.user = user;
+  }
 
-public List<OrderEvent> getOrderEvents() {
-	return orderEvents;
-}
+  public List<OrderEvent> getOrderEvents() {
+    return orderEvents;
+  }
 
-public List<OrderDetail> getOrderDetails() {
-	return orderDetails;
-}
+  public List<OrderDetail> getOrderDetails() {
+    return orderDetails;
+  }
 
-public List<OrderStatusEnum> getNextAdminOrderEventOptions() {
-	return nextAdminOrderEventOptions;
-}
+  public List<OrderStatusEnum> getNextAdminOrderEventOptions() {
+    return nextAdminOrderEventOptions;
+  }
 
-public void setNextAdminOrderEventOptions(List<OrderStatusEnum> nextAdminOrderEventOptions) {
-	this.nextAdminOrderEventOptions = nextAdminOrderEventOptions;
-}
+  public void setNextAdminOrderEventOptions(List<OrderStatusEnum> nextAdminOrderEventOptions) {
+    this.nextAdminOrderEventOptions = nextAdminOrderEventOptions;
+  }
 
-public List<OrderStatusEnum> getNextMemberOrderEventOptions() {
-	return nextMemberOrderEventOptions;
-}
+  public List<OrderStatusEnum> getNextMemberOrderEventOptions() {
+    return nextMemberOrderEventOptions;
+  }
 
-public void setNextMemberOrderEventOptions(List<OrderStatusEnum> nextMemberOrderEventOptions) {
-	this.nextMemberOrderEventOptions = nextMemberOrderEventOptions;
-}
+  public void setNextMemberOrderEventOptions(List<OrderStatusEnum> nextMemberOrderEventOptions) {
+    this.nextMemberOrderEventOptions = nextMemberOrderEventOptions;
+  }
 
-public OrderEvent getLatestOrderEvent() {
-	return latestOrderEvent;
-}
+  public OrderEvent getLatestOrderEvent() {
+    return latestOrderEvent;
+  }
 
-public void setLatestOrderEvent(OrderEvent latestOrderEvent) {
-	this.latestOrderEvent = latestOrderEvent;
-}
+  public void setLatestOrderEvent(OrderEvent latestOrderEvent) {
+    this.latestOrderEvent = latestOrderEvent;
+  }
 }

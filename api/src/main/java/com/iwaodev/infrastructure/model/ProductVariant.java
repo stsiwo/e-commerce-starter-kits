@@ -8,6 +8,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -22,6 +23,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
 import com.iwaodev.domain.product.validator.ProductVariantValidation;
+import com.iwaodev.infrastructure.model.listener.ProductVariantValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
 import com.iwaodev.ui.validator.optional.digit.OptionalDigit;
@@ -42,7 +44,7 @@ import lombok.ToString;
 @Data
 @ToString
 @NoArgsConstructor
-//@EntityListeners(ProductVariantValidationListener.class)
+@EntityListeners(ProductVariantValidationListener.class)
 @Entity(name = "product_variants")
 @FilterDef(
     name = "selectedVariantFilter",
@@ -64,11 +66,11 @@ public class ProductVariant {
   // optional 
   @OptionalDigit(integer = 6, fraction = 2, message = "{productVariant.variantUnitPrice.invalidformat}")
   @Column(name = "variant_unit_price")
-  private BigDecimal variantUnitPrice = new BigDecimal("1");
+  private BigDecimal variantUnitPrice;
 
   @OptionalDigit(integer = 6, fraction = 2, message = "{productVariant.variantDiscountPrice.invalidformat}")
   @Column(name = "variant_discount_price")
-  private BigDecimal variantDiscountPrice = new BigDecimal("1");
+  private BigDecimal variantDiscountPrice;
 
   @Column(name = "variant_discount_start_date")
   private LocalDateTime variantDiscountStartDate;

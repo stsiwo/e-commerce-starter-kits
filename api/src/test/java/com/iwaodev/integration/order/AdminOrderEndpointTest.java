@@ -9,6 +9,7 @@ import javax.servlet.http.Cookie;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwaodev.application.dto.order.OrderDTO;
+import com.iwaodev.application.dto.order.OrderDetailDTO;
 import com.iwaodev.application.dto.order.OrderEventDTO;
 import com.iwaodev.auth.AuthenticateTestUser;
 import com.iwaodev.auth.AuthenticationInfo;
@@ -111,6 +112,63 @@ public class AdminOrderEndpointTest {
     this.authInfo = this.authenticateTestUser.setup(this.entityManager, this.mvc, UserTypeEnum.ADMIN, this.port);
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldAdminGetAllOrders.sql" })
+  public void shouldAdminGetAllOrders() throws Exception {
+
+    String targetUrl = "http://localhost:" + this.port + this.targetPath;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
+
+    logger.info("order events in reaponse");
+
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (OrderDTO orderDTO : responseBody) {
+      // assert
+      assertThat(orderDTO.getOrderId()).isNotNull();
+
+      for (OrderDetailDTO orderDetailDTO: orderDTO.getOrderDetails()) {
+        assertThat(orderDetailDTO.getIsReviewable()).isNotNull();
+      }
+    }
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldAdminGetAllOrdersWithOrderIdFilter.sql" })
+  public void shouldAdminGetAllOrdersWithOrderIdFilter() throws Exception {
+
+    String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450"; // make sure match with sql.
+    String searchQuery = "?searchQuery=" + dummyOrderId;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQuery;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
+
+    logger.info("order events in reaponse");
+
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (OrderDTO orderDTO : responseBody) {
+      // assert
+      assertThat(orderDTO.getOrderId().toString()).isEqualTo(dummyOrderId);
+    }
+
   }
 
   @Test

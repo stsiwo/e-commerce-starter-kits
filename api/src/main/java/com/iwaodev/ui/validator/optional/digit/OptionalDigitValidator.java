@@ -5,7 +5,8 @@ import java.math.BigDecimal;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-class OptionalDigitValidator implements ConstraintValidator<OptionalDigit, BigDecimal> {
+
+public class OptionalDigitValidator implements ConstraintValidator<OptionalDigit, BigDecimal> {
 
   @Override
   public boolean isValid(BigDecimal value, ConstraintValidatorContext context) {

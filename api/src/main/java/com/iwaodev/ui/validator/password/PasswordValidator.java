@@ -6,7 +6,7 @@ import javax.validation.ConstraintValidatorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class PasswordValidator implements ConstraintValidator<Password, String> {
+public class PasswordValidator implements ConstraintValidator<Password, String> {
 
   private static final Logger logger = LoggerFactory.getLogger(PasswordValidator.class);
 

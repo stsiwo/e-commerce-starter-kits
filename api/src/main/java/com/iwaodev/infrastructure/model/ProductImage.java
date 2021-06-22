@@ -2,6 +2,7 @@ package com.iwaodev.infrastructure.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -12,6 +13,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
+import com.iwaodev.infrastructure.model.listener.ProductImageValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
 
@@ -22,7 +24,7 @@ import lombok.ToString;
 @Data
 @ToString
 @NoArgsConstructor
-//@EntityListeners(ProductImageValidationListener.class)
+@EntityListeners(ProductImageValidationListener.class)
 @Entity(name = "product_images")
 public class ProductImage {
 

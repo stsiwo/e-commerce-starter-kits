@@ -32,6 +32,7 @@ public class OrderSpecificationFactoryImpl implements OrderSpecificationFactory 
       .and(
           this.specifications.searchQueryByOrderEmail(criteria.getSearchQuery())
             .or(this.specifications.searchQueryByOrderNumber(criteria.getSearchQuery()))
+            .or(this.specifications.searchQueryByOrderId(criteria.getSearchQuery()))
             .or(this.specifications.searchQueryByOrderLastName(criteria.getSearchQuery()))
             .or(this.specifications.searchQueryByOrderFirstName(criteria.getSearchQuery()))
           );

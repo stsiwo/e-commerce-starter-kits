@@ -93,9 +93,7 @@ public class SendCancelRequestWasConfirmedEmailEventHandler {
 
     Map<String, Object> templateModel = new HashMap<String, Object>();
 
-    if (isGuest) {
-
-    } else {
+    if (!isGuest) {
       // member
       templateModel.put("link", this.clientSpaConfig.getUrl() + "/orders/" + event.getOrder().getOrderId().toString());
     }

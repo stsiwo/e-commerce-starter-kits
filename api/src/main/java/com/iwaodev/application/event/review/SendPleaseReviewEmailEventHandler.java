@@ -101,6 +101,8 @@ public class SendPleaseReviewEmailEventHandler {
     Order order = event.getOrder();
 
     Map<String, Object> templateModel = new HashMap<String, Object>();
+    logger.info("link:");
+    logger.info(this.clientSpaConfig.getUrl() + "/orders/" + event.getOrder().getOrderId().toString());
 
     // set model variables
     templateModel.put("order", order);

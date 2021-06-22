@@ -65,7 +65,7 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
       ProductSortEnum sort) {
 
     return this.wishlistItemRepository
-        .findAll(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
+        .findAllToAvoidNPlusOne(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
         .map(new Function<WishlistItem, WishlistItemDTO>() {
 
           @Override

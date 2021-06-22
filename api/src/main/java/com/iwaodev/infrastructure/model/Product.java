@@ -10,6 +10,7 @@ import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.ForeignKey;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -23,6 +24,7 @@ import javax.validation.constraints.Null;
 import com.iwaodev.domain.product.validator.ProductValidation;
 import com.iwaodev.exception.NotFoundException;
 import com.iwaodev.exception.OutOfStockException;
+import com.iwaodev.infrastructure.model.listener.ProductValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
 
@@ -42,7 +44,7 @@ import lombok.ToString;
 @ProductValidation()
 @ToString()
 @Data
-//@EntityListeners(ProductValidationListener.class)
+@EntityListeners(ProductValidationListener.class)
 @Entity(name = "products")
 public class Product {
 

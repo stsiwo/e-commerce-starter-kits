@@ -288,6 +288,7 @@ public class MemberCartItemEndpointTest {
     String dummyVariantId = "9";
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyCartItemId;
     JSONObject dummyFormJson = new JSONObject();
+    dummyFormJson.put("cartItemId", dummyCartItemId);
     dummyFormJson.put("variantId", dummyVariantId);
     dummyFormJson.put("userId", this.authInfo.getAuthUser().getUserId().toString());
     dummyFormJson.put("quantity", 33);

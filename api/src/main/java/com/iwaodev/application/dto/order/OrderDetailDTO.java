@@ -3,7 +3,6 @@ package com.iwaodev.application.dto.order;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.iwaodev.application.dto.product.ProductDTO;
 import com.iwaodev.application.dto.product.ProductVariantDTO;
 
 import lombok.Data;
@@ -32,10 +31,12 @@ public class OrderDetailDTO {
   private LocalDateTime updatedAt;
 
   // selected product which contains unselected variants too.
-  private ProductDTO product;
+  private OrderProductDTO product;
 
   // selected variant
   private ProductVariantDTO productVariant;
+
+  private Boolean isReviewable;
 }
 
 

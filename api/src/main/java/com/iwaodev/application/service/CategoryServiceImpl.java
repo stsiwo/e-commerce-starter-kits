@@ -46,7 +46,7 @@ public class CategoryServiceImpl implements CategoryService {
     // get result with repository
     // and map entity to dto with MapStruct
     return this.repository
-        .findAll(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
+        .findAllToAvoidNPlusOne(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
         .map(new Function<Category, CategoryDTO>() {
 
           @Override
@@ -54,7 +54,6 @@ public class CategoryServiceImpl implements CategoryService {
             return CategoryMapper.INSTANCE.toCategoryDTO(category);
           }
         });
-
   }
 
   private Sort getSort(CategorySortEnum sortEnum) {
@@ -72,11 +71,19 @@ public class CategoryServiceImpl implements CategoryService {
     // map criteria to entity
     Category newEntity = CategoryMapper.INSTANCE.toCategoryEntityFromCategoryCriteria(criteria);
 
+    // duplication check
+    if (this.repository.findByCategoryName(newEntity.getCategoryName()).isPresent()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the category name already taken.");
+    }
+
+    if (this.repository.findByCategoryPath(newEntity.getCategoryPath()).isPresent()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the category path already taken.");
+    }
     // save it
-    this.repository.save(newEntity);
+    Category savedEntity = this.repository.save(newEntity);
 
     // map entity to dto and return it.
-    return CategoryMapper.INSTANCE.toCategoryDTO(newEntity);
+    return CategoryMapper.INSTANCE.toCategoryDTO(savedEntity);
   }
 
   @Override
@@ -88,6 +95,17 @@ public class CategoryServiceImpl implements CategoryService {
     if (targetEntityOption.isEmpty()) {
       logger.info("the given address does not exist");
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given address does not exist.");
+    }
+
+    Category category = targetEntityOption.get();
+    
+    // duplication check
+    if (this.repository.isOthersHaveName(category.getCategoryId(), criteria.getCategoryName())) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the category name already taken.");
+    }
+
+    if (this.repository.isOthersHavePath(category.getCategoryId(), criteria.getCategoryPath())) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the category path already taken.");
     }
 
     // make sure criteria.categoryId is assigned

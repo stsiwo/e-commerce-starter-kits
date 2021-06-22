@@ -5,7 +5,6 @@ import javax.validation.ConstraintValidatorContext;
 
 import com.iwaodev.application.irepository.CartItemRepository;
 import com.iwaodev.application.irepository.CategoryRepository;
-import com.iwaodev.domain.category.validator.CategoryPathUnique;
 import com.iwaodev.domain.notification.NotificationTypeEnum;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.infrastructure.model.CartItem;
@@ -31,13 +30,18 @@ public class IssuerValidationValidator implements ConstraintValidator<IssuerVali
   @Override
   public boolean isValid(Notification domain, ConstraintValidatorContext context) {
 
+
     // issuer - not null if issuer is admin/member
     NotificationTypeEnum actualNotificationType = domain.getNotificationType().getNotificationType();
+
+    logger.info("start validating issuer.");
+    logger.info("notificaiton type: " + actualNotificationType.toString());
 
     if (domain.isGuestIssuerByTypeOf(actualNotificationType) && domain.getIssuer() != null) {
       // throw new DomainValidationException(String.format("issuer must be null.
       // (type: %s)", actualNotificationType));
 
+      logger.info("{notification.issuer.null}");
       // chage default message to this message to set different message inside this
       // function.
       context.disableDefaultConstraintViolation();
@@ -49,6 +53,7 @@ public class IssuerValidationValidator implements ConstraintValidator<IssuerVali
       HibernateConstraintValidatorContext hibernateConstraintValidatorContext = context
           .unwrap(HibernateConstraintValidatorContext.class);
       hibernateConstraintValidatorContext.addMessageParameter("0", actualNotificationType);
+      return false;
 
     }
 
@@ -56,6 +61,7 @@ public class IssuerValidationValidator implements ConstraintValidator<IssuerVali
       // throw new DomainValidationException(String.format("issuer cannot be null.
       // (type: %s)", actualNotificationType));
 
+      logger.info("{notification.issuer.notnull}");
       // chage default message to this message to set different message inside this
       // function.
       context.disableDefaultConstraintViolation();
@@ -67,6 +73,7 @@ public class IssuerValidationValidator implements ConstraintValidator<IssuerVali
       HibernateConstraintValidatorContext hibernateConstraintValidatorContext = context
           .unwrap(HibernateConstraintValidatorContext.class);
       hibernateConstraintValidatorContext.addMessageParameter("0", actualNotificationType);
+      return false;
     }
 
     logger.info("where is my bug?");
@@ -81,6 +88,7 @@ public class IssuerValidationValidator implements ConstraintValidator<IssuerVali
         //    String.format("the issuer must be %s for the notification (your type: %s and notification type; %s)",
         //        expectedIssuerType, actualIssuerType, actualNotificationType));
         
+        logger.info("{notification.issuer.invalidtype}");
         // chage default message to this message to set different message inside this
         // function.
         context.disableDefaultConstraintViolation();
@@ -91,9 +99,10 @@ public class IssuerValidationValidator implements ConstraintValidator<IssuerVali
         // https://stackoverflow.com/questions/45510986/is-it-possible-to-add-message-parameter-for-constraint-violation-template-messag/45511264
         HibernateConstraintValidatorContext hibernateConstraintValidatorContext = context
             .unwrap(HibernateConstraintValidatorContext.class);
-        hibernateConstraintValidatorContext.addMessageParameter("0", expectedIssuerType);
-        hibernateConstraintValidatorContext.addMessageParameter("1", actualIssuerType);
-        hibernateConstraintValidatorContext.addMessageParameter("2", actualNotificationType);
+        hibernateConstraintValidatorContext.addMessageParameter("{0}", expectedIssuerType);
+        hibernateConstraintValidatorContext.addMessageParameter("{1}", actualIssuerType);
+        hibernateConstraintValidatorContext.addMessageParameter("{2}", actualNotificationType);
+        return false;
       }
     }
 

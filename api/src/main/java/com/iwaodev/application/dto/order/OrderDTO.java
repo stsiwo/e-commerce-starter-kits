@@ -58,6 +58,8 @@ public class OrderDTO {
 
   private String currency;
 
+  private Boolean isReviewable;
+
 }
 
 

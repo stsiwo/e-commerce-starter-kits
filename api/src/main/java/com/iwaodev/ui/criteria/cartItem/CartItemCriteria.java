@@ -6,7 +6,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
-import com.iwaodev.domain.cartItem.validator.UserAndVariantMustBeUnique;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
 
@@ -20,7 +19,6 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @Validated
-@UserAndVariantMustBeUnique()
 public class CartItemCriteria {
 
   @Null(message = "{cartItem.id.null}", groups = OnCreate.class)
@@ -33,7 +31,6 @@ public class CartItemCriteria {
   @NotNull(message = "{cartItem.variant.notnull}")
   private Long variantId;
 
-  @NotNull(message = "{cartItem.isSelected.notnull}")
   private Boolean isSelected;
 
   @NotNull(message = "{cartItem.quantity.notnull}")

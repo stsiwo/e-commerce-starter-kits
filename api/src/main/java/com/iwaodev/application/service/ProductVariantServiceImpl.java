@@ -86,6 +86,12 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
     Product targetEntity = targetEntityOption.get();
 
+    // duplication
+    if (this.repository.findVariantByColorAndSize(productId, criteria.getVariantColor(), criteria.getProductSize().getProductSizeName()).isPresent()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the variant already exist.");
+    }
+
+
     // map criteria to entity
     ProductVariant newEntity = ProductVariantMapper.INSTANCE.toProductVariantEntityFromProductVariantCriteria(criteria);
 
@@ -112,6 +118,11 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     }
 
     Product targetEntity = targetEntityOption.get();
+
+    // duplication
+    if (this.repository.isOthersHaveColorAndSize(productId, variantId, criteria.getVariantColor(), criteria.getProductSize().getProductSizeName())) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the variant already exist.");
+    }
 
     // map criteria to entity
     ProductVariant updateEntity = ProductVariantMapper.INSTANCE

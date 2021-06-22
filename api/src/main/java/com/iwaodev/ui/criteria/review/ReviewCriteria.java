@@ -39,7 +39,6 @@ public class ReviewCriteria {
   @NotEmpty(message = "{review.descripiton.notempty}")
   private String reviewDescription;
 
-  @NotNull(message = "{review.isVerified.notnull}")
   private Boolean isVerified;
 
   private String note;
