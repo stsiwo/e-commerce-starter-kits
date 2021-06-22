@@ -46,6 +46,7 @@ endpoint change:
   - email verification propt  if user still temp user.
   
   - file directory backup
+    - better to use S3 so that you don't need to think about backup stuff.
   
     
       
