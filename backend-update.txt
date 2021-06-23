@@ -11,6 +11,8 @@ endpoint change:
       - (order) totalCost: prevent front-end from calculating (single source of truth)
       
       - (order) mainImagePath: from the first order detail's product main image (for order list page of member)
+      
+      - isReviewable: not working correctly. it's always returning true.
         
   - /products (GET) 
   
@@ -46,6 +48,9 @@ endpoint change:
   - email verification propt  if user still temp user.
   
   - file directory backup
+    - better to use S3 so that you don't need to think about backup stuff.
+    
+  - need to return current price based on discount availability and product & product variant price to client.
   
     
       
