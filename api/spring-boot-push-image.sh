@@ -1,5 +1,7 @@
 #!/bin/bash
 
+## DON'T USE THIS. DEPRECATED!!
+
 # v: version number (e.g., 1.0.0)
 # i: image name for docker hub (e.g., ec-app)
 

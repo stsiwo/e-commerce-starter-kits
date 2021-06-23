@@ -1,5 +1,17 @@
 # Production & Deployment Note
 
+## Steps to deployment to staging server
+
+  1. run 'docker-hub-push.sh' for spa, db, api
+
+      command) ./docker-hub-push.sh -i ec-spa -v 1.0.0 -t production -d ./spa
+      command) ./docker-hub-push.sh -i ec-db -v 1.0.0 -t init -d ./db
+      command) ./docker-hub-push.sh -i ec-api -v 1.0.0 -t production -d ./api
+     
+    * note about api)
+        => if you modify source code, don't forget to run this:
+          command) mvn clean package
+
 ## Command
 
   - connect to the ec2
