@@ -89,7 +89,7 @@ export const fetchSingleAuthOrderActionTypeName = fetchSingleAuthOrderActionCrea
 
 // for POST (post auth order event) request
 export declare type PostAuthOrderEventActionType = OrderEventCriteria & { orderId: string } 
-export const postAuthOrderEventActionCreator = createAction<PostAuthOrderEventActionType>("saga/domain/auth/order/fetch")
+export const postAuthOrderEventActionCreator = createAction<PostAuthOrderEventActionType>("saga/domain/auth/order/event/post")
 export const postAuthOrderEventActionTypeName = postAuthOrderEventActionCreator().type
 
 

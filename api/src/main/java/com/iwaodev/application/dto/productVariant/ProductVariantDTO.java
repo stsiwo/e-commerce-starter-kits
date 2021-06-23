@@ -25,4 +25,9 @@ public class ProductVariantDTO {
   private ProductSizeDTO productSize;
   private String variantColor;
   private UUID productId;
+  private Double variantWeight;
+  private Double variantHeight;
+  private Double variantWidth;
+  private Double variantLength;
+  private BigDecimal currentPrice;
 }

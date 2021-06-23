@@ -127,7 +127,7 @@ public class OrderServiceImpl implements OrderService {
     criteria.setUserId(userId);
 
     return this.orderRepository
-        .findAll(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
+        .findAllToAvoidNPlusOne(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
         .map(new Function<Order, OrderDTO>() {
 
           @Override
@@ -234,7 +234,7 @@ public class OrderServiceImpl implements OrderService {
     PaymentIntentCreateParams createParams = new PaymentIntentCreateParams.Builder().setCustomer(stripeCustomerId)
         .setSetupFutureUsage(PaymentIntentCreateParams.SetupFutureUsage.ON_SESSION)
         .setReceiptEmail(order.getOrderEmail()).setCurrency(order.getCurrency())
-        .setAmount(order.getTotalCost().longValue()).build();
+        .setAmount(order.getTotalCostForStripe()).build();
 
     PaymentIntent intent;
 
@@ -274,6 +274,7 @@ public class OrderServiceImpl implements OrderService {
 
     this.publisher.publishEvent(new OrderFinalConfirmedEvent(this, savedOrder, stripeCustomerId, UserTypeEnum.MEMBER));
 
+    logger.info("done with handling published event.");
     // set any transient property up. DON'T FOREGET TO CALL
     savedOrder.setUpCalculatedProperties();
 
@@ -299,24 +300,18 @@ public class OrderServiceImpl implements OrderService {
 
     // create order events
     try {
-      this.orderEventService.add(order, OrderStatusEnum.DRAFT, "", (User)null);
+      this.orderEventService.add(order, OrderStatusEnum.DRAFT, "", (User) null);
     } catch (DomainException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (NotFoundException e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
-
     // finally, request to create payment intent
     PaymentIntentCreateParams createParams = new PaymentIntentCreateParams.Builder()
         .setReceiptEmail(order.getOrderEmail()).setCurrency(order.getCurrency())
-        .setAmount(order.getTotalCost().longValue()).build();
+        .setAmount(order.getTotalCostForStripe()).build();
 
-    logger.info("total cost: ");
-    logger.info("" + order.getTotalCost().toString());
-
-    logger.info("debug create params for stripe: ");
-    logger.info("" + createParams.getAmount());
     PaymentIntent intent;
 
     try {
@@ -351,9 +346,9 @@ public class OrderServiceImpl implements OrderService {
      **/
     this.orderRepository.flush();
 
-
     this.publisher.publishEvent(new OrderFinalConfirmedEvent(this, savedOrder, null, UserTypeEnum.ANONYMOUS));
 
+    logger.info("done with handling published event.");
     // set any transient property up. DON'T FOREGET TO CALL
     savedOrder.setUpCalculatedProperties();
 
@@ -451,7 +446,6 @@ public class OrderServiceImpl implements OrderService {
     this.orderRepository.flush();
 
     savedOrder.setUpCalculatedProperties();
-
     return OrderMapper.INSTANCE.toOrderDTO(savedOrder);
   }
 
@@ -493,10 +487,8 @@ public class OrderServiceImpl implements OrderService {
      **/
     this.orderRepository.flush();
 
-
     // set any transient property up. DON'T FOREGET TO CALL
     savedOrder.setUpCalculatedProperties();
-
     // publish event.
     this.publisher.publishEvent(new OrderEventWasAddedEvent(this, savedOrder));
 
@@ -529,6 +521,8 @@ public class OrderServiceImpl implements OrderService {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
+    logger.info("what's wrong with this transaction.");
+
     Order savedOrder = this.orderRepository.save(targetOrder);
     /**
      * bug.
@@ -550,10 +544,8 @@ public class OrderServiceImpl implements OrderService {
      **/
     this.orderRepository.flush();
 
-
     // set any transient property up. DON'T FOREGET TO CALL
     savedOrder.setUpCalculatedProperties();
-
     // publish event.
     this.publisher.publishEvent(new OrderEventWasAddedByMemberEvent(this, savedOrder));
 
@@ -571,10 +563,8 @@ public class OrderServiceImpl implements OrderService {
    *
    * also, RECEIVED_RETURN_REQUEST should be added before this function is called.
    *
-   * flow:
-   *  1. the customer requests for the return.
-   *  2. the admin confirm and add 'RECEIVED_RETURN_REQUEST' order event at the management console.
-   *  3. the admin 
+   * flow: 1. the customer requests for the return. 2. the admin confirm and add
+   * 'RECEIVED_RETURN_REQUEST' order event at the management console. 3. the admin
    **/
   @Override
   public void refundOrderAfterShipment(UUID orderId) {
@@ -661,7 +651,6 @@ public class OrderServiceImpl implements OrderService {
      **/
     this.orderRepository.flush();
 
-
     /**
      * TODO: change this event name. this is misnomer. it should be 'ReturnedEvent'
      * or something
@@ -694,12 +683,13 @@ public class OrderServiceImpl implements OrderService {
      * check eligibility
      *
      **/
-    //LocalDateTime curDateTime = LocalDateTime.now();
-    //if (!order.isEligibleToRefund(curDateTime, this.orderRule.getEligibleDays())) {
-    //  logger.info("sorry, you are not eligible to refund for this order.");
-    //  throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-    //      "sorry, you are not eligible to refund for this order.");
-    //}
+    // LocalDateTime curDateTime = LocalDateTime.now();
+    // if (!order.isEligibleToRefund(curDateTime, this.orderRule.getEligibleDays()))
+    // {
+    // logger.info("sorry, you are not eligible to refund for this order.");
+    // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+    // "sorry, you are not eligible to refund for this order.");
+    // }
 
     /**
      * prep refund request to stripe
@@ -755,7 +745,6 @@ public class OrderServiceImpl implements OrderService {
      *
      **/
     this.orderRepository.flush();
-
 
     /**
      * TODO: change this event name. this is misnomer. it should be 'CanceledEvent'
@@ -828,8 +817,6 @@ public class OrderServiceImpl implements OrderService {
      *
      **/
     this.orderRepository.flush();
-
-
     // set any transient property up.
     savedOrder.setUpCalculatedProperties();
 

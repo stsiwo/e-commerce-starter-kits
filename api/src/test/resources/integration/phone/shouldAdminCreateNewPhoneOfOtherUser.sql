@@ -8,6 +8,3 @@ VALUES ('29c845ad-54b1-430a-8a71-5caba98d5978', 'first_name_1', 'last_name_1', '
 INSERT INTO `ec-schema`.`phones` (`phone_number`, `country_code`, `user_id`) VALUES ('1234567890', '+12', '29c845ad-54b1-430a-8a71-5caba98d5978'); -- must match with the user above
 
 INSERT INTO `ec-schema`.`phones` (`phone_number`, `country_code`, `user_id`) VALUES ('1234234234', '+1', '29c845ad-54b1-430a-8a71-5caba98d5978'); -- must match with the user above
-
-INSERT INTO `ec-schema`.`phones` (`phone_number`, `country_code`, `user_id`) VALUES ('4325344423', '+3', '29c845ad-54b1-430a-8a71-5caba98d5978'); -- must match with the user above
-

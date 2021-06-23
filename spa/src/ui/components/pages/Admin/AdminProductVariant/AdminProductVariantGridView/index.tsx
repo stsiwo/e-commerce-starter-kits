@@ -52,6 +52,7 @@ const generateRows: (domains: ProductVariantType[], product: ProductType) => Gri
       id: domain.variantId,
       size: domain.productSize.productSizeName,
       color: domain.variantColor,
+      currentPrice: domain.currentPrice, 
       unitPrice: domain.variantUnitPrice ? domain.variantUnitPrice : product.productBaseUnitPrice,
       stock: domain.variantStock,
       discount: domain.isDiscount,
@@ -77,9 +78,10 @@ const generateColumns: (onEdit: React.EventHandler<React.MouseEvent<HTMLButtonEl
       width: 100,
       renderCell: (params: GridCellParams) => (<ColorCell value={params.value as string} />)
     },
-    { field: 'unitPrice', headerName: 'Unit Price', width: 100 },
+    { field: 'currentPrice', headerName: 'Current Price', width: 150 },
+    { field: 'unitPrice', headerName: 'Unit Price', width: 150 },
     { field: 'stock', headerName: 'Stock #', width: 100 },
-    { field: 'discount', headerName: 'Discount', width: 100 },
+    { field: 'discount', headerName: 'Discount', width: 150 },
     { field: 'soldCount', headerName: 'Sold #', width: 100 },
     { field: 'weight', headerName: 'Weight', width: 100 },
     {

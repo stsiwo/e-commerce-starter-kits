@@ -18,6 +18,7 @@ import javax.validation.constraints.Null;
 
 import com.iwaodev.domain.order.OrderStatusEnum;
 import com.iwaodev.domain.order.validator.OrderEventValidation;
+import com.iwaodev.infrastructure.model.listener.OrderEventListener;
 import com.iwaodev.infrastructure.model.listener.OrderEventValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
@@ -25,14 +26,21 @@ import com.iwaodev.infrastructure.model.validator.OnUpdate;
 import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+// DOUBT this might need to be removed and move teh validation to the service layer.
 @OrderEventValidation()
 @Data
 @ToString
+/**
+ * order & orderEvent cause stackoverflow with its lombok hashcode.
+ * so exclude it. ref: https://stackoverflow.com/questions/34972895/lombok-hashcode-issue-with-java-lang-stackoverflowerror-null
+ **/
+@EqualsAndHashCode(exclude = {"order"})
 @NoArgsConstructor
-@EntityListeners(OrderEventValidationListener.class)
+@EntityListeners( value = { OrderEventValidationListener.class, OrderEventListener.class })
 @Entity(name = "orderEvents")
 public class OrderEvent {
 

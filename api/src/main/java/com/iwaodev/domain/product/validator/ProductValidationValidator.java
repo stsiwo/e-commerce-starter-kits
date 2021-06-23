@@ -39,15 +39,18 @@ public class ProductValidationValidator implements ConstraintValidator<ProductVa
      * for now just disable and create ProductImageValidator instread.
      *
      * but need to fix this otherwise, we cannot check the primary image size > 0.
+     *
+     *  => move this validation to service layer.
      **/
 
     logger.info("" + domain.getProductImages().size());
 
     // productImages: primary image cannot be null.
-    if (domain.getProductImages().size() == 0) {
-      context.disableDefaultConstraintViolation();
-      context.buildConstraintViolationWithTemplate("{product.productImages.primarynotnull}").addConstraintViolation();
-    }
+    //if (domain.getProductImages().size() == 0) {
+    //  context.disableDefaultConstraintViolation();
+    //  context.buildConstraintViolationWithTemplate("{product.productImages.primarynotnull}").addConstraintViolation();
+    //  return false;
+    //}
     for (ProductImage productImage : domain.getProductImages()) {
       // this is primary image
       if (productImage.getProductImageName().contains("0")) {

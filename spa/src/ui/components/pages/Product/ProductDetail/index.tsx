@@ -17,8 +17,6 @@ import Carousel from 'components/common/Carousel';
 import ColorRadio from 'components/common/ColorRadio';
 import { filterUniqueVariantColors, filterUniqueVariantSizes, isExceedStock, filterSingleVariant } from 'domain/product';
 import { ProductType, ProductVariantSizeType, ProductVariantType } from 'domain/product/types';
-import uniq from 'lodash/uniq';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
@@ -26,10 +24,11 @@ import { UserTypeEnum, MessageTypeEnum } from 'src/app';
 import { cartItemActions } from 'reducers/slices/domain/cartItem';
 import { api } from 'configs/axiosConfig';
 import { AxiosError } from 'axios';
-import cloneDeep from 'lodash/cloneDeep';
-import { getNanoId } from 'src/utils';
-import { postWishlistItemFetchStatusActions } from 'reducers/slices/app/fetchStatus/wishlistItem';
+import { getNanoId, cadCurrencyFormat } from 'src/utils';
 import { postWishlistItemActionCreator } from 'reducers/slices/domain/wishlistItem';
+import { messageActions } from 'reducers/slices/app';
+import { cartModalActions } from 'reducers/slices/ui';
+import uniqBy from 'lodash/uniqBy';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -129,9 +128,6 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
 
   const dispatch = useDispatch()
 
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
   // state for color & size & quantity
   const [curSelectedColor, setSelectedColor] = React.useState<string>(
     props.product.variants[0].variantColor
@@ -198,7 +194,7 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
   React.useEffect(() => {
 
     const nextAvailableVariants = props.product.variants.filter((variant: ProductVariantType) => variant.variantColor == curSelectedColor);
-    const nextAvailableSizes: ProductVariantSizeType[] = uniq(nextAvailableVariants.map((variant: ProductVariantType) => variant.productSize))
+    const nextAvailableSizes: ProductVariantSizeType[] = uniqBy(nextAvailableVariants.map((variant: ProductVariantType) => variant.productSize), (productSize: ProductVariantSizeType)  => { return productSize.productSizeId })
 
     // if there is no cur size in the next available sizes, need to change it to the one in the available sizes
     if (!nextAvailableSizes.find((size: ProductVariantSizeType) => size.productSizeId == curSelectedSize.productSizeId)) {
@@ -239,9 +235,35 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
   const auth = useSelector(mSelector.makeAuthSelector());
 
   // event handler for adding cart
+  const isMaxCartItems = useSelector(mSelector.makeIsExceedMaxNumberOfCartItemSelector());
+  const isDuplicatedCartItem = useSelector(mSelector.makeIsDuplicateVariantCartItemSelector(curVariant.variantId));
   const handleAddCart: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
 
     if (auth.userType === UserTypeEnum.GUEST) {
+
+      // validation
+      if (isMaxCartItems) {
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.ERROR,
+            message: "can't add more (max: 5 items)",
+          })
+        )
+        return false;
+      }
+
+      if (isDuplicatedCartItem) {
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.ERROR,
+            message: "selected item already in the cart"
+          })
+        )
+        return false;
+      }
+
       dispatch(cartItemActions.append({
         cartItemId: getNanoId(), // temp id
         createdAt: new Date(Date.now()),
@@ -250,6 +272,14 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
         quantity: curQty,
         user: null,
       }))
+
+      dispatch(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.SUCCESS,
+          message: "added successfully",
+        })
+      )
     } else {
 
       // request
@@ -267,9 +297,21 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
         // fetch again
         dispatch(cartItemActions.append(data.data))
 
-        enqueueSnackbar("added successfully.", { variant: "success" })
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.SUCCESS,
+            message: "added successfully",
+          })
+        )
       }).catch((error: AxiosError) => {
-        enqueueSnackbar(error.message, { variant: "error" })
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.ERROR,
+            message: error.response.data.message,
+          })
+        )
       })
     }
   }
@@ -279,12 +321,95 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
   const handleAddWishlist: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
     dispatch(postWishlistItemActionCreator({
       variantId: curVariant.variantId,
+      userId: auth.user.userId,
       product: props.product
     }))
   }
 
+  // event handler for buy now
   const handleBuyNow: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    return false;
+    if (auth.userType === UserTypeEnum.GUEST) {
+
+      // validation
+      if (isMaxCartItems) {
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.ERROR,
+            message: "can't add more (max: 5 items)",
+          })
+        )
+        return false;
+      }
+
+      if (isDuplicatedCartItem) {
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.ERROR,
+            message: "selected item already in the cart"
+          })
+        )
+        return false;
+      }
+
+      dispatch(cartItemActions.append({
+        cartItemId: getNanoId(), // temp id
+        createdAt: new Date(Date.now()),
+        isSelected: true,
+        product: filterSingleVariant(curVariant.variantId, props.product), // need to set filtered product (only contains selected variant) 
+        quantity: curQty,
+        user: null,
+      }))
+
+      dispatch(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.SUCCESS,
+          message: "added successfully",
+        })
+      )
+
+      dispatch(
+        cartModalActions.open()
+      )
+    } else {
+
+      // request
+      api.request({
+        method: 'POST',
+        url: API1_URL + `/users/${auth.user.userId}/cartItems`,
+        data: {
+          variantId: curVariant.variantId,
+          isSelected: true,
+          quantity: curQty,
+          userId: auth.user.userId,
+        },
+      }).then((data) => {
+
+        // fetch again
+        dispatch(cartItemActions.append(data.data))
+
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.SUCCESS,
+            message: "added successfully",
+          })
+        )
+        dispatch(
+          cartModalActions.open()
+        )
+      }).catch((error: AxiosError) => {
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.ERROR,
+            message: error.response.data.message,
+          })
+        )
+      })
+    }
   }
 
 
@@ -397,7 +522,7 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
           </Box>
           <Box component="div" >
             <Typography variant="body1" component="p" className={classes.productColorTitle}>
-              Price: <b>$ {`${curVariant.variantUnitPrice ? curVariant.variantUnitPrice * curQty : props.product.productBaseUnitPrice * curQty}`}</b>
+              Price: <b>$ {`${cadCurrencyFormat(curVariant.currentPrice * curQty)}`}</b>
             </Typography>
             <Typography variant="body2" component="p" color="textSecondary">
               * this does not include tax and shipping fee
@@ -407,37 +532,43 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
             <Button onClick={handleAddCart}>
               {"Add to Cart"}
             </Button>
-            <Button onClick={handleAddWishlist}>
-              {"save to Wishlist"}
-            </Button>
+            {(auth.userType === UserTypeEnum.MEMBER &&
+              <Button onClick={handleAddWishlist}>
+                {"save to Wishlist"}
+              </Button>
+            )}
             <Button onClick={handleBuyNow}>
               {"buy now"}
             </Button>
           </Box>
         </Grid>
-        <Grid
-          item
-          xs={12}
-          className={classes.detailNoteBox}
-        >
-          <Typography variant="body1" component="h6" className={classes.subtitle}>
-            Detail Note
+        {(props.product.note &&
+          <Grid
+            item
+            xs={12}
+            className={classes.detailNoteBox}
+          >
+            <Typography variant="body1" component="h6" className={classes.subtitle}>
+              Detail Note
           </Typography>
-          <Typography variant="body1" component="p">
-            {props.product.note}
-          </Typography>
-          <Box component="div" className={classes.controllerBox}>
-            <Button>
-              {"Add to Cart"}
-            </Button>
-            <Button>
-              {"save to Wishlist"}
-            </Button>
-            <Button>
-              {"buy now"}
-            </Button>
-          </Box>
-        </Grid>
+            <Typography variant="body1" component="p">
+              {props.product.note}
+            </Typography>
+            <Box component="div" className={classes.controllerBox}>
+              <Button onClick={handleAddCart}>
+                {"Add to Cart"}
+              </Button>
+              {(auth.userType === UserTypeEnum.MEMBER &&
+                <Button onClick={handleAddWishlist}>
+                  {"save to Wishlist"}
+                </Button>
+              )}
+              <Button onClick={handleBuyNow}>
+                {"buy now"}
+              </Button>
+            </Box>
+          </Grid>
+        )}
       </Grid>
     </React.Fragment>
   )

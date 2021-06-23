@@ -68,14 +68,20 @@ public class UserAddressServiceImpl implements UserAddressService {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
+    User user = targetUserOption.get();
+
+    if (user.getAddresses().size() >= 3) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "user cannot have more than 3 addresses.");
+    }
+
     // map criteria to entity
     Address newEntity = AddressMapper.INSTANCE.toAddressEntityFromAddressCriteria(criteria);
 
     // assign the entity to the user
-    targetUserOption.get().addAddress(newEntity);
+    user.addAddress(newEntity);
 
     // save
-    User savedUser = this.repository.save(targetUserOption.get());
+    User savedUser = this.repository.save(user);
 
     /**
      * TODO: how to find the newly saved address with savedUser?

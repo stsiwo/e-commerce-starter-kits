@@ -86,6 +86,7 @@ export function* postWishlistItemWorker(action: PayloadAction<PostWishlistItemAc
       url: apiUrl,
       data: {
         variantId: action.payload.variantId,
+        userId: action.payload.userId
       } as WishlistItemCriteria
     })
       .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))

@@ -6,14 +6,13 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import MenuItem from '@material-ui/core/MenuItem';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { defaultOrderEventData, OrderEventType, orderStatusBagList, OrderStatusEnum, OrderType } from 'domain/order/types';
-import { useSnackbar } from 'notistack';
+import { defaultOrderEventData, OrderEventType, OrderStatusEnum, OrderType } from 'domain/order/types';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { postAuthOrderEventActionCreator } from 'reducers/slices/app';
 import { postOrderEventActionCreator, putOrderEventActionCreator } from 'reducers/slices/domain/order';
 import { AuthType, UserTypeEnum } from 'src/app';
 import { mSelector } from 'src/selectors/selector';
-import { postAuthOrderEventActionCreator } from 'reducers/slices/app';
 
 interface OrderEventUpdateFormDialogPropsType {
   open: boolean

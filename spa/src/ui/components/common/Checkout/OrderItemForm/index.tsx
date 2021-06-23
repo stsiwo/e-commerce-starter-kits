@@ -13,7 +13,7 @@ import { mSelector } from 'src/selectors/selector';
 import Box from '@material-ui/core/Box';
 import { Link as RRLink } from "react-router-dom";
 import { messageActions } from 'reducers/slices/app';
-import { getNanoId } from 'src/utils';
+import { getNanoId, cadCurrencyFormat } from 'src/utils';
 import { MessageTypeEnum } from 'src/app';
 import Switch from '@material-ui/core/Switch';
 
@@ -125,7 +125,7 @@ const OrderItemForm: React.FunctionComponent<OrderItemFormPropsType> = (props) =
             md={6}
           >
             <Typography variant="h6" component="h3" align="right" gutterBottom>
-              SubTotal: $<b>{calcSubTotalPriceAmount(selectedCartItems)}</b>
+              SubTotal: $<b>{cadCurrencyFormat(calcSubTotalPriceAmount(selectedCartItems))}</b>
             </Typography>
             <Typography variant="caption" component="p" align="right" color="textSecondary" gutterBottom >
               * total cost included tax and shipping costs are available at next step.

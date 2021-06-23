@@ -9,6 +9,3 @@ INSERT INTO `ec-schema`.`addresses` (`address_1`, `address_2`, `city`, `province
 
 INSERT INTO `ec-schema`.`addresses` (`address_1`, `address_2`, `city`, `province`, `country`, `postal_code`, `is_billing_address`, `is_shipping_address`, `user_id`) VALUES ('test_address_1_1', 'test_address_2_1', 'test_city', 'test_province', 'CA', 'V5R 2C2', '0', '0', '29c845ad-54b1-430a-8a71-5caba98d5978'); -- must match with the user above
 
-INSERT INTO `ec-schema`.`addresses` (`address_1`, `address_2`, `city`, `province`, `country`, `postal_code`, `is_billing_address`, `is_shipping_address`, `user_id`) VALUES ('test_address_1_1', 'test_address_2_1', 'test_city', 'test_province', 'CA', 'V5R 2C2', '0', '0', '29c845ad-54b1-430a-8a71-5caba98d5978'); -- must match with the user above 
-
-

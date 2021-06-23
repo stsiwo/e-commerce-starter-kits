@@ -281,19 +281,7 @@ public class Product {
       throw new NotFoundException("the target variant does not exist. (variant id: " + variantId + ")");
     }
 
-    if (variant.getIsDiscount()) {
-      return variant.getVariantDiscountPrice();
-    } 
-
-    if (this.getIsDiscount()) {
-      return this.getProductBaseDiscountPrice();
-    }
-
-    if (variant.getVariantUnitPrice() != null) {
-      return variant.getVariantUnitPrice();
-    } 
-
-    return this.getProductBaseUnitPrice();
+    return variant.getCurrentPrice();
   }
 
   public String getColorOfVariant(Long variantId) throws NotFoundException {

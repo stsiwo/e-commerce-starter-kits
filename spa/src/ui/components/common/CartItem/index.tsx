@@ -25,6 +25,7 @@ import { mSelector } from 'src/selectors/selector';
 import SampleSelfImage from 'static/self.jpeg';
 import ColorCell from '../GridData/ColorCell';
 import SizeCell from '../GridData/SizeCell';
+import { cadCurrencyFormat } from 'src/utils';
 
 /**
  * need 'orderDetail' or 'product/variant'
@@ -249,7 +250,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
         className={classes.cardHeader}
         avatar={<Avatar alt="" src={SampleSelfImage} />}
         title={value.product.productName}
-        subheader={`$${value.product.productBaseUnitPrice} NEED TO FIX`}
+        subheader={`$${cadCurrencyFormat(value.product.variants[0].currentPrice)}`}
       >
       </CardHeader>
       <CardActions>

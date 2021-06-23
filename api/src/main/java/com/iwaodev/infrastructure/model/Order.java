@@ -21,6 +21,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
+import javax.persistence.PostLoad;
 import javax.persistence.Transient;
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
@@ -33,6 +34,7 @@ import javax.validation.constraints.Pattern;
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.iwaodev.domain.order.OrderStatusEnum;
 import com.iwaodev.domain.order.validator.OrderValidation;
+import com.iwaodev.infrastructure.model.listener.OrderListener;
 import com.iwaodev.infrastructure.model.listener.OrderValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
@@ -47,14 +49,21 @@ import org.slf4j.LoggerFactory;
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 @OrderValidation()
-@ToString
-@Data
-@EntityListeners(OrderValidationListener.class)
+@ToString()
+@Getter
+@Setter
+/**
+ * order & orderAddress cause stackoverflow with its lombok hashcode.
+ * so exclude it. ref: https://stackoverflow.com/questions/34972895/lombok-hashcode-issue-with-java-lang-stackoverflowerror-null
+ **/
+@EqualsAndHashCode(exclude = {"shippingAddress", "billingAddress"})
+@EntityListeners( value = { OrderValidationListener.class, OrderListener.class })
 @Entity(name = "orders")
 public class Order {
 
@@ -86,7 +95,7 @@ public class Order {
   @DecimalMin(value = "1.0", message = "{order.productCost.min1}")
   @Getter(value = AccessLevel.NONE)
   @Column(name = "product_cost")
-  private BigDecimal productCost = new BigDecimal(1);
+  private BigDecimal productCost = new BigDecimal(0);
 
   @NotNull(message = "{order.taxCost.notnull}")
   @Column(name = "tax_cost")
@@ -310,6 +319,15 @@ public class Order {
   }
 
   // business behaviors
+  
+  /**
+   * this might causes transactional doCommit exception.
+   *
+   * this is because the productCost field is modified after saved by calling getProductCost().
+   *
+   * so workaround is to give a condition. if the productCost field has default value (e.g., 1.00), call teh 'calculateProductCost', so that the field is no longer modifed after saved.
+   *
+   **/
   public void calculateProductCost() {
     BigDecimal tempTotalCost = new BigDecimal("0");
     for (OrderDetail orderDetail : this.orderDetails) {
@@ -321,7 +339,10 @@ public class Order {
   }
 
   public BigDecimal getProductCost() {
-    this.calculateProductCost();
+    if (this.productCost.compareTo(BigDecimal.valueOf(0)) == 0) {
+      // this shouldn't be called after persisted.
+      this.calculateProductCost();
+    }
     return this.productCost;
   }
 
@@ -337,6 +358,8 @@ public class Order {
     totalCost = totalCost.add(this.productCost);
     totalCost = totalCost.add(this.taxCost);
     totalCost = totalCost.add(this.shippingCost);
+
+    logger.info("total cost: " + totalCost);
 
     return totalCost;
   }
@@ -456,6 +479,12 @@ public class Order {
    * set up any transient properties (e.g., latestOrderEvent,
    * nextAdminOrderEventOptions, ...)
    **/
+  /**
+   * if PostLoad on entity doesnt work for you, you need to define entity listener.
+   *
+   * ref: https://stackoverflow.com/questions/2802676/hibernate-postload-never-gets-invoked
+   **/
+  @PostLoad
   public void setUpCalculatedProperties() {
     OrderEvent latestEvent = this.retrieveLatestOrderEvent();
 
@@ -648,255 +677,13 @@ public class Order {
     return this.billingAddress.displayAddress();
   }
 
-  public static Logger getLogger() {
-    return logger;
+  /**
+   * stripe requires to return min 50 (e.g, 50 cents and NOT 0.50).
+   *
+   * so return Long and multiply by 100 since we use 0.5 as 50 cents.
+   **/
+  public Long getTotalCostForStripe() {
+    return this.getTotalCost().longValue() * 100;
   }
 
-  public static OrderStatusEnum[] getDeletableorderstatuslist() {
-    return deletableOrderStatusList;
-  }
-
-  public UUID getOrderId() {
-    return orderId;
-  }
-
-  public void setOrderId(UUID orderId) {
-    this.orderId = orderId;
-  }
-
-  public String getOrderNumber() {
-    return orderNumber;
-  }
-
-  public void setOrderNumber(String orderNumber) {
-    this.orderNumber = orderNumber;
-  }
-
-  public void setProductCost(BigDecimal productCost) {
-    this.productCost = productCost;
-  }
-
-  public BigDecimal getTaxCost() {
-    return taxCost;
-  }
-
-  public void setTaxCost(BigDecimal taxCost) {
-    this.taxCost = taxCost;
-  }
-
-  public BigDecimal getShippingCost() {
-    return shippingCost;
-  }
-
-  public void setShippingCost(BigDecimal shippingCost) {
-    this.shippingCost = shippingCost;
-  }
-
-  public String getNote() {
-    return note;
-  }
-
-  public void setNote(String note) {
-    this.note = note;
-  }
-
-  public String getOrderFirstName() {
-    return orderFirstName;
-  }
-
-  public void setOrderFirstName(String orderFirstName) {
-    this.orderFirstName = orderFirstName;
-  }
-
-  public String getOrderLastName() {
-    return orderLastName;
-  }
-
-  public void setOrderLastName(String orderLastName) {
-    this.orderLastName = orderLastName;
-  }
-
-  public String getOrderEmail() {
-    return orderEmail;
-  }
-
-  public void setOrderEmail(String orderEmail) {
-    this.orderEmail = orderEmail;
-  }
-
-  public String getOrderPhone() {
-    return orderPhone;
-  }
-
-  public void setOrderPhone(String orderPhone) {
-    this.orderPhone = orderPhone;
-  }
-
-  public String getStripePaymentIntentId() {
-    return stripePaymentIntentId;
-  }
-
-  public void setStripePaymentIntentId(String stripePaymentIntentId) {
-    this.stripePaymentIntentId = stripePaymentIntentId;
-  }
-
-  public String getShipmentId() {
-    return shipmentId;
-  }
-
-  public void setShipmentId(String shipmentId) {
-    this.shipmentId = shipmentId;
-  }
-
-  public String getTrackingPin() {
-    return trackingPin;
-  }
-
-  public void setTrackingPin(String trackingPin) {
-    this.trackingPin = trackingPin;
-  }
-
-  public String getRefundLink() {
-    return refundLink;
-  }
-
-  public void setRefundLink(String refundLink) {
-    this.refundLink = refundLink;
-  }
-
-  public String getAuthReturnTrackingPin() {
-    return authReturnTrackingPin;
-  }
-
-  public void setAuthReturnTrackingPin(String authReturnTrackingPin) {
-    this.authReturnTrackingPin = authReturnTrackingPin;
-  }
-
-  public LocalDateTime getAuthReturnExpiryDate() {
-    return authReturnExpiryDate;
-  }
-
-  public void setAuthReturnExpiryDate(LocalDateTime authReturnExpiryDate) {
-    this.authReturnExpiryDate = authReturnExpiryDate;
-  }
-
-  public LocalDateTime getAuthReturnUrl() {
-    return authReturnUrl;
-  }
-
-  public void setAuthReturnUrl(LocalDateTime authReturnUrl) {
-    this.authReturnUrl = authReturnUrl;
-  }
-
-  public OrderStatusEnum getLatestOrderEventStatus() {
-    return latestOrderEventStatus;
-  }
-
-  public void setLatestOrderEventStatus(OrderStatusEnum latestOrderEventStatus) {
-    this.latestOrderEventStatus = latestOrderEventStatus;
-  }
-
-  public LocalDateTime getShipmentOriginalResponse() {
-    return shipmentOriginalResponse;
-  }
-
-  public void setShipmentOriginalResponse(LocalDateTime shipmentOriginalResponse) {
-    this.shipmentOriginalResponse = shipmentOriginalResponse;
-  }
-
-  public LocalDateTime getAuthReturnOriginalResponse() {
-    return authReturnOriginalResponse;
-  }
-
-  public void setAuthReturnOriginalResponse(LocalDateTime authReturnOriginalResponse) {
-    this.authReturnOriginalResponse = authReturnOriginalResponse;
-  }
-
-  public String getCurrency() {
-    return currency;
-  }
-
-  public void setCurrency(String currency) {
-    this.currency = currency;
-  }
-
-  public Boolean getIsGuest() {
-    return isGuest;
-  }
-
-  public void setIsGuest(Boolean isGuest) {
-    this.isGuest = isGuest;
-  }
-
-  public LocalDateTime getEstimatedDeliveryDate() {
-    return estimatedDeliveryDate;
-  }
-
-  public void setEstimatedDeliveryDate(LocalDateTime estimatedDeliveryDate) {
-    this.estimatedDeliveryDate = estimatedDeliveryDate;
-  }
-
-  public OrderAddress getShippingAddress() {
-    return shippingAddress;
-  }
-
-  public OrderAddress getBillingAddress() {
-    return billingAddress;
-  }
-
-  public LocalDateTime getCreatedAt() {
-    return createdAt;
-  }
-
-  public void setCreatedAt(LocalDateTime createdAt) {
-    this.createdAt = createdAt;
-  }
-
-  public LocalDateTime getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public void setUpdatedAt(LocalDateTime updatedAt) {
-    this.updatedAt = updatedAt;
-  }
-
-  public User getUser() {
-    return user;
-  }
-
-  public void setUser(User user) {
-    this.user = user;
-  }
-
-  public List<OrderEvent> getOrderEvents() {
-    return orderEvents;
-  }
-
-  public List<OrderDetail> getOrderDetails() {
-    return orderDetails;
-  }
-
-  public List<OrderStatusEnum> getNextAdminOrderEventOptions() {
-    return nextAdminOrderEventOptions;
-  }
-
-  public void setNextAdminOrderEventOptions(List<OrderStatusEnum> nextAdminOrderEventOptions) {
-    this.nextAdminOrderEventOptions = nextAdminOrderEventOptions;
-  }
-
-  public List<OrderStatusEnum> getNextMemberOrderEventOptions() {
-    return nextMemberOrderEventOptions;
-  }
-
-  public void setNextMemberOrderEventOptions(List<OrderStatusEnum> nextMemberOrderEventOptions) {
-    this.nextMemberOrderEventOptions = nextMemberOrderEventOptions;
-  }
-
-  public OrderEvent getLatestOrderEvent() {
-    return latestOrderEvent;
-  }
-
-  public void setLatestOrderEvent(OrderEvent latestOrderEvent) {
-    this.latestOrderEvent = latestOrderEvent;
-  }
 }

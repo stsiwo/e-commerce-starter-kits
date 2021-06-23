@@ -29,7 +29,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@AddressValidation()
+//@AddressValidation()
 @Data
 @ToString
 @NoArgsConstructor

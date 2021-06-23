@@ -28,4 +28,5 @@ public class ProductVariantDTO {
   private Double variantHeight;
   private Double variantWidth;
   private Double variantLength;
+  private BigDecimal currentPrice;
 }

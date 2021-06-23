@@ -171,6 +171,8 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
 
   const handleNewFormToggleBtnClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
     setFormOpen(!curFormOpen)
+    // set null to make 'isNew' true
+    setProduct(null); 
   }
 
   // deletion dialog stuff

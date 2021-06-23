@@ -87,7 +87,8 @@ export const productSlice = createSlice({
      **/
 
     // use when update existing one
-    merge: (state: NormalizedProductType, action: ProductActionType) => merge(state, action.payload),
+    // put 'action.payload' first at 'merge' so that it is displayed on the list.
+    merge: (state: NormalizedProductType, action: ProductActionType) => merge(action.payload, state),
 
     // use when you want to replace
     update: (state: NormalizedProductType, action: ProductActionType) => action.payload,

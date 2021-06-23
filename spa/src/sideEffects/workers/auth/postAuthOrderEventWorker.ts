@@ -42,6 +42,8 @@ export function* postAuthOrderEventWorker(action: PayloadAction<PostAuthOrderEve
 
   if (curAuth.userType === UserTypeEnum.MEMBER) {
 
+    console.log("start calling post auth order event worker:)")
+
     /**
      * update status for anime data
      **/

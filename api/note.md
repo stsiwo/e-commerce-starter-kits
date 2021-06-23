@@ -482,6 +482,12 @@
       
     - read this about the propagation and the isolation: https://www.baeldung.com/spring-transactional-propagation-isolation
 
+    ### Transactional Note:
+
+      - maybe you don't need to add this annotation for all getter services.
+        => sometimes, it causes this error.
+          e.g., org.springframework.transaction.TransactionSystemException: Could not commit JPA transaction; nested exception is javax.persistence.RollbackException: Error while committing the transaction\n\tat org.springframework.orm.jpa.JpaTransactionManager.doCommit(JpaTransactionManager.java.
+
   ## Persitence Context
 
       - def) the first-level cache where all the entities are fetched from the database or saved to the database.
@@ -715,6 +721,36 @@
 
             - https://docs.jboss.org/hibernate/orm/5.2/userguide/html_single/Hibernate_User_Guide.html#entity-inheritance-joined-table
 
+  ## Integration with javax.validation (JSR 303)
+
+    => mainly for automatiion of validations on entities.
+
+    => by default, Hibernate takes care of the automation so you don't need to implement anything such as registering EntityListener.
+
+      ref: https://thorben-janssen.com/automatically-validate-entities-with-hibernate-validator/
+
+      is this true? or bug
+        => sometime, the validator is not triggered even if I annotated to an entity.
+
+        => to make sure to add "EntityListener"!!
+
+    ### NOTE
+
+      - validating an associate from the parent entity with javax.validation annotation cause this errors: java.lang.NullPointerException: null
+        at org.hibernate.collection.internal.AbstractPersistentCollection$5.hasNext(AbstractPersistentCollection.java:822) ~[hibernate-core-5.4.32.Final.jar:5.4.32.Final].
+       
+      ex) like @PhoneValidation at Phone Entity and try to save from User Entity which is the parent of this Phone entity.
+
+      BUT, it is ok to if you try to validate the parent with its validation. it works nicely.
+      
+      ex) @CartItemValidation with CartItem Entity works well.
+
+      - bugs?
+
+        - EntityListener's domain does not have its association.
+
+          e.g.,) product.productIages is empty at EntityListener's domain at Product. i don't know why.
+ 
   ## IMPORTANT NOTE
 
     - you need to database transaction has to be as short as possible to reduce lock contention.

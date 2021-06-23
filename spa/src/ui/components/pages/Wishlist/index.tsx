@@ -10,7 +10,9 @@ import { WishlistItemType } from 'domain/wishlist/types';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteSingleWishlistItemActionCreator, fetchWishlistItemActionCreator, patchWishlistItemActionCreator, wishlistItemPaginationPageActions } from 'reducers/slices/domain/wishlistItem';
-import { mSelector } from 'src/selectors/selector';
+import { mSelector, rsSelector } from 'src/selectors/selector';
+import { FetchStatusEnum } from 'src/app';
+import { CircularProgress } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -24,7 +26,17 @@ const useStyles = makeStyles((theme: Theme) =>
     controllerBox: {
       textAlign: "center",
       margin: theme.spacing(3),
-    }
+    },
+    emptyBox: {
+      minHeight: 300,
+      padding: theme.spacing(1),
+    },
+    loadingBox: {
+      height: "80vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
   }),
 );
 
@@ -99,15 +111,32 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
 
     dispatch(wishlistItemPaginationPageActions.update(nextPage))
   };
+
+  // spinner
+  const curFetchWishlistFetchStatus = useSelector(rsSelector.app.getFetchWishlistItemFetchStatus);
+
+
   return (
     <React.Fragment>
       <Typography variant="h5" component="h5" align="center" className={classes.title} >
         {"Wishlist"}
       </Typography>
       <WishlistItemSearchController />
-      {(curWishlistItems.length === 0 &&
-        <React.Fragment>
-          <Typography variant="body1" component="p" align="center">
+      {(curFetchWishlistFetchStatus === FetchStatusEnum.FETCHING &&
+        <Box className={classes.loadingBox}>
+          <CircularProgress />
+        </Box>
+      )}
+      {(curFetchWishlistFetchStatus === FetchStatusEnum.FAILED &&
+        <Box className={classes.loadingBox}>
+          <Typography variant="body1" component="h2" >
+            {"failed to fetch data... please try again..."}
+          </Typography>
+        </Box>
+      )}
+      {(curFetchWishlistFetchStatus === FetchStatusEnum.SUCCESS && curWishlistItems.length === 0 &&
+        <Box className={classes.loadingBox}>
+          <Typography variant="h6" component="h6" align="center">
             {"Oops, Your wishlist is empty."}
           </Typography>
           <Box component="div" className={classes.controllerBox}>
@@ -115,7 +144,7 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
               {"search"}
             </Button>
           </Box>
-        </React.Fragment>
+        </Box>
       )}
       {(curWishlistItems.length > 0 &&
         <React.Fragment>

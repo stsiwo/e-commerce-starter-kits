@@ -19,6 +19,7 @@ import { authActions } from 'reducers/slices/app';
 import { fetchNotificationActionCreator, incrementNotificationCurIndexActionCreator } from 'reducers/slices/domain/notification';
 import { cartModalActions } from 'reducers/slices/ui';
 import { mSelector } from 'src/selectors/selector';
+import { useLocation } from 'react-router';
 
 declare interface MenuItemType {
   url: string
@@ -137,8 +138,8 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
       )
     }
   }, [
-    curNotificationPagination.page  
-  ])
+      curNotificationPagination.page
+    ])
 
   const handleNotificationClick = (e: React.MouseEvent<HTMLElement>) => {
     dispatch(
@@ -184,13 +185,18 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
     })
   }
 
+  // disable cart icon when /checkout
+  const location = useLocation()
+
   return (
     <Grid item>
-      <IconButton onClick={handleCartModalOpenClick}>
-        <Badge badgeContent={curNumberOfCartItems} color="error">
-          <ShoppingCartIcon />
-        </Badge>
-      </IconButton>
+      {(location.pathname != "/checkout" &&
+        <IconButton onClick={handleCartModalOpenClick}>
+          <Badge badgeContent={curNumberOfCartItems} color="error">
+            <ShoppingCartIcon />
+          </Badge>
+        </IconButton>
+      )}
       <IconButton onClick={handleNotificationClick}>
         {/** use totalElements to display total number of notifications **/}
         <Badge badgeContent={curNotificationPagination.totalElements} color="error">

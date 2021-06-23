@@ -16,6 +16,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PostLoad;
+import javax.persistence.Transient;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
@@ -23,6 +25,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
 import com.iwaodev.domain.product.validator.ProductVariantValidation;
+import com.iwaodev.infrastructure.model.listener.ProductVariantListener;
 import com.iwaodev.infrastructure.model.listener.ProductVariantValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
@@ -36,15 +39,17 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+// DOUBT thsi might need to be removed
 @ProductVariantValidation()
 @Data
 @ToString
 @NoArgsConstructor
-@EntityListeners(ProductVariantValidationListener.class)
+@EntityListeners(value = { ProductVariantValidationListener.class, ProductVariantListener.class })
 @Entity(name = "product_variants")
 @FilterDef(
     name = "selectedVariantFilter",
@@ -152,6 +157,38 @@ public class ProductVariant {
   @OneToMany(mappedBy = "productVariant", cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, orphanRemoval = false)
   private List<OrderDetail> orderDetails  = new ArrayList<>();
 
+  @Getter(value = AccessLevel.NONE)
+  @Setter(value = AccessLevel.NONE)
+  @Transient
+  private BigDecimal currentPrice;
+
+  /**
+   * if PostLoad on entity doesnt work for you, you need to define entity listener.
+   *
+   * ref: https://stackoverflow.com/questions/2802676/hibernate-postload-never-gets-invoked
+   **/
+  @PostLoad
+  public void setCurPrice() {
+    this.currentPrice = this.getCurrentPrice();
+  }
+
+  public BigDecimal getCurrentPrice() {
+
+    if (this.getIsDiscount()) {
+      return this.getVariantDiscountPrice();
+    } 
+
+    if (this.product.getIsDiscount()) {
+      return this.product.getProductBaseDiscountPrice();
+    }
+
+    if (this.getVariantUnitPrice() != null) {
+      return this.getVariantUnitPrice();
+    } 
+
+    return this.product.getProductBaseUnitPrice();
+  }
+
   public void setCartItems(List<CartItem> cartItems) {
     this.cartItems = cartItems;
 
@@ -206,5 +243,4 @@ public class ProductVariant {
     orderDetail.setProductVariant(null);
   }
 
-  // business behaviors
 }

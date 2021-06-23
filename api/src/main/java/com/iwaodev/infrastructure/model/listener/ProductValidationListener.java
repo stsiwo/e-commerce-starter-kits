@@ -54,6 +54,11 @@ public class ProductValidationListener {
   @PrePersist
   private void beforeCreate(Product domain) {
     logger.info("start validating domain for create...");
+
+    logger.info("iamge size;");
+    logger.info("" + domain.getProductImages().size());
+
+
     Set<ConstraintViolation<Product>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {

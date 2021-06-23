@@ -77,7 +77,7 @@ const ProductCardV2: React.FunctionComponent<ProductCardV2PropsType> = ({ produc
             TODO: need to domain function to select cheapest price via product variant 
                or you can create a property in backend DTO so that you don't need to calculate in front-end 
             **/}
-            <b>${cadCurrencyFormat(product.productBaseUnitPrice)} ~</b>
+            <b>${cadCurrencyFormat(product.cheapestPrice)} ~</b>
           </Typography>
         </CardContent>
         <CardActions className={classes.actions}>
@@ -86,7 +86,9 @@ const ProductCardV2: React.FunctionComponent<ProductCardV2PropsType> = ({ produc
         </Button>
         </CardActions>
       </Card>
-      <CornerRibbon text={"Discount"} />
+      {(product.isDiscountAvailable &&
+        <CornerRibbon text={"Discount"} />
+      )}
     </Box>
   )
 }

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwaodev.application.dto.product.ProductDTO;
+import com.iwaodev.application.dto.product.ProductVariantDTO;
 import com.iwaodev.data.BaseDatabaseSetup;
 
 // MockMvc stuff
@@ -181,6 +182,9 @@ public class GuestProductEndpointTest {
       assertThat(productDto.getCategory().getCategoryId()).isNotNull();
       assertThat(productDto.getVariants().size()).isGreaterThan(0);
       assertThat(productDto.getReviews().size()).isEqualTo(1); // adjusted that all product verfied review number is 1. check sql.
+      for (ProductVariantDTO variantDTO : productDto.getVariants()) {
+        assertThat(variantDTO.getCurrentPrice()).isNotNull();
+      }
     }
   }
 

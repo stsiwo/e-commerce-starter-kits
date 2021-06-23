@@ -6,6 +6,7 @@ import java.util.function.Function;
 import javax.servlet.http.HttpServletResponse;
 
 import com.iwaodev.application.dto.category.CategoryDTO;
+import com.iwaodev.application.dto.user.CompanyDTO;
 import com.iwaodev.application.dto.user.UserDTO;
 import com.iwaodev.application.irepository.CategoryRepository;
 import com.iwaodev.application.irepository.UserRepository;
@@ -67,10 +68,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      * fetch its child entities manually because of lazy loading.
      *
      **/
-    user.getAddresses();
-    user.getPhones();
-    user.getCompanies(); // only for admin
-
     UserDTO userDTO = UserMapper.INSTANCE.toUserDTO(user);
 
     return new AuthenticationResponse(userDTO, jwt);

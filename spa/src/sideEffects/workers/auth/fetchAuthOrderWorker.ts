@@ -64,6 +64,8 @@ export function* fetchAuthOrderWorker(action: PayloadAction<FetchAuthOrderAction
      **/
 
     // prep keyword if necessary
+    console.log("before send request order GET")
+    console.log(apiUrl)
 
     // start fetching
     const response = yield call(() => api({

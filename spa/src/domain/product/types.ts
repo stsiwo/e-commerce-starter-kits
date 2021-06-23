@@ -71,6 +71,7 @@ export declare type ProductVariantType = {
   variantWidth: number
   variantLength: number
   productId?: string
+  currentPrice?: number
 }
 
 
@@ -94,6 +95,8 @@ export declare type ProductType = {
   productImageFiles?: File[] // to upload file in product form
   productImages?: ProductImageType[] // to display teh image at client side (also send this to backend)
   variants?: ProductVariantType[]
+  isDiscountAvailable?: boolean
+  cheapestPrice?: number
 }
 
 export declare type NormalizedProductType = NormalizedDomainType<ProductType>

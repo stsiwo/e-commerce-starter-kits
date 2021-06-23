@@ -183,7 +183,18 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
   return (
     <Box component="div" className={classes.root}>
       <Box className={classes.cartInputBox}>
-        <CardElement />
+        {/**
+          * The card element automatically determines your customer’s billing address country based on their card number. 
+          * Using this information, the postal code field validation reflects whether that country uses numeric or alphanumeric-formatted postal codes, or if the country uses postal codes at all. 
+          * For instance, if a U.S. card is entered, the postal code field only accepts a five-digit numeric value. 
+          * If it’s a UK card, an alphanumeric value can be provided instead. 
+          **/}
+        <CardElement 
+          options={{
+            // we already got billing address so don't need this one.
+            hidePostalCode: true,   
+          }} 
+        />
       </Box>
       <Box className={classes.btnBox}>
         <Button

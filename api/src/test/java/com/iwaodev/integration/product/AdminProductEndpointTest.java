@@ -189,6 +189,9 @@ public class AdminProductEndpointTest {
       assertThat(productDto.getCategory().getCategoryId()).isNotNull();
       //assertThat(productDto.getVariants().size()).isGreaterThan(0);
       //assertThat(productDto.getReviews().size()).isEqualTo(2); // this will include non-verified one too since no filter. 
+      for (ProductVariantDTO variantDTO : productDto.getVariants()) {
+        assertThat(variantDTO.getCurrentPrice()).isNotNull();
+      }
     }
   }
 

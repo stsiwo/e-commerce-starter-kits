@@ -14,6 +14,7 @@ import SampleSelfImage from 'static/self.jpeg';
 import ColorCell from '../GridData/ColorCell';
 import SizeCell from '../GridData/SizeCell';
 import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
+import { cadCurrencyFormat } from 'src/utils';
 
 /**
  * need 'orderDetail' or 'product/variant'
@@ -69,7 +70,7 @@ const WishlistItem: React.FunctionComponent<WishlistItemPropsType> = ({ value, o
         className={classes.cardHeader}
         avatar={<Avatar alt="" src={SampleSelfImage} />}
         title={value.product.productName}
-        subheader={`$${value.product.productBaseUnitPrice} NEED TO FIX`}
+        subheader={`$${cadCurrencyFormat(value.product.variants[0].currentPrice)}`}
       >
       </CardHeader>
       <CardActions>

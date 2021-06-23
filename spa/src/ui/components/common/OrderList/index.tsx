@@ -16,9 +16,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link as RRLink } from "react-router-dom";
 import { fetchAuthOrderActionCreator } from 'reducers/slices/app';
 import { fetchOrderActionCreator, orderPaginationPageActions } from 'reducers/slices/domain/order';
-import { mSelector } from 'src/selectors/selector';
+import { mSelector, rsSelector } from 'src/selectors/selector';
 import { cadCurrencyFormat, toDateString } from 'src/utils';
 import Box from '@material-ui/core/Box';
+import { CircularProgress } from '@material-ui/core';
+import { FetchStatusEnum } from 'src/app';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -59,7 +61,13 @@ const useStyles = makeStyles((theme: Theme) =>
     gridItem: {
       maxWidth: 200,
       margin: theme.spacing(1)
-    }
+    },
+    loadingBox: {
+      height: "80vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
   }),
 );
 
@@ -145,10 +153,25 @@ const OrderList: React.FunctionComponent<{}> = (props) => {
     })
   }
 
+  // spinner stuff.
+  const curFetchAuthOrderFetchStatus  = useSelector(rsSelector.app.getFetchAuthOrderFetchStatus);
+
   return (
     <React.Fragment>
-      {(curOrders.length === 0 &&
-        <React.Fragment>
+      {(curFetchAuthOrderFetchStatus === FetchStatusEnum.FETCHING &&
+        <Box className={classes.loadingBox}>
+          <CircularProgress />
+        </Box>
+      )}
+      {(curFetchAuthOrderFetchStatus === FetchStatusEnum.FAILED &&
+        <Box className={classes.loadingBox}>
+          <Typography variant="body1" component="h2" >
+            {"failed to fetch data... please try again..."}
+          </Typography>
+        </Box>
+      )}
+      {(curFetchAuthOrderFetchStatus === FetchStatusEnum.FAILED && curOrders.length === 0 &&
+        <Box className={classes.loadingBox}>
           <Typography variant="body1" component="p" align="center">
             {"Oops, Your order history is empty."}
           </Typography>
@@ -157,7 +180,7 @@ const OrderList: React.FunctionComponent<{}> = (props) => {
               {"search your product"}
             </Button>
           </Box>
-        </React.Fragment>
+        </Box>
       )}
       {(curOrders.length > 0 &&
         <Grid

@@ -142,17 +142,6 @@ export function* fetchWishlistItemWorker(action: PayloadAction<{}>) {
         put(wishlistItemPaginationTotalElementsActions.update(response.totalElements)),
       ])
 
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.SUCCESS,
-          message: "fetched successfully.",
-        })
-      )
-
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
       console.log(response.message)

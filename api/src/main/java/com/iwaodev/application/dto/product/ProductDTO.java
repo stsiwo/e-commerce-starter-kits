@@ -51,5 +51,9 @@ public class ProductDTO {
   private List<ProductImageDTO> productImages;
 
   private List<ReviewDTO> reviews;
+
+  private BigDecimal cheapestPrice;
+
+  private Boolean isDiscountAvailable;
 }
 

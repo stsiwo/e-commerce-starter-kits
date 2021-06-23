@@ -42,6 +42,8 @@ export const rsSelector = {
     getSearchKeyword: (state: StateType) => state.app.searchKeyword,
     getRequestTracker: (state: StateType) => state.app.requestTracker,
 
+    getFetchAuthOrderFetchStatus: (state: StateType) => state.app.fetchStatus.auth.fetchOrder,
+    getFetchWishlistItemFetchStatus: (state: StateType) => state.app.fetchStatus.wishlistItems.get,
     getPutAuthFetchStatus: (state: StateType) => state.app.fetchStatus.auth.put,
     getPostSessionTimeoutOrderEventFetchStatus: (state: StateType) => state.app.fetchStatus.orders.postSessionTimeoutEvent,
     getPostOrderFetchStatus: (state: StateType) => state.app.fetchStatus.orders.post,
@@ -762,13 +764,27 @@ export const mSelector = {
     )
   },
 
+  makeIsDuplicateVariantCartItemSelector: (variantId: string) => {
+    return createSelector(
+      [
+        rsSelector.domain.getCartItem
+      ],
+      (cartItems) => {
+        if (cartItems.find((cartItem: CartItemType) => cartItem.product.variants[0].variantId == variantId)) {
+         return true; 
+        }
+        return false; 
+      },
+    )
+  },
+
   makeIsExceedMaxNumberOfCartItemSelector: () => {
     return createSelector(
       [
         mSelector.makeNumberOfCartItemSelector(), 
       ],
       (curLength) => {
-        return curLength > 5 
+        return curLength >= 5 
       },
     )
   },

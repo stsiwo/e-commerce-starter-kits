@@ -63,11 +63,7 @@ export const cartItemSlice = createSlice({
     },
 
     append: (state: CartItemType[], action: PayloadAction<CartItemType>) => {
-
-      // if variant already exists, skip
-      if (!state.find((cartItem: CartItemType) => cartItem.product.variants[0].variantId == action.payload.product.variants[0].variantId)) {
-        return merge(state, [action.payload]);
-      }
+      state.push(action.payload);
       return state
     },
 

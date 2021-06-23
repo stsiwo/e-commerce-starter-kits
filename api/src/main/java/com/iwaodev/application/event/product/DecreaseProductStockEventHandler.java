@@ -34,6 +34,7 @@ public class DecreaseProductStockEventHandler {
   @Autowired
   private ExceptionMessenger ExceptionMessenger;
 
+  // this must be the same transaction.
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
   public void handleEvent(OrderFinalConfirmedEvent event) {
 
@@ -51,10 +52,14 @@ public class DecreaseProductStockEventHandler {
 
       // find target product and variant by criteria productId & variantId
       // TODO: make sure pessimistic lock works
-      Product product = this.productRepository.findByIdWithPessimisticLock(productId)
+      
+      //Product product = this.productRepository.findByIdWithPessimisticLock(productId)
+      //    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+      //        this.ExceptionMessenger.getNotFoundMessage("product", productId.toString())));
+
+      Product product = this.productRepository.findById(productId)
           .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
               this.ExceptionMessenger.getNotFoundMessage("product", productId.toString())));
-
       try {
         product.decreaseStockOfVariant(orderDetail.getProductQuantity(),
             orderDetail.getProductVariant().getVariantId());

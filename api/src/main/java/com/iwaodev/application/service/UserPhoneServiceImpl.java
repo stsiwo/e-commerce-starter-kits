@@ -68,14 +68,21 @@ public class UserPhoneServiceImpl implements UserPhoneService {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
+    User user = targetUserOption.get();
+
+    // validate max phone 3
+    if (user.getPhones().size() >= 3) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, " user can't have more than 3 phones.");
+    }
+
     // map criteria to entity
     Phone newEntity = PhoneMapper.INSTANCE.toPhoneEntityFromPhoneCriteria(criteria);
 
     // assign the entity to the user
-    targetUserOption.get().addPhone(newEntity);
+    user.addPhone(newEntity);
 
     // save
-    User savedUser = this.repository.save(targetUserOption.get());
+    User savedUser = this.repository.save(user);
 
     /**
      * TODO: how to find the newly saved address with savedUser?

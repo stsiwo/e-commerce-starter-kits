@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
       width: 25,
       height: 25,
       margin: theme.spacing(0, 1),
+      fontSize: "15px",
     },
   }),
 );
