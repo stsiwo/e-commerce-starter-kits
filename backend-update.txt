@@ -52,6 +52,20 @@ endpoint change:
     
   - need to return current price based on discount availability and product & product variant price to client.
   
+  
+## staging bugs
+
+(generals)
+  - no error message is shown esp bad request.
+  - add validation for paths (product and category).
+  
+(companies)
+  - update does not work at admin.
+  
+(email)
+  - sign up does not send verification email. maybe misconfig of email.
+  
+  
     
       
     
