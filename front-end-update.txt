@@ -40,8 +40,6 @@
     
 - email verification prompt if the user still temp
 
-- enable review only after the item is delivered. => create @Format isReadyReview to check the order events inlcude delivered.
-
 - disable cart icon (on header) when checkout page (don't need to cart drawer at this page)
 
 - product discunt end date
@@ -53,6 +51,14 @@
 
 - company info at footer
 
-- price is wrong at cart item card.
+### Staging Bugs
 
-
+(product)
+  - product images are stored in a wrong place (e.g., if you put an image at 0, then it is stored at 4). what the hell.
+  - ready to publish: validation not working. even if the product has a lot of variants, it still show an error that you need at least one variant.
+  - path validation
+  
+(category)
+  - path valiation
+  
+  
