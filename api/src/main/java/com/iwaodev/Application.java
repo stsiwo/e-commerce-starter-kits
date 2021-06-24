@@ -291,7 +291,13 @@ public class Application {
   @Bean
   public MessageSource messageSource() {
     ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-    messageSource.setBasename("classpath:messages");
+    /**
+     * how to set basename
+     * 
+     * ref: https://stackoverflow.com/questions/15065734/spring-framework-no-message-found-under-code-for-locale/39371075
+     *
+     **/
+    messageSource.setBasename("classpath:/messages/messages");
     messageSource.setDefaultEncoding("UTF-8");
     return messageSource;
   }

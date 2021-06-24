@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
+import com.iwaodev.exception.AppException;
 
 /**
  * validate phone entity before persist/update.
@@ -52,22 +52,22 @@ public class PhoneValidationListener {
   private Validator validator;
 
   @PrePersist
-  private void beforeCreate(Phone domain) {
+  private void beforeCreate(Phone domain) throws AppException {
     logger.info("start validating domain for create...");
     Set<ConstraintViolation<Phone>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
+      throw new AppException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
     }
   }
 
   @PreUpdate
-  private void beforeUpdate(Phone domain) {
+  private void beforeUpdate(Phone domain) throws AppException {
     logger.info("start validating domain for update...");
     Set<ConstraintViolation<Phone>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
+      throw new AppException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
     }
     logger.info("the domain passed all validation:)");
   }

@@ -20,7 +20,7 @@ import com.iwaodev.infrastructure.model.Notification;
 import com.iwaodev.infrastructure.model.Order;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.order.OrderEventCriteria;
-import org.springframework.web.server.ResponseStatusException;
+import com.iwaodev.exception.AppException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +68,7 @@ public class PaymentSucceededEventHandler {
    *
    **/
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-  public void handleEvent(PaymentSucceededEvent event) {
+  public void handleEvent(PaymentSucceededEvent event) throws AppException {
     logger.info("PaymentSucceededEventHandler called.");
     logger.info(Thread.currentThread().getName());
 
@@ -76,7 +76,7 @@ public class PaymentSucceededEventHandler {
     Optional<Order> orderOption = this.orderRepository.findByStripePaymentIntentId(event.getPaymentIntentId());
 
     if (orderOption.isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "target order not found by its payment intent id");
+      throw new AppException(HttpStatus.NOT_FOUND, "target order not found by its payment intent id");
     }
 
     Order order = orderOption.get();
@@ -86,7 +86,7 @@ public class PaymentSucceededEventHandler {
     // make sure the order' user == request user
     if (!userOption.isEmpty()) {
       if (!order.getUser().getUserId().equals(userOption.get().getUserId())) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "you cannot update an order for other member.");
+        throw new AppException(HttpStatus.BAD_REQUEST, "you cannot update an order for other member.");
       }
     }
     // get admin for new order event
@@ -103,9 +103,9 @@ public class PaymentSucceededEventHandler {
         orderEventService.add(order, OrderStatusEnum.PAID, "", userOption.get().getUserId());
       }
     } catch (DomainException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+      throw new AppException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (NotFoundException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+      throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     // save
@@ -145,7 +145,7 @@ public class PaymentSucceededEventHandler {
      *
      **/
     User admin = this.userRepository.getAdmin().orElseThrow(
-        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
+        () -> new AppException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
     Notification notification;
 
     try {
@@ -164,7 +164,7 @@ public class PaymentSucceededEventHandler {
             null, admin, String.format("/admin/orders?orderId=%s", savedOrder.getOrderId().toString()), "");
       }
     } catch (NotFoundException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+      throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     this.notificationRepository.save(notification);

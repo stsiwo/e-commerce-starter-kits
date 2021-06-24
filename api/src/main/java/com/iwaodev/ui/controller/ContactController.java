@@ -33,7 +33,7 @@ public class ContactController {
   public ResponseEntity<BaseResponse> post(
       @Valid @RequestBody ContactCriteria criteria, 
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
 
     if (authUser != null) {
       // member

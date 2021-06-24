@@ -9,13 +9,13 @@ import org.springframework.data.domain.Page;
 
 public interface CategoryService {
 
-  public Page<CategoryDTO> getAll(CategoryQueryStringCriteria criteria, Integer page, Integer limit, CategorySortEnum sort);
+  public Page<CategoryDTO> getAll(CategoryQueryStringCriteria criteria, Integer page, Integer limit, CategorySortEnum sort) throws Exception;
 
-  public CategoryDTO create(CategoryCriteria criteria);
+  public CategoryDTO create(CategoryCriteria criteria) throws Exception;
 
-  public CategoryDTO update(CategoryCriteria criteria, Long id);
+  public CategoryDTO update(CategoryCriteria criteria, Long id) throws Exception;
 
-  public void delete(Long id);
+  public void delete(Long id) throws Exception;
 
 }
 

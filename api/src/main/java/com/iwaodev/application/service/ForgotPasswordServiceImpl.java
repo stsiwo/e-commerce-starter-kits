@@ -5,6 +5,7 @@ import java.util.Optional;
 import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.iservice.ForgotPasswordService;
 import com.iwaodev.domain.user.event.GeneratedForgotPasswordTokenEvent;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.ResetPasswordCriteria;
 
@@ -16,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * ref: https://www.baeldung.com/spring-email-templates
@@ -38,7 +38,7 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
   private ApplicationEventPublisher publisher;
 
   @Override
-  public void requestForgotPassword(String email) {
+  public void requestForgotPassword(String email) throws Exception {
 
     // find the user by this email
     Optional<User> targetUserOption = this.userRepository.getByEmail(email);
@@ -61,7 +61,7 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
   }
 
   @Override
-  public void resetPassword(ResetPasswordCriteria criteria) {
+  public void resetPassword(ResetPasswordCriteria criteria) throws Exception {
 
     // find the user by this email
     Optional<User> targetUserOption = this.userRepository.findByForgotPasswordToken(criteria.getToken());
@@ -72,7 +72,7 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
        * 
        **/
       logger.info("the reset password token is not valid.");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the reset password token is not valid.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "the reset password token is not valid.");
     }
 
     User targetUser = targetUserOption.get();
@@ -80,7 +80,7 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
     // token is expired or invalid
     if (!targetUser.verifyForgotPasswordToken(criteria.getToken())) {
       logger.info("the reset password token is not valid.");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the reset password token is not valid.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "the reset password token is not valid.");
     }
 
     // update password

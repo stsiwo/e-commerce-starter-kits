@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import com.iwaodev.exception.AppException;
 
 @Service
 public class CreateNotificationServiceImpl implements CreateNotificationService {
@@ -85,7 +85,7 @@ public class CreateNotificationServiceImpl implements CreateNotificationService 
     //Set<ConstraintViolation<Notification>> constraintViolations = this.validator.validate(notification);
 
     //if (constraintViolations.size() > 0) {
-    //  throw new ResponseStatusException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
+    //  throw new AppException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
     //}
 
     return notification;

@@ -8,11 +8,11 @@ import org.springframework.data.domain.Page;
 
 public interface NotificationService {
 
-  public Page<NotificationDTO> getAll(UUID userId, Integer page, Integer limit);
+  public Page<NotificationDTO> getAll(UUID userId, Integer page, Integer limit) throws Exception;
 
-  public NotificationDTO turnIsReadTrue(UUID userId, String notificationId);
+  public NotificationDTO turnIsReadTrue(UUID userId, String notificationId) throws Exception;
 
-  public void deleteIfRead(); 
+  public void deleteIfRead() throws Exception; 
 }
 
 

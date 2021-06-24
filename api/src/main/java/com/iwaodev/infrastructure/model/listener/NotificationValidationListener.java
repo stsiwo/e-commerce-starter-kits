@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
+import com.iwaodev.exception.AppException;
 
 /**
  * validate cartitem entity before persist/update.
@@ -55,22 +55,22 @@ public class NotificationValidationListener {
   private Validator validator;
 
   @PrePersist
-  private void beforeCreate(Notification domain) {
+  private void beforeCreate(Notification domain) throws AppException {
     logger.info("start validating cartitem domain for create...");
     Set<ConstraintViolation<Notification>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
+      throw new AppException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
     }
   }
 
   @PreUpdate
-  private void beforeUpdate(Notification domain) {
+  private void beforeUpdate(Notification domain) throws AppException {
     logger.info("start validating cartitem domain for update...");
     Set<ConstraintViolation<Notification>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
+      throw new AppException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
     }
     logger.info("the cartitem domain passed all validation:)");
   }

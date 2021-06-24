@@ -1,7 +1,6 @@
 package com.iwaodev.application.service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -12,6 +11,7 @@ import com.iwaodev.application.dto.notification.NotificationDTO;
 import com.iwaodev.application.irepository.NotificationRepository;
 import com.iwaodev.application.iservice.NotificationService;
 import com.iwaodev.application.mapper.NotificationMapper;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.Notification;
 
 import org.hibernate.Session;
@@ -24,7 +24,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -38,7 +37,7 @@ public class NotificationServiceImpl implements NotificationService {
   @PersistenceContext
   private EntityManager entityManager;
 
-  public Page<NotificationDTO> getAll(UUID userId, Integer page, Integer limit) {
+  public Page<NotificationDTO> getAll(UUID userId, Integer page, Integer limit) throws Exception {
 
     // session filter (e.g., @Filter/@FilterDef) - reviews entity
     Session session = this.entityManager.unwrap(Session.class);
@@ -63,13 +62,13 @@ public class NotificationServiceImpl implements NotificationService {
   }
 
   @Override
-  public NotificationDTO turnIsReadTrue(UUID userId, String id) {
+  public NotificationDTO turnIsReadTrue(UUID userId, String id) throws Exception {
 
     Notification notification = this.repository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "the given address does not exist."));
+        .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given address does not exist."));
 
     if (!notification.getRecipient().getUserId().equals(userId)) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot updte other's notification.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "cannot updte other's notification.");
     }
 
     notification.turnReadTrue();
@@ -87,7 +86,7 @@ public class NotificationServiceImpl implements NotificationService {
    * this is used by scheduling tasks.
    **/
   @Override
-  public void deleteIfRead() {
+  public void deleteIfRead() throws Exception {
 
     List<Notification> removedNotificationList = this.repository.deleteAllByIsRead(true);
 

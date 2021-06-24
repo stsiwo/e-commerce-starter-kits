@@ -1,6 +1,5 @@
 package com.iwaodev.application.service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,6 +10,7 @@ import com.iwaodev.application.dto.user.PhoneDTO;
 import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.iservice.UserPhoneService;
 import com.iwaodev.application.mapper.PhoneMapper;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.Phone;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.user.UserPhoneCriteria;
@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -32,14 +31,14 @@ public class UserPhoneServiceImpl implements UserPhoneService {
   @Autowired
   private UserRepository repository;
 
-  public List<PhoneDTO> getAll(UUID userId) {
+  public List<PhoneDTO> getAll(UUID userId) throws Exception {
     logger.info("start handling a request at UserPhoneServiceImpl");
 
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (targetUserOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     // use this rather than the list method since @Mapping for the list does not
@@ -58,21 +57,21 @@ public class UserPhoneServiceImpl implements UserPhoneService {
   }
 
   @Override
-  public PhoneDTO create(UserPhoneCriteria criteria, UUID userId) {
+  public PhoneDTO create(UserPhoneCriteria criteria, UUID userId) throws Exception {
 
     // check if the target user exist
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (targetUserOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     User user = targetUserOption.get();
 
     // validate max phone 3
     if (user.getPhones().size() >= 3) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, " user can't have more than 3 phones.");
+      throw new AppException(HttpStatus.BAD_REQUEST, " user can't have more than 3 phones.");
     }
 
     // map criteria to entity
@@ -97,14 +96,14 @@ public class UserPhoneServiceImpl implements UserPhoneService {
   }
 
   @Override
-  public List<PhoneDTO> toggleSelection(UUID userId, Long phoneId) {
+  public List<PhoneDTO> toggleSelection(UUID userId, Long phoneId) throws Exception {
 
     // check if the target user exist
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (targetUserOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     User targetEntity = targetUserOption.get();
@@ -133,7 +132,7 @@ public class UserPhoneServiceImpl implements UserPhoneService {
   }
 
   @Override
-  public PhoneDTO update(UserPhoneCriteria criteria, UUID userId, Long phoneId) {
+  public PhoneDTO update(UserPhoneCriteria criteria, UUID userId, Long phoneId) throws Exception {
 
     // make sure criteria.phoneId is assigned
     // - criteria.phoneId does not have validation since it is shared with /post
@@ -147,7 +146,7 @@ public class UserPhoneServiceImpl implements UserPhoneService {
 
     if (targetUserOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     // check the user has the phone of a given id
@@ -159,7 +158,7 @@ public class UserPhoneServiceImpl implements UserPhoneService {
 
     if (!isTargetAddrssExist) {
       logger.info("the given phone does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given phone does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given phone does not exist.");
     }
     // create updated entity
     Phone updatePhone = PhoneMapper.INSTANCE.toPhoneEntityFromPhoneCriteria(criteria);
@@ -184,14 +183,14 @@ public class UserPhoneServiceImpl implements UserPhoneService {
   }
 
   @Override
-  public void delete(UUID userId, Long phoneId) {
+  public void delete(UUID userId, Long phoneId) throws Exception {
 
     // check if the target user exist
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (targetUserOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     targetUserOption.get().removePhoneById(phoneId);

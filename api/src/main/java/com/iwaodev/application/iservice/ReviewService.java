@@ -14,15 +14,15 @@ public interface ReviewService {
 
   public Page<ReviewDTO> getAll(ReviewQueryStringCriteria criteria, Integer page, Integer limit, ReviewSortEnum sort);
 
-  public ReviewDTO getById(Long id);
+  public ReviewDTO getById(Long id) throws Exception;
 
-  public ReviewDTO create(ReviewCriteria criteria);
+  public ReviewDTO create(ReviewCriteria criteria) throws Exception;
 
-  public ReviewDTO update(ReviewCriteria criteria, Long id);
+  public ReviewDTO update(ReviewCriteria criteria, Long id) throws Exception;
 
-  public void delete(Long id);
+  public void delete(Long id) throws Exception;
 
-  public FindReviewDTO findByUserIdAndProductId(UUID userId, UUID productId);
+  public FindReviewDTO findByUserIdAndProductId(UUID userId, UUID productId) throws Exception;
 }
 
 

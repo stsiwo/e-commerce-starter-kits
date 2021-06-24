@@ -42,7 +42,7 @@ public class UserCartItemController {
   public ResponseEntity<List<CartItemDTO>> get(
       @PathVariable(value = "userId") UUID userId,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
 
     logger.info("product controller cur thread name: " + Thread.currentThread().getName());
 
@@ -67,7 +67,7 @@ public class UserCartItemController {
       @PathVariable(value = "userId") UUID userId,
       @Valid @RequestBody CartItemCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     return new ResponseEntity<>(this.service.add(criteria), HttpStatus.OK);
   }
 
@@ -79,7 +79,7 @@ public class UserCartItemController {
       @PathVariable(value = "cartItemId") @NotNull Long cartItemId,
       @Valid @RequestBody CartItemCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
 
     if (criteria.getCartItemId() == null) {
       criteria.setCartItemId(cartItemId);
@@ -95,7 +95,7 @@ public class UserCartItemController {
       @PathVariable(value = "userId") @NotNull UUID userId,
       @PathVariable(value = "cartItemId") @NotNull Long cartItemId,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     logger.info("start handling at /users/{userId}/cartItem/{cartItemId} DELETE");
     this.service.remove(cartItemId);
     return new ResponseEntity<>(new BaseResponse("successfully deleted."), HttpStatus.OK);
@@ -107,7 +107,7 @@ public class UserCartItemController {
   public ResponseEntity<BaseResponse> deleteAll(
       @PathVariable(value = "userId") @NotNull UUID userId,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     logger.info("start handling at /users/{userId}/cartItems/{cartItemId} DELETE");
     this.service.deleteAll(userId);
     return new ResponseEntity<>(new BaseResponse("successfully deleted."), HttpStatus.OK);

@@ -1,7 +1,6 @@
 package com.iwaodev.application.service;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,15 +17,13 @@ import com.iwaodev.application.iservice.ProductService;
 import com.iwaodev.application.mapper.ProductMapper;
 import com.iwaodev.application.specification.factory.ProductSpecificationFactory;
 import com.iwaodev.domain.product.ProductSortEnum;
-import com.iwaodev.infrastructure.model.Phone;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.Product;
 import com.iwaodev.infrastructure.model.ProductImage;
 import com.iwaodev.ui.criteria.product.ProductCriteria;
 import com.iwaodev.ui.criteria.product.ProductImageCriteria;
-import com.iwaodev.ui.criteria.user.UserDeleteTempCriteria;
 import com.iwaodev.ui.criteria.product.ProductQueryStringCriteria;
 
-import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +36,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -66,7 +62,7 @@ public class ProductServiceImpl implements ProductService {
   private EntityManager entityManager;
 
   public Page<ProductDTO> getAll(ProductQueryStringCriteria criteria, Integer page, Integer limit,
-      ProductSortEnum sort) {
+      ProductSortEnum sort) throws Exception {
 
     // get result with repository
     // and map entity to dto with MapStruct
@@ -85,7 +81,7 @@ public class ProductServiceImpl implements ProductService {
 
   @Override
   public Page<ProductDTO> getPublicAll(ProductQueryStringCriteria criteria, Integer page, Integer limit,
-      ProductSortEnum sort) {
+      ProductSortEnum sort) throws Exception {
 
     // set for public
     criteria.setIsPublic(true);
@@ -127,7 +123,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductDTO getById(UUID id) {
+  public ProductDTO getById(UUID id) throws Exception {
 
     // get result with repository
     // and map entity to dto with MapStruct
@@ -135,7 +131,7 @@ public class ProductServiceImpl implements ProductService {
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given product does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given product does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
 
     // map entity to dto
@@ -143,7 +139,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductDTO getByPath(String path) {
+  public ProductDTO getByPath(String path) throws Exception {
 
     // get result with repository
     // and map entity to dto with MapStruct
@@ -151,7 +147,7 @@ public class ProductServiceImpl implements ProductService {
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given product does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given product does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
 
     // map entity to dto
@@ -159,7 +155,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductDTO getByPathOrId(String path) {
+  public ProductDTO getByPathOrId(String path) throws Exception {
 
     // get result with repository
     // and map entity to dto with MapStruct
@@ -167,7 +163,7 @@ public class ProductServiceImpl implements ProductService {
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given product does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given product does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
 
     // map entity to dto
@@ -175,7 +171,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductDTO getPublicByPathOrId(String path) {
+  public ProductDTO getPublicByPathOrId(String path) throws Exception {
 
     // get result with repository
     // and map entity to dto with MapStruct
@@ -183,7 +179,7 @@ public class ProductServiceImpl implements ProductService {
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given product does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given product does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
 
     // map entity to dto
@@ -197,7 +193,7 @@ public class ProductServiceImpl implements ProductService {
    *
    **/
   @Override
-  public ProductDTO create(ProductCriteria criteria, List<MultipartFile> files) {
+  public ProductDTO create(ProductCriteria criteria, List<MultipartFile> files) throws Exception {
 
     /**
      * MapStruct error?
@@ -219,7 +215,7 @@ public class ProductServiceImpl implements ProductService {
 
     // duplication
     if (this.repository.isOthersHavePath(newEntity.getProductId(), criteria.getProductPath())) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the product path already taken.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "the product path already taken.");
     }
 
     List<ProductImage> productImages = this.createImages(newEntity.getProductId(), files, criteria.getProductImages());
@@ -241,7 +237,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   private List<ProductImage> createImages(UUID productId, List<MultipartFile> files,
-      List<ProductImageCriteria> criterion) {
+      List<ProductImageCriteria> criterion) throws Exception {
     // save to local file system & create product image entity
     List<ProductImage> productImages = new ArrayList<>();
 
@@ -276,7 +272,7 @@ public class ProductServiceImpl implements ProductService {
         // check the file content type (only image is allowed)
         if (!this.fileService.isImage(file)) {
           logger.info("only image files are acceptable.");
-          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only image files are acceptable.");
+          throw new AppException(HttpStatus.BAD_REQUEST, "only image files are acceptable.");
         }
 
         // generate unique (including hash for cache) file name
@@ -296,7 +292,7 @@ public class ProductServiceImpl implements ProductService {
           this.fileService.save(localDirectoryWithFile, file);
         } catch (IOException e) {
           logger.info(e.getMessage());
-          throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+          throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
 
         newEntity.setProductImagePath(publicPath);
@@ -325,13 +321,13 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductDTO update(ProductCriteria criteria, UUID id, List<MultipartFile> files) {
+  public ProductDTO update(ProductCriteria criteria, UUID id, List<MultipartFile> files) throws Exception {
 
     Optional<Product> targetEntityOption = this.repository.findById(id);
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given product does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given product does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
 
     Product oldEntity = targetEntityOption.get();
@@ -344,7 +340,7 @@ public class ProductServiceImpl implements ProductService {
 
     // duplication
     if (this.repository.isOthersHavePath(newEntity.getProductId(), criteria.getProductPath())) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the product path already taken.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "the product path already taken.");
     }
 
     // update product images
@@ -362,7 +358,7 @@ public class ProductServiceImpl implements ProductService {
 
   // this includes update/remove product images
   private void updateImages(UUID productId, List<MultipartFile> files, List<ProductImage> oldProductImages,
-      List<ProductImage> newProductImages) {
+      List<ProductImage> newProductImages) throws Exception {
 
     logger.info("start handling update of images");
 
@@ -385,7 +381,7 @@ public class ProductServiceImpl implements ProductService {
       // should exist otherwise your logic is wrong.
       if (oldProductImageOption.isEmpty()) {
         logger.info("the given product image does not exist");
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given product image does not exist.");
+        throw new AppException(HttpStatus.NOT_FOUND, "the given product image does not exist.");
       }
 
       ProductImage oldProductImage = oldProductImageOption.get();
@@ -414,7 +410,7 @@ public class ProductServiceImpl implements ProductService {
         this.fileService.removeWithRegex(localDirectory, oldProductImagePattern);
       } catch (IOException e) {
         logger.info(e.getMessage());
-        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
       }
 
       /**
@@ -431,7 +427,7 @@ public class ProductServiceImpl implements ProductService {
         // check the file content type (only image is allowed)
         if (!this.fileService.isImage(file)) {
           logger.info("only image files are acceptable.");
-          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only image files are acceptable.");
+          throw new AppException(HttpStatus.BAD_REQUEST, "only image files are acceptable.");
         }
         
         // generate unique (including hash for cache) file name
@@ -448,7 +444,7 @@ public class ProductServiceImpl implements ProductService {
 
         } catch (IOException e) {
           logger.info(e.getMessage());
-          throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+          throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
 
         logger.info("updated public path: " + publicPath);
@@ -474,7 +470,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public void delete(UUID id) {
+  public void delete(UUID id) throws Exception {
 
     /**
      * deleting product permanently is not good idea, esp for its related orders.
@@ -508,7 +504,7 @@ public class ProductServiceImpl implements ProductService {
 
   // if (targetEntityOption.isEmpty()) {
   // logger.info("the given product does not exist");
-  // throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given product
+  // throw new AppException(HttpStatus.NOT_FOUND, "the given product
   // does not exist.");
   // }
 
@@ -522,7 +518,7 @@ public class ProductServiceImpl implements ProductService {
   // // check the file content type (only image is allowed)
   // if (!this.fileService.isImage(file)) {
   // logger.info("only image files are acceptable.");
-  // throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only image files
+  // throw new AppException(HttpStatus.BAD_REQUEST, "only image files
   // are acceptable.");
   // }
 
@@ -537,7 +533,7 @@ public class ProductServiceImpl implements ProductService {
   // this.fileService.save(path, file);
   // } catch (IOException e) {
   // logger.info(e.getMessage());
-  // throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+  // throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR,
   // e.getMessage());
   // }
 
@@ -561,7 +557,7 @@ public class ProductServiceImpl implements ProductService {
 
   // if (targetEntityOption.isEmpty()) {
   // logger.info("the given product does not exist");
-  // throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given product
+  // throw new AppException(HttpStatus.NOT_FOUND, "the given product
   // does not exist.");
   // }
 
@@ -589,7 +585,7 @@ public class ProductServiceImpl implements ProductService {
   // }
 
   @Override
-  public byte[] getProductImage(UUID productId, String imageName) {
+  public byte[] getProductImage(UUID productId, String imageName) throws Exception {
 
     String internalPath = this.getProductLocalDirectory(productId) + "/" + imageName;
 
@@ -599,7 +595,7 @@ public class ProductServiceImpl implements ProductService {
       content = this.fileService.load(internalPath);
     } catch (IOException e) {
       logger.info(e.getMessage());
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
     return content;

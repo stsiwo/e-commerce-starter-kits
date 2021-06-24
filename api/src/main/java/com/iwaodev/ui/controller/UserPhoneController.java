@@ -42,7 +42,7 @@ public class UserPhoneController {
   public ResponseEntity<List<PhoneDTO>> get(
       @PathVariable(value = "userId") UUID userId,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     logger.info("start handling a request at UserPhoneController#get");
     logger.info("user id: " + userId);
 
@@ -57,7 +57,7 @@ public class UserPhoneController {
       @PathVariable(value = "userId") UUID userId,
       @AuthenticationPrincipal SpringSecurityUser authUser,
       @Valid @RequestBody UserPhoneCriteria criteria
-      ) {
+      ) throws Exception {
     logger.info("start handling a request at UserPhoneController#post");
     logger.info("user id: " + userId);
     logger.info("criteria" + criteria);
@@ -74,7 +74,7 @@ public class UserPhoneController {
       @PathVariable(value = "phoneId") Long phoneId,
       @AuthenticationPrincipal SpringSecurityUser authUser,
       @Valid @RequestBody UserPhoneCriteria criteria
-      ) {
+      ) throws Exception {
     logger.info("start handling a request at UserPhoneController#post");
     logger.info("user id: " + userId);
     logger.info("criteria" + criteria);
@@ -90,7 +90,7 @@ public class UserPhoneController {
       @PathVariable(value = "userId") UUID userId,
       @PathVariable(value = "phoneId") Long phoneId,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     logger.info("start handling a request at UserPhoneController#patch");
     logger.info("user id: " + userId);
     logger.info("phone id" + phoneId);
@@ -106,7 +106,7 @@ public class UserPhoneController {
       @PathVariable(value = "userId") UUID userId,
       @PathVariable(value = "phoneId") Long phoneId,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
 
     logger.info("user id: " + userId);
     logger.info("phone id: " + phoneId);

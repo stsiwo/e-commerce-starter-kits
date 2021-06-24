@@ -7,9 +7,9 @@ import com.iwaodev.ui.criteria.contact.ContactCriteria;
 
 public interface ContactService {
 
-  public void submit(ContactCriteria criteria, UUID userId);
+  public void submit(ContactCriteria criteria, UUID userId) throws Exception;
 
-  public void submit(ContactCriteria criteria);
+  public void submit(ContactCriteria criteria) throws Exception;
 
 }
 

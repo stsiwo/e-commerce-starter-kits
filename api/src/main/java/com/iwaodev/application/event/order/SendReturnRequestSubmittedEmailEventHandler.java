@@ -28,7 +28,7 @@ import com.iwaodev.infrastructure.model.Notification;
 import com.iwaodev.infrastructure.model.Order;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.order.OrderEventCriteria;
-import org.springframework.web.server.ResponseStatusException;
+import com.iwaodev.exception.AppException;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.slf4j.Logger;
@@ -69,7 +69,7 @@ public class SendReturnRequestSubmittedEmailEventHandler {
    **/
   @Async
   @TransactionalEventListener
-  public void handleEvent(OrderEventWasAddedByMemberEvent event) {
+  public void handleEvent(OrderEventWasAddedByMemberEvent event) throws AppException {
     logger.info("start SendReturnRequestSubmittedEmailEventHandler called.");
     logger.info(Thread.currentThread().getName());
 
@@ -80,7 +80,7 @@ public class SendReturnRequestSubmittedEmailEventHandler {
 
     logger.info("order status is 'return_request' so send an email.");
     User admin = this.userRepository.getAdmin().orElseThrow(
-        () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist"));
+        () -> new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist"));
 
     // Sender
     Company company = admin.getCompanies().get(0);
@@ -114,7 +114,7 @@ public class SendReturnRequestSubmittedEmailEventHandler {
           "A Return Request Was Submitted By Customer (Order #: " + order.getOrderNumber() + ")", htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
   }

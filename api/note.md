@@ -164,6 +164,20 @@
 
       - must wrap with @Transactional for the calling function (e.g., serviceImpl) if you use @TransactionalEventListener.
 
+  ## Error Handling
+
+    - use @ResponseStatusException locally.
+
+      -> this automatically assign ServletResponse.ErrorMessage and its body (the type if similar to 'ErrorBaseResponse').
+
+    - if there are exceptions you can't handle with ResponseStatusException, use @ControllerAdvice class.
+
+      -> return 'ErrorBaseResponse' object as a body of response.
+
+      -> issue1: I don't know how to set ServletResponse.ErrorMessage with @ControllerAdvice. (e.g., I cannnot access to HttpServletResponse)
+
+        => don't rely on ServletResponse.ErrorMessage at client side. always use the body.
+
 # Spring Security
 
   - WebSecurityConfigurerAdapter class
@@ -1129,6 +1143,11 @@
 
   - display dep tree
     - command) mvn dependency:tree
+
+  ### General
+
+  - search and replace text in multiple files recursively.
+    - command) find . -type f -name "*.java" -exec sed -i 's:<Original_Text>:<New_Text>:g' {} +
 
 # Design Issue
 

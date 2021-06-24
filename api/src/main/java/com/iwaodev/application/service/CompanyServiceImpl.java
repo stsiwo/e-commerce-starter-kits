@@ -1,6 +1,5 @@
 package com.iwaodev.application.service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,6 +10,7 @@ import com.iwaodev.application.dto.company.CompanyDTO;
 import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.iservice.CompanyService;
 import com.iwaodev.application.mapper.CompanyMapper;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.Company;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.user.UserCompanyCriteria;
@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -32,14 +31,14 @@ public class CompanyServiceImpl implements CompanyService {
   @Autowired
   private UserRepository repository;
 
-  public List<CompanyDTO> get(UUID userId) {
+  public List<CompanyDTO> get(UUID userId) throws Exception {
     logger.info("start handling a request at UserCompanyServiceImpl");
 
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (targetUserOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     // use this rather than the list method since @Mapping for the list does not
@@ -64,7 +63,7 @@ public class CompanyServiceImpl implements CompanyService {
   }
 
   @Override
-  public CompanyDTO update(UserCompanyCriteria criteria, UUID userId, Long companyId) {
+  public CompanyDTO update(UserCompanyCriteria criteria, UUID userId, Long companyId) throws Exception {
 
     // make sure criteria.companyId is assigned
     // - criteria.companyId does not have validation since it is shared with /post
@@ -78,7 +77,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     if (targetUserOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     // check the user has the company of a given id
@@ -90,7 +89,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     if (!isTargetCompanyExist) {
       logger.info("the given company does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given company does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given company does not exist.");
     }
     // create updated entity
     Company updateCompany = CompanyMapper.INSTANCE.toCompanyEntityFromCompanyCriteria(criteria);

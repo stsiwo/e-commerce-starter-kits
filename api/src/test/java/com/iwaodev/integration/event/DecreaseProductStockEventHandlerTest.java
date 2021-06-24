@@ -71,7 +71,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+import com.iwaodev.exception.AppException;
 
 // this is alias to SpringJUnit4ClassRunner
 @RunWith(SpringRunner.class)
@@ -184,7 +184,7 @@ public class DecreaseProductStockEventHandlerTest {
     // act & assert
     assertThatThrownBy(() -> {
       this.handler.handleEvent(new OrderFinalConfirmedEvent(this, dummyOrder, dummyCustomerId, UserTypeEnum.MEMBER));
-    }).isInstanceOf(ResponseStatusException.class);
+    }).isInstanceOf(AppException.class);
 
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.

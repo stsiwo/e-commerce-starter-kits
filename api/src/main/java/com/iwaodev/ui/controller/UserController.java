@@ -72,7 +72,7 @@ public class UserController {
       @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
       @RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit,
       @RequestParam(value = "sort", required = false, defaultValue = "DATE_DESC") UserSortEnum sort,
-      UserQueryStringCriteria criteria) {
+      UserQueryStringCriteria criteria) throws Exception {
 
     logger.info("user criteria (query string)");
     logger.info(criteria.toString());
@@ -86,7 +86,7 @@ public class UserController {
   @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
                                                                      // user's data
   public ResponseEntity<UserDTO> getWithId(@PathVariable(value = "id") UUID id,
-      @AuthenticationPrincipal SpringSecurityUser authUser) {
+      @AuthenticationPrincipal SpringSecurityUser authUser) throws Exception {
 
     return new ResponseEntity<>(this.service.getById(id), HttpStatus.OK);
   }
@@ -97,7 +97,7 @@ public class UserController {
   @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
                                                                      // user's data
   public ResponseEntity<UserDTO> updateWithId(@PathVariable(value = "id") UUID id,
-      @AuthenticationPrincipal User authUser, @Valid @RequestBody UserCriteria criteria) {
+      @AuthenticationPrincipal User authUser, @Valid @RequestBody UserCriteria criteria) throws Exception {
 
     return new ResponseEntity<>(this.service.update(criteria, id), HttpStatus.OK);
   }
@@ -106,7 +106,7 @@ public class UserController {
   @PreAuthorize("hasRole('ROLE_ADMIN')") // to prevent a member from accessing another
                                                                      // user's data
   public ResponseEntity<UserDTO> patchStatus(@PathVariable(value = "id") UUID id,
-      @AuthenticationPrincipal User authUser, @Valid @RequestBody UserStatusCriteria criteria) {
+      @AuthenticationPrincipal User authUser, @Valid @RequestBody UserStatusCriteria criteria) throws Exception {
     return new ResponseEntity<>(
         this.service.updateStatus(criteria),
         HttpStatus.OK);
@@ -116,7 +116,7 @@ public class UserController {
   @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
                                                                      // user's data
   public ResponseEntity<BaseResponse> tempDeleteWithId(@PathVariable(value = "id") UUID id,
-      @AuthenticationPrincipal User authUser, @Valid @RequestBody UserDeleteTempCriteria criteria) {
+      @AuthenticationPrincipal User authUser, @Valid @RequestBody UserDeleteTempCriteria criteria) throws Exception {
 
     this.service.tempDelete(criteria, id);
 
@@ -126,7 +126,7 @@ public class UserController {
   @DeleteMapping("/users/{id}")
   @PreAuthorize("hasRole('ROLE_ADMIN')") // to prevent a member from accessing another
                                          // user's data
-  public ResponseEntity<BaseResponse> deleteWithId(@PathVariable(value = "id") UUID id) {
+  public ResponseEntity<BaseResponse> deleteWithId(@PathVariable(value = "id") UUID id) throws Exception {
 
     this.service.delete(id);
     return new ResponseEntity<>(new BaseResponse("successfuly deleted."), HttpStatus.OK);
@@ -141,7 +141,7 @@ public class UserController {
   @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
                                                                      // user's data
   public ResponseEntity<ImagePathResponse> uploadAvatarImage(@PathVariable(value = "id") UUID id,
-      @AuthenticationPrincipal SpringSecurityUser authUser, @RequestParam("avatarImage") MultipartFile file) {
+      @AuthenticationPrincipal SpringSecurityUser authUser, @RequestParam("avatarImage") MultipartFile file) throws Exception {
     return new ResponseEntity<>(new ImagePathResponse(this.service.uploadAvatarImage(id, file)), HttpStatus.OK);
   }
 
@@ -150,7 +150,7 @@ public class UserController {
   @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
                                                                      // user's data
   public ResponseEntity<BaseResponse> deleteAvatarImage(@PathVariable(value = "id") UUID id,
-      @AuthenticationPrincipal SpringSecurityUser authUser) {
+      @AuthenticationPrincipal SpringSecurityUser authUser) throws Exception {
     this.service.removeAvatarImage(id);
 
     return new ResponseEntity<>(new BaseResponse("avatar image deleted successfully."), HttpStatus.OK);
@@ -160,7 +160,7 @@ public class UserController {
   @GetMapping(value = "/users/{id}/avatar-image/{imageName}", produces = "image/*")
   public ResponseEntity<byte[]> getAvatarImage(@PathVariable(value = "id") UUID id,
       @AuthenticationPrincipal SpringSecurityUser authUser, @PathVariable(value = "imageName") String imageName,
-      HttpServletResponse response) {
+      HttpServletResponse response) throws Exception {
 
     // disable content sniffing to prevent content sniffing exploit
     response.addHeader("X-Content-Type-Options", "nosniff");
@@ -178,7 +178,7 @@ public class UserController {
       @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
       @RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit,
       @RequestParam(value = "sort", required = false, defaultValue = "DATE_DESC") OrderSortEnum sort,
-      OrderQueryStringCriteria criteria) {
+      OrderQueryStringCriteria criteria) throws Exception {
 
     return new ResponseEntity<>(this.orderService.getAllByUserId(id, criteria, page, limit, sort), HttpStatus.OK);
   }
@@ -189,7 +189,7 @@ public class UserController {
   @GetMapping("/users/{id}/orders/{orderId}")
   @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
   public ResponseEntity<OrderDTO> getWithId(@PathVariable(value = "id") UUID id,
-      @PathVariable(value = "orderId") UUID orderId, @AuthenticationPrincipal SpringSecurityUser authUser) {
+      @PathVariable(value = "orderId") UUID orderId, @AuthenticationPrincipal SpringSecurityUser authUser) throws Exception {
     return new ResponseEntity<>(this.orderService.getByIdAndUserId(orderId, id), HttpStatus.OK);
   }
 
@@ -211,7 +211,7 @@ public class UserController {
   @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
   public ResponseEntity<OrderDTO> addOrder(@PathVariable(value = "id") UUID id,
       @PathVariable(value = "orderId") UUID orderId, @Valid @RequestBody OrderEventCriteria criteria,
-      @AuthenticationPrincipal SpringSecurityUser authUser) {
+      @AuthenticationPrincipal SpringSecurityUser authUser) throws Exception {
 
     return new ResponseEntity<>(this.orderService.addOrderEventByMember(orderId, criteria), HttpStatus.OK);
   }
@@ -228,7 +228,7 @@ public class UserController {
   @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
   public ResponseEntity<FindReviewDTO> findReviewByUserIdAndProductId(@PathVariable(value = "id") UUID id,
       @RequestParam(value = "productId", required = true) UUID productId,
-      @AuthenticationPrincipal SpringSecurityUser authUser) {
+      @AuthenticationPrincipal SpringSecurityUser authUser) throws Exception {
 
       logger.info("userId " + id.toString());
       logger.info("productId " + productId.toString());
@@ -247,7 +247,7 @@ public class UserController {
       @PathVariable(value = "id") UUID id,
       @Valid @RequestBody ReviewCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     logger.info("start handling at /reviews POST");
     return new ResponseEntity<>(this.reviewService.create(criteria), HttpStatus.OK);
   }
@@ -260,7 +260,7 @@ public class UserController {
       @PathVariable(value = "reviewId") Long reviewId,
       @Valid @RequestBody ReviewCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     logger.info("start handling at /reviews PUT");
     return new ResponseEntity<>(this.reviewService.update(criteria, reviewId), HttpStatus.OK);
   }
@@ -272,7 +272,7 @@ public class UserController {
       @PathVariable(value = "id") UUID id,
       @PathVariable(value = "reviewId") Long reviewId,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     logger.info("start handling at /reviews DELETE");
     this.reviewService.delete(reviewId);
     return new ResponseEntity<>(new BaseResponse("successfuly deleted."), HttpStatus.OK);

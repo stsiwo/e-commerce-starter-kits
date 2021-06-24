@@ -10,9 +10,7 @@ import com.iwaodev.application.irepository.ProductRepository;
 import com.iwaodev.application.irepository.ReviewRepository;
 import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.iservice.ReviewService;
-import com.iwaodev.application.mapper.ProductMapper;
 import com.iwaodev.application.mapper.ReviewMapper;
-import com.iwaodev.application.mapper.UserMapper;
 import com.iwaodev.application.specification.factory.ReviewSpecificationFactory;
 import com.iwaodev.config.auth.CurAuthentication;
 import com.iwaodev.domain.review.ReviewSortEnum;
@@ -20,6 +18,7 @@ import com.iwaodev.domain.review.event.NewReviewWasSubmittedEvent;
 import com.iwaodev.domain.review.event.ReviewWasUpdatedByMemberEvent;
 import com.iwaodev.domain.review.event.ReviewWasVerifiedByAdminEvent;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.Product;
 import com.iwaodev.infrastructure.model.Review;
 import com.iwaodev.infrastructure.model.User;
@@ -36,7 +35,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -92,7 +90,7 @@ public class ReviewServiceImpl implements ReviewService {
   }
 
   @Override
-  public ReviewDTO getById(Long id) {
+  public ReviewDTO getById(Long id) throws Exception {
 
     // get result with repository
     // and map entity to dto with MapStruct
@@ -100,7 +98,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given review does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given review does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given review does not exist.");
     }
 
     // map entity to dto
@@ -108,14 +106,14 @@ public class ReviewServiceImpl implements ReviewService {
   }
 
   @Override
-  public ReviewDTO create(ReviewCriteria criteria) {
+  public ReviewDTO create(ReviewCriteria criteria) throws Exception {
 
     // if the review already exist, reject. (must be unique about user_id &
     // product_id combination)
     if (!this.repository.isExist(criteria.getUserId(), criteria.getProductId()).isEmpty()) {
       // user not found so return error
       logger.info("the given review already exist.");
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "the given review already exist.");
+      throw new AppException(HttpStatus.CONFLICT, "the given review already exist.");
     }
 
     Optional<User> customerOption = this.userRepository.findById(criteria.getUserId());
@@ -123,7 +121,7 @@ public class ReviewServiceImpl implements ReviewService {
     if (customerOption.isEmpty()) {
       // user not found so return error
       logger.info("the given customer does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given customer does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given customer does not exist.");
     }
 
     // the customer
@@ -134,7 +132,7 @@ public class ReviewServiceImpl implements ReviewService {
     if (productOption.isEmpty()) {
       // user not found so return error
       logger.info("the given product does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given product does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
 
     // the product
@@ -161,13 +159,13 @@ public class ReviewServiceImpl implements ReviewService {
   }
 
   @Override
-  public ReviewDTO update(ReviewCriteria criteria, Long id) {
+  public ReviewDTO update(ReviewCriteria criteria, Long id) throws Exception {
 
     Optional<Review> targetEntityOption = this.repository.findById(id);
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given review does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given review does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given review does not exist.");
     }
 
     Review oldEntity = targetEntityOption.get();
@@ -197,7 +195,7 @@ public class ReviewServiceImpl implements ReviewService {
   }
 
   @Override
-  public void delete(Long id) {
+  public void delete(Long id) throws Exception {
 
     Optional<Review> targetEntityOption = this.repository.findById(id);
 
@@ -208,15 +206,15 @@ public class ReviewServiceImpl implements ReviewService {
   }
 
   @Override
-  public FindReviewDTO findByUserIdAndProductId(UUID userId, UUID productId) {
+  public FindReviewDTO findByUserIdAndProductId(UUID userId, UUID productId) throws Exception {
 
     logger.info("before user find");
 
     User user = this.userRepository.findById(userId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found."));
+        .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "user not found."));
 
     Product product = this.productRepository.findById(productId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "product not found."));
+        .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "product not found."));
 
     logger.info("before user find");
     Optional<Review> reviewOption = this.repository.isExist(userId, productId);

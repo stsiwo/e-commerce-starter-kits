@@ -44,7 +44,7 @@ public class ProductController {
       @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
       @RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit,
       @RequestParam(value = "sort", required = false, defaultValue = "DATE_DESC") ProductSortEnum sort,
-      ProductQueryStringCriteria criteria) {
+      ProductQueryStringCriteria criteria) throws Exception {
 
     logger.info("product controller cur thread name: " + Thread.currentThread().getName());
 
@@ -56,7 +56,7 @@ public class ProductController {
       @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
       @RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit,
       @RequestParam(value = "sort", required = false, defaultValue = "DATE_DESC") ProductSortEnum sort,
-      ProductQueryStringCriteria criteria) {
+      ProductQueryStringCriteria criteria) throws Exception {
 
     logger.info("product controller cur thread name: " + Thread.currentThread().getName());
 
@@ -72,12 +72,12 @@ public class ProductController {
   // get by path or id
   @GetMapping("/products/{path}")
   @PreAuthorize("hasRole('ROLE_ADMIN')") // admin only
-  public ResponseEntity<ProductDTO> getWithPath(@PathVariable(value = "path") String path) {
+  public ResponseEntity<ProductDTO> getWithPath(@PathVariable(value = "path") String path) throws Exception {
     return new ResponseEntity<>(this.service.getByPathOrId(path), HttpStatus.OK);
   }
   // get by path or id (public)
   @GetMapping("/products/public/{path}")
-  public ResponseEntity<ProductDTO> getPublicWithPath(@PathVariable(value = "path") String path) {
+  public ResponseEntity<ProductDTO> getPublicWithPath(@PathVariable(value = "path") String path) throws Exception {
     return new ResponseEntity<>(this.service.getPublicByPathOrId(path), HttpStatus.OK);
   }
   // create a new product
@@ -86,7 +86,7 @@ public class ProductController {
   public ResponseEntity<ProductDTO> post(
       @RequestPart(name = "files", required = false) List<MultipartFile> files,
       @Valid @RequestPart("criteria") ProductCriteria criteria
-      ) {
+      ) throws Exception {
     logger.info("start handling at /products POST");
     return new ResponseEntity<>(this.service.create(criteria, files), HttpStatus.OK);
   }
@@ -98,7 +98,7 @@ public class ProductController {
       @PathVariable(value = "id") UUID id,
       @Valid @RequestPart("criteria") ProductCriteria criteria,
       @RequestPart(name = "files", required = false) List<MultipartFile> files
-      ) {
+      ) throws Exception {
     logger.info("start handling at /products PUT");
     return new ResponseEntity<>(this.service.update(criteria, id, files), HttpStatus.OK);
   }
@@ -108,7 +108,7 @@ public class ProductController {
   @PreAuthorize("hasRole('ROLE_ADMIN')") // admin only
   public ResponseEntity<BaseResponse> delete(
       @PathVariable(value = "id") UUID id
-      ) {
+      ) throws Exception {
     logger.info("start handling at /products DELETE");
     this.service.delete(id);
     return new ResponseEntity<>(new BaseResponse("successfuly deleted."), HttpStatus.OK);
@@ -145,7 +145,7 @@ public class ProductController {
   public ResponseEntity<byte[]> getProductImage(@PathVariable(value = "id") UUID id,
       @PathVariable(value = "imageName") String imageName,
       HttpServletResponse response
-      ) {
+      ) throws Exception {
 
     // disable content sniffing to prevent content sniffing exploit
     response.addHeader("X-Content-Type-Options", "nosniff");

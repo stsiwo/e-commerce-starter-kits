@@ -8,9 +8,9 @@ import com.iwaodev.ui.criteria.user.UserCompanyCriteria;
 
 public interface CompanyService {
 
-  public List<CompanyDTO> get(UUID userId);
+  public List<CompanyDTO> get(UUID userId) throws Exception;
 
-  public CompanyDTO update(UserCompanyCriteria criteria, UUID userId, Long companyId);
+  public CompanyDTO update(UserCompanyCriteria criteria, UUID userId, Long companyId) throws Exception;
 
 }
 

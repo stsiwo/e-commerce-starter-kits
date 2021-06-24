@@ -1,6 +1,5 @@
 package com.iwaodev.application.service;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -10,18 +9,16 @@ import java.util.stream.Collectors;
 import com.iwaodev.application.dto.product.ProductDTO;
 import com.iwaodev.application.dto.product.ProductVariantDTO;
 import com.iwaodev.application.dto.wishlistItem.WishlistItemDTO;
-import com.iwaodev.application.irepository.CartItemRepository;
 import com.iwaodev.application.irepository.ProductRepository;
 import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.irepository.WishlistItemRepository;
-import com.iwaodev.application.iservice.UserCartItemService;
 import com.iwaodev.application.iservice.UserWishlistItemService;
 import com.iwaodev.application.mapper.ProductMapper;
 import com.iwaodev.application.mapper.WishlistItemMapper;
 import com.iwaodev.application.specification.factory.WishlistItemSpecificationFactory;
 import com.iwaodev.domain.product.ProductSortEnum;
 import com.iwaodev.domain.wishlistItem.event.MovedWishlistItemToCartItemEvent;
-import com.iwaodev.infrastructure.model.CartItem;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.Product;
 import com.iwaodev.infrastructure.model.ProductVariant;
 import com.iwaodev.infrastructure.model.User;
@@ -38,8 +35,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
-
 @Service
 @Transactional
 public class UserWishlistItemServiceImpl implements UserWishlistItemService {
@@ -62,7 +57,7 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
   private ApplicationEventPublisher publisher;
 
   public Page<WishlistItemDTO> getAll(WishlistItemQueryStringCriteria criteria, Integer page, Integer limit,
-      ProductSortEnum sort) {
+      ProductSortEnum sort) throws Exception {
 
     return this.wishlistItemRepository
         .findAllToAvoidNPlusOne(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
@@ -115,14 +110,14 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
   }
 
   @Override
-  public WishlistItemDTO add(UUID userId, Long variantId) {
+  public WishlistItemDTO add(UUID userId, Long variantId) throws Exception {
 
     // check user exists
     Optional<User> targetUserOption = this.userRepository.findById(userId);
 
     if (targetUserOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     // check user exists
@@ -130,7 +125,7 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
 
     if (targetProductOption.isEmpty()) {
       logger.info("the given product or its variant does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given product or its variant does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given product or its variant does not exist.");
     }
 
     logger.info("check duplication");
@@ -140,7 +135,7 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
 
     if (!option.isEmpty()) {
       logger.info("target wishlist item already exist");
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "target wishlist item already exist.");
+      throw new AppException(HttpStatus.CONFLICT, "target wishlist item already exist.");
     }
 
     WishlistItem newWishlistItem = new WishlistItem();
@@ -181,14 +176,14 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
   }
 
   @Override
-  public void moveToCart(UUID userId, Long wishlistItemId) {
+  public void moveToCart(UUID userId, Long wishlistItemId) throws Exception {
 
     // check wishlistItem exists
     Optional<WishlistItem> targetWishlistItemOption = this.wishlistItemRepository.findById(wishlistItemId);
 
     if (targetWishlistItemOption.isEmpty()) {
       logger.info("the target wishlist item does not exist.");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the target wishlist item does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the target wishlist item does not exist.");
     }
 
     WishlistItem wishlistItem = targetWishlistItemOption.get();
@@ -201,7 +196,7 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
   }
 
   @Override
-  public void remove(Long wishlistItemItemId) {
+  public void remove(Long wishlistItemItemId) throws Exception {
 
     // check user exists
     Optional<WishlistItem> targetWishlistItemOption = this.wishlistItemRepository.findById(wishlistItemItemId);
@@ -216,7 +211,7 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
   }
 
   @Override
-  public void deleteAll(UUID userId) {
+  public void deleteAll(UUID userId) throws Exception {
 
     // #TODO: N + 1 problem
 

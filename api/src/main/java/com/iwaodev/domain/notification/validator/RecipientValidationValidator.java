@@ -35,19 +35,15 @@ public class RecipientValidationValidator implements ConstraintValidator<Recipie
 
     // recipient - not null
     if (domain.getRecipient() == null) {
-      //throw new DomainValidationException(String.format("recipient cannot be null."));
-      
-      // chage default message to this message to set different message inside this
-      // function.
-      context.disableDefaultConstraintViolation();
-      context.buildConstraintViolationWithTemplate("{notification.recipient.notnull}").addConstraintViolation();
+      // throw new DomainValidationException(String.format("recipient cannot be
+      // null."));
 
-      // you need to unwrap to set parameter to the message.
-      // ref:
-      // https://stackoverflow.com/questions/45510986/is-it-possible-to-add-message-parameter-for-constraint-violation-template-messag/45511264
+      // https://stackoverflow.com/questions/23702975/building-dynamic-constraintviolation-error-messages
       HibernateConstraintValidatorContext hibernateConstraintValidatorContext = context
           .unwrap(HibernateConstraintValidatorContext.class);
-      hibernateConstraintValidatorContext.addMessageParameter("0", actualNotificationType);
+      hibernateConstraintValidatorContext.disableDefaultConstraintViolation();
+      hibernateConstraintValidatorContext.addMessageParameter("0", actualNotificationType)
+          .buildConstraintViolationWithTemplate("{notification.recipient.notnull}").addConstraintViolation();
 
     }
 
@@ -56,23 +52,18 @@ public class RecipientValidationValidator implements ConstraintValidator<Recipie
     UserTypeEnum expectedRecipientType = domain.getNotificationType().getRecipientType().getUserType();
     UserTypeEnum actualRecipientType = domain.getRecipient().getUserType().getUserType();
     if (!actualRecipientType.equals(expectedRecipientType)) {
-      //throw new DomainValidationException(
-      //    String.format("the recipient must be %s for the notification (your type: %s and notification type; %s)",
-      //        expectedRecipientType, actualRecipientType, actualNotificationType));
-      
-      // chage default message to this message to set different message inside this
-      // function.
-      context.disableDefaultConstraintViolation();
-      context.buildConstraintViolationWithTemplate("{notification.recipient.invalidtype}").addConstraintViolation();
+      // throw new DomainValidationException(
+      // String.format("the recipient must be %s for the notification (your type: %s
+      // and notification type; %s)",
+      // expectedRecipientType, actualRecipientType, actualNotificationType));
 
-      // you need to unwrap to set parameter to the message.
-      // ref:
-      // https://stackoverflow.com/questions/45510986/is-it-possible-to-add-message-parameter-for-constraint-violation-template-messag/45511264
+      // https://stackoverflow.com/questions/23702975/building-dynamic-constraintviolation-error-messages
       HibernateConstraintValidatorContext hibernateConstraintValidatorContext = context
           .unwrap(HibernateConstraintValidatorContext.class);
-      hibernateConstraintValidatorContext.addMessageParameter("0", expectedRecipientType);
-      hibernateConstraintValidatorContext.addMessageParameter("1", actualRecipientType);
-      hibernateConstraintValidatorContext.addMessageParameter("2", actualNotificationType);
+      hibernateConstraintValidatorContext.disableDefaultConstraintViolation();
+      hibernateConstraintValidatorContext.addMessageParameter("0", actualRecipientType)
+          .addMessageParameter("1", expectedRecipientType).addMessageParameter("2", actualNotificationType)
+          .buildConstraintViolationWithTemplate("{notification.recipient.invalidtype}").addConstraintViolation();
     }
     // if pass all of them,
     return true;

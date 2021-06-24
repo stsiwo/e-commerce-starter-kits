@@ -11,6 +11,7 @@ import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.domain.notification.NotificationTypeEnum;
 import com.iwaodev.domain.service.CreateNotificationService;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.exception.NotFoundException;
 import com.iwaodev.infrastructure.model.Notification;
 import com.iwaodev.infrastructure.model.Product;
@@ -23,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 @Component
 public class NotificationSchedule {
@@ -47,14 +47,14 @@ public class NotificationSchedule {
 
   // every day at A.M. 0:00
   @Scheduled(cron = "0 0 0 ? * *") // check with this: https://www.freeformatter.com/cron-expression-generator-quartz.html
-  public void distributeNewProductArrivedNotification() {
+  public void distributeNewProductArrivedNotification() throws Exception {
 
     logger.info("start schedule: distributeNewProductArrivedNotification");
 
     // 1 get all products whose release date is today.
     List<Product> productList = this.productRepository.findAllNewProducts();
     User admin = this.userRepository.getAdmin().orElseThrow(
-        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
+        () -> new AppException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
 
     List<Notification> notificationAllList = new ArrayList<>();
     // 2. create notifications to distribute to all member.
@@ -70,7 +70,7 @@ public class NotificationSchedule {
         notificationAllList = Stream.concat(notificationAllList.stream(), notificationList.stream())
             .collect(Collectors.toList());
       } catch (NotFoundException e) {
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
       }
 
     }

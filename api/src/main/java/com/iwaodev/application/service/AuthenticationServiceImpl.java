@@ -35,7 +35,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -53,7 +52,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private UserRepository userRepository;
 
   @Override
-  public AuthenticationResponse login(String userName, String email, HttpServletResponse response) {
+  public AuthenticationResponse login(String userName, String email, HttpServletResponse response) throws Exception {
 
     final String jwt = this.jwtUtil.generateToken(userName);
 
@@ -74,7 +73,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   }
 
   @Override
-  public void assignApiTokenCookieToResponse(String jwt, HttpServletResponse response) {
+  public void assignApiTokenCookieToResponse(String jwt, HttpServletResponse response) throws Exception {
 
     /**
      * set jwt to cookie (httponly & secure)

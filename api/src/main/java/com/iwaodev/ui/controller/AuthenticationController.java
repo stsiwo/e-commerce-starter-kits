@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+import com.iwaodev.exception.AppException;
 
 @RestController
 public class AuthenticationController {
@@ -55,9 +55,9 @@ public class AuthenticationController {
 
 
     } catch (UsernameNotFoundException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the email is not registered.", e);
+      throw new AppException(HttpStatus.NOT_FOUND, "the email is not registered.");
     } catch (BadCredentialsException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "incorrect password", e);
+      throw new AppException(HttpStatus.BAD_REQUEST, "incorrect password");
     }
 
     final UserDetails userDetails = this.userDetailsService.loadUserByUsername(criteria.getEmail());

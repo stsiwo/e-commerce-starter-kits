@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+import com.iwaodev.exception.AppException;
 
 
 @RestController
@@ -45,7 +45,7 @@ public class UserAddressController {
   public ResponseEntity<List<AddressDTO>> get(
       @PathVariable(value = "userId") UUID userId,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     logger.info("start handling a request at UserAddressController#get");
     logger.info("user id: " + userId);
 
@@ -60,7 +60,7 @@ public class UserAddressController {
       @PathVariable(value = "userId") UUID userId,
       @AuthenticationPrincipal SpringSecurityUser authUser,
       @Valid @RequestBody UserAddressCriteria criteria
-      ) {
+      ) throws Exception {
     logger.info("start handling a request at UserAddressController#post");
     logger.info("user id: " + userId);
     logger.info("criteria" + criteria);
@@ -77,7 +77,7 @@ public class UserAddressController {
       @PathVariable(value = "addressId") Long addressId,
       @AuthenticationPrincipal SpringSecurityUser authUser,
       @Valid @RequestBody UserAddressCriteria criteria
-      ) {
+      ) throws Exception {
     logger.info("start handling a request at UserAddressController#post");
     logger.info("user id: " + userId);
     logger.info("criteria" + criteria);
@@ -94,7 +94,7 @@ public class UserAddressController {
       @PathVariable(value = "addressId") Long addressId,
       @NotEmpty @RequestBody Map<String, String> body,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     logger.info("start handling a request at UserAddressController#post");
     logger.info("user id: " + userId);
 
@@ -106,7 +106,7 @@ public class UserAddressController {
       return new ResponseEntity<>(this.service.toggleShippingAddress(userId, addressId), HttpStatus.OK);
     } else {
       logger.info("invalid request body. only allow to specify 'billing' or 'shipping'.");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid request body. only allow to specify 'billing' or 'shipping'.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "invalid request body. only allow to specify 'billing' or 'shipping'.");
     }
 
   }
@@ -119,7 +119,7 @@ public class UserAddressController {
       @PathVariable(value = "userId") UUID userId,
       @PathVariable(value = "addressId") Long addressId,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
 
     logger.info("user id: " + userId);
     logger.info("address id: " + addressId);

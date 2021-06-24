@@ -170,7 +170,7 @@ const OrderList: React.FunctionComponent<{}> = (props) => {
           </Typography>
         </Box>
       )}
-      {(curFetchAuthOrderFetchStatus === FetchStatusEnum.FAILED && curOrders.length === 0 &&
+      {(curFetchAuthOrderFetchStatus === FetchStatusEnum.SUCCESS && curOrders.length === 0 &&
         <Box className={classes.loadingBox}>
           <Typography variant="body1" component="p" align="center">
             {"Oops, Your order history is empty."}

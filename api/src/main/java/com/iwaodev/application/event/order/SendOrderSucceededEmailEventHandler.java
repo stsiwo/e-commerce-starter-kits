@@ -27,7 +27,7 @@ import com.iwaodev.infrastructure.model.Notification;
 import com.iwaodev.infrastructure.model.Order;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.order.OrderEventCriteria;
-import org.springframework.web.server.ResponseStatusException;
+import com.iwaodev.exception.AppException;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.slf4j.Logger;
@@ -68,18 +68,18 @@ public class SendOrderSucceededEmailEventHandler {
    **/
   @Async
   @TransactionalEventListener
-  public void handleEvent(PaymentSucceededEvent event) {
+  public void handleEvent(PaymentSucceededEvent event) throws AppException {
     logger.info("start SendOrderSucceededEmailEventHandler called.");
     logger.info(Thread.currentThread().getName());
 
     // order
     Order order = this.orderRepository.findByStripePaymentIntentId(event.getPaymentIntentId())
         .orElseThrow(
-            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "target order not found by its payment intent id"));
+            () -> new AppException(HttpStatus.NOT_FOUND, "target order not found by its payment intent id"));
 
     // BCC
     User admin = this.userRepository.getAdmin().orElseThrow(
-        () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist"));
+        () -> new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist"));
     // Sender
     Company company = admin.getCompanies().get(0);
     String senderEmail = "no-reply@" + company.getDomain();
@@ -111,7 +111,7 @@ public class SendOrderSucceededEmailEventHandler {
           htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
   }

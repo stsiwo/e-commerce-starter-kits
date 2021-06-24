@@ -49,7 +49,7 @@ public class UserWishlistItemController {
       @RequestParam(value = "limit", required = false, defaultValue = "10") Integer limit,
       @RequestParam(value = "sort", required = false, defaultValue = "DATE_DESC") ProductSortEnum sort,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
 
     logger.info("product controller cur thread name: " + Thread.currentThread().getName());
 
@@ -65,7 +65,7 @@ public class UserWishlistItemController {
       @PathVariable(value = "userId") UUID userId,
       @Valid @RequestBody WishlistItemCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     logger.info("start handling at /users/{userId}/wishlistItem POST");
     return new ResponseEntity<>(this.service.add(userId, criteria.getVariantId()), HttpStatus.OK);
   }
@@ -77,7 +77,7 @@ public class UserWishlistItemController {
       @PathVariable(value = "userId") UUID userId,
       @PathVariable(value = "wishlistItemId") @NotNull Long wishlistItemId,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
 
     this.service.moveToCart(userId, wishlistItemId);
 
@@ -91,7 +91,7 @@ public class UserWishlistItemController {
       @PathVariable(value = "userId") @NotNull UUID userId,
       @PathVariable(value = "wishlistItemId") @NotNull Long wishlistItemId,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     logger.info("start handling at /users/{userId}/wishlistItem/{wishlistItemId} DELETE");
     this.service.remove(wishlistItemId);
     return new ResponseEntity<>(new BaseResponse("successfully deleted."), HttpStatus.OK);
@@ -103,7 +103,7 @@ public class UserWishlistItemController {
   public ResponseEntity<BaseResponse> deleteAll(
       @PathVariable(value = "userId") @NotNull UUID userId,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     logger.info("start handling at /users/{userId}/wishlistItem/{wishlistItemId} DELETE");
     this.service.deleteAll(userId);
     return new ResponseEntity<>(new BaseResponse("successfully deleted."), HttpStatus.OK);

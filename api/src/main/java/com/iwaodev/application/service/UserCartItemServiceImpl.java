@@ -32,7 +32,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+import com.iwaodev.exception.AppException;
 
 @Service
 @Transactional
@@ -49,7 +49,7 @@ public class UserCartItemServiceImpl implements UserCartItemService {
   @Autowired
   private ProductRepository productRepository;
 
-  public List<CartItemDTO> getAll(UUID userId) {
+  public List<CartItemDTO> getAll(UUID userId) throws Exception {
 
     List<CartItem> cartItems = this.cartItemRepository.getAllByUserId(userId);
 
@@ -105,14 +105,14 @@ public class UserCartItemServiceImpl implements UserCartItemService {
   }
 
   @Override
-  public CartItemDTO add(CartItemCriteria criteria) {
+  public CartItemDTO add(CartItemCriteria criteria) throws Exception {
 
     // check user exists
     Optional<User> targetUserOption = this.userRepository.findById(criteria.getUserId());
 
     if (targetUserOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     // check user exists
@@ -120,7 +120,7 @@ public class UserCartItemServiceImpl implements UserCartItemService {
 
     if (targetProductOption.isEmpty()) {
       logger.info("the given product or its variant does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given product or its variant does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given product or its variant does not exist.");
     }
 
     // check cart item already exist
@@ -128,12 +128,12 @@ public class UserCartItemServiceImpl implements UserCartItemService {
 
     if (!option.isEmpty()) {
       logger.info("target cart item already exist");
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "target cart item already exist.");
+      throw new AppException(HttpStatus.CONFLICT, "target cart item already exist.");
     }
 
     // check exceed max 5
     if (targetUserOption.get().getCartItems().size() == 5) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cart items reaches max size (5 items).");
+      throw new AppException(HttpStatus.BAD_REQUEST, "cart items reaches max size (5 items).");
     }
 
     CartItem newCartItem = new CartItem();
@@ -167,14 +167,14 @@ public class UserCartItemServiceImpl implements UserCartItemService {
   }
 
   @Override
-  public CartItemDTO update(CartItemCriteria criteria) {
+  public CartItemDTO update(CartItemCriteria criteria) throws Exception {
 
     // check user exists
     Optional<CartItem> targetCartItemOption = this.cartItemRepository.findById(criteria.getCartItemId());
 
     if (targetCartItemOption.isEmpty()) {
       logger.info("the given cart item does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given cart item does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given cart item does not exist.");
     }
 
 
@@ -207,7 +207,7 @@ public class UserCartItemServiceImpl implements UserCartItemService {
   }
 
   @Override
-  public void remove(Long cartItemId) {
+  public void remove(Long cartItemId) throws Exception {
 
     // check user exists
     Optional<CartItem> targetCartItemOption = this.cartItemRepository.findById(cartItemId);
@@ -222,7 +222,7 @@ public class UserCartItemServiceImpl implements UserCartItemService {
   }
 
   @Override
-  public void deleteAll(UUID userId) {
+  public void deleteAll(UUID userId) throws Exception {
 
     // #TODO: N + 1 problem
 

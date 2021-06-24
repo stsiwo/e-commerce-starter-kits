@@ -31,65 +31,43 @@ public class OrderEventValidationValidator implements ConstraintValidator<OrderE
 
     // user null
     if (domain.getIsGuest() && domain.getUser() != null) {
-      // throw new DomainValidationException(String.format("order event's user must be
-      // null since this is added by guest (status: %s).", domain.getOrderStatus()));
-      context.disableDefaultConstraintViolation();
-      context.buildConstraintViolationWithTemplate("{orderEvent.user.null}").addConstraintViolation();
-      // you need to unwrap to set parameter to the message.
-      // ref:
-      // https://stackoverflow.com/questions/45510986/is-it-possible-to-add-message-parameter-for-constraint-violation-template-messag/45511264
+        // https://stackoverflow.com/questions/23702975/building-dynamic-constraintviolation-error-messages
       HibernateConstraintValidatorContext hibernateConstraintValidatorContext = context
           .unwrap(HibernateConstraintValidatorContext.class);
-      hibernateConstraintValidatorContext.addMessageParameter("0", domain.getOrderStatus());
+      hibernateConstraintValidatorContext.disableDefaultConstraintViolation();
+      hibernateConstraintValidatorContext.addMessageParameter("0", domain.getOrderStatus()).buildConstraintViolationWithTemplate("{orderEvent.user.null}").addConstraintViolation();
       return false;
     }
 
     // order status by guest user.
     if (domain.getUser() == null && !orderEventInfo.getAddableBy().contains(UserTypeEnum.ANONYMOUS)) {
-      // throw new DomainValidationException(String.format("order status is not
-      // addable by guest user (status: %s)", domain.getOrderStatus()));
-      context.disableDefaultConstraintViolation();
-      context.buildConstraintViolationWithTemplate("{orderEvent.orderStatus.notaddablebyguest}")
-          .addConstraintViolation();
-      // you need to unwrap to set parameter to the message.
-      // ref:
-      // https://stackoverflow.com/questions/45510986/is-it-possible-to-add-message-parameter-for-constraint-violation-template-messag/45511264
+        // https://stackoverflow.com/questions/23702975/building-dynamic-constraintviolation-error-messages
       HibernateConstraintValidatorContext hibernateConstraintValidatorContext = context
           .unwrap(HibernateConstraintValidatorContext.class);
-      hibernateConstraintValidatorContext.addMessageParameter("0", domain.getOrderStatus());
+      hibernateConstraintValidatorContext.disableDefaultConstraintViolation();
+      hibernateConstraintValidatorContext.addMessageParameter("0", domain.getOrderStatus()).buildConstraintViolationWithTemplate("{orderEvent.orderStatus.notaddablebyguest}")
+          .addConstraintViolation();
+;
       return false;
     }
 
     // user not null: admin/member
     if (!domain.getIsGuest() && domain.getUser() == null) {
-      // throw new DomainValidationException(String.format("order event's user cannot
-      // be null since this is added by admin/member (status: %s).",
-      // domain.getOrderStatus()));
-      context.disableDefaultConstraintViolation();
-      context.buildConstraintViolationWithTemplate("{orderEvent.user.notnull}").addConstraintViolation();
-      // you need to unwrap to set parameter to the message.
-      // ref:
-      // https://stackoverflow.com/questions/45510986/is-it-possible-to-add-message-parameter-for-constraint-violation-template-messag/45511264
+        // https://stackoverflow.com/questions/23702975/building-dynamic-constraintviolation-error-messages
       HibernateConstraintValidatorContext hibernateConstraintValidatorContext = context
           .unwrap(HibernateConstraintValidatorContext.class);
-      hibernateConstraintValidatorContext.addMessageParameter("0", domain.getOrderStatus());
+      hibernateConstraintValidatorContext.disableDefaultConstraintViolation();
+      hibernateConstraintValidatorContext.addMessageParameter("0", domain.getOrderStatus()).buildConstraintViolationWithTemplate("{orderEvent.user.notnull}").addConstraintViolation();
       return false;
     }
 
     // order status by admin/member user.
     if (!domain.getIsGuest() && !orderEventInfo.getAddableBy().contains(domain.getUser().getUserType().getUserType())) {
-      // throw new DomainValidationException(String.format("order status is not
-      // addable by this user (status: %s and addable by %s)",
-      // domain.getOrderStatus(), orderEventInfo.addableByToString()));
-      context.disableDefaultConstraintViolation();
-      context.buildConstraintViolationWithTemplate("{orderEvent.orderStatus.notnull}").addConstraintViolation();
-      // you need to unwrap to set parameter to the message.
-      // ref:
-      // https://stackoverflow.com/questions/45510986/is-it-possible-to-add-message-parameter-for-constraint-violation-template-messag/45511264
+        // https://stackoverflow.com/questions/23702975/building-dynamic-constraintviolation-error-messages
       HibernateConstraintValidatorContext hibernateConstraintValidatorContext = context
           .unwrap(HibernateConstraintValidatorContext.class);
-      hibernateConstraintValidatorContext.addMessageParameter("0", domain.getOrderStatus());
-      hibernateConstraintValidatorContext.addMessageParameter("1", orderEventInfo.addableByToString());
+      hibernateConstraintValidatorContext.disableDefaultConstraintViolation();
+      hibernateConstraintValidatorContext.addMessageParameter("0", domain.getOrderStatus()).addMessageParameter("1", orderEventInfo.addableByToString()).buildConstraintViolationWithTemplate("{orderEvent.orderStatus.notnull}").addConstraintViolation();
       return false;
     }
 

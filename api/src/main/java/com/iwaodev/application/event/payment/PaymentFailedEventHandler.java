@@ -18,7 +18,7 @@ import com.iwaodev.infrastructure.model.Order;
 import com.iwaodev.infrastructure.model.Product;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.order.OrderEventCriteria;
-import org.springframework.web.server.ResponseStatusException;
+import com.iwaodev.exception.AppException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +59,7 @@ public class PaymentFailedEventHandler{
    * 2. restore the product stock.
    **/
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-  public void handleEvent(PaymentFailedEvent event) {
+  public void handleEvent(PaymentFailedEvent event) throws AppException {
     logger.info("start handling PaymentFailedEventHandler");
     logger.info(Thread.currentThread().getName());
 
@@ -67,7 +67,7 @@ public class PaymentFailedEventHandler{
     Optional<Order> orderOption = this.orderRepository.findByStripePaymentIntentId(event.getPaymentIntentId());
 
     if (orderOption.isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "target order not found by its payment intent id");
+      throw new AppException(HttpStatus.NOT_FOUND, "target order not found by its payment intent id");
     }
 
     logger.info("before ueserRepo.getAdmin");
@@ -79,7 +79,7 @@ public class PaymentFailedEventHandler{
     // make sure the order' user == request user
     if (!userOption.isEmpty()) {
       if (!order.getUser().getUserId().equals(userOption.get().getUserId())) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "you cannot update an order for other member.");
+        throw new AppException(HttpStatus.BAD_REQUEST, "you cannot update an order for other member.");
       }
     }
 
@@ -96,9 +96,9 @@ public class PaymentFailedEventHandler{
         orderEventService.add(order, OrderStatusEnum.PAYMENT_FAILED, "", userOption.get().getUserId());
       }
     } catch (DomainException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+      throw new AppException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (NotFoundException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+      throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     logger.info("before save");
@@ -136,7 +136,7 @@ public class PaymentFailedEventHandler{
       List<Product> products = this.productStockService.restore(order.getOrderDetails());
       this.productRepository.saveAll(products);
     } catch (NotFoundException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+      throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     logger.info("after save");

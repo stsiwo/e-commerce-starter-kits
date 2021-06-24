@@ -10,19 +10,17 @@ import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.iservice.EmailService;
 import com.iwaodev.config.ClientSpaConfig;
 import com.iwaodev.domain.user.event.GeneratedVerificationTokenEvent;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.Company;
 import com.iwaodev.infrastructure.model.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
-import org.springframework.web.server.ResponseStatusException;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
@@ -50,7 +48,7 @@ public class SendVerificationEmailEventHandler {
 
   @Async
   @TransactionalEventListener
-  public void handleEvent(GeneratedVerificationTokenEvent event) {
+  public void handleEvent(GeneratedVerificationTokenEvent event) throws AppException {
 
     logger.info("start handleSendVerificationEmailEventHandler");
     logger.info(Thread.currentThread().getName());
@@ -60,7 +58,7 @@ public class SendVerificationEmailEventHandler {
     // if not, return 404
     if (adminRecipientOption.isEmpty()) {
       logger.info("the admin user does not exist");
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist");
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist");
     }
 
     User adminRecipient = adminRecipientOption.get();
@@ -89,7 +87,7 @@ public class SendVerificationEmailEventHandler {
           "Verification Email To Activate Your Account.", htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 }

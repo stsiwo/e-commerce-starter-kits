@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.Cookie;
@@ -21,6 +22,7 @@ import com.iwaodev.auth.AuthenticateTestUser;
 import com.iwaodev.auth.AuthenticationInfo;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.ui.response.ErrorBaseResponse;
 import com.iwaodev.util.ResourceReader;
 
 import org.junit.jupiter.api.Test;
@@ -37,6 +39,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -117,6 +121,9 @@ public class AdminProductEndpointTest {
 
   @Value("${file.product.path}")
   private String fileProductPath;
+
+  @Autowired
+  private MessageSource messageSource;
 
   /**
    * insert base test data into mysql database
@@ -224,9 +231,13 @@ public class AdminProductEndpointTest {
         .andExpect(status().isBadRequest());
 
     MvcResult result = resultActions.andReturn();
-
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(400);
+    // if this error from responseStatusException, you have to use 'result.getResponse().getErrorMessage()'
+    // if this error from @ControllerAdvice, you have to use 'responseBody.getMessage()' to access the body message.
+    assertThat(responseBody.getMessage()).isEqualTo(this.messageSource.getMessage("product.isPublic.onevariantandafterreleasedate", new Object[0], LocaleContextHolder.getLocale()));
   }
   /**
    * multipart testing.

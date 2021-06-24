@@ -28,7 +28,7 @@ import com.iwaodev.infrastructure.model.Notification;
 import com.iwaodev.infrastructure.model.Order;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.order.OrderEventCriteria;
-import org.springframework.web.server.ResponseStatusException;
+import com.iwaodev.exception.AppException;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.slf4j.Logger;
@@ -69,7 +69,7 @@ public class SendOrderWasShippedEmailEventHandler {
    **/
   @Async
   @TransactionalEventListener
-  public void handleEvent(OrderEventWasAddedEvent event) {
+  public void handleEvent(OrderEventWasAddedEvent event) throws AppException {
     logger.info("start SendOrderWasShippedEmailEventHandler called.");
     logger.info(Thread.currentThread().getName());
 
@@ -81,7 +81,7 @@ public class SendOrderWasShippedEmailEventHandler {
     logger.info("order status is 'shipped' so send an email.");
     // BCC
     User admin = this.userRepository.getAdmin().orElseThrow(
-        () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist"));
+        () -> new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist"));
     // Sender
     Company company = admin.getCompanies().get(0);
     String senderEmail = "no-reply@" + company.getDomain();
@@ -117,7 +117,7 @@ public class SendOrderWasShippedEmailEventHandler {
           "Your Order Has Been Shipped #" + order.getOrderNumber(), htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
   }

@@ -12,12 +12,16 @@
         => if you modify source code, don't forget to run this:
           command) mvn clean package
 
+  2. deploy sentive file to virtual machine.
+
+    command) ##Command.b
+    
 ## Command
 
-  - connect to the ec2
+  a. connect to the ec2
     command) ssh -i "~/.aws-ssh/iwaodev/iwadodev.pem" ubuntu@ec2-35-83-171-84.us-west-2.compute.amazonaws.com
 
-  - upload prod directory to ec2
+  b. upload prod directory to ec2
     command) scp -v -i "~/.aws-ssh/iwaodev/iwadodev.pem" -r ./prod/ ubuntu@ec2-35-83-171-84.us-west-2.compute.amazonaws.com:~/.
 
 ## Database Backup/Restore

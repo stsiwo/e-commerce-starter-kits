@@ -30,7 +30,6 @@ public class IssuerValidationValidator implements ConstraintValidator<IssuerVali
   @Override
   public boolean isValid(Notification domain, ConstraintValidatorContext context) {
 
-
     // issuer - not null if issuer is admin/member
     NotificationTypeEnum actualNotificationType = domain.getNotificationType().getNotificationType();
 
@@ -42,17 +41,12 @@ public class IssuerValidationValidator implements ConstraintValidator<IssuerVali
       // (type: %s)", actualNotificationType));
 
       logger.info("{notification.issuer.null}");
-      // chage default message to this message to set different message inside this
-      // function.
-      context.disableDefaultConstraintViolation();
-      context.buildConstraintViolationWithTemplate("{notification.issuer.null}").addConstraintViolation();
-
-      // you need to unwrap to set parameter to the message.
-      // ref:
-      // https://stackoverflow.com/questions/45510986/is-it-possible-to-add-message-parameter-for-constraint-violation-template-messag/45511264
+      // https://stackoverflow.com/questions/23702975/building-dynamic-constraintviolation-error-messages
       HibernateConstraintValidatorContext hibernateConstraintValidatorContext = context
           .unwrap(HibernateConstraintValidatorContext.class);
-      hibernateConstraintValidatorContext.addMessageParameter("0", actualNotificationType);
+      hibernateConstraintValidatorContext.disableDefaultConstraintViolation();
+      hibernateConstraintValidatorContext.addMessageParameter("0", actualNotificationType)
+          .buildConstraintViolationWithTemplate("{notification.issuer.null}").addConstraintViolation();
       return false;
 
     }
@@ -62,17 +56,12 @@ public class IssuerValidationValidator implements ConstraintValidator<IssuerVali
       // (type: %s)", actualNotificationType));
 
       logger.info("{notification.issuer.notnull}");
-      // chage default message to this message to set different message inside this
-      // function.
-      context.disableDefaultConstraintViolation();
-      context.buildConstraintViolationWithTemplate("{notification.issuer.notnull}").addConstraintViolation();
 
-      // you need to unwrap to set parameter to the message.
-      // ref:
-      // https://stackoverflow.com/questions/45510986/is-it-possible-to-add-message-parameter-for-constraint-violation-template-messag/45511264
       HibernateConstraintValidatorContext hibernateConstraintValidatorContext = context
           .unwrap(HibernateConstraintValidatorContext.class);
-      hibernateConstraintValidatorContext.addMessageParameter("0", actualNotificationType);
+      hibernateConstraintValidatorContext.disableDefaultConstraintViolation();
+      hibernateConstraintValidatorContext.addMessageParameter("0", actualNotificationType)
+          .buildConstraintViolationWithTemplate("{notification.issuer.notnull}").addConstraintViolation();
       return false;
     }
 
@@ -84,24 +73,21 @@ public class IssuerValidationValidator implements ConstraintValidator<IssuerVali
       UserTypeEnum expectedIssuerType = domain.getNotificationType().getIssuerType().getUserType();
       UserTypeEnum actualIssuerType = domain.getIssuer().getUserType().getUserType();
       if (!actualIssuerType.equals(expectedIssuerType)) {
-        //throw new DomainValidationException(
-        //    String.format("the issuer must be %s for the notification (your type: %s and notification type; %s)",
-        //        expectedIssuerType, actualIssuerType, actualNotificationType));
-        
-        logger.info("{notification.issuer.invalidtype}");
-        // chage default message to this message to set different message inside this
-        // function.
-        context.disableDefaultConstraintViolation();
-        context.buildConstraintViolationWithTemplate("{notification.issuer.invalidtype}").addConstraintViolation();
+        // throw new DomainValidationException(
+        // String.format("the issuer must be %s for the notification (your type: %s and
+        // notification type; %s)",
+        // expectedIssuerType, actualIssuerType, actualNotificationType));
 
-        // you need to unwrap to set parameter to the message.
-        // ref:
-        // https://stackoverflow.com/questions/45510986/is-it-possible-to-add-message-parameter-for-constraint-violation-template-messag/45511264
+        logger.info("{notification.issuer.invalidtype}");
+        // https://stackoverflow.com/questions/23702975/building-dynamic-constraintviolation-error-messages
         HibernateConstraintValidatorContext hibernateConstraintValidatorContext = context
             .unwrap(HibernateConstraintValidatorContext.class);
-        hibernateConstraintValidatorContext.addMessageParameter("{0}", expectedIssuerType);
-        hibernateConstraintValidatorContext.addMessageParameter("{1}", actualIssuerType);
-        hibernateConstraintValidatorContext.addMessageParameter("{2}", actualNotificationType);
+
+        hibernateConstraintValidatorContext.disableDefaultConstraintViolation();
+        hibernateConstraintValidatorContext.addMessageParameter("0", expectedIssuerType)
+            .addMessageParameter("1", actualIssuerType).addMessageParameter("2", actualNotificationType)
+            .buildConstraintViolationWithTemplate("{notification.issuer.invalidtype}").addConstraintViolation();
+
         return false;
       }
     }

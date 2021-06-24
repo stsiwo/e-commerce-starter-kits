@@ -15,23 +15,23 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 
-  public Page<UserDTO> getAll(UserQueryStringCriteria criteria, Integer page, Integer limit, UserSortEnum sort);
+  public Page<UserDTO> getAll(UserQueryStringCriteria criteria, Integer page, Integer limit, UserSortEnum sort) throws Exception;
 
-  public UserDTO getById(UUID id);
+  public UserDTO getById(UUID id) throws Exception;
 
-  public UserDTO update(UserCriteria criteria, UUID id);
+  public UserDTO update(UserCriteria criteria, UUID id) throws Exception;
 
-  public UserDTO updateStatus(UserStatusCriteria criteria);
+  public UserDTO updateStatus(UserStatusCriteria criteria) throws Exception;
 
-  public void delete(UUID id);
+  public void delete(UUID id) throws Exception;
 
-  public void tempDelete(UserDeleteTempCriteria criteria, UUID id);
+  public void tempDelete(UserDeleteTempCriteria criteria, UUID id) throws Exception;
 
-  public String uploadAvatarImage(UUID userId, MultipartFile file);
+  public String uploadAvatarImage(UUID userId, MultipartFile file) throws Exception;
 
-  public void removeAvatarImage(UUID userId);
+  public void removeAvatarImage(UUID userId) throws Exception;
 
-  public byte[] getAvatarImage(UUID userId, String imageName);
+  public byte[] getAvatarImage(UUID userId, String imageName) throws Exception;
 
   /**
    * check a user try to access its own data or other's data.
@@ -39,6 +39,6 @@ public interface UserService {
    *  - if not, return false
    **/
   @Deprecated
-  public boolean isSameAsAuthenticatedUser(User authUser, UUID id);
+  public boolean isSameAsAuthenticatedUser(User authUser, UUID id) throws Exception;
 
 }

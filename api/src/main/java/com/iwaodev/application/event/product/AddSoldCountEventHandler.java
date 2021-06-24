@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.iwaodev.application.irepository.ProductRepository;
 import com.iwaodev.domain.order.event.CompletedOrderPaymentEvent;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.Order;
 import com.iwaodev.infrastructure.model.OrderDetail;
 import com.iwaodev.infrastructure.model.Product;
@@ -14,12 +15,10 @@ import com.iwaodev.infrastructure.model.Product;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class AddSoldCountEventHandler {
@@ -34,7 +33,7 @@ public class AddSoldCountEventHandler {
   }
 
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-  public void handleEvent(CompletedOrderPaymentEvent event) {
+  public void handleEvent(CompletedOrderPaymentEvent event) throws AppException {
 
     logger.info("start handleAddSoldCountEventHandler");
     logger.info(Thread.currentThread().getName());
@@ -57,7 +56,7 @@ public class AddSoldCountEventHandler {
       if (productOption.isEmpty()) {
         // product not found so return error
         logger.info("the given product does not exist (productId: " + productId.toString());
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given customer does not exist.");
+        throw new AppException(HttpStatus.NOT_FOUND, "the given customer does not exist.");
       }
       // product found so assign it to this order
       Product product = productOption.get();

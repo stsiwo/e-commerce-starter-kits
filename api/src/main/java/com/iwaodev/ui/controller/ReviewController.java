@@ -60,7 +60,7 @@ public class ReviewController {
       @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
       @RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit,
       @RequestParam(value = "sort", required = false, defaultValue = "DATE_DESC") ReviewSortEnum sort,
-      ReviewQueryStringCriteria criteria) {
+      ReviewQueryStringCriteria criteria) throws Exception {
 
     logger.info("review controller cur thread name: " + Thread.currentThread().getName());
 
@@ -69,7 +69,7 @@ public class ReviewController {
 
   // get by id
   @GetMapping("/reviews/{id}")
-  public ResponseEntity<ReviewDTO> getWithId(@PathVariable(value = "id") Long id) {
+  public ResponseEntity<ReviewDTO> getWithId(@PathVariable(value = "id") Long id) throws Exception {
     return new ResponseEntity<>(this.service.getById(id), HttpStatus.OK);
   }
 
@@ -79,7 +79,7 @@ public class ReviewController {
   public ResponseEntity<ReviewDTO> post(
       @Valid @RequestBody ReviewCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     logger.info("start handling at /reviews POST");
     return new ResponseEntity<>(this.service.create(criteria), HttpStatus.OK);
   }
@@ -91,7 +91,7 @@ public class ReviewController {
       @PathVariable(value = "id") Long id,
       @Valid @RequestBody ReviewCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     logger.info("start handling at /reviews PUT");
     return new ResponseEntity<>(this.service.update(criteria, id), HttpStatus.OK);
   }
@@ -110,7 +110,7 @@ public class ReviewController {
   public ResponseEntity<BaseResponse> delete(
       @PathVariable(value = "id") Long id,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     logger.info("start handling at /reviews DELETE");
     this.service.delete(id);
     return new ResponseEntity<>(new BaseResponse("successfuly deleted."), HttpStatus.OK);

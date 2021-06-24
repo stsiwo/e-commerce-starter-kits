@@ -1,27 +1,21 @@
 # Integration Testing
 
-## What to Test
+## ResponseStatusException and MockMvc
 
-### Security
+  => does not assign the body when use ResponseStatusExcpetion.
 
-  - who can access to this endpoint?
+    - you need to access its internal exception when testing:
 
-### Functionality
-
-  - GET
-
-  - POST
-
-  - PUT
-
-  - PATCH
-
-  - DELETE
-
-    - how to make sure the deletion?
-
-      - explicitly call repository/entitymanager and retrieve the number of records?
-
+      ```
+      mvc.perform(get("/exception/{exception_id}", exceptionParam)
+      .contentType(MediaType.APPLICATION_JSON))
+      .andExpect(status().isBadRequest())
+      .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadArgumentsException))
+      .andExpect(result -> assertEquals("bad arguments", result.getResolvedException().getMessage()));
+      ```
+    
+    - ref: https://www.baeldung.com/spring-mvc-test-exceptions
+    - reason: unittest vs integrationtest => MockMvc unitest is not enough to test error message (https://github.com/spring-projects/spring-boot/issues/7321)
 
 ## Transactional seems not working.
 

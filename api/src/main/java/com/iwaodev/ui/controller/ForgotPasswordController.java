@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+import com.iwaodev.exception.AppException;
 
 @RestController
 public class ForgotPasswordController {
@@ -33,13 +33,13 @@ public class ForgotPasswordController {
   @PostMapping("/forgot-password")
   public ResponseEntity<BaseResponse> index(
       @RequestBody Map<String, String> body
-      ) { 
+      ) throws Exception { 
 
     String email = body.get("email");
 
     if (email.isEmpty() || email == null) {
       logger.info("email is missing.");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "email is missing.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "email is missing.");
     }
 
     this.service.requestForgotPassword(email);
@@ -50,7 +50,7 @@ public class ForgotPasswordController {
   @PostMapping("/reset-password")
   public ResponseEntity<BaseResponse> index(
       @Valid @RequestBody ResetPasswordCriteria criteria 
-      ) { 
+      ) throws Exception { 
 
     this.service.resetPassword(criteria);
 

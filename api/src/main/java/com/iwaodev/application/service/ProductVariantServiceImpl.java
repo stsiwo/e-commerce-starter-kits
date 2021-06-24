@@ -1,45 +1,26 @@
 package com.iwaodev.application.service;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.iwaodev.application.dto.product.ProductDTO;
 import com.iwaodev.application.dto.productVariant.ProductVariantDTO;
 import com.iwaodev.application.irepository.ProductRepository;
-import com.iwaodev.application.iservice.FileService;
-import com.iwaodev.application.iservice.ProductService;
 import com.iwaodev.application.iservice.ProductVariantService;
-import com.iwaodev.application.mapper.ProductMapper;
 import com.iwaodev.application.mapper.ProductVariantMapper;
-import com.iwaodev.application.specification.factory.ProductSpecificationFactory;
-import com.iwaodev.domain.product.ProductSortEnum;
-import com.iwaodev.infrastructure.model.Phone;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.Product;
-import com.iwaodev.infrastructure.model.ProductImage;
 import com.iwaodev.infrastructure.model.ProductVariant;
-import com.iwaodev.ui.criteria.product.ProductCriteria;
-import com.iwaodev.ui.criteria.user.UserDeleteTempCriteria;
-import com.iwaodev.ui.criteria.product.ProductQueryStringCriteria;
 import com.iwaodev.ui.criteria.product.ProductVariantCriteria;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -54,13 +35,13 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     this.repository = repository;
   }
 
-  public List<ProductVariantDTO> getAll(UUID productId) {
+  public List<ProductVariantDTO> getAll(UUID productId) throws Exception {
 
     Optional<Product> targetEntityOption = this.repository.findById(productId);
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given product does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given product does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
 
     Product targetEntity = targetEntityOption.get();
@@ -75,20 +56,20 @@ public class ProductVariantServiceImpl implements ProductVariantService {
   }
 
   @Override
-  public ProductVariantDTO create(UUID productId, ProductVariantCriteria criteria) {
+  public ProductVariantDTO create(UUID productId, ProductVariantCriteria criteria) throws Exception {
 
     Optional<Product> targetEntityOption = this.repository.findById(productId);
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given product does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given product does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
 
     Product targetEntity = targetEntityOption.get();
 
     // duplication
     if (this.repository.findVariantByColorAndSize(productId, criteria.getVariantColor(), criteria.getProductSize().getProductSizeName()).isPresent()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the variant already exist.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "the variant already exist.");
     }
 
 
@@ -109,19 +90,19 @@ public class ProductVariantServiceImpl implements ProductVariantService {
   }
 
   @Override
-  public ProductVariantDTO replace(UUID productId, Long variantId, ProductVariantCriteria criteria) {
+  public ProductVariantDTO replace(UUID productId, Long variantId, ProductVariantCriteria criteria) throws Exception {
     Optional<Product> targetEntityOption = this.repository.findById(productId);
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given product does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given product does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
 
     Product targetEntity = targetEntityOption.get();
 
     // duplication
     if (this.repository.isOthersHaveColorAndSize(productId, variantId, criteria.getVariantColor(), criteria.getProductSize().getProductSizeName())) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the variant already exist.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "the variant already exist.");
     }
 
     // map criteria to entity
@@ -138,7 +119,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
   }
 
   @Override
-  public void delete(UUID productId, Long variantId) {
+  public void delete(UUID productId, Long variantId) throws Exception {
 
     Optional<Product> targetEntityOption = this.repository.findById(productId);
 

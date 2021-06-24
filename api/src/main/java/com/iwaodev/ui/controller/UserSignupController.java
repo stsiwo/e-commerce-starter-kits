@@ -52,7 +52,7 @@ public class UserSignupController {
   public ResponseEntity<AuthenticationResponse> index(
       @Valid @RequestBody UserSignupCriteria criteria,
       HttpServletResponse response
-      ) { // use @Valid instead of @Validated
+      ) throws Exception { // use @Valid instead of @Validated
 
     logger.debug("user criteria (query string)");
     logger.debug(criteria.toString());
@@ -74,7 +74,7 @@ public class UserSignupController {
   public ResponseEntity<UserDTO> accountVerify(
       @RequestParam(name = "account-verify-token") String verificationToken,
       @PathVariable(value = "id") UUID id,
-      @AuthenticationPrincipal SpringSecurityUser authUser) { // use @Valid instead of @Validated
+      @AuthenticationPrincipal SpringSecurityUser authUser) throws Exception { // use @Valid instead of @Validated
 
     /**
      * redirect after signup to authenticate to create api-token cookie
@@ -89,7 +89,7 @@ public class UserSignupController {
   @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
   public ResponseEntity<BaseResponse> reissueAccountVerify(
       @PathVariable(value = "id") UUID id,
-      @AuthenticationPrincipal SpringSecurityUser authUser) { // use @Valid instead of @Validated
+      @AuthenticationPrincipal SpringSecurityUser authUser) throws Exception { // use @Valid instead of @Validated
 
     /**
      * redirect after signup to authenticate to create api-token cookie

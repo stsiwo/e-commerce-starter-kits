@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
+import com.iwaodev.exception.AppException;
 
 @RestController
 public class ProductVariantController {
@@ -46,7 +46,7 @@ public class ProductVariantController {
   @GetMapping("/products/{productId}/variants")
   public ResponseEntity<List<ProductVariantDTO>> get(
       @PathVariable(value = "productId") UUID productId
-      ) {
+      ) throws Exception {
     return new ResponseEntity<>(this.service.getAll(productId), HttpStatus.OK);
   }
 
@@ -55,7 +55,7 @@ public class ProductVariantController {
   public ResponseEntity<ProductVariantDTO> post(
       @PathVariable(value = "productId") UUID productId,
       @Valid @RequestBody ProductVariantCriteria criteria
-      ) {
+      ) throws Exception {
     return new ResponseEntity<>(this.service.create(productId, criteria), HttpStatus.OK);
   }
 
@@ -66,12 +66,12 @@ public class ProductVariantController {
       @PathVariable(value = "productId") UUID productId,
       @PathVariable(value = "variantId") Long variantId,
       @Valid @RequestBody ProductVariantCriteria criteria
-      ) {
+      ) throws Exception {
     
     // if criteria.variantId != variantId (path), reject to update.
     if (!variantId.toString().equals(criteria.getVariantId().toString())) {
       logger.info("variant id in the request body does not match with the one in url.");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "variant id in the request body does not match with the one in url.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "variant id in the request body does not match with the one in url.");
     }
 
     return new ResponseEntity<>(this.service.replace(productId, variantId, criteria), HttpStatus.OK);
@@ -83,7 +83,7 @@ public class ProductVariantController {
   public ResponseEntity<BaseResponse> delete(
       @PathVariable(value = "productId") UUID productId,
       @PathVariable(value = "variantId") Long variantId
-      ) {
+      ) throws Exception {
     this.service.delete(productId, variantId);
     return new ResponseEntity<>(new BaseResponse("successfuly deleted."), HttpStatus.OK);
   }

@@ -11,6 +11,7 @@ import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.iservice.ContactService;
 import com.iwaodev.application.iservice.EmailService;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.contact.ContactCriteria;
 
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
@@ -44,14 +44,14 @@ public class ContactServiceImpl implements ContactService {
   private UserRepository userRepository;
 
   @Override
-  public void submit(ContactCriteria criteria, UUID userId) {
+  public void submit(ContactCriteria criteria, UUID userId) throws Exception {
 
     Optional<User> adminRecipientOption = this.userRepository.getAdmin();
 
     // if not, return 404
     if (adminRecipientOption.isEmpty()) {
       logger.info("the admin user does not exist");
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist");
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist");
     }
 
     User adminRecipient = adminRecipientOption.get();
@@ -61,7 +61,7 @@ public class ContactServiceImpl implements ContactService {
     // if not, return 404
     if (senderUserOption.isEmpty()) {
       logger.info("the user does not exist");
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "the user does not exist");
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the user does not exist");
     }
 
     User senderUser = senderUserOption.get();
@@ -79,19 +79,19 @@ public class ContactServiceImpl implements ContactService {
       this.emailService.send(adminRecipient.getEmail(), criteria.getEmail(), criteria.getTitle(), htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 
   @Override
-  public void submit(ContactCriteria criteria) {
+  public void submit(ContactCriteria criteria) throws Exception {
 
     Optional<User> adminRecipientOption = this.userRepository.getAdmin();
 
     // if not, return 404
     if (adminRecipientOption.isEmpty()) {
       logger.info("the admin user does not exist");
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist");
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist");
     }
 
     User adminRecipient = adminRecipientOption.get();
@@ -110,7 +110,7 @@ public class ContactServiceImpl implements ContactService {
       this.emailService.send(adminRecipient.getEmail(), criteria.getEmail(), criteria.getTitle(), htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 

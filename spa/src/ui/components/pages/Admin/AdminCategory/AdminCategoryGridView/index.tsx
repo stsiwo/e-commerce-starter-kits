@@ -62,7 +62,7 @@ const generateRows: (domains: CategoryType[]) => GridRowsProp = (domains) => {
       name: domain.categoryName,
       path: domain.categoryPath,
       description: domain.categoryDescription,
-      products: domain.categoryId,
+      products: domain.totalProductCount,
       actions: domain.categoryId,
     }
   })

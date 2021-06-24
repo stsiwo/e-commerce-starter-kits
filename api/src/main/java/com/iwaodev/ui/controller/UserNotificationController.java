@@ -42,7 +42,7 @@ public class UserNotificationController {
       //@RequestParam(value = "sort", required = false, defaultValue = "DATE_DESC") UserSortEnum sort,
       @PathVariable(value = "userId") UUID userId,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     return new ResponseEntity<>(this.service.getAll(userId, page, limit), HttpStatus.OK);
   }
 
@@ -54,7 +54,7 @@ public class UserNotificationController {
       @PathVariable(value = "userId") UUID userId,
       @PathVariable(value = "notificationId") String notificationId,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     return new ResponseEntity<>(this.service.turnIsReadTrue(userId, notificationId), HttpStatus.OK);
   }
 }

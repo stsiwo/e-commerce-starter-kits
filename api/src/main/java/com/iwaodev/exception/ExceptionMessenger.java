@@ -3,7 +3,7 @@ package com.iwaodev.exception;
 import org.springframework.stereotype.Component;
 
 /**
- * provide a template for ResponseStatusException.
+ * provide a template for AppException.
  * 
  **/
 @Component

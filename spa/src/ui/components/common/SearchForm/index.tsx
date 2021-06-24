@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
       width: 300,
       paddingLeft: theme.spacing(2),
       boxShadow: "none",
+      justifyContent: "flex-end",
       borderRadius: "none",
     },
     searchInput: {

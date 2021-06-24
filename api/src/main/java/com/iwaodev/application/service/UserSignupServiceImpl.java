@@ -9,6 +9,7 @@ import com.iwaodev.application.mapper.UserMapper;
 import com.iwaodev.domain.user.UserActiveEnum;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.domain.user.event.GeneratedVerificationTokenEvent;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.infrastructure.model.UserType;
 import com.iwaodev.ui.criteria.user.UserSignupCriteria;
@@ -21,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -38,13 +38,13 @@ public class UserSignupServiceImpl implements UserSignupService {
   @Autowired
   private ApplicationEventPublisher publisher;
 
-  public UserDTO signup(UserSignupCriteria criteria) {
+  public UserDTO signup(UserSignupCriteria criteria) throws Exception {
 
     logger.info("target criteria user name: " + criteria.toString());
 
     if (this.repository.findByEmail(criteria.getEmail()).isPresent()) {
       logger.info("the given user already exisxts");
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "the given user already exists.");
+      throw new AppException(HttpStatus.CONFLICT, "the given user already exists.");
     }
 
     // user does not exist, so create new one.
@@ -53,7 +53,7 @@ public class UserSignupServiceImpl implements UserSignupService {
     User targetEntity = UserMapper.INSTANCE.toUserEntityFromUserSignupCriteria(criteria);
 
     // assign user type
-    UserType memberType = this.repository.findUserType(UserTypeEnum.MEMBER).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "user type not found (type: MEMBER)"));
+    UserType memberType = this.repository.findUserType(UserTypeEnum.MEMBER).orElseThrow(() -> new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "user type not found (type: MEMBER)"));
     targetEntity.setUserType(memberType);
 
     // set bcrypted password
@@ -81,18 +81,18 @@ public class UserSignupServiceImpl implements UserSignupService {
   }
 
   @Override
-  public UserDTO verifyAccount(UUID userId, String verificationToken) {
+  public UserDTO verifyAccount(UUID userId, String verificationToken) throws Exception {
 
-    User targetUser = this.repository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "the user not found (id: " + userId.toString() + ")"));
+    User targetUser = this.repository.findById(userId).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the user not found (id: " + userId.toString() + ")"));
 
     if (targetUser.isActive()) {
       logger.info("your account is already verified.");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "your account is already verified.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "your account is already verified.");
     }
 
     if (!targetUser.verifyVerificationToken(verificationToken)) {
       logger.info("verification token is invalid because of wrong value or expired.");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+      throw new AppException(HttpStatus.BAD_REQUEST,
           "verification token is invalid because of wrong value or expired.");
     }
 
@@ -104,14 +104,14 @@ public class UserSignupServiceImpl implements UserSignupService {
   }
 
   @Override
-  public UserDTO reissueVerification(UUID userId) {
+  public UserDTO reissueVerification(UUID userId) throws Exception {
 
 
-    User targetUser = this.repository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "the user not found (id: " + userId.toString() + ")"));
+    User targetUser = this.repository.findById(userId).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the user not found (id: " + userId.toString() + ")"));
 
     if (targetUser.isActive()) {
       logger.info("your account is already verified.");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "your account is already verified.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "your account is already verified.");
     }
 
     targetUser.refreshVerificationToken();

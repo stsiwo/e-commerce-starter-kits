@@ -37,7 +37,7 @@ public class UserCompanyController {
   public ResponseEntity<List<CompanyDTO>> get(
       @PathVariable(value = "userId") UUID userId,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
     return new ResponseEntity<>(this.service.get(userId), HttpStatus.OK);
   }
 
@@ -49,7 +49,7 @@ public class UserCompanyController {
       @PathVariable(value = "companyId") Long companyId,
       @AuthenticationPrincipal SpringSecurityUser authUser,
       @Valid @RequestBody UserCompanyCriteria criteria
-      ) {
+      ) throws Exception {
     return new ResponseEntity<>(this.service.update(criteria, userId, companyId), HttpStatus.OK);
   }
 }

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+import com.iwaodev.exception.AppException;
 
 /**
  *  Stripe Webhook Endpoint 
@@ -73,13 +73,13 @@ public class PaymentWebhookController {
     // String sigHeader = request.headers("Stripe-Signature");
     Event event = null;
 
-    //  throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given product does not exist.");
+    //  throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     try {
       event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
     } catch (JsonSyntaxException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid payload");
+      throw new AppException(HttpStatus.BAD_REQUEST, "invalid payload");
     } catch (SignatureVerificationException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid signature");
+      throw new AppException(HttpStatus.BAD_REQUEST, "invalid signature");
     }
 
     /**

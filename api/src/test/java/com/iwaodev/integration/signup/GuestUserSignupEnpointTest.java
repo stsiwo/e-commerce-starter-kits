@@ -19,6 +19,7 @@ import com.iwaodev.domain.user.UserActiveEnum;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.response.AuthenticationResponse;
+import com.iwaodev.ui.response.ErrorBaseResponse;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
@@ -94,6 +97,9 @@ public class GuestUserSignupEnpointTest {
 
   @MockBean
   private EmailService emailService;
+
+  @Autowired
+  private MessageSource messageSource;
 
   @Test
   public void shouldGuestUserSignupSuccessfully() throws Exception {
@@ -177,9 +183,24 @@ public class GuestUserSignupEnpointTest {
 
     // act
     ResultActions resultActions = mvc
-        .perform(MockMvcRequestBuilders.post(targetUrl).contentType(MediaType.APPLICATION_JSON)
-            .content(dummyUserSignupForm.toString()).accept(MediaType.APPLICATION_JSON))
-        .andDo(print()).andExpect(status().isBadRequest());
+        .perform(MockMvcRequestBuilders
+            .post(targetUrl)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(dummyUserSignupForm.toString())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andDo(mvcResult -> {
+           
+        });
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+    // assert
+    // if this error from responseStatusException, you have to use 'result.getResponse().getErrorMessage()'
+    // if this error from @ControllerAdvice, you have to use 'responseBody.getMessage()' to access the body message.
+    assertThat(responseBody.getMessage()).isEqualTo(this.messageSource.getMessage("user.firstName.notempty", new Object[0], LocaleContextHolder.getLocale()));
   }
 
   @Test

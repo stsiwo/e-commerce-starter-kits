@@ -31,8 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionalEventListener;
-import org.springframework.web.server.ResponseStatusException;
-
+import com.iwaodev.exception.AppException;
 /**
  * shipment integration will be integrated at next version.
  *
@@ -87,7 +86,7 @@ import org.springframework.web.server.ResponseStatusException;
 //    if (adminOption.isEmpty()) {
 //      // product not found so return error
 //      logger.info("the admin user does not exist.");
-//      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the admin user does not exist.");
+//      throw new AppException(HttpStatus.NOT_FOUND, "the admin user does not exist.");
 //    }
 //
 //    User admin = adminOption.get();
@@ -96,9 +95,9 @@ import org.springframework.web.server.ResponseStatusException;
 //    try {
 //      Address adminSenderAddress = admin.getSenderAddressOfAdmin();
 //    } catch (NotFoundException e) {
-//      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+//      throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
 //    } catch (InvalidUserTypeException e) {
-//      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+//      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 //    }
 //
 //    // main element

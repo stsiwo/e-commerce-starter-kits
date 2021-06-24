@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -18,7 +16,7 @@ import com.iwaodev.application.mapper.UserMapper;
 import com.iwaodev.application.specification.factory.UserSpecificationFactory;
 import com.iwaodev.domain.user.UserActiveEnum;
 import com.iwaodev.domain.user.UserSortEnum;
-import com.iwaodev.infrastructure.model.Phone;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.user.UserCriteria;
 import com.iwaodev.ui.criteria.user.UserDeleteTempCriteria;
@@ -38,7 +36,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -67,7 +64,7 @@ public class UserServiceImpl implements UserService {
   @Autowired
   private ApplicationEventPublisher publisher;
 
-  public Page<UserDTO> getAll(UserQueryStringCriteria criteria, Integer page, Integer limit, UserSortEnum sort) {
+  public Page<UserDTO> getAll(UserQueryStringCriteria criteria, Integer page, Integer limit, UserSortEnum sort) throws Exception {
 
     // get result with repository
     // and map entity to dto with MapStruct
@@ -85,7 +82,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public UserDTO getById(UUID id) {
+  public UserDTO getById(UUID id) throws Exception {
 
     // get result with repository
     // and map entity to dto with MapStruct
@@ -93,7 +90,7 @@ public class UserServiceImpl implements UserService {
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     // map entity to dto
@@ -101,7 +98,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public UserDTO update(UserCriteria criteria, UUID id) {
+  public UserDTO update(UserCriteria criteria, UUID id) throws Exception {
 
     // assign id to this criteria id
     // otherwise, this try to create a new User
@@ -115,7 +112,7 @@ public class UserServiceImpl implements UserService {
     // if not, return 404
     if (targetEntityOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     User targetEntity = targetEntityOption.get();
@@ -127,7 +124,7 @@ public class UserServiceImpl implements UserService {
      * email duplication
      **/
     if (this.repository.isOthersHaveEmail(criteria.getUserId(), criteria.getEmail())) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "this email already taken.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "this email already taken.");
     }
 
     targetEntity.setEmail(criteria.getEmail());
@@ -150,10 +147,10 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public UserDTO updateStatus(UserStatusCriteria criteria) {
+  public UserDTO updateStatus(UserStatusCriteria criteria) throws Exception {
 
     User user = this.repository.findById(criteria.getUserId())
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+        .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND,
             "user not found (id: " + criteria.getUserId().toString() + ")"));
 
     user.setActive(criteria.getActive());
@@ -168,14 +165,14 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void tempDelete(UserDeleteTempCriteria criteria, UUID id) {
+  public void tempDelete(UserDeleteTempCriteria criteria, UUID id) throws Exception {
     // not delete the record, but update 'isDeleted' column
 
     Optional<User> targetEntityOption = this.repository.findById(id);
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     User targetEntity = targetEntityOption.get();
@@ -189,7 +186,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void delete(UUID id) {
+  public void delete(UUID id) throws Exception {
     // completely delete user data
     Optional<User> targetEntityOption = this.repository.findById(id);
 
@@ -201,7 +198,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Deprecated
-  public boolean isSameAsAuthenticatedUser(org.springframework.security.core.userdetails.User authUser, UUID id) {
+  public boolean isSameAsAuthenticatedUser(org.springframework.security.core.userdetails.User authUser, UUID id) throws Exception {
 
     // get result with repository
     // and map entity to dto with MapStruct
@@ -209,7 +206,7 @@ public class UserServiceImpl implements UserService {
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     logger.info("auth user email: " + authUser.getUsername());
@@ -222,20 +219,20 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public String uploadAvatarImage(UUID userId, MultipartFile file) {
+  public String uploadAvatarImage(UUID userId, MultipartFile file) throws Exception {
 
     // find the user
     Optional<User> targetEntityOption = this.repository.findById(userId);
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     // check the file content type (only image is allowed)
     if (!this.fileService.isImage(file)) {
       logger.info("only image files are acceptable.");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only image files are acceptable.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "only image files are acceptable.");
     }
 
     // generate unique (including hash for cache) file name
@@ -255,7 +252,7 @@ public class UserServiceImpl implements UserService {
       this.fileService.save(path, file);
     } catch (IOException e) {
       logger.info(e.getMessage());
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
     // update the user
@@ -273,14 +270,14 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void removeAvatarImage(UUID userId) {
+  public void removeAvatarImage(UUID userId) throws Exception {
 
     // find the user
     Optional<User> targetEntityOption = this.repository.findById(userId);
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     // get avatarImagePath from db
@@ -323,12 +320,12 @@ public class UserServiceImpl implements UserService {
     return this.avatarImageName + "." + this.fileService.getExtension(originalFileName);
   }
 
-  private String switchToDirectoryPathWithFile(String publicPath, String userIdString) {
+  private String switchToDirectoryPathWithFile(String publicPath, String userIdString) throws Exception {
     return getDirectoryPath(userIdString) + "/" + this.fileService.extractFileNameFromPath(publicPath);
   }
 
   @Override
-  public byte[] getAvatarImage(UUID userId, String imageName) {
+  public byte[] getAvatarImage(UUID userId, String imageName) throws Exception {
 
     String internalPath = this.userFilePath + "/" + userId.toString() + "/" + imageName;
 
@@ -338,7 +335,7 @@ public class UserServiceImpl implements UserService {
       content = this.fileService.load(internalPath);
     } catch (IOException e) {
       logger.info(e.getMessage());
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
     return content;

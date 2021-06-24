@@ -1,8 +1,6 @@
 package com.iwaodev.application.service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,17 +17,17 @@ import com.iwaodev.application.iservice.OrderService;
 import com.iwaodev.application.iservice.PaymentService;
 import com.iwaodev.application.mapper.OrderMapper;
 import com.iwaodev.application.specification.factory.OrderSpecificationFactory;
-import com.iwaodev.config.SpringSecurityUser;
 import com.iwaodev.domain.order.OrderRule;
 import com.iwaodev.domain.order.OrderSortEnum;
 import com.iwaodev.domain.order.OrderStatusEnum;
+import com.iwaodev.domain.order.event.OrderCanceledEvent;
 import com.iwaodev.domain.order.event.OrderEventWasAddedByMemberEvent;
 import com.iwaodev.domain.order.event.OrderEventWasAddedEvent;
 import com.iwaodev.domain.order.event.OrderFinalConfirmedEvent;
-import com.iwaodev.domain.order.event.OrderCanceledEvent;
 import com.iwaodev.domain.order.event.OrderReturnedEvent;
 import com.iwaodev.domain.service.OrderEventService;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.exception.DomainException;
 import com.iwaodev.exception.ExceptionMessenger;
 import com.iwaodev.exception.NotFoundException;
@@ -58,7 +56,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -94,7 +91,7 @@ public class OrderServiceImpl implements OrderService {
   private OrderEventService orderEventService;
 
   @Override
-  public Page<OrderDTO> getAll(OrderQueryStringCriteria criteria, Integer page, Integer limit, OrderSortEnum sort) {
+  public Page<OrderDTO> getAll(OrderQueryStringCriteria criteria, Integer page, Integer limit, OrderSortEnum sort) throws Exception {
     return this.orderRepository
         .findAllToAvoidNPlusOne(this.specificationFactory.build(criteria), PageRequest.of(page, limit, getSort(sort)))
         .map(new Function<Order, OrderDTO>() {
@@ -114,13 +111,13 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public Page<OrderDTO> getAllByUserId(UUID userId, OrderQueryStringCriteria criteria, Integer page, Integer limit,
-      OrderSortEnum sort) {
+      OrderSortEnum sort) throws Exception {
 
     Optional<User> targetEntityOption = this.userRepository.findById(userId);
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     // assign the id to criteria
@@ -152,17 +149,17 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public OrderDTO getByIdAndUserId(UUID orderId, UUID userId) {
+  public OrderDTO getByIdAndUserId(UUID orderId, UUID userId) throws Exception {
 
     Order order = this.orderRepository.findByOrderIdAndUserId(orderId, userId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "the given order does not exist."));
+        .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given order does not exist."));
 
     order.setUpCalculatedProperties();
     return OrderMapper.INSTANCE.toOrderDTO(order);
   }
 
   @Override
-  public OrderDTO getById(UUID orderId) {
+  public OrderDTO getById(UUID orderId) throws Exception {
 
     // get result with repository
     // and map entity to dto with MapStruct
@@ -170,7 +167,7 @@ public class OrderServiceImpl implements OrderService {
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given order does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given order does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given order does not exist.");
     }
 
     Order order = targetEntityOption.get();
@@ -184,14 +181,14 @@ public class OrderServiceImpl implements OrderService {
    *
    **/
   @Override
-  public PaymentIntentResponse createForMember(OrderCriteria criteria, UUID authUserId) {
+  public PaymentIntentResponse createForMember(OrderCriteria criteria, UUID authUserId) throws Exception {
 
     // prep input for the requst for stripe
     Order order = OrderMapper.INSTANCE.toOrderEntityFromOrderCriteria(criteria);
 
     // find user
     User customer = this.userRepository.findById(authUserId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+        .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND,
             this.exceptionMessenger.getNotFoundMessage("user", authUserId.toString())));
 
     order.setUser(customer);
@@ -212,7 +209,7 @@ public class OrderServiceImpl implements OrderService {
         stripeCustomerId = stripeCustomer.getId();
       } catch (StripeException e) {
         logger.info(e.getMessage());
-        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+        throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
       }
     }
 
@@ -225,9 +222,9 @@ public class OrderServiceImpl implements OrderService {
     try {
       this.orderEventService.add(order, OrderStatusEnum.DRAFT, "", customer);
     } catch (DomainException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+      throw new AppException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (NotFoundException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+      throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     // finally, request to create payment intent
@@ -245,7 +242,7 @@ public class OrderServiceImpl implements OrderService {
 
     } catch (StripeException e) {
       logger.info(e.getMessage());
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
     // assign payment intent id to this order
@@ -282,7 +279,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public PaymentIntentResponse createForGuest(OrderCriteria criteria) {
+  public PaymentIntentResponse createForGuest(OrderCriteria criteria) throws Exception {
     // prep input for the requst for stripe
     Order order = OrderMapper.INSTANCE.toOrderEntityFromOrderCriteria(criteria);
 
@@ -302,9 +299,9 @@ public class OrderServiceImpl implements OrderService {
     try {
       this.orderEventService.add(order, OrderStatusEnum.DRAFT, "", (User) null);
     } catch (DomainException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+      throw new AppException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (NotFoundException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+      throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     // finally, request to create payment intent
@@ -319,7 +316,7 @@ public class OrderServiceImpl implements OrderService {
 
     } catch (StripeException e) {
       logger.info(e.getMessage());
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
     // assign payment intent id to this order
@@ -355,7 +352,7 @@ public class OrderServiceImpl implements OrderService {
     return new PaymentIntentResponse(intent.getClientSecret(), OrderMapper.INSTANCE.toOrderDTO(savedOrder));
   }
 
-  public void assignOrderDetails(OrderCriteria criteria, Order order) {
+  public void assignOrderDetails(OrderCriteria criteria, Order order) throws Exception {
 
     /**
      * avoid n+1 problem (e.g., sql inside for loop like below).
@@ -380,14 +377,14 @@ public class OrderServiceImpl implements OrderService {
       // .findByIdWithPessimisticLock(orderDetailCriteria.getProductId());
       // Product product =
       // this.productRepository.findById(orderDetailCriteria.getProductId())
-      // .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+      // .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND,
       // this.exceptionMessenger.getNotFoundMessage("product",
       // orderDetailCriteria.getProductId().toString())));
 
       Product product = products.getOrDefault(orderDetailCriteria.getProductId(), null);
 
       if (product == null) {
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+        throw new AppException(HttpStatus.NOT_FOUND,
             this.exceptionMessenger.getNotFoundMessage("product", orderDetailCriteria.getProductId().toString()));
       }
 
@@ -403,25 +400,25 @@ public class OrderServiceImpl implements OrderService {
 
         order.addOrderDetail(orderDetail);
       } catch (NotFoundException e) {
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
       }
     }
   }
 
   @Override
-  public OrderDTO addSessionTimeoutOrderEvent(UUID orderId, String orderNumber, UUID userId) {
+  public OrderDTO addSessionTimeoutOrderEvent(UUID orderId, String orderNumber, UUID userId) throws Exception {
 
     Order order = this.orderRepository.findByOrderIdAndOrderNumber(orderId, orderNumber)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "the given order does not exist."));
+        .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given order does not exist."));
 
     logger.info("order id for session timeout: " + order.getOrderId().toString());
 
     try {
       this.orderEventService.add(order, OrderStatusEnum.SESSION_TIMEOUT, "", userId);
     } catch (NotFoundException e) {
-      new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+      new AppException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (DomainException e) {
-      new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+      new AppException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     Order savedOrder = this.orderRepository.save(order);
@@ -453,17 +450,17 @@ public class OrderServiceImpl implements OrderService {
    * add an order event by admin.
    **/
   @Override
-  public OrderDTO addOrderEvent(UUID orderId, OrderEventCriteria criteria) {
+  public OrderDTO addOrderEvent(UUID orderId, OrderEventCriteria criteria) throws Exception {
 
     Order order = this.orderRepository.findById(orderId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "the given order does not exist."));
+        .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given order does not exist."));
 
     try {
       this.orderEventService.add(order, criteria.getOrderStatus(), criteria.getNote(), criteria.getUserId());
     } catch (DomainException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+      throw new AppException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (NotFoundException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+      throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     Order savedOrder = this.orderRepository.save(order);
@@ -496,10 +493,10 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public OrderDTO addOrderEventByMember(UUID orderId, OrderEventCriteria criteria) {
+  public OrderDTO addOrderEventByMember(UUID orderId, OrderEventCriteria criteria) throws Exception {
 
     Order targetOrder = this.orderRepository.findById(orderId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "the given order does not exist."));
+        .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given order does not exist."));
 
     // if return request, check the eligibility to refund
     // this only apply for members so if admin want to add either
@@ -509,16 +506,16 @@ public class OrderServiceImpl implements OrderService {
       LocalDateTime curDateTime = LocalDateTime.now();
       if (!targetOrder.isEligibleToRefund(curDateTime, this.orderRule.getEligibleDays())) {
         logger.info("sorry. this order is not eligible to return.");
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "sorry. this order is not eligible to return.");
+        throw new AppException(HttpStatus.BAD_REQUEST, "sorry. this order is not eligible to return.");
       }
     }
 
     try {
       this.orderEventService.add(targetOrder, criteria.getOrderStatus(), criteria.getNote(), criteria.getUserId());
     } catch (DomainException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+      throw new AppException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (NotFoundException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+      throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     logger.info("what's wrong with this transaction.");
@@ -567,14 +564,14 @@ public class OrderServiceImpl implements OrderService {
    * 'RECEIVED_RETURN_REQUEST' order event at the management console. 3. the admin
    **/
   @Override
-  public void refundOrderAfterShipment(UUID orderId) {
+  public void refundOrderAfterShipment(UUID orderId) throws Exception {
 
     /**
      * get target order
      * 
      **/
     Order order = this.orderRepository.findById(orderId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "the given order does not exist."));
+        .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given order does not exist."));
 
     /**
      * check eligibility
@@ -591,7 +588,7 @@ public class OrderServiceImpl implements OrderService {
     // if (!order.isEligibleToRefund(curDateTime, this.orderRule.getEligibleDays()))
     // {
     // logger.info("sorry, you are not eligible to refund for this order.");
-    // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+    // throw new AppException(HttpStatus.BAD_REQUEST,
     // "sorry, you are not eligible to refund for this order.");
     // }
 
@@ -611,7 +608,7 @@ public class OrderServiceImpl implements OrderService {
       this.paymentService.requestRefund(paymentIntentId);
     } catch (StripeException e) {
       logger.info(e.getMessage());
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
     /**
@@ -621,13 +618,13 @@ public class OrderServiceImpl implements OrderService {
      **/
 
     User admin = this.userRepository.getAdmin().orElseThrow(
-        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
+        () -> new AppException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
     try {
       this.orderEventService.add(order, OrderStatusEnum.RETURNED, "", admin);
     } catch (DomainException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+      throw new AppException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (NotFoundException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+      throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     Order savedOrder = this.orderRepository.save(order);
@@ -670,14 +667,14 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public void refundBeforeShipment(UUID orderId) {
+  public void refundBeforeShipment(UUID orderId) throws Exception {
 
     /**
      * get target order
      * 
      **/
     Order order = this.orderRepository.findById(orderId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "the given order does not exist."));
+        .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given order does not exist."));
 
     /**
      * check eligibility
@@ -687,7 +684,7 @@ public class OrderServiceImpl implements OrderService {
     // if (!order.isEligibleToRefund(curDateTime, this.orderRule.getEligibleDays()))
     // {
     // logger.info("sorry, you are not eligible to refund for this order.");
-    // throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+    // throw new AppException(HttpStatus.BAD_REQUEST,
     // "sorry, you are not eligible to refund for this order.");
     // }
 
@@ -707,7 +704,7 @@ public class OrderServiceImpl implements OrderService {
       this.paymentService.requestRefund(paymentIntentId);
     } catch (StripeException e) {
       logger.info(e.getMessage());
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
     /**
@@ -716,13 +713,13 @@ public class OrderServiceImpl implements OrderService {
      * - use CANCELED since there is no involvement with customer
      **/
     User admin = this.userRepository.getAdmin().orElseThrow(
-        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
+        () -> new AppException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
     try {
       this.orderEventService.add(order, OrderStatusEnum.CANCELED, "", admin);
     } catch (DomainException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+      throw new AppException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (NotFoundException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+      throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     Order savedOrder = this.orderRepository.save(order);
@@ -761,13 +758,13 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public void testEvent() {
+  public void testEvent() throws Exception {
     Order order = new Order();
     order.raiseTestEvent();
   }
 
   @Override
-  public OrderDTO deleteOrderEvent(UUID orderId, Long orderEventId) {
+  public OrderDTO deleteOrderEvent(UUID orderId, Long orderEventId) throws Exception {
 
     /**
      * get target order
@@ -778,7 +775,7 @@ public class OrderServiceImpl implements OrderService {
     if (orderOption.isEmpty()) {
       // user not found so return error
       logger.info("the target order does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given order does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given order does not exist.");
     }
 
     Order order = orderOption.get();
@@ -787,12 +784,12 @@ public class OrderServiceImpl implements OrderService {
 
     if (!orderEventId.equals(lastOrderEvent.getOrderEventId())) {
       logger.info("only latest order event is deletable");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "only latest order event is deletable");
+      throw new AppException(HttpStatus.BAD_REQUEST, "only latest order event is deletable");
     }
 
     if (!lastOrderEvent.getUndoable()) {
       logger.info("this event is not deletable.");
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "this event is not deletable.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "this event is not deletable.");
     }
 
     order.removeOrderEvent(lastOrderEvent);
@@ -825,7 +822,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public OrderEventDTO updateOrderEvent(UUID orderId, Long orderEventId, OrderEventCriteria criteria) {
+  public OrderEventDTO updateOrderEvent(UUID orderId, Long orderEventId, OrderEventCriteria criteria) throws Exception {
 
     /**
      * get target order
@@ -836,7 +833,7 @@ public class OrderServiceImpl implements OrderService {
     if (orderOption.isEmpty()) {
       // user not found so return error
       logger.info("the target order does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given order does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given order does not exist.");
     }
 
     Order order = orderOption.get();

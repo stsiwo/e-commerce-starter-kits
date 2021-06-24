@@ -13,14 +13,19 @@ const useStyles = makeStyles((theme: Theme) =>
     tabBox: {
       // for search controller which is position: absolute
       position: "relative",
+
+      // for tabPanel to match width
+      width: "100%",
     },
     tabPanel: {
       maxWidth: theme.breakpoints.values.lg, 
       position: "absolute",
       backgroundColor: "#f5f5f5",
-      width: "100%",
       zIndex: 1,
       boxShadow: theme.shadows[8],
+
+      // for tabPanel to match width
+      width: "inherit",
     },
     tabRoot: {
       minWidth: 50,

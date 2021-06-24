@@ -42,7 +42,7 @@ public class CategoryController {
       @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
       @RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit,
       @RequestParam(value = "sort", required = false, defaultValue = "ALPHABETIC_ASC") CategorySortEnum sort,
-      CategoryQueryStringCriteria criteria) {
+      CategoryQueryStringCriteria criteria) throws Exception {
 
     logger.info("category controller cur thread name: " + Thread.currentThread().getName());
 
@@ -63,7 +63,7 @@ public class CategoryController {
   // create a new category
   @PostMapping("/categories")
   @PreAuthorize("hasRole('ROLE_ADMIN')") // admin only
-  public ResponseEntity<CategoryDTO> post(@Valid @RequestBody CategoryCriteria criteria) {
+  public ResponseEntity<CategoryDTO> post(@Valid @RequestBody CategoryCriteria criteria) throws Exception {
 
     return new ResponseEntity<>(this.service.create(criteria), HttpStatus.OK);
   }
@@ -72,14 +72,14 @@ public class CategoryController {
   @PutMapping("/categories/{id}")
   @PreAuthorize("hasRole('ROLE_ADMIN')") // admin only
   public ResponseEntity<CategoryDTO> update(@PathVariable(value = "id") Long id,
-      @Valid @RequestBody CategoryCriteria criteria) {
+      @Valid @RequestBody CategoryCriteria criteria) throws Exception {
 
     return new ResponseEntity<>(this.service.update(criteria, id), HttpStatus.OK);
   }
 
   @DeleteMapping("/categories/{id}")
   @PreAuthorize("hasRole('ROLE_ADMIN')")
-  public ResponseEntity<BaseResponse> deleteWithId(@PathVariable(value = "id") Long id) {
+  public ResponseEntity<BaseResponse> deleteWithId(@PathVariable(value = "id") Long id) throws Exception {
     this.service.delete(id);
     return new ResponseEntity<>(new BaseResponse("successfuly deleted."), HttpStatus.OK);
   }

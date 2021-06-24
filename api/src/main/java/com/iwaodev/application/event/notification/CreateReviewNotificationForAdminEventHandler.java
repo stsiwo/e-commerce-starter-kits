@@ -5,6 +5,7 @@ import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.domain.notification.NotificationTypeEnum;
 import com.iwaodev.domain.review.event.NewReviewWasSubmittedEvent;
 import com.iwaodev.domain.service.CreateNotificationService;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.exception.NotFoundException;
 import com.iwaodev.infrastructure.model.Notification;
 import com.iwaodev.infrastructure.model.User;
@@ -16,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionalEventListener;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class CreateReviewNotificationForAdminEventHandler {
@@ -34,12 +34,12 @@ public class CreateReviewNotificationForAdminEventHandler {
 
   @Async
   @TransactionalEventListener()
-  public void handleEvent(NewReviewWasSubmittedEvent event) {
+  public void handleEvent(NewReviewWasSubmittedEvent event) throws AppException {
     logger.info("start CreateReviewEventNotificationEventHandler");
     logger.info(Thread.currentThread().getName());
 
     User admin = this.userRepository.getAdmin().orElseThrow(
-        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
+        () -> new AppException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
 
     try {
       // member user
@@ -52,7 +52,7 @@ public class CreateReviewNotificationForAdminEventHandler {
 
       this.notificationRepository.save(notification);
     } catch (NotFoundException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+      throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
     }
   }
 }

@@ -9,6 +9,7 @@ import com.iwaodev.application.iservice.CategoryService;
 import com.iwaodev.application.mapper.CategoryMapper;
 import com.iwaodev.application.specification.factory.CategorySpecificationFactory;
 import com.iwaodev.domain.category.CategorySortEnum;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.Category;
 import com.iwaodev.ui.criteria.category.CategoryCriteria;
 import com.iwaodev.ui.criteria.category.CategoryQueryStringCriteria;
@@ -22,7 +23,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -35,13 +35,13 @@ public class CategoryServiceImpl implements CategoryService {
   private CategorySpecificationFactory specificationFactory;
 
   @Autowired
-  public CategoryServiceImpl(CategoryRepository repository, CategorySpecificationFactory specificationFactory) {
+  public CategoryServiceImpl(CategoryRepository repository, CategorySpecificationFactory specificationFactory) throws Exception {
     this.repository = repository;
     this.specificationFactory = specificationFactory;
   }
 
   public Page<CategoryDTO> getAll(CategoryQueryStringCriteria criteria, Integer page, Integer limit,
-      CategorySortEnum sort) {
+      CategorySortEnum sort) throws Exception {
 
     // get result with repository
     // and map entity to dto with MapStruct
@@ -66,18 +66,18 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public CategoryDTO create(CategoryCriteria criteria) {
+  public CategoryDTO create(CategoryCriteria criteria) throws Exception {
 
     // map criteria to entity
     Category newEntity = CategoryMapper.INSTANCE.toCategoryEntityFromCategoryCriteria(criteria);
 
     // duplication check
     if (this.repository.findByCategoryName(newEntity.getCategoryName()).isPresent()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the category name already taken.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "the category name already taken.");
     }
 
     if (this.repository.findByCategoryPath(newEntity.getCategoryPath()).isPresent()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the category path already taken.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "the category path already taken.");
     }
     // save it
     Category savedEntity = this.repository.save(newEntity);
@@ -87,25 +87,25 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public CategoryDTO update(CategoryCriteria criteria, Long id) {
+  public CategoryDTO update(CategoryCriteria criteria, Long id) throws Exception {
     // get result with repository
     // and map entity to dto with MapStruct
     Optional<Category> targetEntityOption = this.repository.findById(id);
 
     if (targetEntityOption.isEmpty()) {
       logger.info("the given address does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given address does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given address does not exist.");
     }
 
     Category category = targetEntityOption.get();
     
     // duplication check
     if (this.repository.isOthersHaveName(category.getCategoryId(), criteria.getCategoryName())) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the category name already taken.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "the category name already taken.");
     }
 
     if (this.repository.isOthersHavePath(category.getCategoryId(), criteria.getCategoryPath())) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the category path already taken.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "the category path already taken.");
     }
 
     // make sure criteria.categoryId is assigned
@@ -124,7 +124,7 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public void delete(Long id) {
+  public void delete(Long id) throws Exception {
 
     // completely delete user data
     Optional<Category> targetEntityOption = this.repository.findById(id);

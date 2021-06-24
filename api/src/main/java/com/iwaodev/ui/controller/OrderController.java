@@ -53,7 +53,7 @@ public class OrderController {
       @RequestParam(value = "sort", required = false, defaultValue = "DATE_DESC") OrderSortEnum sort,
       OrderQueryStringCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
 
 	  return new ResponseEntity<>(
         this.service.getAll(criteria, page, limit, sort),
@@ -66,7 +66,7 @@ public class OrderController {
    **/
   @GetMapping("/orders/{id}")
   @PreAuthorize("hasRole('ROLE_ADMIN')") 
-  public ResponseEntity<OrderDTO> getWithId(@PathVariable(value = "id") UUID id) {
+  public ResponseEntity<OrderDTO> getWithId(@PathVariable(value = "id") UUID id) throws Exception {
     return new ResponseEntity<>(this.service.getById(id), HttpStatus.OK);
   }
 
@@ -79,7 +79,7 @@ public class OrderController {
   public ResponseEntity<PaymentIntentResponse> post(
       @Valid @RequestBody OrderCriteria criteria, 
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
 
     PaymentIntentResponse response;
 
@@ -115,7 +115,7 @@ public class OrderController {
       @PathVariable(value = "orderId") UUID orderId,
       @Valid @RequestBody SessionTimeoutOrderEventCriteria criteria, 
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
 
     OrderDTO orderDTO;
 
@@ -143,7 +143,7 @@ public class OrderController {
       @PathVariable(value = "orderId") UUID orderId,
       @Valid @RequestBody OrderEventCriteria criteria, 
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
 
     // make sure criteria and authUser has the same id
     criteria.setUserId(authUser.getId());
@@ -167,7 +167,7 @@ public class OrderController {
       @PathVariable(value = "orderEventId") Long orderEventId,
       @Valid @RequestBody OrderEventCriteria criteria, 
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
 
       // make sure criteria and authUser has the same id
       criteria.setUserId(authUser.getId());
@@ -200,7 +200,7 @@ public class OrderController {
       @PathVariable(value = "orderId") UUID orderId,
       @PathVariable(value = "orderEventId") Long orderEventId,
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
 
 	  return new ResponseEntity<>(
         this.service.deleteOrderEvent(orderId, orderEventId),
@@ -226,7 +226,7 @@ public class OrderController {
       @PathVariable(value = "orderId") UUID orderId,
       //@Valid @RequestBody OrderEventCriteria criteria, 
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
 
     this.service.refundOrderAfterShipment(orderId);
 
@@ -255,7 +255,7 @@ public class OrderController {
       @PathVariable(value = "orderId") UUID orderId,
       //@Valid @RequestBody OrderEventCriteria criteria, 
       @AuthenticationPrincipal SpringSecurityUser authUser
-      ) {
+      ) throws Exception {
 
     this.service.refundBeforeShipment(orderId);
 
@@ -271,7 +271,7 @@ public class OrderController {
    **/
   @GetMapping("/orders/test-event")
   public ResponseEntity<String> testEvent(
-      ) {
+      ) throws Exception {
 
     logger.info("start test event");
 

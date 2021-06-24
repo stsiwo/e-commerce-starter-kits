@@ -220,7 +220,7 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
           onChange={handleEmailInputChangeEvent}
           helperText={curAdminLoginValidationState.email}
           error={curAdminLoginValidationState.email !== ""}
-        />
+        /><br />
         <TextField
           id="password"
           label="Password"

@@ -1,6 +1,5 @@
 package com.iwaodev.application.service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,6 +10,7 @@ import com.iwaodev.application.dto.user.AddressDTO;
 import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.iservice.UserAddressService;
 import com.iwaodev.application.mapper.AddressMapper;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.Address;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.user.UserAddressCriteria;
@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -32,14 +31,14 @@ public class UserAddressServiceImpl implements UserAddressService {
   @Autowired
   private UserRepository repository;
 
-  public List<AddressDTO> getAll(UUID userId) {
+  public List<AddressDTO> getAll(UUID userId) throws Exception {
     logger.info("start handling a request at UserAddressServiceImpl");
 
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (targetUserOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     // use this rather than the list method since @Mapping for the list does not
@@ -58,20 +57,20 @@ public class UserAddressServiceImpl implements UserAddressService {
   }
 
   @Override
-  public AddressDTO create(UserAddressCriteria criteria, UUID userId) {
+  public AddressDTO create(UserAddressCriteria criteria, UUID userId) throws Exception {
 
     // check if the target user exist
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (targetUserOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     User user = targetUserOption.get();
 
     if (user.getAddresses().size() >= 3) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "user cannot have more than 3 addresses.");
+      throw new AppException(HttpStatus.BAD_REQUEST, "user cannot have more than 3 addresses.");
     }
 
     // map criteria to entity
@@ -97,7 +96,7 @@ public class UserAddressServiceImpl implements UserAddressService {
   }
 
   @Override
-  public AddressDTO update(UserAddressCriteria criteria, UUID userId, Long addressId) {
+  public AddressDTO update(UserAddressCriteria criteria, UUID userId, Long addressId) throws Exception {
 
     // make sure criteria.addressId is assigned
     // - criteria.addressId does not have validation since it is shared with /post
@@ -111,7 +110,7 @@ public class UserAddressServiceImpl implements UserAddressService {
 
     if (targetUserOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     // check the user has the address of a given id
@@ -123,7 +122,7 @@ public class UserAddressServiceImpl implements UserAddressService {
 
     if (!isTargetAddrssExist) {
       logger.info("the given address does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given address does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given address does not exist.");
     }
     // create updated entity
     Address updateAddress = AddressMapper.INSTANCE.toAddressEntityFromAddressCriteria(criteria);
@@ -148,14 +147,14 @@ public class UserAddressServiceImpl implements UserAddressService {
   }
 
   @Override
-  public List<AddressDTO> toggleBillingAddress(UUID userId, Long addressId) {
+  public List<AddressDTO> toggleBillingAddress(UUID userId, Long addressId) throws Exception {
     
     // check if the target user exist
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (targetUserOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     User targetEntity = targetUserOption.get();
@@ -176,14 +175,14 @@ public class UserAddressServiceImpl implements UserAddressService {
   }
 
   @Override
-  public List<AddressDTO> toggleShippingAddress(UUID userId, Long addressId) {
+  public List<AddressDTO> toggleShippingAddress(UUID userId, Long addressId) throws Exception {
 
     // check if the target user exist
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (targetUserOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     User targetEntity = targetUserOption.get();
@@ -204,14 +203,14 @@ public class UserAddressServiceImpl implements UserAddressService {
   }
 
   @Override
-  public void delete(UUID userId, Long addressId) {
+  public void delete(UUID userId, Long addressId) throws Exception {
 
     // check if the target user exist
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (targetUserOption.isEmpty()) {
       logger.info("the given user does not exist");
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "the given user does not exist.");
+      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     targetUserOption.get().removeAddressById(addressId);
