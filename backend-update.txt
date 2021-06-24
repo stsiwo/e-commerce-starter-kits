@@ -52,6 +52,8 @@ endpoint change:
     
   - need to return current price based on discount availability and product & product variant price to client.
   
+
+  
   
 ## staging bugs
 
