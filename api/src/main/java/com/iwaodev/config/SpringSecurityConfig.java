@@ -89,12 +89,19 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
 
         // public
+        
+        /// domain
         .antMatchers(HttpMethod.GET, "/categories").permitAll() //
         .antMatchers(HttpMethod.GET, "/products/public").permitAll() //
         .antMatchers(HttpMethod.GET, "/products/public/{path}").permitAll() //
         .antMatchers(HttpMethod.POST, "/orders").permitAll() //
         .antMatchers(HttpMethod.POST, "/orders/{orderId}/events/session-timeout").permitAll() //
 
+        // spring boot admin: need to open actuator endpoints
+        .antMatchers("/actuator/**").permitAll() //
+        
+
+        /// stripe web hook
         // .antMatchers(HttpMethod.POST, "/create-payment-intent").permitAll() // Stripe
         // PaymentIntent client secret for testing
         .antMatchers(HttpMethod.POST, "/webhook/payment").permitAll() // Stripe Webhook endpoints

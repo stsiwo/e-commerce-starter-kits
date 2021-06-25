@@ -23,7 +23,7 @@ import com.iwaodev.exception.AppException;
 /**
  *  Stripe Webhook Endpoint 
  *
- *    - security: verify a signature to check the request come from Stripe
+ *    - security: verify a signature to check the request come from Stripe (not by another 3rd party).
  *
  *        - steps:
  *
@@ -99,6 +99,7 @@ public class PaymentWebhookController {
       // Deserialization failed, probably due to an API version mismatch.
       // Refer to the Javadoc documentation on `EventDataObjectDeserializer` for
       // instructions on how to handle this case, or return an error here.
+      throw new AppException(HttpStatus.BAD_REQUEST, "failed to deserialize the stripe object.");
     }
 
     logger.info("webhook test endpoint: event name = " + event.getType());

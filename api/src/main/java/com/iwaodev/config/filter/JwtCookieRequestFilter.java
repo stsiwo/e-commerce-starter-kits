@@ -67,7 +67,7 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
       throws ServletException, IOException {
 
-    logger.info("start processing jwt request filter");
+    logger.debug("start processing jwt request filter");
 
     Cookie[] curCookies = request.getCookies();
 
@@ -104,8 +104,8 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
     // member who must have api-token
     if (!isGuest) {
 
-      logger.info("extracted jwt: " + jwt);
-      logger.info("user email: " + userEmail);
+      logger.debug("extracted jwt: " + jwt);
+      logger.debug("user email: " + userEmail);
 
       if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
@@ -113,7 +113,7 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
 
         // validate jwt if it is not expired & user email match 
         if (jwtUtil.validateToken(jwt, userDetails)) {
-          logger.info("jwt is valid so let's move to the next filter.");
+          logger.debug("jwt is valid so let's move to the next filter.");
 
           UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
               userDetails, null, userDetails.getAuthorities());
@@ -134,7 +134,7 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
       }
     }
 
-    logger.info("jwt is invalid so let the user logout.");
+    logger.debug("jwt is invalid so let the user logout.");
   }
 
   private void eraseCookie(HttpServletRequest req, HttpServletResponse resp) {
