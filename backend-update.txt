@@ -65,6 +65,9 @@ endpoint change:
   
 (email)
   - sign up does not send verification email. maybe misconfig of email.
+(product)
+  - create schedule task for make product published when releaseDate.
+    => need to validate (e.g., at least one variant)
   
   
     
