@@ -58,8 +58,7 @@ endpoint change:
 ## staging bugs
 
 (generals)
-  - no error message is shown esp bad request.
-  - add validation for paths (product and category).
+
   
 (companies)
   - update does not work at admin.
