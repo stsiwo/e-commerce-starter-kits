@@ -58,14 +58,16 @@ endpoint change:
 ## staging bugs
 
 (generals)
-  - no error message is shown esp bad request.
-  - add validation for paths (product and category).
+
   
 (companies)
   - update does not work at admin.
   
 (email)
   - sign up does not send verification email. maybe misconfig of email.
+(product)
+  - create schedule task for make product published when releaseDate.
+    => need to validate (e.g., at least one variant)
   
   
     
