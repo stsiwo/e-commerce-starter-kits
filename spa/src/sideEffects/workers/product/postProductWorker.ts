@@ -109,7 +109,7 @@ export function* postProductWorker(action: PayloadAction<PostProductActionType>)
        **/
       yield put(
         // be careful when normalized a single object, you need to append its domain name (plural) to 'entities'
-        productActions.merge(normalizedData.entities.products as NormalizedProductType)
+        productActions.unshiftMerge(normalizedData.entities.products as NormalizedProductType)
       )
 
       /**

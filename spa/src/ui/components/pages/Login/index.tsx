@@ -16,9 +16,11 @@ import { memberLoginSchema } from 'hooks/validation/rules';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { authActions } from 'reducers/slices/app';
+import { authActions, messageActions } from 'reducers/slices/app';
 import { mSelector } from 'src/selectors/selector';
 import { useHistory } from 'react-router';
+import { getNanoId } from 'src/utils';
+import { MessageTypeEnum } from 'src/app';
 
 export declare type MemberLoginDataType = {
   email: string
@@ -82,16 +84,12 @@ const useStyles = makeStyles((theme: Theme) =>
 const Login: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
-  
+
   // dispatch
   const dispatch = useDispatch();
 
   // history 
   const history = useHistory();
-
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
 
   // redirect to previous url if exist
   const curPreviousUrl = useSelector(mSelector.makePreviousUrlSelector());
@@ -137,8 +135,7 @@ const Login: React.FunctionComponent<{}> = (props) => {
     setForgotPasswordDialogOpen(true);
   }
 
-  // event handler to submit
-  const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
+  const submit = () => {
 
     const isValid: boolean = isValidSync(curMemberLoginState)
 
@@ -150,7 +147,7 @@ const Login: React.FunctionComponent<{}> = (props) => {
         method: 'POST',
         url: API1_URL + `/authenticate`,
         data: curMemberLoginState,
-        headers: {"Content-Type": "application/json"}
+        headers: { "Content-Type": "application/json" }
       }).then((data) => {
         /**
          * login success
@@ -163,9 +160,9 @@ const Login: React.FunctionComponent<{}> = (props) => {
         //
         // solution: to use redux state to store the previous url.
         //history.back(); 
-        
+
         let nextDest = "/"
-        
+
         if (curPreviousUrl) {
           nextDest = curPreviousUrl
         }
@@ -180,12 +177,46 @@ const Login: React.FunctionComponent<{}> = (props) => {
          **/
         history.push(nextDest);
 
-        enqueueSnackbar("logged in successfully.", { variant: "success" })
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.SUCCESS,
+            message: "logged in successfully.",
+          })
+        )
+
       }).catch((error: AxiosError) => {
-        enqueueSnackbar(error.response.data.message, { variant: "error" })
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.ERROR,
+            message: error.response.data.message,
+          })
+        )
       })
     } else {
       updateAllValidation()
+    }
+  }
+
+  // 'enter' global to submit by 'enter'
+  React.useEffect(() => {
+
+    window.addEventListener('keydown', handleSubmitKeyDown as unknown as EventListener);
+
+    return () => {
+      window.removeEventListener('keydown', handleSubmitKeyDown as unknown as EventListener);
+    }
+  }, []);
+  // event handler to submit
+  const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
+    submit();
+  }
+
+  // key down to submit 
+  const handleSubmitKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key == "Enter") {
+      submit();
     }
   }
 
@@ -230,13 +261,13 @@ const Login: React.FunctionComponent<{}> = (props) => {
           </Typography>
         </Box>
         <Box component="div" className={classes.actionBox}>
-          <Button onClick={handleUserAccountSaveClickEvent}>
+          <Button onKeyDown={handleSubmitKeyDown} onClick={handleUserAccountSaveClickEvent}>
             Login
           </Button>
         </Box>
       </form>
-      <ForgotPasswordDialog 
-        curFormOpen={curForgotPasswordDialogOpen}  
+      <ForgotPasswordDialog
+        curFormOpen={curForgotPasswordDialogOpen}
         setFormOpen={setForgotPasswordDialogOpen}
       />
     </Grid>

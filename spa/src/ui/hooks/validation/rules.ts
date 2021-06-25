@@ -152,12 +152,10 @@ export const productSchema = yup.object().shape({
        **/
       const isPublic = value
       if (isPublic) {
-        console.log("start validating the size of variants")
-        const variants = this.parent.productVariants; 
+        const variants = this.parent.variants; 
         if (!variants) {
           return false;
         }
-        console.log("the size of variants: " + variants.length);
         if (variants.length == 0) {
           return false;
         }

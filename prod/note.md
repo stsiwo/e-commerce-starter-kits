@@ -39,3 +39,19 @@
   - command) sudo systemctl restart incron.service
 
   - so you need to restart incron after uploading file at the first time.
+
+## Errors
+
+  ### Deployment Cause 'port already used' errors
+
+    - error: ERROR: for spa  Cannot start service spa: driver failed programming external connectivity on endpoint spa (e08daca9da995af824b4c235b6c1e11367a840e45d629ef6face6de2fc7d93de): Bind for 0.0.0.0:443 failed: port is already allocated
+
+    - background: when i try to upload production directory, it causes recreate docker container inside the docker compose, but sometiems it cause this error.
+
+    - workaround: restart docker (e.g., sudo systemctl restart docker)
+
+    - ref: https://github.com/docker/compose/issues/3277 
+
+    
+
+

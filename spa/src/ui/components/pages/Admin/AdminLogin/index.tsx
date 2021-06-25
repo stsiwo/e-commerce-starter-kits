@@ -8,18 +8,18 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import SentimentSatisfiedOutlinedIcon from '@material-ui/icons/SentimentSatisfiedOutlined';
 import { AxiosError } from 'axios';
+import ForgotPasswordDialog from 'components/common/ForgotPasswordDialog';
 import { api } from 'configs/axiosConfig';
 import { UserType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { adminLoginSchema } from 'hooks/validation/rules';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link as RRLink } from "react-router-dom";
-import { authActions } from 'reducers/slices/app';
-import { mSelector } from 'src/selectors/selector';
 import { useHistory } from 'react-router';
-import ForgotPasswordDialog from 'components/common/ForgotPasswordDialog';
+import { authActions, messageActions } from 'reducers/slices/app';
+import { MessageTypeEnum } from 'src/app';
+import { mSelector } from 'src/selectors/selector';
+import { getNanoId } from 'src/utils';
 
 
 export declare type AdminLoginDataType = {
@@ -86,19 +86,15 @@ const useStyles = makeStyles((theme: Theme) =>
 const AdminLogin: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
-  
+
   // dispatch
   const dispatch = useDispatch();
-  
+
   // redirect to previous url if exist
   const curPreviousUrl = useSelector(mSelector.makePreviousUrlSelector());
 
   // history 
   const history = useHistory();
-
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
 
   // temp user account state
   const [curAdminLoginState, setAdminLoginState] = React.useState<AdminLoginDataType>(defaultAdminLoginData);
@@ -145,10 +141,8 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
     setForgotPasswordDialogOpen(true);
   }
 
-
-  // event handler to submit
-  const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
-
+  // login 
+  const submit = React.useCallback(() => {
     const isValid: boolean = isValidSync(curAdminLoginState)
 
     if (isValid) {
@@ -165,15 +159,15 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
          **/
         const loggedInUser: UserType = data.data.user;
         dispatch(authActions.loginWithUser(loggedInUser))
-        
+
         // make sure this work.
         // this does not work esp when there is no previous url.
         //
         // solution: to use redux state to store the previous url.
         //history.back(); 
-        
+
         let nextDest = "/admin"
-        
+
         if (curPreviousUrl) {
           nextDest = curPreviousUrl
         }
@@ -188,13 +182,50 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
          **/
         history.push(nextDest);
 
-        enqueueSnackbar("added successfully.", { variant: "success" })
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.SUCCESS,
+            message: "logged in successfully.",
+          })
+        )
       }).catch((error: AxiosError) => {
-        enqueueSnackbar(error.message, { variant: "error" })
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.ERROR,
+            message: error.response.data.message,
+          })
+        )
       })
 
     } else {
       updateAllValidation()
+    }
+  }, [
+      JSON.stringify(curAdminLoginState),
+      curPreviousUrl,
+    ])
+
+  // 'enter' global to submit by 'enter'
+  React.useEffect(() => {
+
+    window.addEventListener('keydown', handleSubmitKeyDown as unknown as EventListener);
+
+    return () => {
+      window.removeEventListener('keydown', handleSubmitKeyDown as unknown as EventListener);
+    }
+  }, []);
+
+  // event handler to submit
+  const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
+    submit()
+  }
+
+  // key down to submit 
+  const handleSubmitKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key == "Enter") {
+      submit();
     }
   }
 
@@ -244,8 +275,8 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
             </Button>
         </Box>
       </form>
-      <ForgotPasswordDialog 
-        curFormOpen={curForgotPasswordDialogOpen}  
+      <ForgotPasswordDialog
+        curFormOpen={curForgotPasswordDialogOpen}
         setFormOpen={setForgotPasswordDialogOpen}
       />
     </Grid>

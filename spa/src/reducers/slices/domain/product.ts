@@ -86,9 +86,19 @@ export const productSlice = createSlice({
      *
      **/
 
+    /**
+     * unshift.
+     *
+     * - no duplicate. 
+     *
+     **/
+    unshiftMerge: (state: NormalizedProductType, action: ProductActionType) => merge(action.payload, state),
+
     // use when update existing one
     // put 'action.payload' first at 'merge' so that it is displayed on the list.
-    merge: (state: NormalizedProductType, action: ProductActionType) => merge(action.payload, state),
+    // this is wrong. this prevent this product updated at client. make users refresh to get new data, so get it back to (state, action.payload)
+    // if display on the top of the list, use 'unshiftMerge'
+    merge: (state: NormalizedProductType, action: ProductActionType) => merge(state, action.payload),
 
     // use when you want to replace
     update: (state: NormalizedProductType, action: ProductActionType) => action.payload,

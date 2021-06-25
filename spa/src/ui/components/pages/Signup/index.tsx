@@ -13,7 +13,6 @@ import { useValidation } from 'hooks/validation';
 import { memberSignupSchema } from 'hooks/validation/rules';
 import { api } from 'configs/axiosConfig';
 import { useDispatch } from 'react-redux';
-import { useSnackbar } from 'notistack';
 import { UserType } from 'domain/user/types';
 import { authActions, messageActions } from 'reducers/slices/app';
 import { AxiosError } from 'axios';
@@ -163,10 +162,7 @@ const Signup: React.FunctionComponent<{}> = (props) => {
     }));
   }
 
-
-  // event handler to submit
-  const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
-
+  const submit = () => {
     const isValid: boolean = isValidSync(curMemberSignupState)
 
     if (isValid) {
@@ -187,6 +183,14 @@ const Signup: React.FunctionComponent<{}> = (props) => {
         const loggedInUser: UserType = data.data.user;
         dispatch(authActions.loginWithUser(loggedInUser))
 
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.SUCCESS,
+            message: "thank you for signing up.",
+          })
+        )
+
         // move to email verification page
         history.push("/email-verification")
 
@@ -198,13 +202,35 @@ const Signup: React.FunctionComponent<{}> = (props) => {
           messageActions.update({
             id: getNanoId(),
             type: MessageTypeEnum.ERROR,
-            message: "sorry, we failed to sign you up. please try again.",
+            message: error.response.data.message,
           })
         )
       })
 
     } else {
       updateAllValidation()
+    }
+  }
+
+  // 'enter' global to submit by 'enter'
+  React.useEffect(() => {
+
+    window.addEventListener('keydown', handleSubmitKeyDown as unknown as EventListener);
+
+    return () => {
+      window.removeEventListener('keydown', handleSubmitKeyDown as unknown as EventListener);
+    }
+  }, []);
+
+  // event handler to submit
+  const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
+    submit()
+  }
+
+  // key down to submit 
+  const handleSubmitKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key == "Enter") {
+      submit();
     }
   }
 
@@ -279,7 +305,7 @@ const Signup: React.FunctionComponent<{}> = (props) => {
           </Typography>
         </Box>
         <Box component="div" className={classes.actionBox}>
-          <Button onClick={handleUserAccountSaveClickEvent}>
+          <Button onKeyDown={handleSubmitKeyDown} onClick={handleUserAccountSaveClickEvent}>
             Signup
           </Button>
         </Box>

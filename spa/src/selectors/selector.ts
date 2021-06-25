@@ -12,6 +12,7 @@ import { toPhoneStringWithoutSpace } from "domain/user";
 import { toOrderAddress, toOrderDetailCriteriaList } from "domain/order";
 import { UserTypeEnum } from "src/app";
 import { NotificationType } from "domain/notification/types";
+import orderBy from "lodash/orderBy";
 
 export const rsSelector = {
   /**
@@ -1296,8 +1297,21 @@ export const mSelector = {
           }, // entities prop of normalized data (ex, { animes: { "1": { ... }, "2": { ... }, ... }})
         )
 
+        /**
+         * normalizr issues: does not keep the order of its association list (e.g., product.productImages).
+         *
+         * - server return proper order but normalizr change its order.
+         *
+         * - resort here based on the id of productImages.
+         *
+         **/
+        for (let i = 0; i < denormalizedEntities.length; i++) {
+          if (denormalizedEntities[i].productImages && denormalizedEntities[i].productImages.length > 0) {
+            denormalizedEntities[i].productImages = orderBy(denormalizedEntities[i].productImages, ['productImageId']);
+          }
+        }
+        console.log("denormalized entities (resorted product images)")
         console.log(denormalizedEntities)
-
         return denormalizedEntities
       },
     )
