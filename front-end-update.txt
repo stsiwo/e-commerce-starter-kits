@@ -53,12 +53,13 @@
 
 ### Staging Bugs
 
+(general)
+  - fix response error message (always refer to the body not its wrapper object)
+
 (product)
   - product images are stored in a wrong place (e.g., if you put an image at 0, then it is stored at 4). what the hell.
   - ready to publish: validation not working. even if the product has a lot of variants, it still show an error that you need at least one variant.
-  - path validation
-  
+
 (category)
-  - path valiation
   
   
