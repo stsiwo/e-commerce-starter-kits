@@ -59,7 +59,7 @@
 (signup/login/adminlogin)
 
 (product)
-  - product images are stored in a wrong place (e.g., if you put an image at 0, then it is stored at 4). what the hell.
+  - display stock info and if it is out of stock, disable 'buy' button.
 
 (category)
   
