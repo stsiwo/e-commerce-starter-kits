@@ -50,6 +50,10 @@ public class PaymentWebhookController {
   /**
    * Stripe Webhook Endpoint
    *
+   * desc) this is a main endpoint to accept all events from Stripe, and delegate this event to its corresponding event handler (e.g., infrastracture/payment/webhook/).
+   *
+   * prerequisite) you need to register an endpoint you want to listen at Stripe web console. (go to https://dashboard.stripe.com/webhooks).
+   *
    * - Stripe Event: payment_intent_succeeded
    * (https://stripe.com/docs/api/payment_intents)
    *
