@@ -55,6 +55,9 @@
 
 (general)
   - fix response error message (always refer to the body not its wrapper object)
+  
+(signup/login/adminlogin)
+  - add key enter event handler to click submit.
 
 (product)
   - product images are stored in a wrong place (e.g., if you put an image at 0, then it is stored at 4). what the hell.
