@@ -54,6 +54,7 @@
 ### Staging Bugs
 
 (general)
+  - change console.log to my custom log to avoid displaying console at production.
   
 (signup/login/adminlogin)
 
