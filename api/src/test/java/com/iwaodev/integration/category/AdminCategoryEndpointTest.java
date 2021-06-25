@@ -13,6 +13,7 @@ import com.iwaodev.auth.AuthenticateTestUser;
 import com.iwaodev.auth.AuthenticationInfo;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.ui.response.ErrorBaseResponse;
 import com.iwaodev.util.ResourceReader;
 
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -102,6 +105,9 @@ public class AdminCategoryEndpointTest {
 
   @Autowired
   private ResourceReader resourceReader;
+
+  @Autowired
+  private MessageSource messageSource;
 
   private Cookie authCookie;
 
@@ -253,6 +259,37 @@ public class AdminCategoryEndpointTest {
     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.post(targetUrl) // create
         .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie)
         .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  //@Sql(scripts = { "classpath:/integration/category/shouldNotAdminCreateNewCategorySincePathInvalidFormat.sql" })
+  public void shouldNotAdminCreateNewCategorySincePathInvalidFormat(
+      @Value("classpath:/integration/category/shouldNotAdminCreateNewCategorySincePathInvalidFormat.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+    String[] allBeanNames = this.applicationContext.getBeanDefinitionNames();
+    for (String beanName : allBeanNames) {
+      System.out.println(beanName);
+    }
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.post(targetUrl) // create
+        .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo(this.messageSource.getMessage("category.path.invalidformat", new Object[0], LocaleContextHolder.getLocale()));
   }
 
   @Test

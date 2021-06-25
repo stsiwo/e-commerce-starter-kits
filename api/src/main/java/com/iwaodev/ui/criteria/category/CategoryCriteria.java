@@ -1,6 +1,7 @@
 package com.iwaodev.ui.criteria.category;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -30,6 +31,7 @@ public class CategoryCriteria {
   private String categoryDescription;
 
   @NotEmpty(message = "{category.path.notempty}")
+  @Pattern(regexp = "^[a-zA-Z0-9-_]*$", message = "{category.path.invalidformat}")
   private String categoryPath;
 
 }

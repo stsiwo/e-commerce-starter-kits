@@ -15,6 +15,7 @@ import javax.persistence.OneToMany;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
+import javax.validation.constraints.Pattern;
 
 import com.iwaodev.infrastructure.model.listener.CategoryValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
@@ -52,6 +53,7 @@ public class Category {
 
   // unique validation at service layer
   @NotEmpty(message = "{category.path.notempty}")
+  @Pattern(regexp = "^[a-zA-Z0-9-_]*$", message = "{category.path.invalidformat}")
   @Column(name = "category_path", unique = true)
   private String categoryPath;
 

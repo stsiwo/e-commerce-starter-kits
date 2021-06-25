@@ -11,6 +11,7 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
+import javax.validation.constraints.Pattern;
 
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
@@ -41,6 +42,7 @@ public class ProductCriteria {
   private String productDescription;
 
   @NotEmpty(message = "{product.productPath.notempty}")
+  @Pattern(regexp = "^[a-zA-Z0-9-_]*$", message = "{product.productPath.invalidformat}")
   private String productPath;
 
   @NotNull(message = "{product.productBaseUnitPrice.notnull}")

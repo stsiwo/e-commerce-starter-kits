@@ -20,6 +20,7 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
+import javax.validation.constraints.Pattern;
 
 import com.iwaodev.domain.product.validator.ProductValidation;
 import com.iwaodev.exception.NotFoundException;
@@ -65,6 +66,7 @@ public class Product {
   private String productDescription;
 
   @NotEmpty(message = "{product.productPath.notempty}")
+  @Pattern(regexp = "^[a-zA-Z0-9-_]*$", message = "{product.productPath.invalidformat}")
   @Column(name = "product_path", unique = true)
   private String productPath;
 

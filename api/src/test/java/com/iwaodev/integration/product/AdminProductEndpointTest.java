@@ -322,6 +322,45 @@ public class AdminProductEndpointTest {
     assertThat(paths.size()).isEqualTo(3);
   }
 
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldAdminUserCreateNewProduct.sql" })
+  public void shouldNotAdminUserCreateNewProductSinceInvalidPath(
+      @Value("classpath:/integration/product/shouldNotAdminUserCreateNewProductSinceInvalidPath.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath;
+
+    // make sure the file name match with json script (e.g., shouldAdminUserCreateNewProduct.json)
+    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("files", "product-image-0.jpeg", "image/jpeg", "some jpg".getBytes());
+    MockMultipartFile fileAtFirstIndex = new MockMultipartFile("files", "product-image-1.png", "image/png", "some png".getBytes());
+    MockMultipartFile fileAtThirdIndex = new MockMultipartFile("files", "product-image-3.jpeg", "image/jpeg", "some jpeg".getBytes());
+    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json", dummyFormJsonString.getBytes());
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+        .multipart(targetUrl) // create
+        .file(fileAtZeroIndex)
+        .file(fileAtFirstIndex)
+        .file(fileAtThirdIndex)
+        .file(jsonFile)
+        .contentType(MediaType.MULTIPART_FORM_DATA)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(result.getResponse().getStatus()).isEqualTo(400);
+    assertThat(responseBody.getMessage()).isEqualTo(this.messageSource.getMessage("product.productPath.invalidformat", new Object[0], LocaleContextHolder.getLocale()));
+  }
+
   // 400 bad request (bad input) testing
   
   /**

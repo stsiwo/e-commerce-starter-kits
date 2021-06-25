@@ -120,7 +120,7 @@ export const productVariantSchema = yup.object().shape({
 export const productSchema = yup.object().shape({
   productName: yup.string().required(),
   productDescription: yup.string().required(),
-  productPath: yup.string().required(),
+  productPath: yup.string().matches(/^[a-zA-Z0-9-_]*$/, "only alphabetics, numbers, underscore (_) and hyphen (-) are availble.").required(),
   productImages: yup.array().test(
     'has-first-element',
     'the primary product image (1st image) is required.',
@@ -201,7 +201,7 @@ export const productSchema = yup.object().shape({
 export const categorySchema = yup.object().shape({
   categoryName: yup.string().required(),
   categoryDescription: yup.string().required(),
-  categoryPath: yup.string().required(),
+  categoryPath: yup.string().matches(/^[a-zA-Z0-9-_]*$/, "only alphabetics, numbers, underscore (_) and hyphen (-) are availble.").required(),
 })
 
 // reviews
