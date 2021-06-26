@@ -64,10 +64,12 @@ endpoint change:
   - update does not work at admin.
   
 (email)
-  - sign up does not send verification email. maybe misconfig of email.
+  - sign up does not send verification email. maybe misconfig of email. => this is due to that you misconfigure company email domain.
+  - the domain of company's email must match with SES domain or any domain provider. should notice that to user like adding some note for the company email input.
 (product)
   - create schedule task for make product published when releaseDate.
     => need to validate (e.g., at least one variant)
+  - should add unique constaint to product name otherwise, it is ambiguous since we don't use any ID when order detail.
 (order)
   - should i send an email to customer when payment failed?
   
