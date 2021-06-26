@@ -189,7 +189,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     CorsConfiguration configuration = new CorsConfiguration();
 
     logger.info("cors config:");
-    logger.info("origins: " + this.corsConfig.getOrigins());
+    for (String origin: this.corsConfig.getOrigins()) {
+      logger.info("origin: " + origin);
+    }
     logger.info("credetials: " + this.corsConfig.getCredentials());
 
     /**

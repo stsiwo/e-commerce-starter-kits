@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 public class CorsConfig {
 
-  private String origins;
+  private String[] origins;
 
   private Boolean credentials;
 }
