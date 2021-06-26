@@ -201,13 +201,19 @@ const Login: React.FunctionComponent<{}> = (props) => {
 
   // 'enter' global to submit by 'enter'
   React.useEffect(() => {
-
-    window.addEventListener('keydown', handleSubmitKeyDown as unknown as EventListener);
-
+    if (!curForgotPasswordDialogOpen) {
+      window.addEventListener('keydown', handleSubmitKeyDown as unknown as EventListener);
+    } else {
+      window.removeEventListener('keydown', handleSubmitKeyDown as unknown as EventListener);
+    }
     return () => {
       window.removeEventListener('keydown', handleSubmitKeyDown as unknown as EventListener);
     }
-  }, []);
+  }, [
+      JSON.stringify(curMemberLoginState),
+      curPreviousUrl,
+    curForgotPasswordDialogOpen,
+    ]);
   // event handler to submit
   const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
     submit();

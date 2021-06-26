@@ -63,6 +63,7 @@ public class SendForgotPasswordEmailEventHandler {
 
     User adminRecipient = adminRecipientOption.get();
     Company adminCompany = adminRecipient.getCompanies().get(0);
+    String senderEmail = "no-reply@" + adminCompany.getDomain();
 
     User recipientUser = event.getUser();
 
@@ -83,7 +84,7 @@ public class SendForgotPasswordEmailEventHandler {
     try {
       // TODO: make sure 'from' email address (check 'Design Issue: Email With Admin
       // Company State')
-      this.emailService.send(recipientUser.getEmail(), adminCompany.getCompanyEmail(),
+      this.emailService.send(recipientUser.getEmail(), senderEmail,
           "Forgot Password Email To Reset Your Password.", htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());

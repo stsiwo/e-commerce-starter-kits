@@ -124,7 +124,7 @@ const OrderList: React.FunctionComponent<{}> = (props) => {
               }
               title={order.orderNumber}
               subheader={toDateString(order.createdAt)}
-              //subheader={order.createdAt}
+            //subheader={order.createdAt}
             />
             <CardMedia
               className={classes.media}
@@ -154,7 +154,7 @@ const OrderList: React.FunctionComponent<{}> = (props) => {
   }
 
   // spinner stuff.
-  const curFetchAuthOrderFetchStatus  = useSelector(rsSelector.app.getFetchAuthOrderFetchStatus);
+  const curFetchAuthOrderFetchStatus = useSelector(rsSelector.app.getFetchAuthOrderFetchStatus);
 
   return (
     <React.Fragment>
@@ -183,25 +183,25 @@ const OrderList: React.FunctionComponent<{}> = (props) => {
         </Box>
       )}
       {(curOrders.length > 0 &&
-        <Grid
-          container
-          className={classes.gridBox}
-          spacing={0}
-          justify="center"
-        >
-          <React.Fragment>
+        <React.Fragment>
+          <Grid
+            container
+            className={classes.gridBox}
+            spacing={0}
+            justify="center"
+          >
             {renderOrders()}
-            <Pagination
-              page={pagination.page + 1} // don't forget to increment when display
-              count={pagination.totalPages}
-              color="primary"
-              showFirstButton
-              showLastButton
-              size={"medium"}
-              onChange={handlePaginationChange}
-            />
-          </React.Fragment>
-        </Grid>
+          </Grid>
+          <Pagination
+            page={pagination.page + 1} // don't forget to increment when display
+            count={pagination.totalPages}
+            color="primary"
+            showFirstButton
+            showLastButton
+            size={"medium"}
+            onChange={handlePaginationChange}
+          />
+        </React.Fragment>
       )}
     </React.Fragment>
   )

@@ -14,6 +14,9 @@ import { forgotPasswordSchema } from 'hooks/validation/rules';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
+import { messageActions } from 'reducers/slices/app';
+import { getNanoId } from 'src/utils';
+import { MessageTypeEnum } from 'src/app';
 
 export declare type ForgotPasswordDataType = {
   email: string
@@ -122,7 +125,7 @@ const ForgotPasswordDialog: React.FunctionComponent<ForgotPasswordDialogPropsTyp
     props.setFormOpen(nextOpen);
   }
 
-  const handleSubmitClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const submit = () => {
 
     const isValid: boolean = isValidSync(curForgotPasswordState)
 
@@ -135,17 +138,55 @@ const ForgotPasswordDialog: React.FunctionComponent<ForgotPasswordDialogPropsTyp
         url: API1_URL + `/forgot-password`,
         data: curForgotPasswordState,
       }).then((data) => {
-        enqueueSnackbar("Please check your email box.", { variant: "success" })
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.SUCCESS,
+            message: "please check your email box.",
+          })
+        )
       }).catch((error: AxiosError) => {
         /**
          * we not gonna display if the email is exist or not to avoid user enumeration attack.
          **/
-        enqueueSnackbar("Please check your email box.", { variant: "success" })
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.SUCCESS,
+            message: "please check your email box.",
+          })
+        )
       })
     } else {
       updateAllValidation()
     }
   }
+
+  const handleSubmitClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    submit();
+  }
+
+  // key down to submit 
+  const handleSubmitKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key == "Enter") {
+      submit();
+    }
+  }
+
+  // 'enter' global to submit by 'enter'
+  React.useEffect(() => {
+    if (props.curFormOpen) {
+      window.addEventListener('keydown', handleSubmitKeyDown as unknown as EventListener);
+    } else {
+      window.removeEventListener('keydown', handleSubmitKeyDown as unknown as EventListener);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleSubmitKeyDown as unknown as EventListener);
+    }
+  }, [
+      JSON.stringify(curForgotPasswordState),
+      props.curFormOpen,
+    ]);
 
   // render nav items
   return (

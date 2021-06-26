@@ -63,6 +63,7 @@ public class SendVerificationEmailEventHandler {
 
     User adminRecipient = adminRecipientOption.get();
     Company adminCompany = adminRecipient.getCompanies().get(0);
+    String senderEmail = "no-reply@" + adminCompany.getDomain();
 
     User recipientUser = event.getUser();
 
@@ -83,7 +84,7 @@ public class SendVerificationEmailEventHandler {
     try {
       // TODO: make sure 'from' email address (check 'Design Issue: Email With Admin
       // Company State')
-      this.emailService.send(recipientUser.getEmail(), adminCompany.getCompanyEmail(),
+      this.emailService.send(recipientUser.getEmail(), senderEmail,
           "Verification Email To Activate Your Account.", htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());

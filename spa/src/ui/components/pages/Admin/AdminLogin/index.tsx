@@ -142,7 +142,7 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
   }
 
   // login 
-  const submit = React.useCallback(() => {
+  const submit = () => {
     const isValid: boolean = isValidSync(curAdminLoginState)
 
     if (isValid) {
@@ -202,10 +202,7 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
     } else {
       updateAllValidation()
     }
-  }, [
-      JSON.stringify(curAdminLoginState),
-      curPreviousUrl,
-    ])
+  }
 
   // 'enter' global to submit by 'enter'
   React.useEffect(() => {
@@ -215,7 +212,10 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
     return () => {
       window.removeEventListener('keydown', handleSubmitKeyDown as unknown as EventListener);
     }
-  }, []);
+  }, [
+      JSON.stringify(curAdminLoginState),
+      curPreviousUrl,
+    ]);
 
   // event handler to submit
   const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {

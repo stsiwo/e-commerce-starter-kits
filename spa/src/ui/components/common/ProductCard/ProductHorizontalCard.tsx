@@ -86,7 +86,7 @@ const ProductHorizontalCard: React.FunctionComponent<ProductHorizontalCardPropsT
         className={classes.cardHeader}
         avatar={<Avatar alt="" src={SampleSelfImage} />}
         title={productName}
-        subheader={`$${productBaseUnitPrice}`}
+        subheader={`$${productBaseUnitPrice} x${orderDetail.productQuantity}`}
         action={
           <Box component="div" className={classes.actionBox}>
             <ColorCell value={productColor} />

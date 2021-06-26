@@ -220,7 +220,9 @@ const Signup: React.FunctionComponent<{}> = (props) => {
     return () => {
       window.removeEventListener('keydown', handleSubmitKeyDown as unknown as EventListener);
     }
-  }, []);
+  }, [
+    JSON.stringify(curMemberSignupState), 
+  ]);
 
   // event handler to submit
   const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {

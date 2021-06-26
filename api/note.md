@@ -1139,7 +1139,7 @@
     - command) mvn spring-boot:build-image -Dmaven.test.skip=true
 
   - compile (e.g., create .jar file) without test
-    - command) mvn package -Dmaven.test.skip=true 
+    - command) mvn clean package -Dmaven.test.skip=true 
 
   - display dep tree
     - command) mvn dependency:tree
