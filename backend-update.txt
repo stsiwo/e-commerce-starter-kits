@@ -68,7 +68,8 @@ endpoint change:
 (product)
   - create schedule task for make product published when releaseDate.
     => need to validate (e.g., at least one variant)
-  
+(order)
+  - should i send an email to customer when payment failed?
   
     
       
