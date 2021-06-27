@@ -37,7 +37,10 @@ public class ProductListener {
    *
    * in this use case, you can use this reather than Order & OrderEvent case.
    *
-   * if children properties does not affect outside such as parent proerpties, you can use this eventlistener.
+   * #IMPORTANT NOTE FOR USAGE: 
+   *
+   *  - if children properties does not affect outside such as parent proerpties, you can use this eventlistener, or
+   *
    *
    **/
   @PostPersist
@@ -45,11 +48,6 @@ public class ProductListener {
   @PostLoad
   @PostRemove
   private void afterLoad(Product domain) {
-    if (domain.getVariants() != null) {
-      for (ProductVariant variant : domain.getVariants()) {
-        variant.getCurrentPrice();
-      }
-    }
   }
 
 }

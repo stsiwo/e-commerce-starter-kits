@@ -1,6 +1,7 @@
 package com.iwaodev.application.mapper;
 
 import com.iwaodev.application.dto.company.CompanyDTO;
+import com.iwaodev.application.dto.company.PublicCompanyDTO;
 import com.iwaodev.infrastructure.model.Company;
 import com.iwaodev.ui.criteria.user.UserCompanyCriteria;
 
@@ -15,6 +16,9 @@ public interface CompanyMapper {
 
   @Mapping(source = "company.user.userId", target = "userId")
   CompanyDTO toCompanyDTO(Company company);
+ 
+  @Mapping(source = "company.user.userId", target = "userId")
+  PublicCompanyDTO toPublicCompanyDTO(Company company);
  
   Company toCompanyEntityFromCompanyCriteria(UserCompanyCriteria company);
 

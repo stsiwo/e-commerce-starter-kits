@@ -96,6 +96,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.GET, "/products/public/{path}").permitAll() //
         .antMatchers(HttpMethod.POST, "/orders").permitAll() //
         .antMatchers(HttpMethod.POST, "/orders/{orderId}/events/session-timeout").permitAll() //
+        .antMatchers(HttpMethod.GET, "/companies/public").permitAll() //
 
         // spring boot admin: need to open actuator endpoints
         .antMatchers("/actuator/**").permitAll() //

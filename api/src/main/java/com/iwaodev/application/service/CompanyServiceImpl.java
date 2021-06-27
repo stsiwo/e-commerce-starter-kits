@@ -7,6 +7,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.iwaodev.application.dto.company.CompanyDTO;
+import com.iwaodev.application.dto.company.PublicCompanyDTO;
 import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.iservice.CompanyService;
 import com.iwaodev.application.mapper.CompanyMapper;
@@ -45,7 +46,8 @@ public class CompanyServiceImpl implements CompanyService {
     // work.
     //
     /**
-     * a user can have mutlipel companies but in this use case, only admin user can have a single company so be careful. 
+     * a user can have mutlipel companies but in this use case, only admin user can
+     * have a single company so be careful.
      **/
     User targetEntity = targetUserOption.get();
 
@@ -105,6 +107,18 @@ public class CompanyServiceImpl implements CompanyService {
     return CompanyMapper.INSTANCE.toCompanyDTO(targetCompany);
   }
 
+  @Override
+  public PublicCompanyDTO publicGet() throws Exception {
+
+    // get admin
+    User admin = this.repository.getAdmin().orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "admin not found."));
+
+    // get company
+    Company company = admin.getCompanies().get(0);
+
+    return CompanyMapper.INSTANCE.toPublicCompanyDTO(company);
+
+
+  }
 
 }
-

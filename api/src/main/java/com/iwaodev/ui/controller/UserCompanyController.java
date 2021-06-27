@@ -6,6 +6,7 @@ import java.util.UUID;
 import javax.validation.Valid;
 
 import com.iwaodev.application.dto.company.CompanyDTO;
+import com.iwaodev.application.dto.company.PublicCompanyDTO;
 import com.iwaodev.application.iservice.CompanyService;
 import com.iwaodev.config.SpringSecurityUser;
 import com.iwaodev.ui.criteria.user.UserCompanyCriteria;
@@ -40,6 +41,21 @@ public class UserCompanyController {
       ) throws Exception {
     return new ResponseEntity<>(this.service.get(userId), HttpStatus.OK);
   }
+
+  /**
+   * retrieve admin's company info.
+   *
+   * assuming the company info is admin's first company.
+   *
+   * used to display company info in front end.
+   *
+   **/
+  @GetMapping("/companies/public")
+  public ResponseEntity<PublicCompanyDTO> publicGet(
+      ) throws Exception {
+    return new ResponseEntity<>(this.service.publicGet(), HttpStatus.OK);
+  }
+
 
   // replace an existing company of a given user
   @PutMapping("/users/{userId}/companies/{companyId}")

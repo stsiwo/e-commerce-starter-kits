@@ -95,10 +95,10 @@ public class Product {
   @Formula("(select avg(r.review_point) from products p inner join reviews r on r.product_id = p.product_id where p.product_id = product_id)")
   private Double averageReviewPoint = 0.0D;
 
-  @Formula("(select least(p.product_base_unit_price, ifnull(p.product_base_discount_price, 2147483647), min(pv.variant_unit_price), min(ifnull(pv.variant_discount_price, 2147483647))) from products p inner join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id group by p.product_id)")
+  @Formula("(select least(p.product_base_unit_price, ifnull(p.product_base_discount_price, 2147483647), min(ifnull(pv.variant_unit_price, 2147483647)), min(ifnull(pv.variant_discount_price, 2147483647))) from products p inner join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id group by p.product_id)")
   private BigDecimal cheapestPrice;
 
-  @Formula("(select greatest(p.product_base_unit_price, ifnull(p.product_base_discount_price, 0), max(pv.variant_unit_price), max(ifnull(pv.variant_discount_price, 0))) from products p inner join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id group by p.product_id)")
+  @Formula("(select greatest(p.product_base_unit_price, ifnull(p.product_base_discount_price, 0), max(ifnull(pv.variant_unit_price, 0)), max(ifnull(pv.variant_discount_price, 0))) from products p inner join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id group by p.product_id)")
   private BigDecimal highestPrice;
 
   // overall result if discount exist through its variants
