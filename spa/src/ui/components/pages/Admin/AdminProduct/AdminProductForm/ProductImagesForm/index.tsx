@@ -82,10 +82,6 @@ const ProductImagesForm: React.FunctionComponent<ProductImageFormPropsType> = (p
 
   const dispatch = useDispatch()
 
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
-
   /**
    * file uploading stuff
    **/

@@ -42,7 +42,7 @@ const Carousel: React.FunctionComponent<CarouselPropsType> = ({ items }) => {
 
   const classes = useStyles();
 
-  const length = items.length
+  const length = items.filter((item: ProductImageType) => item.productImagePath).length
   const [curCheckBox, setCheckBox] = React.useState<number>(0)
 
   const theme = useTheme();
@@ -60,11 +60,12 @@ const Carousel: React.FunctionComponent<CarouselPropsType> = ({ items }) => {
   };
 
   const renderItems: () => React.ReactNode = () => {
-    return items.map((item: ProductImageType, index: number) => {
+    // filter so that only product image which has path is displayed on the page.
+    return items.filter((item: ProductImageType) => item.productImagePath).map((item: ProductImageType, index: number) => {
       return (
         <div key={item.productImageId}>
             {Math.abs(curCheckBox - index) <= 2 ? (
-              <img className={classes.img} src={item.productImagePath} />
+              <img className={classes.img} src={API1_URL + item.productImagePath} />
             ) : null}
         </div>
       )

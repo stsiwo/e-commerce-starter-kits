@@ -107,6 +107,7 @@ public class SendOrderSucceededEmailEventHandler {
 
     // send it
     try {
+      logger.info(String.format("To: %s, From: %s", recipientEmail, senderEmail));
       this.emailService.send(recipientEmail, senderEmail, "Your Order Has Been Confirmed #" + order.getOrderNumber(),
           htmlBody);
     } catch (MessagingException e) {

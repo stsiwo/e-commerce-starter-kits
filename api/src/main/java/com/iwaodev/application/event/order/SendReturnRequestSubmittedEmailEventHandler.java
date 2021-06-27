@@ -110,6 +110,7 @@ public class SendReturnRequestSubmittedEmailEventHandler {
 
     // send it
     try {
+      logger.info(String.format("To: %s, From: %s", admin.getEmail(), senderEmail));
       this.emailService.send(admin.getEmail(), senderEmail,
           "A Return Request Was Submitted By Customer (Order #: " + order.getOrderNumber() + ")", htmlBody);
     } catch (MessagingException e) {

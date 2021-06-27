@@ -68,6 +68,8 @@ const UserAccountAvatarManagement: React.FunctionComponent<UserAccountAvatarMana
   // auth
   const auth = useSelector(mSelector.makeAuthSelector())
 
+  // avatar image
+  const curAvatarImageUrl = useSelector(mSelector.makeAuthAvatarUrlSelector())
   // snackbar notification
   // usage: 'enqueueSnackbar("message", { variant: "error" };
   const { enqueueSnackbar } = useSnackbar();
@@ -77,7 +79,7 @@ const UserAccountAvatarManagement: React.FunctionComponent<UserAccountAvatarMana
    * file uploading stuff
    **/
   const [curFile, setFile] = React.useState<File>(null);
-  const [curFilePath, setFilePath] = React.useState<string>(API1_URL + auth.user.avatarImagePath);
+  const [curFilePath, setFilePath] = React.useState<string>(curAvatarImageUrl);
   const imageInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleTriggerClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {

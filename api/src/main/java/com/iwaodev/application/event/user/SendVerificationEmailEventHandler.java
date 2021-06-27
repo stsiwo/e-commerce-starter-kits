@@ -84,6 +84,7 @@ public class SendVerificationEmailEventHandler {
     try {
       // TODO: make sure 'from' email address (check 'Design Issue: Email With Admin
       // Company State')
+      logger.info(String.format("To: %s, From: %s", recipientUser.getEmail(), senderEmail));
       this.emailService.send(recipientUser.getEmail(), senderEmail,
           "Verification Email To Activate Your Account.", htmlBody);
     } catch (MessagingException e) {

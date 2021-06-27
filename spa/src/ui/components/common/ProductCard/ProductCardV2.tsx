@@ -58,12 +58,14 @@ const ProductCardV2: React.FunctionComponent<ProductCardV2PropsType> = ({ produc
 
   const classes = useStyles();
 
+  const primaryImageUrl = (product.productImages.length > 0) ? API1_URL + product.productImages[0].productImagePath : null
+
   return (
     <Box className={classes.box}>
       <Card className={classes.card}>
         <CardMedia
           className={classes.media}
-          image={(product.productImages.length > 0) ? product.productImages[0].productImagePath : SampleProduct1_1Image}
+          image={primaryImageUrl}
         />
         <CardContent>
           <Typography variant="body2" color="textSecondary" component="p">
@@ -73,10 +75,6 @@ const ProductCardV2: React.FunctionComponent<ProductCardV2PropsType> = ({ produc
             {product.productName}
           </Typography>
           <Typography variant="body2" color="primary" component="p">
-            {/** 
-            TODO: need to domain function to select cheapest price via product variant 
-               or you can create a property in backend DTO so that you don't need to calculate in front-end 
-            **/}
             <b>${cadCurrencyFormat(product.cheapestPrice)} ~</b>
           </Typography>
         </CardContent>

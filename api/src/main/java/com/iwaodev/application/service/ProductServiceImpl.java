@@ -14,6 +14,7 @@ import com.iwaodev.application.dto.product.ProductDTO;
 import com.iwaodev.application.irepository.ProductRepository;
 import com.iwaodev.application.iservice.FileService;
 import com.iwaodev.application.iservice.ProductService;
+import com.iwaodev.application.iservice.S3Service;
 import com.iwaodev.application.mapper.ProductMapper;
 import com.iwaodev.application.specification.factory.ProductSpecificationFactory;
 import com.iwaodev.domain.product.ProductSortEnum;
@@ -37,6 +38,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import software.amazon.awssdk.services.s3.model.S3Exception;
+
 @Service
 @Transactional
 public class ProductServiceImpl implements ProductService {
@@ -51,6 +54,9 @@ public class ProductServiceImpl implements ProductService {
 
   @Autowired
   private FileService fileService;
+
+  @Autowired
+  private S3Service s3Service;
 
   @Value("${file.product.path}")
   private String productFilePath;
@@ -289,8 +295,8 @@ public class ProductServiceImpl implements ProductService {
 
         // try to save teh file
         try {
-          this.fileService.save(localDirectoryWithFile, file);
-        } catch (IOException e) {
+          this.s3Service.upload(localDirectoryWithFile, file.getBytes());
+        } catch (Exception e) {
           logger.info(e.getMessage());
           throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
@@ -400,15 +406,12 @@ public class ProductServiceImpl implements ProductService {
        * remove previous image (both cases: update/remove)
        *
        **/
-      // get local directory for previous image
-      String oldProductImagePattern = oldProductImage.getProductImageName() + ".*"; // the name is 'product-image-0'
-                                                                                    // without any extension and put
-                                                                                    // wildcard and find and delete.
+      String oldProductImagePath = oldProductImage.getProductImagePath();
 
       // remove it
       try {
-        this.fileService.removeWithRegex(localDirectory, oldProductImagePattern);
-      } catch (IOException e) {
+        this.s3Service.delete(oldProductImagePath);
+      } catch (Exception e) {
         logger.info(e.getMessage());
         throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
       }
@@ -440,9 +443,9 @@ public class ProductServiceImpl implements ProductService {
         // try to save teh file
         try {
           // save new one
-          this.fileService.save(localDirectoryWithFile, file);
+          this.s3Service.upload(localDirectoryWithFile, file.getBytes());
 
-        } catch (IOException e) {
+        } catch (Exception e) {
           logger.info(e.getMessage());
           throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
@@ -466,7 +469,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   private String getPublicPath(String fileName, String productIdString) {
-    return "/products/" + productIdString + "/" + this.productImageParentDirectory + "/" + fileName;
+    return this.productFilePath + "/" + productIdString + "/" + this.productImageParentDirectory + "/" + fileName;
   }
 
   @Override
@@ -492,6 +495,11 @@ public class ProductServiceImpl implements ProductService {
 
     if (!targetEntityOption.isEmpty()) {
       Product targetEntity = targetEntityOption.get();
+
+      // delete product images at s3
+      String productKey = this.productFilePath + "/" + targetEntity.getProductId().toString();
+      this.s3Service.delete(productKey);
+
       this.repository.delete(targetEntity);
     }
   }
@@ -592,8 +600,9 @@ public class ProductServiceImpl implements ProductService {
     byte[] content = null;
 
     try {
-      content = this.fileService.load(internalPath);
-    } catch (IOException e) {
+      //content = this.fileService.load(internalPath);
+      content = this.s3Service.get(internalPath);
+    } catch (Exception e) {
       logger.info(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }

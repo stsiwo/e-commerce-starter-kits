@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwaodev.application.dto.product.ProductDTO;
 import com.iwaodev.application.dto.product.ProductImageDTO;
 import com.iwaodev.application.dto.product.ProductVariantDTO;
+import com.iwaodev.application.iservice.S3Service;
 import com.iwaodev.auth.AuthenticateTestUser;
 import com.iwaodev.auth.AuthenticationInfo;
 import com.iwaodev.data.BaseDatabaseSetup;
@@ -28,6 +29,7 @@ import com.iwaodev.util.ResourceReader;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -124,6 +127,9 @@ public class AdminProductEndpointTest {
 
   @Autowired
   private MessageSource messageSource;
+
+  @MockBean
+  private S3Service s3Service;
 
   /**
    * insert base test data into mysql database
@@ -251,6 +257,9 @@ public class AdminProductEndpointTest {
       @Value("classpath:/integration/product/shouldAdminUserCreateNewProduct.json") Resource dummyFormJsonFile)
       throws Exception {
 
+
+    Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
+
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
 
@@ -295,13 +304,13 @@ public class AdminProductEndpointTest {
       if (i == 0 || i == 1 || i == 3) {
         if (i == 0) {
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-0");  
-          assertThat(productImages.get(i).getProductImagePath()).matches("/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.jpeg");  
+          assertThat(productImages.get(i).getProductImagePath()).matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.jpeg");  
         } else if (i == 1) {
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-1");  
-          assertThat(productImages.get(i).getProductImagePath()).matches("/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");  
+          assertThat(productImages.get(i).getProductImagePath()).matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");  
         } else if (i == 3) {
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-3");  
-          assertThat(productImages.get(i).getProductImagePath()).matches("/products/" + responseBody.getProductId().toString() + "/images/product-image-3-.+.jpeg");  
+          assertThat(productImages.get(i).getProductImagePath()).matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-3-.+.jpeg");  
         }
       } else {
         assertThat(productImages.get(i).getProductImagePath()).isEqualTo("");  
@@ -310,16 +319,6 @@ public class AdminProductEndpointTest {
 
     // make sure any variant is not created.
     assertThat(0).isEqualTo(responseBody.getVariants().size());
-
-    // assert the files are saved to directory
-    String localDirectory = this.fileProductPath + "/" + responseBody.getProductId().toString() + "/images";
-    String pattern = "product-image-0-.+.jpeg|product-image-1-.+.png|product-image-3-.+.jpeg";
-
-    // check the files exist in the target directory with regex
-    List<Path> paths = Files.find(Paths.get(localDirectory), Integer.MAX_VALUE,
-        (path, basicFileAttributes) -> path.toFile().getName().matches(pattern)).collect(Collectors.toList());
-
-    assertThat(paths.size()).isEqualTo(3);
   }
 
   @Test
@@ -327,6 +326,7 @@ public class AdminProductEndpointTest {
   public void shouldNotAdminUserCreateNewProductSinceInvalidPath(
       @Value("classpath:/integration/product/shouldNotAdminUserCreateNewProductSinceInvalidPath.json") Resource dummyFormJsonFile)
       throws Exception {
+
 
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
@@ -374,6 +374,10 @@ public class AdminProductEndpointTest {
       @Value("classpath:/integration/product/shouldAdminUserUpdateProduct.json") Resource dummyFormJsonFile)
       throws Exception {
 
+
+    Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
+    Mockito.doNothing().when(this.s3Service).delete(Mockito.any());
+
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
     
@@ -381,20 +385,6 @@ public class AdminProductEndpointTest {
 
     // create dummy files in the directory
     // - must match with input json script
-    String localDirectory = this.fileProductPath + "/" + dummyProductId + "/images";
-    Files.createDirectories(Paths.get(localDirectory));
-    Path pathForZero = Paths.get(localDirectory + "/product-image-0-xxxx.png");
-    Path pathForFirst = Paths.get(localDirectory + "/product-image-1-yyyy.png");
-    Path pathForThird = Paths.get(localDirectory + "/product-image-3-zzzz.png");
-
-    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("files", "product-image-0.png", "image/png", "some png".getBytes());
-    MockMultipartFile fileAtFirstIndex = new MockMultipartFile("files", "product-image-1.png", "image/png", "some png".getBytes());
-    MockMultipartFile fileAtThirdIndex = new MockMultipartFile("files", "product-image-3.png", "image/png", "some png".getBytes());
-
-    fileAtZeroIndex.transferTo(pathForZero);
-    fileAtFirstIndex.transferTo(pathForFirst);
-    fileAtThirdIndex.transferTo(pathForThird);
-
     // arrange
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyProductId;
 
@@ -445,11 +435,11 @@ public class AdminProductEndpointTest {
         if (i == 0) {
           // update
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-0");  
-          assertThat(productImages.get(i).getProductImagePath()).matches("/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.svg");  
+          assertThat(productImages.get(i).getProductImagePath()).matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.svg");  
         } else if (i == 1) {
           // unchange
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-1");  
-          assertThat(productImages.get(i).getProductImagePath()).matches("/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");  
+          assertThat(productImages.get(i).getProductImagePath()).matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");  
         } else if (i == 3) {
           // remove
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-3");  
@@ -463,26 +453,13 @@ public class AdminProductEndpointTest {
     for (ProductVariantDTO variantDTO : responseBody.getVariants()) {
       assertThat(variantDTO.getVariantId()).isNotNull();  
     }
-    
-
-    // check old files are deleted 
-    String pattern = "product-image-0-.+.png|product-image-3-.+.png";
-    List<Path> paths = Files.find(Paths.get(localDirectory), Integer.MAX_VALUE,
-        (path, basicFileAttributes) -> path.toFile().getName().matches(pattern)).collect(Collectors.toList());
-
-    assertThat(paths.size()).isEqualTo(0);
-
-    // check new files are saved 
-    String pattern1 = "product-image-0-.+.svg|product-image-1-.+.png";
-    List<Path> paths1 = Files.find(Paths.get(localDirectory), Integer.MAX_VALUE,
-        (path, basicFileAttributes) -> path.toFile().getName().matches(pattern1)).collect(Collectors.toList());
-
-    assertThat(paths1.size()).isEqualTo(2);
   }
 
   @Test
   @Sql(scripts = { "classpath:/integration/product/shouldAdminUserDeleteProduct.sql" })
   public void shouldAdminUserDeleteProduct() throws Exception {
+
+    Mockito.doNothing().when(this.s3Service).delete(Mockito.any());
 
     // arrange
     String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";

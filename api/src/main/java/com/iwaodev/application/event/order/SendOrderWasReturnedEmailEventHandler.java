@@ -98,6 +98,7 @@ public class SendOrderWasReturnedEmailEventHandler {
 
     // send it
     try {
+      logger.info(String.format("To: %s, From: %s", recipientEmail, senderEmail));
       this.emailService.send(recipientEmail, senderEmail,
           "Your Order Was Returned (Order #" + order.getOrderNumber(), htmlBody + ")");
     } catch (MessagingException e) {

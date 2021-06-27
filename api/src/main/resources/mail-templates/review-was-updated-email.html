@@ -2,6 +2,50 @@
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        ul {
+          list-style-type: none;
+        }
+        .styled-table {
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            font-family: sans-serif;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .styled-table thead tr {
+            background-color: #000;
+            color: #ffffff;
+            text-align: left;
+        }
+
+        .styled-table th,
+        .styled-table td {
+            padding: 12px 15px;
+        }
+
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .styled-table tbody tr.subtotal {
+            border-top: 2px solid #000;
+        }
+
+        .styled-table tbody tr td.cost-header {
+            text-align:right;
+        }
+
+        .styled-table tbody tr .color {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            box-shadow: grey 1px 1px 1px;
+            border-radius: 10px;
+        } 
+    </style>
   </head>
   <body>
     <!-- 
@@ -13,20 +57,26 @@
 
     <p>The following product's review was updated by a customer. Please check the review to verify.</p><br />
     
-    <h5>Review</h5>
-    <p>Review #: <b th:text="${review.reviewId}"></b></p>
-    <p>Title: <b th:text="${review.reviewTitle}"></b></p>
-    <p>Description: <b th:text="${review.reviewDescription}"></b></p>
-    <p>Point: <b th:text="${review.reviewPoint}"></b></p>
-    <p>Status: <b th:text="${review.isVerified} ? 'Verified' : 'Pending' "></b></p>
+    <h4>Review</h4>
+    <ul>
+      <li>Review #: <b th:text="${review.reviewId}"></b></li>
+      <li>Title: <b th:text="${review.reviewTitle}"></b></li>
+      <li>Description: <b th:text="${review.reviewDescription}"></b></li>
+      <li>Point: <b th:text="${review.reviewPoint}"></b></li>
+      <li>Status: <b th:text="${review.isVerified} ? 'Verified' : 'Pending' "></b></li>
+    </ul>
 
-    <h6>Item</h6>
-    <p>Product #: <b th:text="${review.product.productId}"></b></p>
-    <p>Name: <b th:text="${review.product.productName}"></b></p>
+    <h4>Item</h4>
+    <ul>
+      <li>Product #: <b th:text="${review.product.productId}"></b></li>
+      <li>Name: <b th:text="${review.product.productName}"></b></li>
+    </ul>
 
-    <h6>Customer</h6>
-    <p>Customer #: <b th:text="${review.user.userId}"></b></p>
-    <p>Name: <b th:text="${review.user.firstName + ' ' + review.user.lastName}"></b></p>
+    <h4>Customer</h4>
+    <ul>
+      <li>Customer #: <b th:text="${review.user.userId}"></b></li>
+      <li>Name: <b th:text="${review.user.firstName + ' ' + review.user.lastName}"></b></li>
+    </ul>
 
     <p>Please visit <a th:href="@{{link} (link=${link})}">the review managment page</a> to verify your review.</p>
 

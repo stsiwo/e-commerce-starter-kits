@@ -51,6 +51,9 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
   // auth
   const auth = useSelector(mSelector.makeAuthSelector());
 
+  // avatar image
+  const curAvatarImageUrl = useSelector(mSelector.makeAuthAvatarUrlSelector())
+
   // cart icon click
   const dispatch = useDispatch();
 
@@ -161,7 +164,7 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
             <Avatar
               alt="Satoshi Iwao"
               className={classes.pointer}
-              src={auth.user.avatarImagePath ? API1_URL + auth.user.avatarImagePath : null}
+              src={curAvatarImageUrl}
               onClick={handleMenuOpenClick}
             />
             <Menu

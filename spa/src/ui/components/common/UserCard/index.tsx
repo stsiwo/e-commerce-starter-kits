@@ -7,6 +7,8 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import * as React from 'react';
 import { UserTypeEnum } from 'src/app';
 import SampleSelfImage from 'static/self.jpeg';
+import { useSelector } from 'react-redux';
+import { mSelector } from 'src/selectors/selector';
 
 interface UserCardPropsType {
   firstName: string
@@ -53,14 +55,15 @@ const UserCard: React.FunctionComponent<UserCardPropsType> = (props) => {
   // mui: makeStyles
   const classes = useStyles();
 
-  const imagePath = props.avatarImagePath ? API1_URL + props.avatarImagePath : ""
+  // avatar image
+  const curAvatarImageUrl = useSelector(mSelector.makeAuthAvatarUrlSelector())
 
   return (
     <Card className={`${classes.card} ${classes.root}`}>
       <CardHeader
         className={classes.cardHeader}
         avatar={
-          <Avatar alt="" src={imagePath} />
+          <Avatar alt="" src={curAvatarImageUrl} />
         }
         title={`${props.firstName} ${props.lastName} (${props.userType})`}
         subheader={props.email}

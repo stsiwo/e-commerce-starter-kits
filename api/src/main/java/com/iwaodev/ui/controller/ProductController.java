@@ -141,7 +141,7 @@ public class ProductController {
   //}
 
   // get user avatar image
-  @GetMapping(value = "/products/{id}/images/{imageName}", produces = "image/*")
+  @GetMapping(value = "/domain/products/{id}/images/{imageName}")
   public ResponseEntity<byte[]> getProductImage(@PathVariable(value = "id") UUID id,
       @PathVariable(value = "imageName") String imageName,
       HttpServletResponse response

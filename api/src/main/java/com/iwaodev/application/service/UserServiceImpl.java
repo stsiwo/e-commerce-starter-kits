@@ -1,6 +1,5 @@
 package com.iwaodev.application.service;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -11,6 +10,7 @@ import java.util.function.Function;
 import com.iwaodev.application.dto.user.UserDTO;
 import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.iservice.FileService;
+import com.iwaodev.application.iservice.S3Service;
 import com.iwaodev.application.iservice.UserService;
 import com.iwaodev.application.mapper.UserMapper;
 import com.iwaodev.application.specification.factory.UserSpecificationFactory;
@@ -63,6 +63,9 @@ public class UserServiceImpl implements UserService {
 
   @Autowired
   private ApplicationEventPublisher publisher;
+
+  @Autowired
+  private S3Service s3Service;
 
   public Page<UserDTO> getAll(UserQueryStringCriteria criteria, Integer page, Integer limit, UserSortEnum sort) throws Exception {
 
@@ -192,6 +195,9 @@ public class UserServiceImpl implements UserService {
 
     if (!targetEntityOption.isEmpty()) {
       User targetEntity = targetEntityOption.get();
+      // delete s3 directory of this user also.
+      String userDirectoryKey = this.userFilePath + "/" + targetEntity.getUserId().toString();
+      this.s3Service.delete(userDirectoryKey);
       this.repository.delete(targetEntity);
     }
   }
@@ -249,8 +255,9 @@ public class UserServiceImpl implements UserService {
 
     // try to save teh file
     try {
-      this.fileService.save(path, file);
-    } catch (IOException e) {
+      //this.fileService.save(path, file);
+      this.s3Service.upload(path, file.getBytes());
+    } catch (Exception e) {
       logger.info(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
@@ -313,7 +320,7 @@ public class UserServiceImpl implements UserService {
   }
 
   private String getPublicDirectoryPath(String userIdString) {
-    return "/users/" + userIdString + "/avatar-image";
+    return this.userFilePath + "/" + userIdString + "/avatar-image";
   }
 
   private String updateFileName(String originalFileName) {
@@ -329,11 +336,14 @@ public class UserServiceImpl implements UserService {
 
     String internalPath = this.userFilePath + "/" + userId.toString() + "/" + imageName;
 
+    logger.info("ineternal path: " + internalPath);
+
     byte[] content = null;
 
     try {
-      content = this.fileService.load(internalPath);
-    } catch (IOException e) {
+      //content = this.fileService.load(internalPath);
+      content = this.s3Service.get(internalPath);
+    } catch (Exception e) {
       logger.info(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }

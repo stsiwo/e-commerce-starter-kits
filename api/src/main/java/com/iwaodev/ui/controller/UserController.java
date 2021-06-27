@@ -137,9 +137,8 @@ public class UserController {
    **/
 
   // user avatar image
-  @PostMapping("/users/{id}/avatar-image")
+  @RequestMapping(value = "/users/{id}/avatar-image", method = RequestMethod.POST, consumes = {"multipart/form-data"})
   @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
-                                                                     // user's data
   public ResponseEntity<ImagePathResponse> uploadAvatarImage(@PathVariable(value = "id") UUID id,
       @AuthenticationPrincipal SpringSecurityUser authUser, @RequestParam("avatarImage") MultipartFile file) throws Exception {
     return new ResponseEntity<>(new ImagePathResponse(this.service.uploadAvatarImage(id, file)), HttpStatus.OK);
@@ -157,7 +156,7 @@ public class UserController {
   }
 
   // get user avatar image
-  @GetMapping(value = "/users/{id}/avatar-image/{imageName}", produces = "image/*")
+  @GetMapping(value = "/domain/users/{id}/avatar-image/{imageName}")
   public ResponseEntity<byte[]> getAvatarImage(@PathVariable(value = "id") UUID id,
       @AuthenticationPrincipal SpringSecurityUser authUser, @PathVariable(value = "imageName") String imageName,
       HttpServletResponse response) throws Exception {

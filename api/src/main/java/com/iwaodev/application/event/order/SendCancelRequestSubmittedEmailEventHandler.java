@@ -95,6 +95,7 @@ public class SendCancelRequestSubmittedEmailEventHandler {
 
     // send it
     try {
+      logger.info(String.format("To: %s, From: %s", admin.getEmail(), senderEmail));
       this.emailService.send(admin.getEmail(), senderEmail,
           "A Cancel Request Was Submitted By Customer (Order #: " + order.getOrderNumber() + ")", htmlBody);
     } catch (MessagingException e) {

@@ -104,6 +104,7 @@ public class SendNewOrderWasPlacedEmailEventHandler {
 
     // send it
     try {
+      logger.info(String.format("To: %s, From: %s", admin.getEmail(), senderEmail));
       this.emailService.send(admin.getEmail(), senderEmail,
           "A New Order Was Placed By Customer (Order #: " + order.getOrderNumber() + ")", htmlBody);
     } catch (MessagingException e) {

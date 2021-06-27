@@ -129,7 +129,7 @@ const OrderList: React.FunctionComponent<{}> = (props) => {
             <CardMedia
               className={classes.media}
               // the first product image is the main one
-              image={(order.orderDetails[0].product && order.orderDetails[0].product.productImages.length > 0) ? order.orderDetails[0].product.productImages[0].productImagePath : ""}
+              image={(order.orderDetails[0].product && order.orderDetails[0].product.productImages.length > 0) ? API1_URL + order.orderDetails[0].product.productImages[0].productImagePath : ""}
             />
             <CardContent className={classes.cardContent}>
               <Typography variant="body2" color="textSecondary" component="p">

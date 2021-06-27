@@ -11,6 +11,7 @@ import com.iwaodev.application.dto.order.OrderDTO;
 import com.iwaodev.application.dto.order.OrderEventDTO;
 import com.iwaodev.application.dto.user.PhoneDTO;
 import com.iwaodev.application.dto.user.UserDTO;
+import com.iwaodev.application.iservice.S3Service;
 import com.iwaodev.auth.AuthenticateTestUser;
 import com.iwaodev.auth.AuthenticationInfo;
 import com.iwaodev.data.BaseDatabaseSetup;
@@ -33,6 +34,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -50,6 +53,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -87,6 +91,8 @@ public class MemberUserEndpointTest {
 
   private static final String targetPath = "/users";
 
+  private static final String targetImagePath = "/domain/users";
+
   @Autowired
   private MockMvc mvc;
 
@@ -121,6 +127,9 @@ public class MemberUserEndpointTest {
   private ResourceReader resourceReader;
 
   private Cookie authCookie;
+
+  @MockBean
+  private S3Service s3Service;
 
   /**
    * insert base test data into mysql database
@@ -387,6 +396,110 @@ public class MemberUserEndpointTest {
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(403);
+  }
+
+  @Test
+  //@Sql(scripts = { "classpath:/integration/user/shouldMemberUserUploadAvatar.sql" })
+  public void shouldMemberUserUploadAvatar(/**@Value("classpath:/integration/user/shouldMemberUserUpdateItsOwnData.json") Resource dummyFormJsonFile**/) throws Exception {
+
+    Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
+
+    // dummy form json 
+    //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+
+    //String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/avatar-image";
+
+    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("avatarImage", "product-image-0.jpeg", "image/jpeg", "some jpg".getBytes());
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .multipart(targetUrl) // create
+        .file(fileAtZeroIndex)
+        .contentType(MediaType.MULTIPART_FORM_DATA)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+  }
+
+  @Test
+  //@Sql(scripts = { "classpath:/integration/user/shouldMemberUserUploadAvatar.sql" })
+  public void shouldMemberUserDeleteAvatar(/**@Value("classpath:/integration/user/shouldMemberUserUpdateItsOwnData.json") Resource dummyFormJsonFile**/) throws Exception {
+
+    Mockito.doNothing().when(this.s3Service).delete(Mockito.any());
+    // dummy form json 
+    //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+
+    //String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/avatar-image";
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .delete(targetUrl)
+        .contentType(MediaType.APPLICATION_JSON)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldMemberUserGetAvatar.sql" })
+  public void shouldMemberUserGetAvatar(/**@Value("classpath:/integration/user/shouldMemberUserUpdateItsOwnData.json") Resource dummyFormJsonFile**/) throws Exception {
+
+    byte[] dummyImage = "samoe bytes".getBytes();
+    Mockito.when(this.s3Service.get(Mockito.any())).thenReturn(dummyImage);
+    // dummy form json 
+    //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+
+    //String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyAvatarImageName = "dummy-avatar-image.jpeg";
+    String dummyUserPath = "/" + dummyUserIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetImagePath + dummyUserPath + "/avatar-image/" + dummyAvatarImageName;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .get(targetUrl)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    //JsonNode contentAsJsonNode = this.objectMapper.readValue(.getContentAsString(), JsonNode.class);
+    //byte[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode, byte[].class);
+    // assert
+    
+    assertThat(result.getResponse().getContentAsByteArray()).isEqualTo(dummyImage);
   }
 
   @Test

@@ -2,6 +2,50 @@
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        ul {
+          list-style-type: none;
+        }
+        .styled-table {
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            font-family: sans-serif;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .styled-table thead tr {
+            background-color: #000;
+            color: #ffffff;
+            text-align: left;
+        }
+
+        .styled-table th,
+        .styled-table td {
+            padding: 12px 15px;
+        }
+
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .styled-table tbody tr.subtotal {
+            border-top: 2px solid #000;
+        }
+
+        .styled-table tbody tr td.cost-header {
+            text-align:right;
+        }
+
+        .styled-table tbody tr .color {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            box-shadow: grey 1px 1px 1px;
+            border-radius: 10px;
+        } 
+    </style>
   </head>
   <body>
     <!-- 
@@ -13,7 +57,7 @@
 
     <p>A return reqeust was submitted by a customer. Please refer to the detail below:</p><br />
     
-    <h5>Customer Information</h5>
+    <h4>Customer Information</h4>
     <p>Name: <b th:text="${order.orderFirstName + ' ' + order.orderLastName}"></b></p>
     <p>User Type: <b th:text="${order.isGuest} ? 'Guest' : 'Member'"></b></p> 
     <p>Email: <b th:text="${order.orderEmail}"></b></p>
@@ -22,9 +66,9 @@
     <p>Billing Address: <b th:text="${order.displayBillingAddress()}"></b></p>
 
 
-    <h5>Items Information</h5>
+    <h4>Items Information</h4>
     <p>Order #: <b th:text="${order.orderNumber}"></b></p>
-    <table>
+    <table class="styled-table">
      <thead>
          <tr>
              <th>Name</th>
@@ -37,21 +81,31 @@
      <tbody>
          <tr th:each="orderDetail : *{order.orderDetails}">
             <td><span th:text="${orderDetail.productName}"></span></td>
-            <td><span th:text="${orderDetail.productColor}"></span></td>
+            <td><span th:style="'background-color: ' + ${orderDetail.productColor} + ';'" class="color" ></span></td>
             <td><span th:text="${orderDetail.productSize}"></span></td>
             <td><span th:text="${orderDetail.productUnitPrice}"></span></td>
             <td><span th:text="${orderDetail.productQuantity}"></span></td>
          </tr>
+         <tr class="subtotal">
+             <td colspan="4" class="cost-header">Subtotal</td>
+             <td th:text="${order.getProductCost()}"></td>
+         </tr>
+         <tr>
+             <td colspan="4" class="cost-header">Tax</td>
+             <td th:text="${order.taxCost}"></td>
+         </tr>
+         <tr>
+             <td colspan="4" class="cost-header">Shipping</td>
+             <td th:text="${order.shippingCost}"></td>
+         </tr>
+         <tr>
+             <td colspan="4" class="cost-header">Total</td>
+             <td><b th:text="${order.getTotalCost()}"></b></td>
+         </tr>
      </tbody>
     </table>
-    <div style="display: flex; justify-content: flex-end;">
-       <p>Subtotal Cost: $<b th:text="${order.getProductCost()}"></b></p>
-       <p>Tax Cost: $<b th:text="${order.taxCost}"></b></p>
-       <p>Shipping Cost: $<b th:text="${order.shippingCost}"></b></p>
-       <h6>Total Cost: $<b th:text="${order.getTotalCost()}"></b></p>
-    </div>
 
-    <h5>Management Console</h5>
+    <h4>Management Console</h4>
 
     <p>Please visit to <a th:href="@{{link} (link=${link})}">your order managment page</a> to manage this order.</p>
 

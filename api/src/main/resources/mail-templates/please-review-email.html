@@ -2,14 +2,58 @@
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        ul {
+          list-style-type: none;
+        }
+        .styled-table {
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            font-family: sans-serif;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .styled-table thead tr {
+            background-color: #000;
+            color: #ffffff;
+            text-align: left;
+        }
+
+        .styled-table th,
+        .styled-table td {
+            padding: 12px 15px;
+        }
+
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .styled-table tbody tr.subtotal {
+            border-top: 2px solid #000;
+        }
+
+        .styled-table tbody tr td.cost-header {
+            text-align:right;
+        }
+
+        .styled-table tbody tr .color {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            box-shadow: grey 1px 1px 1px;
+            border-radius: 10px;
+        } 
+    </style>
   </head>
   <body>
     <p th:text="${'Hi ' + order.orderFirstName + ' ' + order.orderLastName}"></p><br />
 
     <p>We would like you to review the following items you purchased.</p><br />
     
-    <h5>Items Information</h5>
-    <table>
+    <h4>Items Information</h4>
+    <table class="styled-table">
      <thead>
          <tr>
              <th>Name</th>
@@ -20,14 +64,14 @@
      <tbody>
          <tr th:each="orderDetail : *{order.orderDetails}">
             <td><span th:text="${orderDetail.productName}"></span></td>
-            <td><span th:text="${orderDetail.productColor}"></span></td>
+            <td><span th:style="'background-color: ' + ${orderDetail.productColor} + ';'" class="color" ></span></td>
             <td><span th:text="${orderDetail.productSize}"></span></td>
          </tr>
      </tbody>
     </table>
     <p th:if="${!order.isGuest}">Please visit <a th:href="@{{link} (link=${link})}">your order managment page</a> to write your review.</p>
 
-    <h5>Note</h5>
+    <h4>Note</h4>
     <p>If you have any inquery about our purchase, please contact us: <b th:text="${company.companyEmail}"></b>.</p>
     <p>Thanks,</p>
   </body>

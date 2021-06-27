@@ -113,6 +113,7 @@ public class SendOrderWasCanceledEmailEventHandler {
 
     // send it
     try {
+      logger.info(String.format("To: %s, From: %s", recipientEmail, senderEmail));
       this.emailService.send(recipientEmail, senderEmail,
           "Your Order Was Canceled (Order #" + order.getOrderNumber(), htmlBody + ")");
     } catch (MessagingException e) {

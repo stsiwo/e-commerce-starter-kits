@@ -113,6 +113,7 @@ public class SendOrderWasShippedEmailEventHandler {
 
     // send it
     try {
+      logger.info(String.format("To: %s, From: %s", recipientEmail, senderEmail));
       this.emailService.send(recipientEmail, senderEmail,
           "Your Order Has Been Shipped #" + order.getOrderNumber(), htmlBody);
     } catch (MessagingException e) {

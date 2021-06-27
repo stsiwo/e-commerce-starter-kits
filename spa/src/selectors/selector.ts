@@ -211,6 +211,20 @@ export const mSelector = {
     )
   },
 
+  makeAuthAvatarUrlSelector: () => {
+    return createSelector(
+      [
+        rsSelector.app.getAuth
+      ],
+      (auth) => {
+        if (auth && auth.isLoggedIn && auth.user && auth.user.avatarImagePath) {
+          return API1_URL + auth.user.avatarImagePath;
+        }
+        return null
+      },
+    )
+  },
+
   // app.auth.user.phones with isSelected
   makeAuthSelectedPhoneSelector: () => {
     return createSelector(

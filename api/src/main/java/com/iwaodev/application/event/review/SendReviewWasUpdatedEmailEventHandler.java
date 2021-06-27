@@ -86,6 +86,7 @@ public class SendReviewWasUpdatedEmailEventHandler {
 
     // send it
     try {
+      logger.info(String.format("To: %s, From: %s", admin.getEmail(), senderEmail));
       this.emailService.send(admin.getEmail(), senderEmail,
           "A Review Was Updated By Customer (Review #: " + review.getReviewId() + ")", htmlBody);
     } catch (MessagingException e) {
