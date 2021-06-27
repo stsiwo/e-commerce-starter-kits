@@ -38,9 +38,7 @@
           => should be done front end. 
             => search page, you just need to display 'isDiscountAvailable' from product entity
             => on detail page, you just check where the discount is originated from (e.g., from product or product variant) and display the date on the detail page when user switch the variant.
-            
-- scroll top when page changes.
-
+ 
 - company info at footer
 
 ### Staging Bugs
@@ -51,7 +49,6 @@
 (signup/login/adminlogin)
 
 (product)
-  - display stock info and if it is out of stock, disable 'buy' button.
 
 (category)
   
