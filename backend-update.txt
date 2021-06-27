@@ -41,27 +41,12 @@ endpoint change:
     
   - async testing 
     - make sure how to handle async event handler at test
-
-  - complete email implementation.
-    - need to release the limit of aws ses to use 'no-reply'@domain
    
   - email verification propt  if user still temp user.
-  
-  - file directory backup
-    - better to use S3 so that you don't need to think about backup stuff.
-    
-  - need to return current price based on discount availability and product & product variant price to client.
-  
-
-  
-  
+ 
 ## staging bugs
 
 (generals)
-
-  
-(companies)
-  - update does not work at admin.
   
 (email)
   - sign up does not send verification email. maybe misconfig of email. => this is due to that you misconfigure company email domain.
@@ -70,6 +55,7 @@ endpoint change:
   - create schedule task for make product published when releaseDate.
     => need to validate (e.g., at least one variant)
   - should add unique constaint to product name otherwise, it is ambiguous since we don't use any ID when order detail.
+  - when upload 5 max images, it causes 'cors' error.
 (order)
   - should i send an email to customer when payment failed?
   
