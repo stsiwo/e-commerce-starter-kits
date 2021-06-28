@@ -55,6 +55,7 @@ endpoint change:
     => need to validate (e.g., at least one variant)
   - should add unique constaint to product name otherwise, it is ambiguous since we don't use any ID when order detail.
   - when upload 5 max images, it causes 'cors' error.
+  - disocunt price must be less than unit pirce validation.
 (order)
   - should i send an email to customer when payment failed?
 (scheduled tasks)
