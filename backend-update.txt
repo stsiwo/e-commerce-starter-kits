@@ -52,14 +52,14 @@ endpoint change:
   - sign up does not send verification email. maybe misconfig of email. => this is due to that you misconfigure company email domain.
   - the domain of company's email must match with SES domain or any domain provider. should notice that to user like adding some note for the company email input.
 (product)
-  - create schedule task for make product published when releaseDate.
     => need to validate (e.g., at least one variant)
   - should add unique constaint to product name otherwise, it is ambiguous since we don't use any ID when order detail.
   - when upload 5 max images, it causes 'cors' error.
 (order)
   - should i send an email to customer when payment failed?
-  
-    
+(scheduled tasks)
+  - turn is_discount false if product passed the end date.    
+  - create schedule task for make product published when releaseDate.
       
     
 
