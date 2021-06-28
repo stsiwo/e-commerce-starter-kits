@@ -177,3 +177,13 @@
     ```
 
       - arrow function does not bind 'this' to surrounding object. so 'this == window' = true.
+
+## Smooth Scroll Implementation
+
+  - use 'html { scroll-behavior: smooth; }' css
+
+    => ie and Safari does not be suppored.
+
+  - use 'smoothscroll-polyfill' https://www.npmjs.com/package/smoothscroll-polyfill
+
+    => to support browsers which are not suported above.

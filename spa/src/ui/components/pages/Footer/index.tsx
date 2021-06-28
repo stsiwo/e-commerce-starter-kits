@@ -8,15 +8,19 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import AlternateEmailIcon from '@material-ui/icons/AlternateEmail';
+import ContactMailIcon from '@material-ui/icons/ContactMail';
 import FacebookIcon from '@material-ui/icons/Facebook';
 import HomeIcon from '@material-ui/icons/Home';
 import InstagramIcon from '@material-ui/icons/Instagram';
+import SearchIcon from '@material-ui/icons/Search';
 import SentimentSatisfiedOutlinedIcon from '@material-ui/icons/SentimentSatisfiedOutlined';
 import TwitterIcon from '@material-ui/icons/Twitter';
 import YouTubeIcon from '@material-ui/icons/YouTube';
-import SearchForm from 'components/common/SearchForm';
 import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link as RRLink } from "react-router-dom";
+import { fetchCompanyActionCreator } from 'reducers/slices/domain/company';
+import { rsSelector } from 'src/selectors/selector';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -67,6 +71,22 @@ const Footer: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
 
+  const dispatch = useDispatch()
+
+  /**
+   * company stuff
+   **/
+  const curCompany = useSelector(rsSelector.domain.getCompany)
+  React.useEffect(() => {
+
+    if (!curCompany) {
+      dispatch(
+        fetchCompanyActionCreator() 
+      )
+    }
+  }, [
+  ])
+
   return (
     <footer className={classes.footer}>
       <Grid
@@ -81,22 +101,22 @@ const Footer: React.FunctionComponent<{}> = (props) => {
         >
           <Typography variant="h6" component="h6" className={classes.title} >
             <SentimentSatisfiedOutlinedIcon />
-            {"Compnay Name"}
+            {curCompany ? curCompany.companyName : ""}
           </Typography>
           <Typography variant="body2" component="p" className={classes.parag} >
-            {"company description here. it might be a long sentense so should be do something different than the other component."}
+            {curCompany ? curCompany.companyDescription : ""}
           </Typography>
           <Box className={classes.linkBox}>
-            <Link href="https://google.com" target="_blank">
+            <Link href={curCompany ? curCompany.facebookLink : ""} target="_blank">
               <FacebookIcon fontSize="large" />
             </Link>
-            <Link href="https://google.com" target="_blank">
+            <Link href={curCompany ? curCompany.instagramLink : ""} target="_blank">
               <InstagramIcon fontSize="large" />
             </Link>
-            <Link href="https://google.com" target="_blank">
+            <Link href={curCompany ? curCompany.twitterLink : ""} target="_blank">
               <TwitterIcon fontSize="large" />
             </Link>
-            <Link href="https://google.com" target="_blank">
+            <Link href={curCompany ? curCompany.youtubeLink : ""} target="_blank">
               <YouTubeIcon fontSize="large" />
             </Link>
             <Link component={RRLink} to="/contact">
@@ -122,27 +142,15 @@ const Footer: React.FunctionComponent<{}> = (props) => {
             </ListItem>
             <ListItem button component={RRLink} to="/">
               <ListItemIcon>
-                <HomeIcon />
+                <SearchIcon />
               </ListItemIcon>
-              <ListItemText primary="Home" />
+              <ListItemText primary="Product Search" />
             </ListItem>
-            <ListItem button component={RRLink} to="/">
+            <ListItem button component={RRLink} to="/contact">
               <ListItemIcon>
-                <HomeIcon />
+                <ContactMailIcon />
               </ListItemIcon>
-              <ListItemText primary="Home" />
-            </ListItem>
-            <ListItem button component={RRLink} to="/">
-              <ListItemIcon>
-                <HomeIcon />
-              </ListItemIcon>
-              <ListItemText primary="Home" />
-            </ListItem>
-            <ListItem button component={RRLink} to="/">
-              <ListItemIcon>
-                <HomeIcon />
-              </ListItemIcon>
-              <ListItemText primary="Home" />
+              <ListItemText primary="Contact" />
             </ListItem>
           </List>
         </Grid>
@@ -177,7 +185,7 @@ const Footer: React.FunctionComponent<{}> = (props) => {
           </Link>
         </Box>
         <Typography variant="body2" component="p" className={classes.title} >
-          {"All Right Reserved by @Company Name 2021"}
+          {`All Right Reserved by @${curCompany ? curCompany.companyName : ""} ${new Date().getFullYear()}`}
         </Typography>
       </Box>
     </footer>

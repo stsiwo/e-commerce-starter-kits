@@ -20,6 +20,8 @@ import { cartModalSliceReducer, leftNavMenuSliceReducer, rightNavMenuSliceReduce
 import { checkoutOrderSliceReducer } from './slices/domain/checkout';
 import { getNotificationFetchStatusSliceReducer, patchNotificationFetchStatusSliceReducer } from './slices/app/fetchStatus/notification';
 import { notificationSliceReducer, notificationPaginationSliceReducer, notificationCurIndexSliceReducer } from './slices/domain/notification';
+import { getCompanyFetchStatusSliceReducer } from './slices/app/fetchStatus/company';
+import { companySliceReducer } from './slices/domain/company';
 
 // ** REFACTOR to new approach **/
 
@@ -129,6 +131,9 @@ export const rootReducer = combineReducers({
       notifications: combineReducers({
         get: getNotificationFetchStatusSliceReducer,
         patch: patchNotificationFetchStatusSliceReducer,
+      }),
+      company: combineReducers({
+        get: getCompanyFetchStatusSliceReducer,
       })
     }),
   }),
@@ -243,6 +248,9 @@ export const rootReducer = combineReducers({
       data: notificationSliceReducer,
       pagination: notificationPaginationSliceReducer,
       curIndex: notificationCurIndexSliceReducer,
+    }),
+    company: combineReducers({
+      data: companySliceReducer,
     }),
   }),
   sensitive: combineReducers({

@@ -169,6 +169,153 @@ public class AdminProductVariantEndpointTest {
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
     assertThat(responseBody.getVariantId()).isNotNull();
     assertThat(responseBody.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
+    // regular price = 10.00 (make sure match with sql & json)
+    assertThat(responseBody.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
+    assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(true);
+    assertThat(responseBody.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantDiscountPrice").asText());
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/productVariant/shouldAdminUserCreateNewProductVariantWithDiscountFalseSincePassedDate.sql" })
+  public void shouldAdminUserCreateNewProductVariantWithDiscountFalseSincePassedDate(
+      @Value("classpath:/integration/productVariant/shouldAdminUserCreateNewProductVariantWithDiscountFalseSincePassedDate.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId);
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+        .post(targetUrl) // create
+        .content(dummyFormJsonString)
+        .contentType(MediaType.APPLICATION_JSON)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductVariantDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductVariantDTO.class);
+
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.getVariantId()).isNotNull();
+    assertThat(responseBody.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
+    // regular price = 10.00 (make sure match with sql & json)
+    //assertThat(responseBody.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
+    assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(false);
+    assertThat(responseBody.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/productVariant/shouldAdminUserCreateNewProductVariantWithDiscountTrueSinceDuringDate.sql" })
+  public void shouldAdminUserCreateNewProductVariantWithDiscountTrueSinceDuringDate(
+      @Value("classpath:/integration/productVariant/shouldAdminUserCreateNewProductVariantWithDiscountTrueSinceDuringDate.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId);
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+        .post(targetUrl) // create
+        .content(dummyFormJsonString)
+        .contentType(MediaType.APPLICATION_JSON)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductVariantDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductVariantDTO.class);
+
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.getVariantId()).isNotNull();
+    assertThat(responseBody.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
+    // regular price = 10.00 (make sure match with sql & json)
+    //assertThat(responseBody.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
+    assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(true);
+    assertThat(responseBody.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantDiscountPrice").asText());
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/productVariant/shouldAdminUserCreateNewProductVariantWithDiscountTrueSinceDuringProductDiscountDate.sql" })
+  public void shouldAdminUserCreateNewProductVariantWithDiscountTrueSinceDuringProductDiscountDate(
+      @Value("classpath:/integration/productVariant/shouldAdminUserCreateNewProductVariantWithDiscountTrueSinceDuringProductDiscountDate.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId);
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+        .post(targetUrl) // create
+        .content(dummyFormJsonString)
+        .contentType(MediaType.APPLICATION_JSON)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductVariantDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductVariantDTO.class);
+
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.getVariantId()).isNotNull();
+    assertThat(responseBody.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
+    // regular price = 10.00 (make sure match with sql & json)
+    //assertThat(responseBody.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
+    assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(true);
+    assertThat(responseBody.getCurrentPrice().toString()).isEqualTo("3.0");
+  }
+  @Test
+  @Sql(scripts = { "classpath:/integration/productVariant/shouldAdminUserCreateNewProductVariantWithProductBaseUnitPrice.sql" })
+  public void shouldAdminUserCreateNewProductVariantWithProductBaseUnitPrice(
+      @Value("classpath:/integration/productVariant/shouldAdminUserCreateNewProductVariantWithProductBaseUnitPrice.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId);
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+        .post(targetUrl) // create
+        .content(dummyFormJsonString)
+        .contentType(MediaType.APPLICATION_JSON)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductVariantDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductVariantDTO.class);
+
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.getVariantId()).isNotNull();
+    assertThat(responseBody.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
+    // regular price = 10.00 (make sure match with sql & json)
+    assertThat(responseBody.getRegularPrice().toString()).isEqualTo("12.21");
+    assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(false);
+    assertThat(responseBody.getCurrentPrice().toString()).isEqualTo("12.21");
   }
 
   // 400 bad request (bad input) testing
@@ -228,6 +375,47 @@ public class AdminProductVariantEndpointTest {
     assertThat(responseBody.getVariantId()).isNotNull();
     assertThat(responseBody.getVariantId().toString()).isEqualTo(dummyFormJson.get("variantId").toString());
     assertThat(responseBody.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
+
+    assertThat(responseBody.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
+    assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(true);
+    assertThat(responseBody.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantDiscountPrice").asText());
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/productVariant/shouldAdminUserUpdateProductVariantWithProductBaseUnitPrice.sql" })
+  public void shouldAdminUserUpdateProductVariantWithProductBaseUnitPrice(
+      @Value("classpath:/integration/productVariant/shouldAdminUserUpdateProductVariantWithProductBaseUnitPrice.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId) + "/" + dummyFormJson.get("variantId").asText();
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+        .put(targetUrl) // update/replace
+        .content(dummyFormJsonString)
+        .contentType(MediaType.APPLICATION_JSON)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductVariantDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductVariantDTO.class);
+
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.getVariantId()).isNotNull();
+    assertThat(responseBody.getVariantId().toString()).isEqualTo(dummyFormJson.get("variantId").toString());
+    assertThat(responseBody.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
+
+    assertThat(responseBody.getRegularPrice().toString()).isEqualTo("12.21");
+    assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(false);
+    assertThat(responseBody.getCurrentPrice().toString()).isEqualTo("12.21");
   }
 
   @Test

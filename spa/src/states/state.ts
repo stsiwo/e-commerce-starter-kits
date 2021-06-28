@@ -174,6 +174,9 @@ export const initialState: StateType = {
       notifications: {
         get: FetchStatusEnum.INITIAL,
         patch: FetchStatusEnum.INITIAL,
+      },
+      company: {
+        get: FetchStatusEnum.INITIAL,
       }
     },
   },
@@ -295,6 +298,9 @@ export const initialState: StateType = {
       },
       curIndex: -1,
     },
+    company: {
+      data: null
+    }
   },
   // never persist
   sensitive: {

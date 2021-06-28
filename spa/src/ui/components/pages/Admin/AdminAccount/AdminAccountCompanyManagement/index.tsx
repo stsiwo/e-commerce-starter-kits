@@ -202,6 +202,50 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
 
   }
 
+  const handleFacebookLinkInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    // don't use 'currentTarget' for select (esp with material ui)
+    const nextFacebookLink = e.target.value
+    updateValidationAt("facebookLink", nextFacebookLink);
+    setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
+      ...prev,
+      facebookLink: nextFacebookLink
+    }));
+
+  }
+
+  const handleInstagramLinkInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    // don't use 'currentTarget' for select (esp with material ui)
+    const nextInstagramLink = e.target.value
+    updateValidationAt("instagramLink", nextInstagramLink);
+    setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
+      ...prev,
+      instagramLink: nextInstagramLink
+    }));
+
+  }
+
+  const handleTwitterLinkInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    // don't use 'currentTarget' for select (esp with material ui)
+    const nextTwitterLink = e.target.value
+    updateValidationAt("twitterLink", nextTwitterLink);
+    setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
+      ...prev,
+      twitterLink: nextTwitterLink
+    }));
+
+  }
+
+  const handleYoutubeLinkInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+    // don't use 'currentTarget' for select (esp with material ui)
+    const nextYoutubeLink = e.target.value
+    updateValidationAt("youtubeLink", nextYoutubeLink);
+    setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
+      ...prev,
+      youtubeLink: nextYoutubeLink
+    }));
+
+  }
+
   // event handler to submit
   const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
 
@@ -226,7 +270,11 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
           city: curAdminCompanyFormState.city,
           province: curAdminCompanyFormState.province,
           country: curAdminCompanyFormState.country,
-          postalCode: curAdminCompanyFormState.postalCode
+          postalCode: curAdminCompanyFormState.postalCode,
+          facebookLink: curAdminCompanyFormState.facebookLink,
+          instagramLink: curAdminCompanyFormState.instagramLink,
+          twitterLink: curAdminCompanyFormState.twitterLink,
+          youtubeLink: curAdminCompanyFormState.youtubeLink,
         })
       );
 
@@ -395,6 +443,49 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
                 onChange={handlePostalCodeInputChangeEvent}
                 helperText={curAdminCompanyFormValidationState.postalCode}
                 error={curAdminCompanyFormValidationState.postalCode !== ""}
+              />
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              sm={12}
+              className={classes.gridItem}
+            >
+              <TextField
+                id="facebook-link"
+                label="FacebookLink"
+                className={classes.formControl}
+                value={curAdminCompanyFormState.facebookLink}
+                onChange={handleFacebookLinkInputChangeEvent}
+                helperText={curAdminCompanyFormValidationState.facebookLink}
+                error={curAdminCompanyFormValidationState.facebookLink !== ""}
+              />
+              <TextField
+                id="instagram-link"
+                label="Instagram Link"
+                className={classes.formControl}
+                value={curAdminCompanyFormState.instagramLink}
+                onChange={handleInstagramLinkInputChangeEvent}
+                helperText={curAdminCompanyFormValidationState.instagramLink}
+                error={curAdminCompanyFormValidationState.instagramLink !== ""}
+              />
+              <TextField
+                id="twitter-link"
+                label="Twitter Link"
+                className={classes.formControl}
+                value={curAdminCompanyFormState.twitterLink}
+                onChange={handleTwitterLinkInputChangeEvent}
+                helperText={curAdminCompanyFormValidationState.twitterLink}
+                error={curAdminCompanyFormValidationState.twitterLink !== ""}
+              />
+              <TextField
+                id="youtube-link"
+                label="Youtube Link"
+                className={classes.formControl}
+                value={curAdminCompanyFormState.youtubeLink}
+                onChange={handleYoutubeLinkInputChangeEvent}
+                helperText={curAdminCompanyFormValidationState.youtubeLink}
+                error={curAdminCompanyFormValidationState.youtubeLink !== ""}
               />
             </Grid>
           </Grid>

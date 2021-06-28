@@ -1,15 +1,15 @@
 {
-  "variantUnitPrice": 10.00,
-  "variantDiscountPrice": 9.00,
+  "variantUnitPrice": null,
+  "variantDiscountPrice": null,
   "variantDiscountStartDate": "2012-04-23T18:25:43.511Z",
-  "variantDiscountEndDate": "2022-04-23T18:25:43.511Z",
+  "variantDiscountEndDate": "2012-04-23T18:25:43.511Z",
   "variantStock": 10,
-  "isDiscount": true,   
+  "isDiscount": false,   
   "variantColor": "GREEN",
   "productSize": {
-    "productSizeId": 3,
-    "productSizeName": "M",
-    "productSizeDescription": "medium"
+    "productSizeId": 1,
+    "productSizeName": "XS",
+    "productSizeDescription": "extra small"
   },
   "variantWeight": 1.00,
   "variantHeight": 1.00,

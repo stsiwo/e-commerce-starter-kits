@@ -8,11 +8,36 @@ import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { theme } from 'ui/css/theme';
+import { useLocation } from "react-router";
 
 /**
  * dev env only
  **/
 //const RoleSwitch = (NODE_ENV === "development") ? loadable(() => import("tests/debug/compoments/RoleSwitch")) : null
+
+/**
+ * scroll polyfill
+ **/
+import smoothscroll from 'smoothscroll-polyfill';
+smoothscroll.polyfill();
+
+/**
+ * scroll to top when new page visit
+ * https://reacttraining.com/react-router/web/guides/scroll-restoration
+ **/
+const ScrollToTop: React.FunctionComponent<{}> = (props) => {
+
+  const { pathname } = useLocation()
+
+  React.useEffect(() => {
+    window.scrollTo({
+      behavior: "smooth",
+      top: 0,
+    })
+  }, [pathname])
+
+  return null
+}
 
 const Index = (props: any) => {
 
@@ -24,6 +49,7 @@ const Index = (props: any) => {
           <SnackbarProvider maxSnack={3}>
             <CssBaseline>
               <Provider store={store}>
+                <ScrollToTop />
                 <Content />
                 {/**(RoleSwitch &&
                   <RoleSwitch />

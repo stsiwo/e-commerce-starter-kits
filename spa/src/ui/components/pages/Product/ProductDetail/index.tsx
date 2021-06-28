@@ -16,7 +16,7 @@ import Rating from '@material-ui/lab/Rating/Rating';
 import Carousel from 'components/common/Carousel';
 import ColorRadio from 'components/common/ColorRadio';
 import { filterUniqueVariantColors, filterUniqueVariantSizes, isExceedStock, filterSingleVariant } from 'domain/product';
-import { ProductType, ProductVariantSizeType, ProductVariantType } from 'domain/product/types';
+import { ProductType, ProductVariantSizeType, ProductVariantType, ProductStockEnum } from 'domain/product/types';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
@@ -230,6 +230,9 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
   }, [
       JSON.stringify(curSelectedSize)
     ])
+
+  // stock availability stuff
+  const curStockBag = useSelector(mSelector.makeProductVariantStockByProductIdAndVariantId(props.product.productId, curVariant.variantId))
 
   // auth
   const auth = useSelector(mSelector.makeAuthSelector());
@@ -524,12 +527,14 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
             <Typography variant="body1" component="p" className={classes.productColorTitle}>
               Price: <b>$ {`${cadCurrencyFormat(curVariant.currentPrice * curQty)}`}</b>
             </Typography>
-            <Typography variant="body2" component="p" color="textSecondary">
-              * this does not include tax and shipping fee
+          </Box>
+          <Box component="div" >
+            <Typography variant="body1" component="p" className={classes.productColorTitle}>
+              Stock: <b style={{ color: curStockBag.color }}>$ {`${curStockBag.label}`}</b>
             </Typography>
           </Box>
           <Box component="div" className={classes.controllerBox}>
-            <Button onClick={handleAddCart}>
+            <Button onClick={handleAddCart} disabled={curStockBag.enum === ProductStockEnum.OUT_OF_STOCK}>
               {"Add to Cart"}
             </Button>
             {(auth.userType === UserTypeEnum.MEMBER &&
@@ -537,7 +542,7 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
                 {"save to Wishlist"}
               </Button>
             )}
-            <Button onClick={handleBuyNow}>
+            <Button onClick={handleBuyNow} disabled={curStockBag.enum === ProductStockEnum.OUT_OF_STOCK}>
               {"buy now"}
             </Button>
           </Box>

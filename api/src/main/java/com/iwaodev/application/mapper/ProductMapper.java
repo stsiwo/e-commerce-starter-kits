@@ -18,4 +18,5 @@ public interface ProductMapper {
 
   Product toProductEntityFromProductCriteria(ProductCriteria product);
 
+
 }

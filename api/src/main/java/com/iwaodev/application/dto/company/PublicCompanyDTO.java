@@ -19,6 +19,14 @@ public class PublicCompanyDTO {
   private String companyEmail;
 
   private UUID userId;
+
+  private String facebookLink;
+
+  private String instagramLink;
+
+  private String twitterLink;
+
+  private String youtubeLink;
 }
 
 

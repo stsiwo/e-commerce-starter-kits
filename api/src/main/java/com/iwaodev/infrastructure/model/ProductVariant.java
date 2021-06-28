@@ -34,6 +34,7 @@ import com.iwaodev.ui.validator.optional.digit.OptionalDigit;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -138,7 +139,21 @@ public class ProductVariant {
 
   @NotNull(message = "{productVariant.productSize.notnull}")
   @ManyToOne
-  @JoinColumn(name = "product_size_id", foreignKey = @ForeignKey(name = "FK_product_variants__product_sizes"), insertable = false, updatable = false) // NOT insert & update when parent try to update this child entity
+  @JoinColumn(
+    name = "product_size_id", 
+    foreignKey = @ForeignKey(name = "FK_product_variants__product_sizes"), 
+      // add product size id with its value when you try to create variant object and
+      // persist it.
+      // so 'insertable' means that when you create a product entity and persist it,
+      // do you want to include this column and its value.
+      // if you don't have its correspnding category id in category table, it gives FK
+      // constraint error.
+    insertable = true,  //allow to insert this column id (FK) when persist this parent entity.
+      // this means if the product size object of this variant entity has different value
+      // than previous one, do you want to update the product size id with the new value.
+      // this does not talking about updating product size entity. only this column id.
+    updatable = true // allow to update this column id (FK) when update this parent entity
+    ) 
   private ProductSize productSize;
 
   // ignore this setter since need to customize for bidirectional relationship
@@ -157,6 +172,24 @@ public class ProductVariant {
   @OneToMany(mappedBy = "productVariant", cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, orphanRemoval = false)
   private List<OrderDetail> orderDetails  = new ArrayList<>();
 
+  /**
+   * whether this variant is disount or not.
+   *
+   **/
+  @Formula("(select exists (select 1 from products p inner join product_variants pv on pv.product_id = p.product_id where pv.variant_id = variant_id and (pv.is_discount = 1 or p.is_discount = 1) and ((p.product_base_discount_start_date < CURRENT_TIMESTAMP and CURRENT_TIMESTAMP < p.product_base_discount_end_date) or (pv.variant_discount_start_date < CURRENT_TIMESTAMP and CURRENT_TIMESTAMP < pv.variant_discount_end_date))))")
+  private Boolean isDiscountAvailable;
+
+  /**
+   * get either product variant unit price or product base unit price based on the variant unit price is defined or not.
+   *
+   * used to show the regular price when it is discount and show the difference of the discount price.
+   *
+   * COALESCE: return the first non-null column
+   *
+   **/
+  @Formula("(select COALESCE(pv.variant_unit_price, p.product_base_unit_price) from products p inner join product_variants pv on pv.product_id = p.product_id where pv.variant_id = variant_id)")
+  private BigDecimal regularPrice;
+
   @Getter(value = AccessLevel.NONE)
   @Setter(value = AccessLevel.NONE)
   @Transient
@@ -168,17 +201,17 @@ public class ProductVariant {
    * ref: https://stackoverflow.com/questions/2802676/hibernate-postload-never-gets-invoked
    **/
   @PostLoad
-  public void setCurPrice() {
+  public void setCurrentPrice() {
     this.currentPrice = this.getCurrentPrice();
   }
 
   public BigDecimal getCurrentPrice() {
 
-    if (this.getIsDiscount()) {
+    if (this.getIsDiscount() && this.variantDiscountStartDate.isBefore(LocalDateTime.now()) && this.variantDiscountEndDate.isAfter(LocalDateTime.now())) {
       return this.getVariantDiscountPrice();
     } 
 
-    if (this.product.getIsDiscount()) {
+    if (this.product.getIsDiscount() && this.product.getProductBaseDiscountStartDate().isBefore(LocalDateTime.now()) && this.product.getProductBaseDiscountEndDate().isAfter(LocalDateTime.now())) {
       return this.product.getProductBaseDiscountPrice();
     }
 

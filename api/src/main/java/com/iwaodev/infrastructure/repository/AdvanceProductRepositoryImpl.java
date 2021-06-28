@@ -1,6 +1,5 @@
 package com.iwaodev.infrastructure.repository;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,16 +16,15 @@ import javax.persistence.criteria.Root;
 
 import com.iwaodev.application.irepository.AdvanceProductRepository;
 import com.iwaodev.infrastructure.model.Product;
+import com.iwaodev.infrastructure.model.ProductSize;
 import com.iwaodev.infrastructure.model.ProductVariant;
 
-import org.hibernate.annotations.QueryHints;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.query.QueryUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 /**
  * any custom repository implementation must be registered with its target
@@ -69,12 +67,8 @@ public class AdvanceProductRepositoryImpl implements AdvanceProductRepository {
   public Boolean isOthersHaveColorAndSize(UUID productId, Long variantId, String color, String size) {
     return this.entityManager.createQuery(
         "select case when (count(p) > 0)  then true else false end from products p INNER JOIN p.variants pv INNER JOIN pv.productSize ps WHERE p.productId = :productId AND pv.variantColor = :color AND ps.productSizeName = :size AND pv.variantId != :variantId",
-        Boolean.class)
-      .setParameter("productId", productId)
-      .setParameter("variantId", variantId)
-      .setParameter("color", color)
-      .setParameter("size", size)
-      .getSingleResult();
+        Boolean.class).setParameter("productId", productId).setParameter("variantId", variantId)
+        .setParameter("color", color).setParameter("size", size).getSingleResult();
   }
 
   @Override
@@ -165,6 +159,20 @@ public class AdvanceProductRepositoryImpl implements AdvanceProductRepository {
     // products = query.getResultList();
 
     return new PageImpl<Product>(products, pageable, total.size());
+  }
+
+  @Override
+  public void refresh(Product domain) {
+    this.entityManager.refresh(domain);
+  }
+
+  @Override
+  public Optional<ProductSize> findProductSizeById(Long id) {
+    return this.entityManager.createQuery(
+        "SELECT ps FROM productSizes ps WHERE ps.productSizeId = :id",
+        ProductSize.class)
+      .setParameter("id", id)
+      .getResultList().stream().findFirst();
   }
 
 }

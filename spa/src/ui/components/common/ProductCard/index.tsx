@@ -1,15 +1,14 @@
+import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import * as React from 'react';
-import SampleProduct1_1Image from 'static/sample-product-1-1.jpg';
 import Typography from '@material-ui/core/Typography';
-import CardActions from '@material-ui/core/CardActions';
-import Button from '@material-ui/core/Button';
 import { ProductType } from 'domain/product/types';
-import { cadCurrencyFormat } from 'src/utils';
+import * as React from 'react';
 import { Link as RRLink } from "react-router-dom";
+import { cadCurrencyFormat } from 'src/utils';
 
 interface ProductCardPropsType {
   product: ProductType
@@ -72,8 +71,8 @@ const ProductCard: React.FunctionComponent<ProductCardPropsType> = ({ product })
         <Typography gutterBottom variant="h6" component="h2">
           {product.productName}
         </Typography>
-        <Typography variant="h6" align="right" color="primary" component="p">
-          <b>${cadCurrencyFormat(product.productBaseUnitPrice)}</b>
+        <Typography variant="body1" align="left" color="primary" component="p">
+          <b>`${cadCurrencyFormat(product.cheapestPrice)} ~`</b>
         </Typography>
       </CardContent>
       <CardActions className={classes.actions}>

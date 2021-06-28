@@ -12,6 +12,7 @@ import com.iwaodev.application.iservice.ProductVariantService;
 import com.iwaodev.application.mapper.ProductVariantMapper;
 import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.Product;
+import com.iwaodev.infrastructure.model.ProductSize;
 import com.iwaodev.infrastructure.model.ProductVariant;
 import com.iwaodev.ui.criteria.product.ProductVariantCriteria;
 
@@ -58,28 +59,71 @@ public class ProductVariantServiceImpl implements ProductVariantService {
   @Override
   public ProductVariantDTO create(UUID productId, ProductVariantCriteria criteria) throws Exception {
 
-    Optional<Product> targetEntityOption = this.repository.findById(productId);
-
-    if (targetEntityOption.isEmpty()) {
-      logger.info("the given product does not exist");
-      throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
-    }
-
-    Product targetEntity = targetEntityOption.get();
-
     // duplication
     if (this.repository.findVariantByColorAndSize(productId, criteria.getVariantColor(), criteria.getProductSize().getProductSizeName()).isPresent()) {
       throw new AppException(HttpStatus.BAD_REQUEST, "the variant already exist.");
     }
 
+    Product targetEntity = this.repository.findById(productId).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given product does not exist."));
+
+    ProductSize productSize = this.repository.findProductSizeById(criteria.getProductSize().getProductSizeId()).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given product size does not exist."));
 
     // map criteria to entity
     ProductVariant newEntity = ProductVariantMapper.INSTANCE.toProductVariantEntityFromProductVariantCriteria(criteria);
+
+    newEntity.setProductSize(productSize);
 
     targetEntity.addVariant(newEntity);
 
     // save it
     Product savedEntity = this.repository.save(targetEntity);
+    /**
+     * if this entity use '@Formula' and '@Transient' you need to refresh.
+     **/
+    this.repository.refresh(savedEntity);
+
+    // find updated entity
+    Optional<ProductVariant> targetVariantOption = savedEntity.findVariantByColorAndSize(criteria.getVariantColor(),
+        criteria.getProductSize().getProductSizeId());
+
+    // map entity to dto and return it.
+    ProductVariantDTO variantDto = ProductVariantMapper.INSTANCE.toProductVariantDTO(targetVariantOption.get());
+
+    return variantDto;
+  }
+
+  @Override
+  public ProductVariantDTO replace(UUID productId, Long variantId, ProductVariantCriteria criteria) throws Exception {
+
+    // duplication
+    if (this.repository.isOthersHaveColorAndSize(productId, variantId, criteria.getVariantColor(), criteria.getProductSize().getProductSizeName())) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "the variant already exist.");
+    }
+
+    Product targetEntity = this.repository.findById(productId).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given product does not exist."));
+
+    ProductSize productSize = this.repository.findProductSizeById(criteria.getProductSize().getProductSizeId()).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given product size does not exist."));
+
+    // map criteria to entity
+    ProductVariant updateEntity = ProductVariantMapper.INSTANCE
+        .toProductVariantEntityFromProductVariantCriteria(criteria);
+
+    updateEntity.setProductSize(productSize);
+
+    targetEntity.updateVariant(variantId, updateEntity);
+
+    // save it
+    Product savedEntity = this.repository.save(targetEntity);
+
+    /**
+     * you need to flush otherwise, update statement is never executed (esp testing).
+     * I don't know why.
+     **/
+    this.repository.flush();
+    /**
+     * if this entity use '@Formula' and '@Transient' you need to refresh.
+     **/
+    this.repository.refresh(savedEntity);
 
     // find updated entity
     Optional<ProductVariant> targetVariantOption = savedEntity.findVariantByColorAndSize(criteria.getVariantColor(),
@@ -87,35 +131,6 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
     // map entity to dto and return it.
     return ProductVariantMapper.INSTANCE.toProductVariantDTO(targetVariantOption.get());
-  }
-
-  @Override
-  public ProductVariantDTO replace(UUID productId, Long variantId, ProductVariantCriteria criteria) throws Exception {
-    Optional<Product> targetEntityOption = this.repository.findById(productId);
-
-    if (targetEntityOption.isEmpty()) {
-      logger.info("the given product does not exist");
-      throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
-    }
-
-    Product targetEntity = targetEntityOption.get();
-
-    // duplication
-    if (this.repository.isOthersHaveColorAndSize(productId, variantId, criteria.getVariantColor(), criteria.getProductSize().getProductSizeName())) {
-      throw new AppException(HttpStatus.BAD_REQUEST, "the variant already exist.");
-    }
-
-    // map criteria to entity
-    ProductVariant updateEntity = ProductVariantMapper.INSTANCE
-        .toProductVariantEntityFromProductVariantCriteria(criteria);
-
-    targetEntity.updateVariant(variantId, updateEntity);
-
-    // save it
-    this.repository.save(targetEntity);
-
-    // map entity to dto and return it.
-    return ProductVariantMapper.INSTANCE.toProductVariantDTO(updateEntity);
   }
 
   @Override

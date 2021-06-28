@@ -645,6 +645,10 @@
 
       - ref: https://stackoverflow.com/questions/2986318/how-to-map-calculated-properties-with-jpa-and-hibernate
 
+    - @Formula/@Transient fields are not updated after saved (e.g., this.repository.save(domain))
+
+      => you need to call 'this.repository.refresh(domain)' to reassign the fields.
+
   ## JOIN vs JOIN FETCH
 
     - 'JOIN FETCH': fetch teh associated entity into memory also. so you don't need to run another query for the entity in the future.

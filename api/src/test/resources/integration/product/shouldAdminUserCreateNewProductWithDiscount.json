@@ -1,0 +1,47 @@
+{
+  "productName": "new_product_name",
+  "productDescription": "new_product_desc",
+  "productPath": "new_product_path",
+  "productBaseUnitPrice": 13.32,
+  "productBaseDiscountPrice": 9.00,
+  "productBaseDiscountStartDate": "2012-04-23T18:25:43.511Z",
+  "productBaseDiscountEndDate": "2022-04-23T18:25:43.511Z",
+  "isDiscount": true,
+  "isPublic": false,
+  "category":  {
+    "categoryId": 1,
+    "categoryName": "category_1_old",
+    "categoryDescription": "category_desc_1",
+    "categoryPath": "category_path_1" 
+  },
+  "releaseDate": "2012-04-23T18:25:43.511Z",
+  "note": "new_note",
+  "productImages": [
+    {
+      "productImagePath": "blob://sample-0.jpg",
+      "productImageName": "product-image-0",
+      "isChange": true
+    },
+    {
+      "productImagePath": "blob://sample-1.png",
+      "productImageName": "product-image-1",
+      "isChange": true
+    },
+    {
+      "productImagePath": "",
+      "productImageName": "product-image-2",
+      "isChange": true
+    },
+    {
+      "productImagePath": "blob://sample-3.jpeg",
+      "productImageName": "product-image-3",
+      "isChange": true
+    },
+    {
+      "productImagePath": "",
+      "productImageName": "product-image-4",
+      "isChange": true
+    }
+  ]
+}
+

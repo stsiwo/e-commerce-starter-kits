@@ -56,5 +56,12 @@ public class UserCompanyCriteria {
   @Pattern( regexp = "^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9]$", message = "invalid postal code format.")
   private String postalCode;
 
+  private String facebookLink;
+
+  private String instagramLink;
+
+  private String twitterLink;
+
+  private String youtubeLink;
 }
 

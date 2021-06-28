@@ -16,33 +16,37 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest
-@ActiveProfiles("unittest")
-public class FileServiceImplTest {
+/**
+ * move file storage to s3 so no longer need this.
+ **/
 
-  @Autowired
-  private FileService fileService;
-
-  @Value("${file.order.path}")
-  private String fileOrderPath;
-
-  private static final Logger logger = LoggerFactory.getLogger(FileServiceImplTest.class);
-
-  @Test
-  public void shouldSaveFileSuccessfullyWhenSave() throws Exception {
-
-    // arrange 
-    String dummyFileName = "sample-artifact.txt";
-    String dummyContent = "dummyContent";
-    InputStream dummyContentStream = new ByteArrayInputStream(dummyContent.getBytes());
-    
-    // act 
-    this.fileService.save(this.fileOrderPath + "/order_id", dummyFileName, dummyContentStream);
-    
-    // assert
-    assertThat(1).isEqualTo(1);
-
-
-
-  }
-}
+//@SpringBootTest
+//@ActiveProfiles("unittest")
+//public class FileServiceImplTest {
+//
+//  @Autowired
+//  private FileService fileService;
+//
+//  @Value("${file.order.path}")
+//  private String fileOrderPath;
+//
+//  private static final Logger logger = LoggerFactory.getLogger(FileServiceImplTest.class);
+//
+//  @Test
+//  public void shouldSaveFileSuccessfullyWhenSave() throws Exception {
+//
+//    // arrange 
+//    String dummyFileName = "sample-artifact.txt";
+//    String dummyContent = "dummyContent";
+//    InputStream dummyContentStream = new ByteArrayInputStream(dummyContent.getBytes());
+//    
+//    // act 
+//    this.fileService.save(this.fileOrderPath + "/order_id", dummyFileName, dummyContentStream);
+//    
+//    // assert
+//    assertThat(1).isEqualTo(1);
+//
+//
+//
+//  }
+//}

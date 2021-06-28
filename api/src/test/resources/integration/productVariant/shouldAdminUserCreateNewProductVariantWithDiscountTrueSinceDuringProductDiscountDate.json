@@ -1,10 +1,10 @@
 {
   "variantUnitPrice": 10.00,
-  "variantDiscountPrice": 9.00,
+  "variantDiscountPrice": null,
   "variantDiscountStartDate": "2012-04-23T18:25:43.511Z",
-  "variantDiscountEndDate": "2022-04-23T18:25:43.511Z",
+  "variantDiscountEndDate": "2012-04-23T18:25:43.511Z",
   "variantStock": 10,
-  "isDiscount": true,   
+  "isDiscount": false,   
   "variantColor": "GREEN",
   "productSize": {
     "productSizeId": 3,

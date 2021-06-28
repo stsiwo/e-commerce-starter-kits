@@ -30,4 +30,6 @@ public class ProductVariantDTO {
   private Double variantWidth;
   private Double variantLength;
   private BigDecimal currentPrice;
+  private Boolean isDiscountAvailable;
+  private BigDecimal regularPrice;
 }

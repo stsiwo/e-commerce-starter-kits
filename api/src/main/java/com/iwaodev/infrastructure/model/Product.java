@@ -16,6 +16,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PostLoad;
+import javax.persistence.Transient;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -39,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -95,14 +98,27 @@ public class Product {
   @Formula("(select avg(r.review_point) from products p inner join reviews r on r.product_id = p.product_id where p.product_id = product_id)")
   private Double averageReviewPoint = 0.0D;
 
-  @Formula("(select least(p.product_base_unit_price, ifnull(p.product_base_discount_price, 2147483647), min(ifnull(pv.variant_unit_price, 2147483647)), min(ifnull(pv.variant_discount_price, 2147483647))) from products p inner join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id group by p.product_id)")
+  // assuming discount_price is null if isDiscount = false
+  // also, you need to isDiscount false when passed the end date and make discount price = null (use can use scheduled task)
+  // - use 'left' isntead of 'inner' to cover the case if a product does not have any variants.
+  /**
+   * the logic is too complicated, so two options:
+   *  - use stored procedures. (ref: https://stackoverflow.com/questions/35631975/how-to-call-a-stored-procedure-which-returns-a-composite-type-from-formula)
+   *  - use @Transient and put the logic in setter with @PostLoad.
+   **/
+  //@Formula("(select least(p.product_base_unit_price, ifnull(p.product_base_discount_price, 2147483647), min(ifnull(pv.variant_unit_price, 2147483647)), min(ifnull(pv.variant_discount_price, 2147483647))) from products p left join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id group by p.product_id)")
+  @Getter(value = AccessLevel.NONE)
+  @Setter(value = AccessLevel.NONE)
+  @Transient
   private BigDecimal cheapestPrice;
 
-  @Formula("(select greatest(p.product_base_unit_price, ifnull(p.product_base_discount_price, 0), max(ifnull(pv.variant_unit_price, 0)), max(ifnull(pv.variant_discount_price, 0))) from products p inner join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id group by p.product_id)")
+  // - use 'left' isntead of 'inner' to cover the case if a product does not have any variants.
+  @Formula("(select greatest(p.product_base_unit_price, ifnull(p.product_base_discount_price, 0), max(ifnull(pv.variant_unit_price, 0)), max(ifnull(pv.variant_discount_price, 0))) from products p left join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id group by p.product_id)")
   private BigDecimal highestPrice;
 
   // overall result if discount exist through its variants
-  @Formula("(select exists (select 1 from products p inner join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id and (pv.is_discount = 1 or p.is_discount = 1)))")
+  // - use 'left' isntead of 'inner' to cover the case if a product does not have any variants.
+  @Formula("(select exists (select 1 from products p left join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id and (pv.is_discount = 1 or p.is_discount = 1) and ((p.product_base_discount_start_date < CURRENT_TIMESTAMP and CURRENT_TIMESTAMP < p.product_base_discount_end_date) or (pv.variant_discount_start_date < CURRENT_TIMESTAMP and CURRENT_TIMESTAMP < pv.variant_discount_end_date))))")
   private Boolean isDiscountAvailable;
 
   @NotNull(message = "{product.category.notnull}")
@@ -114,12 +130,12 @@ public class Product {
       // do you want to include this column and its value.
       // if you don't have its correspnding category id in category table, it gives FK
       // constraint error.
-      insertable = true,
+      insertable = true, //allow to insert this column id (FK) when persist this entity.
 
-      // this means if the category object of this product entity has different value
-      // than existing one, do you want to update the cateogry with the new value (I
-      // haven't tested yet)
-      updatable = false)
+      // this means if the product size object of this variant entity has different value
+      // than previous one, do you want to update the product size id with the new value.
+      // this does not talking about updating product size entity. only this column id.
+      updatable = true) // allow to update this column id (FK) when update this entity
   private Category category;
 
   @NotNull(message = "{product.releaseDate.notnull}")
@@ -169,6 +185,57 @@ public class Product {
   // constructor
   public Product() {
     this.productId = UUID.randomUUID();
+  }
+
+  /**
+   * if PostLoad on entity doesnt work for you, you need to define entity listener.
+   *
+   * ref: https://stackoverflow.com/questions/2802676/hibernate-postload-never-gets-invoked
+   *
+   * #2021/06/27 - it works.
+   **/
+  @PostLoad
+  public void setCheapestPrice() {
+    this.cheapestPrice = this.getCheapestPrice();
+  }
+
+  public BigDecimal getCheapestPrice() {
+
+    logger.info("try to get cheapest price");
+    BigDecimal cheapestPrice = this.productBaseUnitPrice;
+
+    logger.info("cur cheapest: " + cheapestPrice);
+    // if product discount, compare base unit price and discount price and get cheaper price
+    if (this.isDiscount && this.getProductBaseDiscountStartDate().isBefore(LocalDateTime.now()) && this.getProductBaseDiscountEndDate().isAfter(LocalDateTime.now())) {
+      cheapestPrice = cheapestPrice.min(this.productBaseDiscountPrice); 
+      logger.info("cur cheapest at product discount: " + cheapestPrice);
+    }
+
+    // pick cheapest price among all variants
+    for (ProductVariant variant: this.variants) {
+
+      // if the variant has its own unit price
+      if (variant.getVariantUnitPrice() != null) {
+        cheapestPrice = cheapestPrice.min(variant.getVariantUnitPrice());
+      }
+
+      // if the variant is discount
+      if (variant.getIsDiscount() &&  variant.getVariantDiscountStartDate().isBefore(LocalDateTime.now()) && variant.getVariantDiscountEndDate().isAfter(LocalDateTime.now())) {
+        cheapestPrice = cheapestPrice.min(variant.getVariantDiscountPrice());
+      }
+    }
+
+    return cheapestPrice;
+  }
+
+  public boolean isAnyVariantDiscount() {
+    boolean discount = false;
+    for (ProductVariant variant : this.variants) {
+      if (variant.getIsDiscount() && variant.getVariantDiscountStartDate().isBefore(LocalDateTime.now()) && variant.getVariantDiscountEndDate().isAfter(LocalDateTime.now())) {
+        discount = true; 
+      }
+    }
+    return discount;
   }
 
   public void setReviews(List<Review> reviews) {
@@ -350,7 +417,6 @@ public class Product {
     this.variants.remove(variant);
     variant.setProduct(null);
   }
-
 
   public void removeVariantById(Long variantId) {
     ProductVariant variant = this.findVariantById(variantId);

@@ -1,6 +1,22 @@
-# MySQL Docker 
+# Database 
 
-## Commands
+## Env
+
+  - init: no test data is populated (port 3306)
+
+    - use for production and integtest of api
+
+    - command) ./run-dev-db-container.sh -s init -p 3306
+
+  - integ: test data is populated (port 3307)
+
+    - use for integ development of api 
+
+    - command) ./run-dev-db-container.sh -s integ -p 3307
+
+## MySQL Docker 
+
+### Commands
   - build: docker build --tag=ec-db .
     * under this directory
   - run: docker run --name ec-db-container -e MYSQL_DATABASE=ec-schema -e MYSQL_USER=sts -e MYSQL_PASSWORD=sts1551@IWO -e MYSQL_ROOT_PASSWORD=sts1551@IWO -p 3306:3306 -d ec-db

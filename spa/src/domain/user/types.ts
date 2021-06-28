@@ -54,6 +54,10 @@ export declare type AdminCompanyType = {
   province: string
   country: string
   postalCode: string
+  facebookLink: string
+  instagramLink: string
+  twitterLink: string
+  youtubeLink: string
 }
 
 export declare type UserTypeType = {
@@ -61,7 +65,7 @@ export declare type UserTypeType = {
   userType: UserTypeEnum,
 }
 
-export const guestUserType : UserTypeType = {
+export const guestUserType: UserTypeType = {
   userType: UserTypeEnum.GUEST
 }
 
@@ -123,6 +127,10 @@ export declare type UserCompanyCriteria = {
   province: string
   country: string
   postalCode: string
+  facebookLink: string
+  instagramLink: string
+  twitterLink: string
+  youtubeLink: string
 }
 
 // empty
@@ -140,7 +148,7 @@ export const defaultUser: UserType = {
   reviews: [],
   orders: [],
   cartItems: [],
-  userType: guestUserType, 
+  userType: guestUserType,
 }
 
 // form & input 
@@ -329,6 +337,10 @@ export declare type AdminCompanyFormDataType = {
   province: string
   country: string
   postalCode: string
+  facebookLink: string
+  instagramLink: string
+  twitterLink: string
+  youtubeLink: string
 }
 
 export const generateDefaultAdminCompanyFormData: () => AdminCompanyFormDataType = () => {
@@ -345,6 +357,10 @@ export const generateDefaultAdminCompanyFormData: () => AdminCompanyFormDataType
     province: "",
     country: "CA",
     postalCode: "",
+    facebookLink: "",
+    instagramLink: "",
+    twitterLink: "",
+    youtubeLink: "",
   }
 }
 
@@ -360,6 +376,10 @@ export declare type AdminCompanyFormValidationDataType = {
   province: string,
   country: string,
   postalCode: string,
+  facebookLink: string
+  instagramLink: string
+  twitterLink: string
+  youtubeLink: string
 }
 
 export const defaultAdminCompanyFormValidationData: AdminCompanyFormValidationDataType = {
@@ -374,6 +394,10 @@ export const defaultAdminCompanyFormValidationData: AdminCompanyFormValidationDa
   province: "",
   country: "",
   postalCode: "",
+  facebookLink: "",
+  instagramLink: "",
+  twitterLink: "",
+  youtubeLink: "",
 }
 
 // sort

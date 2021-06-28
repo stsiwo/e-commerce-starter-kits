@@ -74,7 +74,9 @@ public class ProductSpecifications {
          **/
         return builder.conjunction();
       }
-      return builder.greaterThanOrEqualTo(root.get(Product_.cheapestPrice), maxPrice);
+      // TODO: not working.
+      // esp when use with @Formula and @Transient
+      return builder.greaterThanOrEqualTo(root.get(Product_.highestPrice), maxPrice);
     };
   }
 

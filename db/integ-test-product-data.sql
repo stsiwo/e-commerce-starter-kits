@@ -11,8 +11,8 @@ INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`
 VALUES ('2', '2', 'black', '13.00', '20', '9e3e67ca-d058-41f0-aad5-4f09c956a81f', '1.00', '1.00', '1.00', '1.00');
 
 -- product variant 1-3 (discount & unit price)
-INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_discount_price`,  `variant_discount_start_date`, `variant_discount_end_date`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('3', '3', 'aqua', '13.00', '7.00', '2020-01-01 00:00:01', '2020-01-07 00:00:00', '100', '9e3e67ca-d058-41f0-aad5-4f09c956a81f', '1.00', '1.00', '1.00', '1.00');
+INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_discount_price`,  `variant_discount_start_date`, `variant_discount_end_date`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`, `is_discount`)
+VALUES ('3', '3', 'aqua', '13.00', '7.00', '2021-01-01 00:00:01', '2023-01-07 00:00:00', '100', '9e3e67ca-d058-41f0-aad5-4f09c956a81f', '1.00', '1.00', '1.00', '1.00', '1');
 
 -- product variant 1-4 (no price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
@@ -478,16 +478,16 @@ INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`
 VALUES ('101', '3', 'aqua', '60', 'ee471735-dccc-4a06-81c3-109506ab3de4', '1.00', '1.00', '1.00', '1.00');
 
 
--- product (category = 5)
+-- product (category = 5) discount available
 INSERT INTO `products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `is_discount`, `product_base_discount_price`, `product_base_discount_start_date`, `product_base_discount_end_date`, `category_id`)
-VALUES ('af416205-26f5-4512-8197-798241576303', 'Test Product Name 3', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-5-3', '20.21', '0', '10.00', '2020-01-07 00:00:00', '2020-02-07 00:00:00', '5'); 
+VALUES ('af416205-26f5-4512-8197-798241576303', 'Test Product Name 3', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-5-3', '20.21', '1', '10.00', '2020-01-07 00:00:00', '2023-02-07 00:00:00', '5'); 
 
 
 -- product (category = 5) 
 INSERT INTO `products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `is_discount`, `product_base_discount_price`, `product_base_discount_start_date`, `product_base_discount_end_date`, `category_id`)
-VALUES ('c80dad9d-cd09-4445-82c2-8f1fcca914ac', 'Test Product Name 4', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-5-4', '20.21', '0', '10.00', '2020-01-07 00:00:00', '2020-02-07 00:00:00', '5'); 
+VALUES ('c80dad9d-cd09-4445-82c2-8f1fcca914ac', 'Test Product Name 4', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-5-4', '20.21', '1', '10.00', '2020-01-07 00:00:00', '2020-02-07 00:00:00', '5'); 
 
 
 -- product (category = 5) 
 INSERT INTO `products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `is_discount`, `product_base_discount_price`, `product_base_discount_start_date`, `product_base_discount_end_date`, `category_id`)
-VALUES ('ae9da1ca-eb40-4bb1-8738-fca35aad4f65', 'Test Product Name 5', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-5-5', '20.21', '0', '10.00', '2020-01-07 00:00:00', '2020-02-07 00:00:00', '5'); 
+VALUES ('ae9da1ca-eb40-4bb1-8738-fca35aad4f65', 'Test Product Name 5', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-5-5', '20.21', '1', '10.00', '2020-01-07 00:00:00', '2020-02-07 00:00:00', '5'); 

@@ -72,7 +72,8 @@ public class WishlistItemSpecifications {
       // cheapest price --> max price ---> highest price => that product should be
       // included.
       return builder.greaterThanOrEqualTo(
-          root.join(WishlistItem_.variant).join(ProductVariant_.product).get(Product_.cheapestPrice), maxPrice);
+          // TODO: fix this highestPrice, should be cheapestPrice
+          root.join(WishlistItem_.variant).join(ProductVariant_.product).get(Product_.highestPrice), maxPrice);
     };
   }
 

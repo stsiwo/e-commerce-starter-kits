@@ -1,5 +1,39 @@
 import { NormalizedDomainType } from "domain/types";
 
+// variant stock enum
+export enum ProductStockEnum {
+  OUT_OF_STOCK = "OUT_OF_STOCK",
+  LIMITED_STOCK = "LIMITED_STOCK",
+  ENOUGH_STOCK = "ENOUGH_STOCK",
+}
+
+export declare type ProductStockBagType = {
+  label: string
+  color: string 
+  enum: ProductStockEnum
+}
+export declare type ProductStockBagsType = {
+  [key in ProductStockEnum]: ProductStockBagType
+}
+
+export const productStockBags: ProductStockBagsType = {
+  [ProductStockEnum.OUT_OF_STOCK]: {
+    label: "out of stock",
+    color: "#f44336", // default theme error.main
+    enum: ProductStockEnum.OUT_OF_STOCK,
+  },
+  [ProductStockEnum.LIMITED_STOCK]: {
+    label: "limited stock",
+    color: "#ff9800", // default theme warning.main
+    enum: ProductStockEnum.LIMITED_STOCK,
+  },
+  [ProductStockEnum.ENOUGH_STOCK]: {
+    label: "enough stock",
+    color: "#4caf50", // default theme success.main
+    enum: ProductStockEnum.ENOUGH_STOCK,
+  },
+}
+
 // variant size
 // this must match with the backend 'product_size' table
 export const productVariantSizeObj = {

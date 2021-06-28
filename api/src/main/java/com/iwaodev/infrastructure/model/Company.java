@@ -85,6 +85,18 @@ public class Company {
   @Column(name="postal_code")
   private String postalCode;
 
+  @Column(name="facebook_link")
+  private String facebookLink;
+
+  @Column(name="instagram_link")
+  private String instagramLink;
+
+  @Column(name="twitter_link")
+  private String twitterLink;
+
+  @Column(name="youtube_link")
+  private String youtubeLink;
+
   @NotNull(message = "{company.user.notnull}")
   @ManyToOne
 	@JoinColumn(
@@ -102,5 +114,3 @@ public class Company {
     return this.companyEmail.substring(this.companyEmail.indexOf("@") + 1);
   }
 }
-
-

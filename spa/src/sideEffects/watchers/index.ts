@@ -79,6 +79,8 @@ import { fetchNotificationActionTypeName, patchNotificationActionTypeName, incre
 import { fetchNotificationWorker } from 'sideEffects/workers/notification/fetchNotificationWorker';
 import { patchNotificationWorker } from 'sideEffects/workers/notification/patchNotificationWorker';
 import { incrementNotificationCurIndexWorker } from 'sideEffects/workers/notification/incrementNotificationCurIndexWorker';
+import { fetchCompanyActionTypeName } from 'reducers/slices/domain/company';
+import { fetchCompanyWorker } from 'sideEffects/workers/company/fetchCompanyWorker';
 
 /**
  * takeEvery: allows multiple worker instances to be started CONCURRENTLY.
@@ -580,6 +582,15 @@ export function* incrementNotificationCurIndexWatcher() {
     incrementNotificationCurIndexWorker,
   )
 }
+
+// company
+export function* fetchCompanyWatcher() {
+  yield takeLatest(
+    fetchCompanyActionTypeName,
+    fetchCompanyWorker,
+  )
+}
+
 
 
 // cache

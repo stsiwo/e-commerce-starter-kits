@@ -16,9 +16,19 @@ declare module "@material-ui/core/styles/createPalette" {
 
 
 export const theme = createMuiTheme({
+
   /**
    * override default theme provided by material-ui here
    **/
+  overrides: {
+    MuiCssBaseline: {
+      '@global': {
+        html: {
+          scrollBehaivor: "smooth",
+        },
+      },
+    },
+  },
   palette: {
     headerBackground: {
       paper: "transparent"

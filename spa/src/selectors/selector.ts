@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { CartItemType } from "domain/cart/types";
-import { ProductType } from "domain/product/types";
+import { ProductType, ProductVariantType, productStockBags, ProductStockEnum } from "domain/product/types";
 import { UserAddressType, UserPhoneType, UserType } from "domain/user/types";
 import merge from 'lodash/merge';
 import { denormalize } from "normalizr";
@@ -123,6 +123,7 @@ export const rsSelector = {
     getNotificationPagination: (state: StateType) => state.domain.notifications.pagination,
     getNotificationCurIndex: (state: StateType) => state.domain.notifications.curIndex,
 
+    getCompany: (state: StateType) => state.domain.company.data,
   },
 
   senstive: {
@@ -1441,6 +1442,28 @@ export const mSelector = {
         console.log(denormalizedEntities)
 
         return denormalizedEntities[0]
+      },
+    )
+  },
+
+  makeProductVariantStockByProductIdAndVariantId: (productId: string, variantId: string) => {
+    return createSelector(
+      [
+        rsSelector.domain.getProduct
+      ],
+      (normalizedProducts) => {
+
+        const product = normalizedProducts[productId];
+
+        const targetVariant = product.variants.filter((variant: ProductVariantType) => variant.variantId == variantId)[0];
+
+        if (targetVariant.variantStock == 0) {
+          return productStockBags[ProductStockEnum.OUT_OF_STOCK];
+        } else if (targetVariant.variantStock < 10) {
+          return productStockBags[ProductStockEnum.LIMITED_STOCK];
+        } else {
+          return productStockBags[ProductStockEnum.ENOUGH_STOCK];
+        }
       },
     )
   },

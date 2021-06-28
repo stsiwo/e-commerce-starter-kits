@@ -296,6 +296,10 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
           dispatch(
             postProductVariantActionCreator({
               ...curProductVariantState,
+              // if user check 'same of product unit price', don't send variant unit price. instead send null.
+              variantUnitPrice: curUnitPriceDisable ? null : curProductVariantState.variantUnitPrice, 
+              // if isDiscount = false, don't send variant discount price.
+              variantDiscountPrice: curProductVariantState.isDiscount ? curProductVariantState.variantDiscountPrice : null, 
               productId: targetProductId,
             })
           )
@@ -306,6 +310,10 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
           dispatch(
             putProductVariantActionCreator({
               ...curProductVariantState,
+              // if user check 'same of product unit price', don't send variant unit price. instead send null.
+              variantUnitPrice: curUnitPriceDisable ? null : curProductVariantState.variantUnitPrice, 
+              // if isDiscount = false, don't send variant discount price.
+              variantDiscountPrice: curProductVariantState.isDiscount ? curProductVariantState.variantDiscountPrice : null, 
               productId: targetProductId,
             })
           )

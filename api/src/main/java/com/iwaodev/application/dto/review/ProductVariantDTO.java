@@ -25,4 +25,6 @@ public class ProductVariantDTO {
   private ProductSizeDTO productSize;
   private String variantColor;
   private BigDecimal currentPrice;
+  private Boolean isDiscountAvailable;
+  private BigDecimal regularPrice;
 }

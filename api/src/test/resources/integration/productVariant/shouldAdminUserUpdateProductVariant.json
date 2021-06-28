@@ -3,14 +3,14 @@
   "variantUnitPrice": 10.00,
   "variantDiscountPrice": 9.00,
   "variantDiscountStartDate": "2012-04-23T18:25:43.511Z",
-  "variantDiscountEndDate": "2012-04-23T18:25:43.511Z",
+  "variantDiscountEndDate": "2022-04-23T18:25:43.511Z",
   "variantStock": 10,
   "isDiscount": true,   
   "variantColor": "PURPLE",
   "productSize": {
-    "productSizeId": 2,
+    "productSizeId": 3,
     "productSizeName": "M",
-    "productSizeDescription": ""
+    "productSizeDescription": "medium"
   }, 
   "variantWeight": 1.00,
   "variantHeight": 1.00,

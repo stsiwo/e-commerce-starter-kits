@@ -252,6 +252,79 @@ public class AdminProductEndpointTest {
    * 
    **/
   @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldAdminUserCreateNewProductWithDiscount.sql" })
+  public void shouldAdminUserCreateNewProductWithDiscount(
+      @Value("classpath:/integration/product/shouldAdminUserCreateNewProductWithDiscount.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+      // no variant is available when creating.
+
+    Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath;
+
+    // make sure the file name match with json script (e.g., shouldAdminUserCreateNewProduct.json)
+    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("files", "product-image-0.jpeg", "image/jpeg", "some jpg".getBytes());
+    MockMultipartFile fileAtFirstIndex = new MockMultipartFile("files", "product-image-1.png", "image/png", "some png".getBytes());
+    MockMultipartFile fileAtThirdIndex = new MockMultipartFile("files", "product-image-3.jpeg", "image/jpeg", "some jpeg".getBytes());
+    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json", dummyFormJsonString.getBytes());
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+        .multipart(targetUrl) // create
+        .file(fileAtZeroIndex)
+        .file(fileAtFirstIndex)
+        .file(fileAtThirdIndex)
+        .file(jsonFile)
+        .contentType(MediaType.MULTIPART_FORM_DATA)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductDTO.class);
+
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.getProductId()).isNotNull();
+    assertThat(responseBody.getProductName()).isEqualTo(dummyFormJson.get("productName").asText());
+    assertThat(responseBody.getCategory().getCategoryId().toString()).isEqualTo(dummyFormJson.get("category").get("categoryId").asText());
+    assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(true);
+    assertThat(responseBody.getCheapestPrice().toString()).isEqualTo(dummyFormJson.get("productBaseDiscountPrice").asText());
+
+
+    List<ProductImageDTO> productImages = responseBody.getProductImages();
+
+    for (int i = 0; i < productImages.size(); i++) {
+
+      assertThat(productImages.get(i).getIsChange()).isEqualTo(false);  
+
+      if (i == 0 || i == 1 || i == 3) {
+        if (i == 0) {
+          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-0");  
+          assertThat(productImages.get(i).getProductImagePath()).matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.jpeg");  
+        } else if (i == 1) {
+          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-1");  
+          assertThat(productImages.get(i).getProductImagePath()).matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");  
+        } else if (i == 3) {
+          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-3");  
+          assertThat(productImages.get(i).getProductImagePath()).matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-3-.+.jpeg");  
+        }
+      } else {
+        assertThat(productImages.get(i).getProductImagePath()).isEqualTo("");  
+      }
+    }
+
+    // make sure any variant is not created.
+    assertThat(0).isEqualTo(responseBody.getVariants().size());
+  }
+
+  @Test
   @Sql(scripts = { "classpath:/integration/product/shouldAdminUserCreateNewProduct.sql" })
   public void shouldAdminUserCreateNewProduct(
       @Value("classpath:/integration/product/shouldAdminUserCreateNewProduct.json") Resource dummyFormJsonFile)
@@ -424,6 +497,95 @@ public class AdminProductEndpointTest {
     assertThat(responseBody.getProductName()).isEqualTo(dummyFormJson.get("productName").asText());
     assertThat(responseBody.getCategory().getCategoryId().toString()).isEqualTo(dummyFormJson.get("category").get("categoryId").asText());
     assertThat(1).isEqualTo(responseBody.getVariants().size());
+
+    List<ProductImageDTO> productImages = responseBody.getProductImages();
+
+    for (int i = 0; i < productImages.size(); i++) {
+
+      assertThat(productImages.get(i).getIsChange()).isEqualTo(false);  
+
+      if (i == 0 || i == 1 || i == 3) {
+        if (i == 0) {
+          // update
+          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-0");  
+          assertThat(productImages.get(i).getProductImagePath()).matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.svg");  
+        } else if (i == 1) {
+          // unchange
+          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-1");  
+          assertThat(productImages.get(i).getProductImagePath()).matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");  
+        } else if (i == 3) {
+          // remove
+          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-3");  
+          assertThat(productImages.get(i).getProductImagePath()).isEqualTo("");  
+        }
+      } else {
+        assertThat(productImages.get(i).getProductImagePath()).isEqualTo("");  
+      }
+    }
+
+    for (ProductVariantDTO variantDTO : responseBody.getVariants()) {
+      assertThat(variantDTO.getVariantId()).isNotNull();  
+    }
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldAdminUserUpdateProductWithDiscount.sql" })
+  public void shouldAdminUserUpdateProductWithDiscount(
+      @Value("classpath:/integration/product/shouldAdminUserUpdateProductWithDiscount.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+
+    Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
+    Mockito.doNothing().when(this.s3Service).delete(Mockito.any());
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    
+    String dummyProductId = dummyFormJson.get("productId").asText();
+
+    // create dummy files in the directory
+    // - must match with input json script
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyProductId;
+
+    // make sure the file name match with input json script.
+    MockMultipartFile newFileAtZeroIndex = new MockMultipartFile("files", "product-image-0.svg", "image/svg+xml", "some svg".getBytes());
+    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json", dummyFormJsonString.getBytes());
+
+    // act & assert
+
+    // multipart & PUT, you need this
+    MockMultipartHttpServletRequestBuilder builder = (MockMultipartHttpServletRequestBuilder) MockMvcRequestBuilders
+        .multipart(targetUrl) // update
+        .with(new RequestPostProcessor() {
+          @Override
+          public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
+            request.setMethod("PUT");
+            return request;
+          }
+        });
+
+    ResultActions resultActions = mvc.perform(builder
+        .file(newFileAtZeroIndex)
+        .file(jsonFile)
+        .contentType(MediaType.MULTIPART_FORM_DATA)
+        .content(dummyFormJsonString)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductDTO.class);
+
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.getProductId()).isNotNull();
+    assertThat(responseBody.getProductName()).isEqualTo(dummyFormJson.get("productName").asText());
+    assertThat(responseBody.getCategory().getCategoryId().toString()).isEqualTo(dummyFormJson.get("category").get("categoryId").asText());
+    assertThat(1).isEqualTo(responseBody.getVariants().size());
+    assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(true);
+    assertThat(responseBody.getCheapestPrice().toString()).isEqualTo(dummyFormJson.get("productBaseDiscountPrice").asText());
 
     List<ProductImageDTO> productImages = responseBody.getProductImages();
 

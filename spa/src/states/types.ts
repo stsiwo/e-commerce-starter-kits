@@ -2,7 +2,7 @@ import { NormalizedCategoryType, NormalizedProductType, ProductSortEnum } from "
 import { AuthType, RequestTrackerType, FetchStatusEnum, MessageTypeEnum, MessageStateType } from "src/app/";
 import { CartItemType } from "domain/cart/types";
 import { WishlistItemType, WishlistItemSortEnum } from "domain/wishlist/types";
-import { UserType, UserSortEnum } from "domain/user/types";
+import { UserType, UserSortEnum, AdminCompanyType } from "domain/user/types";
 import { OrderType, OrderSortEnum } from "domain/order/types";
 import { ReviewType, ReviewSortEnum } from "domain/review/type";
 import { NotificationType } from "domain/notification/types";
@@ -112,6 +112,9 @@ export declare type AppStateType = {
     notifications: {
       get: FetchStatusEnum
       patch: FetchStatusEnum
+    }, 
+    company: {
+      get: FetchStatusEnum
     }
   },
 }
@@ -210,6 +213,9 @@ export declare type DomainStateType = {
     data: NotificationType[], 
     pagination: DomainPaginationType,
     curIndex: number,
+  },
+  company: {
+    data: AdminCompanyType, 
   }
 }
 

@@ -224,6 +224,8 @@ public class ProductServiceImpl implements ProductService {
       throw new AppException(HttpStatus.BAD_REQUEST, "the product path already taken.");
     }
 
+    // discout price must be less then unit price
+
     List<ProductImage> productImages = this.createImages(newEntity.getProductId(), files, criteria.getProductImages());
 
     newEntity.setProductImages(productImages);
@@ -235,6 +237,13 @@ public class ProductServiceImpl implements ProductService {
     logger.info("" + newEntity.getProductName());
     // save it
     Product savedEntity = this.repository.save(newEntity);
+    /**
+     * need this refresh to refresh the @Formular/@Transient fields
+     **/
+    this.repository.refresh(savedEntity);
+
+    logger.info("is discount available");
+    logger.info("" + savedEntity.getIsDiscountAvailable());
 
     logger.info("new product image size afer saved");
     logger.info("" + savedEntity.getProductImages().size());
@@ -358,6 +367,15 @@ public class ProductServiceImpl implements ProductService {
     // hopely, remove old one included nested entity and replace with new one
     // 'save' return updated entity so return this one
     Product updatedEntity = this.repository.save(newEntity);
+    /**
+     * when updating you need to call this flush otherwise update statement does not executed. 
+     * i don't know why.
+     **/
+    this.repository.flush();
+    /**
+     * need this refresh to refresh the @Formular/@Transient fields
+     **/
+    this.repository.refresh(updatedEntity);
 
     return ProductMapper.INSTANCE.toProductDTO(updatedEntity);
   }
