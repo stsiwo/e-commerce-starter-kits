@@ -28,27 +28,17 @@
     - cart items of guest users have temp cart item id for each temporarly.
     
     solution: add user and cartItems to AuthenticationCriteria (e.g., email & password) then publish the event to persist the user and the cartItems.
-    
-  - should I set max cart item numbers? like 5.
-  
-    - should i restrict teh selection of cartItems or price??
 
-  
  - (performance)
   - tree shaking is not working (material ui). maybe.
 
-    
 - email verification prompt if the user still temp
-
-- disable cart icon (on header) when checkout page (don't need to cart drawer at this page)
 
 - product discunt end date
           => should be done front end. 
             => search page, you just need to display 'isDiscountAvailable' from product entity
             => on detail page, you just check where the discount is originated from (e.g., from product or product variant) and display the date on the detail page when user switch the variant.
-            
-- scroll top when page changes.
-
+ 
 - company info at footer
 
 ### Staging Bugs
@@ -59,7 +49,6 @@
 (signup/login/adminlogin)
 
 (product)
-  - display stock info and if it is out of stock, disable 'buy' button.
 
 (category)
   
