@@ -78,19 +78,6 @@ public class Product {
   @Column(name = "product_base_unit_price")
   private BigDecimal productBaseUnitPrice = new BigDecimal(1);
 
-  @Column(name = "product_base_discount_price")
-  private BigDecimal productBaseDiscountPrice = new BigDecimal(1);
-
-  @Column(name = "product_base_discount_start_date")
-  private LocalDateTime productBaseDiscountStartDate;
-
-  @Column(name = "product_base_discount_end_date")
-  private LocalDateTime productBaseDiscountEndDate;
-
-  @NotNull(message = "{product.isDiscount.notnull}")
-  @Column(name = "is_discount")
-  private Boolean isDiscount = false;
-
   @NotNull(message = "{product.isPublic.notnull}")
   @Column(name = "is_public")
   private Boolean isPublic = false;
@@ -113,12 +100,15 @@ public class Product {
   private BigDecimal cheapestPrice;
 
   // - use 'left' isntead of 'inner' to cover the case if a product does not have any variants.
-  @Formula("(select greatest(p.product_base_unit_price, ifnull(p.product_base_discount_price, 0), max(ifnull(pv.variant_unit_price, 0)), max(ifnull(pv.variant_discount_price, 0))) from products p left join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id group by p.product_id)")
+  //@Formula("(select greatest(p.product_base_unit_price, ifnull(p.product_base_discount_price, 0), max(ifnull(pv.variant_unit_price, 0)), max(ifnull(pv.variant_discount_price, 0))) from products p left join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id group by p.product_id)")
+  @Getter(value = AccessLevel.NONE)
+  @Setter(value = AccessLevel.NONE)
+  @Transient
   private BigDecimal highestPrice;
 
   // overall result if discount exist through its variants
   // - use 'left' isntead of 'inner' to cover the case if a product does not have any variants.
-  @Formula("(select exists (select 1 from products p left join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id and (pv.is_discount = 1 or p.is_discount = 1) and ((p.product_base_discount_start_date < CURRENT_TIMESTAMP and CURRENT_TIMESTAMP < p.product_base_discount_end_date) or (pv.variant_discount_start_date < CURRENT_TIMESTAMP and CURRENT_TIMESTAMP < pv.variant_discount_end_date))))")
+  @Formula("(select exists (select 1 from products p left join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id and (pv.is_discount = 1) and (pv.variant_discount_start_date < CURRENT_TIMESTAMP and CURRENT_TIMESTAMP < pv.variant_discount_end_date)))")
   private Boolean isDiscountAvailable;
 
   @NotNull(message = "{product.category.notnull}")
@@ -195,6 +185,11 @@ public class Product {
    * #2021/06/27 - it works.
    **/
   @PostLoad
+  public void setUp() {
+    this.setCheapestPrice();
+    this.setHighestPrice();
+  }
+
   public void setCheapestPrice() {
     this.cheapestPrice = this.getCheapestPrice();
   }
@@ -205,12 +200,6 @@ public class Product {
     BigDecimal cheapestPrice = this.productBaseUnitPrice;
 
     logger.info("cur cheapest: " + cheapestPrice);
-    // if product discount, compare base unit price and discount price and get cheaper price
-    if (this.isDiscount && this.getProductBaseDiscountStartDate().isBefore(LocalDateTime.now()) && this.getProductBaseDiscountEndDate().isAfter(LocalDateTime.now())) {
-      cheapestPrice = cheapestPrice.min(this.productBaseDiscountPrice); 
-      logger.info("cur cheapest at product discount: " + cheapestPrice);
-    }
-
     // pick cheapest price among all variants
     for (ProductVariant variant: this.variants) {
 
@@ -226,6 +215,33 @@ public class Product {
     }
 
     return cheapestPrice;
+  }
+
+  public void setHighestPrice() {
+    this.highestPrice = this.getHighestPrice();
+  }
+
+  public BigDecimal getHighestPrice() {
+
+    logger.info("try to get highest price");
+    BigDecimal highestPrice = this.productBaseUnitPrice;
+
+    logger.info("cur highest: " + highestPrice);
+    // pick highest price among all variants
+    for (ProductVariant variant: this.variants) {
+
+      // if the variant has its own unit price
+      if (variant.getVariantUnitPrice() != null) {
+        highestPrice = highestPrice.max(variant.getVariantUnitPrice());
+      }
+
+      // if the variant is discount
+      if (variant.getIsDiscount() &&  variant.getVariantDiscountStartDate().isBefore(LocalDateTime.now()) && variant.getVariantDiscountEndDate().isAfter(LocalDateTime.now())) {
+        highestPrice = highestPrice.max(variant.getVariantDiscountPrice());
+      }
+    }
+
+    return highestPrice;
   }
 
   public boolean isAnyVariantDiscount() {

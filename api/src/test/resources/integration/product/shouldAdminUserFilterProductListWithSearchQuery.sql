@@ -12,8 +12,8 @@ VALUES ( 'a2901f19-715a-44fe-9701-fae6713fd764', 'Member', 'Test', 'test_member2
 
 
 --- products
-INSERT INTO `ec-schema`.`products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `average_review_point`, `is_discount`, `category_id`, `is_public`) 
-VALUES ('9e3e67ca-d058-41f0-aad5-4f09c956a81f', 'test_name_1', 'test_desc_1', 'test-path-1', '12.21', '4.21', '0', '1', '0');
+INSERT INTO `ec-schema`.`products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `average_review_point`, `category_id`, `is_public`) 
+VALUES ('9e3e67ca-d058-41f0-aad5-4f09c956a81f', 'test_name_1', 'test_desc_1', 'test-path-1', '12.21', '4.21', '1', '0');
 
 -- product variant 1-1 (unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
@@ -61,8 +61,8 @@ VALUES ('a2901f19-715a-44fe-9701-fae6713fd764', '9e3e67ca-d058-41f0-aad5-4f09c95
 
 
 -- prudct 2
-INSERT INTO `ec-schema`.`products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `average_review_point`, `is_discount`, `category_id`, `is_public`) 
-VALUES ('6267c525-396f-4ea0-8dfe-706c95036e5c', 'game_name_2', 'game_desc_2', 'test-path-2', '12.21', '4.21', '0', '1', '1');
+INSERT INTO `ec-schema`.`products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `average_review_point`, `category_id`, `is_public`) 
+VALUES ('6267c525-396f-4ea0-8dfe-706c95036e5c', 'game_name_2', 'game_desc_2', 'test-path-2', '12.21', '4.21', '1', '1');
 
 -- product variant 2-1 (unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
@@ -105,27 +105,27 @@ INSERT INTO `reviews` (`user_id`, `product_id`, `review_point`, `review_title`, 
 VALUES ('a2901f19-715a-44fe-9701-fae6713fd764', '6267c525-396f-4ea0-8dfe-706c95036e5c', '4.7', 'sample title 4', 'sample description', 0); -- to make sure only retrieve verified review. 
 
 -- product (category=1)
-INSERT INTO `products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `is_discount`, `product_base_discount_price`, `product_base_discount_start_date`, `product_base_discount_end_date`, `category_id`, `is_public`)
-VALUES ('db600487-5142-4121-8b3f-237c2d883c14', 'Test Product game 5', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-1-5', '20.21', '0', '10.00', '2020-01-07 00:00:00', '2020-02-07 00:00:00', '1', '1');
+INSERT INTO `products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `category_id`, `is_public`)
+VALUES ('db600487-5142-4121-8b3f-237c2d883c14', 'Test Product game 5', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-1-5', '20.21', '1', '1');
 
 -- product (category=1)
-INSERT INTO `products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `is_discount`, `product_base_discount_price`, `product_base_discount_start_date`, `product_base_discount_end_date`, `category_id`, `is_public`)
-VALUES ('8beac768-b535-45e3-90b9-c55029c8f522', 'Test game Name 5', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-1-6', '20.21', '0', '10.00', '2020-01-07 00:00:00', '2020-02-07 00:00:00', '1', '1');
-
-
--- product (category=1)
-INSERT INTO `products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `is_discount`, `product_base_discount_price`, `product_base_discount_start_date`, `product_base_discount_end_date`, `category_id`, `is_public`)
-VALUES ('3c647e1e-20b1-4367-890b-207776472c0f', 'game Product Name 5', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-1-7', '20.21', '0', '10.00', '2020-01-07 00:00:00', '2020-02-07 00:00:00', '1', '1');
-
--- product (category=1)
-INSERT INTO `products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `is_discount`, `product_base_discount_price`, `product_base_discount_start_date`, `product_base_discount_end_date`, `category_id`, `is_public`)
-VALUES ('da8774dc-223b-4e84-bbc9-53a520774d37', 'Test Product Name game', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-1-8', '20.21', '0', '10.00', '2020-01-07 00:00:00', '2020-02-07 00:00:00', '1', '1');
+INSERT INTO `products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `category_id`, `is_public`)
+VALUES ('8beac768-b535-45e3-90b9-c55029c8f522', 'Test game Name 5', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-1-6', '20.21', '1', '1');
 
 
 -- product (category=1)
-INSERT INTO `products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `is_discount`, `product_base_discount_price`, `product_base_discount_start_date`, `product_base_discount_end_date`, `category_id`, `is_public`)
-VALUES ('d3e29e16-f939-4e26-975f-3742e3d03fa7', 'Test Product Name 5', 'It is a game established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-1-9', '20.21', '0', '10.00', '2020-01-07 00:00:00', '2020-02-07 00:00:00', '1', '1');
+INSERT INTO `products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `category_id`, `is_public`)
+VALUES ('3c647e1e-20b1-4367-890b-207776472c0f', 'game Product Name 5', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-1-7', '20.21', '1', '1');
 
 -- product (category=1)
-INSERT INTO `products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `is_discount`, `product_base_discount_price`, `product_base_discount_start_date`, `product_base_discount_end_date`, `category_id`, `is_public`)
-VALUES ('c3671935-39c3-4b9e-9846-9e8aef1f8ea3', 'Test Product Name 5', 'It is a game established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-1-10', '20.21', '0', '10.00', '2020-01-07 00:00:00', '2020-02-07 00:00:00', '1', '1');
+INSERT INTO `products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `category_id`, `is_public`)
+VALUES ('da8774dc-223b-4e84-bbc9-53a520774d37', 'Test Product Name game', 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-1-8', '20.21', '1', '1');
+
+
+-- product (category=1)
+INSERT INTO `products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `category_id`, `is_public`)
+VALUES ('d3e29e16-f939-4e26-975f-3742e3d03fa7', 'Test Product Name 5', 'It is a game established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-1-9', '20.21', '1', '1');
+
+-- product (category=1)
+INSERT INTO `products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `category_id`, `is_public`)
+VALUES ('c3671935-39c3-4b9e-9846-9e8aef1f8ea3', 'Test Product Name 5', 'It is a game established fact that a reader will be distracted by the readable content of a page when looking at its layout. ', 'test-product-path-1-10', '20.21', '1', '1');

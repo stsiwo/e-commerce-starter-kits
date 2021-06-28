@@ -49,18 +49,6 @@ public class ProductCriteria {
   @DecimalMin(value = "1.0", message = "{product.productBaseUnitPrice.min1}")
   private BigDecimal productBaseUnitPrice;
 
-  @OptionalDigit(integer = 6, fraction = 2, message = "optional but if you specifiy, must be greater than or equal to 1.00")
-  private BigDecimal productBaseDiscountPrice;
-
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime productBaseDiscountStartDate;
-
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime productBaseDiscountEndDate;
-
-  @NotNull(message = "{product.isDiscount.notnull}")
-  private Boolean isDiscount;
-
   @NotNull(message = "{product.isPublic.notnull}")
   private Boolean isPublic;
 

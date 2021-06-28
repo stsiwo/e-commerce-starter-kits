@@ -56,7 +56,7 @@ public class WishlistItemSpecifications {
       // included.
 
       return builder.greaterThanOrEqualTo(
-          root.join(WishlistItem_.variant).join(ProductVariant_.product).get(Product_.highestPrice), minPrice);
+          root.join(WishlistItem_.variant).join(ProductVariant_.product).get(Product_.productBaseUnitPrice), minPrice);
     };
   }
 
@@ -73,7 +73,7 @@ public class WishlistItemSpecifications {
       // included.
       return builder.greaterThanOrEqualTo(
           // TODO: fix this highestPrice, should be cheapestPrice
-          root.join(WishlistItem_.variant).join(ProductVariant_.product).get(Product_.highestPrice), maxPrice);
+          root.join(WishlistItem_.variant).join(ProductVariant_.product).get(Product_.productBaseUnitPrice), maxPrice);
     };
   }
 

@@ -28,10 +28,7 @@ public class ProductSpecificationFactoryImpl implements ProductSpecificationFact
       .and(this.specifications.isGreaterThanReviewPointOf(criteria.getReviewPoint()))
       .and(this.specifications.releaseDateAfter(criteria.getStartDate()))
       .and(this.specifications.releaseDateBefore(criteria.getEndDate()))
-      .and(
-          this.specifications.isDiscountOfThisProduct(criteria.getIsDiscount())
-            .or(this.specifications.isAnyVariantOfThisProductDiscount(criteria.getIsDiscount()))
-          )
+      .and(this.specifications.isAnyVariantOfThisProductDiscount(criteria.getIsDiscount()))
       .and(
           this.specifications.searchQueryByProductName(criteria.getSearchQuery())
             .or(this.specifications.searchQueryByProductDescription(criteria.getSearchQuery()))

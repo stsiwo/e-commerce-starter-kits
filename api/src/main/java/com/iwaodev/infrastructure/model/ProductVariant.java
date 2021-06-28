@@ -176,7 +176,7 @@ public class ProductVariant {
    * whether this variant is disount or not.
    *
    **/
-  @Formula("(select exists (select 1 from products p inner join product_variants pv on pv.product_id = p.product_id where pv.variant_id = variant_id and (pv.is_discount = 1 or p.is_discount = 1) and ((p.product_base_discount_start_date < CURRENT_TIMESTAMP and CURRENT_TIMESTAMP < p.product_base_discount_end_date) or (pv.variant_discount_start_date < CURRENT_TIMESTAMP and CURRENT_TIMESTAMP < pv.variant_discount_end_date))))")
+  @Formula("(select exists (select 1 from products p inner join product_variants pv on pv.product_id = p.product_id where pv.variant_id = variant_id and (pv.is_discount = 1) and (pv.variant_discount_start_date < CURRENT_TIMESTAMP and CURRENT_TIMESTAMP < pv.variant_discount_end_date)))")
   private Boolean isDiscountAvailable;
 
   /**
@@ -210,10 +210,6 @@ public class ProductVariant {
     if (this.getIsDiscount() && this.variantDiscountStartDate.isBefore(LocalDateTime.now()) && this.variantDiscountEndDate.isAfter(LocalDateTime.now())) {
       return this.getVariantDiscountPrice();
     } 
-
-    if (this.product.getIsDiscount() && this.product.getProductBaseDiscountStartDate().isBefore(LocalDateTime.now()) && this.product.getProductBaseDiscountEndDate().isAfter(LocalDateTime.now())) {
-      return this.product.getProductBaseDiscountPrice();
-    }
 
     if (this.getVariantUnitPrice() != null) {
       return this.getVariantUnitPrice();

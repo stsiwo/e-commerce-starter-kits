@@ -24,15 +24,7 @@ public class ProductDTO {
 
   private BigDecimal productBaseUnitPrice;
 
-  private BigDecimal productBaseDiscountPrice;
-
-  private LocalDateTime productBaseDiscountStartDate;
-
-  private LocalDateTime productBaseDiscountEndDate;
-
   private Double averageReviewPoint;
-
-  private Boolean isDiscount;
 
   private Boolean isPublic;
 

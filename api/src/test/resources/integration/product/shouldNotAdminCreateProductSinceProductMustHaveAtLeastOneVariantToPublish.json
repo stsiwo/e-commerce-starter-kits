@@ -3,7 +3,6 @@
   "productDescription": "new_product_desc",
   "productPath": "new_product_path",
   "productBaseUnitPrice": 13.32,
-  "isDiscount": false,
   "isPublic": true,
   "category":  {
     "categoryId": 1,

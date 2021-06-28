@@ -61,7 +61,7 @@ public class ProductSpecifications {
          **/
         return builder.conjunction();
       }
-      return builder.greaterThanOrEqualTo(root.get(Product_.highestPrice), minPrice);
+      return builder.greaterThanOrEqualTo(root.get(Product_.productBaseUnitPrice), minPrice);
     };
   }
 
@@ -76,7 +76,7 @@ public class ProductSpecifications {
       }
       // TODO: not working.
       // esp when use with @Formula and @Transient
-      return builder.greaterThanOrEqualTo(root.get(Product_.highestPrice), maxPrice);
+      return builder.greaterThanOrEqualTo(root.get(Product_.productBaseUnitPrice), maxPrice);
     };
   }
 
@@ -91,19 +91,6 @@ public class ProductSpecifications {
       }
       return builder.equal(root.join(Product_.variants).get(ProductVariant_.isDiscount), isDiscount);
 
-    };
-  }
-
-  public static Specification<Product> isDiscountOfThisProduct(Boolean isDiscount) {
-    return (root, query, builder) -> {
-      if (isDiscount == null) {
-        /**
-         * if paramter is null, we still want to chain specificiation so use
-         * 'conjunction()'
-         **/
-        return builder.conjunction();
-      }
-      return builder.equal(root.get(Product_.isDiscount), isDiscount);
     };
   }
 

@@ -4,10 +4,6 @@
   "productDescription": "update_product_desc",
   "productPath": "update_product_path",
   "productBaseUnitPrice": 13.32,
-  "isDiscount": true,
-  "productBaseDiscountPrice": 9.00,
-  "productBaseDiscountStartDate": "2012-04-23T18:25:43.511Z",
-  "productBaseDiscountEndDate": "2022-04-23T18:25:43.511Z",
   "isPublic": false,
   "category":  {
     "categoryId": 2,

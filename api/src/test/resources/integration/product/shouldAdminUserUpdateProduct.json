@@ -4,7 +4,6 @@
   "productDescription": "update_product_desc",
   "productPath": "update_product_path",
   "productBaseUnitPrice": 13.32,
-  "isDiscount": false,
   "isPublic": false,
   "category":  {
     "categoryId": 2,

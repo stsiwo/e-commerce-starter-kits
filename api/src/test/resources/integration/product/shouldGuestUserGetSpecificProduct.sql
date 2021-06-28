@@ -6,14 +6,14 @@ INSERT INTO `ec-schema`.`categories` (`category_id`, `category_name`, `category_
 
 
 --- products
-INSERT INTO `ec-schema`.`products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `average_review_point`, `is_discount`, `category_id`, `is_public`) 
-VALUES ('9e3e67ca-d058-41f0-aad5-4f09c956a81f', 'test_name_1', 'test_desc_1', 'test-path-1', '12.21', '4.21', '0', '1', '1'); -- must match with test case: product_path
+INSERT INTO `ec-schema`.`products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `average_review_point`, `category_id`, `is_public`) 
+VALUES ('9e3e67ca-d058-41f0-aad5-4f09c956a81f', 'test_name_1', 'test_desc_1', 'test-path-1', '12.21', '4.21', '1', '1'); -- must match with test case: product_path
 
 -- product variant 1-1 (unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
 VALUES ('1', '1', 'white', '123.00', '50', '9e3e67ca-d058-41f0-aad5-4f09c956a81f', '1.00', '1.00', '1.00', '1.00');
 
 
-INSERT INTO `ec-schema`.`products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `average_review_point`, `is_discount`, `category_id`) 
-VALUES ('6267c525-396f-4ea0-8dfe-706c95036e5c', 'game_name_2', 'game_desc_2', 'test-path-2', '12.21', '4.21', '0', '1');
+INSERT INTO `ec-schema`.`products` (`product_id`, `product_name`, `product_description`, `product_path`, `product_base_unit_price`, `average_review_point`, `category_id`) 
+VALUES ('6267c525-396f-4ea0-8dfe-706c95036e5c', 'game_name_2', 'game_desc_2', 'test-path-2', '12.21', '4.21', '1');
 

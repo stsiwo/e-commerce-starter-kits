@@ -111,28 +111,6 @@ public class ProductTest {
   }
 
   @Test
-  public void shouldReturnProductDiscountPriceSuccessfullyWhenGetCurrentPriceOfVariant() throws Exception {
-
-    // arrange
-    Long dummyVariantId = 1L;
-    BigDecimal dummyPrice = new BigDecimal(300);
-    Product product = new Product();
-    product.setProductBaseUnitPrice(new BigDecimal(400));
-    product.setIsDiscount(true);
-    product.setProductBaseDiscountStartDate(LocalDateTime.of(2020, 6, 10, 0, 0, 0));
-    product.setProductBaseDiscountEndDate(LocalDateTime.of(2022, 6, 10, 0, 0, 0));
-    product.setProductBaseDiscountPrice(dummyPrice);
-    ProductVariant variant1 = new ProductVariant();
-    variant1.setVariantId(dummyVariantId);
-
-    product.addVariant(variant1);
-
-    // act
-    // assert
-    assertThat(product.getCurrentPriceOfVariant(dummyVariantId)).isEqualTo(dummyPrice);
-  }
-
-  @Test
   public void shouldReturnProductBaseUnitPriceSuccessfullyWhenGetCurrentPriceOfVariant() throws Exception {
 
     // arrange
@@ -329,44 +307,6 @@ public class ProductTest {
     
     // assert
     assertThat(actualResult).isEqualTo(dummyPrice1);
-  }
-
-  @Test
-  public void shouldReturnProductBaseDiscountPriceForCheapestPrice() throws Exception {
-
-    // arrange
-    
-    // product 
-    Product product = new Product();
-    product.setProductBaseUnitPrice(new BigDecimal(1000));
-    product.setIsDiscount(true);
-    product.setProductBaseDiscountStartDate(LocalDateTime.of(2020, 6, 10, 0, 0, 0));
-    product.setProductBaseDiscountEndDate(LocalDateTime.of(2022, 6, 10, 0, 0, 0));
-    product.setProductBaseDiscountPrice(new BigDecimal(300));
-    
-    // variant 1
-    Long dummyVariant1Id = 1L;
-    BigDecimal dummyPrice1 = new BigDecimal(500);
-    ProductVariant variant1 = new ProductVariant();
-    variant1.setVariantId(dummyVariant1Id);
-    variant1.setVariantUnitPrice(dummyPrice1);
-
-    product.addVariant(variant1);
-
-    // variant 2
-    Long dummyVariant2Id = 2L;
-    BigDecimal dummyPrice2 = new BigDecimal(600);
-    ProductVariant variant2 = new ProductVariant();
-    variant2.setVariantId(dummyVariant2Id);
-    variant2.setVariantUnitPrice(dummyPrice2);
-
-    product.addVariant(variant2);
-
-    // act
-    BigDecimal actualResult = product.getCheapestPrice();
-    
-    // assert
-    assertThat(actualResult).isEqualTo(new BigDecimal(300));
   }
 
   @Test
