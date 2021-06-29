@@ -17,8 +17,7 @@
 - (testing) admin endpoints request testing (products, orders, categories, customers, and so on)
  
  - (implementation) add logo image upload at admin 
- 
- - (refactor) refactor snackbar and spinner : need to make sure the logic
+  - how to deal with dynamic generation of facivon?
 
  - guest user data transition when he becomes member:
    - carts
@@ -38,8 +37,6 @@
           => should be done front end. 
             => search page, you just need to display 'isDiscountAvailable' from product entity
             => on detail page, you just check where the discount is originated from (e.g., from product or product variant) and display the date on the detail page when user switch the variant.
- 
-- company info at footer
 
 ### Staging Bugs
 
