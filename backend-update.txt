@@ -60,8 +60,8 @@ endpoint change:
   - (done)isReviewable: not working correctly. it's always returning true.
 
 (scheduled tasks)
-  - turn is_discount false if product passed the end date.    
-  - create schedule task for make product published when releaseDate.
+  - (done) turn is_discount false if product passed the end date.    
+  - (doen) create schedule task for make product published when releaseDate.
       
     
 
