@@ -21,6 +21,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link as RRLink } from "react-router-dom";
 import { fetchCompanyActionCreator } from 'reducers/slices/domain/company';
 import { rsSelector } from 'src/selectors/selector';
+import SearchForm from 'components/common/SearchForm';
+import { useHistory } from 'react-router';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -64,7 +66,13 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     policyLink: {
       margin: `0 ${theme.spacing(2)}px`,
-    }
+    },
+    searchBox: {
+      display: "flex",
+      justifyContent: "center",
+      backgroundColor: "transparent",
+      margin: theme.spacing(1)
+    },
   }),
 );
 const Footer: React.FunctionComponent<{}> = (props) => {
@@ -73,6 +81,8 @@ const Footer: React.FunctionComponent<{}> = (props) => {
 
   const dispatch = useDispatch()
 
+  const history = useHistory();
+  
   /**
    * company stuff
    **/
@@ -81,11 +91,24 @@ const Footer: React.FunctionComponent<{}> = (props) => {
 
     if (!curCompany) {
       dispatch(
-        fetchCompanyActionCreator() 
+        fetchCompanyActionCreator()
       )
     }
   }, [
-  ])
+    ])
+
+  /**
+   * search query stuffs
+   **/
+  const [curSearchQuery, setSearchQuery] = React.useState<string>("");
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+  }
+
+  const handleSearchClick = () => {
+    history.push("/search?searchQuery=" + curSearchQuery);
+  }
+
 
   return (
     <footer className={classes.footer}>
@@ -166,9 +189,9 @@ const Footer: React.FunctionComponent<{}> = (props) => {
           <Typography variant="body2" component="p" className={classes.parag} >
             {"Let's explore our products."}
           </Typography>
-          {/**
-          <SearchForm />
-          **/}
+          <Box className={classes.searchBox}>
+            <SearchForm searchQuery={curSearchQuery} onChange={handleSearchChange} label={"search..."} onClick={handleSearchClick} />
+          </Box>
         </Grid>
       </Grid>
       <Box className={classes.bottom}>

@@ -1,5 +1,6 @@
 package com.iwaodev.infrastructure.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +20,8 @@ import com.iwaodev.infrastructure.model.Product;
 import com.iwaodev.infrastructure.model.ProductSize;
 import com.iwaodev.infrastructure.model.ProductVariant;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +39,8 @@ import org.springframework.stereotype.Component;
  **/
 @Component("productRepositoryImpl") // must be target repository implementation name
 public class AdvanceProductRepositoryImpl implements AdvanceProductRepository {
+
+  private static final Logger logger = LoggerFactory.getLogger(AdvanceProductRepository.class);
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -72,6 +77,13 @@ public class AdvanceProductRepositoryImpl implements AdvanceProductRepository {
   }
 
   @Override
+  public Boolean isOthersHaveName(UUID productId, String productName) {
+    return this.entityManager.createQuery(
+        "select case when (count(u) > 0)  then true else false end from products u where u.productName = :productName and u.productId != :productId",
+        Boolean.class).setParameter("productId", productId).setParameter("productName", productName).getSingleResult();
+  }
+
+  @Override
   public Page<Product> findAllToAvoidNPlusOne(Specification<Product> spec, Pageable pageable) {
 
     /**
@@ -91,6 +103,7 @@ public class AdvanceProductRepositoryImpl implements AdvanceProductRepository {
     root.fetch("variants", JoinType.LEFT).fetch("productSize", JoinType.LEFT);
     root.fetch("category", JoinType.LEFT);
     if (spec != null) {
+      logger.info("inside variants fetching specificaiton");
       cQuery.where(spec.toPredicate(root, cQuery, cBuilder));
     }
     cQuery.orderBy(QueryUtils.toOrders(pageable.getSort(), root, cBuilder));
@@ -168,11 +181,16 @@ public class AdvanceProductRepositoryImpl implements AdvanceProductRepository {
 
   @Override
   public Optional<ProductSize> findProductSizeById(Long id) {
-    return this.entityManager.createQuery(
-        "SELECT ps FROM productSizes ps WHERE ps.productSizeId = :id",
-        ProductSize.class)
-      .setParameter("id", id)
-      .getResultList().stream().findFirst();
+    return this.entityManager
+        .createQuery("SELECT ps FROM productSizes ps WHERE ps.productSizeId = :id", ProductSize.class)
+        .setParameter("id", id).getResultList().stream().findFirst();
+  }
+
+  @Override
+  public List<ProductVariant> findAllDiscountPassedVariants(LocalDateTime time) {
+    return this.entityManager
+        .createQuery("SELECT pv FROM productVariants pv WHERE pv.isDiscount = 1 AND pv.variantDiscountEndDate < :time", ProductVariant.class)
+        .setParameter("time", time).getResultList();
   }
 
 }

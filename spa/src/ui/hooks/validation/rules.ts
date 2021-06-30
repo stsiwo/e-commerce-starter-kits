@@ -136,11 +136,6 @@ export const productSchema = yup.object().shape({
       return value[0].productImagePath != ""
     }
   ),
-  productBaseUnitPrice: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/, "invalid currency format. please enter currency (e.g., 3.12, 12.00, and so on)").required(),
-  productBaseDiscountPrice: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/, "invalid currency format. please enter currency (e.g., 3.12, 12.00, and so on)").required(),
-  productBaseDiscountStartDate: yup.date().max(yup.ref('productBaseDiscountEndDate'), "start date must be before the end date.").required(),
-  productBaseDiscountEndDate: yup.date().min(yup.ref('productBaseDiscountStartDate'), "end date must be after the start date.").required(),
-  isDiscount: yup.bool().required(),
   releaseDate: yup.date().default(() => new Date()).required().nullable(),
   isPublic: yup.bool().test(
     'has-at-least-one-varaint',

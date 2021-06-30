@@ -1,6 +1,10 @@
 # e-commerce-starter-kits
 e-commerce web app with React + Java + Spring + Docker
 
+## Refs
+
+  - rechaptch management console: https://www.google.com/u/2/recaptcha/admin/site/459661075 (need to login as satoshi@iwaodev.com)
+
 ## Frontend Tech Stack
 
   - TypeScript

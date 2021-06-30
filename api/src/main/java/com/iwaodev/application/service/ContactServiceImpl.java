@@ -10,6 +10,7 @@ import javax.mail.MessagingException;
 import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.iservice.ContactService;
 import com.iwaodev.application.iservice.EmailService;
+import com.iwaodev.application.iservice.ReCaptchaService;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.User;
@@ -18,9 +19,11 @@ import com.iwaodev.ui.criteria.contact.ContactCriteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
@@ -43,6 +46,9 @@ public class ContactServiceImpl implements ContactService {
   @Autowired
   private UserRepository userRepository;
 
+  @Autowired
+  private ReCaptchaService recaptchaService;
+
   @Override
   public void submit(ContactCriteria criteria, UUID userId) throws Exception {
 
@@ -52,6 +58,13 @@ public class ContactServiceImpl implements ContactService {
     if (adminRecipientOption.isEmpty()) {
       logger.info("the admin user does not exist");
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist");
+    }
+
+    // verify recatcha token 
+    try {
+      this.recaptchaService.verify(criteria.getRecaptchaToken());
+    } catch (Exception e) {
+      throw new AppException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     User adminRecipient = adminRecipientOption.get();

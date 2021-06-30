@@ -138,11 +138,11 @@ const OrderList: React.FunctionComponent<{}> = (props) => {
               <Typography variant="body2" color="textSecondary" component="p">
                 Total Items: <b>{calcOrderTotalItemNumber(order)}</b> items
               </Typography>
+              <Typography variant="body2" color="textSecondary" component="p">
+                Status: <b>{getCurOrderStatus(order)}</b>
+              </Typography>
             </CardContent>
             <CardActions className={classes.actions}>
-              <Button disabled>
-                {getCurOrderStatus(order)}
-              </Button>
               <Button component={RRLink} to={`/orders/${order.orderId}`}>
                 Details
             </Button>

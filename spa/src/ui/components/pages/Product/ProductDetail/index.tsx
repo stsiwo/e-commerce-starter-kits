@@ -24,7 +24,7 @@ import { UserTypeEnum, MessageTypeEnum } from 'src/app';
 import { cartItemActions } from 'reducers/slices/domain/cartItem';
 import { api } from 'configs/axiosConfig';
 import { AxiosError } from 'axios';
-import { getNanoId, cadCurrencyFormat } from 'src/utils';
+import { getNanoId, cadCurrencyFormat, toDateString } from 'src/utils';
 import { postWishlistItemActionCreator } from 'reducers/slices/domain/wishlistItem';
 import { messageActions } from 'reducers/slices/app';
 import { cartModalActions } from 'reducers/slices/ui';
@@ -94,6 +94,12 @@ const useStyles = makeStyles((theme: Theme) =>
       "&:disabled": {
         color: "#000",
       }
+    },
+    regularPrice: {
+      textDecoration: "line-through",
+    },
+    discountPrice: {
+      color: theme.palette.error.main
     }
   }),
 );
@@ -194,7 +200,7 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
   React.useEffect(() => {
 
     const nextAvailableVariants = props.product.variants.filter((variant: ProductVariantType) => variant.variantColor == curSelectedColor);
-    const nextAvailableSizes: ProductVariantSizeType[] = uniqBy(nextAvailableVariants.map((variant: ProductVariantType) => variant.productSize), (productSize: ProductVariantSizeType)  => { return productSize.productSizeId })
+    const nextAvailableSizes: ProductVariantSizeType[] = uniqBy(nextAvailableVariants.map((variant: ProductVariantType) => variant.productSize), (productSize: ProductVariantSizeType) => { return productSize.productSizeId })
 
     // if there is no cur size in the next available sizes, need to change it to the one in the available sizes
     if (!nextAvailableSizes.find((size: ProductVariantSizeType) => size.productSizeId == curSelectedSize.productSizeId)) {
@@ -524,13 +530,25 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
             /><br />
           </Box>
           <Box component="div" >
-            <Typography variant="body1" component="p" className={classes.productColorTitle}>
-              Price: <b>$ {`${cadCurrencyFormat(curVariant.currentPrice * curQty)}`}</b>
-            </Typography>
+            {(curVariant.isDiscountAvailable &&
+              <React.Fragment>
+                <Typography variant="body1" component="p" className={classes.productColorTitle}>
+                  Price: <span className={classes.regularPrice}>$ {`${cadCurrencyFormat(curVariant.regularPrice * curQty)}`}</span><b className={classes.discountPrice}>{` ${cadCurrencyFormat(curVariant.currentPrice * curQty)}`}</b>
+                </Typography>
+                <Typography variant="caption" component="p" className={classes.productColorTitle}>
+                  {`${toDateString(curVariant.variantDiscountStartDate)} ~ ${toDateString(curVariant.variantDiscountEndDate)}`}
+                </Typography>
+              </React.Fragment>
+            )}
+            {(!curVariant.isDiscountAvailable &&
+              <Typography variant="body1" component="p" className={classes.productColorTitle}>
+                Price: <b>{` ${cadCurrencyFormat(curVariant.currentPrice * curQty)}`}</b>
+              </Typography>
+            )}
           </Box>
           <Box component="div" >
             <Typography variant="body1" component="p" className={classes.productColorTitle}>
-              Stock: <b style={{ color: curStockBag.color }}>$ {`${curStockBag.label}`}</b>
+              Stock: <b style={{ color: curStockBag.color }}>{`${curStockBag.label}`}</b>
             </Typography>
           </Box>
           <Box component="div" className={classes.controllerBox}>

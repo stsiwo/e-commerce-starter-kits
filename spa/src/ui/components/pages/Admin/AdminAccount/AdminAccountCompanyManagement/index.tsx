@@ -337,6 +337,7 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
                 id="company-email"
                 label="Email"
                 type="email"
+                placeholder={'use the domain which matches with this web app.'}
                 className={classes.formControl}
                 value={curAdminCompanyFormState.companyEmail}
                 onChange={handleCompanyEmailInputChangeEvent}

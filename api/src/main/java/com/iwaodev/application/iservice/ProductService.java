@@ -1,5 +1,6 @@
 package com.iwaodev.application.iservice;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,6 +44,10 @@ public interface ProductService {
   //public void removeProductImages(UUID productId) throws Exception;
 
   public byte[] getProductImage(UUID productId, String imageName) throws Exception;
+
+  public void turnPassedDiscountFalseByTime(LocalDateTime time) throws Exception;
+
+  public void publishProductsByTime(LocalDateTime time) throws Exception;
 }
 
 

@@ -361,6 +361,45 @@ public class AdminProductEndpointTest {
     assertThat(responseBody.getMessage()).isEqualTo(this.messageSource.getMessage("product.productPath.invalidformat", new Object[0], LocaleContextHolder.getLocale()));
   }
 
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldNotAdminUserCreateNewProductSinceDuplicatedName.sql" })
+  public void shouldNotAdminUserCreateNewProductSinceDuplicatedName(
+      @Value("classpath:/integration/product/shouldNotAdminUserCreateNewProductSinceDuplicatedName.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath;
+
+    // make sure the file name match with json script (e.g., shouldAdminUserCreateNewProduct.json)
+    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("files", "product-image-0.jpeg", "image/jpeg", "some jpg".getBytes());
+    MockMultipartFile fileAtFirstIndex = new MockMultipartFile("files", "product-image-1.png", "image/png", "some png".getBytes());
+    MockMultipartFile fileAtThirdIndex = new MockMultipartFile("files", "product-image-3.jpeg", "image/jpeg", "some jpeg".getBytes());
+    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json", dummyFormJsonString.getBytes());
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+        .multipart(targetUrl) // create
+        .file(fileAtZeroIndex)
+        .file(fileAtFirstIndex)
+        .file(fileAtThirdIndex)
+        .file(jsonFile)
+        .contentType(MediaType.MULTIPART_FORM_DATA)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(result.getResponse().getStatus()).isEqualTo(400);
+  }
+
   // 400 bad request (bad input) testing
   
   /**
@@ -453,6 +492,102 @@ public class AdminProductEndpointTest {
     for (ProductVariantDTO variantDTO : responseBody.getVariants()) {
       assertThat(variantDTO.getVariantId()).isNotNull();  
     }
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldNotAdminUserUpdateProductSinceProductUnitPriceLessThanDiscountPriceAtItsVariant.sql" })
+  public void shouldNotAdminUserUpdateProductSinceProductUnitPriceLessThanDiscountPriceAtItsVariant(
+      @Value("classpath:/integration/product/shouldNotAdminUserUpdateProductSinceProductUnitPriceLessThanDiscountPriceAtItsVariant.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+
+    Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
+    Mockito.doNothing().when(this.s3Service).delete(Mockito.any());
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    
+    String dummyProductId = dummyFormJson.get("productId").asText();
+
+    // create dummy files in the directory
+    // - must match with input json script
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyProductId;
+
+    // make sure the file name match with input json script.
+    MockMultipartFile newFileAtZeroIndex = new MockMultipartFile("files", "product-image-0.svg", "image/svg+xml", "some svg".getBytes());
+    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json", dummyFormJsonString.getBytes());
+
+    // act & assert
+
+    // multipart & PUT, you need this
+    MockMultipartHttpServletRequestBuilder builder = (MockMultipartHttpServletRequestBuilder) MockMvcRequestBuilders
+        .multipart(targetUrl) // update
+        .with(new RequestPostProcessor() {
+          @Override
+          public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
+            request.setMethod("PUT");
+            return request;
+          }
+        });
+
+    ResultActions resultActions = mvc.perform(builder
+        .file(newFileAtZeroIndex)
+        .file(jsonFile)
+        .contentType(MediaType.MULTIPART_FORM_DATA)
+        .content(dummyFormJsonString)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldNotAdminUserUpdateProductSinceDuplicatedName.sql" })
+  public void shouldNotAdminUserUpdateProductSinceDuplicatedName(
+      @Value("classpath:/integration/product/shouldNotAdminUserUpdateProductSinceDuplicatedName.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+
+    Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
+    Mockito.doNothing().when(this.s3Service).delete(Mockito.any());
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    
+    String dummyProductId = dummyFormJson.get("productId").asText();
+
+    // create dummy files in the directory
+    // - must match with input json script
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyProductId;
+
+    // make sure the file name match with input json script.
+    MockMultipartFile newFileAtZeroIndex = new MockMultipartFile("files", "product-image-0.svg", "image/svg+xml", "some svg".getBytes());
+    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json", dummyFormJsonString.getBytes());
+
+    // act & assert
+
+    // multipart & PUT, you need this
+    MockMultipartHttpServletRequestBuilder builder = (MockMultipartHttpServletRequestBuilder) MockMvcRequestBuilders
+        .multipart(targetUrl) // update
+        .with(new RequestPostProcessor() {
+          @Override
+          public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
+            request.setMethod("PUT");
+            return request;
+          }
+        });
+
+    ResultActions resultActions = mvc.perform(builder
+        .file(newFileAtZeroIndex)
+        .file(jsonFile)
+        .contentType(MediaType.MULTIPART_FORM_DATA)
+        .content(dummyFormJsonString)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
+
   }
 
   @Test

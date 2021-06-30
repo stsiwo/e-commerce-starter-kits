@@ -10,12 +10,14 @@ import Paper from '@material-ui/core/Paper';
 interface SearchFormPropsType {
   searchQuery: string,
   onChange: (searchQuery: string) => void,
+  onClick?: () => void,
   label: string
 }
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
+      backgroundColor: "transparent",
       display: "flex",
       flexWrap: "nowrap",
       width: 300,
@@ -57,8 +59,25 @@ const SearchForm: React.FunctionComponent<SearchFormPropsType> = (props) => {
     props.onChange(e.target.value);
   }
 
+  const handleSearchClick = (e: React.MouseEvent<HTMLElement>) => {
+    if (props.onClick)
+      props.onClick();
+  }
+
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key === "Enter") {
+      if (props.onClick)
+        props.onClick();
+    }
+  }
+
   return (
-    <Paper component="form" className={classes.root}>
+    <Paper
+      component="form"
+      className={classes.root}
+      classes={{
+        root: classes.root
+      }}>
       {/**
       <Autocomplete
         color={"secondary"}
@@ -78,14 +97,15 @@ const SearchForm: React.FunctionComponent<SearchFormPropsType> = (props) => {
           />
         )}
       />**/}
-        <TextField
-          type="search"
-          label={props.label}
-          margin="normal"
-          value={props.searchQuery}
-          onChange={handleSearchChange}
-        />
-      <IconButton className={classes.btnBox}>
+      <TextField
+        type="search"
+        label={props.label}
+        margin="normal"
+        value={props.searchQuery}
+        onChange={handleSearchChange}
+        onKeyPress={handleSearchKeyPress}
+      />
+      <IconButton className={classes.btnBox} onClick={handleSearchClick}>
         <SearchIcon fontSize={"default"} />
       </IconButton>
     </Paper>

@@ -12,6 +12,7 @@ import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { FetchStatusEnum } from 'src/app';
 import Typography from '@material-ui/core/Typography';
+import { useLocation } from 'react-router';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -31,14 +32,14 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+// A custom hook that builds on useLocation to parse
+// the query string for you.
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
+
 /**
  * "/search" endpoint: to search & display products
- *
- * - stpes:
- *  
- *  1. send a request to /products (GET) to fetch the products
- *  2. manage states (e.g., result blog list, filter/sort/pagination) here (not in child component)
- *  3. every time filter/sort/pagination changes, send a request again.
  *
  **/
 const ProductSearch: React.FunctionComponent<{}> = (props) => {
@@ -51,6 +52,19 @@ const ProductSearch: React.FunctionComponent<{}> = (props) => {
   const curDomains = useSelector(mSelector.makeProductWithoutCacheSelector());
 
   const curQuery = useSelector(mSelector.makeProductQuerySelector())
+
+
+  // spa url query string 
+  const query = useQuery()
+  const searchQuery = query.get("searchQuery")
+  React.useEffect(() => {
+    if (searchQuery) {
+      dispatch(
+        productQuerySearchQueryActions.update(searchQuery)
+      )
+    }
+  }, [])
+
 
   // pagination
   const curPagination = useSelector(mSelector.makeProductPaginationSelector())
@@ -87,7 +101,7 @@ const ProductSearch: React.FunctionComponent<{}> = (props) => {
   return (
     <React.Fragment>
       <Box className={classes.searchBox}>
-        <SearchForm searchQuery={curQuery.searchQuery} onChange={handleSearchChange} label={"keyword search here..."} />
+        <SearchForm searchQuery={curQuery.searchQuery} onChange={handleSearchChange} label={"search..."} />
       </Box>
       <SearchController />
       {(curFetchProductStatus === FetchStatusEnum.FETCHING &&

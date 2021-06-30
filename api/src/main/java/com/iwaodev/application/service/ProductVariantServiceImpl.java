@@ -66,6 +66,8 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
     Product targetEntity = this.repository.findById(productId).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given product does not exist."));
 
+    logger.info("successfully fetch target product.");
+    
     ProductSize productSize = this.repository.findProductSizeById(criteria.getProductSize().getProductSizeId()).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given product size does not exist."));
 
     // map criteria to entity
@@ -74,6 +76,12 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     newEntity.setProductSize(productSize);
 
     targetEntity.addVariant(newEntity);
+
+    // must be cheaper than the unit price validaiton
+    if (!newEntity.isVariantDiscountPriceLessThanUnitPrice()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "the discount price must be less than the unit price.");
+    }
+    logger.info("pass the cheaper discount price validation.");
 
     // save it
     Product savedEntity = this.repository.save(targetEntity);
@@ -111,6 +119,11 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     updateEntity.setProductSize(productSize);
 
     targetEntity.updateVariant(variantId, updateEntity);
+
+    // must be cheaper than the unit price validaiton
+    if (!updateEntity.isVariantDiscountPriceLessThanUnitPrice()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "the discount price must be less than the unit price.");
+    }
 
     // save it
     Product savedEntity = this.repository.save(targetEntity);

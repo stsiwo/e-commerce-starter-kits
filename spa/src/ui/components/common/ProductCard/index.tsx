@@ -72,7 +72,7 @@ const ProductCard: React.FunctionComponent<ProductCardPropsType> = ({ product })
           {product.productName}
         </Typography>
         <Typography variant="body1" align="left" color="primary" component="p">
-          <b>`${cadCurrencyFormat(product.cheapestPrice)} ~`</b>
+          <b>{`${cadCurrencyFormat(product.cheapestPrice)} ~`}</b>
         </Typography>
       </CardContent>
       <CardActions className={classes.actions}>

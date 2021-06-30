@@ -81,7 +81,7 @@ const ProductCardV2: React.FunctionComponent<ProductCardV2PropsType> = ({ produc
         <CardActions className={classes.actions}>
           <Button component={RRLink} to={`/products/${product.productPath}`}>
             Read More
-        </Button>
+          </Button>
         </CardActions>
       </Card>
       {(product.isDiscountAvailable &&

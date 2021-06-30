@@ -37,6 +37,8 @@ import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -61,6 +63,8 @@ import lombok.ToString;
     condition = "variant_id IN :variantIds"
 )
 public class ProductVariant {
+
+  private static final Logger logger = LoggerFactory.getLogger(ProductVariant.class);
 
   @Null(message = "{productVariant.id.null}", groups = OnCreate.class)
   @NotNull(message = "{productVariant.id.notnull}", groups = OnUpdate.class)
@@ -176,7 +180,7 @@ public class ProductVariant {
    * whether this variant is disount or not.
    *
    **/
-  @Formula("(select exists (select 1 from products p inner join product_variants pv on pv.product_id = p.product_id where pv.variant_id = variant_id and (pv.is_discount = 1) and (pv.variant_discount_start_date < CURRENT_TIMESTAMP and CURRENT_TIMESTAMP < pv.variant_discount_end_date)))")
+  @Formula("(select exists (select 1 from products p inner join product_variants pv on pv.product_id = p.product_id where pv.variant_id = variant_id and (pv.is_discount = 1) and (pv.variant_discount_start_date < CURRENT_TIMESTAMP() and CURRENT_TIMESTAMP() < pv.variant_discount_end_date)))")
   private Boolean isDiscountAvailable;
 
   /**
@@ -216,6 +220,23 @@ public class ProductVariant {
     } 
 
     return this.product.getProductBaseUnitPrice();
+  }
+
+  public boolean isHasOwnPrice() {
+    return this.variantUnitPrice != null;
+  }
+
+  public boolean isVariantDiscountPriceLessThanUnitPrice() {
+    if (this.isDiscount != null && this.isDiscount) {
+      if (this.isHasOwnPrice()) {
+        logger.info("variant does have its price");
+        return this.variantDiscountPrice.compareTo(this.variantUnitPrice) < 0;
+      } else {
+        logger.info("variant does not have its price");
+        return this.variantDiscountPrice.compareTo(this.product.getProductBaseUnitPrice()) < 0;
+      }
+    }
+    return true;
   }
 
   public void setCartItems(List<CartItem> cartItems) {

@@ -1,5 +1,6 @@
 package com.iwaodev.application.irepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -74,6 +75,6 @@ public interface ProductRepository
   @Query(value = "SELECT p FROM products p INNER JOIN p.variants v WHERE v.variantId IN :variantIds")
   List<Product> findAllByVariantIds(@Param("variantIds") List<Long> variantIds);
 
-  @Query(value = "SELECT p FROM products p WHERE DATE(p.release_date) = CURDATE()", nativeQuery = true)
-  List<Product> findAllNewProducts();
+  @Query(value = "SELECT * FROM products p WHERE DATE(p.release_date) = ?1 AND p.is_public = 1", nativeQuery = true)
+  List<Product> findAllNewProductsByTime(LocalDateTime time);
 }

@@ -18,6 +18,7 @@ module.exports = merge(common, {
       NODE_ENV: JSON.stringify("production"),
       CHECKOUT_SESSION_TIMEOUT: JSON.stringify("600000"), // 10 mins
       API1_URL: JSON.stringify("https://api.iwaodev.com"),
+      RECAPTCHA_SITE_KEY: JSON.stringify("6LcT32UbAAAAAPkBTDRWFyPfYhd6rN-9JhtUQCLg"),
     })
   ],
   optimization: {

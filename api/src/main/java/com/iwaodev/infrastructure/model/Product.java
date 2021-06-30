@@ -86,29 +86,42 @@ public class Product {
   private Double averageReviewPoint = 0.0D;
 
   // assuming discount_price is null if isDiscount = false
-  // also, you need to isDiscount false when passed the end date and make discount price = null (use can use scheduled task)
-  // - use 'left' isntead of 'inner' to cover the case if a product does not have any variants.
+  // also, you need to isDiscount false when passed the end date and make discount
+  // price = null (use can use scheduled task)
+  // - use 'left' isntead of 'inner' to cover the case if a product does not have
+  // any variants.
   /**
-   * the logic is too complicated, so two options:
-   *  - use stored procedures. (ref: https://stackoverflow.com/questions/35631975/how-to-call-a-stored-procedure-which-returns-a-composite-type-from-formula)
-   *  - use @Transient and put the logic in setter with @PostLoad.
+   * the logic is too complicated, so two options: - use stored procedures. (ref:
+   * https://stackoverflow.com/questions/35631975/how-to-call-a-stored-procedure-which-returns-a-composite-type-from-formula)
+   * - use @Transient and put the logic in setter with @PostLoad.
    **/
-  //@Formula("(select least(p.product_base_unit_price, ifnull(p.product_base_discount_price, 2147483647), min(ifnull(pv.variant_unit_price, 2147483647)), min(ifnull(pv.variant_discount_price, 2147483647))) from products p left join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id group by p.product_id)")
+  // @Formula("(select least(p.product_base_unit_price,
+  // ifnull(p.product_base_discount_price, 2147483647),
+  // min(ifnull(pv.variant_unit_price, 2147483647)),
+  // min(ifnull(pv.variant_discount_price, 2147483647))) from products p left join
+  // product_variants pv on pv.product_id = p.product_id where p.product_id =
+  // product_id group by p.product_id)")
   @Getter(value = AccessLevel.NONE)
   @Setter(value = AccessLevel.NONE)
   @Transient
   private BigDecimal cheapestPrice;
 
-  // - use 'left' isntead of 'inner' to cover the case if a product does not have any variants.
-  //@Formula("(select greatest(p.product_base_unit_price, ifnull(p.product_base_discount_price, 0), max(ifnull(pv.variant_unit_price, 0)), max(ifnull(pv.variant_discount_price, 0))) from products p left join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id group by p.product_id)")
+  // - use 'left' isntead of 'inner' to cover the case if a product does not have
+  // any variants.
+  // @Formula("(select greatest(p.product_base_unit_price,
+  // ifnull(p.product_base_discount_price, 0), max(ifnull(pv.variant_unit_price,
+  // 0)), max(ifnull(pv.variant_discount_price, 0))) from products p left join
+  // product_variants pv on pv.product_id = p.product_id where p.product_id =
+  // product_id group by p.product_id)")
   @Getter(value = AccessLevel.NONE)
   @Setter(value = AccessLevel.NONE)
   @Transient
   private BigDecimal highestPrice;
 
   // overall result if discount exist through its variants
-  // - use 'left' isntead of 'inner' to cover the case if a product does not have any variants.
-  @Formula("(select exists (select 1 from products p left join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id and (pv.is_discount = 1) and (pv.variant_discount_start_date < CURRENT_TIMESTAMP and CURRENT_TIMESTAMP < pv.variant_discount_end_date)))")
+  // - use 'left' isntead of 'inner' to cover the case if a product does not have
+  // any variants.
+  @Formula("(select exists (select 1 from products p left join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id and (pv.is_discount = 1) and (pv.variant_discount_start_date < CURRENT_TIMESTAMP() and CURRENT_TIMESTAMP() < pv.variant_discount_end_date)))")
   private Boolean isDiscountAvailable;
 
   @NotNull(message = "{product.category.notnull}")
@@ -120,11 +133,14 @@ public class Product {
       // do you want to include this column and its value.
       // if you don't have its correspnding category id in category table, it gives FK
       // constraint error.
-      insertable = true, //allow to insert this column id (FK) when persist this entity.
+      insertable = true, // allow to insert this column id (FK) when persist this entity.
 
-      // this means if the product size object of this variant entity has different value
-      // than previous one, do you want to update the product size id with the new value.
-      // this does not talking about updating product size entity. only this column id.
+      // this means if the product size object of this variant entity has different
+      // value
+      // than previous one, do you want to update the product size id with the new
+      // value.
+      // this does not talking about updating product size entity. only this column
+      // id.
       updatable = true) // allow to update this column id (FK) when update this entity
   private Category category;
 
@@ -149,28 +165,32 @@ public class Product {
    * - ex) users: a variable name which must exist in User class
    **/
 
-  // ignore this default & generated setter since need to customize for bidirectional relationship
+  // ignore this default & generated setter since need to customize for
+  // bidirectional relationship
   @Setter(value = AccessLevel.NONE)
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
   @Filter(name = "verifiedFilter", condition = "is_verified = :isVerified")
   private List<Review> reviews = new ArrayList<>();
 
-  // ignore this default & auto-generated setter since need to customize for bidirectional relationship
+  // ignore this default & auto-generated setter since need to customize for
+  // bidirectional relationship
   @Setter(value = AccessLevel.NONE)
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
   @Filter(name = "selectedVariantFilter", condition = "variant_id IN :variantIds")
   private List<ProductVariant> variants = new ArrayList<>();
 
-  // ignore this default & auto generated setter since need to customize for bidirectional relationship
+  // ignore this default & auto generated setter since need to customize for
+  // bidirectional relationship
   @Setter(value = AccessLevel.NONE)
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<ProductImage> productImages = new ArrayList<>();
 
   // ignore this setter since need to customize for bidirectional relationship
-  @Setter( value = AccessLevel.NONE)
+  @Setter(value = AccessLevel.NONE)
   // does not want to delete orderDetail when this is deleted.
-  @OneToMany(mappedBy = "product", cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, orphanRemoval = false)
-  private List<OrderDetail> orderDetails  = new ArrayList<>();
+  @OneToMany(mappedBy = "product", cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST,
+      CascadeType.REFRESH }, orphanRemoval = false)
+  private List<OrderDetail> orderDetails = new ArrayList<>();
 
   // constructor
   public Product() {
@@ -178,11 +198,15 @@ public class Product {
   }
 
   /**
-   * if PostLoad on entity doesnt work for you, you need to define entity listener.
+   * if PostLoad on entity doesnt work for you, you need to define entity
+   * listener.
    *
-   * ref: https://stackoverflow.com/questions/2802676/hibernate-postload-never-gets-invoked
+   * ref:
+   * https://stackoverflow.com/questions/2802676/hibernate-postload-never-gets-invoked
    *
    * #2021/06/27 - it works.
+   *
+   * # 2021/06/27 - you can only use a single @PostLoad per entity. so be careful.
    **/
   @PostLoad
   public void setUp() {
@@ -201,7 +225,7 @@ public class Product {
 
     logger.info("cur cheapest: " + cheapestPrice);
     // pick cheapest price among all variants
-    for (ProductVariant variant: this.variants) {
+    for (ProductVariant variant : this.variants) {
 
       // if the variant has its own unit price
       if (variant.getVariantUnitPrice() != null) {
@@ -209,7 +233,8 @@ public class Product {
       }
 
       // if the variant is discount
-      if (variant.getIsDiscount() &&  variant.getVariantDiscountStartDate().isBefore(LocalDateTime.now()) && variant.getVariantDiscountEndDate().isAfter(LocalDateTime.now())) {
+      if (variant.getIsDiscount() && variant.getVariantDiscountStartDate().isBefore(LocalDateTime.now())
+          && variant.getVariantDiscountEndDate().isAfter(LocalDateTime.now())) {
         cheapestPrice = cheapestPrice.min(variant.getVariantDiscountPrice());
       }
     }
@@ -228,27 +253,41 @@ public class Product {
 
     logger.info("cur highest: " + highestPrice);
     // pick highest price among all variants
-    for (ProductVariant variant: this.variants) {
+    for (ProductVariant variant : this.variants) {
 
       // if the variant has its own unit price
       if (variant.getVariantUnitPrice() != null) {
         highestPrice = highestPrice.max(variant.getVariantUnitPrice());
       }
 
+      logger.info("cur highest price after variant unit price: " + highestPrice);
+
       // if the variant is discount
-      if (variant.getIsDiscount() &&  variant.getVariantDiscountStartDate().isBefore(LocalDateTime.now()) && variant.getVariantDiscountEndDate().isAfter(LocalDateTime.now())) {
+      if (variant.getIsDiscount() && variant.getVariantDiscountStartDate().isBefore(LocalDateTime.now())
+          && variant.getVariantDiscountEndDate().isAfter(LocalDateTime.now())) {
         highestPrice = highestPrice.max(variant.getVariantDiscountPrice());
       }
+
+      logger.info("cur highest price after variant discount price: " + highestPrice);
     }
 
     return highestPrice;
   }
 
+  public boolean isBaseUnitPriceLessThanDiscountPriceAtAnyVariant() {
+    boolean isLess = false;
+    for (ProductVariant variant : this.variants) {
+      isLess = variant.isVariantDiscountPriceLessThanUnitPrice();
+    }
+    return isLess;
+  }
+
   public boolean isAnyVariantDiscount() {
     boolean discount = false;
     for (ProductVariant variant : this.variants) {
-      if (variant.getIsDiscount() && variant.getVariantDiscountStartDate().isBefore(LocalDateTime.now()) && variant.getVariantDiscountEndDate().isAfter(LocalDateTime.now())) {
-        discount = true; 
+      if (variant.getIsDiscount() && variant.getVariantDiscountStartDate().isBefore(LocalDateTime.now())
+          && variant.getVariantDiscountEndDate().isAfter(LocalDateTime.now())) {
+        discount = true;
       }
     }
     return discount;
@@ -340,7 +379,7 @@ public class Product {
   }
 
   public boolean isEnoughStock(Integer quantity, Long variantId) {
-    ProductVariant variant = this.findVariantById(variantId);  
+    ProductVariant variant = this.findVariantById(variantId);
     if (variant.getVariantStock() < quantity) {
       return false;
     }
@@ -350,12 +389,11 @@ public class Product {
   /**
    * get current price of this variant including discount
    *
-   *  - price logic
+   * - price logic
    *
-   *    - if variant discount price available, return this
-   *    - else if product discount price available, return this
-   *    - else if variant unit price is set, return this
-   *    - else return product base unit price.
+   * - if variant discount price available, return this - else if product discount
+   * price available, return this - else if variant unit price is set, return this
+   * - else return product base unit price.
    * 
    **/
   public BigDecimal getCurrentPriceOfVariant(Long variantId) throws NotFoundException {
@@ -393,7 +431,8 @@ public class Product {
 
   public void decreaseStockOfVariant(Integer amount, Long variantId) throws NotFoundException, OutOfStockException {
 
-    ProductVariant variant = this.variants.stream().filter(var -> var.getVariantId().equals(variantId)).findFirst().orElse(null);
+    ProductVariant variant = this.variants.stream().filter(var -> var.getVariantId().equals(variantId)).findFirst()
+        .orElse(null);
 
     if (variant == null) {
       throw new NotFoundException("the target variant does not exist. (variant id: " + variantId + ")");
@@ -410,7 +449,8 @@ public class Product {
   }
 
   public void increaseStockOfVariantBack(Integer amount, Long variantId) throws NotFoundException {
-    ProductVariant variant = this.variants.stream().filter(var -> var.getVariantId().equals(variantId)).findFirst().orElse(null);
+    ProductVariant variant = this.variants.stream().filter(var -> var.getVariantId().equals(variantId)).findFirst()
+        .orElse(null);
     if (variant == null) {
       throw new NotFoundException("the target variant does not exist. (variant id: " + variantId + ")");
     }
@@ -448,5 +488,32 @@ public class Product {
         return false;
       }
     }).findFirst();
+  }
+
+  public void turnDiscountFalseByTime(LocalDateTime time) {
+    for (ProductVariant variant : this.variants) {
+      if (variant.getIsDiscount() && variant.getVariantDiscountEndDate().isBefore(time)) {
+        logger.info("turning discount false of variant id: " + variant.getVariantId());
+        variant.setIsDiscount(false);
+      }
+    }
+  }
+
+  /**
+   * make unpublished products publish.
+   *
+   * need to follow the condition to publish:
+   *  1. the product has at least one variant.
+   *  2. only publish the product whose release date is equals to the given date.
+   **/
+  public void publishProductsByTime(LocalDateTime time) {
+    if (!this.isPublic && 
+        this.releaseDate.getYear() == time.getYear() && 
+        this.releaseDate.getMonth() == time.getMonth() && 
+        this.releaseDate.getDayOfMonth() == time.getDayOfMonth() &&
+        this.variants.size() > 0
+        ) {
+      this.setIsPublic(true);
+    }
   }
 }

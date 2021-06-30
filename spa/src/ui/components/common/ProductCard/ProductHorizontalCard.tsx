@@ -73,24 +73,17 @@ const ProductHorizontalCard: React.FunctionComponent<ProductHorizontalCardPropsT
 
   const auth = useSelector(mSelector.makeAuthSelector());
 
-  const productName = (product) ? product.productName : orderDetail.productName
-  const productBaseUnitPrice = (product) ? product.productBaseUnitPrice : orderDetail.productUnitPrice
-  const productColor = (variant) ? variant.variantColor : orderDetail.productColor
-  const productSize = (variant) ? variant.productSize.productSizeName : orderDetail.productSize
-
-  console.log(menu)
-
   return (
     <Card className={`${classes.card} ${classes.root}`}>
       <CardHeader
         className={classes.cardHeader}
         avatar={<Avatar alt="" src={SampleSelfImage} />}
-        title={productName}
-        subheader={`$${productBaseUnitPrice} x${orderDetail.productQuantity}`}
+        title={orderDetail.productName}
+        subheader={`$${orderDetail.productUnitPrice} x${orderDetail.productQuantity}`}
         action={
           <Box component="div" className={classes.actionBox}>
-            <ColorCell value={productColor} />
-            <SizeCell value={productSize} />
+            <ColorCell value={orderDetail.productColor} />
+            <SizeCell value={orderDetail.productSize} />
             {menu}
           </Box>
         }

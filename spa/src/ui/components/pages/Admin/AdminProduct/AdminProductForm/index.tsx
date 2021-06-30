@@ -211,40 +211,6 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
     }));
   }
 
-  const handleProductBaseDiscountChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextProductBaseDiscount: boolean = e.currentTarget.checked
-    updateValidationAt("isDiscount", nextProductBaseDiscount);
-    setProductState((prev: ProductDataType) => ({
-      ...prev,
-      isDiscount: nextProductBaseDiscount,
-    }));
-  }
-
-  const handleProductBaseDiscountPriceInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextProductBaseDiscountPrice = e.target.value
-    updateValidationAt("productBaseDiscountPrice", nextProductBaseDiscountPrice);
-    setProductState((prev: ProductDataType) => ({
-      ...prev,
-      productBaseDiscountPrice: parseFloat(nextProductBaseDiscountPrice)
-    }));
-  }
-
-  const handleProductBaseDiscountStartDateChange = (date: Date | null) => {
-    updateValidationAt("productBaseDiscountStartDate", date);
-    setProductState((prev: ProductDataType) => ({
-      ...prev,
-      productBaseDiscountStartDate: date
-    }));
-  };
-
-  const handleProductBaseDiscountEndDateChange = (date: Date | null) => {
-    updateValidationAt("productBaseDiscountEndDate", date);
-    setProductState((prev: ProductDataType) => ({
-      ...prev,
-      productBaseDiscountEndDate: date
-    }));
-  };
-
   const handleProductNoteInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextProductNote = e.currentTarget.value
     updateValidationAt("note", nextProductNote);
@@ -334,10 +300,6 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
               productDescription: curProductState.productDescription,
               productPath: curProductState.productPath,
               productBaseUnitPrice: curProductState.productBaseUnitPrice,
-              productBaseDiscountPrice: curProductState.productBaseDiscountPrice,
-              productBaseDiscountStartDate: curProductState.productBaseDiscountStartDate,
-              productBaseDiscountEndDate: curProductState.productBaseDiscountEndDate,
-              isDiscount: curProductState.isDiscount,
               isPublic: curProductState.isPublic,
               category: curProductState.category,
               releaseDate: curProductState.releaseDate,
@@ -357,10 +319,6 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
               productDescription: curProductState.productDescription,
               productPath: curProductState.productPath,
               productBaseUnitPrice: curProductState.productBaseUnitPrice,
-              productBaseDiscountPrice: curProductState.productBaseDiscountPrice,
-              productBaseDiscountStartDate: curProductState.productBaseDiscountStartDate,
-              productBaseDiscountEndDate: curProductState.productBaseDiscountEndDate,
-              isDiscount: curProductState.isDiscount,
               isPublic: curProductState.isPublic,
               category: curProductState.category,
               releaseDate: curProductState.releaseDate,
@@ -459,64 +417,6 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
           startAdornment: <InputAdornment position="start">$</InputAdornment>,
         }}
       /><br />
-      {/** isDiscount **/}
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={curProductState.isDiscount}
-            onChange={handleProductBaseDiscountChangeEvent}
-            name="checkedB"
-            color="primary"
-          />
-        }
-        label="Discount?"
-      /><br />
-      <TextField
-        id="product-base-discount-price"
-        label="Discount Price"
-        type="number"
-        className={`${classes.txtFieldBase} ${classes.productPriceInput}`}
-        value={curProductState.productBaseDiscountPrice}
-        onChange={handleProductBaseDiscountPriceInputChangeEvent}
-        helperText={curProductValidationState.productBaseDiscountPrice}
-        error={curProductValidationState.productBaseDiscountPrice !== ""}
-        disabled={!curProductState.isDiscount}
-        InputProps={{
-          startAdornment: <InputAdornment position="start">$</InputAdornment>,
-        }}
-      /><br />
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <KeyboardDatePicker
-          margin="normal"
-          id="product-base-discount-start-date"
-          label="Discount Start Date"
-          format="MM/dd/yyyy"
-          value={curProductState.productBaseDiscountStartDate}
-          onChange={handleProductBaseDiscountStartDateChange}
-          disabled={!curProductState.isDiscount}
-          helperText={curProductValidationState.productBaseDiscountStartDate}
-          error={curProductValidationState.productBaseDiscountStartDate !== ""}
-          KeyboardButtonProps={{
-            'aria-label': 'change date',
-          }}
-          className={classes.productDateInput}
-        />
-        <KeyboardDatePicker
-          margin="normal"
-          id="product-base-discount-end-date"
-          label="Discount End Date"
-          format="MM/dd/yyyy"
-          disabled={!curProductState.isDiscount}
-          value={curProductState.productBaseDiscountEndDate}
-          onChange={handleProductBaseDiscountEndDateChange}
-          helperText={curProductValidationState.productBaseDiscountEndDate}
-          error={curProductValidationState.productBaseDiscountEndDate !== ""}
-          KeyboardButtonProps={{
-            'aria-label': 'change date',
-          }}
-          className={classes.productDateInput}
-        />
-      </MuiPickersUtilsProvider>
       {/** images **/}
       <Typography variant="subtitle1" component="h6" align="left" className={classes.subtitle}>
         Images

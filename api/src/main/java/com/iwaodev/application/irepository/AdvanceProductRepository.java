@@ -1,5 +1,6 @@
 package com.iwaodev.application.irepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,8 +32,14 @@ public interface AdvanceProductRepository {
   /**
    * check if email exists ecept for this userId
    **/
+  public Boolean isOthersHaveName(UUID productId, String productName);
+
+  /**
+   * check if email exists ecept for this userId
+   **/
   public Boolean isOthersHaveColorAndSize(UUID productId, Long variantId, String color, String size);
 
   public Optional<ProductSize> findProductSizeById(Long id);
 
+  public List<ProductVariant> findAllDiscountPassedVariants(LocalDateTime time);
 }

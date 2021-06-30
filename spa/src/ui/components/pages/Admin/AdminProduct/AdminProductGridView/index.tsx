@@ -67,7 +67,7 @@ const generateRows: (domains: ProductType[]) => GridRowsProp = (domains) => {
       path: domain.productPath,
       category: domain.category.categoryName,
       unitPrice: domain.productBaseUnitPrice,
-      discount: domain.isDiscount,
+      discount: domain.isDiscountAvailable,
       releaseDate: domain.releaseDate,
       publish: domain.isPublic,
       variants: {

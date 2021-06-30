@@ -1,5 +1,6 @@
 package com.iwaodev.application.iservice;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.iwaodev.application.dto.notification.NotificationDTO;
@@ -13,6 +14,8 @@ public interface NotificationService {
   public NotificationDTO turnIsReadTrue(UUID userId, String notificationId) throws Exception;
 
   public void deleteIfRead() throws Exception; 
+
+  public void distributeNewProductArriveByTime(LocalDateTime time)  throws Exception;
 }
 
 

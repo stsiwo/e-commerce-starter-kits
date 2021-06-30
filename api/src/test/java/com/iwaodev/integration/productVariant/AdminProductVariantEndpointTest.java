@@ -308,6 +308,53 @@ public class AdminProductVariantEndpointTest {
 
   }
 
+  @Test
+  @Sql(scripts = { "classpath:/integration/productVariant/shouldNotAdminUserCreateNewProductVariantSinceVariantUnitPriceLessThanDiscountPrice.sql" })
+  public void shouldNotAdminUserCreateNewProductVariantSinceVariantUnitPriceLessThanDiscountPrice(
+      @Value("classpath:/integration/productVariant/shouldNotAdminUserCreateNewProductVariantSinceVariantUnitPriceLessThanDiscountPrice.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId);
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+        .post(targetUrl) // create
+        .content(dummyFormJsonString)
+        .contentType(MediaType.APPLICATION_JSON)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/productVariant/shouldNotAdminUserCreateNewProductVariantSinceProductUnitPriceLessThanDiscountPrice.sql" })
+  public void shouldNotAdminUserCreateNewProductVariantSinceProductUnitPriceLessThanDiscountPrice(
+      @Value("classpath:/integration/productVariant/shouldNotAdminUserCreateNewProductVariantSinceProductUnitPriceLessThanDiscountPrice.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId);
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+        .post(targetUrl) // create
+        .content(dummyFormJsonString)
+        .contentType(MediaType.APPLICATION_JSON)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
+
+  }
 
   @Test
   @Sql(scripts = { "classpath:/integration/productVariant/shouldAdminUserUpdateProductVariant.sql" })
@@ -383,6 +430,53 @@ public class AdminProductVariantEndpointTest {
     assertThat(responseBody.getCurrentPrice().toString()).isEqualTo("12.21");
   }
 
+  @Test
+  @Sql(scripts = { "classpath:/integration/productVariant/shouldNotAdminUserUpdateProductVariantWithVariantUnitPriceLessThanDiscountPrice.sql" })
+  public void shouldNotAdminUserUpdateProductVariantWithVariantUnitPriceLessThanDiscountPrice(
+      @Value("classpath:/integration/productVariant/shouldNotAdminUserUpdateProductVariantWithVariantUnitPriceLessThanDiscountPrice.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId) + "/" + dummyFormJson.get("variantId").asText();
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+        .put(targetUrl) // update/replace
+        .content(dummyFormJsonString)
+        .contentType(MediaType.APPLICATION_JSON)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/productVariant/shouldNotAdminUserUpdateProductVariantWithProductUnitPriceLessThanDiscountPrice.sql" })
+  public void shouldNotAdminUserUpdateProductVariantWithProductUnitPriceLessThanDiscountPrice(
+      @Value("classpath:/integration/productVariant/shouldNotAdminUserUpdateProductVariantWithProductUnitPriceLessThanDiscountPrice.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId) + "/" + dummyFormJson.get("variantId").asText();
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+        .put(targetUrl) // update/replace
+        .content(dummyFormJsonString)
+        .contentType(MediaType.APPLICATION_JSON)
+          .cookie(this.authCookie)
+        .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
+
+  }
   @Test
   @Sql(scripts = { "classpath:/integration/productVariant/shouldAdminUserDeleteProductVariant.sql" })
   public void shouldAdminUserDeleteProductVariant() throws Exception {

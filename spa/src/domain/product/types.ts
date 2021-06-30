@@ -106,6 +106,8 @@ export declare type ProductVariantType = {
   variantLength: number
   productId?: string
   currentPrice?: number
+  isDiscountAvailable: boolean
+  regularPrice: number // either product base unit price / variant uint price
 }
 
 
@@ -115,11 +117,7 @@ export declare type ProductType = {
   productDescription: string
   productPath: string
   productBaseUnitPrice: number
-  productBaseDiscountPrice?: number
-  productBaseDiscountStartDate?: Date
-  productBaseDiscountEndDate?: Date
   averageReviewPoint: number
-  isDiscount: boolean
   isPublic: boolean
   category: CategoryType
   releaseDate: Date
@@ -151,10 +149,6 @@ export declare type ProductCriteria = {
   productDescription: string
   productPath: string
   productBaseUnitPrice: number
-  productBaseDiscountPrice?: number
-  productBaseDiscountStartDate?: Date
-  productBaseDiscountEndDate?: Date
-  isDiscount: boolean
   isPublic: boolean
   category: CategoryType
   releaseDate: Date
@@ -263,10 +257,6 @@ export declare type ProductDataType = {
   productDescription: string
   productPath: string
   productBaseUnitPrice: number
-  productBaseDiscountPrice?: number
-  productBaseDiscountStartDate?: Date
-  productBaseDiscountEndDate?: Date
-  isDiscount: boolean
   isPublic: boolean
   category: CategoryType
   releaseDate: Date
@@ -283,10 +273,6 @@ export const defaultProductData: ProductDataType = {
   productImageFiles: Array(5).fill(null),
   productImages: Array(5).fill(null),
   productBaseUnitPrice: 1,
-  productBaseDiscountPrice: 1,
-  productBaseDiscountStartDate: new Date(),
-  productBaseDiscountEndDate: new Date(),
-  isDiscount: false,
   isPublic: false,
   category: null,
   releaseDate: new Date(),
@@ -329,10 +315,6 @@ export const defaultProductOnlyData: ProductDataType = {
     },
   ],
   productBaseUnitPrice: 1,
-  productBaseDiscountPrice: 1,
-  productBaseDiscountStartDate: new Date(),
-  productBaseDiscountEndDate: new Date(),
-  isDiscount: false,
   isPublic: false,
   category: null,
   releaseDate: new Date(),
@@ -347,10 +329,6 @@ export declare type ProductValidationDataType = {
   productPath: string
   productImages: string 
   productBaseUnitPrice: string
-  productBaseDiscountPrice?: string
-  productBaseDiscountStartDate?: string
-  productBaseDiscountEndDate?: string
-  isDiscount: string
   isPublic: string
   category: string
   releaseDate: string
@@ -364,10 +342,6 @@ export const defaultProductValidationData: ProductValidationDataType = {
   productPath: "",
   productImages: "", 
   productBaseUnitPrice: "",
-  productBaseDiscountPrice: "",
-  productBaseDiscountStartDate: "",
-  productBaseDiscountEndDate: "",
-  isDiscount: "",
   isPublic: "",
   category: "",
   releaseDate: "",

@@ -19,6 +19,11 @@ declare const TEST_USER_PASSWORD: string
 
 declare const CHECKOUT_SESSION_TIMEOUT: string
 
+declare const RECAPTCHA_SITE_KEY: string
+
+// recaptcha
+declare const grecaptcha: any;
+
 /**
  * typeScript Error: 
  *  - create below module declaration.

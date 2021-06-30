@@ -210,6 +210,84 @@ public class AdminOrderEndpointTest {
   }
 
   @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldAdminGetIsReviewableTrueWhenCreateOrderEventOfDeliveredSuccessfully.sql" })
+  public void shouldAdminGetIsReviewableTrueWhenCreateOrderEventOfDeliveredSuccessfully(
+      @Value("classpath:/integration/order/shouldAdminGetIsReviewableTrueWhenCreateOrderEventOfDeliveredSuccessfully.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+    // dummy order id must match with sql.
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
+    String adminUserId = "e95bf632-1518-4bf2-8ba9-cd8b7587530b";
+
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events";
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.post(targetUrl).content(dummyFormJsonString)
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    OrderDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, OrderDTO.class);
+
+    logger.info("order events in reaponse");
+
+    // assert
+    assertThat(responseBody.getOrderId()).isNotNull();
+    assertThat(responseBody.getOrderEvents().size()).isEqualTo(3);
+
+    for (OrderDetailDTO orderDetailDto : responseBody.getOrderDetails()) {
+      assertThat(orderDetailDto.getIsReviewable()).isEqualTo(true);
+    }
+
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldNotAdminGetIsReviewableTrueSinceCreateOrderEventOfNonDelivered.sql" })
+  public void shouldNotAdminGetIsReviewableTrueSinceCreateOrderEventOfNonDelivered(
+      @Value("classpath:/integration/order/shouldNotAdminGetIsReviewableTrueSinceCreateOrderEventOfNonDelivered.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+    // dummy order id must match with sql.
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
+    String adminUserId = "e95bf632-1518-4bf2-8ba9-cd8b7587530b";
+
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events";
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.post(targetUrl).content(dummyFormJsonString)
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    OrderDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, OrderDTO.class);
+
+    logger.info("order events in reaponse");
+
+    // assert
+    assertThat(responseBody.getOrderId()).isNotNull();
+    assertThat(responseBody.getOrderEvents().size()).isEqualTo(2);
+
+    for (OrderDetailDTO orderDetailDto : responseBody.getOrderDetails()) {
+      assertThat(orderDetailDto.getIsReviewable()).isEqualTo(false);
+    }
+
+  }
+
+  @Test
   @Sql(scripts = { "classpath:/integration/order/shouldNotAdminCreateOrderEventSinceNoAddable.sql" })
   public void shouldNotAdminCreateOrderEventSinceNoAddable(
       @Value("classpath:/integration/order/shouldNotAdminCreateOrderEventSinceNoAddable.json") Resource dummyFormJsonFile)

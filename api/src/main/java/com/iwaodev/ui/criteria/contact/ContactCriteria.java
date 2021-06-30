@@ -30,5 +30,9 @@ public class ContactCriteria {
 
   @NotEmpty(message = "description can not be null.")
   private String description;
+
+  @NotEmpty(message = "recaptcha token can not be null.")
+  private String recaptchaToken;
+
 }
 

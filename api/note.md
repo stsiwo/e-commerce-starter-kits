@@ -508,7 +508,15 @@
 
   ## Session
 
-    - a logical transaction defined by your business logic.
+    - a single connection to database base.
+
+  ## Transaction
+
+    - a subset of Session for your a single logic 
+
+    ex) 
+        <------------------- Session ------------------------------>
+        <--- Tx1 -----> <--- Tx2 ---> <--- Tx3 ---> <--- Tx4 -----> 
 
   ## Concurrency 
 

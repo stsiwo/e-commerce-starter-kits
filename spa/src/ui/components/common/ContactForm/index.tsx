@@ -10,6 +10,10 @@ import { contactSchema } from 'hooks/validation/rules';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
+import FormLabel from '@material-ui/core/FormLabel';
+import { messageActions } from 'reducers/slices/app';
+import { getNanoId } from 'src/utils';
+import { MessageTypeEnum } from 'src/app';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -34,8 +38,13 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(2),
       width: "80%",
     },
+    recaptchaBox: {
+      '& > div': {
+        margin: `${theme.spacing(2)}px auto`,
+      },
+    },
     actionBox: {
-      textAlign: "right",
+      textAlign: "center",
       margin: `${theme.spacing(2)}px 0`,
     },
   }),
@@ -50,7 +59,7 @@ const ContactForm: React.FunctionComponent<{}> = (props) => {
   const classes = useStyles();
 
   const dispatch = useDispatch()
-  
+
   // snackbar notification
   // usage: 'enqueueSnackbar("message", { variant: "error" };
   const { enqueueSnackbar } = useSnackbar();
@@ -116,6 +125,19 @@ const ContactForm: React.FunctionComponent<{}> = (props) => {
   // event handler to submit
   const handleContactSendClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
 
+    // recaptcha validation
+    const recaptchaToken = grecaptcha.getResponse();
+
+    if (!recaptchaToken) {
+      dispatch(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.ERROR,
+          message: "please verify the reCaptch first before submit.", 
+        })
+      )
+    }
+
     const isValid: boolean = isValidSync(curContactFormState)
 
     console.log(isValid);
@@ -130,12 +152,28 @@ const ContactForm: React.FunctionComponent<{}> = (props) => {
       api.request({
         method: 'POST',
         url: API1_URL + `/contact`,
-        data: curContactFormState, // application/json since object
+        data: {
+          ...curContactFormState, // application/json since object
+          recaptchaToken: recaptchaToken,
+        },
       }).then((data) => {
 
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.SUCCESS,
+            message: "your request has submitted successfully."
+          })
+        )
         enqueueSnackbar("updated successfully.", { variant: "success" })
       }).catch((error: AxiosError) => {
-        enqueueSnackbar(error.message, { variant: "error" })
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.ERROR,
+            message: error.response.data.message,
+          })
+        )
       })
 
     } else {
@@ -143,6 +181,26 @@ const ContactForm: React.FunctionComponent<{}> = (props) => {
       updateAllValidation()
     }
   }
+
+  /**
+   * bugs? reCAP widget is not showed correctly when router page change.
+   * ex) landing page -> contact page => widget does not show. but after refreshing at contact page, it show the widget
+   * workaround: load this script at the contact component internally here.
+   **/
+  React.useEffect(() => {
+    const script = document.createElement('script');
+
+    script.src = "https://www.google.com/recaptcha/api.js";
+    script.async = true;
+    script.defer = true;
+
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    }
+
+  }, []);
 
 
   return (
@@ -196,6 +254,8 @@ const ContactForm: React.FunctionComponent<{}> = (props) => {
         helperText={curContactFormValidationState.description}
         error={curContactFormValidationState.description !== ""}
       />
+      <FormLabel component="legend">ReCaptcha</FormLabel>
+      <div className={`g-recaptcha ${classes.recaptchaBox}`} data-sitekey={RECAPTCHA_SITE_KEY}></div>
       <Box component="div" className={classes.actionBox}>
         <Button onClick={handleContactSendClickEvent}>
           Send

@@ -1,0 +1,50 @@
+{
+  "productId": "9e3e67ca-d058-41f0-aad5-4f09c956a81f", 
+  "productName": "update_product_name",
+  "productDescription": "update_product_desc",
+  "productPath": "update_product_path",
+  "productBaseUnitPrice": 13.32,
+  "isPublic": false,
+  "category":  {
+    "categoryId": 2,
+    "categoryName": "category_1_old",
+    "categoryDescription": "category_desc_1",
+    "categoryPath": "category_path_1" 
+  },
+  "releaseDate": "2012-04-23T18:25:43.511Z",
+  "note": "update_note",
+  "productImages": [
+    {
+      "productImageId": 10,
+      "productImagePath": "blob://sample-0.jpg",
+      "productImageName": "product-image-0",
+      "isChange": true
+    },
+    {
+      "productImageId": 11,
+      "productImagePath": "/domain/products/9e3e67ca-d058-41f0-aad5-4f09c956a81f/images/product-image-1-yyyy.png",
+      "productImageName": "product-image-1",
+      "isChange": false
+    },
+    {
+      "productImageId": 12,
+      "productImagePath": "",
+      "productImageName": "product-image-2",
+      "isChange": false
+    },
+    {
+      "productImageId": 13,
+      "productImagePath": "",
+      "productImageName": "product-image-3",
+      "isChange": true
+    },
+    {
+      "productImageId": 14,
+      "productImagePath": "",
+      "productImageName": "product-image-4",
+      "isChange": false
+    }
+  ]
+}
+
+

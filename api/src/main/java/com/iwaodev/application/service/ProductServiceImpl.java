@@ -1,6 +1,7 @@
 package com.iwaodev.application.service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -67,8 +68,8 @@ public class ProductServiceImpl implements ProductService {
   @PersistenceContext
   private EntityManager entityManager;
 
-  public Page<ProductDTO> getAll(ProductQueryStringCriteria criteria, Integer page, Integer limit,
-      ProductSortEnum sort) throws Exception {
+  public Page<ProductDTO> getAll(ProductQueryStringCriteria criteria, Integer page, Integer limit, ProductSortEnum sort)
+      throws Exception {
 
     // get result with repository
     // and map entity to dto with MapStruct
@@ -78,7 +79,7 @@ public class ProductServiceImpl implements ProductService {
 
           @Override
           public ProductDTO apply(Product product) {
-            ProductDTO dto =  ProductMapper.INSTANCE.toProductDTO(product);
+            ProductDTO dto = ProductMapper.INSTANCE.toProductDTO(product);
             return dto;
           }
 
@@ -105,7 +106,7 @@ public class ProductServiceImpl implements ProductService {
           @Override
           public ProductDTO apply(Product product) {
             logger.info("yes");
-            
+
             return ProductMapper.INSTANCE.toProductDTO(product);
           }
         });
@@ -224,6 +225,10 @@ public class ProductServiceImpl implements ProductService {
       throw new AppException(HttpStatus.BAD_REQUEST, "the product path already taken.");
     }
 
+    if (this.repository.isOthersHaveName(newEntity.getProductId(), criteria.getProductName())) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "the product name already taken.");
+    }
+
     // discout price must be less then unit price
 
     List<ProductImage> productImages = this.createImages(newEntity.getProductId(), files, criteria.getProductImages());
@@ -264,8 +269,6 @@ public class ProductServiceImpl implements ProductService {
       newEntity.setProductImageName(criteria.getProductImageName());
 
       Optional<MultipartFile> fileOption = files.stream().filter(file -> {
-
-
 
         /**
          * 'getOriginalFilename()': file name 'getName()': key name for multipart form
@@ -358,18 +361,29 @@ public class ProductServiceImpl implements ProductService {
       throw new AppException(HttpStatus.BAD_REQUEST, "the product path already taken.");
     }
 
+    if (this.repository.isOthersHaveName(newEntity.getProductId(), criteria.getProductName())) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "the product name already taken.");
+    }
+
     // update product images
     this.updateImages(id, files, oldEntity.getProductImages(), newEntity.getProductImages());
 
     // transfer variants from old to new too
     newEntity.setVariants(oldEntity.getVariants());
 
+    // unit price must be greater than the discount price at any variant if it does
+    // not has its own unit price validaiton
+    if (!newEntity.isBaseUnitPriceLessThanDiscountPriceAtAnyVariant()) {
+      throw new AppException(HttpStatus.BAD_REQUEST,
+          "the one of your discount price at its varaint must be cheaper than this product unit price.");
+    }
+
     // hopely, remove old one included nested entity and replace with new one
     // 'save' return updated entity so return this one
     Product updatedEntity = this.repository.save(newEntity);
     /**
-     * when updating you need to call this flush otherwise update statement does not executed. 
-     * i don't know why.
+     * when updating you need to call this flush otherwise update statement does not
+     * executed. i don't know why.
      **/
     this.repository.flush();
     /**
@@ -450,7 +464,7 @@ public class ProductServiceImpl implements ProductService {
           logger.info("only image files are acceptable.");
           throw new AppException(HttpStatus.BAD_REQUEST, "only image files are acceptable.");
         }
-        
+
         // generate unique (including hash for cache) file name
         String newFileName = this.fileService.generateHashedFileName(file.getOriginalFilename());
 
@@ -618,7 +632,7 @@ public class ProductServiceImpl implements ProductService {
     byte[] content = null;
 
     try {
-      //content = this.fileService.load(internalPath);
+      // content = this.fileService.load(internalPath);
       content = this.s3Service.get(internalPath);
     } catch (Exception e) {
       logger.info(e.getMessage());
@@ -626,6 +640,40 @@ public class ProductServiceImpl implements ProductService {
     }
 
     return content;
+  }
+
+  @Override
+  public void turnPassedDiscountFalseByTime(LocalDateTime time) throws Exception {
+
+    // get all product
+    List<Product> products = this.repository.findAll();
+
+    // if any variant of the product is discount and it passed the end date, make
+    // is_discount false.
+    for (Product product : products) {
+      product.turnDiscountFalseByTime(time);
+    }
+
+    this.repository.saveAll(products);
+  }
+
+  /**
+   * make is_public true only if the release date == time (date).
+   *
+   * this does not include any other date esp past. this is because user might want to unpublish some products on purpose even if it passed release date.
+   **/
+  @Override
+  public void publishProductsByTime(LocalDateTime time) throws Exception {
+    
+    // get all product
+    List<Product> products = this.repository.findAll();
+
+    // if any unpublished product even if it passed release date, make is_public true 
+    for (Product product : products) {
+      product.publishProductsByTime(time);
+    }
+
+    this.repository.saveAll(products);
   }
 
 }

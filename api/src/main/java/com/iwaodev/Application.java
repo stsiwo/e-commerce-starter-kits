@@ -162,13 +162,28 @@ public class Application {
    * https://stackoverflow.com/questions/28024942/how-to-autowire-resttemplate-using-annotations.
    **/
   @Bean("shippingRestTemplate")
-  public RestTemplate restTemplate(RestTemplateBuilder builder) {
+  public RestTemplate shippingRestTemplate(RestTemplateBuilder builder) {
     return builder.additionalInterceptors(this.shippingApiRequestInterceptor)
         // this does not work.
         // .defaultHeader("Accept", "application/vnd.cpc.ship.rate-v4+xml")
         // .defaultHeader("Content-Type", "application/vnd.cpc.ship.rate-v4+xml")
         // .defaultHeader("Accept-Language", "en-CA")
         .build();
+  }
+
+  /**
+   * rest template builder.
+   * 
+   * to send api request to another api (e.g., Recaptcha API).
+   *
+   * you need to config this to make 'restTemplate' work.
+   *
+   * ref:
+   * https://stackoverflow.com/questions/28024942/how-to-autowire-resttemplate-using-annotations.
+   **/
+  @Bean("recatchaRestTemplate")
+  public RestTemplate recatchaRestTemplate(RestTemplateBuilder builder) {
+    return builder.build();
   }
 
   /**
