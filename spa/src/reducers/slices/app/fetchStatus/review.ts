@@ -8,7 +8,7 @@ export type getReviewFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const getReviewFetchStatusSlice = createSlice({
   name: "app/fetchStatus/review/get", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -40,7 +40,7 @@ export type postReviewFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const postReviewFetchStatusSlice = createSlice({
   name: "app/fetchStatus/review/post", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -72,7 +72,7 @@ export type putReviewFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const putReviewFetchStatusSlice = createSlice({
   name: "app/fetchStatus/review/put", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -104,7 +104,7 @@ export type deleteSingleReviewFetchStatusActionType = PayloadAction<FetchStatusE
 
 export const deleteSingleReviewFetchStatusSlice = createSlice({
   name: "app/fetchStatus/review/deleteSingle", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *

@@ -8,7 +8,7 @@ export type getUserFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const getUserFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/get", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -39,7 +39,7 @@ export type getSingleUserFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const getSingleUserFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/getSingle", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -70,7 +70,7 @@ export type postUserFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const postUserFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/post", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -103,7 +103,7 @@ export type patchUserFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const patchUserFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/patch", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -136,7 +136,7 @@ export type putUserFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const putUserFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/put", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -167,7 +167,7 @@ export type deleteSingleUserFetchStatusActionType = PayloadAction<FetchStatusEnu
 
 export const deleteSingleUserFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/deleteSingle", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -198,7 +198,7 @@ export type deleteUserFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const deleteUserFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/delete", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -231,7 +231,7 @@ export type postUserPhoneFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const postUserPhoneFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/phone/post", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -264,7 +264,7 @@ export type putUserPhoneFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const putUserPhoneFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/phone/put", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -297,7 +297,7 @@ export type patchUserPhoneFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const patchUserPhoneFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/phone/patch", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -330,7 +330,7 @@ export type deleteUserPhoneFetchStatusActionType = PayloadAction<FetchStatusEnum
 
 export const deleteUserPhoneFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/phone/delete", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -363,7 +363,7 @@ export type postUserAddressFetchStatusActionType = PayloadAction<FetchStatusEnum
 
 export const postUserAddressFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/address/put", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -396,7 +396,7 @@ export type putUserAddressFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const putUserAddressFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/address/put", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -429,7 +429,7 @@ export type patchUserAddressFetchStatusActionType = PayloadAction<FetchStatusEnu
 
 export const patchUserAddressFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/address/patch", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -462,7 +462,7 @@ export type deleteUserAddressFetchStatusActionType = PayloadAction<FetchStatusEn
 
 export const deleteUserAddressFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/address/delete", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -494,7 +494,7 @@ export type postUserAvatarImageFetchStatusActionType = PayloadAction<FetchStatus
 
 export const postUserAvatarImageFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/avatar-image/post", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -526,7 +526,7 @@ export type deleteUserAvatarImageFetchStatusActionType = PayloadAction<FetchStat
 
 export const deleteUserAvatarImageFetchStatusSlice = createSlice({
   name: "app/fetchStatus/user/avatar-image/delete", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *

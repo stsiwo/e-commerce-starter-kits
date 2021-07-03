@@ -46,7 +46,7 @@ export type ReviewActionType = PayloadAction<ReviewType[]>
 
 export const reviewSlice = createSlice({ 
   name: "domain/reviews", // a name used in action type
-  initialState: {},        
+  initialState: [],        
   reducers: {              
     /**
      *
@@ -118,7 +118,7 @@ export type ReviewPaginationPageActionType = PayloadAction<number>
 
 export const reviewPaginationPageSlice = createSlice({ 
   name: "domain/reviews/pagination/page", // a name used in action type
-  initialState: {},        
+  initialState: 0,        
   reducers: {              
     /**
      *
@@ -131,8 +131,8 @@ export const reviewPaginationPageSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ReviewPaginationPageActionType) => action.payload,
-    clear: (state: string) => 0, // start from 0, (not 1)
+    update: (state: number, action: ReviewPaginationPageActionType) => action.payload,
+    clear: (state: number) => 0, // start from 0, (not 1)
   },
   /**
    * extraReducers property
@@ -156,7 +156,7 @@ export type ReviewPaginationLimitActionType = PayloadAction<number>
 
 export const reviewPaginationLimitSlice = createSlice({ 
   name: "domain/reviews/pagination/limit", // a name used in action type
-  initialState: {},        
+  initialState: 20,        
   reducers: {              
     /**
      *
@@ -169,8 +169,8 @@ export const reviewPaginationLimitSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ReviewPaginationLimitActionType) => action.payload,
-    clear: (state: string) => 20,
+    update: (state: number, action: ReviewPaginationLimitActionType) => action.payload,
+    clear: (state: number) => 20,
   },
   /**
    * extraReducers property
@@ -194,7 +194,7 @@ export type ReviewPaginationTotalPagesActionType = PayloadAction<number>
 
 export const reviewPaginationTotalPagesSlice = createSlice({ 
   name: "domain/reviews/pagination/totalPages", // a name used in action type
-  initialState: {},        
+  initialState: 1,        
   reducers: {              
     /**
      *
@@ -207,8 +207,8 @@ export const reviewPaginationTotalPagesSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ReviewPaginationTotalPagesActionType) => action.payload,
-    clear: (state: string) => 1,
+    update: (state: number, action: ReviewPaginationTotalPagesActionType) => action.payload,
+    clear: (state: number) => 1,
   },
   /**
    * extraReducers property
@@ -269,7 +269,7 @@ export type ReviewQuerySearchQueryActionType = PayloadAction<string>
 
 export const reviewQuerySearchQuerySlice = createSlice({ 
   name: "domain/reviews/query/searchQuery", // a name used in action type
-  initialState: {},        
+  initialState: "",        
   reducers: {              
     /**
      *
@@ -308,7 +308,7 @@ export type ReviewQueryReviewPointActionType = PayloadAction<number>
 
 export const reviewQueryReviewPointSlice = createSlice({ 
   name: "domain/reviews/query/reviewPoint", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -346,7 +346,7 @@ export type ReviewQueryIsVerifiedActionType = PayloadAction<boolean>
 
 export const reviewQueryIsVerifiedSlice = createSlice({ 
   name: "domain/reviews/query/isVerified", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -384,7 +384,7 @@ export type ReviewQueryStartDateActionType = PayloadAction<Date>
 
 export const reviewQueryStartDateSlice = createSlice({ 
   name: "domain/reviews/query/startDate", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -422,7 +422,7 @@ export type ReviewQueryEndDateActionType = PayloadAction<Date>
 
 export const reviewQueryEndDateSlice = createSlice({ 
   name: "domain/reviews/query/endDate", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -460,7 +460,7 @@ export type ReviewQueryProductIdActionType = PayloadAction<string>
 
 export const reviewQueryProductIdSlice = createSlice({ 
   name: "domain/reviews/query/productId", // a name used in action type
-  initialState: {},        
+  initialState: "",        
   reducers: {              
     /**
      *
@@ -499,7 +499,7 @@ export type ReviewQueryUserIdActionType = PayloadAction<string>
 
 export const reviewQueryUserIdSlice = createSlice({ 
   name: "domain/reviews/query/userId", // a name used in action type
-  initialState: {},        
+  initialState: "",        
   reducers: {              
     /**
      *
@@ -539,7 +539,7 @@ export type ReviewQuerySortActionType = PayloadAction<ReviewSortEnum>
 
 export const reviewQuerySortSlice = createSlice({ 
   name: "domain/reviews/query/sort", // a name used in action type
-  initialState: {},        
+  initialState: ReviewSortEnum.DATE_DESC,        
   reducers: {              
     /**
      *

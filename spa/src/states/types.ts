@@ -12,10 +12,10 @@ import { NotificationType } from "domain/notification/types";
 //import { NormalizedTagType } from "domain/tag";
 
 export declare type UiStateType = {
-  leftNavMenu?: boolean
-  rightNavMenu?: boolean
-  searchModal?: boolean
-  cartModal?: boolean
+  leftNavMenu: boolean
+  rightNavMenu: boolean
+  searchModal: boolean
+  cartModal: boolean
 }
 
 export declare type AppStateType = {
@@ -225,9 +225,9 @@ export declare type SensitiveStateType = {
 }
 
 export declare type StateType = {
-  ui?: UiStateType
-  app?: AppStateType
-  domain?: DomainStateType
+  ui: UiStateType
+  app: AppStateType
+  domain: DomainStateType
   // NEVER EVER STORE THIS ON LOCAL STORAGE/SESSION STORAGE. just for only in-memory
   sensitive: SensitiveStateType 
 }

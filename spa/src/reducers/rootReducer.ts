@@ -22,13 +22,27 @@ import { getNotificationFetchStatusSliceReducer, patchNotificationFetchStatusSli
 import { notificationSliceReducer, notificationPaginationSliceReducer, notificationCurIndexSliceReducer } from './slices/domain/notification';
 import { getCompanyFetchStatusSliceReducer } from './slices/app/fetchStatus/company';
 import { companySliceReducer } from './slices/domain/company';
+import { StateType } from 'states/types';
+import { PayloadAction } from '@reduxjs/toolkit';
 
 // ** REFACTOR to new approach **/
 
 /**
- * new rootReducer
+ * main rootReducer
+ *
+ * @2021/07/03
+ *  
+ *  - structure change due to add 'root/reset/all' reducer to clear all state when logout.
+ *
  **/
-export const rootReducer = combineReducers({
+export const rootReducer = (state: StateType, action: PayloadAction<any>) => {
+  if (action.type === "root/reset/all") {
+    return mainReducer(undefined, action);
+  }
+  return mainReducer(state, action);
+}
+
+const mainReducer = combineReducers({
 
   ui: combineReducers({
     leftNavMenu: leftNavMenuSliceReducer,

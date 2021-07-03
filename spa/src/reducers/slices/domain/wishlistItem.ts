@@ -44,7 +44,7 @@ export type WishlistItemActionType = PayloadAction<WishlistItemType[]>
 
 export const wishlistItemSlice = createSlice({ 
   name: "domain/wishlistItem", // a name used in action type
-  initialState: {},        
+  initialState: [],        
   reducers: {              
     /**
      *
@@ -99,7 +99,7 @@ export type WishlistItemQuerySearchQueryActionType = PayloadAction<string>
 
 export const wishlistItemQuerySearchQuerySlice = createSlice({ 
   name: "domain/wishlistItems/query/searchQuery", // a name used in action type
-  initialState: {},        
+  initialState: "",        
   reducers: {              
     /**
      *
@@ -137,7 +137,7 @@ export type WishlistItemQueryCategoryIdActionType = PayloadAction<string>
 
 export const wishlistItemQueryCategoryIdSlice = createSlice({ 
   name: "domain/wishlistItems/query/categoryId", // a name used in action type
-  initialState: {},        
+  initialState: "",        
   reducers: {              
     /**
      *
@@ -175,7 +175,7 @@ export type WishlistItemQueryMinPriceActionType = PayloadAction<number>
 
 export const wishlistItemQueryMinPriceSlice = createSlice({ 
   name: "domain/wishlistItems/query/minPrice", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -213,7 +213,7 @@ export type WishlistItemQueryMaxPriceActionType = PayloadAction<number>
 
 export const wishlistItemQueryMaxPriceSlice = createSlice({ 
   name: "domain/wishlistItems/query/maxPrice", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -251,7 +251,7 @@ export type WishlistItemQueryReviewPointActionType = PayloadAction<number>
 
 export const wishlistItemQueryReviewPointSlice = createSlice({ 
   name: "domain/wishlistItems/query/reviewPoint", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -289,7 +289,7 @@ export type WishlistItemQueryIsDiscountActionType = PayloadAction<boolean>
 
 export const wishlistItemQueryIsDiscountSlice = createSlice({ 
   name: "domain/wishlistItems/query/isDiscount", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -302,8 +302,8 @@ export const wishlistItemQueryIsDiscountSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: WishlistItemQueryIsDiscountActionType) => action.payload,
-    clear: (state: string) => null,
+    update: (state: boolean, action: WishlistItemQueryIsDiscountActionType) => action.payload,
+    clear: (state: boolean) => null,
   },
   /**
    * extraReducers property
@@ -327,7 +327,7 @@ export type WishlistItemQueryStartDateActionType = PayloadAction<Date>
 
 export const wishlistItemQueryStartDateSlice = createSlice({ 
   name: "domain/wishlistItems/query/startDate", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -340,8 +340,8 @@ export const wishlistItemQueryStartDateSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: WishlistItemQueryStartDateActionType) => action.payload,
-    clear: (state: string) => null,
+    update: (state: Date, action: WishlistItemQueryStartDateActionType) => action.payload,
+    clear: (state: Date) => null,
   },
   /**
    * extraReducers property
@@ -365,7 +365,7 @@ export type WishlistItemQueryEndDateActionType = PayloadAction<Date>
 
 export const wishlistItemQueryEndDateSlice = createSlice({ 
   name: "domain/wishlistItems/query/endDate", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -378,8 +378,8 @@ export const wishlistItemQueryEndDateSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: WishlistItemQueryEndDateActionType) => action.payload,
-    clear: (state: string) => null,
+    update: (state: Date, action: WishlistItemQueryEndDateActionType) => action.payload,
+    clear: (state: Date) => null,
   },
   /**
    * extraReducers property
@@ -403,7 +403,7 @@ export type WishlistItemQuerySortActionType = PayloadAction<WishlistItemSortEnum
 
 export const wishlistItemQuerySortSlice = createSlice({ 
   name: "domain/wishlistItems/query/sort", // a name used in action type
-  initialState: {},        
+  initialState: WishlistItemSortEnum.DATE_DESC,        
   reducers: {              
     /**
      *
@@ -416,8 +416,8 @@ export const wishlistItemQuerySortSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: WishlistItemQuerySortActionType) => action.payload,
-    clear: (state: string) => WishlistItemSortEnum.DATE_DESC,
+    update: (state: WishlistItemSortEnum, action: WishlistItemQuerySortActionType) => action.payload,
+    clear: (state: WishlistItemSortEnum) => WishlistItemSortEnum.DATE_DESC,
   },
   /**
    * extraReducers property
@@ -441,7 +441,7 @@ export type WishlistItemPaginationPageActionType = PayloadAction<number>
 
 export const wishlistItemPaginationPageSlice = createSlice({ 
   name: "domain/wishlistItems/pagination/page", // a name used in action type
-  initialState: {},        
+  initialState: 0,        
   reducers: {              
     /**
      *
@@ -454,8 +454,8 @@ export const wishlistItemPaginationPageSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: WishlistItemPaginationPageActionType) => action.payload,
-    clear: (state: string) => 0, // start from 0, (not 1)
+    update: (state: number, action: WishlistItemPaginationPageActionType) => action.payload,
+    clear: (state: number) => 0, // start from 0, (not 1)
   },
   /**
    * extraReducers property
@@ -479,7 +479,7 @@ export type WishlistItemPaginationLimitActionType = PayloadAction<number>
 
 export const wishlistItemPaginationLimitSlice = createSlice({ 
   name: "domain/wishlistItems/pagination/limit", // a name used in action type
-  initialState: {},        
+  initialState: 20,        
   reducers: {              
     /**
      *
@@ -492,8 +492,8 @@ export const wishlistItemPaginationLimitSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: WishlistItemPaginationLimitActionType) => action.payload,
-    clear: (state: string) => 20,
+    update: (state: number, action: WishlistItemPaginationLimitActionType) => action.payload,
+    clear: (state: number) => 20,
   },
   /**
    * extraReducers property
@@ -517,7 +517,7 @@ export type WishlistItemPaginationTotalPagesActionType = PayloadAction<number>
 
 export const wishlistItemPaginationTotalPagesSlice = createSlice({ 
   name: "domain/wishlistItems/pagination/totalPages", // a name used in action type
-  initialState: {},        
+  initialState: 1,        
   reducers: {              
     /**
      *
@@ -530,8 +530,8 @@ export const wishlistItemPaginationTotalPagesSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: WishlistItemPaginationTotalPagesActionType) => action.payload,
-    clear: (state: string) => 1,
+    update: (state: number, action: WishlistItemPaginationTotalPagesActionType) => action.payload,
+    clear: (state: number) => 1,
   },
   /**
    * extraReducers property

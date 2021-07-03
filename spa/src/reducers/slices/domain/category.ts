@@ -66,7 +66,7 @@ export const categorySlice = createSlice({
       return state
     },
 
-    clear: (state: NormalizedCategoryType) => [],
+    clear: (state: NormalizedCategoryType) => ({}),
   },
   /**
    * extraReducers property
@@ -89,7 +89,7 @@ export type CategoryQuerySearchQueryActionType = PayloadAction<string>
 
 export const categoryQuerySearchQuerySlice = createSlice({ 
   name: "domain/categories/query/searchQuery", // a name used in action type
-  initialState: {},        
+  initialState: "",        
   reducers: {              
     /**
      *
@@ -125,7 +125,7 @@ export type CategoryPaginationPageActionType = PayloadAction<number>
 
 export const categoryPaginationPageSlice = createSlice({ 
   name: "domain/categories/pagination/page", // a name used in action type
-  initialState: {},        
+  initialState: 0,        
   reducers: {              
     /**
      *
@@ -138,8 +138,8 @@ export const categoryPaginationPageSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: CategoryPaginationPageActionType) => action.payload,
-    clear: (state: string) => 0, // start from 0, (not 1)
+    update: (state: number, action: CategoryPaginationPageActionType) => action.payload,
+    clear: (state: number) => 0, // start from 0, (not 1)
   },
   /**
    * extraReducers property
@@ -163,7 +163,7 @@ export type CategoryPaginationLimitActionType = PayloadAction<number>
 
 export const categoryPaginationLimitSlice = createSlice({ 
   name: "domain/categories/pagination/limit", // a name used in action type
-  initialState: {},        
+  initialState: 20,        
   reducers: {              
     /**
      *
@@ -176,8 +176,8 @@ export const categoryPaginationLimitSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: CategoryPaginationLimitActionType) => action.payload,
-    clear: (state: string) => 20,
+    update: (state: number, action: CategoryPaginationLimitActionType) => action.payload,
+    clear: (state: number) => 20,
   },
   /**
    * extraReducers property
@@ -201,7 +201,7 @@ export type CategoryPaginationTotalPagesActionType = PayloadAction<number>
 
 export const categoryPaginationTotalPagesSlice = createSlice({ 
   name: "domain/categories/pagination/totalPages", // a name used in action type
-  initialState: {},        
+  initialState: 1,        
   reducers: {              
     /**
      *
@@ -214,8 +214,8 @@ export const categoryPaginationTotalPagesSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: CategoryPaginationTotalPagesActionType) => action.payload,
-    clear: (state: string) => 1,
+    update: (state: number, action: CategoryPaginationTotalPagesActionType) => action.payload,
+    clear: (state: number) => 1,
   },
   /**
    * extraReducers property

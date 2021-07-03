@@ -23,7 +23,7 @@ export type CompanyActionType = PayloadAction<AdminCompanyType>
 
 export const companySlice = createSlice({ 
   name: "domain/company/data", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *

@@ -12,7 +12,7 @@ export type CheckoutOrderActionType = PayloadAction<OrderType>
 
 export const checkoutOrderSlice = createSlice({ 
   name: "domain/checkout/order", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *

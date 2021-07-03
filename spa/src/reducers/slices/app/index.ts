@@ -30,7 +30,7 @@ export const putAuthPhoneActionCreator = createAction<PutAuthPhoneActionType>("s
 export const putAuthPhoneActionTypeName = putAuthPhoneActionCreator().type
 
 // for PATCH (replace a phone) request
-export declare type PatchAuthPhoneActionType = { phoneId: string } 
+export declare type PatchAuthPhoneActionType = { phoneId: string }
 export const patchAuthPhoneActionCreator = createAction<PatchAuthPhoneActionType>("saga/domain/auth/phone/patch")
 export const patchAuthPhoneActionTypeName = patchAuthPhoneActionCreator().type
 
@@ -62,13 +62,13 @@ export const deleteAuthAddressActionTypeName = deleteAuthAddressActionCreator().
 
 
 // for POST (avatar-image) request
-export declare type PostAuthAvatarImageActionType = { avatarImage: File, userId: string } 
+export declare type PostAuthAvatarImageActionType = { avatarImage: File, userId: string }
 export const postAuthAvatarImageActionCreator = createAction<PostAuthAvatarImageActionType>("saga/domain/auth/avatar-image/post")
 export const postAuthAvatarImageActionTypeName = postAuthAvatarImageActionCreator().type
 
 
 // for DELETE (avatar-image) request
-export declare type DeleteAuthAvatarImageActionType = { userId: string } 
+export declare type DeleteAuthAvatarImageActionType = { userId: string }
 export const deleteAuthAvatarImageActionCreator = createAction<DeleteAuthAvatarImageActionType>("saga/domain/auth/avatar-image/delete")
 export const deleteAuthAvatarImageActionTypeName = deleteAuthAvatarImageActionCreator().type
 
@@ -78,17 +78,17 @@ export const putAuthCompanyActionCreator = createAction<PutAuthCompanyActionType
 export const putAuthCompanyActionTypeName = putAuthCompanyActionCreator().type
 
 // for GET (fetch auth order) request
-export declare type FetchAuthOrderActionType = { userId: string } 
+export declare type FetchAuthOrderActionType = { userId: string }
 export const fetchAuthOrderActionCreator = createAction<FetchAuthOrderActionType>("saga/domain/auth/order/fetch")
 export const fetchAuthOrderActionTypeName = fetchAuthOrderActionCreator().type
 
 // for GET (fetch single auth order) request
-export declare type FetchSingleAuthOrderActionType = { userId: string, orderId: string } 
+export declare type FetchSingleAuthOrderActionType = { userId: string, orderId: string }
 export const fetchSingleAuthOrderActionCreator = createAction<FetchSingleAuthOrderActionType>("saga/domain/auth/order/fetchSingle")
 export const fetchSingleAuthOrderActionTypeName = fetchSingleAuthOrderActionCreator().type
 
 // for POST (post auth order event) request
-export declare type PostAuthOrderEventActionType = OrderEventCriteria & { orderId: string } 
+export declare type PostAuthOrderEventActionType = OrderEventCriteria & { orderId: string }
 export const postAuthOrderEventActionCreator = createAction<PostAuthOrderEventActionType>("saga/domain/auth/order/event/post")
 export const postAuthOrderEventActionTypeName = postAuthOrderEventActionCreator().type
 
@@ -102,7 +102,8 @@ export const authSlice = createSlice({
   name: "app/auth", // a name used in action type
   initialState: {
     isLoggedIn: false,
-    userType: UserTypeEnum.GUEST
+    userType: UserTypeEnum.GUEST,
+    user: defaultUser,
   } as AuthType,
   reducers: {
     /**
@@ -115,7 +116,7 @@ export const authSlice = createSlice({
      *
      **/
     login: (state: AuthType, action: authUpdateActionType) => action.payload,
-    loginWithUser: (state: AuthType,  action: PayloadAction<UserType>) => {
+    loginWithUser: (state: AuthType, action: PayloadAction<UserType>) => {
       return {
         isLoggedIn: true,
         userType: action.payload.userType.userType,
@@ -134,7 +135,7 @@ export const authSlice = createSlice({
       return state
     },
 
-    switchPrimaryPhone: (state: AuthType, action: PayloadAction<{phoneId: string}>) => {
+    switchPrimaryPhone: (state: AuthType, action: PayloadAction<{ phoneId: string }>) => {
       state.user.phones = state.user.phones.map((phone: UserPhoneType) => {
         if (phone.phoneId == action.payload.phoneId) {
           phone.isSelected = true
@@ -292,7 +293,11 @@ export type MessageActionType = PayloadAction<MessageStateType>
 
 export const messageSlice = createSlice({
   name: "app/message", // a name used in action type
-  initialState: {},
+  initialState: {
+    id: getNanoId(),
+    type: MessageTypeEnum.INITIAL,
+    message: ""
+  },
   reducers: {
     /**
      *

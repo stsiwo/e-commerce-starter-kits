@@ -64,7 +64,7 @@ export type OrderActionType = PayloadAction<OrderType[]>
 
 export const orderSlice = createSlice({ 
   name: "domain/order", // a name used in action type
-  initialState: {},        
+  initialState: [],        
   reducers: {              
     /**
      *
@@ -173,7 +173,7 @@ export type OrderPaginationPageActionType = PayloadAction<number>
 
 export const orderPaginationPageSlice = createSlice({ 
   name: "domain/orders/pagination/page", // a name used in action type
-  initialState: {},        
+  initialState: 0,        
   reducers: {              
     /**
      *
@@ -186,8 +186,8 @@ export const orderPaginationPageSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: OrderPaginationPageActionType) => action.payload,
-    clear: (state: string) => 0, // start from 0, (not 1)
+    update: (state: number, action: OrderPaginationPageActionType) => action.payload,
+    clear: (state: number) => 0, // start from 0, (not 1)
   },
   /**
    * extraReducers property
@@ -211,7 +211,7 @@ export type OrderPaginationLimitActionType = PayloadAction<number>
 
 export const orderPaginationLimitSlice = createSlice({ 
   name: "domain/orders/pagination/limit", // a name used in action type
-  initialState: {},        
+  initialState: 20,        
   reducers: {              
     /**
      *
@@ -224,8 +224,8 @@ export const orderPaginationLimitSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: OrderPaginationLimitActionType) => action.payload,
-    clear: (state: string) => 20,
+    update: (state: number, action: OrderPaginationLimitActionType) => action.payload,
+    clear: (state: number) => 20,
   },
   /**
    * extraReducers property
@@ -249,7 +249,7 @@ export type OrderPaginationTotalPagesActionType = PayloadAction<number>
 
 export const orderPaginationTotalPagesSlice = createSlice({ 
   name: "domain/orders/pagination/totalPages", // a name used in action type
-  initialState: {},        
+  initialState: 1,        
   reducers: {              
     /**
      *
@@ -262,8 +262,8 @@ export const orderPaginationTotalPagesSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: OrderPaginationTotalPagesActionType) => action.payload,
-    clear: (state: string) => 1,
+    update: (state: number, action: OrderPaginationTotalPagesActionType) => action.payload,
+    clear: (state: number) => 1,
   },
   /**
    * extraReducers property
@@ -325,7 +325,7 @@ export type OrderQuerySearchQueryActionType = PayloadAction<string>
 
 export const orderQuerySearchQuerySlice = createSlice({ 
   name: "domain/orders/query/searchQuery", // a name used in action type
-  initialState: {},        
+  initialState: "",        
   reducers: {              
     /**
      *
@@ -363,7 +363,7 @@ export type OrderQueryOrderStatusActionType = PayloadAction<string>
 
 export const orderQueryOrderStatusSlice = createSlice({ 
   name: "domain/orders/query/orderStatus", // a name used in action type
-  initialState: {},        
+  initialState: "",        
   reducers: {              
     /**
      *
@@ -401,7 +401,7 @@ export type OrderQueryStartDateActionType = PayloadAction<Date>
 
 export const orderQueryStartDateSlice = createSlice({ 
   name: "domain/orders/query/startDate", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -439,7 +439,7 @@ export type OrderQueryEndDateActionType = PayloadAction<Date>
 
 export const orderQueryEndDateSlice = createSlice({ 
   name: "domain/orders/query/endDate", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -477,7 +477,7 @@ export type OrderQuerySortActionType = PayloadAction<OrderSortEnum>
 
 export const orderQuerySortSlice = createSlice({ 
   name: "domain/orders/query/sort", // a name used in action type
-  initialState: {},        
+  initialState: OrderSortEnum.DATE_DESC,        
   reducers: {              
     /**
      *
@@ -490,8 +490,8 @@ export const orderQuerySortSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: OrderQuerySortActionType) => action.payload,
-    clear: (state: string) => OrderSortEnum.DATE_DESC,
+    update: (state: OrderSortEnum, action: OrderQuerySortActionType) => action.payload,
+    clear: (state: OrderSortEnum) => OrderSortEnum.DATE_DESC,
   },
   /**
    * extraReducers property

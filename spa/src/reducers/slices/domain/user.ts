@@ -98,7 +98,7 @@ export type UserActionType = PayloadAction<UserType[]>
 
 export const userSlice = createSlice({ 
   name: "domain/user", // a name used in action type
-  initialState: {},        
+  initialState: [],        
   reducers: {              
     /**
      *
@@ -242,7 +242,7 @@ export type UserPaginationPageActionType = PayloadAction<number>
 
 export const userPaginationPageSlice = createSlice({ 
   name: "domain/users/pagination/page", // a name used in action type
-  initialState: {},        
+  initialState: 0,        
   reducers: {              
     /**
      *
@@ -255,8 +255,8 @@ export const userPaginationPageSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: UserPaginationPageActionType) => action.payload,
-    clear: (state: string) => 0, // start from 0, (not 1)
+    update: (state: number, action: UserPaginationPageActionType) => action.payload,
+    clear: (state: number) => 0, // start from 0, (not 1)
   },
   /**
    * extraReducers property
@@ -280,7 +280,7 @@ export type UserPaginationLimitActionType = PayloadAction<number>
 
 export const userPaginationLimitSlice = createSlice({ 
   name: "domain/users/pagination/limit", // a name used in action type
-  initialState: {},        
+  initialState: 20,        
   reducers: {              
     /**
      *
@@ -293,8 +293,8 @@ export const userPaginationLimitSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: UserPaginationLimitActionType) => action.payload,
-    clear: (state: string) => 20,
+    update: (state: number, action: UserPaginationLimitActionType) => action.payload,
+    clear: (state: number) => 20,
   },
   /**
    * extraReducers property
@@ -318,7 +318,7 @@ export type UserPaginationTotalPagesActionType = PayloadAction<number>
 
 export const userPaginationTotalPagesSlice = createSlice({ 
   name: "domain/users/pagination/totalPages", // a name used in action type
-  initialState: {},        
+  initialState: 1,        
   reducers: {              
     /**
      *
@@ -331,8 +331,8 @@ export const userPaginationTotalPagesSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: UserPaginationTotalPagesActionType) => action.payload,
-    clear: (state: string) => 1,
+    update: (state: number, action: UserPaginationTotalPagesActionType) => action.payload,
+    clear: (state: number) => 1,
   },
   /**
    * extraReducers property
@@ -393,7 +393,7 @@ export type UserQuerySearchQueryActionType = PayloadAction<string>
 
 export const userQuerySearchQuerySlice = createSlice({ 
   name: "domain/users/query/searchQuery", // a name used in action type
-  initialState: {},        
+  initialState: "",        
   reducers: {              
     /**
      *
@@ -431,7 +431,7 @@ export type UserQueryActiveActionType = PayloadAction<UserActiveEnum>
 
 export const userQueryActiveSlice = createSlice({ 
   name: "domain/users/query/active", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -469,7 +469,7 @@ export type UserQueryStartDateActionType = PayloadAction<Date>
 
 export const userQueryStartDateSlice = createSlice({ 
   name: "domain/users/query/startDate", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -507,7 +507,7 @@ export type UserQueryEndDateActionType = PayloadAction<Date>
 
 export const userQueryEndDateSlice = createSlice({ 
   name: "domain/users/query/endDate", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -545,7 +545,7 @@ export type UserQuerySortActionType = PayloadAction<UserSortEnum>
 
 export const userQuerySortSlice = createSlice({ 
   name: "domain/users/query/sort", // a name used in action type
-  initialState: {},        
+  initialState: UserSortEnum.DATE_DESC,        
   reducers: {              
     /**
      *

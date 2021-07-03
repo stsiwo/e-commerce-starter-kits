@@ -8,7 +8,7 @@ export type getCategoryFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const getCategoryFetchStatusSlice = createSlice({
   name: "app/fetchStatus/category/get", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -39,7 +39,7 @@ export type postCategoryFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const postCategoryFetchStatusSlice = createSlice({
   name: "app/fetchStatus/category/post", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -70,7 +70,7 @@ export type putCategoryFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const putCategoryFetchStatusSlice = createSlice({
   name: "app/fetchStatus/category/put", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -101,7 +101,7 @@ export type deleteSingleCategoryFetchStatusActionType = PayloadAction<FetchStatu
 
 export const deleteSingleCategoryFetchStatusSlice = createSlice({
   name: "app/fetchStatus/category/deleteSingle", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -132,7 +132,7 @@ export type deleteCategoryFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const deleteCategoryFetchStatusSlice = createSlice({
   name: "app/fetchStatus/category/delete", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *

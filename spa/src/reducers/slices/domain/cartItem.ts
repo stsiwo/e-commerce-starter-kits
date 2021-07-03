@@ -40,7 +40,7 @@ export type CartItemActionType = PayloadAction<CartItemType[]>
 
 export const cartItemSlice = createSlice({ 
   name: "domain/cartItem", // a name used in action type
-  initialState: {},        
+  initialState: [],        
   reducers: {              
     /**
      *

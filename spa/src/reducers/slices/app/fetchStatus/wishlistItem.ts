@@ -8,7 +8,7 @@ export type getWishlistItemFetchStatusActionType = PayloadAction<FetchStatusEnum
 
 export const getWishlistItemFetchStatusSlice = createSlice({
   name: "app/fetchStatus/wishlistItem/get", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -39,7 +39,7 @@ export type postWishlistItemFetchStatusActionType = PayloadAction<FetchStatusEnu
 
 export const postWishlistItemFetchStatusSlice = createSlice({
   name: "app/fetchStatus/wishlistItem/post", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -70,7 +70,7 @@ export type patchWishlistItemFetchStatusActionType = PayloadAction<FetchStatusEn
 
 export const patchWishlistItemFetchStatusSlice = createSlice({
   name: "app/fetchStatus/wishlistItem/patch", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -101,7 +101,7 @@ export type deleteSingleWishlistItemFetchStatusActionType = PayloadAction<FetchS
 
 export const deleteSingleWishlistItemFetchStatusSlice = createSlice({
   name: "app/fetchStatus/wishlistItem/deleteSingle", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -132,7 +132,7 @@ export type deleteWishlistItemFetchStatusActionType = PayloadAction<FetchStatusE
 
 export const deleteWishlistItemFetchStatusSlice = createSlice({
   name: "app/fetchStatus/wishlistItem/delete", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *

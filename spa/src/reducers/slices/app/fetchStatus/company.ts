@@ -8,7 +8,7 @@ export type getCompanyFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const getCompanyFetchStatusSlice = createSlice({
   name: "app/fetchStatus/company/get", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *

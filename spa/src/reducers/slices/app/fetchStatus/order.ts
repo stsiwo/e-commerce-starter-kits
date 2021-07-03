@@ -9,7 +9,7 @@ export type getOrderFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const getOrderFetchStatusSlice = createSlice({
   name: "app/fetchStatus/order/get", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -40,7 +40,7 @@ export type getSingleOrderFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const getSingleOrderFetchStatusSlice = createSlice({
   name: "app/fetchStatus/order/getSingle", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -71,7 +71,7 @@ export type postOrderFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const postOrderFetchStatusSlice = createSlice({
   name: "app/fetchStatus/order/post", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -107,7 +107,7 @@ export type patchOrderFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const patchOrderFetchStatusSlice = createSlice({
   name: "app/fetchStatus/order/patch", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -140,7 +140,7 @@ export type putOrderFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const putOrderFetchStatusSlice = createSlice({
   name: "app/fetchStatus/order/put", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -171,7 +171,7 @@ export type deleteSingleOrderFetchStatusActionType = PayloadAction<FetchStatusEn
 
 export const deleteSingleOrderFetchStatusSlice = createSlice({
   name: "app/fetchStatus/order/deleteSingle", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -202,7 +202,7 @@ export type deleteOrderFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const deleteOrderFetchStatusSlice = createSlice({
   name: "app/fetchStatus/order/delete", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -235,7 +235,7 @@ export type postOrderEventFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const postOrderEventFetchStatusSlice = createSlice({
   name: "app/fetchStatus/order/event/post", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -268,7 +268,7 @@ export type putOrderEventFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const putOrderEventFetchStatusSlice = createSlice({
   name: "app/fetchStatus/order/event/put", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -299,7 +299,7 @@ export type deleteSingleOrderEventFetchStatusActionType = PayloadAction<FetchSta
 
 export const deleteSingleOrderEventFetchStatusSlice = createSlice({
   name: "app/fetchStatus/order/event/deleteSingle", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -330,7 +330,7 @@ export type postSessionTimeoutOrderEventFetchStatusActionType = PayloadAction<Fe
 
 export const postSessionTimeoutOrderEventFetchStatusSlice = createSlice({
   name: "app/fetchStatus/order/event/post", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *

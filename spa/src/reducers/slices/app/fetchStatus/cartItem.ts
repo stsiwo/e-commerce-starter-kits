@@ -8,7 +8,7 @@ export type getCartItemFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const getCartItemFetchStatusSlice = createSlice({
   name: "app/fetchStatus/cartItem/get", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -39,7 +39,7 @@ export type postCartItemFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const postCartItemFetchStatusSlice = createSlice({
   name: "app/fetchStatus/cartItem/post", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -70,7 +70,7 @@ export type putCartItemFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const putCartItemFetchStatusSlice = createSlice({
   name: "app/fetchStatus/cartItem/put", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -101,7 +101,7 @@ export type deleteSingleCartItemFetchStatusActionType = PayloadAction<FetchStatu
 
 export const deleteSingleCartItemFetchStatusSlice = createSlice({
   name: "app/fetchStatus/cartItem/deleteSingle", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -132,7 +132,7 @@ export type deleteCartItemFetchStatusActionType = PayloadAction<FetchStatusEnum>
 
 export const deleteCartItemFetchStatusSlice = createSlice({
   name: "app/fetchStatus/cartItem/delete", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *

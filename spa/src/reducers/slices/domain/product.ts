@@ -153,7 +153,7 @@ export type ProductQuerySearchQueryActionType = PayloadAction<string>
 
 export const productQuerySearchQuerySlice = createSlice({ 
   name: "domain/products/query/searchQuery", // a name used in action type
-  initialState: {},        
+  initialState: "",        
   reducers: {              
     /**
      *
@@ -191,7 +191,7 @@ export type ProductQueryCategoryIdActionType = PayloadAction<string>
 
 export const productQueryCategoryIdSlice = createSlice({ 
   name: "domain/products/query/categoryId", // a name used in action type
-  initialState: {},        
+  initialState: "",        
   reducers: {              
     /**
      *
@@ -229,7 +229,7 @@ export type ProductQueryMinPriceActionType = PayloadAction<number>
 
 export const productQueryMinPriceSlice = createSlice({ 
   name: "domain/products/query/minPrice", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -267,7 +267,7 @@ export type ProductQueryMaxPriceActionType = PayloadAction<number>
 
 export const productQueryMaxPriceSlice = createSlice({ 
   name: "domain/products/query/maxPrice", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -305,7 +305,7 @@ export type ProductQueryReviewPointActionType = PayloadAction<number>
 
 export const productQueryReviewPointSlice = createSlice({ 
   name: "domain/products/query/reviewPoint", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -343,7 +343,7 @@ export type ProductQueryIsDiscountActionType = PayloadAction<boolean>
 
 export const productQueryIsDiscountSlice = createSlice({ 
   name: "domain/products/query/isDiscount", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -381,7 +381,7 @@ export type ProductQueryStartDateActionType = PayloadAction<Date>
 
 export const productQueryStartDateSlice = createSlice({ 
   name: "domain/products/query/startDate", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -419,7 +419,7 @@ export type ProductQueryEndDateActionType = PayloadAction<Date>
 
 export const productQueryEndDateSlice = createSlice({ 
   name: "domain/products/query/endDate", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -457,7 +457,7 @@ export type ProductQuerySortActionType = PayloadAction<ProductSortEnum>
 
 export const productQuerySortSlice = createSlice({ 
   name: "domain/products/query/sort", // a name used in action type
-  initialState: {},        
+  initialState: null,        
   reducers: {              
     /**
      *
@@ -543,7 +543,7 @@ export type ProductPaginationPageActionType = PayloadAction<number>
 
 export const productPaginationPageSlice = createSlice({ 
   name: "domain/products/pagination/page", // a name used in action type
-  initialState: {},        
+  initialState: 0,        
   reducers: {              
     /**
      *
@@ -556,8 +556,8 @@ export const productPaginationPageSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ProductPaginationPageActionType) => action.payload,
-    clear: (state: string) => 0, // start from 0, (not 1)
+    update: (state: number, action: ProductPaginationPageActionType) => action.payload,
+    clear: (state: number) => 0, // start from 0, (not 1)
   },
   /**
    * extraReducers property
@@ -581,7 +581,7 @@ export type ProductPaginationLimitActionType = PayloadAction<number>
 
 export const productPaginationLimitSlice = createSlice({ 
   name: "domain/products/pagination/limit", // a name used in action type
-  initialState: {},        
+  initialState: 20,        
   reducers: {              
     /**
      *
@@ -594,8 +594,8 @@ export const productPaginationLimitSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ProductPaginationLimitActionType) => action.payload,
-    clear: (state: string) => 20,
+    update: (state: number, action: ProductPaginationLimitActionType) => action.payload,
+    clear: (state: number) => 20,
   },
   /**
    * extraReducers property
@@ -619,7 +619,7 @@ export type ProductPaginationTotalPagesActionType = PayloadAction<number>
 
 export const productPaginationTotalPagesSlice = createSlice({ 
   name: "domain/products/pagination/totalPages", // a name used in action type
-  initialState: {},        
+  initialState: 1,        
   reducers: {              
     /**
      *
@@ -632,8 +632,8 @@ export const productPaginationTotalPagesSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ProductPaginationTotalPagesActionType) => action.payload,
-    clear: (state: string) => 1,
+    update: (state: number, action: ProductPaginationTotalPagesActionType) => action.payload,
+    clear: (state: number) => 1,
   },
   /**
    * extraReducers property
@@ -695,7 +695,7 @@ export type ProductcurItemsActionType = PayloadAction<string[]>
 
 export const productCurItemsSlice = createSlice({ 
   name: "domain/products/curItems", // a name used in action type
-  initialState: {},        
+  initialState: [],        
   reducers: {              
     /**
      *
@@ -709,7 +709,7 @@ export const productCurItemsSlice = createSlice({
 
     // use when you want to replace
     update: (state: string[], action: ProductcurItemsActionType) => action.payload,
-    clear: (state: string[]) => 1,
+    clear: (state: string[]) => [],
   },
   /**
    * extraReducers property

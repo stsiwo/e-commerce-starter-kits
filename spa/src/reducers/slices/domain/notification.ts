@@ -15,7 +15,7 @@ export const fetchNotificationActionCreator = createAction<FetchNotificationActi
 export const fetchNotificationActionTypeName = fetchNotificationActionCreator().type
 
 // for PUT (add a new cart item) request
-export declare type PatchNotificationActionType = { notificationId: string, userId: string } 
+export declare type PatchNotificationActionType = { notificationId: string, userId: string }
 export const patchNotificationActionCreator = createAction<PatchNotificationActionType>("saga/domain/notification/patch")
 export const patchNotificationActionTypeName = patchNotificationActionCreator().type
 
@@ -29,12 +29,12 @@ export const incrementNotificationCurIndexActionTypeName = incrementNotification
  *
  **/
 // action type             
-export type NotificationActionType = PayloadAction<NotificationType[]> 
+export type NotificationActionType = PayloadAction<NotificationType[]>
 
-export const notificationSlice = createSlice({ 
+export const notificationSlice = createSlice({
   name: "domain/notification/data", // a name used in action type
-  initialState: {},        
-  reducers: {              
+  initialState: [],
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -68,7 +68,7 @@ export const notificationSlice = createSlice({
    * You can respond to other action types besides the types it has generated. 
    *
    **/
-}) 
+})
 
 export const notificationSliceReducer = notificationSlice.reducer
 export const notificationActions = notificationSlice.actions
@@ -82,12 +82,17 @@ export const notificationActions = notificationSlice.actions
  *
  **/
 // action type             
-export type NotificationPaginationActionType = PayloadAction<DomainPaginationType> 
+export type NotificationPaginationActionType = PayloadAction<DomainPaginationType>
 
-export const notificationPaginationSlice = createSlice({ 
+export const notificationPaginationSlice = createSlice({
   name: "domain/notifications/pagination", // a name used in action type
-  initialState: {},        
-  reducers: {              
+  initialState: {
+    page: 0,
+    limit: 5,
+    totalPages: 1,
+    totalElements: 0,
+  },
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -106,7 +111,7 @@ export const notificationPaginationSlice = createSlice({
       state.page = state.page + 1
       return state
     },
-    clear: (state: string) => ({
+    clear: (state: DomainPaginationType) => ({
       page: 0,
       limit: 5,
       totalPages: 1,
@@ -119,7 +124,7 @@ export const notificationPaginationSlice = createSlice({
    * You can respond to other action types besides the types it has generated. 
    *
    **/
-}) 
+})
 
 export const notificationPaginationSliceReducer = notificationPaginationSlice.reducer
 export const notificationPaginationActions = notificationPaginationSlice.actions
@@ -131,12 +136,12 @@ export const notificationPaginationActions = notificationPaginationSlice.actions
  *
  **/
 // action type             
-export type NotificationCurIndexActionType = PayloadAction<number> 
+export type NotificationCurIndexActionType = PayloadAction<number>
 
-export const notificationCurIndexSlice = createSlice({ 
+export const notificationCurIndexSlice = createSlice({
   name: "domain/notifications/curIndex", // a name used in action type
-  initialState: {},        
-  reducers: {              
+  initialState: -1,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -151,7 +156,7 @@ export const notificationCurIndexSlice = createSlice({
     update: (state: number, action: NotificationCurIndexActionType) => action.payload,
     increment: (state: number) => state + 1,
     decrement: (state: number) => state - 1,
-    clear: (state: number ) => -1,
+    clear: (state: number) => -1,
   },
   /**
    * extraReducers property
@@ -159,7 +164,7 @@ export const notificationCurIndexSlice = createSlice({
    * You can respond to other action types besides the types it has generated. 
    *
    **/
-}) 
+})
 
 export const notificationCurIndexSliceReducer = notificationCurIndexSlice.reducer
 export const notificationCurIndexActions = notificationCurIndexSlice.actions

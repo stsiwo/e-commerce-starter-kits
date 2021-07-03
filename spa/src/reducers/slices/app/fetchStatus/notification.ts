@@ -8,7 +8,7 @@ export type getNotificationFetchStatusActionType = PayloadAction<FetchStatusEnum
 
 export const getNotificationFetchStatusSlice = createSlice({
   name: "app/fetchStatus/notification/get", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *
@@ -41,7 +41,7 @@ export type patchNotificationFetchStatusActionType = PayloadAction<FetchStatusEn
 
 export const patchNotificationFetchStatusSlice = createSlice({
   name: "app/fetchStatus/notification/patch", // a name used in action type
-  initialState: {},
+  initialState: FetchStatusEnum.INITIAL,
   reducers: {
     /**
      *

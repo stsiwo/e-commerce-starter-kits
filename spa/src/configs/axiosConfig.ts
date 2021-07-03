@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getCookie } from "src/utils";
+import { store } from "./storeConfig";
 
 /**
  * need to be something like below:
@@ -65,7 +66,7 @@ axios.defaults.transformResponse = [].concat(
 /**
  * request interceptor
  *
- * this is for csrf token to prevent this csrf attack.
+ * (request) this is for csrf token to prevent this csrf attack.
  **/
 axios.interceptors.request.use(function (config) {
 
@@ -77,6 +78,24 @@ axios.interceptors.request.use(function (config) {
 
   return config;
 });
+
+/**
+ * response interceptor
+ *
+ * if receive 401 error, clear the all state of this user since auth is no longer valid.
+ * re-authentication is required.
+ *
+ **/
+axios.interceptors.response.use(function (response) {
+  if (response.status === 401) {
+    store.dispatch({
+      type: "root/reset/all",
+      payload: null
+    })
+  }
+  return response
+});
+
 
 // set default 'withCredential'
 axios.defaults.withCredentials = true;
