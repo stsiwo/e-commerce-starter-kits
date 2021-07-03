@@ -120,6 +120,7 @@ public class MemberCartItemEndpointTest {
 
   private Cookie authCookie;
 
+  private Cookie csrfCookie;
   /**
    * insert base test data into mysql database
    *
@@ -141,6 +142,7 @@ public class MemberCartItemEndpointTest {
         );
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
+    this.csrfCookie = new Cookie("csrf-token", this.authInfo.getCsrfToken());
     /**
      * stop using TestRestTEmplate
      *
@@ -166,6 +168,8 @@ public class MemberCartItemEndpointTest {
         MockMvcRequestBuilders
           .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -184,6 +188,8 @@ public class MemberCartItemEndpointTest {
         MockMvcRequestBuilders
         .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -225,6 +231,8 @@ public class MemberCartItemEndpointTest {
         .content(dummyFormJson.toString())
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -263,6 +271,8 @@ public class MemberCartItemEndpointTest {
         .content(dummyFormJson.toString())
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -299,6 +309,8 @@ public class MemberCartItemEndpointTest {
         .content(dummyFormJson.toString())
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -330,6 +342,8 @@ public class MemberCartItemEndpointTest {
         .content(dummyFormJson.toString())
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -365,6 +379,8 @@ public class MemberCartItemEndpointTest {
         MockMvcRequestBuilders
         .delete(targetUrl) // remove single cart item
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -390,6 +406,8 @@ public class MemberCartItemEndpointTest {
         MockMvcRequestBuilders
         .delete(targetUrl) // remove all cart item 
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())

@@ -41,6 +41,12 @@ public class ProductDTO {
   private List<ProductVariantDTO> variants;
 
   private List<ProductImageDTO> productImages;
+
+  private BigDecimal cheapestPrice;
+
+  private BigDecimal highestPrice;
+
+  private Boolean isDiscountAvailable;
 }
 
 

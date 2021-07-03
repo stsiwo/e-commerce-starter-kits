@@ -119,6 +119,7 @@ public class MemberProductEndpointTest {
   private ResourceReader resourceReader;
 
   private Cookie authCookie;
+  private Cookie csrfCookie;
   /**
    * insert base test data into mysql database
    *
@@ -140,6 +141,7 @@ public class MemberProductEndpointTest {
         );
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
+    this.csrfCookie = new Cookie("csrf-token", this.authInfo.getCsrfToken());
     /**
      * stop using TestRestTEmplate
      *
@@ -165,6 +167,8 @@ public class MemberProductEndpointTest {
         MockMvcRequestBuilders
           .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -182,6 +186,8 @@ public class MemberProductEndpointTest {
         MockMvcRequestBuilders
           .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -199,6 +205,8 @@ public class MemberProductEndpointTest {
         MockMvcRequestBuilders
           .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -225,6 +233,8 @@ public class MemberProductEndpointTest {
           .file(jsonFile)
           .contentType(MediaType.MULTIPART_FORM_DATA)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())

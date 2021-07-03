@@ -111,6 +111,8 @@ public class AdminCategoryEndpointTest {
 
   private Cookie authCookie;
 
+  private Cookie csrfCookie;
+
   private AuthenticationInfo authInfo;
 
   /**
@@ -129,6 +131,7 @@ public class AdminCategoryEndpointTest {
     this.authInfo = this.authenticateTestUser.setup(this.entityManager, this.mvc, UserTypeEnum.ADMIN, this.port);
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
+    this.csrfCookie = new Cookie("csrf-token", this.authInfo.getCsrfToken());
   }
 
   @Test
@@ -138,7 +141,12 @@ public class AdminCategoryEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath;
 
     // act & assert
-    mvc.perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+    mvc.perform(MockMvcRequestBuilders
+        .get(targetUrl)
+        .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+        .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
   }
 
@@ -150,7 +158,10 @@ public class AdminCategoryEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath;
 
     // act & assert
-    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+        .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -174,7 +185,11 @@ public class AdminCategoryEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQuery;
 
     // act & assert
-    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get(targetUrl)
+        .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+        .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -205,7 +220,10 @@ public class AdminCategoryEndpointTest {
 
     // act & assert
     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.post(targetUrl) // create
-        .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie)
+        .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON)
+        .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -233,7 +251,10 @@ public class AdminCategoryEndpointTest {
 
     // act & assert
     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.post(targetUrl) // create
-        .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie)
+        .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON)
+        .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -257,7 +278,10 @@ public class AdminCategoryEndpointTest {
 
     // act & assert
     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.post(targetUrl) // create
-        .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie)
+        .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON)
+        .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -281,7 +305,10 @@ public class AdminCategoryEndpointTest {
 
     // act & assert
     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.post(targetUrl) // create
-        .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie)
+        .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON)
+        .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
 
     MvcResult result = resultActions.andReturn();
@@ -310,7 +337,10 @@ public class AdminCategoryEndpointTest {
 
     // act & assert
     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.put(targetUrl) // update/replace
-        .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie)
+        .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON)
+        .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -339,7 +369,10 @@ public class AdminCategoryEndpointTest {
 
     // act & assert
     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.delete(targetUrl) // delete
-        .cookie(this.authCookie).accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
+        .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+        .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 

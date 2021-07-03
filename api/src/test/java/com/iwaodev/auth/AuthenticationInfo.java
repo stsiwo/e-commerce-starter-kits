@@ -16,6 +16,9 @@ public class AuthenticationInfo {
   @NonNull
   String jwtToken;
 
+  @NonNull
+  String csrfToken;
+
 }
 
 

@@ -2,6 +2,7 @@ package com.iwaodev.infrastructure.specification;
 
 import java.time.LocalDateTime;
 
+import com.iwaodev.domain.user.UserActiveEnum;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.infrastructure.model.User_;
 
@@ -32,6 +33,18 @@ public class UserSpecifications {
         return builder.conjunction();
       }
       return builder.lessThanOrEqualTo(root.get(User_.createdAt), signUpDate);
+    };
+  }
+
+  public static Specification<User> isUserActiveType(UserActiveEnum active) {
+    return (root, query, builder) -> {
+      if (active == null) {
+        /**
+         * if paramter is null, we still want to chain specificiation so use 'conjunction()' 
+         **/
+        return builder.conjunction();
+      }
+      return builder.equal(root.get(User_.active), active);
     };
   }
 
@@ -68,6 +81,18 @@ public class UserSpecifications {
         return builder.conjunction();
       }
       return builder.like(root.get(User_.email), "%" + searchQuery + "%");
+    };
+  }
+
+  public static Specification<User> searchQueryByUserId(String searchQuery) {
+    return (root, query, builder) -> {
+      if (searchQuery == null) {
+        /**
+         * if paramter is null, we still want to chain specificiation so use 'conjunction()' 
+         **/
+        return builder.conjunction();
+      }
+      return builder.like(root.get(User_.userId).as(String.class), "%" + searchQuery + "%");
     };
   }
 }

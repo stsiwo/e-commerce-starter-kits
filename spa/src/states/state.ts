@@ -217,6 +217,7 @@ export const initialState: StateType = {
       data: [],
       query: {
         searchQuery: "",
+        active: null,
         startDate: null,
         endDate: null,
         sort: UserSortEnum.DATE_DESC,

@@ -18,6 +18,19 @@
       - more flexible, more complxity
       - less flexible, less complexity
 
+    - avoid write complicated code & sql.
+
+      - hard to maintain.
+      - find the simplest & easiest way to implement. e.g., don't write really complex sql. instead, create additinoal columns to make the sql easy.
+
+## DDD
+
+  - why enclose several entities in an aggregate.
+
+    - one change inside an entity might affect another entity in the same aggreagte.
+
+      e.g., adding new product variant affect the properties of product (e.g., cheapest price & highest price)
+
 ## Testing
 
   ### Test Data

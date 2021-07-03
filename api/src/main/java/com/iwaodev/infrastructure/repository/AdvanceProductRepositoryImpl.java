@@ -113,6 +113,8 @@ public class AdvanceProductRepositoryImpl implements AdvanceProductRepository {
     tQuery.setMaxResults(pageable.getPageSize());
     products = tQuery.getResultList();
 
+    logger.info("done variants fetching");
+
     /**
      * for reviews fetching
      **/
@@ -171,6 +173,7 @@ public class AdvanceProductRepositoryImpl implements AdvanceProductRepository {
     // query.setHint(QueryHints.PASS_DISTINCT_THROUGH, false);
     // products = query.getResultList();
 
+    logger.info("done jpa specification");
     return new PageImpl<Product>(products, pageable, total.size());
   }
 

@@ -46,6 +46,8 @@ public class ProductDTO {
 
   private BigDecimal cheapestPrice;
 
+  private BigDecimal highestPrice;
+
   private Boolean isDiscountAvailable;
 }
 

@@ -128,6 +128,8 @@ public class MemberUserEndpointTest {
 
   private Cookie authCookie;
 
+  private Cookie csrfCookie;
+
   @MockBean
   private S3Service s3Service;
 
@@ -152,7 +154,7 @@ public class MemberUserEndpointTest {
         );
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
-
+    this.csrfCookie = new Cookie("csrf-token", this.authInfo.getCsrfToken());
     /**
      * stop using TestRestTEmplate
      *
@@ -205,6 +207,8 @@ public class MemberUserEndpointTest {
         MockMvcRequestBuilders
           .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -227,6 +231,8 @@ public class MemberUserEndpointTest {
         MockMvcRequestBuilders
         .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -257,6 +263,8 @@ public class MemberUserEndpointTest {
         MockMvcRequestBuilders
         .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -295,6 +303,8 @@ public class MemberUserEndpointTest {
         .content(dummyUserSignupForm.toString())
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -341,6 +351,8 @@ public class MemberUserEndpointTest {
         .contentType(MediaType.APPLICATION_JSON)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -387,6 +399,8 @@ public class MemberUserEndpointTest {
         .contentType(MediaType.APPLICATION_JSON)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -423,6 +437,8 @@ public class MemberUserEndpointTest {
         .file(fileAtZeroIndex)
         .contentType(MediaType.MULTIPART_FORM_DATA)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -455,6 +471,8 @@ public class MemberUserEndpointTest {
         .delete(targetUrl)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -488,6 +506,8 @@ public class MemberUserEndpointTest {
         MockMvcRequestBuilders
         .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -519,6 +539,8 @@ public class MemberUserEndpointTest {
         .content(dummyFormJson.toString())
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -547,6 +569,8 @@ public class MemberUserEndpointTest {
         .content(dummyFormJson.toString())
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -571,6 +595,8 @@ public class MemberUserEndpointTest {
         MockMvcRequestBuilders
         .delete(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -597,6 +623,8 @@ public class MemberUserEndpointTest {
         MockMvcRequestBuilders
         .get(targetUrl)
         .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -642,6 +670,8 @@ public class MemberUserEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -685,6 +715,8 @@ public class MemberUserEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -712,6 +744,8 @@ public class MemberUserEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -740,6 +774,8 @@ public class MemberUserEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -783,6 +819,8 @@ public class MemberUserEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -810,6 +848,8 @@ public class MemberUserEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())

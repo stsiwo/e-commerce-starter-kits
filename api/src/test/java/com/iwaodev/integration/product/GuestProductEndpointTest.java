@@ -12,6 +12,10 @@ import com.iwaodev.data.BaseDatabaseSetup;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
 import org.junit.jupiter.api.Test;
@@ -182,6 +186,271 @@ public class GuestProductEndpointTest {
       assertThat(productDto.getCategory().getCategoryId()).isNotNull();
       assertThat(productDto.getVariants().size()).isGreaterThan(0);
       assertThat(productDto.getReviews().size()).isEqualTo(1); // adjusted that all product verfied review number is 1. check sql.
+      for (ProductVariantDTO variantDTO : productDto.getVariants()) {
+        assertThat(variantDTO.getCurrentPrice()).isNotNull();
+      }
+    }
+  }
+
+  // filter: isDiscount
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldGuestUserFilterProductListWithIsDiscount.sql" })
+  public void shouldGuestUserFilterProductListWithIsDiscount() throws Exception {
+
+    // arrange
+    String dummySearchQueryString = "true";
+    String searchQueryString = "?isDiscount=" + dummySearchQueryString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/public" + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .get(targetUrl)
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ProductDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (ProductDTO productDto : responseBody) {
+      // check if the dummy string contains either name, or description
+      assertThat(productDto.getIsDiscountAvailable()).isEqualTo(true);
+      assertThat(productDto.getIsPublic()).isEqualTo(true);
+      assertThat(productDto.getCategory().getCategoryId()).isNotNull();
+      assertThat(productDto.getVariants().size()).isGreaterThan(0);
+      for (ProductVariantDTO variantDTO : productDto.getVariants()) {
+        assertThat(variantDTO.getCurrentPrice()).isNotNull();
+      }
+    }
+  }
+
+  // filter: maxPrice
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldGuestUserFilterProductListWithMaxPrice.sql" })
+  public void shouldGuestUserFilterProductListWithMaxPrice() throws Exception {
+
+    // arrange
+    BigDecimal dummyMaxPrice = new BigDecimal("50.00");
+    String searchQueryString = "?maxPrice=" + dummyMaxPrice.toString();
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/public" + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .get(targetUrl)
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ProductDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (ProductDTO productDto : responseBody) {
+      // check if the dummy string contains either name, or description
+      assertThat(productDto.getIsPublic()).isEqualTo(true);
+      assertThat(productDto.getCategory().getCategoryId()).isNotNull();
+      assertThat(productDto.getVariants().size()).isGreaterThan(0);
+      assertThat(productDto.getCheapestPrice()).isLessThan(dummyMaxPrice);
+      for (ProductVariantDTO variantDTO : productDto.getVariants()) {
+        assertThat(variantDTO.getCurrentPrice()).isNotNull();
+      }
+    }
+  }
+
+  // filter: minPrice
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldGuestUserFilterProductListWithMinPrice.sql" })
+  public void shouldGuestUserFilterProductListWithMinPrice() throws Exception {
+
+    // arrange
+    BigDecimal dummyMinPrice = new BigDecimal("100.00");
+    String searchQueryString = "?minPrice=" + dummyMinPrice.toString();
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/public" + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .get(targetUrl)
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ProductDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (ProductDTO productDto : responseBody) {
+      // check if the dummy string contains either name, or description
+      assertThat(productDto.getIsPublic()).isEqualTo(true);
+      assertThat(productDto.getCategory().getCategoryId()).isNotNull();
+      assertThat(productDto.getVariants().size()).isGreaterThan(0);
+      assertThat(productDto.getHighestPrice()).isGreaterThan(dummyMinPrice);
+      for (ProductVariantDTO variantDTO : productDto.getVariants()) {
+        assertThat(variantDTO.getCurrentPrice()).isNotNull();
+      }
+    }
+  }
+
+  // filter: category
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldGuestUserFilterProductListWithCategory.sql" })
+  public void shouldGuestUserFilterProductListWithCategory() throws Exception {
+
+    // arrange
+    String dummyCategoryIdString = "3"; 
+    String searchQueryString = "?categoryId=" + dummyCategoryIdString; 
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/public" + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .get(targetUrl)
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ProductDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (ProductDTO productDto : responseBody) {
+      // check if the dummy string contains either name, or description
+      assertThat(productDto.getIsPublic()).isEqualTo(true);
+      assertThat(productDto.getCategory().getCategoryId().toString()).isEqualTo(dummyCategoryIdString);
+      assertThat(productDto.getVariants().size()).isGreaterThan(0);
+      for (ProductVariantDTO variantDTO : productDto.getVariants()) {
+        assertThat(variantDTO.getCurrentPrice()).isNotNull();
+      }
+    }
+  }
+
+  // filter: releaseDate
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldGuestUserFilterProductListWithStartDate.sql" })
+  public void shouldGuestUserFilterProductListWithStartDate() throws Exception {
+
+    // arrange
+    LocalDateTime dummyStartDate = LocalDateTime.of(2020, 1, 1, 0, 0, 0); 
+    String searchQueryString = "?startDate=" + dummyStartDate.toString(); 
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/public" + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .get(targetUrl)
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ProductDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (ProductDTO productDto : responseBody) {
+      // check if the dummy string contains either name, or description
+      assertThat(productDto.getIsPublic()).isEqualTo(true);
+      assertThat(productDto.getCategory().getCategoryId().toString()).isNotNull();
+      assertThat(productDto.getVariants().size()).isGreaterThan(0);
+      assertThat(productDto.getReleaseDate()).isAfter(dummyStartDate);
+      for (ProductVariantDTO variantDTO : productDto.getVariants()) {
+        assertThat(variantDTO.getCurrentPrice()).isNotNull();
+      }
+    }
+  }
+
+  // filter: releaseDate
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldGuestUserFilterProductListWithReviewPoint.sql" })
+  public void shouldGuestUserFilterProductListWithReviewPoint() throws Exception {
+
+    // arrange
+    Double dummyReviewPoint = 3.00; 
+    String searchQueryString = "?reviewPoint=" + dummyReviewPoint; 
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/public" + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .get(targetUrl)
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ProductDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (ProductDTO productDto : responseBody) {
+      // check if the dummy string contains either name, or description
+      assertThat(productDto.getIsPublic()).isEqualTo(true);
+      assertThat(productDto.getCategory().getCategoryId().toString()).isNotNull();
+      assertThat(productDto.getVariants().size()).isGreaterThan(0);
+      assertThat(productDto.getAverageReviewPoint()).isGreaterThanOrEqualTo(dummyReviewPoint);
+      for (ProductVariantDTO variantDTO : productDto.getVariants()) {
+        assertThat(variantDTO.getCurrentPrice()).isNotNull();
+      }
+    }
+  }
+
+  // filter: releaseDate
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldGuestUserFilterProductListWithEndDate.sql" })
+  public void shouldGuestUserFilterProductListWithEndDate() throws Exception {
+
+    // arrange
+    LocalDateTime dummyEndDate = LocalDateTime.of(2020, 1, 1, 0, 0, 0); 
+    String searchQueryString = "?endDate=" + dummyEndDate.toString(); 
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/public" + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .get(targetUrl)
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ProductDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (ProductDTO productDto : responseBody) {
+      // check if the dummy string contains either name, or description
+      assertThat(productDto.getIsPublic()).isEqualTo(true);
+      assertThat(productDto.getCategory().getCategoryId().toString()).isNotNull();
+      assertThat(productDto.getVariants().size()).isGreaterThan(0);
+      assertThat(productDto.getReleaseDate()).isBefore(dummyEndDate);
       for (ProductVariantDTO variantDTO : productDto.getVariants()) {
         assertThat(variantDTO.getCurrentPrice()).isNotNull();
       }

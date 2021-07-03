@@ -3,6 +3,8 @@ package com.iwaodev.ui.criteria.user;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import com.iwaodev.domain.user.UserActiveEnum;
+
 import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.ToString;
@@ -11,6 +13,8 @@ import lombok.ToString;
 public class UserQueryStringCriteria {
 
   private Optional<String> searchQuery;
+
+  private Optional<UserActiveEnum> active;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private Optional<LocalDateTime> startDate;
@@ -25,6 +29,7 @@ public class UserQueryStringCriteria {
      *  - there might be better way such as @Default so that I don't need to specify in the constructor
      **/
     this.searchQuery = Optional.empty();
+    this.active = Optional.empty();
     this.startDate = Optional.empty();
     this.endDate = Optional.empty();
   }
@@ -35,6 +40,14 @@ public class UserQueryStringCriteria {
 
   public void setSearchQuery(Optional<String> searchQuery) {
     this.searchQuery = searchQuery;
+  }
+
+  public UserActiveEnum getActive() {
+    return this.active.orElse(null);
+  }
+
+  public void setActive(Optional<UserActiveEnum> active) {
+    this.active = active;
   }
 
   public LocalDateTime getStartDate() {

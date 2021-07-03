@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.servlet.http.Cookie;
@@ -115,6 +116,7 @@ public class AdminReviewEndpointTest {
 
   private Cookie authCookie;
 
+  private Cookie csrfCookie;
   /**
    * insert base test data into mysql database
    *
@@ -131,6 +133,7 @@ public class AdminReviewEndpointTest {
     this.authInfo = this.authenticateTestUser.setup(this.entityManager, this.mvc, UserTypeEnum.ADMIN, this.port);
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
+    this.csrfCookie = new Cookie("csrf-token", this.authInfo.getCsrfToken());
   }
 
   @Test
@@ -144,6 +147,8 @@ public class AdminReviewEndpointTest {
         MockMvcRequestBuilders
         .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
       .andDo(print())
       .andExpect(status().isOk());
@@ -161,6 +166,8 @@ public class AdminReviewEndpointTest {
         MockMvcRequestBuilders
           .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -177,6 +184,314 @@ public class AdminReviewEndpointTest {
       assertThat(review.getReviewId().toString()).isNotNull();
       assertThat(review.getUser().getUserId().toString()).isNotNull();
       assertThat(review.getProduct().getProductId().toString()).isNotNull();
+    }
+  }
+
+  // filter: userId
+  @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminFilterReviewByUserId.sql" })
+  public void shouldAdminFilterReviewByUserId(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnReview.json") Resource dummyFormJsonFile*/) throws Exception {
+
+    // arrange
+    String dummyQueryStringValue = "c7081519-16e5-4f92-ac50-1834001f12b9";
+    String dummyQueryString = "?userId=" + dummyQueryStringValue;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyQueryString;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+          .get(targetUrl)
+          .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+          .accept(MediaType.APPLICATION_JSON)
+          )
+      .andDo(print())
+      .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ReviewDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ReviewDTO[].class);
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (ReviewDTO review : responseBody) {
+      assertThat(review.getUser().getUserId().toString()).isEqualTo(dummyQueryStringValue);
+    }
+  }
+
+  // filter: productId
+  @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminFilterReviewByProductId.sql" })
+  public void shouldAdminFilterReviewByProductId(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnReview.json") Resource dummyFormJsonFile*/) throws Exception {
+
+    // arrange
+    String dummyQueryStringValue = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String dummyQueryString = "?productId=" + dummyQueryStringValue;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyQueryString;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+          .get(targetUrl)
+          .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+          .accept(MediaType.APPLICATION_JSON)
+          )
+      .andDo(print())
+      .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ReviewDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ReviewDTO[].class);
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (ReviewDTO review : responseBody) {
+      assertThat(review.getProduct().getProductId().toString()).isEqualTo(dummyQueryStringValue);
+    }
+  }
+
+  // filter: reviewPoint
+  @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminFilterReviewByReviewPoint.sql" })
+  public void shouldAdminFilterReviewByReviewPoint(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnReview.json") Resource dummyFormJsonFile*/) throws Exception {
+
+    // arrange
+    Double dummyQueryStringValue = 3.00; 
+    String dummyQueryString = "?reviewPoint=" + dummyQueryStringValue;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyQueryString;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+          .get(targetUrl)
+          .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+          .accept(MediaType.APPLICATION_JSON)
+          )
+      .andDo(print())
+      .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ReviewDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ReviewDTO[].class);
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (ReviewDTO review : responseBody) {
+      assertThat(review.getReviewPoint()).isGreaterThanOrEqualTo(dummyQueryStringValue);
+    }
+  }
+
+  // filter: isVerified
+  @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminFilterReviewByIsVerified.sql" })
+  public void shouldAdminFilterReviewByIsVerified(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnReview.json") Resource dummyFormJsonFile*/) throws Exception {
+
+    // arrange
+    Boolean dummyQueryStringValue = true; 
+    String dummyQueryString = "?isVerified=" + dummyQueryStringValue;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyQueryString;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+          .get(targetUrl)
+          .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+          .accept(MediaType.APPLICATION_JSON)
+          )
+      .andDo(print())
+      .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ReviewDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ReviewDTO[].class);
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (ReviewDTO review : responseBody) {
+      assertThat(review.getIsVerified()).isEqualTo(dummyQueryStringValue);
+    }
+  }
+
+  // filter: searchQuery
+  @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminFilterReviewBySearchQuery.sql" })
+  public void shouldAdminFilterReviewBySearchQuery(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnReview.json") Resource dummyFormJsonFile*/) throws Exception {
+
+    // arrange
+    String dummyQueryStringValue = "Game"; 
+    String dummyQueryString = "?searchQuery=" + dummyQueryStringValue;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyQueryString;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+          .get(targetUrl)
+          .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+          .accept(MediaType.APPLICATION_JSON)
+          )
+      .andDo(print())
+      .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ReviewDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ReviewDTO[].class);
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (ReviewDTO review : responseBody) {
+      assertThat(
+          review.getReviewTitle().contains(dummyQueryStringValue) || review.getReviewDescription().contains(dummyQueryStringValue)
+              ).isEqualTo(true);
+    }
+  }
+
+  // filter: searchQuery - productId
+  @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminFilterReviewBySearchQuery.sql" })
+  public void shouldAdminFilterReviewBySearchQueryProductId(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnReview.json") Resource dummyFormJsonFile*/) throws Exception {
+
+    // arrange
+    String dummyQueryStringValue = "9e3e67ca-d058-41f0-aad5-4f09c956a81f"; 
+    String dummyQueryString = "?searchQuery=" + dummyQueryStringValue;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyQueryString;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+          .get(targetUrl)
+          .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+          .accept(MediaType.APPLICATION_JSON)
+          )
+      .andDo(print())
+      .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ReviewDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ReviewDTO[].class);
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (ReviewDTO review : responseBody) {
+      assertThat(review.getProduct().getProductId().toString()).isEqualTo(dummyQueryStringValue);
+    }
+  }
+
+  // filter: searchQuery - userId
+  @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminFilterReviewBySearchQuery.sql" })
+  public void shouldAdminFilterReviewBySearchQueryUserId(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnReview.json") Resource dummyFormJsonFile*/) throws Exception {
+
+    // arrange
+    String dummyQueryStringValue = "c7081519-16e5-4f92-ac50-1834001f12b9"; 
+    String dummyQueryString = "?searchQuery=" + dummyQueryStringValue;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyQueryString;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+          .get(targetUrl)
+          .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+          .accept(MediaType.APPLICATION_JSON)
+          )
+      .andDo(print())
+      .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ReviewDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ReviewDTO[].class);
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (ReviewDTO review : responseBody) {
+      assertThat(review.getUser().getUserId().toString()).isEqualTo(dummyQueryStringValue);
+    }
+  }
+
+  // filter: startDate
+  @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminFilterReviewByStartDate.sql" })
+  public void shouldAdminFilterReviewByStartDate(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnReview.json") Resource dummyFormJsonFile*/) throws Exception {
+
+    // arrange
+    LocalDateTime dummyQueryStringValue = LocalDateTime.of(2021, 1, 1, 0, 0, 0); 
+    String dummyQueryString = "?startDate=" + dummyQueryStringValue.toString();
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyQueryString;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+          .get(targetUrl)
+          .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+          .accept(MediaType.APPLICATION_JSON)
+          )
+      .andDo(print())
+      .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ReviewDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ReviewDTO[].class);
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (ReviewDTO review : responseBody) {
+      assertThat(review.getCreatedAt()).isAfter(dummyQueryStringValue);
+    }
+  }
+
+  // filter: endDate
+  @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminFilterReviewByEndDate.sql" })
+  public void shouldAdminFilterReviewByEndDate(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnReview.json") Resource dummyFormJsonFile*/) throws Exception {
+
+    // arrange
+    LocalDateTime dummyQueryStringValue = LocalDateTime.of(2021, 1, 1, 0, 0, 0); 
+    String dummyQueryString = "?endDate=" + dummyQueryStringValue.toString();
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyQueryString;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+          .get(targetUrl)
+          .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+          .accept(MediaType.APPLICATION_JSON)
+          )
+      .andDo(print())
+      .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ReviewDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ReviewDTO[].class);
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (ReviewDTO review : responseBody) {
+      assertThat(review.getCreatedAt()).isBefore(dummyQueryStringValue);
     }
   }
 
@@ -203,6 +518,8 @@ public class AdminReviewEndpointTest {
           .content(dummyFormJsonString)
           .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -242,6 +559,8 @@ public class AdminReviewEndpointTest {
           .content(dummyFormJsonString)
           .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -277,6 +596,8 @@ public class AdminReviewEndpointTest {
           .content(dummyFormJsonString)
           .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -310,6 +631,8 @@ public class AdminReviewEndpointTest {
         MockMvcRequestBuilders
           .delete(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())

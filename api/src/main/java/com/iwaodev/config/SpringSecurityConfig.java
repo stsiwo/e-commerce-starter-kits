@@ -81,8 +81,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     security
 
         // disable cxrf
-        // #TODO: search why need this. if you use cookie, I believe that this must be
         // enabled.
+        // use custom 'double submit cookie' to prevent csrf token.
         .csrf().disable()
 
         // authorization
@@ -133,7 +133,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
          *
          *
          **/
-        .logout().permitAll().deleteCookies("api-token").logoutSuccessHandler((request, response, authentication) -> {
+        .logout().permitAll().deleteCookies("api-token", "csrf-token").logoutSuccessHandler((request, response, authentication) -> {
           response.setStatus(HttpServletResponse.SC_OK);
         })
 

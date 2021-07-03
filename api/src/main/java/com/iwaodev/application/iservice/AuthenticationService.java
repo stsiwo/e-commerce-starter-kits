@@ -17,8 +17,9 @@ public interface AuthenticationService {
   public void assignApiTokenCookieToResponse(String jwt, HttpServletResponse response) throws Exception;
 
   /**
-   * 
+   * assign csrf token cookie to reponse.
    **/
+  public String assignCsrfTokenCookieToResponse(HttpServletResponse response) throws Exception;
 }
 
 

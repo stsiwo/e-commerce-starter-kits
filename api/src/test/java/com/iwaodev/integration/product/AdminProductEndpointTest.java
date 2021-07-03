@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -122,6 +123,7 @@ public class AdminProductEndpointTest {
 
   private Cookie authCookie;
 
+  private Cookie csrfCookie;
   @Value("${file.product.path}")
   private String fileProductPath;
 
@@ -147,6 +149,7 @@ public class AdminProductEndpointTest {
     this.authInfo = this.authenticateTestUser.setup(this.entityManager, this.mvc, UserTypeEnum.ADMIN, this.port);
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
+    this.csrfCookie = new Cookie("csrf-token", this.authInfo.getCsrfToken());
   }
 
   @Test
@@ -160,6 +163,8 @@ public class AdminProductEndpointTest {
         MockMvcRequestBuilders
         .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
       .andDo(print())
       .andExpect(status().isOk());
@@ -179,6 +184,8 @@ public class AdminProductEndpointTest {
         MockMvcRequestBuilders
         .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -231,6 +238,8 @@ public class AdminProductEndpointTest {
         .file(jsonFile)
         .contentType(MediaType.MULTIPART_FORM_DATA)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -281,6 +290,8 @@ public class AdminProductEndpointTest {
         .file(jsonFile)
         .contentType(MediaType.MULTIPART_FORM_DATA)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
@@ -293,6 +304,8 @@ public class AdminProductEndpointTest {
     assertThat(responseBody.getProductId()).isNotNull();
     assertThat(responseBody.getProductName()).isEqualTo(dummyFormJson.get("productName").asText());
     assertThat(responseBody.getCategory().getCategoryId().toString()).isEqualTo(dummyFormJson.get("category").get("categoryId").asText());
+    assertThat(responseBody.getCheapestPrice()).isEqualTo(responseBody.getProductBaseUnitPrice());
+    assertThat(responseBody.getHighestPrice()).isEqualTo(responseBody.getProductBaseUnitPrice());
 
 
     List<ProductImageDTO> productImages = responseBody.getProductImages();
@@ -349,6 +362,8 @@ public class AdminProductEndpointTest {
         .file(jsonFile)
         .contentType(MediaType.MULTIPART_FORM_DATA)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
@@ -389,6 +404,8 @@ public class AdminProductEndpointTest {
         .file(jsonFile)
         .contentType(MediaType.MULTIPART_FORM_DATA)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
@@ -450,6 +467,8 @@ public class AdminProductEndpointTest {
         .contentType(MediaType.MULTIPART_FORM_DATA)
         .content(dummyFormJsonString)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
@@ -462,6 +481,8 @@ public class AdminProductEndpointTest {
     assertThat(responseBody.getProductId()).isNotNull();
     assertThat(responseBody.getProductName()).isEqualTo(dummyFormJson.get("productName").asText());
     assertThat(responseBody.getCategory().getCategoryId().toString()).isEqualTo(dummyFormJson.get("category").get("categoryId").asText());
+    assertThat(responseBody.getCheapestPrice()).isEqualTo(new BigDecimal("13.32"));
+    assertThat(responseBody.getHighestPrice()).isEqualTo(new BigDecimal("123.0"));
     assertThat(1).isEqualTo(responseBody.getVariants().size());
 
     List<ProductImageDTO> productImages = responseBody.getProductImages();
@@ -537,6 +558,8 @@ public class AdminProductEndpointTest {
         .contentType(MediaType.MULTIPART_FORM_DATA)
         .content(dummyFormJsonString)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
@@ -585,6 +608,8 @@ public class AdminProductEndpointTest {
         .contentType(MediaType.MULTIPART_FORM_DATA)
         .content(dummyFormJsonString)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
@@ -604,6 +629,8 @@ public class AdminProductEndpointTest {
     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
         .delete(targetUrl) // delete 
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 

@@ -13,7 +13,7 @@ import { categoryPaginationLimitSliceReducer, categoryPaginationPageSliceReducer
 import { orderPaginationLimitSliceReducer, orderPaginationPageSliceReducer, orderPaginationTotalElementsSliceReducer, orderPaginationTotalPagesSliceReducer, orderQueryEndDateSliceReducer, orderQueryOrderStatusSliceReducer, orderQuerySearchQuerySliceReducer, orderQuerySortSliceReducer, orderQueryStartDateSliceReducer, orderSliceReducer } from './slices/domain/order';
 import { productCurItemsSliceReducer, productPaginationLimitSliceReducer, productPaginationPageSliceReducer, productPaginationTotalElementsSliceReducer, productPaginationTotalPagesSliceReducer, productQueryCategoryIdSliceReducer, productQueryEndDateSliceReducer, productQueryIsDiscountSliceReducer, productQueryMaxPriceSliceReducer, productQueryMinPriceSliceReducer, productQueryReviewPointSliceReducer, productQuerySearchQuerySliceReducer, productQuerySortSliceReducer, productQueryStartDateSliceReducer, productSliceReducer } from './slices/domain/product';
 import { reviewPaginationLimitSliceReducer, reviewPaginationPageSliceReducer, reviewPaginationTotalElementsSliceReducer, reviewPaginationTotalPagesSliceReducer, reviewQueryEndDateSliceReducer, reviewQueryIsVerifiedSliceReducer, reviewQueryProductIdSliceReducer, reviewQueryReviewPointSliceReducer, reviewQuerySearchQuerySliceReducer, reviewQuerySortSliceReducer, reviewQueryStartDateSliceReducer, reviewQueryUserIdSliceReducer, reviewSliceReducer } from './slices/domain/review';
-import { userPaginationLimitSliceReducer, userPaginationPageSliceReducer, userPaginationTotalElementsSliceReducer, userPaginationTotalPagesSliceReducer, userQueryEndDateSliceReducer, userQuerySearchQuerySliceReducer, userQuerySortSliceReducer, userQueryStartDateSliceReducer, userSliceReducer } from './slices/domain/user';
+import { userPaginationLimitSliceReducer, userPaginationPageSliceReducer, userPaginationTotalElementsSliceReducer, userPaginationTotalPagesSliceReducer, userQueryEndDateSliceReducer, userQuerySearchQuerySliceReducer, userQuerySortSliceReducer, userQueryStartDateSliceReducer, userSliceReducer, userQueryActiveSliceReducer } from './slices/domain/user';
 import { wishlistItemPaginationLimitSliceReducer, wishlistItemPaginationPageSliceReducer, wishlistItemPaginationTotalElementsSliceReducer, wishlistItemPaginationTotalPagesSliceReducer, wishlistItemQueryEndDateSliceReducer, wishlistItemQueryIsDiscountSliceReducer, wishlistItemQueryMaxPriceSliceReducer, wishlistItemQueryMinPriceSliceReducer, wishlistItemQueryReviewPointSliceReducer, wishlistItemQuerySearchQuerySliceReducer, wishlistItemQuerySortSliceReducer, wishlistItemQueryStartDateSliceReducer, wishlistItemSliceReducer } from './slices/domain/wishlistItem';
 import { stripeClientSecretSliceReducer } from './slices/sensitive';
 import { cartModalSliceReducer, leftNavMenuSliceReducer, rightNavMenuSliceReducer, searchModalSliceReducer } from './slices/ui';
@@ -174,6 +174,7 @@ export const rootReducer = combineReducers({
       data: userSliceReducer,
       query: combineReducers({
         searchQuery: userQuerySearchQuerySliceReducer,
+        active: userQueryActiveSliceReducer,
         startDate: userQueryStartDateSliceReducer,
         endDate: userQueryEndDateSliceReducer,
         sort: userQuerySortSliceReducer,

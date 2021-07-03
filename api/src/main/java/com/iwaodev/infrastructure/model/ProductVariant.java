@@ -17,6 +17,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
+import javax.persistence.PreRemove;
+import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Min;
@@ -208,6 +211,22 @@ public class ProductVariant {
   public void setCurrentPrice() {
     this.currentPrice = this.getCurrentPrice();
   }
+
+  /**
+   * don't do this. this deos not update the parent entity (e.g., product) and produce nullpointerexcepiton.
+   *
+   **/
+  //@PrePersist
+  //@PreUpdate
+  //@PreRemove
+  //public void setUp() {
+  //  if (this.product != null) {
+  //    logger.info("start setup");
+  //    this.product.setCheapestPrice();
+  //    this.product.setHighestPrice();
+  //    logger.info("end setup");
+  //  }
+  //}
 
   public BigDecimal getCurrentPrice() {
 

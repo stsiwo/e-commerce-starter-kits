@@ -51,12 +51,12 @@ public class WishlistItem implements Serializable {
 
   @NotNull(message = "{wishlistItem.user.notnull}")
   @ManyToOne
-  @JoinColumn(name = "user_id", insertable = true, updatable = false)
+  @JoinColumn(name = "user_id", insertable = true, updatable = true)
   private User user;
 
   @NotNull(message = "{wishlistItem.variant.notnull}")
   @ManyToOne
-  @JoinColumn(name = "variant_id", insertable = true, updatable = false)
+  @JoinColumn(name = "variant_id", insertable = true, updatable = true)
   private ProductVariant variant;
 
   @CreationTimestamp

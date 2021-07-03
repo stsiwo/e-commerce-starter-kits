@@ -85,6 +85,7 @@ public class ProductVariantValidationValidator
       }
     }
 
+    logger.info("done product variant validator");
     // if pass all of them,
     return true;
   }

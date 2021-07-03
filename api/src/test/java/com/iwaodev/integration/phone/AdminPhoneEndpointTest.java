@@ -91,6 +91,7 @@ public class AdminPhoneEndpointTest {
 
   private Cookie authCookie;
 
+  private Cookie csrfCookie;
   private AuthenticationInfo authInfo;
   /**
    * insert base test data into mysql database
@@ -112,6 +113,7 @@ public class AdminPhoneEndpointTest {
        this.port);
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
+    this.csrfCookie = new Cookie("csrf-token", this.authInfo.getCsrfToken());
   }
 
   //
@@ -153,6 +155,8 @@ public class AdminPhoneEndpointTest {
         MockMvcRequestBuilders
           .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -182,6 +186,8 @@ public class AdminPhoneEndpointTest {
         MockMvcRequestBuilders
           .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -218,6 +224,8 @@ public class AdminPhoneEndpointTest {
         MockMvcRequestBuilders
           .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -252,6 +260,8 @@ public class AdminPhoneEndpointTest {
         MockMvcRequestBuilders
           .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -281,6 +291,8 @@ public class AdminPhoneEndpointTest {
           .content(dummyFormJsonString)
           .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -315,6 +327,8 @@ public class AdminPhoneEndpointTest {
           .content(dummyFormJsonString)
           .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -348,6 +362,8 @@ public class AdminPhoneEndpointTest {
           .content(dummyFormJsonString)
           .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -373,6 +389,8 @@ public class AdminPhoneEndpointTest {
           .content(dummyFormJsonString)
           .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -404,6 +422,8 @@ public class AdminPhoneEndpointTest {
           .content(dummyFormJsonString)
           .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -441,6 +461,8 @@ public class AdminPhoneEndpointTest {
           .content(dummyFormJsonString)
           .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -469,6 +491,8 @@ public class AdminPhoneEndpointTest {
         MockMvcRequestBuilders
           .delete(targetUrl) // remove
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -493,6 +517,8 @@ public class AdminPhoneEndpointTest {
         MockMvcRequestBuilders
           .delete(targetUrl) // remove
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())

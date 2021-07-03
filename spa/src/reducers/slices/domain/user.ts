@@ -1,7 +1,7 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import merge from "lodash/merge";
 import remove from 'lodash/remove';
-import { UserType, UserCriteria, UserSortEnum, UserPhoneCriteria, UserAddressCriteria, UserPhoneType, UserAddressType } from "domain/user/types";
+import { UserType, UserCriteria, UserSortEnum, UserPhoneCriteria, UserAddressCriteria, UserPhoneType, UserAddressType, UserActiveEnum } from "domain/user/types";
 
 /**
  * redux-sage actions (side effects)
@@ -419,6 +419,44 @@ export const userQuerySearchQuerySlice = createSlice({
 
 export const userQuerySearchQuerySliceReducer = userQuerySearchQuerySlice.reducer
 export const userQuerySearchQueryActions = userQuerySearchQuerySlice.actions
+
+
+/**
+ *
+ * domain.users.query.active state Slice (no side effects)
+ *
+ **/
+// action type             
+export type UserQueryActiveActionType = PayloadAction<UserActiveEnum> 
+
+export const userQueryActiveSlice = createSlice({ 
+  name: "domain/users/query/active", // a name used in action type
+  initialState: {},        
+  reducers: {              
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: UserActiveEnum, action: UserQueryActiveActionType) => action.payload,
+    clear: (state: UserActiveEnum) => null,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated. 
+   *
+   **/
+}) 
+
+export const userQueryActiveSliceReducer = userQueryActiveSlice.reducer
+export const userQueryActiveActions = userQueryActiveSlice.actions
 
 
 /**

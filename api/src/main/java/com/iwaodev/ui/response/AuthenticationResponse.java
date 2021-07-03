@@ -13,8 +13,11 @@ public class AuthenticationResponse {
 
   private UserDTO user;
 
-  public AuthenticationResponse(UserDTO user, String jwt) {
+  private String csrfToken;
+
+  public AuthenticationResponse(UserDTO user, String jwt, String csrfToken) {
     this.user = user;
     this.jwt = jwt;
+    this.csrfToken = csrfToken;
   }
 }

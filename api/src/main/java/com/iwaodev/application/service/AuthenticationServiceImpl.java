@@ -1,6 +1,7 @@
 package com.iwaodev.application.service;
 
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +34,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,12 +53,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   @Autowired
   private UserRepository userRepository;
 
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+
   @Override
   public AuthenticationResponse login(String userName, String email, HttpServletResponse response) throws Exception {
 
     final String jwt = this.jwtUtil.generateToken(userName);
 
     this.assignApiTokenCookieToResponse(jwt, response);
+    String csrfToken = this.assignCsrfTokenCookieToResponse(response);
 
     /**
      * find the user for response
@@ -69,7 +75,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      **/
     UserDTO userDTO = UserMapper.INSTANCE.toUserDTO(user);
 
-    return new AuthenticationResponse(userDTO, jwt);
+    return new AuthenticationResponse(userDTO, jwt, csrfToken);
   }
 
   @Override
@@ -102,5 +108,35 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
       response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
+  }
+
+  @Override
+  public String assignCsrfTokenCookieToResponse(HttpServletResponse response) throws Exception {
+
+    String token = this.passwordEncoder.encode(UUID.randomUUID().toString());
+
+    // this is for localhost since if you set 'domain' it does not work even if it
+    // is empty string
+    if (!apiTokenCookieConfig.getDomain().isEmpty()) {
+
+      ResponseCookie cookie = ResponseCookie.from("csrf-token", token).sameSite(apiTokenCookieConfig.getSameSite())
+          .maxAge(apiTokenCookieConfig.getTimeout()).secure(apiTokenCookieConfig.getSecure())
+          .domain(apiTokenCookieConfig.getDomain()).path(apiTokenCookieConfig.getPath()).build();
+
+      response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+      // .domain(apiTokenCookieConfig.getDomain())
+
+    } else {
+      /**
+       * don't be 'httpOnly'. this is for csrf prevention.
+       **/
+      ResponseCookie cookie = ResponseCookie.from("csrf-token", token).sameSite(apiTokenCookieConfig.getSameSite())
+          .maxAge(apiTokenCookieConfig.getTimeout()).secure(apiTokenCookieConfig.getSecure())
+          .path(apiTokenCookieConfig.getPath()).build();
+
+      response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
+    return token;
   }
 }

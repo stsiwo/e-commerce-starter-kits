@@ -7,6 +7,7 @@ import * as React from 'react';
 import TabPanel from './TabPanel';
 import UserDateFilterTabPanel from './TabPanel/UserDateFilterTabPanel';
 import UserSortTabPanel from './TabPanel/UserSortTabPanel';
+import UserActiveTabPanel from './TabPanel/UserActiveTabPanel';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -91,7 +92,8 @@ const AdminUserSearchController: React.FunctionComponent<{}> = (props) => {
         >
           <Tab label="Result" classes={{ root: classes.tabRoot }} {...a11yProps(0)} />
           <Tab label="Date" classes={{ root: classes.tabRoot }} {...a11yProps(1)} />
-          <Tab label="Sort" classes={{ root: classes.tabRoot }} {...a11yProps(2)} />
+          <Tab label="Status" classes={{ root: classes.tabRoot }} {...a11yProps(2)} />
+          <Tab label="Sort" classes={{ root: classes.tabRoot }} {...a11yProps(3)} />
         </Tabs>
       </AppBar>
       <TabPanel 
@@ -108,6 +110,12 @@ const AdminUserSearchController: React.FunctionComponent<{}> = (props) => {
       <TabPanel 
         value={curTabIndex} 
         index={2} 
+        className={classes.tabPanel}
+        render={() => <UserActiveTabPanel/>} 
+      />
+      <TabPanel 
+        value={curTabIndex} 
+        index={3} 
         className={classes.tabPanel}
         render={() => <UserSortTabPanel/>} 
       />

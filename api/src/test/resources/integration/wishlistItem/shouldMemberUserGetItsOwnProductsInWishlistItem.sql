@@ -1,3 +1,10 @@
+
+-- dummy another users
+-- member user with phones only
+INSERT INTO `users` (`user_id`, `first_name`, `last_name`, `email`, `password`, `user_type_id`)
+VALUES ( 'd2474e1c-4c69-467b-8a7f-11d3ffe8d6d3', 'Member', 'Test', 'test_member3@test.com', '$2a$10$elqDcxXm.YgyuwRS/TcnfuwI4qO8JMKRDJqc4lJatXJ9LIRRhqzB2', '2');
+
+
 -- category
 INSERT INTO `ec-schema`.`categories` (`category_id`, `category_name`, `category_description`, `category_path`) VALUES ('1', 'category_1', 'category_1_desc', 'category_1_path');
 
@@ -53,4 +60,10 @@ VALUES ('c7081519-16e5-4f92-ac50-1834001f12b9', '5'); -- user_id = this test mem
 
 INSERT INTO `ec-schema`.`wishlist_items` (`user_id`, `variant_id`) 
 VALUES ('c7081519-16e5-4f92-ac50-1834001f12b9', '9'); -- user_id = this test member user's id 
+
+INSERT INTO `ec-schema`.`wishlist_items` (`user_id`, `variant_id`) 
+VALUES ('d2474e1c-4c69-467b-8a7f-11d3ffe8d6d3', '3'); -- user_id = dummy another user (should be included)
+
+INSERT INTO `ec-schema`.`wishlist_items` (`user_id`, `variant_id`) 
+VALUES ('d2474e1c-4c69-467b-8a7f-11d3ffe8d6d3', '8'); -- user_id = dummy another user (should be included) 
 

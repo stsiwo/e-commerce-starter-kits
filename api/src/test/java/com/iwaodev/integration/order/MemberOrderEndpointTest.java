@@ -127,6 +127,7 @@ public class MemberOrderEndpointTest {
   private UserRepository userRepository;
 
   private Cookie authCookie;
+  private Cookie csrfCookie;
   /**
    * insert base test data into mysql database
    *
@@ -148,6 +149,7 @@ public class MemberOrderEndpointTest {
         );
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
+    this.csrfCookie = new Cookie("csrf-token", this.authInfo.getCsrfToken());
   }
 
   @Test
@@ -159,6 +161,8 @@ public class MemberOrderEndpointTest {
     mvc.perform(MockMvcRequestBuilders
         .get(targetUrl)
         .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -183,6 +187,8 @@ public class MemberOrderEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -251,6 +257,8 @@ public class MemberOrderEndpointTest {
             .content(dummyFormJsonString)
             .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk());

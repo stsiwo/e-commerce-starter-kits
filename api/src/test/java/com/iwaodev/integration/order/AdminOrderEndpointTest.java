@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
+
 import javax.servlet.http.Cookie;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -94,6 +96,8 @@ public class AdminOrderEndpointTest {
 
   private Cookie authCookie;
 
+  private Cookie csrfCookie;
+
   private AuthenticationInfo authInfo;
 
   /**
@@ -112,6 +116,7 @@ public class AdminOrderEndpointTest {
     this.authInfo = this.authenticateTestUser.setup(this.entityManager, this.mvc, UserTypeEnum.ADMIN, this.port);
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
+    this.csrfCookie = new Cookie("csrf-token", this.authInfo.getCsrfToken());
   }
 
   @Test
@@ -122,7 +127,11 @@ public class AdminOrderEndpointTest {
 
     // act
     ResultActions resultActions = mvc
-        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -137,9 +146,49 @@ public class AdminOrderEndpointTest {
       // assert
       assertThat(orderDTO.getOrderId()).isNotNull();
 
-      for (OrderDetailDTO orderDetailDTO: orderDTO.getOrderDetails()) {
+      for (OrderDetailDTO orderDetailDTO : orderDTO.getOrderDetails()) {
         assertThat(orderDetailDTO.getIsReviewable()).isNotNull();
       }
+    }
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldAdminGetAllOrdersWithIsReviewable.sql" })
+  public void shouldAdminGetAllOrdersWithIsReviewable() throws Exception {
+
+    String targetUrl = "http://localhost:" + this.port + this.targetPath;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
+
+    logger.info("order events in reaponse");
+
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (OrderDTO orderDTO : responseBody) {
+      // assert
+      assertThat(orderDTO.getOrderId()).isNotNull();
+
+      if (orderDTO.getOrderId().toString().equals("c8f8591c-bb83-4fd1-a098-3fac8d40e450")) {
+        for (OrderDetailDTO orderDetailDTO : orderDTO.getOrderDetails()) {
+          assertThat(orderDetailDTO.getIsReviewable()).isTrue();
+        }
+      } else {
+        for (OrderDetailDTO orderDetailDTO : orderDTO.getOrderDetails()) {
+          assertThat(orderDetailDTO.getIsReviewable()).isFalse();
+        }
+      }
+
     }
   }
 
@@ -148,12 +197,16 @@ public class AdminOrderEndpointTest {
   public void shouldAdminGetAllOrdersWithOrderIdFilter() throws Exception {
 
     String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450"; // make sure match with sql.
-    String searchQuery = "?searchQuery=" + dummyOrderId;
+    String searchQuery = "?orderId=" + dummyOrderId;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQuery;
 
     // act
     ResultActions resultActions = mvc
-        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -167,6 +220,167 @@ public class AdminOrderEndpointTest {
     for (OrderDTO orderDTO : responseBody) {
       // assert
       assertThat(orderDTO.getOrderId().toString()).isEqualTo(dummyOrderId);
+    }
+
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldAdminGetAllOrdersWithOrderIdFilter.sql" })
+  public void shouldAdminGetAllOrdersWithsearchQueryOrderIdFilter() throws Exception {
+
+    String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450"; // make sure match with sql.
+    String searchQuery = "?searchQuery=" + dummyOrderId;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQuery;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
+
+    logger.info("order events in reaponse");
+
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (OrderDTO orderDTO : responseBody) {
+      // assert
+      assertThat(orderDTO.getOrderId().toString()).isEqualTo(dummyOrderId);
+    }
+
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldAdminGetAllOrdersWithOrderNumberFilter.sql" })
+  public void shouldAdminGetAllOrdersWithOrderNumberFilter() throws Exception {
+
+    String dummyOrderNumber = "order_w0vDYZvqy_Y"; // make sure match with sql.
+    String searchQuery = "?searchQuery=" + dummyOrderNumber;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQuery;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
+
+    logger.info("order events in reaponse");
+
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (OrderDTO orderDTO : responseBody) {
+      // assert
+      assertThat(orderDTO.getOrderNumber().toString()).isEqualTo(dummyOrderNumber);
+    }
+
+  }
+
+  // filter: startDate
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldAdminGetAllOrdersWithStartDateFilter.sql" })
+  public void shouldAdminGetAllOrdersWithStartDateFilter() throws Exception {
+
+    LocalDateTime dummyStartDate = LocalDateTime.of(2022, 1, 1, 0, 0, 0);
+    String searchQueryString = "?startDate=" + dummyStartDate.toString();
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
+
+    logger.info("order events in reaponse");
+
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (OrderDTO orderDTO : responseBody) {
+      // assert
+      assertThat(orderDTO.getCreatedAt()).isAfter(dummyStartDate);
+    }
+
+  }
+
+  // filter: endDate
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldAdminGetAllOrdersWithEndDateFilter.sql" })
+  public void shouldAdminGetAllOrdersWithEndDateFilter() throws Exception {
+
+    LocalDateTime dummyEndDate = LocalDateTime.of(2022, 1, 1, 0, 0, 0);
+    String searchQueryString = "?endDate=" + dummyEndDate.toString();
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
+
+    logger.info("order events in reaponse");
+
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (OrderDTO orderDTO : responseBody) {
+      // assert
+      assertThat(orderDTO.getCreatedAt()).isBefore(dummyEndDate);
+    }
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldAdminGetAllOrdersWithOrderStatusFilter.sql" })
+  public void shouldAdminGetAllOrdersWithOrderStatusFilter() throws Exception {
+
+    String dummyOrderStatus = "PAID"; // make sure match with sql.
+    String searchQuery = "?orderStatus=" + dummyOrderStatus;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQuery;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
+
+    logger.info("order events in reaponse");
+
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (OrderDTO orderDTO : responseBody) {
+      // assert
+      assertThat(orderDTO.getLatestOrderEvent().getOrderStatus().toString()).isEqualTo(dummyOrderStatus);
     }
 
   }
@@ -190,7 +404,11 @@ public class AdminOrderEndpointTest {
     // act
     ResultActions resultActions = mvc
         .perform(MockMvcRequestBuilders.post(targetUrl).content(dummyFormJsonString)
-            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -210,7 +428,8 @@ public class AdminOrderEndpointTest {
   }
 
   @Test
-  @Sql(scripts = { "classpath:/integration/order/shouldAdminGetIsReviewableTrueWhenCreateOrderEventOfDeliveredSuccessfully.sql" })
+  @Sql(scripts = {
+      "classpath:/integration/order/shouldAdminGetIsReviewableTrueWhenCreateOrderEventOfDeliveredSuccessfully.sql" })
   public void shouldAdminGetIsReviewableTrueWhenCreateOrderEventOfDeliveredSuccessfully(
       @Value("classpath:/integration/order/shouldAdminGetIsReviewableTrueWhenCreateOrderEventOfDeliveredSuccessfully.json") Resource dummyFormJsonFile)
       throws Exception {
@@ -228,7 +447,11 @@ public class AdminOrderEndpointTest {
     // act
     ResultActions resultActions = mvc
         .perform(MockMvcRequestBuilders.post(targetUrl).content(dummyFormJsonString)
-            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -249,7 +472,8 @@ public class AdminOrderEndpointTest {
   }
 
   @Test
-  @Sql(scripts = { "classpath:/integration/order/shouldNotAdminGetIsReviewableTrueSinceCreateOrderEventOfNonDelivered.sql" })
+  @Sql(scripts = {
+      "classpath:/integration/order/shouldNotAdminGetIsReviewableTrueSinceCreateOrderEventOfNonDelivered.sql" })
   public void shouldNotAdminGetIsReviewableTrueSinceCreateOrderEventOfNonDelivered(
       @Value("classpath:/integration/order/shouldNotAdminGetIsReviewableTrueSinceCreateOrderEventOfNonDelivered.json") Resource dummyFormJsonFile)
       throws Exception {
@@ -267,7 +491,11 @@ public class AdminOrderEndpointTest {
     // act
     ResultActions resultActions = mvc
         .perform(MockMvcRequestBuilders.post(targetUrl).content(dummyFormJsonString)
-            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -306,7 +534,11 @@ public class AdminOrderEndpointTest {
     // act
     ResultActions resultActions = mvc
         .perform(MockMvcRequestBuilders.post(targetUrl).content(dummyFormJsonString)
-            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
   }
@@ -332,7 +564,11 @@ public class AdminOrderEndpointTest {
     // act
     ResultActions resultActions = mvc
         .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyFormJsonString)
-            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -367,7 +603,11 @@ public class AdminOrderEndpointTest {
 
     // act
     ResultActions resultActions = mvc
-        .perform(MockMvcRequestBuilders.delete(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .perform(MockMvcRequestBuilders.delete(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -405,7 +645,11 @@ public class AdminOrderEndpointTest {
 
     // act
     ResultActions resultActions = mvc
-        .perform(MockMvcRequestBuilders.delete(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .perform(MockMvcRequestBuilders.delete(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
   }
@@ -430,7 +674,11 @@ public class AdminOrderEndpointTest {
 
     // act
     ResultActions resultActions = mvc
-        .perform(MockMvcRequestBuilders.delete(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .perform(MockMvcRequestBuilders.delete(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
   }

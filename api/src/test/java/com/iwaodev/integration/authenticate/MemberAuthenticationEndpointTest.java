@@ -116,6 +116,8 @@ public class MemberAuthenticationEndpointTest {
 
   private Cookie authCookie;
 
+  private Cookie csrfCookie;
+
   @Autowired
   private ResourceReader resourceReader;
 
@@ -141,6 +143,7 @@ public class MemberAuthenticationEndpointTest {
         );
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
+    this.csrfCookie = new Cookie("csrf-token", this.authInfo.getCsrfToken());
 
     /**
      * stop using TestRestTEmplate
@@ -167,6 +170,8 @@ public class MemberAuthenticationEndpointTest {
         MockMvcRequestBuilders
           .get(targetUrl)
           .cookie(new Cookie("api-token", "malformed-jwt"))
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -183,5 +188,33 @@ public class MemberAuthenticationEndpointTest {
     }
   }
 
+  @Test
+  public void shouldMemberLogoutSuccessfuly() throws Exception {
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + "/logout";
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+          .get(targetUrl)
+          .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+          .accept(MediaType.APPLICATION_JSON)
+          )
+      .andDo(print())
+      .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    // does not work for this case.
+    // need to make sure 'Max-Age' = 0.
+    //assertThat(result.getResponse().getCookies().length).isEqualTo(0);
+    
+    for (Cookie cookie: result.getResponse().getCookies()) {
+      assertThat(cookie.getMaxAge()).isEqualTo(0); 
+    }
+  }
 }
 

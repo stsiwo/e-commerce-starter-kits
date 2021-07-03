@@ -38,6 +38,7 @@ public class OrderSpecifications {
     };
   }
 
+  // this is only used for member when they access orders page
   public static Specification<Order> byUserId(UUID userId) {
     return (root, query, builder) -> {
       if (userId == null) {
@@ -73,7 +74,21 @@ public class OrderSpecifications {
          **/
         return builder.conjunction();
       }
-      return builder.equal(root.get(Order_.orderId), UUID.fromString(searchQuery));
+      return builder.like(root.get(Order_.orderId).as(String.class), "%" + searchQuery + "%");
+    };
+  }
+
+  // this is only used for email link 
+  public static Specification<Order> searchByOrderId(UUID orderId) {
+    return (root, query, builder) -> {
+      if (orderId == null) {
+        /**
+         * if paramter is null, we still want to chain specificiation so use
+         * 'conjunction()'
+         **/
+        return builder.conjunction();
+      }
+      return builder.equal(root.get(Order_.orderId), orderId);
     };
   }
 

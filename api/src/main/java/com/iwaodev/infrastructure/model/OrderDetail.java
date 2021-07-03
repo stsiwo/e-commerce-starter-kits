@@ -90,7 +90,7 @@ public class OrderDetail {
   private LocalDateTime createdAt;
 
   // use SQL (not HQL/JPQL) everything is sql even if ref id
-  @Formula("(select case when (count(*) > 0) then true else false end from orders o inner join order_details od inner join order_events oe where oe.order_status = 'DELIVERED' and od.product_id is not null and od.order_detail_id = order_detail_id)")
+  @Formula("(select case when (count(*) > 0) then true else false end from orders o inner join order_details od on od.order_id = o.order_id inner join order_events oe on oe.order_id = o.order_id where oe.order_status = 'DELIVERED' and od.product_id is not null and od.order_detail_id = order_detail_id)")
   private Boolean isReviewable;
 
 

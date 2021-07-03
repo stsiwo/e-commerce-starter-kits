@@ -67,10 +67,6 @@ public class ReviewSpecifications {
          **/
         return builder.conjunction();
       }
-      logger.info("is this called?");
-      logger.info("value " + isVerified);
-      logger.info("" + root.get(Review_.isVerified));
-
       return builder.equal(root.get(Review_.isVerified), isVerified);
     };
   }
@@ -110,7 +106,7 @@ public class ReviewSpecifications {
          **/
         return builder.conjunction();
       }
-      return builder.like(root.join(Review_.user).get(User_.userId.toString()), "%" + searchQuery + "%");
+      return builder.like(root.join(Review_.user).get(User_.userId).as(String.class), "%" + searchQuery + "%");
     };
   }
 
@@ -123,7 +119,7 @@ public class ReviewSpecifications {
          **/
         return builder.conjunction();
       }
-      return builder.like(root.join(Review_.product).get(Product_.productId.toString()), "%" + searchQuery + "%");
+      return builder.like(root.join(Review_.product).get(Product_.productId).as(String.class), "%" + searchQuery + "%");
     };
   }
 

@@ -65,8 +65,9 @@ public class UserSignupController {
     final String jwt = this.jwtUtil.generateToken(user.getEmail());
 
     this.authenticationService.assignApiTokenCookieToResponse(jwt, response);
+    String csrfToken = this.authenticationService.assignCsrfTokenCookieToResponse(response);
 
-    return new ResponseEntity<>(new AuthenticationResponse(user, jwt), HttpStatus.OK);
+    return new ResponseEntity<>(new AuthenticationResponse(user, jwt, csrfToken), HttpStatus.OK);
   }
 
   @GetMapping("/users/{id}/account-verify")

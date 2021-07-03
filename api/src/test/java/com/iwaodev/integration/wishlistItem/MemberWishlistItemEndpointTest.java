@@ -23,7 +23,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -124,6 +126,7 @@ public class MemberWishlistItemEndpointTest {
   private ResourceReader resourceReader;
 
   private Cookie authCookie;
+  private Cookie csrfCookie;
   /**
    * insert base test data into mysql database
    *
@@ -145,6 +148,7 @@ public class MemberWishlistItemEndpointTest {
         );
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
+    this.csrfCookie = new Cookie("csrf-token", this.authInfo.getCsrfToken());
   }
 
   @Test
@@ -158,6 +162,8 @@ public class MemberWishlistItemEndpointTest {
         MockMvcRequestBuilders
           .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -176,6 +182,8 @@ public class MemberWishlistItemEndpointTest {
         MockMvcRequestBuilders
         .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -193,6 +201,253 @@ public class MemberWishlistItemEndpointTest {
     for (WishlistItemDTO wishlistItemDTO : responseBody) {
       assertThat(wishlistItemDTO.getUser().getUserId().toString()).isEqualTo(this.authInfo.getAuthUser().getUserId().toString());
       assertThat(wishlistItemDTO.getProduct().getVariants().size()).isEqualTo(1);
+    }
+  }
+
+  // filter: reviewPoint
+  @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserFilterWishlistItemByReviewPoint.sql" })
+  public void shouldMemberUserFilterWishlistItemByReviewPoint() throws Exception {
+
+    // arrange
+    Double dummyQueryStringParamValue = 3.00;
+    String searchQueryString = "?reviewPoint=" + dummyQueryStringParamValue.toString();
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .get(targetUrl)
+          .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    WishlistItemDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), WishlistItemDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+
+    for (WishlistItemDTO wishlistItemDTO : responseBody) {
+      assertThat(wishlistItemDTO.getProduct().getAverageReviewPoint()).isGreaterThanOrEqualTo(dummyQueryStringParamValue);
+    }
+  }
+
+  // filter: minPrice
+  @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserFilterWishlistItemByMinPrice.sql" })
+  public void shouldMemberUserFilterWishlistItemByMinPrice() throws Exception {
+
+    // arrange
+    BigDecimal dummyQueryStringParamValue = new BigDecimal("20.00");
+    String searchQueryString = "?minPrice=" + dummyQueryStringParamValue.toString();
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .get(targetUrl)
+          .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    WishlistItemDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), WishlistItemDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+
+    for (WishlistItemDTO wishlistItemDTO : responseBody) {
+      assertThat(wishlistItemDTO.getProduct().getHighestPrice()).isGreaterThanOrEqualTo(dummyQueryStringParamValue);
+    }
+  }
+
+  // filter: maxPrice
+  @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserFilterWishlistItemByMaxPrice.sql" })
+  public void shouldMemberUserFilterWishlistItemByMaxPrice() throws Exception {
+
+    // arrange
+    BigDecimal dummyQueryStringParamValue = new BigDecimal("70.00");
+    String searchQueryString = "?maxPrice=" + dummyQueryStringParamValue.toString();
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .get(targetUrl)
+          .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    WishlistItemDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), WishlistItemDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+
+    for (WishlistItemDTO wishlistItemDTO : responseBody) {
+      assertThat(wishlistItemDTO.getProduct().getCheapestPrice()).isLessThanOrEqualTo(dummyQueryStringParamValue);
+    }
+  }
+
+  // filter: isDiscount
+  @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserFilterWishlistItemByIsDiscount.sql" })
+  public void shouldMemberUserFilterWishlistItemByIsDiscount() throws Exception {
+
+    // arrange
+    Boolean dummyQueryStringParamValue = true;
+    String searchQueryString = "?isDiscount=" + dummyQueryStringParamValue.toString();
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .get(targetUrl)
+          .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    WishlistItemDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), WishlistItemDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+
+    for (WishlistItemDTO wishlistItemDTO : responseBody) {
+      assertThat(wishlistItemDTO.getProduct().getVariants().get(0).getIsDiscount()).isTrue();
+    }
+  }
+
+  // filter: searchQuery
+  @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserFilterWishlistItemBysearchQuery.sql" })
+  public void shouldMemberUserFilterWishlistItemBysearchQuery() throws Exception {
+
+    // arrange
+    String dummyQueryStringParamValue = "Game"; 
+    String searchQueryString = "?searchQuery=" + dummyQueryStringParamValue.toString();
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .get(targetUrl)
+          .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    WishlistItemDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), WishlistItemDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+
+    for (WishlistItemDTO wishlistItemDTO : responseBody) {
+      assertThat(
+      wishlistItemDTO.getProduct().getProductName().contains(dummyQueryStringParamValue) || wishlistItemDTO.getProduct().getProductDescription().contains(dummyQueryStringParamValue)
+      ).isTrue();
+    }
+  }
+
+  // filter: startDate
+  @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserFilterWishlistItemByStartDate.sql" })
+  public void shouldMemberUserFilterWishlistItemByStartDate() throws Exception {
+
+    // arrange
+    LocalDateTime dummyQueryStringParamValue = LocalDateTime.of(2021, 1, 1, 0, 0, 0);
+    String searchQueryString = "?startDate=" + dummyQueryStringParamValue.toString();
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .get(targetUrl)
+          .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    WishlistItemDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), WishlistItemDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+
+    for (WishlistItemDTO wishlistItemDTO : responseBody) {
+      assertThat(wishlistItemDTO.getProduct().getReleaseDate()).isAfter(dummyQueryStringParamValue);
+    }
+  }
+
+  // filter: endDate
+  @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserFilterWishlistItemByEndDate.sql" })
+  public void shouldMemberUserFilterWishlistItemByEndDate() throws Exception {
+
+    // arrange
+    LocalDateTime dummyQueryStringParamValue = LocalDateTime.of(2021, 1, 1, 0, 0, 0);
+    String searchQueryString = "?endDate=" + dummyQueryStringParamValue.toString();
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+        MockMvcRequestBuilders
+        .get(targetUrl)
+          .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+        .accept(MediaType.APPLICATION_JSON)
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    WishlistItemDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), WishlistItemDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+
+    for (WishlistItemDTO wishlistItemDTO : responseBody) {
+      assertThat(wishlistItemDTO.getProduct().getReleaseDate()).isBefore(dummyQueryStringParamValue);
     }
   }
 
@@ -217,6 +472,8 @@ public class MemberWishlistItemEndpointTest {
         .content(dummyFormJson.toString())
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -255,6 +512,8 @@ public class MemberWishlistItemEndpointTest {
         .content(dummyFormJson.toString())
         .contentType(MediaType.APPLICATION_JSON)
         .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -282,6 +541,8 @@ public class MemberWishlistItemEndpointTest {
         MockMvcRequestBuilders
         .patch(targetUrl)
         .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -313,6 +574,8 @@ public class MemberWishlistItemEndpointTest {
         MockMvcRequestBuilders
         .delete(targetUrl) // remove single cart item
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -338,6 +601,8 @@ public class MemberWishlistItemEndpointTest {
         MockMvcRequestBuilders
         .delete(targetUrl) // remove all cart item 
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())

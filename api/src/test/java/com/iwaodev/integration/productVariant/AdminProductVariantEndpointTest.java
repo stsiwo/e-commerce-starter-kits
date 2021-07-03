@@ -103,6 +103,7 @@ public class AdminProductVariantEndpointTest {
   private AuthenticationInfo authInfo;
 
   private Cookie authCookie;
+  private Cookie csrfCookie;
   /**
    * insert base test data into mysql database
    *
@@ -119,6 +120,7 @@ public class AdminProductVariantEndpointTest {
     this.authInfo = this.authenticateTestUser.setup(this.entityManager, this.mvc, UserTypeEnum.ADMIN, this.port);
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
+    this.csrfCookie = new Cookie("csrf-token", this.authInfo.getCsrfToken());
   }
 
   @Test
@@ -134,6 +136,8 @@ public class AdminProductVariantEndpointTest {
         MockMvcRequestBuilders
         .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
       .andDo(print())
       .andExpect(status().isOk());
@@ -158,6 +162,8 @@ public class AdminProductVariantEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
@@ -173,6 +179,9 @@ public class AdminProductVariantEndpointTest {
     assertThat(responseBody.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
     assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(true);
     assertThat(responseBody.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantDiscountPrice").asText());
+    /**
+     * need to check product.cheapestPrice/highestPrice but thsi variant endpoint just return the updated variant so need to refatcor
+     **/
   }
 
   @Test
@@ -194,6 +203,8 @@ public class AdminProductVariantEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
@@ -230,6 +241,8 @@ public class AdminProductVariantEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
@@ -266,6 +279,8 @@ public class AdminProductVariantEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
@@ -303,6 +318,8 @@ public class AdminProductVariantEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
@@ -327,6 +344,8 @@ public class AdminProductVariantEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
@@ -351,6 +370,8 @@ public class AdminProductVariantEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
@@ -375,6 +396,8 @@ public class AdminProductVariantEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
@@ -391,6 +414,10 @@ public class AdminProductVariantEndpointTest {
     assertThat(responseBody.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
     assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(true);
     assertThat(responseBody.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantDiscountPrice").asText());
+
+    /**
+     * need to check product.cheapestPrice/highestPrice but thsi variant endpoint just return the updated variant so need to refatcor
+     **/
   }
 
   @Test
@@ -412,6 +439,8 @@ public class AdminProductVariantEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
@@ -449,6 +478,8 @@ public class AdminProductVariantEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
@@ -473,6 +504,8 @@ public class AdminProductVariantEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
@@ -490,6 +523,8 @@ public class AdminProductVariantEndpointTest {
     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
         .delete(targetUrl) // delete 
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 

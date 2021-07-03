@@ -82,6 +82,6 @@ public class AuthenticateTestUser {
       throw new Exception("test user FAILED to get authentication jwt: " + result.getResponse().getStatus());
     }
 
-    return new AuthenticationInfo(authUser, responseBody.getJwt());
+    return new AuthenticationInfo(authUser, responseBody.getJwt(), responseBody.getCsrfToken());
   }
 }

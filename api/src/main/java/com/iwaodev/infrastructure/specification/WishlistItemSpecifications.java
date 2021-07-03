@@ -39,9 +39,6 @@ public class WishlistItemSpecifications {
     };
   }
 
-  /**
-   * #TODO: review this (root, query, builder) stuff to create complex sql
-   **/
   public static Specification<WishlistItem> moreThanEqualWishlistItemPrice(BigDecimal minPrice) {
     return (root, query, builder) -> {
       if (minPrice == null) {
@@ -56,7 +53,7 @@ public class WishlistItemSpecifications {
       // included.
 
       return builder.greaterThanOrEqualTo(
-          root.join(WishlistItem_.variant).join(ProductVariant_.product).get(Product_.productBaseUnitPrice), minPrice);
+          root.join(WishlistItem_.variant).join(ProductVariant_.product).get(Product_.highestPrice), minPrice);
     };
   }
 
@@ -71,9 +68,8 @@ public class WishlistItemSpecifications {
       }
       // cheapest price --> max price ---> highest price => that product should be
       // included.
-      return builder.greaterThanOrEqualTo(
-          // TODO: fix this highestPrice, should be cheapestPrice
-          root.join(WishlistItem_.variant).join(ProductVariant_.product).get(Product_.productBaseUnitPrice), maxPrice);
+      return builder.lessThanOrEqualTo(
+          root.join(WishlistItem_.variant).join(ProductVariant_.product).get(Product_.cheapestPrice), maxPrice);
     };
   }
 
@@ -87,7 +83,7 @@ public class WishlistItemSpecifications {
         return builder.conjunction();
       }
       return builder.equal(
-          root.join(WishlistItem_.variant).join(ProductVariant_.product).get(Product_.isDiscountAvailable), isDiscount);
+          root.join(WishlistItem_.variant).get(ProductVariant_.isDiscount), isDiscount);
 
     };
   }

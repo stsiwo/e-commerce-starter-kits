@@ -28,6 +28,7 @@ public class OrderQueryStringCriteria {
 
   private UUID userId;
 
+  private UUID orderId;
 }
 
 

@@ -1,18 +1,13 @@
 package com.iwaodev.integration.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import javax.persistence.EntityManager;
 import javax.servlet.http.Cookie;
-
-// MockMvc stuff
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,6 +15,7 @@ import com.iwaodev.application.dto.user.UserDTO;
 import com.iwaodev.auth.AuthenticateTestUser;
 import com.iwaodev.auth.AuthenticationInfo;
 import com.iwaodev.data.BaseDatabaseSetup;
+import com.iwaodev.domain.user.UserActiveEnum;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.util.ResourceReader;
 
@@ -37,15 +33,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.transaction.BeforeTransaction;
@@ -105,6 +96,7 @@ public class AdminUserEndpointTest {
 
   private Cookie authCookie;
 
+  private Cookie csrfCookie;
   private AuthenticationInfo authInfo;
 
   /**
@@ -123,6 +115,7 @@ public class AdminUserEndpointTest {
     this.authInfo = this.authenticateTestUser.setup(this.entityManager, this.mvc, UserTypeEnum.ADMIN, this.port);
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
+    this.csrfCookie = new Cookie("csrf-token", this.authInfo.getCsrfToken());
   }
 
   @Test
@@ -140,7 +133,11 @@ public class AdminUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath;
 
     // act & assert
-    mvc.perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+    mvc.perform(MockMvcRequestBuilders.get(targetUrl)
+        .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+        .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
   }
 
@@ -153,7 +150,11 @@ public class AdminUserEndpointTest {
 
     // act & assert
     ResultActions resultActions = mvc
-        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
     MvcResult result = resultActions.andReturn();
 
@@ -167,11 +168,6 @@ public class AdminUserEndpointTest {
     }
   }
 
-  /**
-   * skip sort & pagination testing since those are functionalities of Spring
-   * Framework
-   **/
-
   @Test
   @Sql(scripts = { "classpath:/integration/user/shouldAdminUserCanFilterUserListWithStartDate.sql" })
   public void shouldAdminUserCanFilterUserListWithStartDate() throws Exception {
@@ -184,7 +180,11 @@ public class AdminUserEndpointTest {
 
     // act
     ResultActions resultActions = mvc
-        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -211,7 +211,11 @@ public class AdminUserEndpointTest {
 
     // act
     ResultActions resultActions = mvc
-        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -238,7 +242,11 @@ public class AdminUserEndpointTest {
 
     // act
     ResultActions resultActions = mvc
-        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -258,6 +266,70 @@ public class AdminUserEndpointTest {
   }
 
   @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldAdminUserCanFilterUserListWithSearchQuery.sql" })
+  public void shouldAdminUserCanFilterUserListWithSearchQueryUserId() throws Exception {
+
+    // arrange
+    String dummySearchQueryString = "ac6bfbba-a00b-4367-8826-8a1495a2a014";
+    String searchQueryQueryString = "?searchQuery=" + dummySearchQueryString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQueryQueryString;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    UserDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), UserDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    assertThat(responseBody.length).isLessThan(4);
+    for (UserDTO userDto : responseBody) {
+      // check if the dummy string contains either fistName, lastName, or email
+      assertThat(userDto.getUserId().toString()).isEqualTo(dummySearchQueryString);
+    }
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldAdminUserCanFilterUserListWithUserActiveStatus.sql" })
+  public void shouldAdminUserCanFilterUserListWithUserActiveStatus() throws Exception {
+
+    // arrange
+    UserActiveEnum dummySearchQueryString = UserActiveEnum.TEMP ;
+    String searchQueryQueryString = "?active=" + dummySearchQueryString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQueryQueryString;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    UserDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), UserDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    assertThat(responseBody.length).isLessThan(4);
+    for (UserDTO userDto : responseBody) {
+      // check if the dummy string contains either fistName, lastName, or email
+      assertThat(userDto.getActive()).isEqualTo(dummySearchQueryString);
+    }
+  }
+
+  @Test
   @Sql(scripts = { "classpath:/integration/user/shouldAdminUserAccessSpecificUser.sql" })
   public void shouldAdminUserAccessSpecificUser() throws Exception {
 
@@ -270,7 +342,11 @@ public class AdminUserEndpointTest {
 
     // act
     ResultActions resultActions = mvc
-        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -295,7 +371,11 @@ public class AdminUserEndpointTest {
 
     // act
     ResultActions resultActions = mvc
-        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isNotFound());
 
     MvcResult result = resultActions.andReturn();
@@ -330,7 +410,11 @@ public class AdminUserEndpointTest {
     // act
     ResultActions resultActions = mvc
         .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyUserSignupForm.toString())
-            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -372,7 +456,11 @@ public class AdminUserEndpointTest {
     // act
     ResultActions resultActions = mvc
         .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyUserSignupForm.toString())
-            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -411,7 +499,11 @@ public class AdminUserEndpointTest {
     // act
     ResultActions resultActions = mvc
         .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyUserSignupForm.toString())
-            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isNotFound());
 
     MvcResult result = resultActions.andReturn();
@@ -441,7 +533,11 @@ public class AdminUserEndpointTest {
     // act
     ResultActions resultActions = mvc
         .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyFormJsonString)
-            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -466,7 +562,11 @@ public class AdminUserEndpointTest {
     // act
     ResultActions resultActions = mvc
         .perform(MockMvcRequestBuilders.patch(targetUrl).content(dummyFormJsonString)
-            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -497,7 +597,11 @@ public class AdminUserEndpointTest {
     // act
     ResultActions resultActions = mvc
         .perform(MockMvcRequestBuilders.patch(targetUrl).content(dummyFormJson.toString())
-            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -521,7 +625,11 @@ public class AdminUserEndpointTest {
     // act
     ResultActions resultActions = mvc
         .perform(MockMvcRequestBuilders.patch(targetUrl).content(dummyFormJson.toString())
-            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -544,7 +652,11 @@ public class AdminUserEndpointTest {
     // act
     ResultActions resultActions = mvc
         .perform(MockMvcRequestBuilders.patch(targetUrl).content(dummyFormJson.toString())
-            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isNotFound());
 
     MvcResult result = resultActions.andReturn();
@@ -564,7 +676,11 @@ public class AdminUserEndpointTest {
 
     // act
     ResultActions resultActions = mvc
-        .perform(MockMvcRequestBuilders.delete(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .perform(MockMvcRequestBuilders.delete(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -585,7 +701,11 @@ public class AdminUserEndpointTest {
 
     // act
     ResultActions resultActions = mvc
-        .perform(MockMvcRequestBuilders.delete(targetUrl).cookie(this.authCookie).accept(MediaType.APPLICATION_JSON))
+        .perform(MockMvcRequestBuilders.delete(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();

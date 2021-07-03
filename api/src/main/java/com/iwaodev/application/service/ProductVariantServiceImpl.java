@@ -83,20 +83,26 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     }
     logger.info("pass the cheaper discount price validation.");
 
+    // recalculate product cheapest & highest price.
+    targetEntity.setUp();
+
     // save it
     Product savedEntity = this.repository.save(targetEntity);
+    logger.info("after save");
     /**
      * if this entity use '@Formula' and '@Transient' you need to refresh.
      **/
     this.repository.refresh(savedEntity);
+    logger.info("after refresh");
 
     // find updated entity
     Optional<ProductVariant> targetVariantOption = savedEntity.findVariantByColorAndSize(criteria.getVariantColor(),
         criteria.getProductSize().getProductSizeId());
-
+    logger.info("after filter");
     // map entity to dto and return it.
     ProductVariantDTO variantDto = ProductVariantMapper.INSTANCE.toProductVariantDTO(targetVariantOption.get());
 
+    logger.info("returning variant dto after service");
     return variantDto;
   }
 
@@ -125,6 +131,9 @@ public class ProductVariantServiceImpl implements ProductVariantService {
       throw new AppException(HttpStatus.BAD_REQUEST, "the discount price must be less than the unit price.");
     }
 
+    // recalculate product cheapest & highest price.
+    targetEntity.setUp();
+
     // save it
     Product savedEntity = this.repository.save(targetEntity);
 
@@ -137,6 +146,10 @@ public class ProductVariantServiceImpl implements ProductVariantService {
      * if this entity use '@Formula' and '@Transient' you need to refresh.
      **/
     this.repository.refresh(savedEntity);
+
+    logger.info("product variant create");
+    //logger.info("product cheapest price " + savedEntity.getCheapestPrice());
+    //logger.info("product highest price " + savedEntity.getHighestPrice());
 
     // find updated entity
     Optional<ProductVariant> targetVariantOption = savedEntity.findVariantByColorAndSize(criteria.getVariantColor(),
@@ -156,6 +169,9 @@ public class ProductVariantServiceImpl implements ProductVariantService {
       Product targetEntity = targetEntityOption.get();
 
       targetEntity.removeVariantById(variantId);
+
+      // recalculate 'cheapestPrice' and 'highestPrice'
+      targetEntity.setUp();
 
       // save it
       this.repository.save(targetEntity);

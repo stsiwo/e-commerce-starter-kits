@@ -86,7 +86,6 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
                 }).collect(Collectors.toList());
 
             tempWishlistItemDTO.getProduct().setVariants(targetVariantDTO);
-
             return tempWishlistItemDTO;
           }
         });

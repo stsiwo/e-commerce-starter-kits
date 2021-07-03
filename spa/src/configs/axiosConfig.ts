@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getCookie } from "src/utils";
 
 /**
  * need to be something like below:
@@ -56,11 +57,26 @@ axios.defaults.transformResponse = [].concat(
         }
         return value
       });
-
     }
     return data
   },
 )
+
+/**
+ * request interceptor
+ *
+ * this is for csrf token to prevent this csrf attack.
+ **/
+axios.interceptors.request.use(function (config) {
+
+  // if cookie is set, attack this token to header as 'csrf-token=xxxx'.
+  if (document.cookie.indexOf("csrf-token") != -1) {
+    const token = getCookie("csrf-token");
+    config.headers["csrf-token"] = token;
+  }
+
+  return config;
+});
 
 // set default 'withCredential'
 axios.defaults.withCredentials = true;

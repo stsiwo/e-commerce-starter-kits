@@ -2,7 +2,7 @@ import { NormalizedCategoryType, NormalizedProductType, ProductSortEnum } from "
 import { AuthType, RequestTrackerType, FetchStatusEnum, MessageTypeEnum, MessageStateType } from "src/app/";
 import { CartItemType } from "domain/cart/types";
 import { WishlistItemType, WishlistItemSortEnum } from "domain/wishlist/types";
-import { UserType, UserSortEnum, AdminCompanyType } from "domain/user/types";
+import { UserType, UserSortEnum, AdminCompanyType, UserActiveEnum } from "domain/user/types";
 import { OrderType, OrderSortEnum } from "domain/order/types";
 import { ReviewType, ReviewSortEnum } from "domain/review/type";
 import { NotificationType } from "domain/notification/types";
@@ -160,6 +160,7 @@ export declare type DomainStateType = {
     pagination: DomainPaginationType,
     query: {
       searchQuery: string,
+      active: UserActiveEnum
       startDate: Date,
       endDate: Date,
       sort: UserSortEnum,

@@ -115,6 +115,7 @@ public class MemberCategoryEndpointTest {
   private AuthenticationInfo authInfo;
 
   private Cookie authCookie;
+  private Cookie csrfCookie;
 
   @Autowired
   private ResourceReader resourceReader;
@@ -141,6 +142,7 @@ public class MemberCategoryEndpointTest {
         );
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
+    this.csrfCookie = new Cookie("csrf-token", this.authInfo.getCsrfToken());
 
     /**
      * stop using TestRestTEmplate
@@ -167,6 +169,8 @@ public class MemberCategoryEndpointTest {
         MockMvcRequestBuilders
           .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -190,6 +194,8 @@ public class MemberCategoryEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -213,6 +219,8 @@ public class MemberCategoryEndpointTest {
         .content(dummyFormJsonString)
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -229,6 +237,8 @@ public class MemberCategoryEndpointTest {
     mvc.perform(MockMvcRequestBuilders
         .delete(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())

@@ -90,6 +90,7 @@ public class AdminNotificationEndpointTest {
   private ResourceReader resourceReader;
 
   private Cookie authCookie;
+  private Cookie csrfCookie;
 
   private AuthenticationInfo authInfo;
   /**
@@ -112,6 +113,7 @@ public class AdminNotificationEndpointTest {
        this.port);
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
+    this.csrfCookie = new Cookie("csrf-token", this.authInfo.getCsrfToken());
   }
 
   @Test
@@ -133,6 +135,8 @@ public class AdminNotificationEndpointTest {
         MockMvcRequestBuilders
           .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -162,6 +166,8 @@ public class AdminNotificationEndpointTest {
         MockMvcRequestBuilders
           .get(targetUrl)
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -205,6 +211,8 @@ public class AdminNotificationEndpointTest {
         MockMvcRequestBuilders
           .patch(targetUrl) // update
           .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())

@@ -17,6 +17,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
+import javax.persistence.PreRemove;
+import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
@@ -103,7 +106,6 @@ public class Product {
   // product_id group by p.product_id)")
   @Getter(value = AccessLevel.NONE)
   @Setter(value = AccessLevel.NONE)
-  @Transient
   private BigDecimal cheapestPrice;
 
   // - use 'left' isntead of 'inner' to cover the case if a product does not have
@@ -115,7 +117,6 @@ public class Product {
   // product_id group by p.product_id)")
   @Getter(value = AccessLevel.NONE)
   @Setter(value = AccessLevel.NONE)
-  @Transient
   private BigDecimal highestPrice;
 
   // overall result if discount exist through its variants
@@ -208,7 +209,8 @@ public class Product {
    *
    * # 2021/06/27 - you can only use a single @PostLoad per entity. so be careful.
    **/
-  @PostLoad
+  @PrePersist
+  @PreUpdate
   public void setUp() {
     this.setCheapestPrice();
     this.setHighestPrice();

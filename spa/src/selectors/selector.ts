@@ -91,6 +91,7 @@ export const rsSelector = {
     getUser: (state: StateType) => state.domain.users.data,
     getUserPagination: (state: StateType) => state.domain.users.pagination,
     getUserQuerySearchQuery: (state: StateType) => state.domain.users.query.searchQuery,
+    getUserQueryActive: (state: StateType) => state.domain.users.query.active,
     getUserQueryStartDate: (state: StateType) => state.domain.users.query.startDate,
     getUserQueryEndDate: (state: StateType) => state.domain.users.query.endDate,
     getUserQuerySort: (state: StateType) => state.domain.users.query.sort,
@@ -1029,15 +1030,17 @@ export const mSelector = {
     return createSelector(
       [
         rsSelector.domain.getUserQuerySearchQuery,
+        rsSelector.domain.getUserQueryActive,
         rsSelector.domain.getUserQueryStartDate,
         rsSelector.domain.getUserQueryEndDate,
         rsSelector.domain.getUserQuerySort,
         rsSelector.domain.getUserPagination
       ],
-      (searchQuery, startDate, endDate, sort, pagination) => {
+      (searchQuery, active, startDate, endDate, sort, pagination) => {
         // react state should be immutable so put empty object first
         return merge({}, {
           searchQuery: searchQuery,
+          active: active,
           startDate: startDate,
           endDate: endDate,
           sort: sort,
@@ -1053,15 +1056,17 @@ export const mSelector = {
     return createSelector(
       [
         rsSelector.domain.getUserQuerySearchQuery,
+        rsSelector.domain.getUserQueryActive,
         rsSelector.domain.getUserQueryStartDate,
         rsSelector.domain.getUserQueryEndDate,
         rsSelector.domain.getUserQuerySort,
 
       ],
-      (searchQuery, startDate, endDate, sort) => {
+      (searchQuery, active, startDate, endDate, sort) => {
 
         return {
           searchQuery: searchQuery,
+          active: active,
           startDate: startDate,
           endDate: endDate,
           sort: sort,
@@ -1077,6 +1082,17 @@ export const mSelector = {
       ],
       (searchQuery) => {
         return searchQuery
+      },
+    )
+  },
+
+  makeUserQueryActiveSelector: () => {
+    return createSelector(
+      [
+        rsSelector.domain.getUserQueryActive
+      ],
+      (active) => {
+        return active
       },
     )
   },

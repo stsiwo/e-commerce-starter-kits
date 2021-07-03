@@ -38,7 +38,9 @@ public class ProductVariantListener {
   @PostLoad
   @PostRemove
   private void afterLoad(ProductVariant domain) {
+    logger.info("start post get current price");
     domain.getCurrentPrice();
+    logger.info("end post get current price");
   }
 
 }

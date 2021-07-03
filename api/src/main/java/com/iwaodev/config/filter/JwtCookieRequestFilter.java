@@ -21,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -31,9 +32,11 @@ import io.jsonwebtoken.MalformedJwtException;
  * a filter to check request cookie (httpOnly & secure) and validate it to
  * authorize the user access
  *
- * if you don't want the request to move to the next filter. you can do this by not calling 'doFilter' function.
+ * if you don't want the request to move to the next filter. you can do this by
+ * not calling 'doFilter' function.
  *
- * e.g., if you want to return 401 rsponse if jwt is invalid, you just don't need to call 'doFilter' if you know the jwt is invalid (e.g., try/catch)
+ * e.g., if you want to return 401 rsponse if jwt is invalid, you just don't
+ * need to call 'doFilter' if you know the jwt is invalid (e.g., try/catch)
  *
  **/
 
@@ -61,6 +64,13 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
    *
    * also, retrieve email from jwt cookie and then find the user based on the
    * email.
+   *
+   * @2021/07/02
+   *
+   * double submit cookie implementation to prevent csrf attack. 
+   *  - ref: https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie
+   *
+   * desc) set additional non-httponly cookie which hold bcrypted token and require any request to have this cookie to prevent csrf attack.
    *
    **/
   @Override
@@ -99,7 +109,7 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
     // guest user skip below code.
     if (isGuest) {
       chain.doFilter(request, response);
-    } 
+    }
 
     // member who must have api-token
     if (!isGuest) {
@@ -111,19 +121,48 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
 
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-        // validate jwt if it is not expired & user email match 
+        // validate jwt if it is not expired & user email match
         if (jwtUtil.validateToken(jwt, userDetails)) {
           logger.debug("jwt is valid so let's move to the next filter.");
 
           UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
               userDetails, null, userDetails.getAuthorities());
-
           usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
           SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
-          // if jwt is valid, let this move to next step.
-          chain.doFilter(request, response);
+          /**
+           * double submit cookie.
+           *
+           * to prevent csrf attack with 'api-token' (httponly&secure) cookie.
+           *
+           * note: - don't use httponly. - use 'secure' since all of communications are
+           * done via https.
+           *
+           **/
+          
+
+          for (Cookie cookie: request.getCookies()) {
+            logger.info("cookie: " + cookie.getName() + " and " + cookie.getValue());
+          }
+
+          Cookie csrfToken = Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals("csrf-token"))
+              .findFirst().orElse(null);
+          String csrfTokenFromHeader = request.getHeader("csrf-token");
+
+          logger.info("csrfToken from cookie = " + csrfToken);
+          logger.info("csrfToken from header = " + csrfTokenFromHeader);
+
+          if (csrfToken != null && csrfTokenFromHeader != null && csrfTokenFromHeader.equals(csrfToken.getValue())) {
+            logger.info("pass jwt token & csrf token validation. congrats:)");
+            // if jwt is valid, let this move to next step.
+            chain.doFilter(request, response);
+          } else {
+            // otherwise, jwt is invalid
+            // force logout
+            this.eraseCookie(request, response);
+            // return error message
+            this.errorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "invalid csrf token. please login again.");
+          }
         } else {
           // otherwise, jwt is invalid
           // force logout
@@ -134,7 +173,6 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
       }
     }
 
-    logger.debug("jwt is invalid so let the user logout.");
   }
 
   private void eraseCookie(HttpServletRequest req, HttpServletResponse resp) {
