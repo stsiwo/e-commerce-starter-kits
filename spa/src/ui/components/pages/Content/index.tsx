@@ -8,6 +8,7 @@ import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import IconButton from '@material-ui/core/IconButton';
 import Notification from 'components/common/Notification';
 import { NotificationType } from 'domain/notification/types';
+import Background from 'components/common/Background';
 
 const Content: React.FunctionComponent<{}> = (props) => {
 
@@ -48,6 +49,7 @@ const Content: React.FunctionComponent<{}> = (props) => {
 
   return (
     <React.Fragment>
+      <Background />
       <PageRoute />       
     </React.Fragment>
   )

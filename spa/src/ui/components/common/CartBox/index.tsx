@@ -94,7 +94,7 @@ const CartBox: React.FunctionComponent<CartBoxPropsType> = (props) => {
           {"Oops, Your cart is empty."}
         </Typography>
         <Box component="div" className={classes.controllerBox}>
-          <Button>  
+          <Button variant="contained">  
             {"go search"}
           </Button>
         </Box>
@@ -109,7 +109,7 @@ const CartBox: React.FunctionComponent<CartBoxPropsType> = (props) => {
             </Typography>
           </Box>
           <Box component="div" className={classes.controllerBox}>
-            <Button onClick={handleCheckoutClick}>
+            <Button onClick={handleCheckoutClick} variant="contained">
               {"Checkout"}
             </Button>
           </Box>

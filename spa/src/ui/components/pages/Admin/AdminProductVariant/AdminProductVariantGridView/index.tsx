@@ -255,10 +255,10 @@ const AdminProductVariantGridView: React.FunctionComponent<AdminProductVariantGr
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={handleDeletionCancel} color="primary">
+          <Button autoFocus onClick={handleDeletionCancel} variant="contained">
             Cancel
           </Button>
-          <Button onClick={handleDeletionOk} color="primary">
+          <Button onClick={handleDeletionOk} variant="contained">
             Ok
           </Button>
         </DialogActions>

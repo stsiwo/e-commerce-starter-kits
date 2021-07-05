@@ -16,7 +16,10 @@ import { Link as RRLink } from "react-router-dom";
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     appBar: {
-      background: "rgba(255, 255, 255, 1)",
+      //background: "rgba(255, 255, 255, 1)",
+      background: "transparent",
+      boxShadow: "none",
+
       color: theme.palette.text.primary,
     },
     menuItem: {
@@ -45,11 +48,9 @@ const Header: React.FunctionComponent<{}> = (props) => {
           container
         >
           <Grid item>
-            <Link color="inherit" component={RRLink} to="/">
-              <IconButton edge="start"  color="inherit" aria-label="menu">
-                <SentimentSatisfiedOutlinedIcon />
-              </IconButton>
-            </Link>
+            <IconButton edge="start" color="inherit" aria-label="menu" component={RRLink} to="/">
+              <SentimentSatisfiedOutlinedIcon />
+            </IconButton>
           </Grid>
           {(auth.userType === UserTypeEnum.GUEST &&
             <GuestHeaderMenuItems />

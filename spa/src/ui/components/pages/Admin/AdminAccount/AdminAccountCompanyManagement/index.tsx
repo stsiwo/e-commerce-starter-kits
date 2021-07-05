@@ -493,7 +493,7 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
         </form>
       </CardContent>
       <CardActions disableSpacing>
-        <Button onClick={handleUserAccountSaveClickEvent}>
+        <Button onClick={handleUserAccountSaveClickEvent} variant="contained">
           Save
         </Button>
       </CardActions>

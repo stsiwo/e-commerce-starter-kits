@@ -225,6 +225,7 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({ order 
             className={classes.addBtn}
             disabled={!nextOrderEventOptions || nextOrderEventOptions.length === 0}
             onClick={(e) => handleAddNewClick(e)}
+            variant="contained"
           >
             {"Add New Order Event"}
           </Button>
@@ -255,10 +256,10 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({ order 
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={handleDeletionCancel} color="primary">
+          <Button autoFocus onClick={handleDeletionCancel} variant="contained">
             Cancel
           </Button>
-          <Button onClick={handleDeletionOk} color="primary">
+          <Button onClick={handleDeletionOk} variant="contained">
             Ok
           </Button>
         </DialogActions>

@@ -8,7 +8,6 @@ import Typography from '@material-ui/core/Typography';
 import { ProductType } from 'domain/product/types';
 import * as React from 'react';
 import { cadCurrencyFormat } from 'src/utils';
-import SampleProduct1_1Image from 'static/sample-product-1-1.jpg';
 import CornerRibbon from '../CornerRibbon';
 import Box from '@material-ui/core/Box';
 import { Link as RRLink } from "react-router-dom";
@@ -79,7 +78,7 @@ const ProductCardV2: React.FunctionComponent<ProductCardV2PropsType> = ({ produc
           </Typography>
         </CardContent>
         <CardActions className={classes.actions}>
-          <Button component={RRLink} to={`/products/${product.productPath}`}>
+          <Button component={RRLink} to={`/products/${product.productPath}`} variant="contained">
             Read More
           </Button>
         </CardActions>

@@ -107,7 +107,7 @@ const EmailVerification: React.FunctionComponent<{}> = (props) => {
         {"Thank you for signing up:) Please checkout your email box and click the link to verify your email address."}
       </Typography>
       <Box component="div" className={classes.actionBox}>
-        <Button onClick={handleUserAccountSaveClickEvent}>
+        <Button onClick={handleUserAccountSaveClickEvent} variant="contained">
           Send Verification Email Again
         </Button>
       </Box>

@@ -76,7 +76,7 @@ const ProductCard: React.FunctionComponent<ProductCardPropsType> = ({ product })
         </Typography>
       </CardContent>
       <CardActions className={classes.actions}>
-        <Button component={RRLink} to={`/products/${product.productPath}`}>
+        <Button component={RRLink} to={`/products/${product.productPath}`} variant="contained">
           Read More
         </Button>
       </CardActions>

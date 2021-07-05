@@ -20,6 +20,7 @@ import { fetchNotificationActionCreator, incrementNotificationCurIndexActionCrea
 import { cartModalActions } from 'reducers/slices/ui';
 import { mSelector } from 'src/selectors/selector';
 import { useLocation } from 'react-router';
+import MenuIcon from '@material-ui/icons/Menu';
 
 declare interface MenuItemType {
   url: string
@@ -95,7 +96,7 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
   };
 
   // logout event handler
-  const handleLogout: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+  const handleLogout: React.EventHandler<React.MouseEvent<HTMLAnchorElement>> = (e) => {
 
     e.preventDefault()
 
@@ -161,6 +162,7 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
         <Link key={menuItem.url}
           color="inherit"
           {...linkProps}
+          onClick={(e: React.MouseEvent<HTMLAnchorElement>) => menuItem.isLogout ? handleLogout(e) : null}
         >
           {menuItem.label}
         </Link>
@@ -177,6 +179,7 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
             className={classes.menuItem}
             component={RRLink}
             to={menuItem.url}
+            onClick={(e: React.MouseEvent<HTMLAnchorElement>) => menuItem.isLogout ? handleLogout(e) : null}
           >
             {menuItem.label}
           </Link>
@@ -206,16 +209,13 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
       {(isMdUp &&
         <React.Fragment>
           {renderMenuItemListForLargeScreen()}
-          <Button onClick={handleLogout}>
-            Logout
-          </Button>
         </React.Fragment>
       )}
       {(!isMdUp &&
         <React.Fragment>
-          <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleDropDownMenuOpenClickEvent}>
-            Open Menu
-            </Button>
+          <IconButton aria-controls="simple-menu" aria-haspopup="true" onClick={handleDropDownMenuOpenClickEvent}>
+            <MenuIcon />            
+          </IconButton>
           <Menu
             id="simple-menu"
             anchorEl={anchorEl}
@@ -224,9 +224,6 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
             onClose={handleDropDownMenuCloseClickEvent}
           >
             {renderMenuItemListForSmallScreen()}
-            <Button onClick={handleLogout}>
-              Logout
-            </Button>
           </Menu>
         </React.Fragment>
       )}

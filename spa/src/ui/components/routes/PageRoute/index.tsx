@@ -9,6 +9,7 @@ import { withBasePage } from 'ui/hoc/withBasePage';
 import NotFound from 'components/pages/NotFound';
 import { usePrevious } from 'hooks/previous';
 import { previousUrlActions } from 'reducers/slices/app';
+import Background from 'components/common/Background';
 
 const PageRoute: React.FunctionComponent<{}> = (props) => {
 

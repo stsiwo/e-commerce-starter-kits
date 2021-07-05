@@ -4,10 +4,9 @@ import Button from '@material-ui/core/Button';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import ListItemText from '@material-ui/core/ListItemText';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardHeader from '@material-ui/core/CardHeader';
 import Modal from '@material-ui/core/Modal';
 import Radio from '@material-ui/core/Radio';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -15,7 +14,10 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import EditIcon from '@material-ui/icons/Edit';
 import HomeIcon from '@material-ui/icons/Home';
-import { toAddressString } from 'domain/user';
+import Tooltip from '@material-ui/core/Tooltip';
+import LocalShippingIcon from '@material-ui/icons/LocalShipping';
+import PaymentIcon from '@material-ui/icons/Payment';
+import { toAddressString, getShippingAddressId, getBillingAddressId } from 'domain/user';
 import { CustomerAddressesFormDataType, CustomerAddressesFormValidationDataType, defaultUserAccountValidationAddressData, generateDefaultCustomerAddressesFormData, UserAddressType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { userAccountAddressSchema } from 'hooks/validation/rules';
@@ -25,6 +27,7 @@ import { deleteAuthAddressActionCreator, patchAuthAddressActionCreator, postAuth
 import { mSelector } from 'src/selectors/selector';
 import { getCountryList, getProvinceList } from 'src/utils';
 import MenuItem from '@material-ui/core/MenuItem';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -63,6 +66,21 @@ const useStyles = makeStyles((theme: Theme) =>
     actionBox: {
       textAlign: "center"
     },
+    root: {
+      margin: `${theme.spacing(1)}px auto`,
+      maxWidth: 700,
+    },
+    cardActions: {
+      display: "flex",
+      justifyContent: "flex-end",
+    },
+    card: {
+    },
+    cardHeader: {
+    },
+    noMarginRight: {
+      marginRight: 0,
+    }
   }),
 );
 
@@ -98,9 +116,9 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
   // auth
   const auth = useSelector(mSelector.makeAuthSelector())
 
-  // cur shipping/billing phone
-  const curShippingAddress = useSelector(mSelector.makeAuthShippingAddressSelector());
-  const curBillingAddress = useSelector(mSelector.makeAuthBillingAddressSelector());
+  // shipping & billing address selection stuff
+  const [curShippingId, setShippingId] = React.useState<string>(getShippingAddressId(auth.user.addresses));
+  const [curBillingId, setBillingId] = React.useState<string>(getBillingAddressId(auth.user.addresses));
 
   // dispatch
   const dispatch = useDispatch();
@@ -235,9 +253,14 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
   // delete an existing phone number
   const handleDeleteAddressClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
     console.log("delete an existing address event triggered")
+
+    const addressId = e.currentTarget.getAttribute("data-address-id")
+
+    console.log("target address id to be remvoed: " + addressId);
+
     dispatch(
       deleteAuthAddressActionCreator({
-        addressId: curCustomerAddressesFormState.addressId
+        addressId: addressId,
       })
     )
   }
@@ -256,86 +279,86 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
     setModalOpen(true)
   }
 
-  // shipping address change event handler
-  const onShippingAddressClick: React.EventHandler<React.MouseEvent<HTMLLabelElement>> = (e) => {
-    const targetAddressId: string = e.currentTarget.getAttribute("data-shipping-address-id");
+  const handleBillingAddressChange = (e: React.MouseEvent<HTMLLabelElement>, addressId: string) => {
+
+    setBillingId(addressId)
+
     dispatch(
-      patchAuthAddressActionCreator({
-        addressId: targetAddressId,
-        type: "shipping",
-      })
-    )
+      patchAuthAddressActionCreator({ addressId: addressId, type: "billing" })
+    );
   }
 
-  // billing address change event handler
-  const onBillingAddressClick: React.EventHandler<React.MouseEvent<HTMLLabelElement>> = (e) => {
+  const handleShippingAddressChange = (e: React.MouseEvent<HTMLLabelElement>, addressId: string) => {
 
-    const targetAddressId: string = e.currentTarget.getAttribute("data-billing-address-id");
+    setShippingId(addressId)
+
     dispatch(
-      patchAuthAddressActionCreator({
-        addressId: targetAddressId,
-        type: "billing",
-      })
-    )
+      patchAuthAddressActionCreator({ addressId: addressId, type: "shipping" })
+    );
   }
-
   // render functions
 
   // display current phone number list
   const renderCurAddressListComponent: () => React.ReactNode = () => {
     return props.addresses.map((address: UserAddressType) => {
-      console.log("billing")
-      console.log(curBillingAddress && curBillingAddress.addressId === address.addressId)
-      console.log("shipping")
-      console.log(curShippingAddress && curShippingAddress.addressId === address.addressId)
       return (
-        <ListItem key={address.addressId}>
-          <ListItemAvatar>
-            <Avatar>
-              <HomeIcon />
-            </Avatar>
-          </ListItemAvatar>
-          <ListItemText
-            primary={toAddressString(address)}
-            secondary={
-              <React.Fragment>
-                {/**
-              * not use usual radio button group because of two different radio group with the same list item
-              *
-              *   - ref: https://stackoverflow.com/questions/37150254/radiobuttongroup-within-nested-list 
-              *
-              *   - TODO:
-              *   - this aaporach complains 'A component is changing the uncontrolled checked state of SwitchBase to be controlled.'. find better approach!!
-              **/}
+        <Card key={address.addressId} className={`${classes.card} ${classes.root}`}>
+          <CardHeader
+            className={classes.cardHeader}
+            avatar={
+              <Avatar>
+                <HomeIcon />
+              </Avatar>
+            }
+            title={toAddressString(address)}
+          >
+          </CardHeader>
+          <CardActions className={classes.cardActions}>
+            <React.Fragment>
+              {/**
+                * not use usual radio button group because of two different radio group with the same list item
+                *
+                *   - ref: https://stackoverflow.com/questions/37150254/radiobuttongroup-within-nested-list 
+                **/}
+              <Tooltip title="Shipping Address">
                 <FormControlLabel
                   value={address.addressId}
                   data-billing-address-id={address.addressId}
-                  checked={curBillingAddress && curBillingAddress.addressId === address.addressId}
-                  control={<Radio />}
+                  checked={curShippingId === address.addressId}
+                  control={<Radio icon={<LocalShippingIcon color="disabled" />} checkedIcon={<LocalShippingIcon style={{ fill: "#000000" }} />} />}
+                  label={""}
                   labelPlacement="bottom"
-                  label={curBillingAddress && curBillingAddress.addressId === address.addressId ? "billing" : ""}
                   name="user-billing-address"
-                  onClick={onBillingAddressClick}
+                  onClick={(e) => handleShippingAddressChange(e, address.addressId)}
+                  classes={{
+                    root: classes.noMarginRight,
+                  }}
                 />
+              </Tooltip>
+              <Tooltip title="Billing Address">
                 <FormControlLabel
                   value={address.addressId}
                   data-shipping-address-id={address.addressId}
-                  checked={curShippingAddress && curShippingAddress.addressId === address.addressId}
-                  control={<Radio />}
+                  checked={curBillingId === address.addressId}
+                  control={<Radio icon={<PaymentIcon color="disabled" />} checkedIcon={<PaymentIcon style={{ fill: "#000000" }} />} />}
+                  label={""}
                   labelPlacement="bottom"
-                  label={curShippingAddress && curShippingAddress.addressId === address.addressId ? "shipping" : ""}
                   name="user-shipping-address"
-                  onClick={onShippingAddressClick}
+                  onClick={(e) => handleBillingAddressChange(e, address.addressId)}
+                  classes={{
+                    root: classes.noMarginRight,
+                  }}
                 />
-                <IconButton edge="end" aria-label="edit" data-address-id={address.addressId} onClick={handleAddressItemClickEvent}>
-                  <EditIcon />
-                </IconButton>
-              </React.Fragment>
-            }
-          />
-          <ListItemSecondaryAction>
-          </ListItemSecondaryAction>
-        </ListItem>
+              </Tooltip>
+              <IconButton edge="end" aria-label="delete" data-address-id={address.addressId} onClick={handleDeleteAddressClickEvent}>
+                <DeleteIcon />
+              </IconButton>
+              <IconButton edge="end" aria-label="edit" data-address-id={address.addressId} onClick={handleAddressItemClickEvent}>
+                <EditIcon />
+              </IconButton>
+            </React.Fragment>
+          </CardActions>
+        </Card>
       )
     })
   }
@@ -359,6 +382,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
           <Button 
             onClick={handleAddNewAddressBtnClickEvent}
             disabled={props.addresses.length === maxSize}
+            variant="contained"
           >
             Add New Address
         </Button>
@@ -443,10 +467,10 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
             error={curCustomerAddressesFormValidationState.postalCode !== ""}
           />
           <Box component="div" className={classes.actionBox}>
-            <Button onClick={handleModalCancelClickEvent}>
+            <Button onClick={handleModalCancelClickEvent} variant="contained">
               Cancel
             </Button>
-            <Button onClick={handleUserAccountSaveClickEvent}>
+            <Button onClick={handleUserAccountSaveClickEvent} variant="contained">
               Save
             </Button>
           </Box>

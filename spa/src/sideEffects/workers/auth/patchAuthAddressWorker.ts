@@ -95,7 +95,7 @@ export function* patchAuthAddressWorker(action: PayloadAction<PatchAuthAddressAc
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
-          message: "switched primary successfully.",
+          message: `switched ${action.payload.type} address successfully.`,
         })
       )
 

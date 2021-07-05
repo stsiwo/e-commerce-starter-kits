@@ -15,10 +15,7 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: -1,
     },
     textBox: {
-      position: "absolute",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
+      margin: "40vh 0"
     },
   }),
 );
@@ -29,7 +26,7 @@ const Hero: React.FunctionComponent<{}> = (props) => {
 
   return (
     <Box component="div" className={classes.wrapperBox}>
-      <img src={HeroBCImage} className={classes.heroImage} alt="stsDev Hero Image" />
+    {/**<img src={HeroBCImage} className={classes.heroImage} alt="stsDev Hero Image" />**/}
       <Box component="div" className={classes.textBox} >
         <Typography variant="h2" component="h2" align="center">
           {"stsDev"}

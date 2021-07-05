@@ -27,10 +27,10 @@ import { useHistory } from 'react-router';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     footer: {
-      backgroundColor: theme.palette.secondary.main,
-      color: "#FFF",
+      //backgroundColor: theme.palette.secondary.main,
+      //color: "#FFF",
       textAlign: "center",
-      marginTop: theme.spacing(5),
+      paddingTop: theme.spacing(20),
     },
     gridBox: {
       display: "flex",

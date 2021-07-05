@@ -226,7 +226,7 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
           <Typography variant="subtitle1" component="p" align="center" className={classes.title} >
             {"verified your account successfully."}
           </Typography>
-          <Button component={RRLink} to="/">
+          <Button component={RRLink} to="/" variant="contained">
             {"Visit Home"}
           </Button>
         </Box>
@@ -236,7 +236,7 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
           <Typography variant="subtitle1" component="p" align="center" className={classes.title} >
             {"seems like you are not logged in. please login first and click the link again."}
           </Typography>
-          <Button component={RRLink} to="/login">
+          <Button component={RRLink} to="/login" variant="contained">
             {"Go to Login Page"}
           </Button>
         </Box>
@@ -246,7 +246,7 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
           <Typography variant="subtitle1" component="p" align="center" className={classes.title} >
             {"your verification token is invalid (e.g., expired or wrong value). please re-issue the token again. we will send the verification email again."}
           </Typography>
-          <Button onClick={handleReissueToken}>
+          <Button onClick={handleReissueToken} variant="contained">
             {"Send the Verification Email Again"}
           </Button>
         </Box>
@@ -256,7 +256,7 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
           <Typography variant="subtitle1" component="p" align="center" className={classes.title} >
             {"we failed to process your request. please contact to our customer service."}
           </Typography>
-          <Button component={RRLink} to="/contact">
+          <Button component={RRLink} to="/contact" variant="contained">
             {"Go to Contact Form"}
           </Button>
         </Box>

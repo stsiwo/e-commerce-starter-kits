@@ -81,7 +81,7 @@ const BrandNewProduct: React.FunctionComponent<{}> = (props) => {
         {renderDomains()}
       </Grid>
       <Box component="div" className={classes.moreBtnBox}>
-        <Button component={RRLink} to={`/search`}>
+        <Button component={RRLink} to={`/search`} variant="contained">
           More Brad New Products
         </Button>
       </Box>

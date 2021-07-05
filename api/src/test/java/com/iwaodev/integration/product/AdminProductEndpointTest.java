@@ -159,15 +159,9 @@ public class AdminProductEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath;
 
     // act & assert
-    mvc.perform(
-        MockMvcRequestBuilders
-        .get(targetUrl)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON))
-      .andDo(print())
-      .andExpect(status().isOk());
+    mvc.perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).cookie(this.csrfCookie)
+        .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON)).andDo(print())
+        .andExpect(status().isOk());
   }
 
   @Test
@@ -180,16 +174,10 @@ public class AdminProductEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQueryString;
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .get(targetUrl)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -203,12 +191,12 @@ public class AdminProductEndpointTest {
     for (ProductDTO productDto : responseBody) {
       // check if the dummy string contains either name, or description
       logger.info(productDto.getProductId().toString());
-      assertThat(
-          productDto.getProductName().contains(dummySearchQueryString) || productDto.getProductDescription().contains(dummySearchQueryString)
-              ).isEqualTo(true);
+      assertThat(productDto.getProductName().contains(dummySearchQueryString)
+          || productDto.getProductDescription().contains(dummySearchQueryString)).isEqualTo(true);
       assertThat(productDto.getCategory().getCategoryId()).isNotNull();
-      //assertThat(productDto.getVariants().size()).isGreaterThan(0);
-      //assertThat(productDto.getReviews().size()).isEqualTo(2); // this will include non-verified one too since no filter. 
+      // assertThat(productDto.getVariants().size()).isGreaterThan(0);
+      // assertThat(productDto.getReviews().size()).isEqualTo(2); // this will include
+      // non-verified one too since no filter.
       for (ProductVariantDTO variantDTO : productDto.getVariants()) {
         assertThat(variantDTO.getCurrentPrice()).isNotNull();
       }
@@ -218,31 +206,25 @@ public class AdminProductEndpointTest {
   // test if product.reviews only include 'verified'
 
   @Test
-  @Sql(scripts = { "classpath:/integration/product/shouldNotAdminCreateProductSinceProductMustHaveAtLeastOneVariantToPublish.sql" })
+  @Sql(scripts = {
+      "classpath:/integration/product/shouldNotAdminCreateProductSinceProductMustHaveAtLeastOneVariantToPublish.sql" })
   public void shouldNotAdminCreateProductSinceProductMustHaveAtLeastOneVariantToPublish(
-      @Value("classpath:/integration/product/shouldNotAdminCreateProductSinceProductMustHaveAtLeastOneVariantToPublish.json") Resource dummyFormJsonFile
-      ) throws Exception {
+      @Value("classpath:/integration/product/shouldNotAdminCreateProductSinceProductMustHaveAtLeastOneVariantToPublish.json") Resource dummyFormJsonFile)
+      throws Exception {
 
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
 
-    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json", dummyFormJsonString.getBytes());
+    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json",
+        dummyFormJsonString.getBytes());
 
     // arrange
     String targetUrl = "http://localhost:" + this.port + this.targetPath;
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .multipart(targetUrl) // create
-        .file(jsonFile)
-        .contentType(MediaType.MULTIPART_FORM_DATA)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.multipart(targetUrl) // create
+        .file(jsonFile).contentType(MediaType.MULTIPART_FORM_DATA).cookie(this.authCookie).cookie(this.csrfCookie)
+        .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON)).andDo(print())
         .andExpect(status().isBadRequest());
 
     MvcResult result = resultActions.andReturn();
@@ -250,14 +232,19 @@ public class AdminProductEndpointTest {
     ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(400);
-    // if this error from responseStatusException, you have to use 'result.getResponse().getErrorMessage()'
-    // if this error from @ControllerAdvice, you have to use 'responseBody.getMessage()' to access the body message.
-    assertThat(responseBody.getMessage()).isEqualTo(this.messageSource.getMessage("product.isPublic.onevariantandafterreleasedate", new Object[0], LocaleContextHolder.getLocale()));
+    // if this error from responseStatusException, you have to use
+    // 'result.getResponse().getErrorMessage()'
+    // if this error from @ControllerAdvice, you have to use
+    // 'responseBody.getMessage()' to access the body message.
+    assertThat(responseBody.getMessage()).isEqualTo(this.messageSource
+        .getMessage("product.isPublic.onevariantandafterreleasedate", new Object[0], LocaleContextHolder.getLocale()));
   }
+
   /**
    * multipart testing.
    *
-   * ref: https://stackoverflow.com/questions/21800726/using-spring-mvc-test-to-unit-test-multipart-post-request
+   * ref:
+   * https://stackoverflow.com/questions/21800726/using-spring-mvc-test-to-unit-test-multipart-post-request
    * 
    **/
   @Test
@@ -265,7 +252,6 @@ public class AdminProductEndpointTest {
   public void shouldAdminUserCreateNewProduct(
       @Value("classpath:/integration/product/shouldAdminUserCreateNewProduct.json") Resource dummyFormJsonFile)
       throws Exception {
-
 
     Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
 
@@ -275,24 +261,107 @@ public class AdminProductEndpointTest {
     // arrange
     String targetUrl = "http://localhost:" + this.port + this.targetPath;
 
-    // make sure the file name match with json script (e.g., shouldAdminUserCreateNewProduct.json)
-    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("files", "product-image-0.jpeg", "image/jpeg", "some jpg".getBytes());
-    MockMultipartFile fileAtFirstIndex = new MockMultipartFile("files", "product-image-1.png", "image/png", "some png".getBytes());
-    MockMultipartFile fileAtThirdIndex = new MockMultipartFile("files", "product-image-3.jpeg", "image/jpeg", "some jpeg".getBytes());
-    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json", dummyFormJsonString.getBytes());
+    // make sure the file name match with json script (e.g.,
+    // shouldAdminUserCreateNewProduct.json)
+    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("files", "product-image-0.jpeg", "image/jpeg",
+        "some jpg".getBytes());
+    MockMultipartFile fileAtFirstIndex = new MockMultipartFile("files", "product-image-1.png", "image/png",
+        "some png".getBytes());
+    MockMultipartFile fileAtThirdIndex = new MockMultipartFile("files", "product-image-3.jpeg", "image/jpeg",
+        "some jpeg".getBytes());
+    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json",
+        dummyFormJsonString.getBytes());
 
     // act & assert
-    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
-        .multipart(targetUrl) // create
-        .file(fileAtZeroIndex)
-        .file(fileAtFirstIndex)
-        .file(fileAtThirdIndex)
-        .file(jsonFile)
-        .contentType(MediaType.MULTIPART_FORM_DATA)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON))
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.multipart(targetUrl) // create
+        .file(fileAtZeroIndex).file(fileAtFirstIndex).file(fileAtThirdIndex).file(jsonFile)
+        .contentType(MediaType.MULTIPART_FORM_DATA).cookie(this.authCookie).cookie(this.csrfCookie)
+        .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON)).andDo(print())
+        .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductDTO.class);
+
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.getProductId()).isNotNull();
+    assertThat(responseBody.getProductName()).isEqualTo(dummyFormJson.get("productName").asText());
+    assertThat(responseBody.getCategory().getCategoryId().toString())
+        .isEqualTo(dummyFormJson.get("category").get("categoryId").asText());
+    assertThat(responseBody.getCheapestPrice()).isEqualTo(responseBody.getProductBaseUnitPrice());
+    assertThat(responseBody.getHighestPrice()).isEqualTo(responseBody.getProductBaseUnitPrice());
+
+    List<ProductImageDTO> productImages = responseBody.getProductImages();
+
+    for (int i = 0; i < productImages.size(); i++) {
+
+      assertThat(productImages.get(i).getIsChange()).isEqualTo(false);
+
+      if (i == 0 || i == 1 || i == 3) {
+        if (i == 0) {
+          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-0");
+          assertThat(productImages.get(i).getProductImagePath()).matches(
+              "/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.jpeg");
+        } else if (i == 1) {
+          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-1");
+          assertThat(productImages.get(i).getProductImagePath())
+              .matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");
+        } else if (i == 3) {
+          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-3");
+          assertThat(productImages.get(i).getProductImagePath()).matches(
+              "/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-3-.+.jpeg");
+        }
+      } else {
+        assertThat(productImages.get(i).getProductImagePath()).isEqualTo("");
+      }
+    }
+
+    // make sure any variant is not created.
+    assertThat(0).isEqualTo(responseBody.getVariants().size());
+  }
+
+  /**
+   * multipart testing.
+   *
+   * ref:
+   * https://stackoverflow.com/questions/21800726/using-spring-mvc-test-to-unit-test-multipart-post-request
+   * 
+   **/
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldAdminUserCreateNewProductWithMax5Images.sql" })
+  public void shouldAdminUserCreateNewProductWithMax5Images(
+      @Value("classpath:/integration/product/shouldAdminUserCreateNewProductWithMax5Images.json") Resource dummyFormJsonFile)
+      throws Exception {
+
+    Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath;
+
+    // make sure the file name match with json script (e.g.,
+    // shouldAdminUserCreateNewProduct.json)
+    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("files", "product-image-0.jpeg", "image/jpeg",
+        "some jpg".getBytes());
+    MockMultipartFile fileAtFirstIndex = new MockMultipartFile("files", "product-image-1.png", "image/png",
+        "some png".getBytes());
+    MockMultipartFile fileAtSecondIndex = new MockMultipartFile("files", "product-image-2.jpeg", "image/jpeg",
+        "some png".getBytes());
+    MockMultipartFile fileAtThirdIndex = new MockMultipartFile("files", "product-image-3.jpeg", "image/jpeg",
+        "some jpeg".getBytes());
+    MockMultipartFile fileAtFourthIndex = new MockMultipartFile("files", "product-image-4.jpeg", "image/jpeg",
+        "some jpeg".getBytes());
+    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json",
+        dummyFormJsonString.getBytes());
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.multipart(targetUrl) // create
+        .file(fileAtZeroIndex).file(fileAtFirstIndex).file(fileAtSecondIndex).file(fileAtThirdIndex)
+        .file(fileAtFourthIndex).file(jsonFile).contentType(MediaType.MULTIPART_FORM_DATA).cookie(this.authCookie)
+        .cookie(this.csrfCookie).header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -303,33 +372,39 @@ public class AdminProductEndpointTest {
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
     assertThat(responseBody.getProductId()).isNotNull();
     assertThat(responseBody.getProductName()).isEqualTo(dummyFormJson.get("productName").asText());
-    assertThat(responseBody.getCategory().getCategoryId().toString()).isEqualTo(dummyFormJson.get("category").get("categoryId").asText());
+    assertThat(responseBody.getCategory().getCategoryId().toString())
+        .isEqualTo(dummyFormJson.get("category").get("categoryId").asText());
     assertThat(responseBody.getCheapestPrice()).isEqualTo(responseBody.getProductBaseUnitPrice());
     assertThat(responseBody.getHighestPrice()).isEqualTo(responseBody.getProductBaseUnitPrice());
-
 
     List<ProductImageDTO> productImages = responseBody.getProductImages();
 
     for (int i = 0; i < productImages.size(); i++) {
 
-      assertThat(productImages.get(i).getIsChange()).isEqualTo(false);  
+      assertThat(productImages.get(i).getIsChange()).isEqualTo(false);
 
-      if (i == 0 || i == 1 || i == 3) {
-        if (i == 0) {
-          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-0");  
-          assertThat(productImages.get(i).getProductImagePath()).matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.jpeg");  
-        } else if (i == 1) {
-          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-1");  
-          assertThat(productImages.get(i).getProductImagePath()).matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");  
-        } else if (i == 3) {
-          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-3");  
-          assertThat(productImages.get(i).getProductImagePath()).matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-3-.+.jpeg");  
-        }
-      } else {
-        assertThat(productImages.get(i).getProductImagePath()).isEqualTo("");  
+      if (i == 0) {
+        assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-0");
+        assertThat(productImages.get(i).getProductImagePath())
+            .matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.jpeg");
+      } else if (i == 1) {
+        assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-1");
+        assertThat(productImages.get(i).getProductImagePath())
+            .matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");
+      } else if (i == 2) {
+        assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-2");
+        assertThat(productImages.get(i).getProductImagePath())
+            .matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-2-.+.jpeg");
+      } else if (i == 3) {
+        assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-3");
+        assertThat(productImages.get(i).getProductImagePath())
+            .matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-3-.+.jpeg");
+      } else if (i == 4) {
+        assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-4");
+        assertThat(productImages.get(i).getProductImagePath())
+            .matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-4-.+.jpeg");
       }
     }
-
     // make sure any variant is not created.
     assertThat(0).isEqualTo(responseBody.getVariants().size());
   }
@@ -340,32 +415,29 @@ public class AdminProductEndpointTest {
       @Value("classpath:/integration/product/shouldNotAdminUserCreateNewProductSinceInvalidPath.json") Resource dummyFormJsonFile)
       throws Exception {
 
-
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
 
     // arrange
     String targetUrl = "http://localhost:" + this.port + this.targetPath;
 
-    // make sure the file name match with json script (e.g., shouldAdminUserCreateNewProduct.json)
-    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("files", "product-image-0.jpeg", "image/jpeg", "some jpg".getBytes());
-    MockMultipartFile fileAtFirstIndex = new MockMultipartFile("files", "product-image-1.png", "image/png", "some png".getBytes());
-    MockMultipartFile fileAtThirdIndex = new MockMultipartFile("files", "product-image-3.jpeg", "image/jpeg", "some jpeg".getBytes());
-    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json", dummyFormJsonString.getBytes());
+    // make sure the file name match with json script (e.g.,
+    // shouldAdminUserCreateNewProduct.json)
+    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("files", "product-image-0.jpeg", "image/jpeg",
+        "some jpg".getBytes());
+    MockMultipartFile fileAtFirstIndex = new MockMultipartFile("files", "product-image-1.png", "image/png",
+        "some png".getBytes());
+    MockMultipartFile fileAtThirdIndex = new MockMultipartFile("files", "product-image-3.jpeg", "image/jpeg",
+        "some jpeg".getBytes());
+    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json",
+        dummyFormJsonString.getBytes());
 
     // act & assert
-    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
-        .multipart(targetUrl) // create
-        .file(fileAtZeroIndex)
-        .file(fileAtFirstIndex)
-        .file(fileAtThirdIndex)
-        .file(jsonFile)
-        .contentType(MediaType.MULTIPART_FORM_DATA)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON))
-        .andDo(print()).andExpect(status().isBadRequest());
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.multipart(targetUrl) // create
+        .file(fileAtZeroIndex).file(fileAtFirstIndex).file(fileAtThirdIndex).file(jsonFile)
+        .contentType(MediaType.MULTIPART_FORM_DATA).cookie(this.authCookie).cookie(this.csrfCookie)
+        .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON)).andDo(print())
+        .andExpect(status().isBadRequest());
 
     MvcResult result = resultActions.andReturn();
 
@@ -373,7 +445,8 @@ public class AdminProductEndpointTest {
     ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
 
     assertThat(result.getResponse().getStatus()).isEqualTo(400);
-    assertThat(responseBody.getMessage()).isEqualTo(this.messageSource.getMessage("product.productPath.invalidformat", new Object[0], LocaleContextHolder.getLocale()));
+    assertThat(responseBody.getMessage()).isEqualTo(this.messageSource.getMessage("product.productPath.invalidformat",
+        new Object[0], LocaleContextHolder.getLocale()));
   }
 
   @Test
@@ -382,32 +455,29 @@ public class AdminProductEndpointTest {
       @Value("classpath:/integration/product/shouldNotAdminUserCreateNewProductSinceDuplicatedName.json") Resource dummyFormJsonFile)
       throws Exception {
 
-
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
 
     // arrange
     String targetUrl = "http://localhost:" + this.port + this.targetPath;
 
-    // make sure the file name match with json script (e.g., shouldAdminUserCreateNewProduct.json)
-    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("files", "product-image-0.jpeg", "image/jpeg", "some jpg".getBytes());
-    MockMultipartFile fileAtFirstIndex = new MockMultipartFile("files", "product-image-1.png", "image/png", "some png".getBytes());
-    MockMultipartFile fileAtThirdIndex = new MockMultipartFile("files", "product-image-3.jpeg", "image/jpeg", "some jpeg".getBytes());
-    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json", dummyFormJsonString.getBytes());
+    // make sure the file name match with json script (e.g.,
+    // shouldAdminUserCreateNewProduct.json)
+    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("files", "product-image-0.jpeg", "image/jpeg",
+        "some jpg".getBytes());
+    MockMultipartFile fileAtFirstIndex = new MockMultipartFile("files", "product-image-1.png", "image/png",
+        "some png".getBytes());
+    MockMultipartFile fileAtThirdIndex = new MockMultipartFile("files", "product-image-3.jpeg", "image/jpeg",
+        "some jpeg".getBytes());
+    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json",
+        dummyFormJsonString.getBytes());
 
     // act & assert
-    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
-        .multipart(targetUrl) // create
-        .file(fileAtZeroIndex)
-        .file(fileAtFirstIndex)
-        .file(fileAtThirdIndex)
-        .file(jsonFile)
-        .contentType(MediaType.MULTIPART_FORM_DATA)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON))
-        .andDo(print()).andExpect(status().isBadRequest());
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.multipart(targetUrl) // create
+        .file(fileAtZeroIndex).file(fileAtFirstIndex).file(fileAtThirdIndex).file(jsonFile)
+        .contentType(MediaType.MULTIPART_FORM_DATA).cookie(this.authCookie).cookie(this.csrfCookie)
+        .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON)).andDo(print())
+        .andExpect(status().isBadRequest());
 
     MvcResult result = resultActions.andReturn();
 
@@ -418,9 +488,10 @@ public class AdminProductEndpointTest {
   }
 
   // 400 bad request (bad input) testing
-  
+
   /**
-   * senario: update first image and remove 3rd image and leave 2nd image as it is.
+   * senario: update first image and remove 3rd image and leave 2nd image as it
+   * is.
    *
    **/
 
@@ -430,13 +501,12 @@ public class AdminProductEndpointTest {
       @Value("classpath:/integration/product/shouldAdminUserUpdateProduct.json") Resource dummyFormJsonFile)
       throws Exception {
 
-
     Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
     Mockito.doNothing().when(this.s3Service).delete(Mockito.any());
 
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
-    
+
     String dummyProductId = dummyFormJson.get("productId").asText();
 
     // create dummy files in the directory
@@ -445,8 +515,10 @@ public class AdminProductEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyProductId;
 
     // make sure the file name match with input json script.
-    MockMultipartFile newFileAtZeroIndex = new MockMultipartFile("files", "product-image-0.svg", "image/svg+xml", "some svg".getBytes());
-    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json", dummyFormJsonString.getBytes());
+    MockMultipartFile newFileAtZeroIndex = new MockMultipartFile("files", "product-image-0.svg", "image/svg+xml",
+        "some svg".getBytes());
+    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json",
+        dummyFormJsonString.getBytes());
 
     // act & assert
 
@@ -461,15 +533,10 @@ public class AdminProductEndpointTest {
           }
         });
 
-    ResultActions resultActions = mvc.perform(builder
-        .file(newFileAtZeroIndex)
-        .file(jsonFile)
-        .contentType(MediaType.MULTIPART_FORM_DATA)
-        .content(dummyFormJsonString)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON))
+    ResultActions resultActions = mvc
+        .perform(builder.file(newFileAtZeroIndex).file(jsonFile).contentType(MediaType.MULTIPART_FORM_DATA)
+            .content(dummyFormJsonString).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -480,7 +547,8 @@ public class AdminProductEndpointTest {
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
     assertThat(responseBody.getProductId()).isNotNull();
     assertThat(responseBody.getProductName()).isEqualTo(dummyFormJson.get("productName").asText());
-    assertThat(responseBody.getCategory().getCategoryId().toString()).isEqualTo(dummyFormJson.get("category").get("categoryId").asText());
+    assertThat(responseBody.getCategory().getCategoryId().toString())
+        .isEqualTo(dummyFormJson.get("category").get("categoryId").asText());
     assertThat(responseBody.getCheapestPrice()).isEqualTo(new BigDecimal("13.32"));
     assertThat(responseBody.getHighestPrice()).isEqualTo(new BigDecimal("123.0"));
     assertThat(1).isEqualTo(responseBody.getVariants().size());
@@ -489,45 +557,47 @@ public class AdminProductEndpointTest {
 
     for (int i = 0; i < productImages.size(); i++) {
 
-      assertThat(productImages.get(i).getIsChange()).isEqualTo(false);  
+      assertThat(productImages.get(i).getIsChange()).isEqualTo(false);
 
       if (i == 0 || i == 1 || i == 3) {
         if (i == 0) {
           // update
-          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-0");  
-          assertThat(productImages.get(i).getProductImagePath()).matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.svg");  
+          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-0");
+          assertThat(productImages.get(i).getProductImagePath())
+              .matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.svg");
         } else if (i == 1) {
           // unchange
-          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-1");  
-          assertThat(productImages.get(i).getProductImagePath()).matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");  
+          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-1");
+          assertThat(productImages.get(i).getProductImagePath())
+              .matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");
         } else if (i == 3) {
           // remove
-          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-3");  
-          assertThat(productImages.get(i).getProductImagePath()).isEqualTo("");  
+          assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-3");
+          assertThat(productImages.get(i).getProductImagePath()).isEqualTo("");
         }
       } else {
-        assertThat(productImages.get(i).getProductImagePath()).isEqualTo("");  
+        assertThat(productImages.get(i).getProductImagePath()).isEqualTo("");
       }
     }
 
     for (ProductVariantDTO variantDTO : responseBody.getVariants()) {
-      assertThat(variantDTO.getVariantId()).isNotNull();  
+      assertThat(variantDTO.getVariantId()).isNotNull();
     }
   }
 
   @Test
-  @Sql(scripts = { "classpath:/integration/product/shouldNotAdminUserUpdateProductSinceProductUnitPriceLessThanDiscountPriceAtItsVariant.sql" })
+  @Sql(scripts = {
+      "classpath:/integration/product/shouldNotAdminUserUpdateProductSinceProductUnitPriceLessThanDiscountPriceAtItsVariant.sql" })
   public void shouldNotAdminUserUpdateProductSinceProductUnitPriceLessThanDiscountPriceAtItsVariant(
       @Value("classpath:/integration/product/shouldNotAdminUserUpdateProductSinceProductUnitPriceLessThanDiscountPriceAtItsVariant.json") Resource dummyFormJsonFile)
       throws Exception {
-
 
     Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
     Mockito.doNothing().when(this.s3Service).delete(Mockito.any());
 
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
-    
+
     String dummyProductId = dummyFormJson.get("productId").asText();
 
     // create dummy files in the directory
@@ -536,8 +606,10 @@ public class AdminProductEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyProductId;
 
     // make sure the file name match with input json script.
-    MockMultipartFile newFileAtZeroIndex = new MockMultipartFile("files", "product-image-0.svg", "image/svg+xml", "some svg".getBytes());
-    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json", dummyFormJsonString.getBytes());
+    MockMultipartFile newFileAtZeroIndex = new MockMultipartFile("files", "product-image-0.svg", "image/svg+xml",
+        "some svg".getBytes());
+    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json",
+        dummyFormJsonString.getBytes());
 
     // act & assert
 
@@ -552,15 +624,10 @@ public class AdminProductEndpointTest {
           }
         });
 
-    ResultActions resultActions = mvc.perform(builder
-        .file(newFileAtZeroIndex)
-        .file(jsonFile)
-        .contentType(MediaType.MULTIPART_FORM_DATA)
-        .content(dummyFormJsonString)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON))
+    ResultActions resultActions = mvc
+        .perform(builder.file(newFileAtZeroIndex).file(jsonFile).contentType(MediaType.MULTIPART_FORM_DATA)
+            .content(dummyFormJsonString).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
   }
@@ -571,13 +638,12 @@ public class AdminProductEndpointTest {
       @Value("classpath:/integration/product/shouldNotAdminUserUpdateProductSinceDuplicatedName.json") Resource dummyFormJsonFile)
       throws Exception {
 
-
     Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
     Mockito.doNothing().when(this.s3Service).delete(Mockito.any());
 
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
-    
+
     String dummyProductId = dummyFormJson.get("productId").asText();
 
     // create dummy files in the directory
@@ -586,8 +652,10 @@ public class AdminProductEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyProductId;
 
     // make sure the file name match with input json script.
-    MockMultipartFile newFileAtZeroIndex = new MockMultipartFile("files", "product-image-0.svg", "image/svg+xml", "some svg".getBytes());
-    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json", dummyFormJsonString.getBytes());
+    MockMultipartFile newFileAtZeroIndex = new MockMultipartFile("files", "product-image-0.svg", "image/svg+xml",
+        "some svg".getBytes());
+    MockMultipartFile jsonFile = new MockMultipartFile("criteria", "", "application/json",
+        dummyFormJsonString.getBytes());
 
     // act & assert
 
@@ -602,15 +670,10 @@ public class AdminProductEndpointTest {
           }
         });
 
-    ResultActions resultActions = mvc.perform(builder
-        .file(newFileAtZeroIndex)
-        .file(jsonFile)
-        .contentType(MediaType.MULTIPART_FORM_DATA)
-        .content(dummyFormJsonString)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON))
+    ResultActions resultActions = mvc
+        .perform(builder.file(newFileAtZeroIndex).file(jsonFile).contentType(MediaType.MULTIPART_FORM_DATA)
+            .content(dummyFormJsonString).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
   }
@@ -626,13 +689,9 @@ public class AdminProductEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyProductId;
 
     // act & assert
-    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
-        .delete(targetUrl) // delete 
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON))
-        .andDo(print()).andExpect(status().isOk());
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.delete(targetUrl) // delete
+        .cookie(this.authCookie).cookie(this.csrfCookie).header("csrf-token", this.authInfo.getCsrfToken())
+        .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 

@@ -270,7 +270,7 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
           </Typography>
         </Box>
         <Box component="div" className={classes.actionBox}>
-          <Button onClick={handleUserAccountSaveClickEvent}>
+          <Button onClick={handleUserAccountSaveClickEvent} variant="contained">
             Login
             </Button>
         </Box>

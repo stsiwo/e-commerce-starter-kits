@@ -75,7 +75,7 @@ const UserActiveTabPanel: React.FunctionComponent<{}> = (props) => {
           {renderUserActiveRadioInputs()}
         </RadioGroup>
       </FormControl>
-        <Button onClick={handleReset}>
+        <Button onClick={handleReset} variant="contained">
           Reset
       </Button>
     </Box>

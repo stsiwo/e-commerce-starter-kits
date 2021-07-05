@@ -103,7 +103,7 @@ const CategoryList: React.FunctionComponent<{}> = (props) => {
         </Grid>
       </Grid>
       <Box component="div" className={classes.moreBtnBox}>
-        <Button>
+        <Button variant="contained">
           More Categories 
         </Button>
       </Box>

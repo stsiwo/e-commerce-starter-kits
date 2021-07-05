@@ -144,6 +144,7 @@ const UserAccountRemovalManagement: React.FunctionComponent<UserAccountRemovalMa
           <Button
             onClick={handleUserAccountSaveClickEvent}
             disabled={!curRemovalCheck}
+            variant="contained"
           >
             Delete My Account
           </Button>

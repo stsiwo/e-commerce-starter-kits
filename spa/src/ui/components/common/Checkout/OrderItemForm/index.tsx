@@ -23,6 +23,9 @@ import Switch from '@material-ui/core/Switch';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    actionBox: {
+      textAlign: "right",
+    },
   }),
 );
 
@@ -61,7 +64,7 @@ const OrderItemForm: React.FunctionComponent<OrderItemFormPropsType> = (props) =
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
           message: "please select at least one product to buy.",
-        }) 
+        })
       );
     } else {
       props.goToNextStep()
@@ -94,7 +97,7 @@ const OrderItemForm: React.FunctionComponent<OrderItemFormPropsType> = (props) =
             {"Oops. Your cart is empty."}
           </Typography>
           <Box>
-            <Button component={RRLink} to={"/search"} >
+            <Button component={RRLink} to={"/search"} variant="contained">
               {"Search Products"}
             </Button>
           </Box>
@@ -108,14 +111,14 @@ const OrderItemForm: React.FunctionComponent<OrderItemFormPropsType> = (props) =
             md={6}
           >
             <Typography variant="subtitle2" component="p" align="left" gutterBottom >
-              you purchase only selected items e.g., 
+              you purchase only selected items e.g.,
             <Switch
-              edge="end"
-              readOnly
-              checked={true}
-              inputProps={{ 'aria-labelledby': 'switch-list-label-selected-cart-item' }}
-              size="small"
-            />
+                edge="end"
+                readOnly
+                checked={true}
+                inputProps={{ 'aria-labelledby': 'switch-list-label-selected-cart-item' }}
+                size="small"
+              />
             </Typography>
             {renderCartItems()}
           </Grid>
@@ -137,12 +140,14 @@ const OrderItemForm: React.FunctionComponent<OrderItemFormPropsType> = (props) =
         item
         xs={12}
       >
-        <Button onClick={(e) => props.goToPrevStep()}>
-          {"Previous"}
-        </Button>
-        <Button onClick={handleValidateClick}>
-          {"Confirm"}
-        </Button>
+        <Box component="div" className={classes.actionBox}>
+          <Button onClick={(e) => props.goToPrevStep()} variant="contained">
+            {"Previous"}
+          </Button>
+          <Button onClick={handleValidateClick} variant="contained">
+            {"Confirm"}
+          </Button>
+        </Box>
       </Grid>
     </Grid>
   )

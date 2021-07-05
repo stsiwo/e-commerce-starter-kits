@@ -183,10 +183,10 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.onClose} color="primary">
+        <Button onClick={props.onClose} color="primary" variant="contained">
           Cancel
         </Button>
-        <Button onClick={handleFormSaveClick} color="primary">
+        <Button onClick={handleFormSaveClick} color="primary" variant="contained">
           Save
         </Button>
       </DialogActions>

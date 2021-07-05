@@ -207,10 +207,10 @@ const ResetPassword: React.FunctionComponent<{}> = (props) => {
           error={curResetPasswordValidationState.confirm !== ""}
         />
         <Box component="div" className={classes.actionBox}>
-          <Button onClick={handleUserAccountSaveClickEvent}>
+          <Button onClick={handleUserAccountSaveClickEvent} variant="contained">
             Reset Password
           </Button>
-          <Button component={RRLink} to="/login">
+          <Button component={RRLink} to="/login" variant="contained">
             Send Reset Password Email Again
           </Button>
         </Box>

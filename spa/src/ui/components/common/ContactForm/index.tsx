@@ -257,7 +257,7 @@ const ContactForm: React.FunctionComponent<{}> = (props) => {
       <FormLabel component="legend">ReCaptcha</FormLabel>
       <div className={`g-recaptcha ${classes.recaptchaBox}`} data-sitekey={RECAPTCHA_SITE_KEY}></div>
       <Box component="div" className={classes.actionBox}>
-        <Button onClick={handleContactSendClickEvent}>
+        <Button onClick={handleContactSendClickEvent} variant="contained">
           Send
         </Button>
       </Box>

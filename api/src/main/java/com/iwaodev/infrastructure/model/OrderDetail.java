@@ -108,7 +108,10 @@ public class OrderDetail {
   // business behaviors
   
   public Product getProduct() {
-    return this.productVariant.getProduct();
+    if (this.productVariant != null) {
+      return this.productVariant.getProduct();
+    }
+    return null;
   }
 
 }

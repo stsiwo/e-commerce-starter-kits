@@ -3,7 +3,6 @@ import Grid from '@material-ui/core/Grid';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { CheckoutStepComponentPropsType } from 'components/pages/Checkout/checkoutSteps';
 import { UserType } from 'domain/user/types';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
@@ -12,12 +11,12 @@ import CustomerPhonesForm from './CustomerPhonesForm';
 import { messageActions } from 'reducers/slices/app';
 import { getNanoId } from 'src/utils';
 import { MessageTypeEnum } from 'src/app';
+import Box from '@material-ui/core/Box';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     actionBox: {
       textAlign: "right",
-      margin: `${theme.spacing(2)}px 0`,
     },
   }),
 );
@@ -60,12 +59,12 @@ const CustomerContactForm: React.FunctionComponent<CustomerContactFormPropsType>
       props.goToNextStep()
     } else {
       // validation failed.
-      
+
       dispatch(
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: "please select phone, shipping address, and billing address."  
+          message: "please select phone, shipping address, and billing address."
         })
       )
     }
@@ -98,12 +97,14 @@ const CustomerContactForm: React.FunctionComponent<CustomerContactFormPropsType>
         item
         xs={12}
       >
-        <Button onClick={(e) => props.goToPrevStep()} className={classes.actionBox}>
-          {"Previous"}
-        </Button>
-        <Button onClick={handleValidateClick} className={classes.actionBox}>
-          {"Confirm"}
-        </Button>
+        <Box component="div" className={classes.actionBox}>
+          <Button onClick={(e) => props.goToPrevStep()} variant="contained">
+            {"Previous"}
+          </Button>
+          <Button onClick={handleValidateClick} variant="contained">
+            {"Confirm"}
+          </Button>
+        </Box>
       </Grid>
     </Grid>
   )

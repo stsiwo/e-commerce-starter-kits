@@ -213,9 +213,9 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
             />
             {(NODE_ENV === 'development' &&
               <React.Fragment>
-                <Button onClick={(e) => goToStep(CheckoutStepEnum.FINAL_CONFIRM)}>Final Conform</Button>
-                <Button onClick={(e) => goToStep(CheckoutStepEnum.ORDER_ITEMS)}>Order Items</Button>
-                <Button onClick={(e) => goToStep(CheckoutStepEnum.PAYMENT)}>Payment</Button>
+                <Button onClick={(e) => goToStep(CheckoutStepEnum.FINAL_CONFIRM)} variant="contained">Final Conform</Button>
+                <Button onClick={(e) => goToStep(CheckoutStepEnum.ORDER_ITEMS)} variant="contained">Order Items</Button>
+                <Button onClick={(e) => goToStep(CheckoutStepEnum.PAYMENT)} variant="contained">Payment</Button>
               </React.Fragment>
             )}
           </StepContent>

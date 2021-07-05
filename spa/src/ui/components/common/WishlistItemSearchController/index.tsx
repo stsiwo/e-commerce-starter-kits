@@ -13,10 +13,11 @@ import SortTabPanel from './TabPanel/SortTabPanel';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    appBar: {
+      boxShadow: "none",
+    },
     tabPanel: {
       maxWidth: theme.breakpoints.values.lg, 
-      position: "absolute",
-      backgroundColor: "#f5f5f5",
       width: "100%",
       zIndex: 50,
     }
@@ -66,7 +67,7 @@ const WishlistItemSearchController: React.FunctionComponent<{}> = (props) => {
 
   return (
     <Box component="div" >
-      <AppBar position="static" color="default">
+      <AppBar position="static" color="default" className={classes.appBar}>
         <Tabs
           value={curTabIndex}
           onChange={handleChange}

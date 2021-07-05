@@ -306,6 +306,7 @@ const AdminCustomerPhoneForm: React.FunctionComponent<AdminCustomerPhoneFormProp
           <Button 
             onClick={handleAddNewPhoneBtnClickEvent}
             disabled={phones.length === maxSize}
+            variant="contained"
           >
             Add New Phone
         </Button>
@@ -339,10 +340,10 @@ const AdminCustomerPhoneForm: React.FunctionComponent<AdminCustomerPhoneFormProp
             error={curAdminCustomerPhoneValidationState.countryCode !== ""}
           />
           <Box component="div" className={classes.actionBox}>
-            <Button onClick={handleModalCancelClickEvent}>
+            <Button onClick={handleModalCancelClickEvent} variant="contained">
               Cancel
             </Button>
-            <Button onClick={handleAdminCustomerSaveClickEvent}>
+            <Button onClick={handleAdminCustomerSaveClickEvent} variant="contained">
               Save
             </Button>
           </Box>

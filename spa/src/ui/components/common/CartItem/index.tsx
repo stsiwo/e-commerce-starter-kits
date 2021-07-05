@@ -263,10 +263,11 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
             <SizeCell value={value.product.variants[0].productSize.productSizeName} />
           </Box>
           <Box component="div" className={classes.actionBox}>
-            <ButtonGroup size="small" aria-label="small outlined button group">
+            <ButtonGroup size="small" aria-label="small outlined button group" >
               <Button
                 onClick={handleQtyIncrement}
                 disabled={value.quantity === value.product.variants[0].variantStock}
+                variant="contained"
               >
                 <AddCircleIcon />
               </Button>
@@ -276,12 +277,14 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
                   /** this override default and 'disable' custom style. **/
                   root: classes.btnRoot,
                 }}
+                variant="contained"
               >
                 {value.quantity}
               </Button>
               <Button
                 onClick={handleQtyDecrement}
                 disabled={value.quantity === 1}
+                variant="contained"
               >
                 <RemoveCircleIcon />
               </Button>

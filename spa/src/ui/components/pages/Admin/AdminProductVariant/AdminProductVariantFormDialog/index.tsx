@@ -84,10 +84,10 @@ const AdminProductVariantFormDialog: React.FunctionComponent<AdminProductVariant
         <AdminProductVariantForm productVariant={props.curProductVariant} ref={childRef}/>
       </DialogContent>
       <DialogActions>
-        <Button onClick={toggleDialog(false)} color="primary">
+        <Button onClick={toggleDialog(false)} variant="contained">
           Cancel
         </Button>
-        <Button onClick={(e) => childRef.current.handleSaveClickEvent(e)} color="primary">
+        <Button onClick={(e) => childRef.current.handleSaveClickEvent(e)} variant="contained" >
           Save
         </Button>
       </DialogActions>

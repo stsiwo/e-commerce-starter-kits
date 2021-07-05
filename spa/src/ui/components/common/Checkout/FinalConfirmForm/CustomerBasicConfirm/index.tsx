@@ -87,7 +87,7 @@ const CustomerBasicConfirm: React.FunctionComponent<CustomerBasicConfirmPropsTyp
         }}
       />
       <Box component="div" className={classes.actionBox}>
-        <Button onClick={(e) => props.goToStep(CheckoutStepEnum.CUSTOMER_BASIC_INFORMATION)}>
+        <Button onClick={(e) => props.goToStep(CheckoutStepEnum.CUSTOMER_BASIC_INFORMATION)} variant="contained">
           Edit
         </Button>
       </Box>

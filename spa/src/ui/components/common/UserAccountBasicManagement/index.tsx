@@ -225,7 +225,7 @@ const UserAccountBasicManagement: React.FunctionComponent<UserAccountBasicManage
           error={curUserAccountValidationState.confirm !== ""}
         />
         <Box component="div" className={classes.actionBox}>
-          <Button onClick={handleUserAccountSaveClickEvent}>
+          <Button onClick={handleUserAccountSaveClickEvent} variant="contained">
             Save
         </Button>
         </Box>

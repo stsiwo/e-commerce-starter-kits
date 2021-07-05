@@ -52,7 +52,7 @@ const CategoryCard: React.FunctionComponent<{}> = (props) => {
           </Typography>
         </CardContent>
         <CardActions className={classes.actions}>
-          <Button>
+          <Button variant="contained">
             Read More
           </Button>
         </CardActions>

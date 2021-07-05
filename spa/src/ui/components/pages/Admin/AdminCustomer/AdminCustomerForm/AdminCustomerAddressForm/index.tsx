@@ -388,6 +388,7 @@ const AdminCustomerAddressForm: React.FunctionComponent<AdminCustomerAddressForm
           <Button 
             onClick={handleAddNewAddressBtnClickEvent}
             disabled={addresses.length === maxSize}
+            variant="contained"
           >
             Add New Address
         </Button>
@@ -472,10 +473,10 @@ const AdminCustomerAddressForm: React.FunctionComponent<AdminCustomerAddressForm
             error={curAdminCustomerAddressValidationState.postalCode !== ""}
           />
           <Box component="div" className={classes.actionBox}>
-            <Button onClick={handleModalCancelClickEvent}>
+            <Button onClick={handleModalCancelClickEvent} variant="contained">
               Cancel
             </Button>
-            <Button onClick={handleAdminCustomerSaveClickEvent}>
+            <Button onClick={handleAdminCustomerSaveClickEvent} variant="contained">
               Save
             </Button>
           </Box>

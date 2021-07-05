@@ -307,7 +307,7 @@ const Signup: React.FunctionComponent<{}> = (props) => {
           </Typography>
         </Box>
         <Box component="div" className={classes.actionBox}>
-          <Button onKeyDown={handleSubmitKeyDown} onClick={handleUserAccountSaveClickEvent}>
+          <Button onKeyDown={handleSubmitKeyDown} onClick={handleUserAccountSaveClickEvent} variant="contained">
             Signup
           </Button>
         </Box>

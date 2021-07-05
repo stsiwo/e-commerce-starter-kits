@@ -292,11 +292,11 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
           /><br />
           <Box component="div" className={classes.actionBox}>
             {(!props.isNew &&
-              <Button onClick={handleDeleteClick}>
+              <Button onClick={handleDeleteClick} variant="contained">
                 Delete
               </Button>
             )}
-            <Button onClick={handleSaveClickEvent}>
+            <Button onClick={handleSaveClickEvent} variant="contained">
               Save
             </Button>
           </Box>
@@ -315,10 +315,10 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
               </Typography>
             </DialogContent>
             <DialogActions>
-              <Button autoFocus onClick={handleDeletionCancel} color="primary">
+              <Button autoFocus onClick={handleDeletionCancel} variant="contained">
                 Cancel
               </Button>
-              <Button onClick={handleDeletionOk} color="primary">
+              <Button onClick={handleDeletionOk} variant="contained">
                 Ok
               </Button>
             </DialogActions>

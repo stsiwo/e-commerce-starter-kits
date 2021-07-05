@@ -84,10 +84,10 @@ const WishlistItem: React.FunctionComponent<WishlistItemPropsType> = ({ value, o
           </Box>
           <Box component="div" className={classes.actionBox}>
             <Button
-              variant="contained"
               startIcon={<AddShoppingCartIcon />}
               onClick={onMoveToCartClick}
               data-wishlist-id={value.wishlistItemId}
+              variant="contained"
             >
               Move To Cart
             </Button>

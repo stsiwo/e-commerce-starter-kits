@@ -12,6 +12,7 @@ import { UserTypeEnum } from 'src/app';
 import AddressCard from './AddressCard';
 import PhoneCard from './PhoneCard';
 import OrderDetail from 'components/common/OrderDetail';
+import OrderProductHorizontalCard from 'components/pages/Order/OrderForm/OrderProductHorizontalCard';
 
 interface AdminOrderFormPropsType {
   order: OrderType
@@ -127,7 +128,7 @@ const AdminOrderForm: React.FunctionComponent<AdminOrderFormPropsType> = (props)
         </Typography>
         {
           props.order.orderDetails.map((orderDetail: OrderDetailType, index: number) => (
-            <ProductHorizontalCard orderDetail={orderDetail} key={index} />
+            <OrderProductHorizontalCard orderDetail={orderDetail} key={index} />
           ))
         }
       </Grid>

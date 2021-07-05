@@ -1,20 +1,23 @@
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardHeader from '@material-ui/core/CardHeader';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import ListItemText from '@material-ui/core/ListItemText';
 import Modal from '@material-ui/core/Modal';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import PhoneIphoneIcon from '@material-ui/icons/PhoneIphone';
 import { CustomerPhonesFormDataType, CustomerPhonesFormValidationDataType, defaultUserAccountValidationPhoneData, generateDefaultCustomerPhonesFormData, UserPhoneType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
@@ -64,6 +67,21 @@ const useStyles = makeStyles((theme: Theme) =>
     actionBox: {
       textAlign: "center"
     },
+    root: {
+      margin: `${theme.spacing(1)}px auto`,
+      maxWidth: 700,
+    },
+    cardActions: {
+      display: "flex",
+      justifyContent: "flex-end",
+    },
+    card: {
+    },
+    cardHeader: {
+    },
+    noMarginRight: {
+      marginRight: 0,
+    }
   }),
 );
 
@@ -213,7 +231,7 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
 
     dispatch(
       deleteAuthPhoneActionCreator({
-        phoneId: phoneId 
+        phoneId: phoneId
       })
     )
   }
@@ -241,7 +259,7 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
     const nextPrimePhoneId = e.currentTarget.value;
 
     dispatch(
-      patchAuthPhoneActionCreator({ phoneId: nextPrimePhoneId  }) 
+      patchAuthPhoneActionCreator({ phoneId: nextPrimePhoneId })
     );
 
   }
@@ -253,27 +271,37 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
   const renderCurPhoneListComponent: () => React.ReactNode = () => {
     return auth.user.phones.map((phone: UserPhoneType) => {
       return (
-        <ListItem key={phone.phoneId} data-phone-id={phone.phoneId} onClick={handlePhoneItemClickEvent}>
-          <ListItemAvatar>
-            <Avatar>
-              <PhoneIphoneIcon />
-            </Avatar>
-          </ListItemAvatar>
-          <ListItemText
-            primary={phone.phoneNumber}
-            secondary={phone.countryCode}
-          />
-          <ListItemSecondaryAction>
-            <FormControlLabel
-              value={phone.phoneId}
-              control={<Radio />}
-              label={(curPrimaryId == phone.phoneId) ? "primary" : ""}
-            />
-            <IconButton edge="end" aria-label="delete" data-phone-id={phone.phoneId} onClick={handleDeletePhoneClickEvent}>
-              <DeleteIcon />
-            </IconButton>
-          </ListItemSecondaryAction>
-        </ListItem>
+        <Card key={phone.phoneId} className={`${classes.card} ${classes.root}`}>
+          <CardHeader
+            className={classes.cardHeader}
+            avatar={
+              <Avatar>
+                <PhoneIphoneIcon />
+              </Avatar>
+            }
+            title={phone.phoneNumber}
+            subheader={phone.countryCode}
+          >
+          </CardHeader>
+          <CardActions className={classes.cardActions}>
+            <Tooltip title="Primary">
+              <FormControlLabel
+                value={phone.phoneId}
+                control={<Radio icon={<FavoriteBorderIcon />} checkedIcon={<FavoriteIcon style={{ fill: "#000000" }} />} />}
+                label={""}
+                classes={{
+                  root: classes.noMarginRight,
+                }}
+              />
+            </Tooltip>
+              <IconButton edge="end" aria-label="delete" data-phone-id={phone.phoneId} onClick={handleDeletePhoneClickEvent}>
+                <DeleteIcon />
+              </IconButton>
+              <IconButton edge="end" aria-label="edit" data-phone-id={phone.phoneId} onClick={handlePhoneItemClickEvent}>
+                <EditIcon />
+              </IconButton>
+          </CardActions>
+        </Card>
       )
     })
   }
@@ -304,9 +332,10 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
           </RadioGroup>
         )}
         <Box component="div" className={classes.actionBox}>
-          <Button 
+          <Button
             onClick={handleAddNewPhoneBtnClickEvent}
             disabled={phones.length === maxSize}
+            variant="contained"
           >
             Add New Phone
         </Button>
@@ -340,10 +369,10 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
             error={curUserAccountPhoneValidationState.countryCode !== ""}
           />
           <Box component="div" className={classes.actionBox}>
-            <Button onClick={handleModalCancelClickEvent}>
+            <Button onClick={handleModalCancelClickEvent} variant="contained">
               Cancel
             </Button>
-            <Button onClick={handleUserAccountSaveClickEvent}>
+            <Button onClick={handleUserAccountSaveClickEvent} variant="contained">
               Save
             </Button>
           </Box>

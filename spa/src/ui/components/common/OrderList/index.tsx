@@ -10,7 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import ShoppingBasketIcon from '@material-ui/icons/ShoppingBasket';
 import Pagination from '@material-ui/lab/Pagination/Pagination';
 import { calcOrderTotalCost, calcOrderTotalItemNumber, getCurOrderStatus } from 'domain/order';
-import { OrderType } from 'domain/order/types';
+import { OrderType, orderStatusLabelList } from 'domain/order/types';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link as RRLink } from "react-router-dom";
@@ -32,7 +32,8 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: theme.spacing(1),
     },
     controllerBox: {
-      textAlign: "center"
+      textAlign: "center",
+      margin: `${theme.spacing(3)}px 0`,
     },
     card: {
     },
@@ -139,11 +140,11 @@ const OrderList: React.FunctionComponent<{}> = (props) => {
                 Total Items: <b>{calcOrderTotalItemNumber(order)}</b> items
               </Typography>
               <Typography variant="body2" color="textSecondary" component="p">
-                Status: <b>{getCurOrderStatus(order)}</b>
+                Status: <b>{orderStatusLabelList[getCurOrderStatus(order)]}</b>
               </Typography>
             </CardContent>
             <CardActions className={classes.actions}>
-              <Button component={RRLink} to={`/orders/${order.orderId}`}>
+              <Button component={RRLink} to={`/orders/${order.orderId}`} variant="contained">
                 Details
             </Button>
             </CardActions>
@@ -176,7 +177,7 @@ const OrderList: React.FunctionComponent<{}> = (props) => {
             {"Oops, Your order history is empty."}
           </Typography>
           <Box component="div" className={classes.controllerBox}>
-            <Button>
+            <Button variant="contained" >
               {"search your product"}
             </Button>
           </Box>
@@ -192,6 +193,7 @@ const OrderList: React.FunctionComponent<{}> = (props) => {
           >
             {renderOrders()}
           </Grid>
+          <Grid container justify="center" className={classes.controllerBox}>
           <Pagination
             page={pagination.page + 1} // don't forget to increment when display
             count={pagination.totalPages}
@@ -201,6 +203,7 @@ const OrderList: React.FunctionComponent<{}> = (props) => {
             size={"medium"}
             onChange={handlePaginationChange}
           />
+          </Grid>
         </React.Fragment>
       )}
     </React.Fragment>

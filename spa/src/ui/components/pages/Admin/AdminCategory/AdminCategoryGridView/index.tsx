@@ -283,10 +283,10 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
           )}
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={handleDeletionCancel} color="primary">
+          <Button autoFocus onClick={handleDeletionCancel} variant="contained">
             Cancel
           </Button>
-          <Button onClick={handleDeletionOk} color="primary" disabled={curCategory && curCategory.totalProductCount > 0}>
+          <Button onClick={handleDeletionOk} color="primary" disabled={curCategory && curCategory.totalProductCount > 0} variant="contained">
             Ok
           </Button>
         </DialogActions>

@@ -119,7 +119,7 @@ const Review: React.FunctionComponent<{}> = (props) => {
           <Typography variant="subtitle1" component="p" align="center">
             {"seems like you are not logged in. please login first."}
           </Typography>
-          <Button component={RRLink} to="/login">
+          <Button component={RRLink} to="/login" variant="contained">
             {"Go to Login Page"}
           </Button>
         </Box>

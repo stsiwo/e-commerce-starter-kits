@@ -192,7 +192,7 @@ const TimelineUpdateForm: React.FunctionComponent<TimelineUpdateFormPropsType> =
               onChange={handleNoteInputChangeEvent}
             />
             <Box component="div" className={classes.actionBox}>
-              <Button onClick={handleNextOrderStatusSaveClickEvent}>
+              <Button onClick={handleNextOrderStatusSaveClickEvent} variant="contained">
                 Save
               </Button>
             </Box>

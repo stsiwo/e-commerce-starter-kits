@@ -53,7 +53,7 @@ const ReviewFilterTabPanel: React.FunctionComponent<{}> = ({
           precision={0.5}
           value={curReviewPoint}
         />
-        <Button onClick={handleReset}>
+        <Button onClick={handleReset} variant="contained">
           Reset
       </Button>
       </Box>

@@ -509,6 +509,7 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
                   /** this override default and 'disable' custom style. **/
                   root: classes.btnRoot,
                 }}
+                variant="contained"
               >
                 {curQty}
               </Button>
@@ -552,15 +553,15 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
             </Typography>
           </Box>
           <Box component="div" className={classes.controllerBox}>
-            <Button onClick={handleAddCart} disabled={curStockBag.enum === ProductStockEnum.OUT_OF_STOCK}>
+            <Button onClick={handleAddCart} disabled={curStockBag.enum === ProductStockEnum.OUT_OF_STOCK} variant="contained">
               {"Add to Cart"}
             </Button>
             {(auth.userType === UserTypeEnum.MEMBER &&
-              <Button onClick={handleAddWishlist}>
+              <Button onClick={handleAddWishlist} variant="contained">
                 {"save to Wishlist"}
               </Button>
             )}
-            <Button onClick={handleBuyNow} disabled={curStockBag.enum === ProductStockEnum.OUT_OF_STOCK}>
+            <Button onClick={handleBuyNow} disabled={curStockBag.enum === ProductStockEnum.OUT_OF_STOCK} variant="contained">
               {"buy now"}
             </Button>
           </Box>
@@ -578,15 +579,15 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
               {props.product.note}
             </Typography>
             <Box component="div" className={classes.controllerBox}>
-              <Button onClick={handleAddCart}>
+              <Button onClick={handleAddCart} variant="contained">
                 {"Add to Cart"}
               </Button>
               {(auth.userType === UserTypeEnum.MEMBER &&
-                <Button onClick={handleAddWishlist}>
+                <Button onClick={handleAddWishlist} variant="contained">
                   {"save to Wishlist"}
                 </Button>
               )}
-              <Button onClick={handleBuyNow}>
+              <Button onClick={handleBuyNow} variant="contained">
                 {"buy now"}
               </Button>
             </Box>

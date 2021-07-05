@@ -1,21 +1,24 @@
 import Avatar from '@material-ui/core/Avatar';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardHeader from '@material-ui/core/CardHeader';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import ListItemText from '@material-ui/core/ListItemText';
+import MenuItem from '@material-ui/core/MenuItem';
 import Modal from '@material-ui/core/Modal';
 import Radio from '@material-ui/core/Radio';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import HomeIcon from '@material-ui/icons/Home';
+import LocalShippingIcon from '@material-ui/icons/LocalShipping';
+import PaymentIcon from '@material-ui/icons/Payment';
 import { getBillingAddressId, getShippingAddressId, toAddressString } from 'domain/user';
 import { CustomerAddressesFormDataType, CustomerAddressesFormValidationDataType, defaultUserAccountValidationAddressData, generateDefaultCustomerAddressesFormData, UserAddressType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
@@ -25,7 +28,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { deleteAuthAddressActionCreator, patchAuthAddressActionCreator, postAuthAddressActionCreator, putAuthAddressActionCreator } from 'reducers/slices/app';
 import { mSelector } from 'src/selectors/selector';
 import { getCountryList, getProvinceList } from 'src/utils';
-import MenuItem from '@material-ui/core/MenuItem';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -67,6 +69,22 @@ const useStyles = makeStyles((theme: Theme) =>
     actionBox: {
       textAlign: "center"
     },
+
+    root: {
+      margin: `${theme.spacing(1)}px auto`,
+      maxWidth: 700,
+    },
+    cardActions: {
+      display: "flex",
+      justifyContent: "flex-end",
+    },
+    card: {
+    },
+    cardHeader: {
+    },
+    noMarginRight: {
+      marginRight: 0,
+    }
   }),
 );
 
@@ -307,53 +325,63 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
       console.log("render address compoennt: " + address.addressId)
 
       return (
-        <ListItem key={address.addressId} >
-          <ListItemAvatar>
-            <Avatar>
-              <HomeIcon />
-            </Avatar>
-          </ListItemAvatar>
-          <ListItemText
-            primary={toAddressString(address)}
-            secondary={
-              <React.Fragment>
-                {/**
+        <Card key={address.addressId} className={`${classes.card} ${classes.root}`}>
+          <CardHeader
+            className={classes.cardHeader}
+            avatar={
+              <Avatar>
+                <HomeIcon />
+              </Avatar>
+            }
+            title={toAddressString(address)}
+          >
+          </CardHeader>
+          <CardActions className={classes.cardActions}>
+            <React.Fragment>
+              {/**
                 * not use usual radio button group because of two different radio group with the same list item
                 *
                 *   - ref: https://stackoverflow.com/questions/37150254/radiobuttongroup-within-nested-list 
                 **/}
+              <Tooltip title="Shipping Address">
                 <FormControlLabel
                   value={address.addressId}
                   data-billing-address-id={address.addressId}
                   checked={curShippingId === address.addressId}
-                  control={<Radio />}
+                  control={<Radio icon={<LocalShippingIcon color="disabled" />} checkedIcon={<LocalShippingIcon style={{ fill: "#000000" }} />} />}
+                  label={""}
                   labelPlacement="bottom"
-                  label={curShippingId === address.addressId ? "shipping" : ""}
                   name="user-billing-address"
                   onClick={(e) => handleShippingAddressChange(e, address.addressId)}
+                  classes={{
+                    root: classes.noMarginRight,
+                  }}
                 />
+              </Tooltip>
+              <Tooltip title="Billing Address">
                 <FormControlLabel
                   value={address.addressId}
                   data-shipping-address-id={address.addressId}
                   checked={curBillingId === address.addressId}
-                  control={<Radio />}
+                  control={<Radio icon={<PaymentIcon color="disabled" />} checkedIcon={<PaymentIcon style={{ fill: "#000000" }} />} />}
+                  label={""}
                   labelPlacement="bottom"
-                  label={curBillingId === address.addressId ? "billing" : ""}
                   name="user-shipping-address"
                   onClick={(e) => handleBillingAddressChange(e, address.addressId)}
+                  classes={{
+                    root: classes.noMarginRight,
+                  }}
                 />
-                <IconButton edge="end" aria-label="delete" data-address-id={address.addressId} onClick={handleDeleteAddressClickEvent}>
-                  <DeleteIcon />
-                </IconButton>
-                <IconButton edge="end" aria-label="edit" data-address-id={address.addressId} onClick={handleAddressItemClickEvent}>
-                  <EditIcon />
-                </IconButton>
-              </React.Fragment>
-            }
-          />
-          <ListItemSecondaryAction>
-          </ListItemSecondaryAction>
-        </ListItem>
+              </Tooltip>
+              <IconButton edge="end" aria-label="delete" data-address-id={address.addressId} onClick={handleDeleteAddressClickEvent}>
+                <DeleteIcon />
+              </IconButton>
+              <IconButton edge="end" aria-label="edit" data-address-id={address.addressId} onClick={handleAddressItemClickEvent}>
+                <EditIcon />
+              </IconButton>
+            </React.Fragment>
+          </CardActions>
+        </Card>
       )
     })
   }
@@ -377,9 +405,10 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
           </List>
         )}
         <Box component="div" className={classes.actionBox}>
-          <Button 
+          <Button
             onClick={handleAddNewAddressBtnClickEvent}
             disabled={auth.user.addresses.length === maxSize}
+            variant="contained"
           >
             Add New Address
         </Button>
@@ -464,10 +493,10 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
             error={curUserAccountAddressValidationState.postalCode !== ""}
           />
           <Box component="div" className={classes.actionBox}>
-            <Button onClick={handleModalCancelClickEvent}>
+            <Button onClick={handleModalCancelClickEvent} variant="contained">
               Cancel
             </Button>
-            <Button onClick={handleUserAccountSaveClickEvent}>
+            <Button onClick={handleUserAccountSaveClickEvent} variant="contained">
               Save
             </Button>
           </Box>

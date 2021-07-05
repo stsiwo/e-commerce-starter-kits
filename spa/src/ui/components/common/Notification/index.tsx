@@ -19,6 +19,7 @@ import { Link as RRLink } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   root: {
+    backgroundColor: "#FFFFFF",
     [theme.breakpoints.up('sm')]: {
       minWidth: '344px !important',
     },
@@ -101,7 +102,7 @@ const Notification = React.forwardRef<HTMLDivElement, { id: string | number, mes
             <Typography>{props.message.notificationDescription}</Typography>
             <Box className={classes.box}>
               <Typography variant="caption" color="textSecondary">{toDateString(props.message.createdAt)}</Typography>
-              <Button color="primary" size="small" component={RRLink} to={props.message.link}>
+              <Button size="small" component={RRLink} to={props.message.link} variant="contained">
                 visit 
               </Button>
             </Box>

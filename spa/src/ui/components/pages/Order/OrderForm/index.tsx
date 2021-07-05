@@ -5,7 +5,6 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import ReceiptIcon from '@material-ui/icons/Receipt';
 import OrderTimeline from 'components/common/OrderTimeline';
-import ProductHorizontalCard from 'components/common/ProductCard/ProductHorizontalCard';
 import UserCard from 'components/common/UserCard';
 import { OrderDetailType, OrderType } from 'domain/order/types';
 import * as React from 'react';
@@ -19,6 +18,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { useHistory } from 'react-router';
+import OrderProductHorizontalCard from './OrderProductHorizontalCard';
 
 interface OrderFormPropsType {
   order: OrderType
@@ -157,10 +157,14 @@ const OrderForm: React.FunctionComponent<OrderFormPropsType> = (props) => {
           {"Products"}
         </Typography>
         {
+          /**
+           * order's product & variant might be null if the product is deleted.
+           *
+           * - must display the order detail but don't need to display the product information if null.
+           **/
           props.order.orderDetails.map((orderDetail: OrderDetailType, index: number) => (
-            <ProductHorizontalCard 
+            <OrderProductHorizontalCard 
               orderDetail={orderDetail} 
-              product={orderDetail.product} 
               key={index} 
               menu={( orderDetail.isReviewable &&  
                 <React.Fragment>

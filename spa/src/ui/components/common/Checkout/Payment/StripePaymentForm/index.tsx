@@ -201,8 +201,9 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
           disabled={!stripe}
           onClick={handleMakePaymentClick}
           className={classes.btn}
+          variant="contained"
         >
-          Make Payment (<b>$ {totalCost} </b>)
+          Pay (<b>$ {totalCost} </b>)
         </Button>
       </Box>
     </Box>

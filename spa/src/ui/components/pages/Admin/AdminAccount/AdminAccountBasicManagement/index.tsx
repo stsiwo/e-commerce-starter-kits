@@ -232,7 +232,7 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
         helperText={curUserAccountValidationState.confirm}
         error={curUserAccountValidationState.confirm !== ""}
       />
-      <Button onClick={handleUserAccountSaveClickEvent}>
+      <Button onClick={handleUserAccountSaveClickEvent} variant="contained">
         Save
       </Button>
     </form>

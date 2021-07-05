@@ -160,7 +160,7 @@ const FinalConfirmForm: React.FunctionComponent<FinalConfirmFormPropsType> = (pr
                 {"Oops. You haven't selected any item in your cart."}
               </Typography>
               <Box>
-                <Button onClick={(e) => props.goToStep(CheckoutStepEnum.ORDER_ITEMS)}>
+                <Button onClick={(e) => props.goToStep(CheckoutStepEnum.ORDER_ITEMS)} variant="contained">
                   {"Go Back To Order Items Step"}
                 </Button>
               </Box>
@@ -178,7 +178,7 @@ const FinalConfirmForm: React.FunctionComponent<FinalConfirmFormPropsType> = (pr
         <CartItemTotal />
       </Grid>
       <Box>
-        <Button onClick={handleValidateClick}>
+        <Button onClick={handleValidateClick} variant="contained">
           {"Final Confirm"}
         </Button>
       </Box>

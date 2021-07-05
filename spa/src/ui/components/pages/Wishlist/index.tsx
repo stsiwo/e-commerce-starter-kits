@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     controllerBox: {
       textAlign: "center",
-      margin: theme.spacing(3),
+      margin: `${theme.spacing(3)}px 0`,
     },
     emptyBox: {
       minHeight: 300,
@@ -115,7 +115,6 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
   // spinner
   const curFetchWishlistFetchStatus = useSelector(rsSelector.app.getFetchWishlistItemFetchStatus);
 
-
   return (
     <React.Fragment>
       <Typography variant="h5" component="h5" align="center" className={classes.title} >
@@ -140,7 +139,7 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
             {"Oops, Your wishlist is empty."}
           </Typography>
           <Box component="div" className={classes.controllerBox}>
-            <Button>
+            <Button variant="contained">
               {"search"}
             </Button>
           </Box>

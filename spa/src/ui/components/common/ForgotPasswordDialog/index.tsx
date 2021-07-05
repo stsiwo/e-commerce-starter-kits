@@ -207,10 +207,10 @@ const ForgotPasswordDialog: React.FunctionComponent<ForgotPasswordDialogPropsTyp
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={toggleDialog(false)} color="primary">
+        <Button onClick={toggleDialog(false)} variant="contained">
           Cancel
         </Button>
-        <Button onClick={handleSubmitClick} color="primary">
+        <Button onClick={handleSubmitClick} variant="contained">
           Submit
         </Button>
       </DialogActions>

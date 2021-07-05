@@ -270,7 +270,7 @@ const AdminCustomerBasicForm: React.FunctionComponent<AdminCustomerBasicFormProp
           }}
         />
         <Box component="div" className={classes.actionBox}>
-          <Button onClick={handleAdminCustomerSaveClickEvent}>
+          <Button onClick={handleAdminCustomerSaveClickEvent} variant="contained">
             Save
         </Button>
         </Box>
