@@ -27,6 +27,7 @@ import ResetPassword from 'components/pages/ResetPassword';
 import Orders from 'components/pages/Orders';
 import EmailVerification from 'components/pages/EmailVerification';
 import Review from 'components/pages/Review';
+import AdminDashboard from 'components/pages/Admin/AdminBashboard';
 
 // route data
 export declare type RouteDataType = {
@@ -109,7 +110,7 @@ export const routesData: RoutesDataType = {
   [UserTypeEnum.ADMIN]: [
     {
       url: "/admin",
-      component: withAdminBasePage(Admin),
+      component: withAdminBasePage(AdminDashboard),
     },
     {
       url: "/admin/account",

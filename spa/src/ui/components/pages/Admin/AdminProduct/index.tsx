@@ -9,6 +9,11 @@ const useStyles = makeStyles((theme: Theme) =>
     box: {
       flexGrow: 1,
       padding: theme.spacing(0, 1),
+
+      /**
+       * this is necessary for scrollable tabs (from Mui) used for filter/sort for each domain.
+       **/
+      width: "100%",
     },
     title: {
       textTransform: "uppercase",

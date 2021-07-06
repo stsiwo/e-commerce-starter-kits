@@ -21,10 +21,13 @@ const useStyles = makeStyles((theme: Theme) =>
       // for tabPanel to match width
       width: "100%",
     },
+    appBar: {
+      boxShadow: "none",
+    },
     tabPanel: {
       maxWidth: theme.breakpoints.values.lg, 
       position: "absolute",
-      backgroundColor: "#f5f5f5",
+      backgroundColor: theme.palette.third.main,
       zIndex: 1,
       boxShadow: theme.shadows[8],
 
@@ -80,7 +83,7 @@ const AdminProductSearchController: React.FunctionComponent<{}> = (props) => {
 
   return (
     <Box component="div" className={classes.tabBox}>
-      <AppBar position="static" color="default">
+      <AppBar position="static" color="default" className={classes.appBar}>
         <Tabs
           classes={{
             root: classes.tabRoot,
@@ -93,13 +96,13 @@ const AdminProductSearchController: React.FunctionComponent<{}> = (props) => {
           scrollButtons="auto"
           aria-label="scrollable auto tabs example"
         >
-          <Tab label="Result" classes={{ root: classes.tabRoot }} {...a11yProps(0)} />
-          <Tab label="Category" classes={{ root: classes.tabRoot }} {...a11yProps(1)} />
+          <Tab label="Result" classes={{ root: classes.tabRoot }}  {...a11yProps(0)} />
+          <Tab label="Category" classes={{ root: classes.tabRoot }}  {...a11yProps(1)} />
           <Tab label="Price" classes={{ root: classes.tabRoot }} {...a11yProps(2)} />
-          <Tab label="Review" classes={{ root: classes.tabRoot }} {...a11yProps(3)} />
-          <Tab label="Discount" classes={{ root: classes.tabRoot }} {...a11yProps(4)} />
-          <Tab label="Release Date" classes={{ root: classes.tabRoot }} {...a11yProps(5)} />
-          <Tab label="Sort" classes={{ root: classes.tabRoot }} {...a11yProps(6)} />
+          <Tab label="Review" classes={{ root: classes.tabRoot }}  {...a11yProps(3)} />
+          <Tab label="Discount" classes={{ root: classes.tabRoot }}  {...a11yProps(4)} />
+          <Tab label="Release Date" classes={{ root: classes.tabRoot }}  {...a11yProps(5)} />
+          <Tab label="Sort" classes={{ root: classes.tabRoot }}  {...a11yProps(6)} />
         </Tabs>
       </AppBar>
       <TabPanel 

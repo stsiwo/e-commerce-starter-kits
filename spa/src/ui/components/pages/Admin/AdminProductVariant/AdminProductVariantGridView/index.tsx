@@ -17,7 +17,6 @@ import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import ColorCell from 'components/common/GridData/ColorCell';
 import SizeCell from 'components/common/GridData/SizeCell';
 import { ProductVariantType, ProductType } from 'domain/product/types';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
@@ -39,8 +38,11 @@ const useStyles = makeStyles((theme: Theme) =>
     actionBox: {
       textAlign: "center"
     },
+    cardHeader: {
+      paddingBottom: 0,
+    },
     cardContentBox: {
-      height: "70vh",
+      paddingTop: 0,
     }
   }),
 );
@@ -150,10 +152,6 @@ const AdminProductVariantGridView: React.FunctionComponent<AdminProductVariantGr
    *
    **/
 
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
-
   const handleNewProductVariantFormToggleBtnClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
     props.setFormOpen(!props.curFormOpen)
   }
@@ -207,6 +205,7 @@ const AdminProductVariantGridView: React.FunctionComponent<AdminProductVariantGr
   return (
     <Card className={classes.root}>
       <CardHeader
+        className={classes.cardHeader}
         titleTypographyProps={{
           variant: 'h6',
         }}

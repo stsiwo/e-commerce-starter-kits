@@ -49,8 +49,11 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       justifyContent: "flex-end",
     },
+    cardHeader: {
+      paddingBottom: 0,
+    },
     cardContentBox: {
-      height: "70vh",
+      paddingTop: 0,
     }
   }),
 );
@@ -209,6 +212,7 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
   return (
     <Card className={classes.root}>
       <CardHeader
+        className={classes.cardHeader}
         titleTypographyProps={{
           variant: 'h6',
         }}
@@ -226,7 +230,7 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
         className={classes.cardContentBox}
       >
         <Box className={classes.searchBox}>
-          <SearchForm searchQuery={curQueryString.searchQuery} onChange={handleSearchChange} label={"keyword search here..."} />
+          <SearchForm searchQuery={curQueryString.searchQuery} onChange={handleSearchChange} label={"search"} />
         </Box>
         {(curFetchCategoryStatus === FetchStatusEnum.FETCHING &&
           <Box className={classes.loadingBox}>
@@ -241,6 +245,7 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
             pageSize={pagination.limit}
             rowCount={pagination.totalElements}
             onPageChange={handlePageChange}
+              autoHeight
           // not gonna use pagination of this DataGrid
           />
         )}

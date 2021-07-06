@@ -15,6 +15,10 @@ const useStyles = makeStyles((theme: Theme) =>
     box: {
       flexGrow: 1,
       padding: theme.spacing(0, 1),
+      /**
+       * this is necessary for scrollable tabs (from Mui) used for filter/sort for each domain.
+       **/
+      width: "100%",
     },
     card: {
       flexGrow: 1,
@@ -48,9 +52,6 @@ const AdminAccount: React.FunctionComponent<{}> = (props) => {
 
   return (
     <Box component="div" className={classes.box}>
-      <Typography variant="body2" component="p" align="left" className={classes.title} >
-        {"Account"}
-      </Typography>
       {/** row 1 **/}
       <Box>
         <Card className={classes.card}>

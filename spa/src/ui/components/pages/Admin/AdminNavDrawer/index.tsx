@@ -19,6 +19,73 @@ import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
 import { Link as RRLink } from "react-router-dom";
 
+export declare type NavDataItemType = {
+  label: string,
+  Icon: React.FunctionComponent,
+  link: string
+  desc?: string
+}
+
+export declare type NavDataType = {
+  title: string
+  items: NavDataItemType[]
+}
+
+export const adminNavData: NavDataType[] = [
+  {
+    title: "General",
+    items: [
+      {
+        label: "Dashboard",
+        Icon: DashboardIcon,
+        link: "/admin",
+      },
+      {
+        label: "Account",
+        Icon: AccountCircleIcon,
+        link: "/admin/account",
+        desc: "Manage your account information including your personal contact and your company information. Your company information is published so that visitors can communicate with you."
+      },
+    ],
+  },
+  {
+    title: "Management",
+    items: [
+      {
+        label: "Products",
+        Icon: FavoriteIcon,
+        link: "/admin/products",
+        desc: "Manage your products including adding a new product, updating an exiting product, and delete an unecessary one. Each product must have at least one variant (e.g., different color and size) to be published."
+      },
+      {
+        label: "Categories",
+        Icon: CategoryIcon,
+        link: "/admin/categories",
+        desc: "Manage your categories such as adding a new category, updating an existing category, and delete an unecessary category. Use this category to logically group your product for better organization."
+      },
+      {
+        label: "Orders",
+        Icon: ShopIcon,
+        link: "/admin/orders",
+        desc: "Manage your orders. We will notifiy if a new order is arrived via email and notification in this app. You can update the order status of any order and any update will also notify the customer via email and the notification."
+      },
+      {
+        label: "Reviews",
+        Icon: RateReviewIcon,
+        link: "/admin/reviews",
+        desc: "Manage your reviews. We will notify if a new review is submitted or existing review is modified by the customer. Your responsibility is to verify the review so that it helps increase conversion rate for the other customer."
+      },
+      {
+        label: "Customers",
+        Icon: SupervisedUserCircleIcon,
+        link: "/admin/customers",
+        desc: "Manage your customers. You can update any information of any customer. Also, you can change the active satus of those user so if a customer did suspcious behavior using his account, you can disable this account as you like."
+      },
+    ],
+  },
+]
+
+
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -32,6 +99,12 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     drawerPaper: {
       width: 240,
+
+      [theme.breakpoints.up("md")]: {
+        backgroundColor: "transparent",
+        borderRight: 0,
+      },
+
     },
     toolbar: theme.mixins.toolbar,
     title: {
@@ -43,6 +116,7 @@ const useStyles = makeStyles((theme: Theme) =>
       position: 'fixed',
       bottom: '10px',
       left: '10px',
+      zIndex: 1200,
     },
   }),
 );
@@ -53,54 +127,6 @@ const AdminNavDrawer: React.FunctionComponent<{}> = (props) => {
   const theme = useTheme();
   const isDownSm = useMediaQuery(theme.breakpoints.down('sm'));
 
-
-  const navList = [
-    {
-      title: "General",
-      items: [
-        {
-          label: "Dashboard",
-          Icon: DashboardIcon,
-          link: "/admin/",
-        },
-        {
-          label: "Account",
-          Icon: AccountCircleIcon,
-          link: "/admin/account",
-        },
-      ],
-    },
-    {
-      title: "Management",
-      items: [
-        {
-          label: "Products",
-          Icon: FavoriteIcon,
-          link: "/admin/products",
-        },
-        {
-          label: "Categories",
-          Icon: CategoryIcon,
-          link: "/admin/categories",
-        },
-        {
-          label: "Orders",
-          Icon: ShopIcon,
-          link: "/admin/orders",
-        },
-        {
-          label: "Reviews",
-          Icon: RateReviewIcon,
-          link: "/admin/reviews",
-        },
-        {
-          label: "Customers",
-          Icon: SupervisedUserCircleIcon,
-          link: "/admin/customers",
-        },
-      ],
-    },
-  ]
 
   const [curAdminNavOpen, setAdminNavOpen] = React.useState<boolean>(false);
 
@@ -128,7 +154,7 @@ const AdminNavDrawer: React.FunctionComponent<{}> = (props) => {
 
   // render nav items
   const renderNavItems: () => React.ReactNode = () => {
-    return navList.map((navSection) => {
+    return adminNavData.map((navSection) => {
       return (
         <React.Fragment key={navSection.title}>
           <Typography variant="body1" component="p" align="left" className={classes.title} >

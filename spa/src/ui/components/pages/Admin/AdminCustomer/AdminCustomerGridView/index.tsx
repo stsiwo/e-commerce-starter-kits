@@ -55,8 +55,11 @@ const useStyles = makeStyles((theme: Theme) =>
     actionBox: {
       textAlign: "center"
     },
+    cardHeader: {
+      paddingBottom: 0,
+    },
     cardContentBox: {
-      height: "70vh",
+      paddingTop: 0,
     }
   }),
 );
@@ -236,6 +239,7 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
   return (
     <Card className={classes.root}>
       <CardHeader
+        className={classes.cardHeader}
         titleTypographyProps={{
           variant: 'h6',
         }}
@@ -248,7 +252,7 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
         className={classes.cardContentBox}
       >
         <Box className={classes.searchBox}>
-          <SearchForm searchQuery={curQueryString.searchQuery} onChange={handleSearchChange} label={"keyword search here..."} />
+          <SearchForm searchQuery={curQueryString.searchQuery} onChange={handleSearchChange} label={"search"} />
         </Box>
         <AdminUserSearchController />
         {(curFetchCustomerStatus === FetchStatusEnum.FETCHING &&
@@ -264,6 +268,7 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
           pageSize={pagination.limit}
           rowCount={pagination.totalElements}
           onPageChange={handlePageChange}
+              autoHeight
         />
         )}
         {(curFetchCustomerStatus === FetchStatusEnum.FAILED &&

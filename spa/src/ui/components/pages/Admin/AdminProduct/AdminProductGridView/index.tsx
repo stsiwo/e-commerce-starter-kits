@@ -37,6 +37,10 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       paddingBottom: theme.spacing(4),
+      /**
+       * this is necessary for scrollable tabs (from Mui) used for filter/sort for each domain.
+       **/
+      width: "100%",
     },
     loadingBox: {
       height: "80vh",
@@ -53,8 +57,11 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       justifyContent: "flex-end",
     },
+    cardHeader: {
+      paddingBottom: 0,
+    },
     cardContentBox: {
-      height: "70vh",
+      paddingTop: 0,
     }
   }),
 );
@@ -236,6 +243,7 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
   return (
     <Card className={classes.root}>
       <CardHeader
+        className={classes.cardHeader}
         titleTypographyProps={{
           variant: 'h6',
         }}
@@ -253,7 +261,7 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
         className={classes.cardContentBox}
       >
         <Box className={classes.searchBox}>
-          <SearchForm searchQuery={curQueryString.searchQuery} onChange={handleSearchChange} label={"keyword search here..."} />
+          <SearchForm searchQuery={curQueryString.searchQuery} onChange={handleSearchChange} label={"search"} />
         </Box>
         <AdminProductSearchController />
         {(curFetchProductStatus === FetchStatusEnum.FETCHING &&
@@ -269,6 +277,7 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
             pageSize={pagination.limit}
             rowCount={pagination.totalElements}
             onPageChange={handlePageChange}
+            autoHeight
           // not gonna use pagination of this DataGrid
           />
         )}

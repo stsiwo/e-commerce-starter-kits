@@ -7,8 +7,6 @@ import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import Link from '@material-ui/core/Link';
 import Avatar from '@material-ui/core/Avatar';
-import SampleSelfImage from 'static/self.jpeg';
-import SearchOutlinedIcon from '@material-ui/icons/SearchOutlined';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import { Link as RRLink } from "react-router-dom";
 import Menu from '@material-ui/core/Menu';
@@ -26,8 +24,7 @@ import Badge from '@material-ui/core/Badge';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     appBar: {
-      background: "rgba(255, 255, 255, 1)",
-      color: theme.palette.text.primary,
+      boxShadow: "none",
     },
     gridItemRight: {
       display: "flex",
@@ -136,7 +133,7 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
 
 
   return (
-    <AppBar position="sticky" className={classes.appBar}>
+    <AppBar position="sticky" className={classes.appBar} color="default">
       <Toolbar >
         <Grid
           justify="space-between"

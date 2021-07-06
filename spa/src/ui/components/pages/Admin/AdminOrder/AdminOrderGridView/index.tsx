@@ -45,8 +45,11 @@ const useStyles = makeStyles((theme: Theme) =>
     actionBox: {
       textAlign: "center"
     },
+    cardHeader: {
+      paddingBottom: 0,
+    },
     cardContentBox: {
-      height: "70vh",
+      paddingTop: 0,
     }
   }),
 );
@@ -172,6 +175,7 @@ const AdminOrderGridView: React.FunctionComponent<AdminOrderGridViewPropsType> =
   return (
     <Card className={classes.root}>
       <CardHeader
+        className={classes.cardHeader}
         titleTypographyProps={{
           variant: 'h6',
         }}
@@ -184,7 +188,7 @@ const AdminOrderGridView: React.FunctionComponent<AdminOrderGridViewPropsType> =
         className={classes.cardContentBox}
       >
         <Box className={classes.searchBox}>
-          <SearchForm searchQuery={curQueryString.searchQuery} onChange={handleSearchChange} label={"keyword search here..."} />
+          <SearchForm searchQuery={curQueryString.searchQuery} onChange={handleSearchChange} label={"search"} />
         </Box>
         <AdminOrderSearchController />
         {(curFetchOrderStatus === FetchStatusEnum.FETCHING &&
@@ -200,6 +204,7 @@ const AdminOrderGridView: React.FunctionComponent<AdminOrderGridViewPropsType> =
             pageSize={pagination.limit}
             rowCount={pagination.totalElements}
             onPageChange={handlePageChange}
+              autoHeight
           />
         )}
         {(curFetchOrderStatus === FetchStatusEnum.FAILED &&

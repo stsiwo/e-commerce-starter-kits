@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     box: {
       position: "absolute",
-      backgroundColor: "#fff",
+      backgroundColor: theme.palette.third.main,
       width: "100%",
     },
   }),

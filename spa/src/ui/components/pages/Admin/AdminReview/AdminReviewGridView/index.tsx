@@ -52,8 +52,11 @@ const useStyles = makeStyles((theme: Theme) =>
     actionBox: {
       textAlign: "center"
     },
+    cardHeader: {
+      paddingBottom: 0,
+    },
     cardContentBox: {
-      height: "70vh",
+      paddingTop: 0,
     }
   }),
 );
@@ -207,6 +210,7 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
   return (
     <Card className={classes.root}>
       <CardHeader
+        className={classes.cardHeader}
         titleTypographyProps={{
           variant: 'h6',
         }}
@@ -219,7 +223,7 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
         className={classes.cardContentBox}
       >
         <Box className={classes.searchBox}>
-          <SearchForm searchQuery={curQueryString.searchQuery} onChange={handleSearchChange} label={"keyword search here..."} />
+          <SearchForm searchQuery={curQueryString.searchQuery} onChange={handleSearchChange} label={"search"} />
         </Box>
         <AdminReviewSearchController />
         {(curFetchReviewStatus === FetchStatusEnum.FETCHING &&
@@ -236,6 +240,7 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
               pageSize={pagination.limit}
               rowCount={pagination.totalElements}
               onPageChange={handlePageChange}
+              autoHeight
             />
           </React.Fragment>
         )}

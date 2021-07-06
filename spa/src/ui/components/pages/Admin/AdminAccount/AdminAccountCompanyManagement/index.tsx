@@ -31,6 +31,9 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(1),
       width: "80%",
     },
+    formLink: {
+      maxWidth: 400,
+    },
     actionBox: {
       textAlign: "center"
     },
@@ -449,45 +452,48 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
             <Grid
               item
               xs={12}
-              sm={12}
+              sm={6}
               className={classes.gridItem}
             >
+              <Typography variant="h6" component="h6" align="left" gutterBottom>
+                {"SNS Link"}
+              </Typography>
               <TextField
                 id="facebook-link"
                 label="FacebookLink"
-                className={classes.formControl}
+                className={`${classes.formControl} ${classes.formLink}`}
                 value={curAdminCompanyFormState.facebookLink}
                 onChange={handleFacebookLinkInputChangeEvent}
                 helperText={curAdminCompanyFormValidationState.facebookLink}
                 error={curAdminCompanyFormValidationState.facebookLink !== ""}
-              />
+              />< br/>
               <TextField
                 id="instagram-link"
                 label="Instagram Link"
-                className={classes.formControl}
+                className={`${classes.formControl} ${classes.formLink}`}
                 value={curAdminCompanyFormState.instagramLink}
                 onChange={handleInstagramLinkInputChangeEvent}
                 helperText={curAdminCompanyFormValidationState.instagramLink}
                 error={curAdminCompanyFormValidationState.instagramLink !== ""}
-              />
+              />< br/>
               <TextField
                 id="twitter-link"
                 label="Twitter Link"
-                className={classes.formControl}
+                className={`${classes.formControl} ${classes.formLink}`}
                 value={curAdminCompanyFormState.twitterLink}
                 onChange={handleTwitterLinkInputChangeEvent}
                 helperText={curAdminCompanyFormValidationState.twitterLink}
                 error={curAdminCompanyFormValidationState.twitterLink !== ""}
-              />
+              />< br/>
               <TextField
                 id="youtube-link"
                 label="Youtube Link"
-                className={classes.formControl}
+                className={`${classes.formControl} ${classes.formLink}`}
                 value={curAdminCompanyFormState.youtubeLink}
                 onChange={handleYoutubeLinkInputChangeEvent}
                 helperText={curAdminCompanyFormValidationState.youtubeLink}
                 error={curAdminCompanyFormValidationState.youtubeLink !== ""}
-              />
+              />< br/>
             </Grid>
           </Grid>
         </form>

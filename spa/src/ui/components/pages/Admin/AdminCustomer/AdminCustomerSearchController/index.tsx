@@ -18,10 +18,13 @@ const useStyles = makeStyles((theme: Theme) =>
       // for tabPanel to match width
       width: "100%",
     },
+    appBar: {
+      boxShadow: "none",
+    },
     tabPanel: {
       maxWidth: theme.breakpoints.values.lg, 
       position: "absolute",
-      backgroundColor: "#f5f5f5",
+      backgroundColor: theme.palette.third.main,
       zIndex: 1,
       boxShadow: theme.shadows[8],
 
@@ -77,7 +80,7 @@ const AdminUserSearchController: React.FunctionComponent<{}> = (props) => {
 
   return (
     <Box component="div" className={classes.tabBox}>
-      <AppBar position="static" color="default">
+      <AppBar position="static" color="default" className={classes.appBar}>
         <Tabs
           classes={{
             root: classes.tabRoot,

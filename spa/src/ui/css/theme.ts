@@ -9,10 +9,10 @@ import { createMuiTheme } from '@material-ui/core/styles';
  *  fourth: FFC478 (thick orange)
  *
  **/
-const primeColor = "#75CFB8";
+const primeColor = "#FFC478";
 const secondaryColor = "#BBDFC8";
 const thirdColor = "#F0E5D8";
-const fourthColor = "#FFC478";  
+const fourthColor = "#75CFB8";  
 
 /**
  * add additional theme property
@@ -20,10 +20,14 @@ const fourthColor = "#FFC478";
  **/
 declare module "@material-ui/core/styles/createPalette" {
   interface Palette {
-    headerBackground: Palette['background'];
+    headerBackground: Palette['background']
+    third: Palette['primary']
+    fourth: Palette['primary']
   }
   interface PaletteOptions {
     headerBackground: PaletteOptions['background'];
+    third: PaletteOptions['primary']
+    fourth: PaletteOptions['primary']
   }
 }
 
@@ -63,7 +67,7 @@ export const theme = createMuiTheme({
     MuiButton: {
       contained: {
         margin: `8px 4px`,
-        backgroundColor: fourthColor 
+        backgroundColor: primeColor 
       }
     },
     MuiPaper: {
@@ -95,7 +99,7 @@ export const theme = createMuiTheme({
     MuiSwitch: {
       colorSecondary: {
         '&$checked': {
-          color: fourthColor,
+          color: primeColor,
         }
       }
     },
@@ -107,10 +111,16 @@ export const theme = createMuiTheme({
   },
   palette: {
     primary: {
-      main: fourthColor,
+      main: primeColor,
     },
     secondary: {
       main: secondaryColor,
+    },
+    third: {
+      main: thirdColor,
+    },
+    fourth: {
+      main: fourthColor
     },
     background: {
     },
