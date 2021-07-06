@@ -15,6 +15,9 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
+
+      // enable 3d
+      transformStyle: "preserve-3d",
     },
     svgBox: {
       position: "fixed",
@@ -78,27 +81,59 @@ export declare type MorphMapType = {
   [key: string]: MorphPathDataType
 }
 
+/**
+ * note:
+ *  - match unit even if 0, otherwise won't work.
+ *
+ **/
+
+// big think green shape
 const morphMap: MorphMapType = {
   "/": {
-    transform: "scale(1.3) rotate(0deg) translate(10%, -10%) skew(0, 0)",
+    transform: "scale(1.3, 1.3) rotate(0deg) translate(10%, -10%) translateZ(10px) skew(0deg, 0deg)",
   },
   "/login": {
-    transform: "scale(1.5) rotate(0deg) translate(0, 0) skew(0deg, 0deg)",
+    transform: "scale(1.5, 1.5) rotate(0deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
   },
   "/signup": {
-    transform: "scale(1.5) rotate(45deg) translate(0, 0) skew(0deg, 0deg)",
+    transform: "scale(1.5, 1.5) rotate(45deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
+  },
+  "/search": {
+    transform: "scale(3.0, 3.0) rotate(0deg) translate(-10%, -10%) translateZ(0px) skew(0deg, 0deg)",
+  },
+  "/account": {
+    transform: "scale(2.0, 1.0) rotate(0deg) translate(-30%, -20%) translateZ(0px) skew(10deg, 10deg)",
+  },
+  "/wishlist": {
+    transform: "scale(1.0, 1.0) rotate(0deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
+  },
+  "/orders": {
+    transform: "scale(1.0, 1.0) rotate(0deg) translate(0%, 0%) translateZ(50px) skew(0deg, 0deg)",
   },
 }
 
+// small thin green shape
 const morphAltMap: MorphMapType = {
   "/": {
-    transform: "scale(1.7) rotate(0deg) translate(0, 0) skew(0, 0)",
+    transform: "scale(4.0, 5.0) rotate(0deg) translate(25%, 30%) translateZ(0px) skew(0deg, 0deg)",
   },
   "/login": {
-    transform: "scale(1.5) rotate(0deg) translate(0, 0) skew(0deg, 0deg)",
+    transform: "scale(1.5, 1.5) rotate(0deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
   },
   "/signup": {
-    transform: "scale(1.5) rotate(10deg) translate(50%, 0) skew(0deg, 0deg)",
+    transform: "scale(1.5, 1.5) rotate(10deg) translate(50%, 0%) translateZ(0px) skew(0deg, 0deg)",
+  },
+  "/search": {
+    transform: "scale(1.5, 1.5) rotate(45deg) translate(30%, 30%) translateZ(0px) skew(10deg, 10deg)",
+  },
+  "/account": {
+    transform: "scale(2.0, 2.0) rotate(45deg) translate(30%, 30%) translateZ(0px) skew(-10deg, -10deg)",
+  },
+  "/wishlist": {
+    transform: "scale(4.0, 4.0) rotate(0deg) translate(25%, 25%) translateZ(0px) skew(0deg, 0deg)",
+  },
+  "/orders": {
+    transform: "scale(5.0, 5.0) rotate(0deg) translate(25%, 25%) translateZ(-50px) skew(0deg, 0deg)",
   },
 }
 

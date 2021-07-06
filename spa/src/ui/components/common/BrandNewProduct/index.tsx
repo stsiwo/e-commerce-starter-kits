@@ -47,7 +47,7 @@ const BrandNewProduct: React.FunctionComponent<{}> = (props) => {
   }, [])
 
   const renderDomains: () => React.ReactNode = () => {
-    return curDomains.map((product: ProductType) => {
+    return curDomains.slice(0, 5).map((product: ProductType) => {
       return (
         <Grid
           item

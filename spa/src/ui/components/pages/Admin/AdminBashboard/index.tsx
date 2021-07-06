@@ -24,7 +24,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     topSection: {
       display: "flex",
-      justifyContent: "flex-start",
+      justifyContent: "space-around",
+      flexWrap: "wrap",
     },
     card: {
       maxWidth: 300,

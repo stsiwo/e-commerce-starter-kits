@@ -13,7 +13,12 @@ const useStyles = makeStyles((theme: Theme) =>
        * make 'navDrawer' toggleable
        **/
       [theme.breakpoints.down("sm")]: {
-      }
+      },
+
+      /**
+       * make toggle button easy to click when small screen.
+       **/
+      marginBottom: theme.spacing(10),
     },
   }),
 );

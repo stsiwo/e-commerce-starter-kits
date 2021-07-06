@@ -16,11 +16,12 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     tabPanel: {
       maxWidth: theme.breakpoints.values.lg, 
-      position: "absolute",
-      backgroundColor: "#f5f5f5",
       zIndex: 1,
       width: "100%",
-    }
+    },
+    appBar: {
+      boxShadow: "none",
+    },
   }),
 );
 
@@ -67,7 +68,7 @@ const SearchController: React.FunctionComponent<{}> = (props) => {
 
   return (
     <Box component="div" >
-      <AppBar position="static" color="default">
+      <AppBar position="static" color="default"  className={classes.appBar}>
         <Tabs
           value={curTabIndex}
           onChange={handleChange}
