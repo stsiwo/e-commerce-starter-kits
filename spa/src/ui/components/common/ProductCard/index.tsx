@@ -8,7 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import { ProductType } from 'domain/product/types';
 import * as React from 'react';
 import { Link as RRLink } from "react-router-dom";
-import { cadCurrencyFormat } from 'src/utils';
+import { cadCurrencyFormat, getApiUrl } from 'src/utils';
 
 interface ProductCardPropsType {
   product: ProductType
@@ -55,7 +55,7 @@ const ProductCard: React.FunctionComponent<ProductCardPropsType> = ({ product })
   /**
    * what is difference btw <CardActionArea> and <CardActions>
    **/
-  const primaryImageUrl = (product.productImages.length > 0) ? API1_URL + product.productImages[0].productImagePath : null
+  const primaryImageUrl = (product.productImages.length > 0) ? getApiUrl(product.productImages[0].productImagePath) : null
 
   return (
     <Card className={classes.card}>

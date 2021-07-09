@@ -12,6 +12,7 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteUserAvatarImageActionCreator, postUserAvatarImageActionCreator } from 'reducers/slices/domain/user';
 import { mSelector } from 'src/selectors/selector';
+import { getApiUrl } from 'src/utils';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -81,7 +82,7 @@ const AdminCustomerAvatarForm: React.FunctionComponent<AdminCustomerAvatarFormPr
 
   React.useEffect(() => {
     if (props.user && props.user.avatarImagePath) {
-      setFilePath(API1_URL + props.user.avatarImagePath)
+      setFilePath(getApiUrl(props.user.avatarImagePath))
     }
   }, [
     JSON.stringify(props.user) 

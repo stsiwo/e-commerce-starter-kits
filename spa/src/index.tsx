@@ -6,19 +6,18 @@ import { SnackbarProvider } from 'notistack';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { theme } from 'ui/css/theme';
 import { useLocation } from "react-router";
-
+import { BrowserRouter as Router } from 'react-router-dom';
 /**
  * dev env only
  **/
 //const RoleSwitch = (NODE_ENV === "development") ? loadable(() => import("tests/debug/compoments/RoleSwitch")) : null
-
 /**
  * scroll polyfill
  **/
 import smoothscroll from 'smoothscroll-polyfill';
+import { theme } from 'ui/css/theme';
+
 smoothscroll.polyfill();
 
 /**
@@ -49,9 +48,9 @@ const Index = (props: any) => {
           <SnackbarProvider maxSnack={3}>
             <CssBaseline>
               <Provider store={store}>
-                <ScrollToTop />
-                <Content />
-                {/**(RoleSwitch &&
+                  <ScrollToTop />
+                  <Content />
+                  {/**(RoleSwitch &&
                   <RoleSwitch />
                 )**/}
               </Provider>

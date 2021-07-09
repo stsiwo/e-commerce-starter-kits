@@ -17,6 +17,7 @@ import com.iwaodev.application.mapper.CategoryMapper;
 import com.iwaodev.application.mapper.UserMapper;
 import com.iwaodev.application.specification.factory.CategorySpecificationFactory;
 import com.iwaodev.config.ApiTokenCookieConfig;
+import com.iwaodev.config.service.CookieService;
 import com.iwaodev.domain.category.CategorySortEnum;
 import com.iwaodev.infrastructure.model.Category;
 import com.iwaodev.infrastructure.model.User;
@@ -56,6 +57,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   @Autowired
   private PasswordEncoder passwordEncoder;
 
+  @Autowired
+  private CookieService cookieService;
+
   @Override
   public AuthenticationResponse login(String userName, String email, HttpServletResponse response) throws Exception {
 
@@ -88,26 +92,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     logger.info("api token cookie security info: ");
     logger.info(apiTokenCookieConfig.toString());
 
-    // this is for localhost since if you set 'domain' it does not work even if it
-    // is empty string
-    if (!apiTokenCookieConfig.getDomain().isEmpty()) {
+    ResponseCookie cookie = this.cookieService.createApiTokenCookie(jwt);
 
-      ResponseCookie cookie = ResponseCookie.from("api-token", jwt).sameSite(apiTokenCookieConfig.getSameSite())
-          .maxAge(apiTokenCookieConfig.getTimeout()).secure(apiTokenCookieConfig.getSecure())
-          .httpOnly(apiTokenCookieConfig.getHttpOnly()).domain(apiTokenCookieConfig.getDomain())
-          .path(apiTokenCookieConfig.getPath()).build();
-
-      response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
-    } else {
-      ResponseCookie cookie = ResponseCookie.from("api-token", jwt).sameSite(apiTokenCookieConfig.getSameSite())
-          .maxAge(apiTokenCookieConfig.getTimeout()).secure(apiTokenCookieConfig.getSecure())
-          .httpOnly(apiTokenCookieConfig.getHttpOnly())
-          // .domain(apiTokenCookieConfig.getDomain())
-          .path(apiTokenCookieConfig.getPath()).build();
-
-      response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-    }
+    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
   }
 
   @Override
@@ -115,27 +102,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     String token = this.passwordEncoder.encode(UUID.randomUUID().toString());
 
-    // this is for localhost since if you set 'domain' it does not work even if it
-    // is empty string
-    if (!apiTokenCookieConfig.getDomain().isEmpty()) {
+    ResponseCookie cookie = this.cookieService.createCsrfTokenCookie(token);
 
-      ResponseCookie cookie = ResponseCookie.from("csrf-token", token).sameSite(apiTokenCookieConfig.getSameSite())
-          .maxAge(apiTokenCookieConfig.getTimeout()).secure(apiTokenCookieConfig.getSecure())
-          .domain(apiTokenCookieConfig.getDomain()).path(apiTokenCookieConfig.getPath()).build();
-
-      response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-      // .domain(apiTokenCookieConfig.getDomain())
-
-    } else {
-      /**
-       * don't be 'httpOnly'. this is for csrf prevention.
-       **/
-      ResponseCookie cookie = ResponseCookie.from("csrf-token", token).sameSite(apiTokenCookieConfig.getSameSite())
-          .maxAge(apiTokenCookieConfig.getTimeout()).secure(apiTokenCookieConfig.getSecure())
-          .path(apiTokenCookieConfig.getPath()).build();
-
-      response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-    }
+    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
     return token;
   }

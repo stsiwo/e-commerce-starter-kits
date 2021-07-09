@@ -35,6 +35,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
+      flexDirection: "column",
     },
     media: {
     },
@@ -135,8 +136,10 @@ const AdminOrderGridView: React.FunctionComponent<AdminOrderGridViewPropsType> =
     ])
 
   // spa url query string 
+  // you can use either 'orderId'/'seachQuery' when request to the api
+  // notification/email link use 'orderId' but the request to the api use 'searchQuery' internally.
   const query = useQuery()
-  const searchQuery = query.get("searchQuery")
+  const searchQuery = query.get("orderId")
   React.useEffect(() => {
     if (searchQuery) {
       dispatch(

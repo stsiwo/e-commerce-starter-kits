@@ -9,6 +9,7 @@ import { UserTypeEnum } from 'src/app';
 import SampleSelfImage from 'static/self.jpeg';
 import { useSelector } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
+import { getApiUrl } from 'src/utils';
 
 interface UserCardPropsType {
   firstName: string
@@ -56,7 +57,7 @@ const UserCard: React.FunctionComponent<UserCardPropsType> = (props) => {
   const classes = useStyles();
 
   // avatar image
-  const curAvatarImageUrl = useSelector(mSelector.makeAuthAvatarUrlSelector())
+  const curAvatarImageUrl = props.avatarImagePath ? getApiUrl(props.avatarImagePath) : null 
 
   return (
     <Card className={`${classes.card} ${classes.root}`}>

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # update docker-compose when files are uploaded to production
 
@@ -16,6 +17,12 @@
 # write stdout/err to syslog
 exec 1> >(logger -s -t $(basename $0)) 2>&1
 
+echo "start taking the backup with mysql-backup container by restarting the service"
+echo "mysql-backup service name must match the name in docker compose file"
+
+#docker-compose restart db-backup
+
+echo "backup succeeded so moves to the next step"
 echo "start update docker-compose since we detect new files are uploaded here"
 
 echo "start pull docker image from DockerHub"
@@ -28,6 +35,8 @@ echo "start update docker-compose"
 # update docker-compose
 docker-compose -f /home/ubuntu/prod/docker-compose.secret.yml -f /home/ubuntu/prod/docker-compose.yml up -d
 
-echo "done running docker compose update"
+echo "clean up the unused docker components"
+docker system prune -f
 
+echo "done running docker compose update"
 

@@ -5,7 +5,7 @@ import { CartItemType } from "./types";
 export const calcSubTotalPriceAmount: (cartItems: CartItemType[]) => number = (cartItems) => {
   return cartItems.reduce((acc: number, cartItem: CartItemType) => {
     if (cartItem.isSelected) {
-      const unitPrice = cartItem.product.variants[0].variantUnitPrice ? cartItem.product.variants[0].variantUnitPrice : cartItem.product.productBaseUnitPrice
+      const unitPrice = cartItem.product.variants[0].currentPrice
       acc += (unitPrice * cartItem.quantity)
     }
     return acc

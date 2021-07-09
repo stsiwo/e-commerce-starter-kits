@@ -78,7 +78,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     targetEntity.addVariant(newEntity);
 
     // must be cheaper than the unit price validaiton
-    if (!newEntity.isVariantDiscountPriceLessThanUnitPrice()) {
+    if (!newEntity.isUnitPriceGraterThanDiscountPrice()) {
       throw new AppException(HttpStatus.BAD_REQUEST, "the discount price must be less than the unit price.");
     }
     logger.info("pass the cheaper discount price validation.");
@@ -127,7 +127,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     targetEntity.updateVariant(variantId, updateEntity);
 
     // must be cheaper than the unit price validaiton
-    if (!updateEntity.isVariantDiscountPriceLessThanUnitPrice()) {
+    if (!updateEntity.isUnitPriceGraterThanDiscountPrice()) {
       throw new AppException(HttpStatus.BAD_REQUEST, "the discount price must be less than the unit price.");
     }
 

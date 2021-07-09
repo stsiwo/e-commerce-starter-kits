@@ -5,7 +5,6 @@ import Switch from '@material-ui/core/Switch';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Rating from '@material-ui/lab/Rating';
-import ProductHorizontalCard from 'components/common/ProductCard/ProductHorizontalCard';
 import UserCard from 'components/common/UserCard';
 import { defaultReviewValidationData, ReviewDataType, ReviewType, ReviewValidationDataType } from 'domain/review/type';
 import { useValidation } from 'hooks/validation';
@@ -13,6 +12,7 @@ import { reviewSchema } from 'hooks/validation/rules';
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
 import { putReviewActionCreator } from 'reducers/slices/domain/review';
+import ReviewProductHorizontalCard from './ReviewProductHorizontalCard';
 
 interface AdminReviewFormPropsType {
   review: ReviewType
@@ -190,7 +190,7 @@ const AdminReviewForm = React.forwardRef<any, AdminReviewFormPropsType>((props, 
         <Typography variant="subtitle1" component="h6" className={classes.title}>
           {"Reviewed Product"}
         </Typography>
-        <ProductHorizontalCard product={props.review.product} variant={props.review.product.variants[0]} />
+        <ReviewProductHorizontalCard product={props.review.product} />
       </Grid>
       <Grid
         item

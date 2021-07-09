@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
 import SampleProductImage from 'static/sample-product-1-1.jpg';
 import { ProductImageType } from 'domain/product/types';
+import { getApiUrl } from 'src/utils';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -132,7 +133,7 @@ const ProductImagesForm: React.FunctionComponent<ProductImageFormPropsType> = (p
           />
           <CardMedia
             className={classes.media}
-            image={!props.productImages[index].isChange ? API1_URL + props.productImages[index].productImagePath : props.productImages[index].productImagePath}
+            image={!props.productImages[index].isChange ? getApiUrl(props.productImages[index].productImagePath) : props.productImages[index].productImagePath}
             title={file ? file.name : ""}
           />
           <CardActions disableSpacing>

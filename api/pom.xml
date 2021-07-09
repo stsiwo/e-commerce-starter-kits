@@ -24,6 +24,7 @@
     <cxf.version>3.4.2</cxf.version>
     <xerces.version>2.12.0</xerces.version>
     <software.amazon.awssdk.version>2.16.90</software.amazon.awssdk.version>
+    <flyway.version>7.11.0</flyway.version>
   </properties>
   
   <!-- you need this for aws sdk version 2 (software.amazon.awssdk) -->
@@ -103,6 +104,13 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>30.1.1-jre</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-core -->
+    <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-core</artifactId>
+        <version>${flyway.version}</version>
     </dependency>
 
 
@@ -543,6 +551,23 @@
           </execution>
         </executions>
       </plugin>
+      <!--
+      <plugin>
+         <groupId>org.flywaydb</groupId>
+         <artifactId>flyway-maven-plugin</artifactId>
+         <version>${flyway.version}</version>
+         <executions>
+            <execution>
+               <phase>generate-sources</phase>
+               <goals>
+                  <goal>migrate</goal>
+               </goals>
+            </execution>
+         </executions>
+      </plugin>
+      -->
+
+
     </plugins>
   </build>
 </project>

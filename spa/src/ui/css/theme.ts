@@ -3,10 +3,10 @@ import { createMuiTheme } from '@material-ui/core/styles';
 /**
  * color theme:
  *
- *  primary: 75CFB8 (thick green)
+ *  primary: FFC478 (thick orange)
  *  secondary: BBDFC8 (thin green)
  *  third: F0E5D8 (thin orange)
- *  fourth: FFC478 (thick orange)
+ *  fourth: 75CFB8 (thick green)
  *
  **/
 const primeColor = "#FFC478";
@@ -103,6 +103,11 @@ export const theme = createMuiTheme({
         }
       }
     },
+    MuiMobileStepper: {
+      root: {
+        backgroundColor: "transparent",
+      }
+    }
     //MuiCollapse:  {
     //  container: {
     //    backgroundColor: "#FFFFFF"

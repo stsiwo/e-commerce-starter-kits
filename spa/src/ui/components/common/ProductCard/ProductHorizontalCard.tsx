@@ -5,9 +5,9 @@ import CardHeader from '@material-ui/core/CardHeader';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { ProductType, ProductVariantType } from 'domain/product/types';
 import * as React from 'react';
+import { getApiUrl } from 'src/utils';
 import ColorCell from '../GridData/ColorCell';
 import SizeCell from '../GridData/SizeCell';
-import { cadCurrencyFormat } from 'src/utils';
 
 /**
  * need 'orderDetail' or 'product/variant'
@@ -61,7 +61,7 @@ const ProductHorizontalCard: React.FunctionComponent<ProductHorizontalCardPropsT
   /**
    * if the product is available (e.g., not null), display teh primary image.
    **/
-  const primaryImageUrl = (product && product.productImages.length > 0) ? API1_URL + product.productImages[0].productImagePath : null
+  const primaryImageUrl = (product && product.productImages.length > 0) ? getApiUrl(product.productImages[0].productImagePath) : null
 
   return (
     <Card className={`${classes.card} ${classes.root}`}>

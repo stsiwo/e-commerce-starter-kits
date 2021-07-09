@@ -22,11 +22,12 @@ import { OrderEventType, orderStatusBagList, OrderType } from 'domain/order/type
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteSingleOrderEventActionCreator } from 'reducers/slices/domain/order';
+import { deleteSingleOrderEventActionCreator, postOrderEventActionCreator } from 'reducers/slices/domain/order';
 import { toDateString } from 'src/utils';
 import OrderEventUpdateFormDialog from '../OrderEventUpdateFormDialog';
-import { mSelector } from 'src/selectors/selector';
-import { UserTypeEnum } from 'src/app';
+import { mSelector, rsSelector } from 'src/selectors/selector';
+import { UserTypeEnum, FetchStatusEnum } from 'src/app';
+import { postOrderEventFetchStatusActions, putOrderEventFetchStatusActions, deleteSingleOrderEventFetchStatusActions } from 'reducers/slices/app/fetchStatus/order';
 
 /**
  * TODO: review this when test data is available.
@@ -157,6 +158,31 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({ order 
     }
   }, [JSON.stringify(order)])
 
+  // close form dialog only when success for post/put/delete
+  const curPostFetchStatus = useSelector(rsSelector.app.getPostOrderEventFetchStatus);
+  const curPutFetchStatus = useSelector(rsSelector.app.getPutOrderEventFetchStatus);
+  const curDeleteSingleFetchStatus = useSelector(rsSelector.app.getDeleteSingleOrderEventFetchStatus);
+  React.useEffect(() => {
+    if (
+      curPostFetchStatus === FetchStatusEnum.SUCCESS ||
+      curPutFetchStatus === FetchStatusEnum.SUCCESS ||
+      curDeleteSingleFetchStatus === FetchStatusEnum.SUCCESS
+    ) {
+      setDeleteDialogOpen(false)
+      setFormOpen(false)
+
+      dispatch(
+        postOrderEventFetchStatusActions.clear()
+      )
+      dispatch(
+        putOrderEventFetchStatusActions.clear()
+      )
+      dispatch(
+        deleteSingleOrderEventFetchStatusActions.clear()
+      )
+    }
+  })
+
   const renderTimelineContent: (orderEvent: OrderEventType, latestOrderEvent: OrderEventType) => React.ReactNode = (orderEvent, latestOrderEvent) => {
 
     const OrderStatusIcon = orderStatusBagList[orderEvent.orderStatus].icon
@@ -186,10 +212,7 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({ order 
               {orderStatusObj.label}
             </Typography>
             <Typography variant="body2" component="p" color="textSecondary">
-              {orderStatusObj.defaultNote}
-            </Typography>
-            <Typography variant="body2" component="p" color="textSecondary">
-              {orderEvent.note}
+              {orderEvent.note ? orderEvent.note : orderStatusObj.defaultNote}
             </Typography>
             <Divider />
             <Box>

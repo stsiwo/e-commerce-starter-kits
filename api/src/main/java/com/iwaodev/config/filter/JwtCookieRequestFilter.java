@@ -10,7 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iwaodev.config.ApiTokenCookieConfig;
 import com.iwaodev.config.SpringSecurityUserDetailsService;
+import com.iwaodev.config.service.CookieService;
 import com.iwaodev.ui.response.BaseResponse;
 import com.iwaodev.util.JwtUtil;
 
@@ -26,6 +28,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 
 /**
@@ -54,6 +57,9 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
   @Autowired
   private ObjectMapper objectMapper;
 
+  @Autowired
+  private CookieService cookieService;
+
   /**
    * if cookie is empty, we assume that request is from a guest. so, we don't
    * validate the jwt and throw any exception.
@@ -67,10 +73,11 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
    *
    * @2021/07/02
    *
-   * double submit cookie implementation to prevent csrf attack. 
-   *  - ref: https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie
+   * double submit cookie implementation to prevent csrf attack. - ref:
+   * https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie
    *
-   * desc) set additional non-httponly cookie which hold bcrypted token and require any request to have this cookie to prevent csrf attack.
+   * desc) set additional non-httponly cookie which hold bcrypted token and
+   * require any request to have this cookie to prevent csrf attack.
    *
    **/
   @Override
@@ -99,6 +106,11 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
       try {
         userEmail = jwtUtil.extractUserEmail(jwt);
       } catch (MalformedJwtException e) {
+        // force logout e.g., delete 'api-token' cookie
+        this.eraseCookie(request, response);
+        // return error response
+        this.errorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "invalid jwt token. please login again.");
+      } catch (ExpiredJwtException e) {
         // force logout e.g., delete 'api-token' cookie
         this.eraseCookie(request, response);
         // return error response
@@ -139,9 +151,8 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
            * done via https.
            *
            **/
-          
 
-          for (Cookie cookie: request.getCookies()) {
+          for (Cookie cookie : request.getCookies()) {
             logger.info("cookie: " + cookie.getName() + " and " + cookie.getValue());
           }
 
@@ -161,7 +172,8 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
             // force logout
             this.eraseCookie(request, response);
             // return error message
-            this.errorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "invalid csrf token. please login again.");
+            this.errorResponse(response, HttpServletResponse.SC_UNAUTHORIZED,
+                "invalid csrf token. please login again.");
           }
         } else {
           // otherwise, jwt is invalid
@@ -176,14 +188,7 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
   }
 
   private void eraseCookie(HttpServletRequest req, HttpServletResponse resp) {
-    Cookie[] cookies = req.getCookies();
-    if (cookies != null)
-      for (Cookie cookie : cookies) {
-        cookie.setValue("");
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        resp.addCookie(cookie);
-      }
+    this.cookieService.eraseCookies(req, resp);
   }
 
   private void errorResponse(HttpServletResponse response, int statusCode, String message) throws IOException {

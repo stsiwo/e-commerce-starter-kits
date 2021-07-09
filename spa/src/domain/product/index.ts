@@ -1,4 +1,4 @@
-import { ProductType, ProductVariantType, ProductVariantSizeType } from "./types";
+import { ProductType, ProductVariantType, ProductVariantSizeType, productStockBags, ProductStockEnum, ProductStockBagType } from "./types";
 import uniq from 'lodash/uniq';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -38,4 +38,14 @@ export function filterSingleVariant(variantId: string, product: ProductType): Pr
   const tempProduct = cloneDeep(product)
   tempProduct.variants = product.variants.filter((variant: ProductVariantType) => variant.variantId == variantId);
   return tempProduct;
+}
+
+export function getVariantStockBack(stock: number): ProductStockBagType {
+  if (stock == 0) {
+    return productStockBags[ProductStockEnum.OUT_OF_STOCK];
+  } else if (stock < 10) {
+    return productStockBags[ProductStockEnum.LIMITED_STOCK];
+  } else {
+    return productStockBags[ProductStockEnum.ENOUGH_STOCK];
+  }
 }

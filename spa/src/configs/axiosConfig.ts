@@ -70,10 +70,18 @@ axios.defaults.transformResponse = [].concat(
  **/
 axios.interceptors.request.use(function (config) {
 
+  console.log("start chekcing csrf-token cookie exists or not")
+  console.log(document.cookie.indexOf("csrf-token") != -1)
+  console.log(document.cookie)
+
   // if cookie is set, attack this token to header as 'csrf-token=xxxx'.
   if (document.cookie.indexOf("csrf-token") != -1) {
+    console.log("csrf-token in cookie does exist")
     const token = getCookie("csrf-token");
+    console.log("token: " + token)
     config.headers["csrf-token"] = token;
+  } else {
+    console.log("csrf-token in cookie does not exist")
   }
 
   return config;
@@ -87,11 +95,16 @@ axios.interceptors.request.use(function (config) {
  *
  **/
 axios.interceptors.response.use(function (response) {
+  console.log("checking response status == 401 or not")
+  console.log(response)
   if (response.status === 401) {
+    console.log("receive 401 response so clear the user store data.")
     store.dispatch({
       type: "root/reset/all",
       payload: null
     })
+  } else {
+    console.log("no 401 status code")
   }
   return response
 });

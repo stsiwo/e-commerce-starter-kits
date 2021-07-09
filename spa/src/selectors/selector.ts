@@ -13,6 +13,8 @@ import { toOrderAddress, toOrderDetailCriteriaList } from "domain/order";
 import { UserTypeEnum } from "src/app";
 import { NotificationType } from "domain/notification/types";
 import orderBy from "lodash/orderBy";
+import { getApiUrl } from "src/utils";
+import { getVariantStockBack } from "domain/product";
 
 export const rsSelector = {
   /**
@@ -43,6 +45,12 @@ export const rsSelector = {
     getSearchKeyword: (state: StateType) => state.app.searchKeyword,
     getRequestTracker: (state: StateType) => state.app.requestTracker,
 
+    getPostOrderEventFetchStatus: (state: StateType) => state.app.fetchStatus.orders.postEvent,
+    getPutOrderEventFetchStatus: (state: StateType) => state.app.fetchStatus.orders.putEvent,
+    getDeleteSingleOrderEventFetchStatus: (state: StateType) => state.app.fetchStatus.orders.deleteSingleEvent,
+
+    getPostProductFetchStatus: (state: StateType) => state.app.fetchStatus.products.post,
+    getPutProductFetchStatus: (state: StateType) => state.app.fetchStatus.products.put,
     getFetchAuthOrderFetchStatus: (state: StateType) => state.app.fetchStatus.auth.fetchOrder,
     getFetchWishlistItemFetchStatus: (state: StateType) => state.app.fetchStatus.wishlistItems.get,
     getPutAuthFetchStatus: (state: StateType) => state.app.fetchStatus.auth.put,
@@ -213,6 +221,9 @@ export const mSelector = {
     )
   },
 
+  /**
+   * already wrap with 'getApiUrl'
+   **/
   makeAuthAvatarUrlSelector: () => {
     return createSelector(
       [
@@ -220,7 +231,7 @@ export const mSelector = {
       ],
       (auth) => {
         if (auth && auth.isLoggedIn && auth.user && auth.user.avatarImagePath) {
-          return API1_URL + auth.user.avatarImagePath;
+          return getApiUrl(auth.user.avatarImagePath);
         }
         return null
       },
@@ -1469,17 +1480,13 @@ export const mSelector = {
       ],
       (normalizedProducts) => {
 
+        console.log(normalizedProducts)
+
         const product = normalizedProducts[productId];
 
         const targetVariant = product.variants.filter((variant: ProductVariantType) => variant.variantId == variantId)[0];
 
-        if (targetVariant.variantStock == 0) {
-          return productStockBags[ProductStockEnum.OUT_OF_STOCK];
-        } else if (targetVariant.variantStock < 10) {
-          return productStockBags[ProductStockEnum.LIMITED_STOCK];
-        } else {
-          return productStockBags[ProductStockEnum.ENOUGH_STOCK];
-        }
+        return getVariantStockBack(targetVariant.variantStock)
       },
     )
   },

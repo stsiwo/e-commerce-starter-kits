@@ -234,6 +234,18 @@
             @Query(value = "SELECT * FROM users u WHERE u.email = ?1", nativeQuery = true)
             Address findByEmail(String email);  <- this gives you error. so just return User or Collection<User>
         ```
+
+  ## Common Erros:
+
+    ### rg.springframework.security.web.firewall.RequestRejectedException: The request was rejected because the URL contained a potentially malicious String "//"
+
+      - this happens because you include invalid url in your form data, query string, or main url. 
+
+      - e.g., form data:
+
+        {
+          image-path: "/products//image.jpg", // this cause the error.
+        } 
   
 # Spring Boot
 
@@ -306,6 +318,51 @@
       *you need to set properties for this email at application.properties. (see ref more detail)
 
     - ref: https://www.baeldung.com/spring-email
+
+  ## DB Migration (Flyway)
+
+    - ref: https://flywaydb.org/documentation/concepts/migrations.html#overview (official docs of Flyway)
+    - ref: https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.data-initialization.batch (how to config Flyway with Spring Boot)
+
+    - migrations: keep track of all changes on database.
+
+    - types:
+
+      1. versioned migration
+
+        1.1. regular: 
+
+          - has a verison (unique), a desc, and a checksum.
+
+          - apply only once.
+
+        1.2. undo: 
+
+          - undo the regular one.
+
+      2. repeatable migration
+
+        - has a desc & a checksum, but no version
+
+        - apply every time their checksum changes.
+
+        - apply last after all pending versioned migrations are executed.
+
+    ### Guide
+
+      - you need to create migration file manually. there is no way to Flyway detect any change automatically and generate the files.
+
+      - you can do DDL/INSERT/UPDATE/ALTER/DELETE as you like to manipulate any existing data.
+
+    ### NOTE:
+
+      - file name must comply the formats otherwise Flyway does not detect the files:
+
+        - versioned migration: V<VERSION>__<DESC>.sql (e.g., V1_0_0__init.sql)
+
+        - undo migrations: U<VERSION>__<DESC>.sql (e.g., U1_0_1__undo.sql)
+
+        - repeatable migrations: R__<DESC>.sql (e.g, R__repeatable.sql)
 
 # Hibernate
 
@@ -1594,4 +1651,18 @@
 # Next Version
 
     - remvoe product_color table. it is totally useless and increase code base.
+
+# Reverse Proxy With Nginx
+
+  - if you use a reverse proxy (esp for single application system), you need to be careful about security such as cors, cookie access.
+
+  ## Cookie Access
+
+    - by default, cookie is not allowed you to access if cookie is cross domain.
+
+    - you need to specify the 'domain' and 'path'.
+
+      - For example, if Domain=mozilla.org is set, then cookies are available on subdomains like developer.mozilla.org.
+
+      - ref: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#define_where_cookies_are_sent
 

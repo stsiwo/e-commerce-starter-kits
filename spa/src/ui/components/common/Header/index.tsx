@@ -1,17 +1,17 @@
 import AppBar from '@material-ui/core/AppBar';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
-import Link from '@material-ui/core/Link';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Toolbar from '@material-ui/core/Toolbar';
 import SentimentSatisfiedOutlinedIcon from '@material-ui/icons/SentimentSatisfiedOutlined';
 import * as React from 'react';
 import { useSelector } from 'react-redux';
+import { Link as RRLink } from "react-router-dom";
 import { AuthType, UserTypeEnum } from 'src/app';
 import { mSelector } from 'src/selectors/selector';
+import AdminHeaderMenuItems from './AdminHeaderMenuItems';
 import GuestHeaderMenuItems from './GuestHeaderMenuItem';
 import MemberHeaderMenuItems from './MemberHeaderMenuItems';
-import { Link as RRLink } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -35,10 +35,6 @@ const Header: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
 
-  /**
-   * TODO: need to use <Link> from 'react-router-dom' with <Link> from 'mui'. otherwise, all state is refreshed all the time you click a link
-   **/
-
   return (
     <AppBar position="sticky" className={classes.appBar}>
       <Toolbar >
@@ -57,6 +53,9 @@ const Header: React.FunctionComponent<{}> = (props) => {
           )}
           {(auth.userType === UserTypeEnum.MEMBER &&
             <MemberHeaderMenuItems />
+          )}
+          {(auth.userType === UserTypeEnum.ADMIN &&
+            <AdminHeaderMenuItems />
           )}
         </Grid>
       </Toolbar>

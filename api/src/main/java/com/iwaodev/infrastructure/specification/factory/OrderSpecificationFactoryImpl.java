@@ -28,6 +28,7 @@ public class OrderSpecificationFactoryImpl implements OrderSpecificationFactory 
     return this.specifications.orderStatusOf(criteria.getOrderStatus())
       .and(this.specifications.createdDateAfter(criteria.getStartDate()))
       .and(this.specifications.createdDateBefore(criteria.getEndDate()))
+      .and(this.specifications.byUserId(criteria.getUserId()))
       .and(this.specifications.searchByOrderId(criteria.getOrderId()))
       .and(
           this.specifications.searchQueryByOrderEmail(criteria.getSearchQuery())

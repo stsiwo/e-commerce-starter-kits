@@ -37,6 +37,8 @@ const useStyles = makeStyles((theme: Theme) =>
 
       padding: `0 ${theme.spacing(1)}px`,
       overflowY: "scroll",
+      backgroundColor: theme.palette.third.main, 
+      maxWidth: 400,
 
       [theme.breakpoints.down('xs')]: {
         width: "100%",

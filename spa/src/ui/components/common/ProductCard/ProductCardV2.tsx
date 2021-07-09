@@ -7,7 +7,7 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { ProductType } from 'domain/product/types';
 import * as React from 'react';
-import { cadCurrencyFormat } from 'src/utils';
+import { cadCurrencyFormat, getApiUrl } from 'src/utils';
 import CornerRibbon from '../CornerRibbon';
 import Box from '@material-ui/core/Box';
 import { Link as RRLink } from "react-router-dom";
@@ -57,7 +57,7 @@ const ProductCardV2: React.FunctionComponent<ProductCardV2PropsType> = ({ produc
 
   const classes = useStyles();
 
-  const primaryImageUrl = (product.productImages.length > 0) ? API1_URL + product.productImages[0].productImagePath : null
+  const primaryImageUrl = (product.productImages.length > 0) ? getApiUrl(product.productImages[0].productImagePath) : null
 
   return (
     <Box className={classes.box}>

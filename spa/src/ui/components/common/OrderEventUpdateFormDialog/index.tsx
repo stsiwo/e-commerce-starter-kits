@@ -44,25 +44,13 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
 
   // order event form stuff
   const auth: AuthType = useSelector(mSelector.makeAuthSelector())
-  const [curOrderEventState, setOrderEventState] = React.useState<OrderEventType>(defaultOrderEventData);
+  const [curOrderEventState, setOrderEventState] = React.useState<OrderEventType>(props.orderEvent ? props.orderEvent : defaultOrderEventData);
 
   // update/create logic for product
   //  - true: create
   //  - false: update
   // if props.product exists, it updates, otherwise, new
-  const [isNew, setNew] = React.useState<boolean>(true);
-
-  React.useEffect(() => {
-    if (props.orderEvent) {
-      setNew(false);
-      setOrderEventState(props.orderEvent)
-    } else {
-      setNew(true);
-      setOrderEventState(defaultOrderEventData)
-    }
-  }, [
-      JSON.stringify(props.orderEvent)
-    ])
+  const [isNew, setNew] = React.useState<boolean>(props.orderEvent ? false : true);
 
   /**
    * update btn click event handler

@@ -264,26 +264,20 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
           </Box>
           <Box component="div" className={classes.actionBox}>
             <ButtonGroup size="small" aria-label="small outlined button group" >
-              <Button
+              {/** don't use <IconButton> inside <ButtonGroup>, it causes errors e.g., 'fullwidth' 'disableelevation unrecognaized property. use lowercase... **/}
+              <Button 
                 onClick={handleQtyIncrement}
-                disabled={value.quantity === value.product.variants[0].variantStock}
                 variant="contained"
               >
                 <AddCircleIcon />
               </Button>
               <Button
-                disabled
-                classes={{
-                  /** this override default and 'disable' custom style. **/
-                  root: classes.btnRoot,
-                }}
                 variant="contained"
               >
                 {value.quantity}
               </Button>
-              <Button
+              <Button 
                 onClick={handleQtyDecrement}
-                disabled={value.quantity === 1}
                 variant="contained"
               >
                 <RemoveCircleIcon />

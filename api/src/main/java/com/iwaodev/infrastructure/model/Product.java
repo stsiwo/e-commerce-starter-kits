@@ -276,12 +276,30 @@ public class Product {
     return highestPrice;
   }
 
-  public boolean isBaseUnitPriceLessThanDiscountPriceAtAnyVariant() {
-    boolean isLess = false;
+  /**
+   * product unit price must be greater than disocunt price.
+   *
+   * logic:
+   *  - product:
+   *    - base unit price: if a variant does not have its unit price, the base unit price takes that place.
+   *  - variant: 
+   *    - unit price: (optional).
+   *      - if the price is assigned, the variant's price is the unit price.
+   *    - discount price: (optional).
+   *      - if the price is assigned (e.g., is_disoucnt = true), the discount price is the variant price. 
+   *  - conditions:
+   *    - base unit price/variant unit price must be greater than the discount price.
+   *    - base unit price can be less/greater than variant unit price and vice versa.
+   *
+   *
+   **/
+
+  public boolean isBaseUnitPriceGreaterThanDiscountPriceAtAnyVariant() {
+    boolean isGreater = true;
     for (ProductVariant variant : this.variants) {
-      isLess = variant.isVariantDiscountPriceLessThanUnitPrice();
+      isGreater = variant.isUnitPriceGraterThanDiscountPrice();
     }
-    return isLess;
+    return isGreater;
   }
 
   public boolean isAnyVariantDiscount() {

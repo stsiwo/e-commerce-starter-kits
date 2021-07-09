@@ -120,6 +120,7 @@ export const productVariantSchema = yup.object().shape({
 export const productSchema = yup.object().shape({
   productName: yup.string().required(),
   productDescription: yup.string().required(),
+  productBaseUnitPrice: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/, "invalid currency format. please enter currency (e.g., 3.12, 12.00, and so on)").required(),
   productPath: yup.string().matches(/^[a-zA-Z0-9-_]*$/, "only alphabetics, numbers, underscore (_) and hyphen (-) are availble.").required(),
   productImages: yup.array().test(
     'has-first-element',

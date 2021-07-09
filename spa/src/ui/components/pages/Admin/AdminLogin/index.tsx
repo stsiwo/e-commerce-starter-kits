@@ -16,6 +16,7 @@ import { adminLoginSchema } from 'hooks/validation/rules';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
+import { Link as RRLink } from "react-router-dom";
 import { authActions, messageActions } from 'reducers/slices/app';
 import { MessageTypeEnum } from 'src/app';
 import { mSelector } from 'src/selectors/selector';
@@ -270,9 +271,12 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
           </Typography>
         </Box>
         <Box component="div" className={classes.actionBox}>
+          <Button variant="contained" component={RRLink} to={"/"}>
+            Home
+          </Button>
           <Button onClick={handleUserAccountSaveClickEvent} variant="contained">
             Login
-            </Button>
+          </Button>
         </Box>
       </form>
       <ForgotPasswordDialog

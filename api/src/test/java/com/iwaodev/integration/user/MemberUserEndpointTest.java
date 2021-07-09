@@ -146,12 +146,7 @@ public class MemberUserEndpointTest {
     this.baseDatabaseSetup.setup(this.entityManager);
 
     // send authentication request before testing
-    this.authInfo = this.authenticateTestUser.setup(
-        this.entityManager, 
-        this.mvc, 
-        UserTypeEnum.MEMBER, 
-        this.port
-        );
+    this.authInfo = this.authenticateTestUser.setup(this.entityManager, this.mvc, UserTypeEnum.MEMBER, this.port);
 
     this.authCookie = new Cookie("api-token", this.authInfo.getJwtToken());
     this.csrfCookie = new Cookie("csrf-token", this.authInfo.getCsrfToken());
@@ -203,16 +198,9 @@ public class MemberUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath;
 
     // act & assert
-    mvc.perform(
-        MockMvcRequestBuilders
-          .get(targetUrl)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-          .accept(MediaType.APPLICATION_JSON)
-          )
-      .andDo(print())
-      .andExpect(status().isForbidden());
+    mvc.perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).cookie(this.csrfCookie)
+        .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON)).andDo(print())
+        .andExpect(status().isForbidden());
   }
 
   @Test
@@ -227,16 +215,10 @@ public class MemberUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .get(targetUrl)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -259,16 +241,10 @@ public class MemberUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .get(targetUrl)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isForbidden());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isForbidden());
 
     MvcResult result = resultActions.andReturn();
 
@@ -277,13 +253,19 @@ public class MemberUserEndpointTest {
   }
 
   @Test
-  //@Sql(scripts = { "classpath:/integration/user/shouldMemberUserUpdateItsOwnData.sql" })
-  public void shouldMemberUserUpdateItsOwnData(/**@Value("classpath:/integration/user/shouldMemberUserUpdateItsOwnData.json") Resource dummyFormJsonFile**/) throws Exception {
+  // @Sql(scripts = {
+  // "classpath:/integration/user/shouldMemberUserUpdateItsOwnData.sql" })
+  public void shouldMemberUserUpdateItsOwnData(/**
+                                                * @Value("classpath:/integration/user/shouldMemberUserUpdateItsOwnData.json")
+                                                * Resource dummyFormJsonFile
+                                                **/
+  ) throws Exception {
 
-    // dummy form json 
-    //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    // dummy form json
+    // JsonNode dummyFormJson =
+    // this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
 
-    //String dummyFormJsonString = dummyFormJson.toString();
+    // String dummyFormJsonString = dummyFormJson.toString();
 
     // arrange
     String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
@@ -297,18 +279,11 @@ public class MemberUserEndpointTest {
     dummyUserSignupForm.put("email", "update_email@test.com");
     dummyUserSignupForm.put("password", "test_PASSWORD");
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .put(targetUrl)
-        .content(dummyUserSignupForm.toString())
-        .contentType(MediaType.APPLICATION_JSON)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyUserSignupForm.toString())
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -324,13 +299,20 @@ public class MemberUserEndpointTest {
   }
 
   @Test
-  //@Sql(scripts = { "classpath:/integration/user/shouldMemberUserUpdateOnlyNotNullProperty.sql" })
-  public void shouldMemberUserUpdateOnlyNotNullProperty(/**@Value("classpath:/integration/user/shouldMemberUserUpdateOnlyNotNullProperty.json") Resource dummyFormJsonFile**/) throws Exception {
+  // @Sql(scripts = {
+  // "classpath:/integration/user/shouldMemberUserUpdateOnlyNotNullProperty.sql"
+  // })
+  public void shouldMemberUserUpdateOnlyNotNullProperty(/**
+                                                         * @Value("classpath:/integration/user/shouldMemberUserUpdateOnlyNotNullProperty.json")
+                                                         * Resource dummyFormJsonFile
+                                                         **/
+  ) throws Exception {
 
-    // dummy form json 
-    //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    // dummy form json
+    // JsonNode dummyFormJson =
+    // this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
 
-    //String dummyFormJsonString = dummyFormJson.toString();
+    // String dummyFormJsonString = dummyFormJson.toString();
 
     // arrange
     String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
@@ -344,18 +326,10 @@ public class MemberUserEndpointTest {
     dummyUserSignupForm.put("email", "update_email@test.com");
     dummyUserSignupForm.put("password", "test_PASSWORD");
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .put(targetUrl)
-        .content(dummyUserSignupForm.toString())
-        .contentType(MediaType.APPLICATION_JSON)
-        .contentType(MediaType.APPLICATION_JSON)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.put(targetUrl)
+        .content(dummyUserSignupForm.toString()).contentType(MediaType.APPLICATION_JSON)
+        .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).cookie(this.csrfCookie)
+        .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON)).andDo(print())
         .andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -369,16 +343,21 @@ public class MemberUserEndpointTest {
     assertThat(responseBody.getUserId().toString()).isEqualTo(this.authInfo.getAuthUser().getUserId().toString());
     assertThat(responseBody.getLastName()).isEqualTo(dummyUserSignupForm.get("lastName"));
 
-
   }
+
   @Test
   @Sql(scripts = { "classpath:/integration/user/shouldNotMemberUserUpdateOtherOwnData.sql" })
-  public void shouldNotMemberUserUpdateOtherOwnData(/**@Value("classpath:/integration/user/shouldMemberUserUpdateItsOwnData.json") Resource dummyFormJsonFile**/) throws Exception {
+  public void shouldNotMemberUserUpdateOtherOwnData(/**
+                                                     * @Value("classpath:/integration/user/shouldMemberUserUpdateItsOwnData.json")
+                                                     * Resource dummyFormJsonFile
+                                                     **/
+  ) throws Exception {
 
-    // dummy form json 
-    //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    // dummy form json
+    // JsonNode dummyFormJson =
+    // this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
 
-    //String dummyFormJsonString = dummyFormJson.toString();
+    // String dummyFormJsonString = dummyFormJson.toString();
 
     // arrange
     String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978";
@@ -392,18 +371,10 @@ public class MemberUserEndpointTest {
     dummyUserSignupForm.put("email", "update_email@test.com");
     dummyUserSignupForm.put("password", "test_PASSWORD");
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .put(targetUrl)
-        .content(dummyUserSignupForm.toString())
-        .contentType(MediaType.APPLICATION_JSON)
-        .contentType(MediaType.APPLICATION_JSON)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.put(targetUrl)
+        .content(dummyUserSignupForm.toString()).contentType(MediaType.APPLICATION_JSON)
+        .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).cookie(this.csrfCookie)
+        .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON)).andDo(print())
         .andExpect(status().isForbidden());
 
     MvcResult result = resultActions.andReturn();
@@ -413,36 +384,35 @@ public class MemberUserEndpointTest {
   }
 
   @Test
-  //@Sql(scripts = { "classpath:/integration/user/shouldMemberUserUploadAvatar.sql" })
-  public void shouldMemberUserUploadAvatar(/**@Value("classpath:/integration/user/shouldMemberUserUpdateItsOwnData.json") Resource dummyFormJsonFile**/) throws Exception {
+  // @Sql(scripts = {
+  // "classpath:/integration/user/shouldMemberUserUploadAvatar.sql" })
+  public void shouldMemberUserUploadAvatar(/**
+                                            * @Value("classpath:/integration/user/shouldMemberUserUpdateItsOwnData.json")
+                                            * Resource dummyFormJsonFile
+                                            **/
+  ) throws Exception {
 
     Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
 
-    // dummy form json 
-    //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    // dummy form json
+    // JsonNode dummyFormJson =
+    // this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
 
-    //String dummyFormJsonString = dummyFormJson.toString();
+    // String dummyFormJsonString = dummyFormJson.toString();
 
     // arrange
     String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/avatar-image";
 
-    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("avatarImage", "product-image-0.jpeg", "image/jpeg", "some jpg".getBytes());
+    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("avatarImage", "product-image-0.jpeg", "image/jpeg",
+        "some jpg".getBytes());
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .multipart(targetUrl) // create
-        .file(fileAtZeroIndex)
-        .contentType(MediaType.MULTIPART_FORM_DATA)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.multipart(targetUrl) // create
+        .file(fileAtZeroIndex).contentType(MediaType.MULTIPART_FORM_DATA).cookie(this.authCookie)
+        .cookie(this.csrfCookie).header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -451,14 +421,20 @@ public class MemberUserEndpointTest {
   }
 
   @Test
-  //@Sql(scripts = { "classpath:/integration/user/shouldMemberUserUploadAvatar.sql" })
-  public void shouldMemberUserDeleteAvatar(/**@Value("classpath:/integration/user/shouldMemberUserUpdateItsOwnData.json") Resource dummyFormJsonFile**/) throws Exception {
+  // @Sql(scripts = {
+  // "classpath:/integration/user/shouldMemberUserUploadAvatar.sql" })
+  public void shouldMemberUserDeleteAvatar(/**
+                                            * @Value("classpath:/integration/user/shouldMemberUserUpdateItsOwnData.json")
+                                            * Resource dummyFormJsonFile
+                                            **/
+  ) throws Exception {
 
     Mockito.doNothing().when(this.s3Service).delete(Mockito.any());
-    // dummy form json 
-    //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    // dummy form json
+    // JsonNode dummyFormJson =
+    // this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
 
-    //String dummyFormJsonString = dummyFormJson.toString();
+    // String dummyFormJsonString = dummyFormJson.toString();
 
     // arrange
     String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
@@ -466,16 +442,9 @@ public class MemberUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/avatar-image";
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .delete(targetUrl)
-        .contentType(MediaType.APPLICATION_JSON)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.delete(targetUrl)
+        .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).cookie(this.csrfCookie)
+        .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON)).andDo(print())
         .andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -486,39 +455,41 @@ public class MemberUserEndpointTest {
 
   @Test
   @Sql(scripts = { "classpath:/integration/user/shouldMemberUserGetAvatar.sql" })
-  public void shouldMemberUserGetAvatar(/**@Value("classpath:/integration/user/shouldMemberUserUpdateItsOwnData.json") Resource dummyFormJsonFile**/) throws Exception {
+  public void shouldMemberUserGetAvatar(/**
+                                         * @Value("classpath:/integration/user/shouldMemberUserUpdateItsOwnData.json")
+                                         * Resource dummyFormJsonFile
+                                         **/
+  ) throws Exception {
 
     byte[] dummyImage = "samoe bytes".getBytes();
     Mockito.when(this.s3Service.get(Mockito.any())).thenReturn(dummyImage);
-    // dummy form json 
-    //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    // dummy form json
+    // JsonNode dummyFormJson =
+    // this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
 
-    //String dummyFormJsonString = dummyFormJson.toString();
+    // String dummyFormJsonString = dummyFormJson.toString();
 
     // arrange
     String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
     String dummyAvatarImageName = "dummy-avatar-image.jpeg";
     String dummyUserPath = "/" + dummyUserIdString;
-    String targetUrl = "http://localhost:" + this.port + this.targetImagePath + dummyUserPath + "/avatar-image/" + dummyAvatarImageName;
+    String targetUrl = "http://localhost:" + this.port + this.targetImagePath + dummyUserPath + "/avatar-image/"
+        + dummyAvatarImageName;
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .get(targetUrl)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
-    //JsonNode contentAsJsonNode = this.objectMapper.readValue(.getContentAsString(), JsonNode.class);
-    //byte[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode, byte[].class);
+    // JsonNode contentAsJsonNode =
+    // this.objectMapper.readValue(.getContentAsString(), JsonNode.class);
+    // byte[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode,
+    // byte[].class);
     // assert
-    
+
     assertThat(result.getResponse().getContentAsByteArray()).isEqualTo(dummyImage);
   }
 
@@ -533,18 +504,11 @@ public class MemberUserEndpointTest {
     dummyFormJson.put("activeNote", "some reason.");
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .patch(targetUrl)
-        .content(dummyFormJson.toString())
-        .contentType(MediaType.APPLICATION_JSON)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.patch(targetUrl).content(dummyFormJson.toString())
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -563,18 +527,11 @@ public class MemberUserEndpointTest {
     dummyFormJson.put("activeNote", "");
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .patch(targetUrl)
-        .content(dummyFormJson.toString())
-        .contentType(MediaType.APPLICATION_JSON)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.patch(targetUrl).content(dummyFormJson.toString())
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -591,21 +548,42 @@ public class MemberUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .delete(targetUrl)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isForbidden());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.delete(targetUrl).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isForbidden());
 
     MvcResult result = resultActions.andReturn();
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(403);
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldMemberUserGetAllOfItsOwnOrders.sql" })
+  public void shouldMemberUserGetAllOfItsOwnOrders() throws Exception {
+
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString + "/orders";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
+
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    for (OrderDTO orderDTO : responseBody) {
+      // assert
+      assertThat(orderDTO.getUser().getUserId().toString()).isEqualTo(dummyUserIdString);
+    }
   }
 
   @Test
@@ -619,16 +597,10 @@ public class MemberUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .get(targetUrl)
-        .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -649,11 +621,14 @@ public class MemberUserEndpointTest {
 
     // assert
   }
+
   @Test
   @Sql(scripts = { "classpath:/integration/user/shouldMemberAddCancelOrderEventSuccessfully.sql" })
-  public void shouldMemberAddCancelOrderEventSuccessfully(@Value("classpath:/integration/user/shouldMemberAddCancelOrderEventSuccessfully.json") Resource dummyFormJsonFile) throws Exception {
+  public void shouldMemberAddCancelOrderEventSuccessfully(
+      @Value("classpath:/integration/user/shouldMemberAddCancelOrderEventSuccessfully.json") Resource dummyFormJsonFile)
+      throws Exception {
 
-    // dummy form json 
+    // dummy form json
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
     String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
@@ -661,21 +636,15 @@ public class MemberUserEndpointTest {
     // arrange
     String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
     String dummyUserPath = "/" + dummyUserIdString;
-    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/orders/" + dummyOrderId + "/events";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/orders/" + dummyOrderId
+        + "/events";
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .post(targetUrl)
-        .content(dummyFormJsonString)
-        .contentType(MediaType.APPLICATION_JSON)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.post(targetUrl).content(dummyFormJsonString)
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -693,12 +662,14 @@ public class MemberUserEndpointTest {
       assertThat(orderEventDTO.getOrderEventId()).isNotNull();
     }
   }
-  
+
   @Test
   @Sql(scripts = { "classpath:/integration/user/shouldNotMemberAddCancelOrderEventSinceNoAddableAsNext.sql" })
-  public void shouldNotMemberAddCancelOrderEventSinceNoAddableAsNext(@Value("classpath:/integration/user/shouldNotMemberAddCancelOrderEventSinceNoAddableAsNext.json") Resource dummyFormJsonFile) throws Exception {
+  public void shouldNotMemberAddCancelOrderEventSinceNoAddableAsNext(
+      @Value("classpath:/integration/user/shouldNotMemberAddCancelOrderEventSinceNoAddableAsNext.json") Resource dummyFormJsonFile)
+      throws Exception {
 
-    // dummy form json 
+    // dummy form json
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
     String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
@@ -706,28 +677,25 @@ public class MemberUserEndpointTest {
     // arrange
     String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
     String dummyUserPath = "/" + dummyUserIdString;
-    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/orders/" + dummyOrderId + "/events";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/orders/" + dummyOrderId
+        + "/events";
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .post(targetUrl)
-        .content(dummyFormJsonString)
-        .contentType(MediaType.APPLICATION_JSON)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isBadRequest());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.post(targetUrl).content(dummyFormJsonString)
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
 
   }
+
   @Test
   @Sql(scripts = { "classpath:/integration/user/shouldNotMemberAddCancelOrderEventSinceDuplication.sql" })
-  public void shouldNotMemberAddCancelOrderEventSinceDuplication(@Value("classpath:/integration/user/shouldNotMemberAddCancelOrderEventSinceDuplication.json") Resource dummyFormJsonFile) throws Exception {
+  public void shouldNotMemberAddCancelOrderEventSinceDuplication(
+      @Value("classpath:/integration/user/shouldNotMemberAddCancelOrderEventSinceDuplication.json") Resource dummyFormJsonFile)
+      throws Exception {
 
-    // dummy form json 
+    // dummy form json
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
     String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
@@ -735,29 +703,25 @@ public class MemberUserEndpointTest {
     // arrange
     String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
     String dummyUserPath = "/" + dummyUserIdString;
-    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/orders/" + dummyOrderId + "/events";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/orders/" + dummyOrderId
+        + "/events";
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .post(targetUrl)
-        .content(dummyFormJsonString)
-        .contentType(MediaType.APPLICATION_JSON)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isBadRequest());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.post(targetUrl).content(dummyFormJsonString)
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
 
   }
 
   @Test
   @Sql(scripts = { "classpath:/integration/user/shouldMemberAddReturnOrderEventSuccessfully.sql" })
-  public void shouldMemberAddReturnOrderEventSuccessfully(@Value("classpath:/integration/user/shouldMemberAddReturnOrderEventSuccessfully.json") Resource dummyFormJsonFile) throws Exception {
+  public void shouldMemberAddReturnOrderEventSuccessfully(
+      @Value("classpath:/integration/user/shouldMemberAddReturnOrderEventSuccessfully.json") Resource dummyFormJsonFile)
+      throws Exception {
 
-    // dummy form json 
+    // dummy form json
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
     String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
@@ -765,21 +729,15 @@ public class MemberUserEndpointTest {
     // arrange
     String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
     String dummyUserPath = "/" + dummyUserIdString;
-    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/orders/" + dummyOrderId + "/events";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/orders/" + dummyOrderId
+        + "/events";
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .post(targetUrl)
-        .content(dummyFormJsonString)
-        .contentType(MediaType.APPLICATION_JSON)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isOk());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.post(targetUrl).content(dummyFormJsonString)
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
@@ -797,12 +755,14 @@ public class MemberUserEndpointTest {
       assertThat(orderEventDTO.getOrderEventId()).isNotNull();
     }
   }
-  
+
   @Test
   @Sql(scripts = { "classpath:/integration/user/shouldNotMemberAddReturnOrderEventSinceNoAddableAsNext.sql" })
-  public void shouldNotMemberAddReturnOrderEventSinceNoAddableAsNext(@Value("classpath:/integration/user/shouldNotMemberAddReturnOrderEventSinceNoAddableAsNext.json") Resource dummyFormJsonFile) throws Exception {
+  public void shouldNotMemberAddReturnOrderEventSinceNoAddableAsNext(
+      @Value("classpath:/integration/user/shouldNotMemberAddReturnOrderEventSinceNoAddableAsNext.json") Resource dummyFormJsonFile)
+      throws Exception {
 
-    // dummy form json 
+    // dummy form json
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
     String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
@@ -810,28 +770,25 @@ public class MemberUserEndpointTest {
     // arrange
     String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
     String dummyUserPath = "/" + dummyUserIdString;
-    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/orders/" + dummyOrderId + "/events";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/orders/" + dummyOrderId
+        + "/events";
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .post(targetUrl)
-        .content(dummyFormJsonString)
-        .contentType(MediaType.APPLICATION_JSON)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isBadRequest());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.post(targetUrl).content(dummyFormJsonString)
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
 
   }
+
   @Test
   @Sql(scripts = { "classpath:/integration/user/shouldNotMemberAddReturnOrderEventSinceDuplication.sql" })
-  public void shouldNotMemberAddReturnOrderEventSinceDuplication(@Value("classpath:/integration/user/shouldNotMemberAddReturnOrderEventSinceDuplication.json") Resource dummyFormJsonFile) throws Exception {
+  public void shouldNotMemberAddReturnOrderEventSinceDuplication(
+      @Value("classpath:/integration/user/shouldNotMemberAddReturnOrderEventSinceDuplication.json") Resource dummyFormJsonFile)
+      throws Exception {
 
-    // dummy form json 
+    // dummy form json
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
     String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
@@ -839,21 +796,15 @@ public class MemberUserEndpointTest {
     // arrange
     String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
     String dummyUserPath = "/" + dummyUserIdString;
-    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/orders/" + dummyOrderId + "/events";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/orders/" + dummyOrderId
+        + "/events";
 
     // act
-    ResultActions resultActions = mvc.perform(
-        MockMvcRequestBuilders
-        .post(targetUrl)
-        .content(dummyFormJsonString)
-        .contentType(MediaType.APPLICATION_JSON)
-          .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)
-        )
-        .andDo(print())
-        .andExpect(status().isBadRequest());
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.post(targetUrl).content(dummyFormJsonString)
+            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
 
   }
 }

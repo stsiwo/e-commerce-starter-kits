@@ -108,14 +108,14 @@ const morphMap: MorphMapType = {
     transform: "scale(1.0, 1.0) rotate(0deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
   },
   "/orders": {
-    transform: "scale(1.0, 1.0) rotate(0deg) translate(0%, 0%) translateZ(50px) skew(0deg, 0deg)",
+    transform: "scale(1.0, 1.0) rotate(0deg) translate(0%, 0%) translateZ(-40px) skew(0deg, 0deg)",
   },
 }
 
 // small thin green shape
 const morphAltMap: MorphMapType = {
   "/": {
-    transform: "scale(4.0, 5.0) rotate(0deg) translate(25%, 30%) translateZ(0px) skew(0deg, 0deg)",
+    transform: "scale(1.5, 1.5) rotate(0deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
   },
   "/login": {
     transform: "scale(1.5, 1.5) rotate(0deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",

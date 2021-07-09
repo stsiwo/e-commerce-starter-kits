@@ -17,11 +17,14 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCategoryActionCreator } from 'reducers/slices/domain/category';
 import { postProductActionCreator, putProductActionCreator } from 'reducers/slices/domain/product';
-import { mSelector } from 'src/selectors/selector';
+import { mSelector, rsSelector } from 'src/selectors/selector';
 import { renameFile } from 'src/utils';
 import ProductImagesForm from './ProductImagesForm';
 import Favorite from '@material-ui/icons/Favorite';
 import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
+import { FetchStatusEnum } from 'src/app';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 interface AdminProductFormPropsType {
   product: ProductType
@@ -77,6 +80,9 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(1, 0, 1, 0),
     },
     actionBox: {
+    },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
     },
   }),
 );
@@ -336,6 +342,21 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
     }
   }));
 
+  // backdrop & spinner to prevent users to click 'save' again
+  const curPostFetchStatus = useSelector(rsSelector.app.getPostProductFetchStatus); 
+  const curPutFetchStatus = useSelector(rsSelector.app.getPutProductFetchStatus); 
+  const [curBackdropOpen, setBackdropOpen] = React.useState<boolean>(false);
+  React.useEffect(() => {
+    if (curPostFetchStatus === FetchStatusEnum.FETCHING || curPutFetchStatus === FetchStatusEnum.FETCHING) {
+      setBackdropOpen(true);
+    } else {
+      setBackdropOpen(false);
+    }
+  }, [
+    curPostFetchStatus,
+    curPutFetchStatus,
+  ])
+
   return (
     <form className={classes.form} noValidate autoComplete="off">
       <TextField
@@ -468,6 +489,9 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
         }
         label="Ready to Publish?"
       /><br />
+      <Backdrop className={classes.backdrop} open={curBackdropOpen} >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </form>
   )
 });

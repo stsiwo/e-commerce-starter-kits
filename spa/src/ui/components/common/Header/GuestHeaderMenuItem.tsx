@@ -24,13 +24,6 @@ const GuestHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
 
   const classes = useStyles();
 
-  /**
-   * TODO: create cart state in redux to keep track of products for guest users
-   *
-   *    - need to be persist in local storage/session storage otherwise, the data is vanished after refresh
-   *
-   **/
-
   const dispatch = useDispatch();
 
   // cur cart item #

@@ -29,6 +29,7 @@ import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import SearchForm from 'components/common/SearchForm';
 import { useLocation } from 'react-router';
+import { getApiUrl } from 'src/utils';
 
 
 declare type AdminCustomerGridViewPropsType = {
@@ -45,6 +46,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
+      flexDirection: "column",
     },
     media: {
     },
@@ -88,7 +90,7 @@ const generateColumns: (onEdit: React.EventHandler<React.MouseEvent<HTMLButtonEl
       width: 100,
       renderCell: (params: GridCellParams) => (
         <Avatar
-          src={params.value? API1_URL + params.value : null}
+          src={params.value? getApiUrl(params.value as string) : null}
         />
       ),
     },

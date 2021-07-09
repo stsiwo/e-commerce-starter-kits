@@ -9,6 +9,7 @@ import MobileStepper from '@material-ui/core/MobileStepper';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import Button from '@material-ui/core/Button';
+import { getApiUrl } from 'src/utils';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -65,7 +66,7 @@ const Carousel: React.FunctionComponent<CarouselPropsType> = ({ items }) => {
       return (
         <div key={item.productImageId}>
             {Math.abs(curCheckBox - index) <= 2 ? (
-              <img className={classes.img} src={API1_URL + item.productImagePath} />
+              <img className={classes.img} src={getApiUrl(item.productImagePath)} />
             ) : null}
         </div>
       )

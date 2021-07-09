@@ -3,16 +3,19 @@ package com.iwaodev.config;
 import java.util.Arrays;
 
 import javax.servlet.Filter;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwaodev.config.filter.JwtCookieRequestFilter;
 import com.iwaodev.config.filter.LimitLoginAttemptFilter;
+import com.iwaodev.config.service.CookieService;
 import com.iwaodev.ui.response.BaseResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,6 +27,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -37,7 +41,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity()
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -58,6 +62,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
   @Autowired
   private ObjectMapper objectMapper;
 
+  @Autowired
+  private CookieService cookieService;
+
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     auth
@@ -69,15 +76,78 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
          * need to register to make authentication event listener works.
          **/
         .authenticationEventPublisher(authenticationEventPublisher());
-        /**
-         * don't set this otherwise, authentication manager uses default provider.
-         **/
-        //.userDetailsService(this.userDetailsService);
+    /**
+     * don't set this otherwise, authentication manager uses default provider.
+     **/
+    // .userDetailsService(this.userDetailsService);
+  }
+
+  /**
+   * how this works.
+   *
+   * 1. the order is important. the earlier registration (e.g., anyMatchers) takes
+   * precedence over the latter registration.
+   *
+   * 2. you can use 'and()' if you wan to chain it.
+   *
+   * 3. filter: - if your custom filter with beans, it is automatically registered
+   * so every endpoint goes through the filter. - if you don't want
+   * auto-registration filter, you need to disable it first with the following:
+   *
+   * ```
+        @Bean
+        public FilterRegistrationBean registration() {
+          FilterRegistrationBean registration = new FilterRegistrationBean();
+          registration.setEnabled(false);
+          registration.setFilter(this.jwtCookieRequestFilter);
+          return registration;
+        }
+   * ```
+   * 
+   *
+   * 4. use 'ignore()' if the endpoint if publicly available. don't do it with 'antMatchers().permitAll()'.
+   *  - if you do this, the filter you register (e.g., JwtCookieFilter) still apply for the public endpoint so USE 'ignore()' to make sure that.
+   *
+   * 5. ref:
+   *  - https://github.com/spring-projects/spring-boot/issues/2173
+   *  - https://stackoverflow.com/questions/28421966/prevent-spring-boot-from-registering-a-servlet-filter
+   *  - https://stackoverflow.com/questions/39152803/spring-websecurity-ignoring-doesnt-ignore-custom-filter
+   *
+   * issues:
+   *  - if you apply the filter (e.g., jwtCookieFilter) on public endpoint and the request is image request (ie., avatars or product images) which does not have property csrf-token header, this causes the user force delete api-token/csrf-token cookie and hte user need to login again.
+   *    => so be sure that don't run the filter on public endpoint!!
+   *
+   *  - if you use 'ignore()', it ignores everything including cors so that would be problem. (e.g., we cannot receive the response since it cors).
+   *
+   * ideal goal:
+   *  - don't use 'ignore'.
+   *  - apply filter for secured endpoints but eclude any 'permitAll' endpoint.
+   *
+   **/
+
+  @Override
+  public void configure(WebSecurity webSecurity) throws Exception {
+
+    /**
+     * use this to ignore any public endpoint and does not want to apply any filter.
+     *
+     * * cors also ignored. that is a problem.
+     *
+     * * ignore any image request (GET) since this does not include csrf header to skip JwtCookieFilter.
+     **/
+    webSecurity.ignoring()
+        /// images
+        .antMatchers(HttpMethod.GET, "/domain/products/{id}/images/{imageName}") //
+        .antMatchers(HttpMethod.GET, "/domain/users/{id}/avatar-image/{imageName}"); //
+
   }
 
   @Override
   protected void configure(HttpSecurity security) throws Exception {
 
+    /**
+     * ONLY GUEST
+     **/
     security
 
         // disable cxrf
@@ -89,7 +159,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
 
         // public
-        
         /// domain
         .antMatchers(HttpMethod.GET, "/categories").permitAll() //
         .antMatchers(HttpMethod.GET, "/products/public").permitAll() //
@@ -100,7 +169,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
         // spring boot admin: need to open actuator endpoints
         .antMatchers("/actuator/**").permitAll() //
-        
 
         /// stripe web hook
         // .antMatchers(HttpMethod.POST, "/create-payment-intent").permitAll() // Stripe
@@ -112,13 +180,29 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers("/logout").anonymous() // login
         .antMatchers("/signup").anonymous() // signup
         .antMatchers(HttpMethod.POST, "/forgot-password").anonymous() // signup
-        .antMatchers(HttpMethod.POST, "/reset-password").anonymous() // signup
+        .antMatchers(HttpMethod.POST, "/reset-password").anonymous(); // signup
+
+    /**
+     * secure endpoint
+     **/
+    security
+
+        // disable cxrf
+        // enabled.
+        // use custom 'double submit cookie' to prevent csrf token.
+        .csrf().disable()
+
+        // authorization
+        .authorizeRequests()
 
         // protected resources (need authentication)
-        .anyRequest().authenticated()
+        .anyRequest().authenticated().and()
+        .addFilterBefore(this.jwtCookieRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
-        .and() // conjunction
-
+    /**
+     * LOGOUT
+     **/
+    security
         /**
          * spring automatically redirect after successfully logout and i want to disable
          * this since using api.
@@ -133,19 +217,23 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
          *
          *
          **/
-        .logout().permitAll().deleteCookies("api-token", "csrf-token").logoutSuccessHandler((request, response, authentication) -> {
+        .logout().permitAll().deleteCookies("api-token", "csrf-token")
+        .logoutSuccessHandler((request, response, authentication) -> {
+
+          /**
+           * explicitly delete cookie since sometime this 'deleteCookies' does not delete
+           * cookie completely when logout. so just in case.
+           *
+           * @2021/07/07 - this is because in order to delete a cookie you must specify
+           * the other property to match the properties of the cookie (e.g., domain, path,
+           * and so on)
+           **/
+          this.cookieService.eraseCookies(request, response);
+
           response.setStatus(HttpServletResponse.SC_OK);
         })
 
         .and()
-
-        /**
-         * login.
-         * 
-         **/
-        //.formLogin().failureHandler(this.authenticationFailureHandler)
-
-        //.and()
 
         // (403) access denied response
         .exceptionHandling().accessDeniedHandler((request, response, exception) -> {
@@ -164,10 +252,10 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         })
 
         /**
-         * default authenticationEntryPoint return 403 if something is wrong during the authentication.
-         * But you can change this to reutrn 401 if do like the below.
+         * default authenticationEntryPoint return 403 if something is wrong during the
+         * authentication. But you can change this to reutrn 401 if do like the below.
          **/
-        //.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+        // .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
 
         .and()
 
@@ -181,7 +269,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     // insert jwt cookie request filter
     security.addFilterBefore(this.limitLoginAttemptFilter, UsernamePasswordAuthenticationFilter.class);
-    security.addFilterBefore(this.jwtCookieRequestFilter, UsernamePasswordAuthenticationFilter.class);
+    // security.addFilterBefore(this.jwtCookieRequestFilter,
+    // UsernamePasswordAuthenticationFilter.class);
 
   }
 
@@ -190,7 +279,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     CorsConfiguration configuration = new CorsConfiguration();
 
     logger.info("cors config:");
-    for (String origin: this.corsConfig.getOrigins()) {
+    for (String origin : this.corsConfig.getOrigins()) {
       logger.info("origin: " + origin);
     }
     logger.info("credetials: " + this.corsConfig.getCredentials());
@@ -203,9 +292,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     configuration.setAllowedOrigins(Arrays.asList(this.corsConfig.getOrigins()));
     configuration.setAllowedMethods(Arrays.asList(new String[] { "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" }));
-    configuration.setAllowedHeaders(Arrays.asList(
-        new String[] { "Authorization", "Accept", "Origin", "DNT", "X-Chisel-Proxied-Url", "Keep-Alive", "User-Agent",
-            "X-Requested-With", "If-Modified-Since", "Cache-Control", "Content-Type", "Content-Range", "Range", "csrf-token" })); // don't forget add this custo 'csrf-token'.
+    configuration.setAllowedHeaders(Arrays.asList(new String[] { "Authorization", "Accept", "Origin", "DNT",
+        "X-Chisel-Proxied-Url", "Keep-Alive", "User-Agent", "X-Requested-With", "If-Modified-Since", "Cache-Control",
+        "Content-Type", "Content-Range", "Range", "csrf-token" })); // don't forget add this custo 'csrf-token'.
     configuration.setAllowCredentials(this.corsConfig.getCredentials());
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
@@ -234,7 +323,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
   }
 
   /**
-   * need this custom daoAuthenticationProvider since I need to display UsernameNotFoundException.
+   * need this custom daoAuthenticationProvider since I need to display
+   * UsernameNotFoundException.
    *
    * by default, it is disabled.
    *
@@ -248,4 +338,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     return provider;
   }
 
+  @Bean
+  public FilterRegistrationBean registration() {
+    FilterRegistrationBean registration = new FilterRegistrationBean();
+    registration.setEnabled(false);
+    registration.setFilter(this.jwtCookieRequestFilter);
+    return registration;
+  }
 }

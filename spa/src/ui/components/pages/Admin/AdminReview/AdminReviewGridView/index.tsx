@@ -42,6 +42,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
+      flexDirection: "column",
     },
     media: {
     },
@@ -139,8 +140,9 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
     ])
 
   // spa url query string 
+  // notification/email link use 'reviewId' but the request to the api use 'searchQuery' internally.
   const query = useQuery()
-  const searchQuery = query.get("searchQuery")
+  const searchQuery = query.get("reviewId")
   React.useEffect(() => {
     if (searchQuery) {
       dispatch(

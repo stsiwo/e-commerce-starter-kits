@@ -17,8 +17,11 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +71,7 @@ public class S3ServiceImpl implements S3Service {
   public void upload(String path, byte[] bytes) throws Exception {
 
     logger.info("start upload image to " + path);
+    logger.info("size: " + bytes.length);
 
     try {
       PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(this.awsBucketName).key(path).build();
@@ -81,6 +85,7 @@ public class S3ServiceImpl implements S3Service {
   @Override
   public byte[] get(String path) throws Exception {
 
+    logger.info("start get image to " + path);
     GetObjectRequest getObjectRequest = GetObjectRequest.builder().bucket(this.awsBucketName).key(path).build();
 
     ResponseBytes<GetObjectResponse> responseBytes;
@@ -93,8 +98,18 @@ public class S3ServiceImpl implements S3Service {
     return responseBytes.asByteArray();
   }
 
+  /**
+   * if you need to delete a folder, you need to delete all of its object inside the folder first.
+   **/
   @Override
   public void delete(String path) throws Exception {
+    logger.info("start delete image to " + path);
+
+    if (path == null || path.isEmpty()) {
+      logger.info("path is empty so skip deleting");
+      return;
+    }
+
     DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder().bucket(this.awsBucketName).key(path)
         .build();
 
@@ -103,5 +118,46 @@ public class S3ServiceImpl implements S3Service {
     } catch (S3Exception e) {
       throw new Exception(e.getMessage());
     }
+  }
+
+  @Override
+  public void deleteFolder(String path) throws Exception {
+
+    try {
+            // To delete a bucket, all the objects in the bucket must be deleted first
+            ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request
+              .builder()
+              .bucket(this.awsBucketName)
+              .prefix(path)
+              .build();
+
+            ListObjectsV2Response listObjectsV2Response;
+
+            do {
+                listObjectsV2Response = this.s3Client.listObjectsV2(listObjectsV2Request);
+                for (S3Object s3Object : listObjectsV2Response.contents()) {
+                    this.s3Client.deleteObject(DeleteObjectRequest.builder()
+                            .bucket(this.awsBucketName)
+                            .key(s3Object.key())
+                            .build());
+                }
+
+                listObjectsV2Request = ListObjectsV2Request.builder().bucket(this.awsBucketName)
+                        .continuationToken(listObjectsV2Response.nextContinuationToken())
+                        .build();
+
+            } while(listObjectsV2Response.isTruncated());
+
+            // then, delete an empty folder.
+            this.delete(path);
+
+    } catch (S3Exception e) {
+      throw new Exception(e.getMessage());
+    }
+  }
+
+  @Override
+  public void listAllObjects(String path) throws Exception {
+    
   }
 }

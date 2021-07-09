@@ -245,7 +245,7 @@ public class ProductVariant {
     return this.variantUnitPrice != null;
   }
 
-  public boolean isVariantDiscountPriceLessThanUnitPrice() {
+  public boolean isUnitPriceGraterThanDiscountPrice() {
     if (this.isDiscount != null && this.isDiscount) {
       if (this.isHasOwnPrice()) {
         logger.info("variant does have its price");

@@ -25,6 +25,9 @@ const useStyles = makeStyles((theme: Theme) =>
     topSection: {
       display: "flex",
       justifyContent: "space-around",
+      [theme.breakpoints.up("md")]: {
+      justifyContent: "flex-start",
+      },
       flexWrap: "wrap",
     },
     card: {

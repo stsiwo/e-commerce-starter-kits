@@ -180,6 +180,10 @@ public class ProductServiceImpl implements ProductService {
   @Override
   public ProductDTO getPublicByPathOrId(String path) throws Exception {
 
+    // session filter (e.g., @Filter/@FilterDef) - reviews entity
+    Session session = this.entityManager.unwrap(Session.class);
+    session.enableFilter("verifiedFilter").setParameter("isVerified", true);
+
     // get result with repository
     // and map entity to dto with MapStruct
     Optional<Product> targetEntityOption = this.repository.findPublicByPathOrId(path);
@@ -373,9 +377,9 @@ public class ProductServiceImpl implements ProductService {
 
     // unit price must be greater than the discount price at any variant if it does
     // not has its own unit price validaiton
-    if (!newEntity.isBaseUnitPriceLessThanDiscountPriceAtAnyVariant()) {
+    if (!newEntity.isBaseUnitPriceGreaterThanDiscountPriceAtAnyVariant()) {
       throw new AppException(HttpStatus.BAD_REQUEST,
-          "the one of your discount price at its varaint must be cheaper than this product unit price.");
+          "the base unit price is less than the discount price of one of variants of this product.");
     }
 
     // hopely, remove old one included nested entity and replace with new one
@@ -399,6 +403,16 @@ public class ProductServiceImpl implements ProductService {
       List<ProductImage> newProductImages) throws Exception {
 
     logger.info("start handling update of images");
+
+    logger.info("old product images");
+
+    for (ProductImage image: oldProductImages) {
+      logger.info("id: " + image.getProductImageId().toString() + " and product image path " + image.getProductImagePath());
+    }
+
+    for (ProductImage image: newProductImages) {
+      logger.info("id: " + image.getProductImageId().toString() + " and product image path " + image.getProductImagePath());
+    }
 
     for (ProductImage newProductImage : newProductImages) {
 
@@ -426,10 +440,21 @@ public class ProductServiceImpl implements ProductService {
 
       logger.info("product image id: " + oldProductImage.getProductImageId());
 
+      logger.info("find target file from criteria. if this is empty, we just need to remvoe the image from storage. if this is not empty, first need to remove and then upload this one as a new one.");
+
+      /**
+       * got null pointer exception at 'files.stream().filter()...' below when there is no updated file in this 'files'
+       **/
+      if (files == null) {
+        files = new ArrayList<>();
+      }
+
       // if this is empty => remove the product image
       // if this is not empty => update the product image
       Optional<MultipartFile> fileOption = files.stream()
-          .filter(file -> file.getOriginalFilename().contains(newProductImage.getProductImageName())).findFirst();
+          .filter(file -> {
+            return file.getOriginalFilename().contains(newProductImage.getProductImageName());
+          }).findFirst();
 
       // get local product directory
       String localDirectory = this.getProductLocalDirectory(productId);
@@ -439,6 +464,8 @@ public class ProductServiceImpl implements ProductService {
        *
        **/
       String oldProductImagePath = oldProductImage.getProductImagePath();
+
+      logger.info("old product image path: " + oldProductImagePath);
 
       // remove it
       try {
@@ -528,9 +555,14 @@ public class ProductServiceImpl implements ProductService {
     if (!targetEntityOption.isEmpty()) {
       Product targetEntity = targetEntityOption.get();
 
+      logger.info("target product id to be deleted: " + targetEntity.getProductId().toString());
       // delete product images at s3
-      String productKey = this.productFilePath + "/" + targetEntity.getProductId().toString();
-      this.s3Service.delete(productKey);
+      String productKey = this.productFilePath + "/" + targetEntity.getProductId().toString() + "/";
+
+      logger.info("start delete its images.");
+      logger.info("path: " + productKey);
+
+      this.s3Service.deleteFolder(productKey);
 
       this.repository.delete(targetEntity);
     }

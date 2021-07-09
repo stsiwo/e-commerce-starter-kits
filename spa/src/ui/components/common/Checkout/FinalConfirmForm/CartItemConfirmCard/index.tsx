@@ -10,7 +10,7 @@ import * as React from 'react';
 import SampleSelfImage from 'static/self.jpeg';
 import Typography from '@material-ui/core/Typography';
 import CardActions from '@material-ui/core/CardActions';
-import { cadCurrencyFormat } from 'src/utils';
+import { cadCurrencyFormat, getApiUrl } from 'src/utils';
 
 /**
  * need 'orderDetail' or 'product/variant'
@@ -66,7 +66,7 @@ const CartItemConfirmCard: React.FunctionComponent<CartItemConfirmCardPropsType>
 
   // event handlers
 
-  const primaryImageUrl = (value.product.productImages.length > 0) ? API1_URL + value.product.productImages[0].productImagePath : null
+  const primaryImageUrl = (value.product.productImages.length > 0) ? getApiUrl(value.product.productImages[0].productImagePath) : null
 
   return (
     <Card className={`${classes.card} ${classes.root}`}>

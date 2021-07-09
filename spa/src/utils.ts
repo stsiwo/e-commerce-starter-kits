@@ -1,6 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
 import { nanoid } from 'nanoid'
 
+export const getApiUrl = (path: string): string => {
+  if (!path) return null
+
+  return API1_URL + "/" + path
+}
 
 export const dateFormatOption = { year: 'numeric', month: 'long', day: 'numeric' }
 

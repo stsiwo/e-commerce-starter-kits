@@ -39,6 +39,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
+      flexDirection: "column",
     },
     media: {
     },

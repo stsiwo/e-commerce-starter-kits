@@ -17,7 +17,7 @@ import { Link as RRLink } from "react-router-dom";
 import { fetchAuthOrderActionCreator } from 'reducers/slices/app';
 import { fetchOrderActionCreator, orderPaginationPageActions } from 'reducers/slices/domain/order';
 import { mSelector, rsSelector } from 'src/selectors/selector';
-import { cadCurrencyFormat, toDateString } from 'src/utils';
+import { cadCurrencyFormat, toDateString, getApiUrl } from 'src/utils';
 import Box from '@material-ui/core/Box';
 import { CircularProgress } from '@material-ui/core';
 import { FetchStatusEnum } from 'src/app';
@@ -68,6 +68,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
+      flexDirection: "column",
     },
   }),
 );
@@ -130,7 +131,7 @@ const OrderList: React.FunctionComponent<{}> = (props) => {
             <CardMedia
               className={classes.media}
               // the first product image is the main one
-              image={(order.orderDetails[0].product && order.orderDetails[0].product.productImages.length > 0) ? API1_URL + order.orderDetails[0].product.productImages[0].productImagePath : ""}
+              image={(order.orderDetails[0].product && order.orderDetails[0].product.productImages.length > 0) ? getApiUrl(order.orderDetails[0].product.productImages[0].productImagePath) : ""}
             />
             <CardContent className={classes.cardContent}>
               <Typography variant="body2" color="textSecondary" component="p">
@@ -177,8 +178,8 @@ const OrderList: React.FunctionComponent<{}> = (props) => {
             {"Oops, Your order history is empty."}
           </Typography>
           <Box component="div" className={classes.controllerBox}>
-            <Button variant="contained" >
-              {"search your product"}
+            <Button variant="contained" component={RRLink} to={"/search"}>
+              {"search"}
             </Button>
           </Box>
         </Box>

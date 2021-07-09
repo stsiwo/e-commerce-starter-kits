@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import { mSelector } from 'src/selectors/selector';
 import FavoriteIcon from '@material-ui/icons/Favorite';
+import { getApiUrl } from 'src/utils';
 
 /**
  * need 'orderDetail' or 'product/variant'
@@ -69,7 +70,7 @@ const OrderProductHorizontalCard: React.FunctionComponent<ProductHorizontalCardP
   /**
    * if the product is available (e.g., not null), display teh primary image.
    **/
-  const primaryImageUrl = (orderDetail.product && orderDetail.product.productImages.length > 0) ? API1_URL + orderDetail.product.productImages[0].productImagePath : null
+  const primaryImageUrl = (orderDetail.product && orderDetail.product.productImages.length > 0) ? getApiUrl(orderDetail.product.productImages[0].productImagePath) : null
 
   const renderPrimaryImage = (url: string) => {
     if (url) {

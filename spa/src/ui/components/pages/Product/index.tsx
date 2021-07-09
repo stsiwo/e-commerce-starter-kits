@@ -2,13 +2,18 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { AxiosError } from 'axios';
 import { api } from 'configs/axiosConfig';
-import { ProductType } from 'domain/product/types';
+import { ProductType, NormalizedProductType } from 'domain/product/types';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import { mSelector } from 'src/selectors/selector';
 import ProductDetail from './ProductDetail';
+import Box from '@material-ui/core/Box';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { normalize } from 'normalizr';
+import { productSchemaArray, productSchemaEntity } from 'states/state';
+import { productActions } from 'reducers/slices/domain/product';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -25,6 +30,13 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     controllerBox: {
       textAlign: "center"
+    },
+    loadingBox: {
+      height: "80vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      flexDirection: "column",
     },
   }),
 );
@@ -79,7 +91,14 @@ const Product: React.FunctionComponent<{}> = (props) => {
 
         const targetProduct: ProductType = data.data;
 
+        // local state
         setProduct(targetProduct)
+
+        // redux store
+        const normalizedData = normalize(data.data, productSchemaEntity)
+        dispatch(
+          productActions.update(normalizedData.entities.products as NormalizedProductType)
+        )
 
         //enqueueSnackbar("updated successfully.", { variant: "success" })
       }).catch((error: AxiosError) => {
@@ -90,9 +109,9 @@ const Product: React.FunctionComponent<{}> = (props) => {
 
   if (!curProduct) {
     return (
-      <Typography variant="h5" component="h5" align="center" className={classes.title} >
-        Loading...
-      </Typography>
+      <Box className={classes.loadingBox}>
+        <CircularProgress />
+      </Box>
     )
   }
 

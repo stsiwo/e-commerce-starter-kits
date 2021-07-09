@@ -99,7 +99,7 @@ export function* deleteSingleProductWorker(action: PayloadAction<DeleteSinglePro
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
-          message: "added successfully.",
+          message: "deleted successfully.",
         })
       )
 

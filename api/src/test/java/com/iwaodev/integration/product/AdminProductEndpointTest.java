@@ -302,15 +302,15 @@ public class AdminProductEndpointTest {
         if (i == 0) {
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-0");
           assertThat(productImages.get(i).getProductImagePath()).matches(
-              "/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.jpeg");
+              "domain/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.jpeg");
         } else if (i == 1) {
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-1");
           assertThat(productImages.get(i).getProductImagePath())
-              .matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");
+              .matches("domain/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");
         } else if (i == 3) {
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-3");
           assertThat(productImages.get(i).getProductImagePath()).matches(
-              "/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-3-.+.jpeg");
+              "domain/products/" + responseBody.getProductId().toString() + "/images/product-image-3-.+.jpeg");
         }
       } else {
         assertThat(productImages.get(i).getProductImagePath()).isEqualTo("");
@@ -386,23 +386,23 @@ public class AdminProductEndpointTest {
       if (i == 0) {
         assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-0");
         assertThat(productImages.get(i).getProductImagePath())
-            .matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.jpeg");
+            .matches("domain/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.jpeg");
       } else if (i == 1) {
         assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-1");
         assertThat(productImages.get(i).getProductImagePath())
-            .matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");
+            .matches("domain/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");
       } else if (i == 2) {
         assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-2");
         assertThat(productImages.get(i).getProductImagePath())
-            .matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-2-.+.jpeg");
+            .matches("domain/products/" + responseBody.getProductId().toString() + "/images/product-image-2-.+.jpeg");
       } else if (i == 3) {
         assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-3");
         assertThat(productImages.get(i).getProductImagePath())
-            .matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-3-.+.jpeg");
+            .matches("domain/products/" + responseBody.getProductId().toString() + "/images/product-image-3-.+.jpeg");
       } else if (i == 4) {
         assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-4");
         assertThat(productImages.get(i).getProductImagePath())
-            .matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-4-.+.jpeg");
+            .matches("domain/products/" + responseBody.getProductId().toString() + "/images/product-image-4-.+.jpeg");
       }
     }
     // make sure any variant is not created.
@@ -564,12 +564,12 @@ public class AdminProductEndpointTest {
           // update
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-0");
           assertThat(productImages.get(i).getProductImagePath())
-              .matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.svg");
+              .matches("domain/products/" + responseBody.getProductId().toString() + "/images/product-image-0-.+.svg");
         } else if (i == 1) {
           // unchange
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-1");
           assertThat(productImages.get(i).getProductImagePath())
-              .matches("/domain/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");
+              .matches("domain/products/" + responseBody.getProductId().toString() + "/images/product-image-1-.+.png");
         } else if (i == 3) {
           // remove
           assertThat(productImages.get(i).getProductImageName()).isEqualTo("product-image-3");

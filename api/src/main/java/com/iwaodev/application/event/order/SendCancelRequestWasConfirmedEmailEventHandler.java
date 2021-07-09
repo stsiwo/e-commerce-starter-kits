@@ -70,6 +70,7 @@ public class SendCancelRequestWasConfirmedEmailEventHandler {
     // Sender
     Company company = admin.getCompanies().get(0);
     String senderEmail = "no-reply@" + company.getDomain();
+    String from = String.format("%s <%s>", company.getCompanyName(), senderEmail);
     // Recipient
     String recipientEmail = event.getOrder().getOrderEmail();
     boolean isGuest = event.getOrder().getIsGuest();
@@ -97,7 +98,7 @@ public class SendCancelRequestWasConfirmedEmailEventHandler {
     // send it
     try {
       logger.info(String.format("To: %s, From: %s", recipientEmail, senderEmail));
-      this.emailService.send(recipientEmail, senderEmail,
+      this.emailService.send(recipientEmail, from,
           "Your Cancel Request Was Confirmed (Order #" + order.getOrderNumber(), htmlBody + ")");
     } catch (MessagingException e) {
       logger.info(e.getMessage());

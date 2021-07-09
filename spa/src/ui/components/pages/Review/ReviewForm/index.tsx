@@ -10,8 +10,8 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Rating from '@material-ui/lab/Rating';
 import { AxiosError } from 'axios';
-import ProductHorizontalCard from 'components/common/ProductCard/ProductHorizontalCard';
 import UserCard from 'components/common/UserCard';
+import ReviewProductHorizontalCard from 'components/pages/Admin/AdminReview/AdminReviewForm/ReviewProductHorizontalCard';
 import { api } from 'configs/axiosConfig';
 import { defaultReviewValidationData, ReviewDataType, ReviewType, ReviewValidationDataType } from 'domain/review/type';
 import { useValidation } from 'hooks/validation';
@@ -24,6 +24,7 @@ import { postReviewActionCreator, putReviewActionCreator } from 'reducers/slices
 import { MessageTypeEnum } from 'src/app';
 import { mSelector } from 'src/selectors/selector';
 import { getNanoId } from 'src/utils';
+import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
 
 interface ReviewFormPropsType {
   review: ReviewType
@@ -49,6 +50,11 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(1, 0, 1, 0),
     },
     actionBox: {
+    },
+    reviewStatus: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
     }
   }),
 );
@@ -247,10 +253,23 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
         <Typography variant="subtitle1" component="h6" className={classes.title}>
           {"Reviewed Product"}
         </Typography>
-        <ProductHorizontalCard
+        <ReviewProductHorizontalCard
           product={props.review.product}
-          variant={props.review.product.variants[0]}
         />
+      </Grid>
+      <Grid
+        item
+        xs={12}
+      >
+        <Typography variant="subtitle1" component="h6" className={classes.title}>
+          {"Current Review Status"}
+        </Typography>
+        <Box className={classes.reviewStatus}>
+          <VerifiedUserIcon color={curReviewState.isVerified ? "primary" : "disabled" } /> 
+          <Typography variant="body2" component="p" className={classes.title}>
+            {curReviewState.isVerified ? "Approved" : "Pending"}
+          </Typography>
+        </Box>
       </Grid>
       <Grid
         item

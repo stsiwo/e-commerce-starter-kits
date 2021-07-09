@@ -90,7 +90,7 @@ export const orderStatusBagList: OrderStatusBagListType = {
   },
   [OrderStatusEnum.PAID]: {
     label: "Paid:)",
-    defaultNote: "the customer failed payment.",
+    defaultNote: "the customer paid successfuly.",
     icon: PaymentIcon,
     color: theme.palette.success.main
   },

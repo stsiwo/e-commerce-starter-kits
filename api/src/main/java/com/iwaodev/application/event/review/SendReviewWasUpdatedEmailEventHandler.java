@@ -59,6 +59,7 @@ public class SendReviewWasUpdatedEmailEventHandler {
     // Sender
     Company company = admin.getCompanies().get(0);
     String senderEmail = "no-reply@" + company.getDomain();
+    String from = String.format("%s <%s>", company.getCompanyName(), senderEmail);
 
     // Recipient
     // admin and company email
@@ -87,7 +88,7 @@ public class SendReviewWasUpdatedEmailEventHandler {
     // send it
     try {
       logger.info(String.format("To: %s, From: %s", admin.getEmail(), senderEmail));
-      this.emailService.send(admin.getEmail(), senderEmail,
+      this.emailService.send(admin.getEmail(), from,
           "A Review Was Updated By Customer (Review #: " + review.getReviewId() + ")", htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());

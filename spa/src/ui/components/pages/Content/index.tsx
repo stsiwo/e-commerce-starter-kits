@@ -9,6 +9,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Notification from 'components/common/Notification';
 import { NotificationType } from 'domain/notification/types';
 import Background from 'components/common/Background';
+import ErrorBoundary from 'components/common/ErrorBoundary';
 
 const Content: React.FunctionComponent<{}> = (props) => {
 
@@ -19,13 +20,13 @@ const Content: React.FunctionComponent<{}> = (props) => {
   React.useEffect(() => {
     if (curMessage.type !== MessageTypeEnum.INITIAL) {
       enqueueSnackbar(
-        curMessage.message, 
-        { 
+        curMessage.message,
+        {
           variant: curMessage.type,
           persist: curMessage.persist,
           action: (key: any) => (
             <IconButton onClick={() => { closeSnackbar(key) }}>
-             <HighlightOffIcon /> 
+              <HighlightOffIcon />
             </IconButton>
           )
         });
@@ -37,11 +38,11 @@ const Content: React.FunctionComponent<{}> = (props) => {
   React.useEffect(() => {
     if (curNotification) {
       enqueueSnackbar(
-        curNotification, 
-        { 
-          variant: "info", 
+        curNotification,
+        {
+          variant: "info",
           content: (key, message: NotificationType) => (
-           <Notification id={key} message={message} />   
+            <Notification id={key} message={message} />
           )
         });
     }
@@ -50,7 +51,9 @@ const Content: React.FunctionComponent<{}> = (props) => {
   return (
     <React.Fragment>
       <Background />
-      <PageRoute />       
+      <ErrorBoundary>
+        <PageRoute />
+      </ErrorBoundary>
     </React.Fragment>
   )
 }

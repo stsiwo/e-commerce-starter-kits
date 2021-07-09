@@ -15,7 +15,7 @@ import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import Rating from '@material-ui/lab/Rating/Rating';
 import Carousel from 'components/common/Carousel';
 import ColorRadio from 'components/common/ColorRadio';
-import { filterUniqueVariantColors, filterUniqueVariantSizes, isExceedStock, filterSingleVariant } from 'domain/product';
+import { filterUniqueVariantColors, filterUniqueVariantSizes, isExceedStock, filterSingleVariant, getVariantStockBack } from 'domain/product';
 import { ProductType, ProductVariantSizeType, ProductVariantType, ProductStockEnum } from 'domain/product/types';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -24,11 +24,14 @@ import { UserTypeEnum, MessageTypeEnum } from 'src/app';
 import { cartItemActions } from 'reducers/slices/domain/cartItem';
 import { api } from 'configs/axiosConfig';
 import { AxiosError } from 'axios';
-import { getNanoId, cadCurrencyFormat, toDateString } from 'src/utils';
+import { getNanoId, cadCurrencyFormat, toDateString, getApiUrl } from 'src/utils';
 import { postWishlistItemActionCreator } from 'reducers/slices/domain/wishlistItem';
 import { messageActions } from 'reducers/slices/app';
 import { cartModalActions } from 'reducers/slices/ui';
 import uniqBy from 'lodash/uniqBy';
+import { ReviewType } from 'domain/review/type';
+import SingleLineList from 'components/common/SingleLineList';
+import ReviewCard from 'components/common/ReviewCard';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -100,7 +103,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     discountPrice: {
       color: theme.palette.error.main
-    }
+    },
   }),
 );
 
@@ -126,6 +129,12 @@ interface ProductDetailPropsType {
  *    - display all colors (default selection: the 1st color)
  *
  *    - every time a user change the color, it also causes changing the sizes, means that display only available sizes for selected color.
+ *
+ *  - note:
+ *
+ *    - don't use 'selector' to grab or calculate value of product.
+ *
+ *      - if users visit this page directly, state.domain.products might not be available (e.g., empty object) so just use this props.product for handling this page.
  *
  **/
 const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) => {
@@ -238,7 +247,7 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
     ])
 
   // stock availability stuff
-  const curStockBag = useSelector(mSelector.makeProductVariantStockByProductIdAndVariantId(props.product.productId, curVariant.variantId))
+  const curStockBag = getVariantStockBack(curVariant.variantStock)
 
   // auth
   const auth = useSelector(mSelector.makeAuthSelector());
@@ -432,6 +441,15 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
     })
   }
 
+  // render reviews if exist
+  const renderReviews: () => React.ReactNode = () => {
+    return props.product.reviews.map((review: ReviewType) => {
+      return (
+        <ReviewCard key={review.reviewId} review={review} />
+      )
+    })
+  }
+
   return (
     <React.Fragment>
       <Typography variant="h5" component="h5" align="center" className={classes.title} >
@@ -500,22 +518,24 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
               Qty:
             </Typography>
             <ButtonGroup size="small" aria-label="small outlined button group">
-              <IconButton onClick={handleQtyInc}>
-                <AddCircleIcon />
-              </IconButton>
+              {/** don't use <IconButton> inside <ButtonGroup>, it causes errors e.g., 'fullwidth' 'disableelevation unrecognaized property. use lowercase... **/}
               <Button
-                disabled
-                classes={{
-                  /** this override default and 'disable' custom style. **/
-                  root: classes.btnRoot,
-                }}
+                onClick={handleQtyInc}
+                variant="contained"
+              >
+                <AddCircleIcon />
+              </Button>
+              <Button
                 variant="contained"
               >
                 {curQty}
               </Button>
-              <IconButton onClick={handleQtyDec}>
+              <Button
+                onClick={handleQtyDec}
+                variant="contained"
+              >
                 <RemoveCircleIcon />
-              </IconButton>
+              </Button>
             </ButtonGroup>
           </Box>
           <Box component="div" className={classes.productColorBox}>
@@ -566,6 +586,20 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (props) =
             </Button>
           </Box>
         </Grid>
+        {(props.product.reviews && props.product.reviews.length > 0 &&
+          <React.Fragment>
+            <Grid
+              item
+              xs={12}
+              className={classes.detailNoteBox}
+            >
+              <Typography variant="body1" component="h6" className={classes.subtitle}>
+                Reviews
+              </Typography>
+            </Grid>
+            <SingleLineList renderDomainFunc={renderReviews} />
+          </React.Fragment>
+        )}
         {(props.product.note &&
           <Grid
             item

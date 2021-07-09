@@ -1,4 +1,5 @@
 import { NormalizedDomainType } from "domain/types";
+import { ReviewType } from "domain/review/type";
 
 // variant stock enum
 export enum ProductStockEnum {
@@ -129,6 +130,7 @@ export declare type ProductType = {
   variants?: ProductVariantType[]
   isDiscountAvailable?: boolean
   cheapestPrice?: number
+  reviews?: ReviewType[]
 }
 
 export declare type NormalizedProductType = NormalizedDomainType<ProductType>

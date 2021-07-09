@@ -13,6 +13,10 @@ public interface S3Service {
    **/
   public void delete(String path) throws Exception;
 
+  public void deleteFolder(String path) throws Exception;
+
+  public void listAllObjects(String path) throws Exception;
+
 }
 
 

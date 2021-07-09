@@ -13,6 +13,7 @@ import { deleteSingleWishlistItemActionCreator, fetchWishlistItemActionCreator, 
 import { mSelector, rsSelector } from 'src/selectors/selector';
 import { FetchStatusEnum } from 'src/app';
 import { CircularProgress } from '@material-ui/core';
+import { Link as RRLink } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -36,6 +37,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
+      flexDirection: "column",
     },
   }),
 );
@@ -139,7 +141,7 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
             {"Oops, Your wishlist is empty."}
           </Typography>
           <Box component="div" className={classes.controllerBox}>
-            <Button variant="contained">
+            <Button variant="contained" component={RRLink} to={"/search"}>
               {"search"}
             </Button>
           </Box>
