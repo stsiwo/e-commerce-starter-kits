@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javax.mail.MessagingException;
 
+import com.iwaodev.application.event.EventHandler;
 import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.iservice.EmailService;
 import com.iwaodev.config.ClientSpaConfig;
@@ -25,7 +26,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 @Service
-public class SendVerificationEmailEventHandler {
+public class SendVerificationEmailEventHandler implements EventHandler<GeneratedVerificationTokenEvent> {
 
   private static final Logger logger = LoggerFactory.getLogger(SendVerificationEmailEventHandler.class);
 
@@ -64,6 +65,7 @@ public class SendVerificationEmailEventHandler {
     User adminRecipient = adminRecipientOption.get();
     Company adminCompany = adminRecipient.getCompanies().get(0);
     String senderEmail = "no-reply@" + adminCompany.getDomain();
+    String from = String.format("%s <%s>", adminCompany.getCompanyName(), senderEmail);
 
     User recipientUser = event.getUser();
 
@@ -82,10 +84,8 @@ public class SendVerificationEmailEventHandler {
 
     // send it
     try {
-      // TODO: make sure 'from' email address (check 'Design Issue: Email With Admin
-      // Company State')
       logger.info(String.format("To: %s, From: %s", recipientUser.getEmail(), senderEmail));
-      this.emailService.send(recipientUser.getEmail(), senderEmail,
+      this.emailService.send(recipientUser.getEmail(), from,
           "Verification Email To Activate Your Account.", htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());

@@ -1,5 +1,6 @@
 package com.iwaodev.application.event.notification;
 
+import com.iwaodev.application.event.EventHandler;
 import com.iwaodev.application.irepository.NotificationRepository;
 import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.domain.notification.NotificationTypeEnum;
@@ -18,8 +19,15 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+/**
+ * create a notification for an review was verified.
+ *
+ * 
+ * don't forget implements EventHandler<E>. this is used for testing.
+ *
+ **/
 @Service
-public class CreateReviewVerifiedNotificationForMemberEventHandler {
+public class CreateReviewVerifiedNotificationForMemberEventHandler implements EventHandler<ReviewWasVerifiedByAdminEvent>{
 
   private static final Logger logger = LoggerFactory
       .getLogger(CreateReviewVerifiedNotificationForMemberEventHandler.class);

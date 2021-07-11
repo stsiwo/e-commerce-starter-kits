@@ -223,22 +223,24 @@ public class Product {
   public BigDecimal getCheapestPrice() {
 
     logger.info("try to get cheapest price");
-    BigDecimal cheapestPrice = this.productBaseUnitPrice;
+    /**
+     * in order to find min price, need to set the max.
+     * currently set $10000.00. 
+     *
+     * - you can change to any price but also need to fix the max price at documentation.
+     *
+     **/
+    BigDecimal cheapestPrice = BigDecimal.valueOf(10000.00); 
+
+    if (this.variants.size() == 0) {
+      cheapestPrice = this.productBaseUnitPrice;
+    }
 
     logger.info("cur cheapest: " + cheapestPrice);
     // pick cheapest price among all variants
     for (ProductVariant variant : this.variants) {
-
       // if the variant has its own unit price
-      if (variant.getVariantUnitPrice() != null) {
-        cheapestPrice = cheapestPrice.min(variant.getVariantUnitPrice());
-      }
-
-      // if the variant is discount
-      if (variant.getIsDiscount() && variant.getVariantDiscountStartDate().isBefore(LocalDateTime.now())
-          && variant.getVariantDiscountEndDate().isAfter(LocalDateTime.now())) {
-        cheapestPrice = cheapestPrice.min(variant.getVariantDiscountPrice());
-      }
+      cheapestPrice = cheapestPrice.min(variant.getCurrentPrice());
     }
 
     return cheapestPrice;

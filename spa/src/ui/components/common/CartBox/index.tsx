@@ -1,5 +1,6 @@
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
+import { Link as RRLink } from "react-router-dom";
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import CartItem from 'components/common/CartItem';
@@ -94,7 +95,7 @@ const CartBox: React.FunctionComponent<CartBoxPropsType> = (props) => {
           {"Oops, Your cart is empty."}
         </Typography>
         <Box component="div" className={classes.controllerBox}>
-          <Button variant="contained">  
+          <Button variant="contained" component={RRLink} to="/search">  
             {"go search"}
           </Button>
         </Box>

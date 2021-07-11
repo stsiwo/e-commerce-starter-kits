@@ -8,7 +8,7 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { CategoryType, defaultProductOnlyData, defaultProductValidationData, ProductDataType, ProductType, ProductValidationDataType } from 'domain/product/types';
+import { CategoryType, defaultProductOnlyData, defaultProductValidationData, ProductDataType, ProductType, ProductValidationDataType, generateDefaultProductOnlyData } from 'domain/product/types';
 import { useValidation } from 'hooks/validation';
 import { productSchema } from 'hooks/validation/rules';
 import cloneDeep from 'lodash/cloneDeep';
@@ -116,7 +116,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
    * need to do 'merge({}, defaultProductOnlyData, props.product)' since props.product does not include 'productImageFiles'.
    * 
    **/
-  const [curProductState, setProductState] = React.useState<ProductDataType>(props.product ? merge({}, defaultProductOnlyData, props.product) : defaultProductOnlyData);
+  const [curProductState, setProductState] = React.useState<ProductDataType>(props.product ? merge({}, defaultProductOnlyData, props.product) : generateDefaultProductOnlyData());
 
   // update/create logic for product
   //  - true: create

@@ -24,8 +24,10 @@ import EditIcon from '@material-ui/icons/Edit';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteAuthPhoneActionCreator, patchAuthPhoneActionCreator, postAuthPhoneActionCreator, putAuthPhoneActionCreator } from 'reducers/slices/app';
-import { mSelector } from 'src/selectors/selector';
+import { mSelector, rsSelector } from 'src/selectors/selector';
 import IconButton from '@material-ui/core/IconButton';
+import { FetchStatusEnum } from 'src/app';
+import { postAuthPhoneFetchStatusActions, putAuthPhoneFetchStatusActions, deleteAuthPhoneFetchStatusActions } from 'reducers/slices/app/fetchStatus/auth';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -243,6 +245,29 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
     )
   }
 
+  // close form dialog only when success for post/put/delete
+  const curPostFetchStatus = useSelector(rsSelector.app.getPostAuthPhoneFetchStatus);
+  const curPutFetchStatus = useSelector(rsSelector.app.getPutAuthPhoneFetchStatus);
+  const curDeleteSingleFetchStatus = useSelector(rsSelector.app.getDeleteAuthPhoneFetchStatus);
+  React.useEffect(() => {
+    if (
+      curPostFetchStatus === FetchStatusEnum.SUCCESS ||
+      curPutFetchStatus === FetchStatusEnum.SUCCESS ||
+      curDeleteSingleFetchStatus === FetchStatusEnum.SUCCESS
+    ) {
+      setModalOpen(false);
+
+      dispatch(
+        postAuthPhoneFetchStatusActions.clear()
+      )
+      dispatch(
+        putAuthPhoneFetchStatusActions.clear()
+      )
+      dispatch(
+        deleteAuthPhoneFetchStatusActions.clear()
+      )
+    }
+  })
   // render functions
 
   // display current phone number list

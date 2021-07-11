@@ -25,6 +25,7 @@
     <xerces.version>2.12.0</xerces.version>
     <software.amazon.awssdk.version>2.16.90</software.amazon.awssdk.version>
     <flyway.version>7.11.0</flyway.version>
+    <org.aspectj.version>1.9.7</org.aspectj.version>
   </properties>
   
   <!-- you need this for aws sdk version 2 (software.amazon.awssdk) -->
@@ -87,6 +88,30 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
       <version>${org.springframework.boot.version}</version>
+    </dependency>
+
+    <!-- aspectj -->
+    <!-- https://mvnrepository.com/artifact/org.aspectj/aspectjrt -->
+    <dependency>
+        <groupId>org.aspectj</groupId>
+        <artifactId>aspectjrt</artifactId>
+        <version>${org.aspectj.version}</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.aspectj/aspectjweaver -->
+    <dependency>
+        <groupId>org.aspectj</groupId>
+        <artifactId>aspectjweaver</artifactId>
+        <version>${org.aspectj.version}</version>
+    </dependency>
+
+    <!-- reflections library -->
+    <!-- need this one to get a list of all classes of a geven annotated class => testing purpose -->
+    <!-- https://mvnrepository.com/artifact/org.reflections/reflections -->
+    <dependency>
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <version>0.9.12</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/s3 -->

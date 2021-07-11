@@ -90,7 +90,7 @@ const UserAccountBasicManagement: React.FunctionComponent<UserAccountBasicManage
   // validation logic (should move to hooks)
   const [curUserAccountValidationState, setUserAccountValidationState] = React.useState<UserBasicAccountValidationDataType>(defaultUserBasicAccountValidationData);
 
-  const { updateValidationAt, updateAllValidation, isValidSync } = useValidation({
+  const { updateValidationAt, updateAllValidation, updateValidationAtMultiple, isValidSync } = useValidation({
     curDomain: curUserAccountState,
     curValidationDomain: curUserAccountValidationState,
     schema: userAccountSchema,
@@ -128,7 +128,6 @@ const UserAccountBasicManagement: React.FunctionComponent<UserAccountBasicManage
 
   const handlePasswordInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextPassword = e.currentTarget.value
-    updateValidationAt("password", e.currentTarget.value);
     setUserAccountState((prev: UserBasicAccountDataType) => ({
       ...prev,
       password: nextPassword
@@ -137,13 +136,35 @@ const UserAccountBasicManagement: React.FunctionComponent<UserAccountBasicManage
 
   const handleConfirmInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextConfirm = e.currentTarget.value
-    updateValidationAt("confirm", e.currentTarget.value);
     setUserAccountState((prev: UserBasicAccountDataType) => ({
       ...prev,
       confirm: nextConfirm
     }));
   }
 
+  /**
+   * validation for multiple fields together
+   **/
+  const isInitial = React.useRef<boolean>(true)
+  React.useEffect(() => {
+
+    if (!isInitial.current) {
+    updateValidationAtMultiple([
+      {
+        key: "password",
+        value: curUserAccountState.password
+      },
+      {
+        key: "confirm",
+        value: curUserAccountState.confirm
+      },
+    ])
+    }
+      isInitial.current = false;
+  }, [
+    curUserAccountState.password,
+    curUserAccountState.confirm
+  ])
 
   // event handler to submit
   const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {

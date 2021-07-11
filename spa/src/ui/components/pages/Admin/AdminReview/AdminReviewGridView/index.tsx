@@ -21,11 +21,12 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteSingleReviewActionCreator, fetchReviewActionCreator, reviewPaginationPageActions, reviewQuerySearchQueryActions } from 'reducers/slices/domain/review';
 import { FetchStatusEnum } from 'src/app';
-import { mSelector } from 'src/selectors/selector';
+import { mSelector, rsSelector } from 'src/selectors/selector';
 import AdminReviewFormDialog from '../AdminReviewFormDialog';
 import AdminReviewSearchController from '../AdminReviewSearchController';
 import SearchForm from 'components/common/SearchForm';
 import { useLocation } from 'react-router';
+import { postReviewFetchStatusActions, putReviewFetchStatusActions, deleteSingleReviewFetchStatusActions } from 'reducers/slices/app/fetchStatus/review';
 
 declare type AdminReviewGridViewPropsType = {
 }
@@ -209,6 +210,30 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
   // fetch order fetching result
   const curFetchReviewStatus = useSelector(mSelector.makeFetchReviewFetchStatusSelector())
 
+  // close form dialog only when success for post/put/delete
+  const curPostFetchStatus = useSelector(rsSelector.app.getPostReviewFetchStatus);
+  const curPutFetchStatus = useSelector(rsSelector.app.getPutReviewFetchStatus);
+  const curDeleteSingleFetchStatus = useSelector(rsSelector.app.getDeleteSingleReviewFetchStatus);
+  React.useEffect(() => {
+    if (
+      curPostFetchStatus === FetchStatusEnum.SUCCESS ||
+      curPutFetchStatus === FetchStatusEnum.SUCCESS ||
+      curDeleteSingleFetchStatus === FetchStatusEnum.SUCCESS
+    ) {
+      setFormOpen(false);
+      setDeleteDialogOpen(false);
+
+      dispatch(
+        postReviewFetchStatusActions.clear()
+      )
+      dispatch(
+        putReviewFetchStatusActions.clear()
+      )
+      dispatch(
+        deleteSingleReviewFetchStatusActions.clear()
+      )
+    }
+  })
   return (
     <Card className={classes.root}>
       <CardHeader

@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -77,9 +78,13 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
     targetEntity.addVariant(newEntity);
 
+    /**
+     * bug: when throw AppEception instead of ResponseStatusException, it causes 'detached entity passed to persist: com.iwaodev.infrastructure.model.ProductVariant' in response message.
+     *
+     **/
     // must be cheaper than the unit price validaiton
     if (!newEntity.isUnitPriceGraterThanDiscountPrice()) {
-      throw new AppException(HttpStatus.BAD_REQUEST, "the discount price must be less than the unit price.");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the discount price must be less than the unit price.");
     }
     logger.info("pass the cheaper discount price validation.");
 

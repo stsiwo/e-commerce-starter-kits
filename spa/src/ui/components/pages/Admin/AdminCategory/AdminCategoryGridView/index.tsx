@@ -22,9 +22,10 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { categoryPaginationPageActions, categoryQuerySearchQueryActions, deleteSingleCategoryActionCreator, fetchCategoryActionCreator } from 'reducers/slices/domain/category';
 import { FetchStatusEnum } from 'src/app';
-import { mSelector } from 'src/selectors/selector';
+import { mSelector, rsSelector } from 'src/selectors/selector';
 import AdminCategoryFormDialog from '../AdminCategoryFormDialog';
 import { useLocation } from 'react-router';
+import { postCategoryFetchStatusActions, putCategoryFetchStatusActions, deleteSingleCategoryFetchStatusActions } from 'reducers/slices/app/fetchStatus/category';
 
 declare type AdminCategoryGridViewPropsType = {
 }
@@ -210,6 +211,32 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
   // fetch result
   // fetch order fetching result
   const curFetchCategoryStatus = useSelector(mSelector.makeFetchCategoryFetchStatusSelector())
+
+  // close form dialog only when success for post/put/delete
+  const curPostFetchStatus = useSelector(rsSelector.app.getPostCategoryFetchStatus);
+  const curPutFetchStatus = useSelector(rsSelector.app.getPutCategoryFetchStatus);
+  const curDeleteSingleFetchStatus = useSelector(rsSelector.app.getDeleteSingleCategoryFetchStatus);
+  React.useEffect(() => {
+    if (
+      curPostFetchStatus === FetchStatusEnum.SUCCESS ||
+      curPutFetchStatus === FetchStatusEnum.SUCCESS ||
+      curDeleteSingleFetchStatus === FetchStatusEnum.SUCCESS
+    ) {
+      setFormOpen(false);
+      setDeleteDialogOpen(false);
+
+      dispatch(
+        postCategoryFetchStatusActions.clear()
+      )
+      dispatch(
+        putCategoryFetchStatusActions.clear()
+      )
+      dispatch(
+        deleteSingleCategoryFetchStatusActions.clear()
+      )
+    }
+  })
+
   return (
     <Card className={classes.root}>
       <CardHeader

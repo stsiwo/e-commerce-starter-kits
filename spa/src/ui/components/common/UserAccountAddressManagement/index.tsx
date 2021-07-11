@@ -26,8 +26,10 @@ import { userAccountAddressSchema } from 'hooks/validation/rules';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteAuthAddressActionCreator, patchAuthAddressActionCreator, postAuthAddressActionCreator, putAuthAddressActionCreator } from 'reducers/slices/app';
-import { mSelector } from 'src/selectors/selector';
+import { mSelector, rsSelector } from 'src/selectors/selector';
 import { getCountryList, getProvinceList } from 'src/utils';
+import { FetchStatusEnum } from 'src/app';
+import { postAuthPhoneFetchStatusActions, putAuthAddressFetchStatusActions, deleteAuthAddressFetchStatusActions, postAuthAddressFetchStatusActions } from 'reducers/slices/app/fetchStatus/auth';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -315,6 +317,30 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
       patchAuthAddressActionCreator({ addressId: addressId, type: "shipping" })
     );
   }
+
+  // close form dialog only when success for post/put/delete
+  const curPostFetchStatus = useSelector(rsSelector.app.getPostAuthAddressFetchStatus);
+  const curPutFetchStatus = useSelector(rsSelector.app.getPutAuthAddressFetchStatus);
+  const curDeleteSingleFetchStatus = useSelector(rsSelector.app.getDeleteAuthAddressFetchStatus);
+  React.useEffect(() => {
+    if (
+      curPostFetchStatus === FetchStatusEnum.SUCCESS ||
+      curPutFetchStatus === FetchStatusEnum.SUCCESS ||
+      curDeleteSingleFetchStatus === FetchStatusEnum.SUCCESS
+    ) {
+      setModalOpen(false);
+
+      dispatch(
+        postAuthAddressFetchStatusActions.clear()
+      )
+      dispatch(
+        putAuthAddressFetchStatusActions.clear()
+      )
+      dispatch(
+        deleteAuthAddressFetchStatusActions.clear()
+      )
+    }
+  })
   // render functions
 
   // display current address number list

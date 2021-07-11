@@ -13,6 +13,7 @@ import { postAuthOrderEventActionCreator } from 'reducers/slices/app';
 import { postOrderEventActionCreator, putOrderEventActionCreator } from 'reducers/slices/domain/order';
 import { AuthType, UserTypeEnum } from 'src/app';
 import { mSelector } from 'src/selectors/selector';
+import Typography from '@material-ui/core/Typography';
 
 interface OrderEventUpdateFormDialogPropsType {
   open: boolean
@@ -33,6 +34,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     actionBox: {
     },
+    warning: {
+      fontWeight: "bold",
+    }
   }),
 );
 
@@ -168,6 +172,11 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
             value={curOrderEventState.note}
             onChange={handleNoteInputChangeEvent}
           />
+          {((curOrderEventState.orderStatus === OrderStatusEnum.CANCELED || curOrderEventState.orderStatus === OrderStatusEnum.RETURNED) &&
+            <Typography variant="body1" component="p" align="left" className={classes.warning} color="error" >
+              {"This order event cannot be undo once you add it and the payment will be refund to the customer. Are you sure you want to add this event?"}
+            </Typography>
+          )}
         </form>
       </DialogContent>
       <DialogActions>

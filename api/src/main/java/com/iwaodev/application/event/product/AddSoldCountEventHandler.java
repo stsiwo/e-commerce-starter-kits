@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.iwaodev.application.event.EventHandler;
 import com.iwaodev.application.irepository.ProductRepository;
 import com.iwaodev.domain.order.event.CompletedOrderPaymentEvent;
 import com.iwaodev.exception.AppException;
@@ -21,7 +22,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
-public class AddSoldCountEventHandler {
+public class AddSoldCountEventHandler implements EventHandler<CompletedOrderPaymentEvent>{
 
   private static final Logger logger = LoggerFactory.getLogger(AddSoldCountEventHandler.class);
 

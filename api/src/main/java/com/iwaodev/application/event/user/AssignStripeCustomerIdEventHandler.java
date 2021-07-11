@@ -1,5 +1,6 @@
 package com.iwaodev.application.event.user;
 
+import com.iwaodev.application.event.EventHandler;
 import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.domain.order.event.OrderFinalConfirmedEvent;
 import com.iwaodev.domain.user.UserTypeEnum;
@@ -14,7 +15,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
-public class AssignStripeCustomerIdEventHandler {
+public class AssignStripeCustomerIdEventHandler implements EventHandler<OrderFinalConfirmedEvent>{
 
   private static final Logger logger = LoggerFactory.getLogger(AssignStripeCustomerIdEventHandler.class);
 

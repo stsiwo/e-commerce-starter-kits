@@ -178,6 +178,13 @@
 
       - arrow function does not bind 'this' to surrounding object. so 'this == window' = true.
 
+  ### Loop With Async/Await
+
+     for loop with async/await
+      - you CANNOT USE forEach with await/async.
+      - you must use 'for (... of ...)'
+      - ref: https://stackoverflow.com/questions/37576685/using-async-await-with-a-foreach-loop
+
 ## Smooth Scroll Implementation
 
   - use 'html { scroll-behavior: smooth; }' css

@@ -4,6 +4,11 @@ import { DomainValidationType, UseValidationInputType, UseValidationOutputType }
 import cloneDeep from 'lodash/cloneDeep';
 import set from 'lodash/set';
 
+export declare type ValidationKeyValuePiarType = {
+  key: string
+  value: any
+}
+
 export const useValidation = <D extends Record<string, unknown>>(input: UseValidationInputType<D>): UseValidationOutputType<D> => {
 
 
@@ -29,6 +34,36 @@ export const useValidation = <D extends Record<string, unknown>>(input: UseValid
           return set(tempValidationData, path, error.errors[0])
         })
       })
+  }
+
+  /**
+   * use this if you need to validate multiple fields which depend on each other.
+   *
+   **/
+  const updateValidationAtMultiple: (list: ValidationKeyValuePiarType[]) => void = (list) => {
+
+    const tempValidationData: DomainValidationType<D> = cloneDeep(input.curValidationDomain)
+
+    const tempDomainData: D = cloneDeep(input.curDomain)
+
+    list.forEach((item: ValidationKeyValuePiarType) => set(tempDomainData, item.key, item.value))
+
+    /**
+     * for loop with async/await
+     *  - you CANNOT USE forEach with await/async.
+     *  - you must use 'for (... of ...)'
+     *  - ref: https://stackoverflow.com/questions/37576685/using-async-await-with-a-foreach-loop
+     **/
+    for (const item of list) {
+      try {
+        input.schema.validateSyncAt(item.key, tempDomainData)
+        set(tempValidationData, item.key, "")
+      } catch (error) {
+        set(tempValidationData, item.key, error.errors[0])
+      }
+    }
+
+    input.setValidationDomain(tempValidationData)
   }
 
   const updateAllValidation: () => void = async () => {
@@ -73,6 +108,7 @@ export const useValidation = <D extends Record<string, unknown>>(input: UseValid
 
   return {
     updateValidationAt: updateValidationAt,
+    updateValidationAtMultiple: updateValidationAtMultiple,
     updateAllValidation: updateAllValidation,
     isValidSync: isValidSync,
   }

@@ -1,14 +1,11 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { AxiosError } from 'axios';
-import { api } from 'configs/axiosConfig';
-import { CategoryDataType, CategoryType, CategoryValidationDataType, defaultCategoryData, defaultCategoryValidationData } from 'domain/product/types';
+import { CategoryDataType, CategoryType, CategoryValidationDataType, defaultCategoryData, defaultCategoryValidationData, generateDefaultCategoryData } from 'domain/product/types';
 import { useValidation } from 'hooks/validation';
 import { categorySchema } from 'hooks/validation/rules';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCategoryActionCreator, postCategoryActionCreator, putCategoryActionCreator } from 'reducers/slices/domain/category';
+import { postCategoryActionCreator, putCategoryActionCreator } from 'reducers/slices/domain/category';
 import { mSelector } from 'src/selectors/selector';
 
 interface AdminCategoryFormPropsType {
@@ -74,14 +71,10 @@ const AdminCategoryForm = React.forwardRef<any, AdminCategoryFormPropsType>((pro
   // auth
   const auth = useSelector(mSelector.makeAuthSelector())
 
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
-
   const dispatch = useDispatch()
 
   // temp user account state
-  const [curCategoryState, setCategoryState] = React.useState<CategoryDataType>(props.category ? props.category : defaultCategoryData);
+  const [curCategoryState, setCategoryState] = React.useState<CategoryDataType>(props.category ? props.category : generateDefaultCategoryData());
 
   // update/create logic for product
   //  - true: create

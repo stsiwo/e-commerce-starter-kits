@@ -250,24 +250,6 @@ public class ProductTest {
     Product product = new Product();
     product.setProductBaseUnitPrice(new BigDecimal(100));
     
-    // variant 1
-    Long dummyVariant1Id = 1L;
-    BigDecimal dummyPrice1 = new BigDecimal(500);
-    ProductVariant variant1 = new ProductVariant();
-    variant1.setVariantId(dummyVariant1Id);
-    variant1.setVariantUnitPrice(dummyPrice1);
-
-    product.addVariant(variant1);
-
-    // variant 2
-    Long dummyVariant2Id = 2L;
-    BigDecimal dummyPrice2 = new BigDecimal(600);
-    ProductVariant variant2 = new ProductVariant();
-    variant2.setVariantId(dummyVariant2Id);
-    variant2.setVariantUnitPrice(dummyPrice2);
-
-    product.addVariant(variant2);
-
     // act
     BigDecimal actualResult = product.getCheapestPrice();
     

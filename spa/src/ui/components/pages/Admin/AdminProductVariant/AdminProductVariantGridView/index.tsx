@@ -21,8 +21,10 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
 import { deleteSingleProductVariantActionCreator, fetchSingleProductActionCreator } from 'reducers/slices/domain/product';
-import { mSelector } from 'src/selectors/selector';
+import { mSelector, rsSelector } from 'src/selectors/selector';
 import AdminProductVariantFormDialog from '../AdminProductVariantFormDialog';
+import { FetchStatusEnum } from 'src/app';
+import { deleteSingleProductFetchStatusActions, putProductVariantFetchStatusActions, postProductVariantFetchStatusActions, deleteSingleProductVariantFetchStatusActions } from 'reducers/slices/app/fetchStatus/product';
 
 declare type AdminProductVariantGridViewPropsType = {
   curFormOpen: boolean
@@ -197,6 +199,30 @@ const AdminProductVariantGridView: React.FunctionComponent<AdminProductVariantGr
     setProductVariant(targetProduct);
   }
 
+  // close form dialog only when success for post/put/delete
+  const curPostFetchStatus = useSelector(rsSelector.app.getPostProductVariantFetchStatus);
+  const curPutFetchStatus = useSelector(rsSelector.app.getPutProductVariantFetchStatus);
+  const curDeleteSingleFetchStatus = useSelector(rsSelector.app.getDeleteSingleProductVariantFetchStatus);
+  React.useEffect(() => {
+    if (
+      curPostFetchStatus === FetchStatusEnum.SUCCESS ||
+      curPutFetchStatus === FetchStatusEnum.SUCCESS ||
+      curDeleteSingleFetchStatus === FetchStatusEnum.SUCCESS
+    ) {
+      props.setFormOpen(false);
+      setDeleteDialogOpen(false);
+
+      dispatch(
+        postProductVariantFetchStatusActions.clear()
+      )
+      dispatch(
+        putProductVariantFetchStatusActions.clear()
+      )
+      dispatch(
+        deleteSingleProductVariantFetchStatusActions.clear()
+      )
+    }
+  })
   if (!curProduct) {
     return (<p>Fetching Data...</p>)
   }

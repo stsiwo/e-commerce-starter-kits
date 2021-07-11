@@ -1,5 +1,6 @@
 import { ObjectSchema } from "yup";
 import { Assign, TypeOfShape, ObjectShape, AnyObject } from "yup/lib/object";
+import { ValidationKeyValuePiarType } from ".";
 
 export declare type UseValidationPropsType = {
 }
@@ -18,6 +19,7 @@ export declare type UseValidationInputType<D extends Record<string, unknown>> = 
 
 export declare type UseValidationOutputType<D extends Record<string, unknown>> = {
   updateValidationAt: (path: string, value: any) => void
+  updateValidationAtMultiple: (list: ValidationKeyValuePiarType[]) => void
   updateAllValidation: () => void,
   isValidSync: (curDomain: D) => boolean
 }

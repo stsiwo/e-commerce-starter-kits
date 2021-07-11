@@ -79,14 +79,9 @@ const ForgotPasswordDialog: React.FunctionComponent<ForgotPasswordDialogPropsTyp
   // used to switch 'permanent' or 'temporary' nav menu based on this screen size 
   const theme = useTheme();
   const classes = useStyles();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   // dispatch
   const dispatch = useDispatch();
-
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
 
   // forgot password state
   const [curForgotPasswordState, setForgotPasswordState] = React.useState<ForgotPasswordDataType>(defaultForgotPasswordData);

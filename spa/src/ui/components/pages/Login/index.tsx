@@ -13,14 +13,13 @@ import { api } from 'configs/axiosConfig';
 import { UserType } from 'domain/user/types';
 import { useValidation } from 'hooks/validation';
 import { memberLoginSchema } from 'hooks/validation/rules';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { authActions, messageActions } from 'reducers/slices/app';
-import { mSelector } from 'src/selectors/selector';
 import { useHistory } from 'react-router';
-import { getNanoId } from 'src/utils';
+import { authActions, messageActions } from 'reducers/slices/app';
 import { MessageTypeEnum } from 'src/app';
+import { mSelector } from 'src/selectors/selector';
+import { getNanoId } from 'src/utils';
 
 export declare type MemberLoginDataType = {
   email: string

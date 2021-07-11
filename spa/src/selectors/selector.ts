@@ -49,8 +49,38 @@ export const rsSelector = {
     getPutOrderEventFetchStatus: (state: StateType) => state.app.fetchStatus.orders.putEvent,
     getDeleteSingleOrderEventFetchStatus: (state: StateType) => state.app.fetchStatus.orders.deleteSingleEvent,
 
+    getPostAuthPhoneFetchStatus: (state: StateType) => state.app.fetchStatus.auth.postPhone,
+    getPutAuthPhoneFetchStatus: (state: StateType) => state.app.fetchStatus.auth.putPhone,
+    getDeleteAuthPhoneFetchStatus: (state: StateType) => state.app.fetchStatus.auth.deletePhone,
+    
+    getPostAuthAddressFetchStatus: (state: StateType) => state.app.fetchStatus.auth.postAddress,
+    getPutAuthAddressFetchStatus: (state: StateType) => state.app.fetchStatus.auth.putAddress,
+    getDeleteAuthAddressFetchStatus: (state: StateType) => state.app.fetchStatus.auth.deleteAddress,
+    
     getPostProductFetchStatus: (state: StateType) => state.app.fetchStatus.products.post,
     getPutProductFetchStatus: (state: StateType) => state.app.fetchStatus.products.put,
+    getDeleteSingleProductFetchStatus: (state: StateType) => state.app.fetchStatus.products.deleteSingle,
+
+    getPostProductVariantFetchStatus: (state: StateType) => state.app.fetchStatus.products.postVariant,
+    getPutProductVariantFetchStatus: (state: StateType) => state.app.fetchStatus.products.putVariant,
+    getDeleteSingleProductVariantFetchStatus: (state: StateType) => state.app.fetchStatus.products.deleteSingleVariant,
+
+    getPostCategoryFetchStatus: (state: StateType) => state.app.fetchStatus.categories.post,
+    getPutCategoryFetchStatus: (state: StateType) => state.app.fetchStatus.categories.put,
+    getDeleteSingleCategoryFetchStatus: (state: StateType) => state.app.fetchStatus.categories.deleteSingle,
+
+    getPostReviewFetchStatus: (state: StateType) => state.app.fetchStatus.reviews.post,
+    getPutReviewFetchStatus: (state: StateType) => state.app.fetchStatus.reviews.put,
+    getDeleteSingleReviewFetchStatus: (state: StateType) => state.app.fetchStatus.reviews.deleteSingle,
+
+    getPostUserPhoneFetchStatus: (state: StateType) => state.app.fetchStatus.users.postPhone,
+    getPutUserPhoneFetchStatus: (state: StateType) => state.app.fetchStatus.users.putPhone,
+    getDeleteUserPhoneFetchStatus: (state: StateType) => state.app.fetchStatus.users.deletePhone,
+    
+    getPostUserAddressFetchStatus: (state: StateType) => state.app.fetchStatus.users.postAddress,
+    getPutUserAddressFetchStatus: (state: StateType) => state.app.fetchStatus.users.putAddress,
+    getDeleteUserAddressFetchStatus: (state: StateType) => state.app.fetchStatus.users.deleteAddress,
+    
     getFetchAuthOrderFetchStatus: (state: StateType) => state.app.fetchStatus.auth.fetchOrder,
     getFetchWishlistItemFetchStatus: (state: StateType) => state.app.fetchStatus.wishlistItems.get,
     getPutAuthFetchStatus: (state: StateType) => state.app.fetchStatus.auth.put,

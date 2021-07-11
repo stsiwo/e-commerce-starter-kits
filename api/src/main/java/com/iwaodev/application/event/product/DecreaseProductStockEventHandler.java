@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.iwaodev.application.event.EventHandler;
 import com.iwaodev.application.irepository.ProductRepository;
 import com.iwaodev.domain.order.event.OrderFinalConfirmedEvent;
 import com.iwaodev.exception.AppException;
@@ -22,7 +23,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
-public class DecreaseProductStockEventHandler {
+public class DecreaseProductStockEventHandler implements EventHandler<OrderFinalConfirmedEvent>{
 
   private static final Logger logger = LoggerFactory.getLogger(DecreaseProductStockEventHandler.class);
 

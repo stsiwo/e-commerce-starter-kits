@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.mail.MessagingException;
 
+import com.iwaodev.application.event.EventHandler;
 import com.iwaodev.application.irepository.OrderRepository;
 import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.iservice.EmailService;
@@ -26,8 +27,15 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
+/**
+ * 
+ *
+ * 
+ * don't forget implements EventHandler<E>. this is used for testing.
+ *
+ **/
 @Service
-public class SendCancelRequestWasConfirmedEmailEventHandler {
+public class SendCancelRequestWasConfirmedEmailEventHandler implements EventHandler<OrderEventWasAddedEvent> {
 
   private static final Logger logger = LoggerFactory.getLogger(SendCancelRequestWasConfirmedEmailEventHandler.class);
 

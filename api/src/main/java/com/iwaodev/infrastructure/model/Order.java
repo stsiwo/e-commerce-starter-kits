@@ -59,20 +59,21 @@ import lombok.ToString;
 @Getter
 @Setter
 /**
- * order & orderAddress cause stackoverflow with its lombok hashcode.
- * so exclude it. ref: https://stackoverflow.com/questions/34972895/lombok-hashcode-issue-with-java-lang-stackoverflowerror-null
+ * order & orderAddress cause stackoverflow with its lombok hashcode. so exclude
+ * it. ref:
+ * https://stackoverflow.com/questions/34972895/lombok-hashcode-issue-with-java-lang-stackoverflowerror-null
  **/
-@EqualsAndHashCode(exclude = {"shippingAddress", "billingAddress"})
-@EntityListeners( value = { OrderValidationListener.class, OrderListener.class })
+@EqualsAndHashCode(exclude = { "shippingAddress", "billingAddress" })
+@EntityListeners(value = { OrderValidationListener.class, OrderListener.class })
 @Entity(name = "orders")
 public class Order {
 
   private static final Logger logger = LoggerFactory.getLogger(Order.class);
 
   private static final OrderStatusEnum[] deletableOrderStatusList = new OrderStatusEnum[] {
-      OrderStatusEnum.CANCEL_REQUEST, OrderStatusEnum.RECEIVED_CANCEL_REQUEST, OrderStatusEnum.CANCELED,
-      OrderStatusEnum.DELIVERED, OrderStatusEnum.RETURN_REQUEST, OrderStatusEnum.RECEIVED_RETURN_REQUEST,
-      OrderStatusEnum.RETURNED, OrderStatusEnum.SHIPPED, OrderStatusEnum.ERROR, };
+      OrderStatusEnum.CANCEL_REQUEST, OrderStatusEnum.RECEIVED_CANCEL_REQUEST, OrderStatusEnum.DELIVERED,
+      OrderStatusEnum.RETURN_REQUEST, OrderStatusEnum.RECEIVED_RETURN_REQUEST, OrderStatusEnum.SHIPPED,
+      OrderStatusEnum.ERROR, };
 
   @NotNull(message = "{order.id.notnull}", groups = OnUpdate.class)
   @Null(message = "{order.id.null}", groups = OnCreate.class)
@@ -319,13 +320,16 @@ public class Order {
   }
 
   // business behaviors
-  
+
   /**
    * this might causes transactional doCommit exception.
    *
-   * this is because the productCost field is modified after saved by calling getProductCost().
+   * this is because the productCost field is modified after saved by calling
+   * getProductCost().
    *
-   * so workaround is to give a condition. if the productCost field has default value (e.g., 1.00), call teh 'calculateProductCost', so that the field is no longer modifed after saved.
+   * so workaround is to give a condition. if the productCost field has default
+   * value (e.g., 1.00), call teh 'calculateProductCost', so that the field is no
+   * longer modifed after saved.
    *
    **/
   public void calculateProductCost() {
@@ -480,9 +484,11 @@ public class Order {
    * nextAdminOrderEventOptions, ...)
    **/
   /**
-   * if PostLoad on entity doesnt work for you, you need to define entity listener.
+   * if PostLoad on entity doesnt work for you, you need to define entity
+   * listener.
    *
-   * ref: https://stackoverflow.com/questions/2802676/hibernate-postload-never-gets-invoked
+   * ref:
+   * https://stackoverflow.com/questions/2802676/hibernate-postload-never-gets-invoked
    **/
   @PostLoad
   public void setUpCalculatedProperties() {

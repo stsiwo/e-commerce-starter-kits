@@ -149,7 +149,9 @@ public class ReviewServiceImpl implements ReviewService {
     Review savedEntity = this.repository.save(newEntity);
 
     // publish event
+    logger.info("start publish review was created event.");
     // I leave this event here for any future reference.
+    // actually, this add a notification to teh admin
     this.publisher.publishEvent(new NewReviewWasSubmittedEvent(this, savedEntity));
     // this send review-was-updated-email to admin
     this.publisher.publishEvent(new ReviewWasUpdatedByMemberEvent(this, savedEntity));

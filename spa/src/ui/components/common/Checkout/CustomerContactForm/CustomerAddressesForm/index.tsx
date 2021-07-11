@@ -24,10 +24,12 @@ import { userAccountAddressSchema } from 'hooks/validation/rules';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteAuthAddressActionCreator, patchAuthAddressActionCreator, postAuthAddressActionCreator, putAuthAddressActionCreator } from 'reducers/slices/app';
-import { mSelector } from 'src/selectors/selector';
+import { mSelector, rsSelector } from 'src/selectors/selector';
 import { getCountryList, getProvinceList } from 'src/utils';
 import MenuItem from '@material-ui/core/MenuItem';
 import DeleteIcon from '@material-ui/icons/Delete';
+import { FetchStatusEnum } from 'src/app';
+import { postAuthAddressFetchStatusActions, putAuthAddressFetchStatusActions, deleteAuthAddressFetchStatusActions } from 'reducers/slices/app/fetchStatus/auth';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -296,6 +298,31 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
       patchAuthAddressActionCreator({ addressId: addressId, type: "shipping" })
     );
   }
+
+  // close form dialog only when success for post/put/delete
+  const curPostFetchStatus = useSelector(rsSelector.app.getPostAuthAddressFetchStatus);
+  const curPutFetchStatus = useSelector(rsSelector.app.getPutAuthAddressFetchStatus);
+  const curDeleteSingleFetchStatus = useSelector(rsSelector.app.getDeleteAuthAddressFetchStatus);
+  React.useEffect(() => {
+    if (
+      curPostFetchStatus === FetchStatusEnum.SUCCESS ||
+      curPutFetchStatus === FetchStatusEnum.SUCCESS ||
+      curDeleteSingleFetchStatus === FetchStatusEnum.SUCCESS
+    ) {
+      setModalOpen(false);
+
+      dispatch(
+        postAuthAddressFetchStatusActions.clear()
+      )
+      dispatch(
+        putAuthAddressFetchStatusActions.clear()
+      )
+      dispatch(
+        deleteAuthAddressFetchStatusActions.clear()
+      )
+    }
+  })
+
   // render functions
 
   // display current phone number list

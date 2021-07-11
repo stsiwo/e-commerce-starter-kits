@@ -3,6 +3,7 @@ package com.iwaodev.application.event.payment;
 import java.util.List;
 import java.util.Optional;
 
+import com.iwaodev.application.event.EventHandler;
 import com.iwaodev.application.irepository.OrderRepository;
 import com.iwaodev.application.irepository.ProductRepository;
 import com.iwaodev.application.irepository.UserRepository;
@@ -30,7 +31,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
-public class PaymentFailedEventHandler{
+public class PaymentFailedEventHandler implements EventHandler<PaymentFailedEvent>{
 
   private static final Logger logger = LoggerFactory.getLogger(PaymentFailedEventHandler.class);
 

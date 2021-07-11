@@ -20,7 +20,7 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link as RRLink } from "react-router-dom";
 import { deleteSingleProductActionCreator, fetchProductActionCreator, productPaginationPageActions, productQuerySearchQueryActions } from 'reducers/slices/domain/product';
-import { mSelector } from 'src/selectors/selector';
+import { mSelector, rsSelector } from 'src/selectors/selector';
 import AdminProductFormDialog from '../AdminProductFormDialog';
 import AdminProductSearchController from '../ADminProductSearchController';
 import { FetchStatusEnum } from 'src/app';
@@ -28,6 +28,7 @@ import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import SearchForm from 'components/common/SearchForm';
 import { useLocation } from 'react-router';
+import { deleteProductFetchStatusActions, deleteSingleProductFetchStatusActions, putProductFetchStatusActions, postProductFetchStatusActions } from 'reducers/slices/app/fetchStatus/product';
 
 declare type AdminProductGridViewPropsType = {
 }
@@ -240,6 +241,31 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
   // fetch result
   // fetch order fetching result
   const curFetchProductStatus = useSelector(mSelector.makeFetchProductFetchStatusSelector())
+
+  // close form dialog only when success for post/put/delete
+  const curPostFetchStatus = useSelector(rsSelector.app.getPostProductFetchStatus);
+  const curPutFetchStatus = useSelector(rsSelector.app.getPutProductFetchStatus);
+  const curDeleteSingleFetchStatus = useSelector(rsSelector.app.getDeleteSingleProductFetchStatus);
+  React.useEffect(() => {
+    if (
+      curPostFetchStatus === FetchStatusEnum.SUCCESS ||
+      curPutFetchStatus === FetchStatusEnum.SUCCESS ||
+      curDeleteSingleFetchStatus === FetchStatusEnum.SUCCESS
+    ) {
+      setFormOpen(false);
+      setDeleteDialogOpen(false);
+
+      dispatch(
+        postProductFetchStatusActions.clear()
+      )
+      dispatch(
+        putProductFetchStatusActions.clear()
+      )
+      dispatch(
+        deleteSingleProductFetchStatusActions.clear()
+      )
+    }
+  })
 
   return (
     <Card className={classes.root}>

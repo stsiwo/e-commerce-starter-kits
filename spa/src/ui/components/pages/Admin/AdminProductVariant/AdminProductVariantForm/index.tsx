@@ -8,7 +8,7 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { defaultProductVariantData, defaultProductVariantValidationData, ProductVariantDataType, ProductVariantSizeType, ProductVariantType, ProductVariantValidationDataType, productVariantSizeObj } from 'domain/product/types';
+import { defaultProductVariantData, defaultProductVariantValidationData, ProductVariantDataType, ProductVariantSizeType, ProductVariantType, ProductVariantValidationDataType, productVariantSizeObj, generateDefaultProductVariantData } from 'domain/product/types';
 import { useValidation } from 'hooks/validation';
 import { productVariantSchema } from 'hooks/validation/rules';
 import * as React from 'react';
@@ -118,12 +118,12 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
   const [isNew, setNew] = React.useState<boolean>(props.productVariant ? false : true);
 
   // temp user account state
-  const [curProductVariantState, setProductVariantState] = React.useState<ProductVariantDataType>(props.productVariant ? props.productVariant : defaultProductVariantData);
+  const [curProductVariantState, setProductVariantState] = React.useState<ProductVariantDataType>(props.productVariant ? props.productVariant : generateDefaultProductVariantData());
 
   // validation logic (should move to hooks)
   const [curProductVariantValidationState, setProductVariantValidationState] = React.useState<ProductVariantValidationDataType>(defaultProductVariantValidationData);
 
-  const { updateValidationAt, updateAllValidation, isValidSync } = useValidation({
+  const { updateValidationAt, updateAllValidation, updateValidationAtMultiple, isValidSync } = useValidation({
     curDomain: curProductVariantState,
     curValidationDomain: curProductVariantValidationState,
     schema: productVariantSchema,
@@ -256,7 +256,6 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
   }
 
   const handleProductVariantDiscountStartDateChange = (date: Date | null) => {
-    updateValidationAt("variantDiscountStartDate", date);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
       variantDiscountStartDate: date,
@@ -264,12 +263,32 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
   };
 
   const handleProductVariantDiscountEndDateChange = (date: Date | null) => {
-    updateValidationAt("variantDiscountEndDate", date);
+
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
       variantDiscountEndDate: date,
     }));
   };
+
+  /**
+   * validation for multiple fields together
+   **/
+  React.useEffect(() => {
+
+    updateValidationAtMultiple([
+      {
+        key: "variantDiscountStartDate",
+        value: curProductVariantState.variantDiscountStartDate
+      },
+      {
+        key: "variantDiscountEndDate",
+        value: curProductVariantState.variantDiscountEndDate
+      },
+    ])
+  }, [
+    curProductVariantState.variantDiscountStartDate,
+    curProductVariantState.variantDiscountEndDate
+  ])
 
   /**
    * call child function from parent 

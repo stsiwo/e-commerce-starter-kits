@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javax.mail.MessagingException;
 
+import com.iwaodev.application.event.EventHandler;
 import com.iwaodev.application.irepository.NotificationRepository;
 import com.iwaodev.application.irepository.OrderRepository;
 import com.iwaodev.application.irepository.UserRepository;
@@ -42,7 +43,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
-public class SendOrderWasCanceledEmailEventHandler {
+public class SendOrderWasCanceledEmailEventHandler implements EventHandler<OrderEventWasAddedEvent>{
 
   private static final Logger logger = LoggerFactory.getLogger(SendOrderWasCanceledEmailEventHandler.class);
 

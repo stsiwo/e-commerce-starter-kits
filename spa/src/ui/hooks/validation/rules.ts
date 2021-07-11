@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { get2AlphaCountryCodeRegex, getProvinceList } from 'src/utils';
+import { get2AlphaCountryCodeRegex, getProvinceList, isBeforeOrEqualDateOf, isValidDate, isAfterOrEqualDateOf } from 'src/utils';
 
 /**
  * note:
@@ -105,9 +105,73 @@ export const productVariantSchema = yup.object().shape({
   productSize: yup.object().nullable(),
   variantColor: yup.string().required(),
   variantUnitPrice: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/, "invalid currency format. please enter currency (e.g., 3.12, 12.00, and so on)").optional().nullable(),
-  variantDiscountPrice: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/, "invalid currency format. please enter currency (e.g., 3.12, 12.00, and so on)").optional().nullable(),
-  variantDiscountStartDate: yup.date().max(yup.ref('variantDiscountEndDate'), "start date must be before the end date.").required(),
-  variantDiscountEndDate: yup.date().min(yup.ref('variantDiscountStartDate'), "end date must be after the start date.").required(),
+  variantDiscountPrice: yup.string()
+  .test("variant-discount-price-mandatory-if-discount", "variant discount price cannot be null.",
+    function(value: string) {
+      const isDiscount = this.parent.isDiscount
+      if (isDiscount) {
+        if (!value) {
+          return false
+        }
+      }
+      return true
+    })
+  .matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/, "invalid currency format. please enter currency (e.g., 3.12, 12.00, and so on)").optional().nullable(),
+  variantDiscountStartDate: yup.date()
+  .test("start-date-mandatory-if-discount", "please enter valid date.",
+    function(value: Date) {
+      const isDiscount = this.parent.isDiscount
+      console.log(value)
+      if (isDiscount) {
+        console.log("disocunt is enable so start date cannot be null")
+        if (!isValidDate(value)) {
+          console.log("invalid start dte")
+          return false
+        }
+          console.log("valid start dte")
+      }
+      return true
+    })
+  .test("start-date-validator", "start date must be before or equal to the end date.", 
+    function(value: Date) {
+      if (value) {
+        const startDate = value
+        const endDate = this.parent.variantDiscountEndDate 
+        if (isBeforeOrEqualDateOf(startDate, endDate)) {
+          return true
+        } else {
+          return false
+        }
+      }
+      return true
+    }).optional().nullable(),
+  variantDiscountEndDate: yup.date()
+  .test("end-date-mandatory-if-discount", "please enter valid date.",
+    function(value: Date) {
+      const isDiscount = this.parent.isDiscount
+      console.log(value)
+      if (isDiscount) {
+        console.log("disocunt is enable so end date cannot be null")
+        if (!isValidDate(value)) {
+          return false
+        }
+        console.log("valid end date")
+      }
+      return true
+    })
+  .test("end-date-validator", "end date must be after or equal to the start date.", 
+    function(value: Date) {
+      if (value) {
+        const endDate = value
+        const startDate = this.parent.variantDiscountStartDate 
+        if (isAfterOrEqualDateOf(endDate, startDate)) {
+          return true
+        } else {
+          return false
+        }
+      }
+      return true
+    }).optional().nullable(),
   variantStock: yup.number().min(0).required(),
   isDiscount: yup.bool().optional().nullable(),
   note: yup.string().optional().nullable(),

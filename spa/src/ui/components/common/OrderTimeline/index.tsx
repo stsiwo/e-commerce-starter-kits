@@ -19,15 +19,14 @@ import TimelineItem from '@material-ui/lab/TimelineItem';
 import TimelineOppositeContent from '@material-ui/lab/TimelineOppositeContent';
 import TimelineSeparator from '@material-ui/lab/TimelineSeparator';
 import { OrderEventType, orderStatusBagList, OrderType } from 'domain/order/types';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteSingleOrderEventActionCreator, postOrderEventActionCreator } from 'reducers/slices/domain/order';
+import { deleteSingleOrderEventFetchStatusActions, postOrderEventFetchStatusActions, putOrderEventFetchStatusActions } from 'reducers/slices/app/fetchStatus/order';
+import { deleteSingleOrderEventActionCreator } from 'reducers/slices/domain/order';
+import { FetchStatusEnum, UserTypeEnum } from 'src/app';
+import { mSelector, rsSelector } from 'src/selectors/selector';
 import { toDateString } from 'src/utils';
 import OrderEventUpdateFormDialog from '../OrderEventUpdateFormDialog';
-import { mSelector, rsSelector } from 'src/selectors/selector';
-import { UserTypeEnum, FetchStatusEnum } from 'src/app';
-import { postOrderEventFetchStatusActions, putOrderEventFetchStatusActions, deleteSingleOrderEventFetchStatusActions } from 'reducers/slices/app/fetchStatus/order';
 
 /**
  * TODO: review this when test data is available.

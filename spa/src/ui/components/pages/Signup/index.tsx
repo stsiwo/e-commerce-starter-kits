@@ -100,7 +100,7 @@ const Signup: React.FunctionComponent<{}> = (props) => {
   // validation logic (should move to hooks)
   const [curMemberSignupValidationState, setMemberSignupValidationState] = React.useState<MemberSignupValidationDataType>(defaultMemberSignupValidationData);
 
-  const { updateValidationAt, updateAllValidation, isValidSync } = useValidation({
+  const { updateValidationAt, updateAllValidation, updateValidationAtMultiple, isValidSync } = useValidation({
     curDomain: curMemberSignupState,
     curValidationDomain: curMemberSignupValidationState,
     schema: memberSignupSchema,
@@ -138,11 +138,6 @@ const Signup: React.FunctionComponent<{}> = (props) => {
 
   const handlePasswordInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextPassword = e.currentTarget.value
-    updateValidationAt("password", e.currentTarget.value);
-    /**
-     * TODO: sync password change with confirm error message for improve UX
-     *
-     **/
     setMemberSignupState((prev: MemberSignupDataType) => ({
       ...prev,
       password: nextPassword
@@ -151,16 +146,35 @@ const Signup: React.FunctionComponent<{}> = (props) => {
 
   const handleConfirmInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextConfirm = e.currentTarget.value
-    updateValidationAt("confirm", e.currentTarget.value);
-    /**
-     * TODO: sync password change with confirm error message for improve UX
-     *
-     **/
     setMemberSignupState((prev: MemberSignupDataType) => ({
       ...prev,
       confirm: nextConfirm
     }));
   }
+
+  /**
+   * validation for multiple fields together
+   **/
+  const isInitial = React.useRef<boolean>(true)
+  React.useEffect(() => {
+
+    if (!isInitial.current) {
+      updateValidationAtMultiple([
+        {
+          key: "password",
+          value: curMemberSignupState.password
+        },
+        {
+          key: "confirm",
+          value: curMemberSignupState.confirm
+        },
+      ])
+    }
+      isInitial.current = false;
+  }, [
+      curMemberSignupState.password,
+      curMemberSignupState.confirm
+    ])
 
   const submit = () => {
     const isValid: boolean = isValidSync(curMemberSignupState)
@@ -221,8 +235,8 @@ const Signup: React.FunctionComponent<{}> = (props) => {
       window.removeEventListener('keydown', handleSubmitKeyDown as unknown as EventListener);
     }
   }, [
-    JSON.stringify(curMemberSignupState), 
-  ]);
+      JSON.stringify(curMemberSignupState),
+    ]);
 
   // event handler to submit
   const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {

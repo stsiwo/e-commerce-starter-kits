@@ -97,3 +97,7 @@
   ### Test Data
 
     - try to use nullable and default value fields in db as much as possible. this make me easy to create test data (e.g., you don't need to define the field and value at insert statement). 
+
+  ### Test Case
+
+    - when you create test cases, it should take it into account that if code is updated, the test case should be failed so that I can realize .. i don't know.

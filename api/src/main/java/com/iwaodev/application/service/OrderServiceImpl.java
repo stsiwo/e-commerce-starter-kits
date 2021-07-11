@@ -648,10 +648,6 @@ public class OrderServiceImpl implements OrderService {
      **/
     this.orderRepository.flush();
 
-    /**
-     * TODO: change this event name. this is misnomer. it should be 'ReturnedEvent'
-     * or something
-     **/
     this.publisher.publishEvent(new OrderReturnedEvent(this, savedOrder));
 
     /**
@@ -743,10 +739,6 @@ public class OrderServiceImpl implements OrderService {
      **/
     this.orderRepository.flush();
 
-    /**
-     * TODO: change this event name. this is misnomer. it should be 'CanceledEvent'
-     * or something
-     **/
     this.publisher.publishEvent(new OrderCanceledEvent(this, savedOrder));
 
     /**

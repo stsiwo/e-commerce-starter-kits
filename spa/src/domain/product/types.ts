@@ -203,7 +203,7 @@ export declare type ProductVariantDataType = {
   variantLength: number
 }
 
-export const defaultProductVariantData: ProductVariantDataType = {
+export const generateDefaultProductVariantData: () => ProductVariantDataType = () => ({
   productSize: productVariantSizeObj.xs,
   variantColor: "#fff",
   variantUnitPrice: 1,
@@ -217,7 +217,7 @@ export const defaultProductVariantData: ProductVariantDataType = {
   variantHeight: 1,
   variantWidth: 1,
   variantLength: 1,
-}
+})
 
 // product variant state type for form & input
 export declare type ProductVariantValidationDataType = {
@@ -280,11 +280,11 @@ export const defaultProductData: ProductDataType = {
   releaseDate: new Date(),
   note: "",
   productVariants: [
-    defaultProductVariantData
+    generateDefaultProductVariantData()
   ],
 }
 
-export const defaultProductOnlyData: ProductDataType = {
+export const generateDefaultProductOnlyData: () => ProductDataType = () => ({
   productName: "",
   productDescription: "",
   productPath: "",
@@ -321,7 +321,7 @@ export const defaultProductOnlyData: ProductDataType = {
   category: null,
   releaseDate: new Date(),
   note: "",
-}
+})
 
 // product validation state type for form & input
 export declare type ProductValidationDataType = {
@@ -361,12 +361,11 @@ export declare type CategoryDataType = {
   categoryPath: string
 }
 
-export const defaultCategoryData: CategoryDataType = {
+export const generateDefaultCategoryData: () => CategoryDataType = () => ({
   categoryName: "",
   categoryDescription: "",
   categoryPath: ""
-}
-
+})
 
 // category validation type for form & input
 export declare type CategoryValidationDataType = {

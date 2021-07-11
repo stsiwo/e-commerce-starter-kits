@@ -10,14 +10,13 @@ import { AxiosError } from 'axios';
 import { api } from 'configs/axiosConfig';
 import { useValidation } from 'hooks/validation';
 import { resetPasswordSchema } from 'hooks/validation/rules';
-import { useSnackbar } from 'notistack';
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
-import { useLocation, useHistory } from 'react-router';
-import { messageActions } from 'reducers/slices/app';
-import { getNanoId } from 'src/utils';
-import { MessageTypeEnum } from 'src/app';
+import { useHistory, useLocation } from 'react-router';
 import { Link as RRLink } from "react-router-dom";
+import { messageActions } from 'reducers/slices/app';
+import { MessageTypeEnum } from 'src/app';
+import { getNanoId } from 'src/utils';
 
 export declare type ResetPasswordDataType = {
   confirm: string
@@ -92,17 +91,13 @@ const ResetPassword: React.FunctionComponent<{}> = (props) => {
   // dispatch
   const dispatch = useDispatch();
 
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
-
   // temp user account state
   const [curResetPasswordState, setResetPasswordState] = React.useState<ResetPasswordDataType>(defaultResetPasswordData);
 
   // validation logic (should move to hooks)
   const [curResetPasswordValidationState, setResetPasswordValidationState] = React.useState<ResetPasswordValidationDataType>(defaultResetPasswordValidationData);
 
-  const { updateValidationAt, updateAllValidation, isValidSync } = useValidation({
+  const { updateValidationAt, updateAllValidation, updateValidationAtMultiple, isValidSync } = useValidation({
     curDomain: curResetPasswordState,
     curValidationDomain: curResetPasswordValidationState,
     schema: resetPasswordSchema,
@@ -113,7 +108,6 @@ const ResetPassword: React.FunctionComponent<{}> = (props) => {
   // event handlers
   const handleConfirmInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextConfirm = e.currentTarget.value
-    updateValidationAt("confirm", e.currentTarget.value);
     setResetPasswordState((prev: ResetPasswordDataType) => ({
       ...prev,
       confirm: nextConfirm
@@ -122,13 +116,35 @@ const ResetPassword: React.FunctionComponent<{}> = (props) => {
 
   const handlePasswordInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextPassword = e.currentTarget.value
-    updateValidationAt("password", e.currentTarget.value);
     setResetPasswordState((prev: ResetPasswordDataType) => ({
       ...prev,
       password: nextPassword
     }));
   }
 
+  /**
+   * validation for multiple fields together
+   **/
+  const isInitial = React.useRef<boolean>(true)
+  React.useEffect(() => {
+
+    if (!isInitial.current) {
+      updateValidationAtMultiple([
+        {
+          key: "password",
+          value: curResetPasswordState.password
+        },
+        {
+          key: "confirm",
+          value: curResetPasswordState.confirm
+        },
+      ])
+    }
+    isInitial.current = false;
+  }, [
+      curResetPasswordState.password,
+      curResetPasswordState.confirm
+    ])
   // event handler to submit
   const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
 
@@ -163,7 +179,7 @@ const ResetPassword: React.FunctionComponent<{}> = (props) => {
           messageActions.update({
             id: getNanoId(),
             type: MessageTypeEnum.ERROR,
-            message: error.response.data.message, 
+            message: error.response.data.message,
           })
         )
       })

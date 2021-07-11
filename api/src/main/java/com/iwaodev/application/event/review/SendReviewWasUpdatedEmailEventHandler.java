@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.mail.MessagingException;
 
+import com.iwaodev.application.event.EventHandler;
 import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.iservice.EmailService;
 import com.iwaodev.config.ClientSpaConfig;
@@ -25,7 +26,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 @Service
-public class SendReviewWasUpdatedEmailEventHandler {
+public class SendReviewWasUpdatedEmailEventHandler implements EventHandler<ReviewWasUpdatedByMemberEvent>{
 
   private static final Logger logger = LoggerFactory.getLogger(SendReviewWasUpdatedEmailEventHandler.class);
 

@@ -2,6 +2,7 @@ package com.iwaodev.ui.controller;
 
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -13,6 +14,7 @@ import com.iwaodev.application.iservice.OrderService;
 import com.iwaodev.application.iservice.ReviewService;
 import com.iwaodev.application.iservice.UserService;
 import com.iwaodev.config.SpringSecurityUser;
+import com.iwaodev.config.service.CookieService;
 import com.iwaodev.domain.order.OrderSortEnum;
 import com.iwaodev.domain.user.UserSortEnum;
 import com.iwaodev.ui.criteria.user.UserCriteria;
@@ -59,6 +61,9 @@ public class UserController {
 
   @Autowired
   private ReviewService reviewService;
+
+  @Autowired
+  private CookieService cookieService;
 
   @Autowired
   public UserController(UserService service, OrderService orderService) {
@@ -115,10 +120,18 @@ public class UserController {
   @PatchMapping("/users/{id}")
   @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
                                                                      // user's data
-  public ResponseEntity<BaseResponse> tempDeleteWithId(@PathVariable(value = "id") UUID id,
-      @AuthenticationPrincipal User authUser, @Valid @RequestBody UserDeleteTempCriteria criteria) throws Exception {
+  public ResponseEntity<BaseResponse> tempDeleteWithId(
+      @PathVariable(value = "id") UUID id,
+      @AuthenticationPrincipal User authUser, 
+      @Valid @RequestBody UserDeleteTempCriteria criteria,
+      HttpServletRequest request, 
+      HttpServletResponse response
+      ) throws Exception {
 
     this.service.tempDelete(criteria, id);
+
+    // delete cookie
+    this.cookieService.eraseCookies(request, response);
 
     return new ResponseEntity<>(new BaseResponse("successfuly deleted temporarly."), HttpStatus.OK);
   }

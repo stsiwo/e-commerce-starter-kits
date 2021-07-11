@@ -23,9 +23,13 @@ import { CustomerPhonesFormDataType, CustomerPhonesFormValidationDataType, defau
 import { useValidation } from 'hooks/validation';
 import { userAccountPhoneSchema } from 'hooks/validation/rules';
 import * as React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { deleteUserPhoneActionCreator, patchUserPhoneActionCreator, postUserPhoneActionCreator, putUserPhoneActionCreator } from 'reducers/slices/domain/user';
 import { getPrimaryPhoneId } from 'domain/user';
+import { rsSelector } from 'src/selectors/selector';
+import { FetchStatusEnum } from 'src/app';
+import { deleteAuthPhoneFetchStatusActions } from 'reducers/slices/app/fetchStatus/auth';
+import { putUserPhoneFetchStatusActions, postUserPhoneFetchStatusActions, deleteUserPhoneFetchStatusActions } from 'reducers/slices/app/fetchStatus/user';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -263,6 +267,29 @@ const AdminCustomerPhoneForm: React.FunctionComponent<AdminCustomerPhoneFormProp
 
   }
 
+  // close form dialog only when success for post/put/delete
+  const curPostFetchStatus = useSelector(rsSelector.app.getPostUserPhoneFetchStatus);
+  const curPutFetchStatus = useSelector(rsSelector.app.getPutUserPhoneFetchStatus);
+  const curDeleteSingleFetchStatus = useSelector(rsSelector.app.getDeleteUserPhoneFetchStatus);
+  React.useEffect(() => {
+    if (
+      curPostFetchStatus === FetchStatusEnum.SUCCESS ||
+      curPutFetchStatus === FetchStatusEnum.SUCCESS ||
+      curDeleteSingleFetchStatus === FetchStatusEnum.SUCCESS
+    ) {
+      setModalOpen(false);
+
+      dispatch(
+        postUserPhoneFetchStatusActions.clear()
+      )
+      dispatch(
+        putUserPhoneFetchStatusActions.clear()
+      )
+      dispatch(
+        deleteUserPhoneFetchStatusActions.clear()
+      )
+    }
+  })
 
   // render functions
 

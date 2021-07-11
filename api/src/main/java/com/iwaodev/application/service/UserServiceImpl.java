@@ -186,6 +186,7 @@ public class UserServiceImpl implements UserService {
         + LocalDateTime.now().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)) + ")");
 
     this.repository.save(targetEntity);
+
   }
 
   @Override

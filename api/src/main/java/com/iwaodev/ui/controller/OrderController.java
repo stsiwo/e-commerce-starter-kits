@@ -219,22 +219,36 @@ public class OrderController {
    *
    * So, Call this after "RECEIVED_RETURN_REQUEST" event.
    *
+   * @2021/07/09: change
+   *
+   *  - to make this process easy, decided to call 'refundBeforeShipment' internally inside event handler.
+   *  
+   *  - flow:
+   *    1. the admin add order event (RETURNED). make sure to display a prompt that this is undoable since payment is canceled.
+   *    2. publish an event (OrderEventWasAddedEvent@OrderService#addOrderEvent)
+   *    3. the event handler (RefundPaymentEventHandler) 
+   *      - check if the order event is 'canceled'
+   *      - cancel the payement (e.g., send cancel request to the stripe) 
+   *
+   *  - note:
+   *    - does not matter about elagibility of refund in this case. this is because if the admin want to cancel the order even if not eligible and give more flexible choice to the admin.
+   *
    **/
-  @PostMapping("/orders/{orderId}/refund-after-shippment")
-  @PreAuthorize("hasRole('ROLE_ADMIN')") // admin only
-  public ResponseEntity<BaseResponse> refundOrderAfterShipment(
-      @PathVariable(value = "orderId") UUID orderId,
-      //@Valid @RequestBody OrderEventCriteria criteria, 
-      @AuthenticationPrincipal SpringSecurityUser authUser
-      ) throws Exception {
+  //@PostMapping("/orders/{orderId}/refund-after-shippment")
+  //@PreAuthorize("hasRole('ROLE_ADMIN')") // admin only
+  //public ResponseEntity<BaseResponse> refundOrderAfterShipment(
+  //    @PathVariable(value = "orderId") UUID orderId,
+  //    //@Valid @RequestBody OrderEventCriteria criteria, 
+  //    @AuthenticationPrincipal SpringSecurityUser authUser
+  //    ) throws Exception {
 
-    this.service.refundOrderAfterShipment(orderId);
+  //  this.service.refundOrderAfterShipment(orderId);
 
-	  return new ResponseEntity<>(
-        new BaseResponse("confirmed refund request successfully"),
-        HttpStatus.OK
-        );
-  }
+	//  return new ResponseEntity<>(
+  //      new BaseResponse("confirmed refund request successfully"),
+  //      HttpStatus.OK
+  //      );
+  //}
 
   /**
    * refund request to the order before shipment made.
@@ -247,23 +261,36 @@ public class OrderController {
    *
    * So, Call this after "RECEIVED_CANCEL_REQUEST" event.
    *
+   * @2021/07/09: change
+   *
+   *  - to make this process easy, decided to call 'refundBeforeShipment' internally inside event handler.
+   *  
+   *  - flow:
+   *    1. the admin add order event (CANCELED). make sure to display a prompt that this is undoable since payment is canceled.
+   *    2. publish an event (OrderEventWasAddedEvent@OrderService#addOrderEvent)
+   *    3. the event handler (RefundPaymentEventHandler) 
+   *      - check if the order event is 'canceled'
+   *      - cancel the payement (e.g., send cancel request to the stripe) 
+   *
+   *  - note:
+   *    - does not matter about elagibility of refund in this case. this is because if the admin want to cancel the order even if not eligible and give more flexible choice to the admin.
    *
    **/
-  @PostMapping("/orders/{orderId}/refund-before-shipment")
-  @PreAuthorize("hasRole('ROLE_ADMIN')") // admin only
-  public ResponseEntity<BaseResponse> refundOrderBeforeShipment(
-      @PathVariable(value = "orderId") UUID orderId,
-      //@Valid @RequestBody OrderEventCriteria criteria, 
-      @AuthenticationPrincipal SpringSecurityUser authUser
-      ) throws Exception {
+  //@PostMapping("/orders/{orderId}/refund-before-shipment")
+  //@PreAuthorize("hasRole('ROLE_ADMIN')") // admin only
+  //public ResponseEntity<BaseResponse> refundOrderBeforeShipment(
+  //    @PathVariable(value = "orderId") UUID orderId,
+  //    //@Valid @RequestBody OrderEventCriteria criteria, 
+  //    @AuthenticationPrincipal SpringSecurityUser authUser
+  //    ) throws Exception {
 
-    this.service.refundBeforeShipment(orderId);
+  //  this.service.refundBeforeShipment(orderId);
 
-	  return new ResponseEntity<>(
-        new BaseResponse("confirmed refund request successfully"),
-        HttpStatus.OK
-        );
-  }
+	//  return new ResponseEntity<>(
+  //      new BaseResponse("confirmed refund request successfully"),
+  //      HttpStatus.OK
+  //      );
+  //}
 
   /**
    * test event endpoint 

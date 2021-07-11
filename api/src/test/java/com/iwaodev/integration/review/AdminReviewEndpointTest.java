@@ -20,10 +20,14 @@ import com.iwaodev.application.dto.product.ProductVariantDTO;
 import com.iwaodev.application.dto.review.ReviewDTO;
 import com.iwaodev.auth.AuthenticateTestUser;
 import com.iwaodev.auth.AuthenticationInfo;
+import com.iwaodev.config.MyTestConfiguration;
 import com.iwaodev.data.BaseDatabaseSetup;
+import com.iwaodev.domain.review.event.NewReviewWasSubmittedEvent;
+import com.iwaodev.domain.review.event.ReviewWasUpdatedByMemberEvent;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.util.ResourceReader;
 
+import org.mockito.Mockito;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.runner.RunWith;
@@ -37,7 +41,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -85,6 +92,15 @@ import org.springframework.transaction.annotation.Transactional;
  * use mvcMock
  **/
 @AutoConfigureMockMvc
+/**
+ * bug: ApplicationEventPublisher with @MockBean does not create mocked ApplicationEventPublisher.
+ *
+ * workaournd: create this Testconfiguration class.
+ *
+ * ref: https://github.com/spring-projects/spring-framework/issues/18907
+ *
+ **/
+@Import(MyTestConfiguration.class)
 public class AdminReviewEndpointTest {
 
   private static final Logger logger = LoggerFactory.getLogger(AdminReviewEndpointTest.class);
@@ -111,6 +127,9 @@ public class AdminReviewEndpointTest {
 
   @Autowired
   private ResourceReader resourceReader;
+
+  @MockBean
+  private ApplicationEventPublisher publisher;
 
   private AuthenticationInfo authInfo;
 
@@ -534,6 +553,10 @@ public class AdminReviewEndpointTest {
     assertThat(responseBody.getReviewId().toString()).isNotNull();
     assertThat(responseBody.getUser().getUserId().toString()).isEqualTo(dummyUserId);
     assertThat(responseBody.getProduct().getProductId().toString()).isEqualTo(dummyProductId);
+
+    // event assert
+    Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(NewReviewWasSubmittedEvent.class));
+    Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(ReviewWasUpdatedByMemberEvent.class));
   }
 
   @Test

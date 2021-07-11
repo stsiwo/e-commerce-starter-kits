@@ -9,6 +9,72 @@ export const getApiUrl = (path: string): string => {
 
 export const dateFormatOption = { year: 'numeric', month: 'long', day: 'numeric' }
 
+/**
+ * check if two dates are same or not.
+ *
+ * ignore time and only compare year, month and date.
+ *
+ **/
+export function isAfterOrEqualDateOf(one: Date, two: Date) {
+  if (!one || !two) {
+    return false
+  }
+  const oneDate = new Date(one.getTime())
+  const twoDate = new Date(two.getTime())
+  oneDate.setHours(0, 0, 0, 0);
+  twoDate.setHours(0, 0, 0, 0);
+  
+  console.log("one: " + oneDate.getTime())
+  console.log("two: " + twoDate.getTime())
+
+  if (oneDate.getTime() >= twoDate.getTime()) {
+    return true
+  } else {
+    return false
+  }
+}
+
+/**
+ * check if two dates are same or not.
+ *
+ * ignore time and only compare year, month and date.
+ *
+ **/
+export function isBeforeOrEqualDateOf(one: Date, two: Date) {
+
+  if (!one || !two) {
+    return false
+  }
+  const oneDate = new Date(one.getTime())
+  const twoDate = new Date(two.getTime())
+  oneDate.setHours(0, 0, 0, 0);
+  twoDate.setHours(0, 0, 0, 0);
+
+  console.log("one: " + oneDate.getTime())
+  console.log("two: " + twoDate.getTime())
+  
+
+  if (oneDate.getTime() <= twoDate.getTime()) {
+    return true
+  } else {
+    return false
+  }
+}
+
+/**
+ * check if the date is valid or not
+ **/
+export function isValidDate(d: Date) {
+  if (!d) {
+    return false;
+  }
+  if (isNaN(d.getTime())) {
+    return false
+  } else {
+    return true
+  }
+} 
+
 export function getCookie(name: string): string {
   const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
   if (match) return match[2];

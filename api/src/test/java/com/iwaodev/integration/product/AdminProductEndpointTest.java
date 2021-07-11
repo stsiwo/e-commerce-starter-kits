@@ -549,7 +549,7 @@ public class AdminProductEndpointTest {
     assertThat(responseBody.getProductName()).isEqualTo(dummyFormJson.get("productName").asText());
     assertThat(responseBody.getCategory().getCategoryId().toString())
         .isEqualTo(dummyFormJson.get("category").get("categoryId").asText());
-    assertThat(responseBody.getCheapestPrice()).isEqualTo(new BigDecimal("13.32"));
+    assertThat(responseBody.getCheapestPrice()).isEqualTo(new BigDecimal("123.0"));
     assertThat(responseBody.getHighestPrice()).isEqualTo(new BigDecimal("123.0"));
     assertThat(1).isEqualTo(responseBody.getVariants().size());
 

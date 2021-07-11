@@ -76,10 +76,6 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
 
   const dispatch = useDispatch()
 
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
-
   // temp user account state
   const [curUserAccountState, setUserAccountState] = React.useState<UserBasicAccountDataType>(defaultUserBasicAccountData);
 
@@ -100,7 +96,7 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
   // validation logic (should move to hooks)
   const [curUserAccountValidationState, setUserAccountValidationState] = React.useState<UserBasicAccountValidationDataType>(defaultUserBasicAccountValidationData);
 
-  const { updateValidationAt, updateAllValidation, isValidSync } = useValidation({
+  const { updateValidationAt, updateAllValidation, updateValidationAtMultiple, isValidSync } = useValidation({
     curDomain: curUserAccountState,
     curValidationDomain: curUserAccountValidationState,
     schema: userAccountSchema,
@@ -140,7 +136,6 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
 
   const handlePasswordInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextPassword = e.currentTarget.value
-    updateValidationAt("password", e.currentTarget.value);
     setUserAccountState((prev: UserAccountDataType) => ({
       ...prev,
       password: nextPassword
@@ -149,13 +144,35 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
 
   const handleConfirmInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
     const nextConfirm = e.currentTarget.value
-    updateValidationAt("confirm", e.currentTarget.value);
     setUserAccountState((prev: UserAccountDataType) => ({
       ...prev,
       confirm: nextConfirm
     }));
   }
 
+  /**
+   * validation for multiple fields together
+   **/
+  const isInitial = React.useRef<boolean>(true)
+  React.useEffect(() => {
+
+    if (!isInitial.current) {
+      updateValidationAtMultiple([
+        {
+          key: "password",
+          value: curUserAccountState.password
+        },
+        {
+          key: "confirm",
+          value: curUserAccountState.confirm
+        },
+      ])
+    }
+    isInitial.current = false;
+  }, [
+      curUserAccountState.password,
+      curUserAccountState.confirm
+    ])
 
   // event handler to submit
   const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
@@ -174,8 +191,8 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
           firstName: curUserAccountState.firstName,
           lastName: curUserAccountState.lastName,
           email: curUserAccountState.email,
-          ...(curUserAccountState.password ? { password: curUserAccountState.password } : {}), 
-        }) 
+          ...(curUserAccountState.password ? { password: curUserAccountState.password } : {}),
+        })
       );
     } else {
       updateAllValidation()
