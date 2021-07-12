@@ -60,7 +60,7 @@ public class ContactServiceImpl implements ContactService {
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist");
     }
 
-    // verify recatcha token 
+    // verify recatcha token
     try {
       this.recaptchaService.verify(criteria.getRecaptchaToken());
     } catch (Exception e) {
@@ -69,20 +69,28 @@ public class ContactServiceImpl implements ContactService {
 
     User adminRecipient = adminRecipientOption.get();
 
-    Optional<User> senderUserOption = this.userRepository.findById(userId);
+    UserTypeEnum userType;
+    User senderUser;
+    if (userId == null) {
+      userType = UserTypeEnum.ANONYMOUS;
+      senderUser = null;
+    } else {
+      userType = UserTypeEnum.MEMBER;
+      Optional<User> senderUserOption = this.userRepository.findById(userId);
 
-    // if not, return 404
-    if (senderUserOption.isEmpty()) {
-      logger.info("the user does not exist");
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the user does not exist");
+      // if not, return 404
+      if (senderUserOption.isEmpty()) {
+        logger.info("the user does not exist");
+        throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the user does not exist");
+      }
+      senderUser = senderUserOption.get();
     }
-
-    User senderUser = senderUserOption.get();
 
     // prep variables for tmeplate html
     Map<String, Object> templateModel = new HashMap<String, Object>();
     templateModel.put("sender", criteria);
-    templateModel.put("userType", UserTypeEnum.ANONYMOUS);
+    templateModel.put("userType", userType);
+    templateModel.put("user", senderUser);
     templateModel.put("recipient", adminRecipient);
     Context thymeleafContext = new Context();
     thymeleafContext.setVariables(templateModel);
@@ -92,39 +100,9 @@ public class ContactServiceImpl implements ContactService {
       this.emailService.send(adminRecipient.getEmail(), criteria.getEmail(), criteria.getTitle(), htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "failed to send an email. please try again later.");
     }
   }
 
-  @Override
-  public void submit(ContactCriteria criteria) throws Exception {
-
-    Optional<User> adminRecipientOption = this.userRepository.getAdmin();
-
-    // if not, return 404
-    if (adminRecipientOption.isEmpty()) {
-      logger.info("the admin user does not exist");
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist");
-    }
-
-    User adminRecipient = adminRecipientOption.get();
-
-    // prep variables for tmeplate html
-    Map<String, Object> templateModel = new HashMap<String, Object>();
-    templateModel.put("sender", criteria);
-    templateModel.put("userType", UserTypeEnum.ANONYMOUS);
-    templateModel.put("recipient", adminRecipient);
-    Context thymeleafContext = new Context();
-    thymeleafContext.setVariables(templateModel);
-    String htmlBody = thymeleafTemplateEngine.process("contact.html", thymeleafContext);
-
-    // send it
-    try {
-      this.emailService.send(adminRecipient.getEmail(), criteria.getEmail(), criteria.getTitle(), htmlBody);
-    } catch (MessagingException e) {
-      logger.info(e.getMessage());
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-    }
-  }
 
 }

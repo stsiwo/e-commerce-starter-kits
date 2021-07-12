@@ -2,7 +2,7 @@
 
 ## My Goal
 
-  ### build maintainable and scalable web apps
+  ### build maintainable, testable and scalable web apps
 
     - maintainability: 
 
@@ -40,9 +40,10 @@
         - sql optimization:
           - how to achieve: avoid N+1 problem if you use orm and other tricky stuff.
           - why important:  when increase the scale, negatively afftect your performance.
-          
-        
 
+    - testability:
+
+      - test is the key to make our development effcient and generate long-term benefits (e.g., maintanability).
 
 ## Design Carefully
 

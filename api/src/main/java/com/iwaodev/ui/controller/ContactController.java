@@ -40,7 +40,7 @@ public class ContactController {
       this.service.submit(criteria, authUser.getId());
     } else {
       // guest
-      this.service.submit(criteria);
+      this.service.submit(criteria, null);
     }
 
 	  return new ResponseEntity<>(

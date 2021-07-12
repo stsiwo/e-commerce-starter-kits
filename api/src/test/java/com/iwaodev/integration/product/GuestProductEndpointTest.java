@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwaodev.application.dto.product.ProductDTO;
 import com.iwaodev.application.dto.product.ProductVariantDTO;
+import com.iwaodev.application.dto.product.ReviewDTO;
 import com.iwaodev.data.BaseDatabaseSetup;
 
 // MockMvc stuff
@@ -525,6 +526,10 @@ public class GuestProductEndpointTest {
     // assert
     assertThat(responseBody.getProductPath().toString()).isEqualTo(dummyProductPath);
     assertThat(responseBody.getProductName()).isNotNull();
+
+    for (ReviewDTO reviewDto: responseBody.getReviews()) {
+      assertThat(reviewDto.getIsVerified()).isEqualTo(true);
+    }
   }
 
   // not found testing

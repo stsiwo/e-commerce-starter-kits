@@ -7,8 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwaodev.application.dto.order.OrderDTO;
 import com.iwaodev.application.dto.order.OrderDetailDTO;
 import com.iwaodev.application.dto.order.OrderEventDTO;
+import com.iwaodev.config.MyTestConfiguration;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.order.OrderStatusEnum;
+import com.iwaodev.domain.order.event.OrderFinalConfirmedEvent;
 import com.iwaodev.ui.response.PaymentIntentResponse;
 import com.iwaodev.util.ResourceReader;
 
@@ -21,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +34,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -70,6 +76,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @ActiveProfiles("integtest")
 @AutoConfigureMockMvc
+/**
+ * bug: ApplicationEventPublisher with @MockBean does not create mocked ApplicationEventPublisher.
+ *
+ * workaournd: create this Testconfiguration class.
+ *
+ * ref: https://github.com/spring-projects/spring-framework/issues/18907
+ *
+ **/
+@Import(MyTestConfiguration.class)
 public class GuestOrderEndpointTest {
 
   private static final Logger logger = LoggerFactory.getLogger(GuestOrderEndpointTest.class);
@@ -81,6 +96,9 @@ public class GuestOrderEndpointTest {
 
   @LocalServerPort
   private int port;
+
+  @MockBean
+  private ApplicationEventPublisher publisher;
 
   /**
    * don't use this.
@@ -174,6 +192,7 @@ public class GuestOrderEndpointTest {
       assertThat(orderDetailDTO.getProductVariant().getVariantId().toString()).isEqualTo(orderDetailCriteria.get("productVariantId").asText());
     }
 
+    Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(OrderFinalConfirmedEvent.class));
 
   }
 

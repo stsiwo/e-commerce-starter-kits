@@ -14,8 +14,12 @@ import com.iwaodev.application.dto.user.UserDTO;
 import com.iwaodev.application.iservice.S3Service;
 import com.iwaodev.auth.AuthenticateTestUser;
 import com.iwaodev.auth.AuthenticationInfo;
+import com.iwaodev.config.MyTestConfiguration;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.order.OrderStatusEnum;
+import com.iwaodev.domain.order.event.OrderEventWasAddedByMemberEvent;
+import com.iwaodev.domain.review.event.NewReviewWasSubmittedEvent;
+import com.iwaodev.domain.user.UserActiveEnum;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.util.ResourceReader;
@@ -49,6 +53,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -85,6 +91,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @ActiveProfiles("integtest")
 @AutoConfigureMockMvc
+/**
+ * bug: ApplicationEventPublisher with @MockBean does not create mocked ApplicationEventPublisher.
+ *
+ * workaournd: create this Testconfiguration class.
+ *
+ * ref: https://github.com/spring-projects/spring-framework/issues/18907
+ *
+ **/
+@Import(MyTestConfiguration.class)
 public class MemberUserEndpointTest {
 
   private static final Logger logger = LoggerFactory.getLogger(MemberUserEndpointTest.class);
@@ -101,6 +116,9 @@ public class MemberUserEndpointTest {
 
   @Autowired
   private ObjectMapper objectMapper;
+
+  @MockBean
+  private ApplicationEventPublisher publisher;
 
   /**
    * don't use this. this cause my app run in a independent server so we couldn't
@@ -514,6 +532,10 @@ public class MemberUserEndpointTest {
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
+
+    for (Cookie cookie: result.getResponse().getCookies()) {
+      assertThat(cookie.getMaxAge()).isEqualTo(0); 
+    }
   }
 
   @Test
@@ -537,6 +559,10 @@ public class MemberUserEndpointTest {
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    
+    for (Cookie cookie: result.getResponse().getCookies()) {
+      assertThat(cookie.getMaxAge()).isEqualTo(0); 
+    }
   }
 
   @Test
@@ -661,6 +687,8 @@ public class MemberUserEndpointTest {
       logger.info(orderEventDTO.toString());
       assertThat(orderEventDTO.getOrderEventId()).isNotNull();
     }
+
+    Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(OrderEventWasAddedByMemberEvent.class));
   }
 
   @Test
@@ -687,6 +715,7 @@ public class MemberUserEndpointTest {
             .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
+    Mockito.verify(this.publisher, Mockito.never()).publishEvent(Mockito.any(OrderEventWasAddedByMemberEvent.class));
   }
 
   @Test
@@ -713,6 +742,7 @@ public class MemberUserEndpointTest {
             .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
+    Mockito.verify(this.publisher, Mockito.never()).publishEvent(Mockito.any(OrderEventWasAddedByMemberEvent.class));
   }
 
   @Test
@@ -754,6 +784,7 @@ public class MemberUserEndpointTest {
       logger.info(orderEventDTO.toString());
       assertThat(orderEventDTO.getOrderEventId()).isNotNull();
     }
+    Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(OrderEventWasAddedByMemberEvent.class));
   }
 
   @Test
@@ -780,6 +811,7 @@ public class MemberUserEndpointTest {
             .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
+    Mockito.verify(this.publisher, Mockito.never()).publishEvent(Mockito.any(OrderEventWasAddedByMemberEvent.class));
   }
 
   @Test
@@ -804,6 +836,101 @@ public class MemberUserEndpointTest {
         .perform(MockMvcRequestBuilders.post(targetUrl).content(dummyFormJsonString)
             .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).cookie(this.csrfCookie)
             .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
+
+    Mockito.verify(this.publisher, Mockito.never()).publishEvent(Mockito.any(OrderEventWasAddedByMemberEvent.class));
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldMemberUserVerifyItsAccount.sql" })
+  public void shouldMemberUserVerifyItsAccount() throws Exception {
+
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String dummyToken = "dummy_token";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/account-verify?account-verify-token=" + dummyToken;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders
+            .get(targetUrl)
+            .cookie(this.authCookie)
+            .cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    UserDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, UserDTO.class);
+    assertThat(responseBody.getActive()).isEqualTo(UserActiveEnum.ACTIVE);
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldNotMemberUserVerifyItsAccountSinceInvalidToken.sql" })
+  public void shouldNotMemberUserVerifyItsAccountSinceInvalidToken() throws Exception {
+
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String dummyToken = "invalid_token";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/account-verify?account-verify-token=" + dummyToken;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders
+            .get(targetUrl)
+            .cookie(this.authCookie)
+            .cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldNotMemberUserVerifyItsAccountSinceExpiredToken.sql" })
+  public void shouldNotMemberUserVerifyItsAccountSinceExpiredToken() throws Exception {
+
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String dummyToken = "dummy_token";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/account-verify?account-verify-token=" + dummyToken;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders
+            .get(targetUrl)
+            .cookie(this.authCookie)
+            .cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldNotMemberUserVerifyItsAccountSinceAlreadyVerified.sql" })
+  public void shouldNotMemberUserVerifyItsAccountSinceAlreadyVerified() throws Exception {
+
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String dummyToken = "dummy_token";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/account-verify?account-verify-token=" + dummyToken;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders
+            .get(targetUrl)
+            .cookie(this.authCookie)
+            .cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
   }

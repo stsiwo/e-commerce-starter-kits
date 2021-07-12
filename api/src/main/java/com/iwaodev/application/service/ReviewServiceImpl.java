@@ -188,7 +188,8 @@ public class ReviewServiceImpl implements ReviewService {
       this.publisher.publishEvent(new ReviewWasVerifiedByAdminEvent(this, updatedEntity));
     }
 
-    if (this.curAuthentication.getRole().equals(UserTypeEnum.MEMBER)) {
+    //  getRole return "ROLE_XXXX" so use 'contains' rather than 'equals'
+    if (this.curAuthentication.getRole().contains(UserTypeEnum.MEMBER)) {
       this.publisher.publishEvent(new ReviewWasUpdatedByMemberEvent(this, updatedEntity));
     }
 

@@ -13,8 +13,10 @@ import com.iwaodev.application.dto.wishlistItem.WishlistItemDTO;
 import com.iwaodev.application.irepository.CartItemRepository;
 import com.iwaodev.auth.AuthenticateTestUser;
 import com.iwaodev.auth.AuthenticationInfo;
+import com.iwaodev.config.MyTestConfiguration;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.domain.wishlistItem.event.MovedWishlistItemToCartItemEvent;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.util.ResourceReader;
 
@@ -35,6 +37,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,9 +48,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -83,6 +89,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @ActiveProfiles("integtest")
 @AutoConfigureMockMvc
+/**
+ * bug: ApplicationEventPublisher with @MockBean does not create mocked ApplicationEventPublisher.
+ *
+ * workaournd: create this Testconfiguration class.
+ *
+ * ref: https://github.com/spring-projects/spring-framework/issues/18907
+ *
+ **/
+@Import(MyTestConfiguration.class)
 public class MemberWishlistItemEndpointTest {
 
   private static final Logger logger = LoggerFactory.getLogger(MemberWishlistItemEndpointTest.class);
@@ -124,6 +139,9 @@ public class MemberWishlistItemEndpointTest {
 
   @Autowired
   private ResourceReader resourceReader;
+
+  @MockBean
+  private ApplicationEventPublisher publisher;
 
   private Cookie authCookie;
   private Cookie csrfCookie;
@@ -556,6 +574,8 @@ public class MemberWishlistItemEndpointTest {
     // repository does not work. the data is not sync with production code.??
     //BigInteger exist = this.cartItemRepository.isExist(dummyVariantId, this.authInfo.getAuthUser().getUserId());
     //assertThat(exist.intValue()).isEqualTo(1);
+    
+    Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(MovedWishlistItemToCartItemEvent.class));
   }
 
 

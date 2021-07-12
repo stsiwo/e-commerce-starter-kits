@@ -1213,6 +1213,10 @@
   - display dep tree
     - command) mvn dependency:tree
 
+  - generate jacoco (test coverage) report
+    - command) mvn clean jacoco:prepare-agent install jacoco:report 
+    - config ref: https://stackoverflow.com/questions/36304793/jacoco-with-maven-missing-execution-data-file/36305148#36305148
+
   ### General
 
   - search and replace text in multiple files recursively.

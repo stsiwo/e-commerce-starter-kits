@@ -15,14 +15,17 @@ import com.iwaodev.application.dto.order.OrderDetailDTO;
 import com.iwaodev.application.dto.order.OrderEventDTO;
 import com.iwaodev.auth.AuthenticateTestUser;
 import com.iwaodev.auth.AuthenticationInfo;
+import com.iwaodev.config.MyTestConfiguration;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.order.OrderStatusEnum;
+import com.iwaodev.domain.order.event.OrderEventWasAddedEvent;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.util.ResourceReader;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +36,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -67,6 +73,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(isolation = Isolation.READ_UNCOMMITTED)
 @ActiveProfiles("integtest")
 @AutoConfigureMockMvc
+/**
+ * bug: ApplicationEventPublisher with @MockBean does not create mocked ApplicationEventPublisher.
+ *
+ * workaournd: create this Testconfiguration class.
+ *
+ * ref: https://github.com/spring-projects/spring-framework/issues/18907
+ *
+ **/
+@Import(MyTestConfiguration.class)
 public class AdminOrderEndpointTest {
 
   private static final Logger logger = LoggerFactory.getLogger(AdminOrderEndpointTest.class);
@@ -90,6 +105,9 @@ public class AdminOrderEndpointTest {
 
   @Autowired
   private ObjectMapper objectMapper;
+
+  @MockBean
+  private ApplicationEventPublisher publisher;
 
   @Autowired
   private ResourceReader resourceReader;
@@ -425,6 +443,7 @@ public class AdminOrderEndpointTest {
     assertThat(responseBody.getLatestOrderEvent().getUser().getUserId().toString()).isEqualTo(adminUserId);
     assertThat(responseBody.getLatestOrderEvent().getUndoable()).isEqualTo(true);
 
+    Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(OrderEventWasAddedEvent.class));
   }
 
   @Test
@@ -469,6 +488,7 @@ public class AdminOrderEndpointTest {
       assertThat(orderDetailDto.getIsReviewable()).isEqualTo(true);
     }
 
+    Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(OrderEventWasAddedEvent.class));
   }
 
   @Test
@@ -513,6 +533,7 @@ public class AdminOrderEndpointTest {
       assertThat(orderDetailDto.getIsReviewable()).isEqualTo(false);
     }
 
+    Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(OrderEventWasAddedEvent.class));
   }
 
   @Test
@@ -541,6 +562,7 @@ public class AdminOrderEndpointTest {
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
+    Mockito.verify(this.publisher, Mockito.never()).publishEvent(Mockito.any(OrderEventWasAddedEvent.class));
   }
 
   @Test

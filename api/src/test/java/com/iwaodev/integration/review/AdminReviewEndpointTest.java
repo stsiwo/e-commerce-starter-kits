@@ -24,6 +24,7 @@ import com.iwaodev.config.MyTestConfiguration;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.review.event.NewReviewWasSubmittedEvent;
 import com.iwaodev.domain.review.event.ReviewWasUpdatedByMemberEvent;
+import com.iwaodev.domain.review.event.ReviewWasVerifiedByAdminEvent;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.util.ResourceReader;
 
@@ -636,6 +637,9 @@ public class AdminReviewEndpointTest {
     assertThat(responseBody.getIsVerified()).isEqualTo(true);
     assertThat(responseBody.getUser().getUserId().toString()).isEqualTo(dummyUserId);
     assertThat(responseBody.getProduct().getProductId().toString()).isEqualTo(dummyProductId);
+
+    // event
+    Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(ReviewWasVerifiedByAdminEvent.class));
   }
 
   @Test

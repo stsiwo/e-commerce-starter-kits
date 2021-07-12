@@ -52,7 +52,24 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
 @EnableCaching
 @EnableScheduling
 @EnableAspectJAutoProxy
-//@EnableAsync
+/**
+ * @Async requires the class you use to wrape with an interface. to automatically create this, add 'proxyTargetClass = true'.
+ *
+ * Otherwise, you receive ''The method 'recordHeartBeat' declared on target class 'NodeStatusService', but not found in any interface(s) of the exposed proxy type. Either pull the method up to an interface or switch to CGLIB proxies by enforcing proxy-target-class mode in your configuration..
+ *
+ *
+ * @2021/07/12
+ *
+ *  stop using this since this is not necessary. mostly i use @Async for domain event handlers.
+ *
+ *  issue:
+ *
+ *    how to test async with MOckito. currently Mockito does not support any async implementation. for example, it is impossbiel to test async function with Awaitability (org.awaitability) with Mockito.verify.
+ *
+ *    available workaround is to make async sync only when testing using profile. so if you really need async feature, you should implement this.
+ *
+ **/
+//@EnableAsync(proxyTargetClass = true)
 public class Application {
 
   private static final Logger logger = LoggerFactory.getLogger(Application.class);

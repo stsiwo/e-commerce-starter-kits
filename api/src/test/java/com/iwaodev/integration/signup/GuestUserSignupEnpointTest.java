@@ -15,8 +15,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwaodev.application.dto.user.UserDTO;
 import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.iservice.EmailService;
+import com.iwaodev.config.MyTestConfiguration;
 import com.iwaodev.domain.user.UserActiveEnum;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.domain.user.event.GeneratedVerificationTokenEvent;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.response.AuthenticationResponse;
 import com.iwaodev.ui.response.ErrorBaseResponse;
@@ -37,7 +39,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -74,6 +78,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @ActiveProfiles("integtest")
 @AutoConfigureMockMvc
+/**
+ * bug: ApplicationEventPublisher with @MockBean does not create mocked ApplicationEventPublisher.
+ *
+ * workaournd: create this Testconfiguration class.
+ *
+ * ref: https://github.com/spring-projects/spring-framework/issues/18907
+ *
+ **/
+@Import(MyTestConfiguration.class)
 public class GuestUserSignupEnpointTest {
 
   private static final Logger logger = LoggerFactory.getLogger(GuestUserSignupEnpointTest.class);
@@ -100,6 +113,9 @@ public class GuestUserSignupEnpointTest {
 
   @Autowired
   private MessageSource messageSource;
+
+  @MockBean
+  private ApplicationEventPublisher publisher;
 
   @Test
   public void shouldGuestUserSignupSuccessfully() throws Exception {
@@ -138,32 +154,7 @@ public class GuestUserSignupEnpointTest {
     assertThat(user.getVerificationTokenExpiryDate()).isAfter(LocalDateTime.now());
     assertThat(user.getVerificationTokenExpiryDate().minusHours(2)).isBefore(LocalDateTime.now());
 
-    //await().atMost(5, TimeUnit.SECONDS)
-    //  .until(() -> Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.any(), Mockito.any(), Mockito.any(),
-    //    Mockito.any()));
-
-
-    /**
-     * TODO
-     * ?? this is not triggered with @TransactionalEventListener when only testing. it works at integ dev.
-     *
-     * should I make this async since this is totally side effect?
-     *
-     * I make this async. (e.g., @Async)
-     *
-     * how to test with async.
-     *
-     *  - install org.awaitablility.
-     * 
-     * how to test with Mockito with async?
-     *
-     *  - i don't know.
-     *
-     *  - verify with timeout does not work like below.
-     *
-     **/
-    //Mockito.verify(this.emailService, Mockito.timeout(5000).times(1)).send(Mockito.any(), Mockito.any(), Mockito.any(),
-    //    Mockito.any());
+    Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(GeneratedVerificationTokenEvent.class));
   }
 
   @Test

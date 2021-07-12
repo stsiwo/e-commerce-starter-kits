@@ -106,7 +106,7 @@ public class ReviewController {
    **/
   // delete a new review
   @DeleteMapping("/reviews/{id}")
-  @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #criteria.getUserId()") // to prevent a member from accessing another
+  @PreAuthorize("hasRole('ROLE_ADMIN')") // to prevent a member from accessing another
   public ResponseEntity<BaseResponse> delete(
       @PathVariable(value = "id") Long id,
       @AuthenticationPrincipal SpringSecurityUser authUser
