@@ -18,6 +18,11 @@ import com.iwaodev.util.ResourceReader;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
 import org.junit.jupiter.api.Test;
@@ -180,6 +185,8 @@ public class GuestOrderEndpointTest {
     assertThat(order.getBillingAddress().getPostalCode()).isEqualTo(dummyFormJson.get("billingAddress").get("postalCode").asText());
     assertThat(order.getUser()).isNull();
     assertThat(order.getCurrency()).isEqualTo(dummyFormJson.get("currency").asText());
+    assertThat(order.getShippingCost()).isGreaterThan(new BigDecimal(0.00));
+    assertThat(order.getEstimatedDeliveryDate()).isAfter(LocalDateTime.now());
     assertThat(order.getOrderEvents().get(0).getOrderStatus()).isEqualTo(OrderStatusEnum.DRAFT);
 
     for (int i = 0; i < order.getOrderDetails().size(); i++) {
@@ -190,6 +197,14 @@ public class GuestOrderEndpointTest {
       assertThat(orderDetailDTO.getProductQuantity().toString()).isEqualTo(orderDetailCriteria.get("productQuantity").asText());
       assertThat(orderDetailDTO.getProduct().getProductId().toString()).isEqualTo(orderDetailCriteria.get("productId").asText());
       assertThat(orderDetailDTO.getProductVariant().getVariantId().toString()).isEqualTo(orderDetailCriteria.get("productVariantId").asText());
+
+      if (orderDetailDTO.getProductVariant().getVariantId().toString().equals("3")) {
+        assertThat(orderDetailDTO.getProductWeight()).isEqualTo(1.00);
+      } else if (orderDetailDTO.getProductVariant().getVariantId().toString().equals("6")) {
+        assertThat(orderDetailDTO.getProductWeight()).isEqualTo(0.6);
+      } else if (orderDetailDTO.getProductVariant().getVariantId().toString().equals("11")) {
+        assertThat(new BigDecimal(orderDetailDTO.getProductWeight()).setScale(1, RoundingMode.UP)).isEqualTo(new BigDecimal(2.1).setScale(1, RoundingMode.DOWN));
+      }
     }
 
     Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(OrderFinalConfirmedEvent.class));

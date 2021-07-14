@@ -131,6 +131,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     if (!targetEntityOption.isEmpty()) {
       Category targetEntity = targetEntityOption.get();
+
+      if (targetEntity.getProducts().size() > 0) {
+        throw new AppException(HttpStatus.BAD_REQUEST, "cannot delete this category since it has products.");
+      }
       this.repository.delete(targetEntity);
     }
   }

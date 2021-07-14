@@ -161,12 +161,12 @@ public class User {
 
   // ignore this setter since need to customize for bidirectional relationship
   @Setter( value = AccessLevel.NONE)
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
+  @OneToMany(mappedBy = "user", cascade = {}, orphanRemoval = false)
   private List<Order> orders = new ArrayList<>();
 
   // ignore this setter since need to customize for bidirectional relationship
   @Setter( value = AccessLevel.NONE)
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
+  @OneToMany(mappedBy = "user", cascade = {}, orphanRemoval = false)
   private List<OrderEvent> orderEvents = new ArrayList<>();
 
   // ignore this setter since need to customize for bidirectional relationship

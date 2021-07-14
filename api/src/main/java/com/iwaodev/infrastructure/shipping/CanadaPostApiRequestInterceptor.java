@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-public class ShippingApiRequestInterceptor implements ClientHttpRequestInterceptor {
+public class CanadaPostApiRequestInterceptor implements ClientHttpRequestInterceptor {
 
   @Value("${shipping.api.username}")
   private String shippingApiUserName;

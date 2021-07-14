@@ -354,6 +354,9 @@
 
       - you can do DDL/INSERT/UPDATE/ALTER/DELETE as you like to manipulate any existing data.
 
+      - (mysql) transaction does not work on DDL as you might know.
+        => better to separate DDL migration file and data migration file seprately. make management easy.
+
     ### NOTE:
 
       - file name must comply the formats otherwise Flyway does not detect the files:
@@ -756,6 +759,12 @@
     - DELETE: whether you want to delete all children entities as well when delete its parent entity.
 
     - 
+
+  ## Cascade.Remove vs orphanRemoval
+
+    - orphanRemoval: when one of children is deleted (e.g., one of products which belong to this category is deleted from this category such as category.removeProduct(targetProduct), this product is deleted from db.
+   
+    - CascadeType.Remove: this category is deleted, all products which belong to this category are also deleted.
 
   ## Keep Insertion Order (Collection with @OrderBy)
 

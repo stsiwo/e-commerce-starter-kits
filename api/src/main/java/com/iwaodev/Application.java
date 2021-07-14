@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import com.iwaodev.config.MailConfig;
-import com.iwaodev.infrastructure.shipping.ShippingApiRequestInterceptor;
+import com.iwaodev.infrastructure.shipping.CanadaPostApiRequestInterceptor;
 import com.iwaodev.util.TrimStringModule;
 import com.stripe.Stripe;
 
@@ -78,7 +78,7 @@ public class Application {
   private String stripeApiKey;
 
   @Autowired
-  private ShippingApiRequestInterceptor shippingApiRequestInterceptor;
+  private CanadaPostApiRequestInterceptor canadaPostApiRequestInterceptor;
 
   @Autowired
   private MailConfig mailConfig;
@@ -184,7 +184,7 @@ public class Application {
    **/
   @Bean("shippingRestTemplate")
   public RestTemplate shippingRestTemplate(RestTemplateBuilder builder) {
-    return builder.additionalInterceptors(this.shippingApiRequestInterceptor)
+    return builder.additionalInterceptors(this.canadaPostApiRequestInterceptor)
         // this does not work.
         // .defaultHeader("Accept", "application/vnd.cpc.ship.rate-v4+xml")
         // .defaultHeader("Content-Type", "application/vnd.cpc.ship.rate-v4+xml")

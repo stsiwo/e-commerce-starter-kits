@@ -23,4 +23,6 @@ public interface AdvanceUserRepository {
    * check if email exists ecept for this userId
    **/
   public Boolean isOthersHaveEmail(UUID userId, String email);
+
+  public String getPostalCodeOfAdmin();
 }

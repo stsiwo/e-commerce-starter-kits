@@ -64,6 +64,12 @@ public class AdvanceUserRepositoryImpl implements AdvanceUserRepository {
 	}
 
 	@Override
+	public String getPostalCodeOfAdmin() {
+		return this.entityManager.createQuery("select c.postalCode from users u inner join u.userType ut inner join u.companies c where ut.userType = 'ADMIN'", String.class)
+      .getSingleResult();
+	}
+
+	@Override
 	public Page<User> findAllToAvoidNPlusOne(Specification<User> spec, Pageable pageable) {
     /**
      * CriteriaQuery & TypedQuery version.

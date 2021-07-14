@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.Cookie;
@@ -697,5 +698,30 @@ public class AdminProductEndpointTest {
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
+
+    // association assert
+    // - category (exist)
+    // - product iamges (deleted)
+    // - reviews (deleted)
+    // - product variant (deleted) 
+    Boolean isCategoryExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(c) > 0)  then true else false end from categories c where c.categoryId = :categoryId",
+        Boolean.class).setParameter("categoryId", 1L).getSingleResult();
+    Boolean isProductImagesExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(pi) > 0)  then true else false end from productImages pi inner join pi.product p where p.productId = :productId",
+        Boolean.class).setParameter("productId", UUID.fromString(dummyProductId)).getSingleResult();
+    Boolean isReviewsExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(r) > 0)  then true else false end from reviews r inner join r.product p where p.productId = :productId",
+        Boolean.class).setParameter("productId", UUID.fromString(dummyProductId)).getSingleResult();
+    Boolean isProductVariantsExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(pv) > 0)  then true else false end from productVariants pv inner join pv.product p where p.productId = :productId",
+        Boolean.class).setParameter("productId", UUID.fromString(dummyProductId)).getSingleResult();
+
+    assertThat(isCategoryExist).isTrue();
+    assertThat(isProductImagesExist).isFalse();
+    assertThat(isReviewsExist).isFalse();
+    assertThat(isProductVariantsExist).isFalse();
+    
+    
   }
 }

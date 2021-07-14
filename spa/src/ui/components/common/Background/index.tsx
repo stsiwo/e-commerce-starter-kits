@@ -90,7 +90,7 @@ export declare type MorphMapType = {
 // big think green shape
 const morphMap: MorphMapType = {
   "/": {
-    transform: "scale(1.3, 1.3) rotate(0deg) translate(10%, -10%) translateZ(10px) skew(0deg, 0deg)",
+    transform: "scale(1.3, 1.3) rotate(0deg) translate(10%, -10%) translateZ(0px) skew(0deg, 0deg)",
   },
   "/login": {
     transform: "scale(1.5, 1.5) rotate(0deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
@@ -108,7 +108,7 @@ const morphMap: MorphMapType = {
     transform: "scale(1.0, 1.0) rotate(0deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
   },
   "/orders": {
-    transform: "scale(1.0, 1.0) rotate(0deg) translate(0%, 0%) translateZ(-40px) skew(0deg, 0deg)",
+    transform: "scale(1.0, 1.0) rotate(0deg) translate(0%, 0%) translateZ(-1px) skew(0deg, 0deg)",
   },
 }
 
@@ -133,7 +133,7 @@ const morphAltMap: MorphMapType = {
     transform: "scale(4.0, 4.0) rotate(0deg) translate(25%, 25%) translateZ(0px) skew(0deg, 0deg)",
   },
   "/orders": {
-    transform: "scale(5.0, 5.0) rotate(0deg) translate(25%, 25%) translateZ(-50px) skew(0deg, 0deg)",
+    transform: "scale(5.0, 5.0) rotate(0deg) translate(25%, 25%) translateZ(-2px) skew(0deg, 0deg)",
   },
 }
 

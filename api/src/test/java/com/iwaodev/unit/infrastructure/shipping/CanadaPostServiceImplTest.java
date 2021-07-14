@@ -2,6 +2,7 @@ package com.iwaodev.unit.infrastructure.shipping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.iwaodev.application.iservice.CanadaPostService;
 import com.iwaodev.application.iservice.ShippingService;
 import com.iwaodev.infrastructure.shipping.schema.rating.PriceQuotes;
 import com.iwaodev.ui.criteria.shipping.RatingCriteria;
@@ -15,21 +16,24 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("unittest")
-public class ShippingServiceImplTest {
+public class CanadaPostServiceImplTest {
 
-  private static final Logger logger = LoggerFactory.getLogger(ShippingServiceImplTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(CanadaPostServiceImplTest.class);
 
   @Autowired
-  private ShippingService shippingService;
+  private CanadaPostService canadaPostService;
 
   @Test
   public void shouldReturnPriceQuotesAtRating() throws Exception {
 
     // arrange 
-    RatingCriteria criteria = new RatingCriteria(1D, "V5R2C2");
+    RatingCriteria criteria = new RatingCriteria();
+    criteria.setParcelWeight(1D);
+    criteria.setDestinationPostalCode("M4W2G8");
     
     // act
-    PriceQuotes priceQuotes = this.shippingService.getRating(criteria);
+    //PriceQuotes priceQuotes = this.canadaPostService.getRating(criteria, "V5R 2C2");
+    PriceQuotes priceQuotes = this.canadaPostService.getRating(criteria.getParcelWeight(), criteria.getDestinationPostalCode(), "V5R 2C2");
     
     // assert
     assertThat(priceQuotes).isNotNull(); 

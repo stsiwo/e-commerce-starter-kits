@@ -18,7 +18,7 @@ public class NotificationSchedule {
   @Autowired
   private NotificationService notificationService;
 
-  // every day at A.M. 0:00
+  // every day at A.M. 0:07
   // this should be called after "PublishNewProducts" schedule task (e.g., assuming the new products are is_public = true after that task.)
   @Scheduled(cron = "7 0 0 ? * *") // check with this: https://www.freeformatter.com/cron-expression-generator-quartz.html
   public void distributeNewProductArrivedNotification() throws Exception {
@@ -26,6 +26,16 @@ public class NotificationSchedule {
     logger.info("start schedule: distributeNewProductArrivedNotification");
 
     this.notificationService.distributeNewProductArriveByTime(LocalDateTime.now());
+
+  }
+
+  // every day at A.M. 0:00
+  @Scheduled(cron = "0 0 0 ? * *") // check with this: https://www.freeformatter.com/cron-expression-generator-quartz.html
+  public void deleteNotificationsIfRead() throws Exception {
+
+    logger.info("start schedule: deleteNotificationsIfRead");
+
+    this.notificationService.deleteIfRead();
 
   }
 }

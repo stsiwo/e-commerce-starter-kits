@@ -136,23 +136,23 @@ VALUES ('9e3e67ca-d058-41f0-aad5-4f09c956a81f', 'Test Product Name That Should B
 
 -- product variant 1-1 (unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('1', '1', 'white', '123.00', '50', '9e3e67ca-d058-41f0-aad5-4f09c956a81f', '1.00', '1.00', '1.00', '1.00');
+VALUES ('1', '1', 'white', '123.00', '50', '9e3e67ca-d058-41f0-aad5-4f09c956a81f', '2.00', '1.00', '1.00', '1.00');
 
 -- product variant 1-2 (unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('2', '2', 'black', '13.00', '20', '9e3e67ca-d058-41f0-aad5-4f09c956a81f', '1.00', '1.00', '1.00', '1.00');
+VALUES ('2', '2', 'black', '13.00', '20', '9e3e67ca-d058-41f0-aad5-4f09c956a81f', '1.50', '1.00', '1.00', '1.00');
 
 -- product variant 1-3 (discount & unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_discount_price`,  `variant_discount_start_date`, `variant_discount_end_date`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`, `is_discount`)
-VALUES ('3', '3', 'aqua', '13.00', '7.00', '2021-01-01 00:00:01', '2023-01-07 00:00:00', '100', '9e3e67ca-d058-41f0-aad5-4f09c956a81f', '1.00', '1.00', '1.00', '1.00', '1');
+VALUES ('3', '3', 'aqua', '13.00', '7.00', '2021-01-01 00:00:01', '2023-01-07 00:00:00', '100', '9e3e67ca-d058-41f0-aad5-4f09c956a81f', '3.00', '1.00', '1.00', '1.00', '1');
 
 -- product variant 1-4 (no price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('4', '4', 'aqua', '100', '9e3e67ca-d058-41f0-aad5-4f09c956a81f', '1.00', '1.00', '1.00', '1.00');
+VALUES ('4', '4', 'aqua', '100', '9e3e67ca-d058-41f0-aad5-4f09c956a81f', '2.00', '1.00', '1.00', '1.00');
 
 -- product variant 1-5 (discount price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_discount_price`,  `variant_discount_start_date`, `variant_discount_end_date`,  `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('5', '5', 'aqua', '7.00', '2020-01-01 00:00:01', '2020-01-07 00:00:00', '100', '9e3e67ca-d058-41f0-aad5-4f09c956a81f', '1.00', '1.00', '1.00', '1.00');
+VALUES ('5', '5', 'aqua', '7.00', '2020-01-01 00:00:01', '2020-01-07 00:00:00', '100', '9e3e67ca-d058-41f0-aad5-4f09c956a81f', '3.00', '1.00', '1.00', '1.00');
 
 
 -- product (category=1)
@@ -161,15 +161,15 @@ VALUES ('773f1fc7-c037-447a-a5b2-f790ea2302e5', 'Test Product Name 2', 'It is a 
 
 -- product variant 2-1 (unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('6', '1', 'white', '123.00', '30', '773f1fc7-c037-447a-a5b2-f790ea2302e5', '1.00', '1.00', '1.00', '1.00');
+VALUES ('6', '1', 'white', '123.00', '30', '773f1fc7-c037-447a-a5b2-f790ea2302e5', '0.50', '1.00', '1.00', '1.00');
 
 -- product variant 2-2 (unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('7', '2', 'black', '13.00', '50', '773f1fc7-c037-447a-a5b2-f790ea2302e5', '1.00', '1.00', '1.00', '1.00');
+VALUES ('7', '2', 'black', '13.00', '50', '773f1fc7-c037-447a-a5b2-f790ea2302e5', '0.50', '1.00', '1.00', '1.00');
 
 -- product variant 2-3 (discount & unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_discount_price`,  `variant_discount_start_date`, `variant_discount_end_date`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('8', '3', 'aqua', '13.00', '7.00', '2020-01-01 00:00:01', '2020-01-07 00:00:00', '50', '773f1fc7-c037-447a-a5b2-f790ea2302e5', '1.00', '1.00', '1.00', '1.00');
+VALUES ('8', '3', 'aqua', '13.00', '7.00', '2020-01-01 00:00:01', '2020-01-07 00:00:00', '50', '773f1fc7-c037-447a-a5b2-f790ea2302e5', '1.32', '1.00', '1.00', '1.00');
 
 -- product variant 2-4 (no price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
@@ -182,19 +182,19 @@ VALUES ('a362bbc3-5c70-4e82-96d3-5fa1e3103332', 'Test Product Name 3', 'It is a 
 
 -- product variant 3-1 (unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('10', '1', 'white', '123.00', '120', 'a362bbc3-5c70-4e82-96d3-5fa1e3103332', '1.00', '1.00', '1.00', '1.00');
+VALUES ('10', '1', 'white', '123.00', '120', 'a362bbc3-5c70-4e82-96d3-5fa1e3103332', '1.11', '1.00', '1.00', '1.00');
 
 -- product variant 3-2 (unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('11', '2', 'black', '13.00', '50', 'a362bbc3-5c70-4e82-96d3-5fa1e3103332', '1.00', '1.00', '1.00', '1.00');
+VALUES ('11', '2', 'black', '13.00', '50', 'a362bbc3-5c70-4e82-96d3-5fa1e3103332', '1.12', '1.00', '1.00', '1.00');
 
 -- product variant 3-3 (discount & unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_discount_price`,  `variant_discount_start_date`, `variant_discount_end_date`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('12', '3', 'aqua', '13.00', '7.00', '2020-01-01 00:00:01', '2020-01-07 00:00:00', '60', 'a362bbc3-5c70-4e82-96d3-5fa1e3103332', '1.00', '1.00', '1.00', '1.00');
+VALUES ('12', '3', 'aqua', '13.00', '7.00', '2020-01-01 00:00:01', '2020-01-07 00:00:00', '60', 'a362bbc3-5c70-4e82-96d3-5fa1e3103332', '1.23', '1.00', '1.00', '1.00');
 
 -- product variant 3-4 (no price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('13', '4', 'aqua', '60', 'a362bbc3-5c70-4e82-96d3-5fa1e3103332', '1.00', '1.00', '1.00', '1.00');
+VALUES ('13', '4', 'aqua', '60', 'a362bbc3-5c70-4e82-96d3-5fa1e3103332', '1.33', '1.00', '1.00', '1.00');
 
 
 -- product (category=1)
@@ -203,19 +203,19 @@ VALUES ('de7e767d-cd0c-4705-b633-353b2340715b', 'Test Product Name 4', 'It is a 
 
 -- product variant 4-1 (unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('14', '1', 'white', '123.00', '120', 'de7e767d-cd0c-4705-b633-353b2340715b', '1.00', '1.00', '1.00', '1.00');
+VALUES ('14', '1', 'white', '123.00', '120', 'de7e767d-cd0c-4705-b633-353b2340715b', '2.00', '1.00', '1.00', '1.00');
 
 -- product variant 4-2 (unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('15', '2', 'black', '13.00', '50', 'de7e767d-cd0c-4705-b633-353b2340715b', '1.00', '1.00', '1.00', '1.00');
+VALUES ('15', '2', 'black', '13.00', '50', 'de7e767d-cd0c-4705-b633-353b2340715b', '2.00', '1.00', '1.00', '1.00');
 
 -- product variant 4-3 (discount & unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_discount_price`,  `variant_discount_start_date`, `variant_discount_end_date`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('16', '3', 'aqua', '13.00', '7.00', '2020-01-01 00:00:01', '2020-01-07 00:00:00', '60', 'de7e767d-cd0c-4705-b633-353b2340715b', '1.00', '1.00', '1.00', '1.00');
+VALUES ('16', '3', 'aqua', '13.00', '7.00', '2020-01-01 00:00:01', '2020-01-07 00:00:00', '60', 'de7e767d-cd0c-4705-b633-353b2340715b', '1.01', '1.00', '1.00', '1.00');
 
 -- product variant 4-4 (no price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('17', '4', 'aqua', '60', 'de7e767d-cd0c-4705-b633-353b2340715b', '1.00', '1.00', '1.00', '1.00');
+VALUES ('17', '4', 'aqua', '60', 'de7e767d-cd0c-4705-b633-353b2340715b', '2.00', '1.00', '1.00', '1.00');
 
 
 -- product (category=1)
@@ -224,7 +224,7 @@ VALUES ('db600487-5142-4121-8b3f-237c2d883c14', 'Test Product Name 5', 'It is a 
 
 -- product variant 5-1 (unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('18', '1', 'white', '123.00', '120', 'db600487-5142-4121-8b3f-237c2d883c14', '1.00', '1.00', '1.00', '1.00');
+VALUES ('18', '1', 'white', '123.00', '120', 'db600487-5142-4121-8b3f-237c2d883c14', '1.36', '1.00', '1.00', '1.00');
 
 -- product variant 5-2 (unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
@@ -245,23 +245,23 @@ VALUES ('bff91a24-02dd-4762-9ddd-6972ee15c9f7', 'Test Product Name That Should B
 
 -- product variant 1-1 (unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('22', '1', 'white', '123.00', '120', 'bff91a24-02dd-4762-9ddd-6972ee15c9f7', '1.00', '1.00', '1.00', '1.00');
+VALUES ('22', '1', 'white', '123.00', '120', 'bff91a24-02dd-4762-9ddd-6972ee15c9f7', '2.00', '1.00', '1.00', '1.00');
 
 -- product variant 1-2 (unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('23', '2', 'black', '13.00', '50', 'bff91a24-02dd-4762-9ddd-6972ee15c9f7', '1.00', '1.00', '1.00', '1.00');
+VALUES ('23', '2', 'black', '13.00', '50', 'bff91a24-02dd-4762-9ddd-6972ee15c9f7', '2.00', '1.00', '1.00', '1.00');
 
 -- product variant 1-3 (discount & unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_discount_price`,  `variant_discount_start_date`, `variant_discount_end_date`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('24', '3', 'aqua', '13.00', '7.00', '2020-01-01 00:00:01', '2020-01-07 00:00:00', '60', 'bff91a24-02dd-4762-9ddd-6972ee15c9f7', '1.00', '1.00', '1.00', '1.00');
+VALUES ('24', '3', 'aqua', '13.00', '7.00', '2020-01-01 00:00:01', '2020-01-07 00:00:00', '60', 'bff91a24-02dd-4762-9ddd-6972ee15c9f7', '2.00', '1.00', '1.00', '1.00');
 
 -- product variant 1-4 (no price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('25', '4', 'aqua', '60', 'bff91a24-02dd-4762-9ddd-6972ee15c9f7', '1.00', '1.00', '1.00', '1.00');
+VALUES ('25', '4', 'aqua', '60', 'bff91a24-02dd-4762-9ddd-6972ee15c9f7', '3.00', '1.00', '1.00', '1.00');
 
 -- product variant 1-5 (discount price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_discount_price`,  `variant_discount_start_date`, `variant_discount_end_date`,  `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('26', '5', 'aqua', '7.00', '2020-01-01 00:00:01', '2020-01-07 00:00:00', '60', 'bff91a24-02dd-4762-9ddd-6972ee15c9f7', '1.00', '1.00', '1.00', '1.00');
+VALUES ('26', '5', 'aqua', '7.00', '2020-01-01 00:00:01', '2020-01-07 00:00:00', '60', 'bff91a24-02dd-4762-9ddd-6972ee15c9f7', '1.32', '1.00', '1.00', '1.00');
 
 
 -- product (category = 2)
@@ -270,11 +270,11 @@ VALUES ('4f545dc7-ed77-4049-83ef-26904b85a4c2', 'Test Product Name 2', 'It is a 
 
 -- product variant 2-1 (unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('27', '1', 'white', '123.00', '120', '4f545dc7-ed77-4049-83ef-26904b85a4c2', '1.00', '1.00', '1.00', '1.00');
+VALUES ('27', '1', 'white', '123.00', '120', '4f545dc7-ed77-4049-83ef-26904b85a4c2', '0.50', '1.00', '1.00', '1.00');
 
 -- product variant 2-2 (unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
-VALUES ('28', '2', 'black', '13.00', '50', '4f545dc7-ed77-4049-83ef-26904b85a4c2', '1.00', '1.00', '1.00', '1.00');
+VALUES ('28', '2', 'black', '13.00', '50', '4f545dc7-ed77-4049-83ef-26904b85a4c2', '0.30', '1.00', '1.00', '1.00');
 
 -- product variant 2-3 (discount & unit price)
 INSERT INTO `product_variants` (`variant_id`, `product_size_id`, `variant_color`, `variant_unit_price`, `variant_discount_price`,  `variant_discount_start_date`, `variant_discount_end_date`, `variant_stock`, `product_id`, `variant_weight`, `variant_width`, `variant_height`, `variant_length`)
@@ -1319,4 +1319,23 @@ VALUES ('862fb67f-4d03-4554-a99a-9b66e0d8f82e', '773f1fc7-c037-447a-a5b2-f790ea2
 
 INSERT INTO `reviews` (`user_id`, `product_id`, `review_point`, `review_title`, `review_description`, `is_verified`)
 VALUES ('862fb67f-4d03-4554-a99a-9b66e0d8f82e', 'a362bbc3-5c70-4e82-96d3-5fa1e3103332', '2.0', 'sample title 19', 'sample description', 0); 
+
+
+-- notifications
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_bGCZkE31wah', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_IWyudx53pLg', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '1');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_OIDbKusAQ8M', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_NJxfyoN63ZR', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '1');
+
+
+
+
+
 

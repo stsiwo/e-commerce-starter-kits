@@ -1,6 +1,6 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import { CategoryDataType, CategoryType, CategoryValidationDataType, defaultCategoryData, defaultCategoryValidationData, generateDefaultCategoryData } from 'domain/product/types';
+import { CategoryDataType, CategoryType, CategoryValidationDataType, defaultCategoryValidationData, generateDefaultCategoryData } from 'domain/product/types';
 import { useValidation } from 'hooks/validation';
 import { categorySchema } from 'hooks/validation/rules';
 import * as React from 'react';

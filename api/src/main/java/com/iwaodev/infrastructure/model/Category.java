@@ -71,7 +71,13 @@ public class Category {
    * - ex) users: a variable name which must exist in User class
    **/
 
-  @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = false)
+  /**
+   * orphanRemoval: when one of children is deleted (e.g., one of products which belong to this category is deleted from this category such as category.removeProduct(targetProduct), this product is deleted from db.
+   *
+   * CascadeType.Remove: this category is deleted, all products which belong to this category are also deleted.
+   *
+   **/
+  @OneToMany(mappedBy = "category", cascade = {}, orphanRemoval = false)
   private List<Product> products = new ArrayList<>();
 
 }

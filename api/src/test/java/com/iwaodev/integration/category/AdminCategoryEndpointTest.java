@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.UUID;
+
 import javax.servlet.http.Cookie;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -377,5 +379,26 @@ public class AdminCategoryEndpointTest {
     MvcResult result = resultActions.andReturn();
 
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
+
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/category/shouldNotAdminDeleteCategorySinceItHasCategory.sql" })
+  public void shouldNotAdminDeleteCategorySinceItHasCategory() throws Exception {
+
+    // make sure category id match the one in sql
+
+    // arrange
+    Long dummyCategoryId = 100L;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyCategoryId.toString();
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.delete(targetUrl) // delete
+        .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+        .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
   }
 }

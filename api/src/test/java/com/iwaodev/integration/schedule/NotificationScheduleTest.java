@@ -2,6 +2,7 @@ package com.iwaodev.integration.schedule;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 // MockMvc stuff
@@ -116,7 +117,6 @@ public class NotificationScheduleTest {
     String dummyProductName1 = "Test Product Name That Should Be Long One For Testing Purpose.";
     String dummyProductName2 = "Test Product Name 2";
 
-
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.
      *
@@ -135,7 +135,6 @@ public class NotificationScheduleTest {
     // assert
     List<User> users = this.userRepository.findAvailableAllByType(UserTypeEnum.MEMBER);
 
-
     for (User user : users) {
       List<String> targetNotifications = user.getReceivedNotifications().stream()
           .filter(notification -> notification.getNotificationType().getNotificationType()
@@ -149,4 +148,43 @@ public class NotificationScheduleTest {
 
   }
 
+  @Test
+  @Sql(scripts = { "classpath:/integration/schedule/shouldDeleteReadNotifications.sql" })
+  public void shouldDeleteReadNotifications() throws Exception {
+
+    // arrange
+    /**
+     * NOTE: 'save' inside this handler automatically update/reflect target entity.
+     *
+     * e.g., even if we call the this.orderRepository before this handler is
+     * handled, its variant sold count is updated.
+     **/
+
+    /**
+     * dont use this task handler directly since we dont' any control over the date
+     * paramter from this test so use product service directly.
+     **/
+    // this.task.handle();
+    // this.task.distributeNewProductArrivedNotification();
+    this.notificationService.deleteIfRead();
+
+    // assert
+    List<Notification> notifications = this.notificationRepository.findAll();
+    for (Notification notification: notifications) {
+      logger.info("notification id : " +  notification.getNotificationId());
+      assertThat(notification.getIsRead()).isFalse();
+    }
+
+    // association assert
+    // - user (exist)
+    Boolean isIssuerExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(u) > 0)  then true else false end from users u where u.userId = :userId",
+        Boolean.class).setParameter("userId", UUID.fromString("e95bf632-1518-4bf2-8ba9-cd8b7587530b")).getSingleResult();
+    Boolean isRecipientExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(u) > 0)  then true else false end from users u where u.userId = :userId",
+        Boolean.class).setParameter("userId", UUID.fromString("c7081519-16e5-4f92-ac50-1834001f12b9")).getSingleResult();
+
+    assertThat(isIssuerExist).isTrue();
+    assertThat(isRecipientExist).isTrue();
+  }
 }

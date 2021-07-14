@@ -29,6 +29,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -229,6 +232,8 @@ public class MemberOrderEndpointTest {
     assertThat(order.getBillingAddress().getPostalCode()).isEqualTo(dummyFormJson.get("billingAddress").get("postalCode").asText());
     assertThat(order.getUser().getUserId().toString()).isEqualTo(dummyFormJson.get("userId").asText());
     assertThat(order.getCurrency()).isEqualTo(dummyFormJson.get("currency").asText());
+    assertThat(order.getShippingCost()).isGreaterThan(new BigDecimal(0.00));
+    assertThat(order.getEstimatedDeliveryDate()).isAfter(LocalDateTime.now());
     assertThat(order.getOrderEvents().get(0).getOrderStatus()).isEqualTo(OrderStatusEnum.DRAFT);
 
     for (int i = 0; i < order.getOrderDetails().size(); i++) {
@@ -239,6 +244,14 @@ public class MemberOrderEndpointTest {
       assertThat(orderDetailDTO.getProductQuantity().toString()).isEqualTo(orderDetailCriteria.get("productQuantity").asText());
       assertThat(orderDetailDTO.getProduct().getProductId().toString()).isEqualTo(orderDetailCriteria.get("productId").asText());
       assertThat(orderDetailDTO.getProductVariant().getVariantId().toString()).isEqualTo(orderDetailCriteria.get("productVariantId").asText());
+
+      if (orderDetailDTO.getProductVariant().getVariantId().equals(3)) {
+        assertThat(orderDetailDTO.getProductWeight()).isEqualTo(1.00);
+      } else if (orderDetailDTO.getProductVariant().getVariantId().equals(6)) {
+        assertThat(orderDetailDTO.getProductWeight()).isEqualTo(0.6);
+      } else if (orderDetailDTO.getProductVariant().getVariantId().equals(11)) {
+        assertThat(new BigDecimal(orderDetailDTO.getProductWeight()).setScale(1, RoundingMode.UP)).isEqualTo(new BigDecimal(2.1).setScale(1, RoundingMode.DOWN));
+      }
     }
 
     // event assert

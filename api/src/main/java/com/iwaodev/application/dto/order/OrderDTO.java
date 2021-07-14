@@ -58,6 +58,8 @@ public class OrderDTO {
 
   private String currency;
 
+  private LocalDateTime estimatedDeliveryDate;
+
 }
 
 

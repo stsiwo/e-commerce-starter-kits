@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 import javax.servlet.http.Cookie;
 
@@ -326,6 +327,38 @@ public class AdminUserEndpointTest {
     for (UserDTO userDto : responseBody) {
       // check if the dummy string contains either fistName, lastName, or email
       assertThat(userDto.getActive()).isEqualTo(dummySearchQueryString);
+    }
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldAdminUserCanFilterUserListWithUserType.sql" })
+  public void shouldAdminUserCanFilterUserListWithUserType() throws Exception {
+
+    // arrange
+    UserTypeEnum dummySearchQueryString = UserTypeEnum.MEMBER ;
+    String searchQueryQueryString = "?userType=" + dummySearchQueryString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQueryQueryString;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    UserDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), UserDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    assertThat(responseBody.length).isLessThan(4);
+    for (UserDTO userDto : responseBody) {
+      // check if the dummy string contains either fistName, lastName, or email
+      assertThat(userDto.getUserType().getUserType().toString()).isEqualTo(UserTypeEnum.MEMBER.toString());
     }
   }
 
@@ -712,6 +745,60 @@ public class AdminUserEndpointTest {
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
+
+    // association assert
+    // - phone (delete)
+    // - address (delete)
+    // - company (deleted)
+    // - review (deleted) 
+    // - cartItems (deleted) 
+    // - wishlistItems (deleted) 
+    // - orders (exist) 
+    // - orderEvents (exist) 
+    // - issuerNotifications (deleted) 
+    // - recipientNotifications (deleted) 
+    Boolean isPhonesExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(c) > 0)  then true else false end from phones c inner join c.user u where u.userId = :userId",
+        Boolean.class).setParameter("userId", UUID.fromString("29c845ad-54b1-430a-8a71-5caba98d5978")).getSingleResult();
+    Boolean isAddressesExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(c) > 0)  then true else false end from addresses c inner join c.user u where u.userId = :userId",
+        Boolean.class).setParameter("userId", UUID.fromString("29c845ad-54b1-430a-8a71-5caba98d5978")).getSingleResult();
+    Boolean isCompaniesExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(c) > 0)  then true else false end from companies c inner join c.user u where u.userId = :userId",
+        Boolean.class).setParameter("userId", UUID.fromString("29c845ad-54b1-430a-8a71-5caba98d5978")).getSingleResult();
+    Boolean isReviewsExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(c) > 0)  then true else false end from reviews c inner join c.user u where u.userId = :userId",
+        Boolean.class).setParameter("userId", UUID.fromString("29c845ad-54b1-430a-8a71-5caba98d5978")).getSingleResult();
+    Boolean isCartItemsExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(c) > 0)  then true else false end from cartItems c inner join c.user u where u.userId = :userId",
+        Boolean.class).setParameter("userId", UUID.fromString("29c845ad-54b1-430a-8a71-5caba98d5978")).getSingleResult();
+    Boolean isWishlistItemsExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(c) > 0)  then true else false end from wishlistItems c inner join c.user u where u.userId = :userId",
+        Boolean.class).setParameter("userId", UUID.fromString("29c845ad-54b1-430a-8a71-5caba98d5978")).getSingleResult();
+    Boolean isOrderExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(c) > 0)  then true else false end from orders c where c.orderId = :orderId",
+        Boolean.class).setParameter("orderId", UUID.fromString("c8f8591c-bb83-4fd1-a098-3fac8d40e450")).getSingleResult();
+    Boolean isOrderEventExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(c) > 0)  then true else false end from orderEvents c where c.orderEventId = :orderEventId",
+        Boolean.class).setParameter("orderEventId", 1L).getSingleResult();
+    Boolean isIssuerNotificationsExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(c) > 0)  then true else false end from notifications c inner join c.issuer u where u.userId = :userId",
+        Boolean.class).setParameter("userId", UUID.fromString("29c845ad-54b1-430a-8a71-5caba98d5978")).getSingleResult();
+    Boolean isRecipientNotificationsExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(c) > 0)  then true else false end from notifications c inner join c.recipient u where u.userId = :userId",
+        Boolean.class).setParameter("userId", UUID.fromString("29c845ad-54b1-430a-8a71-5caba98d5978")).getSingleResult();
+
+
+    assertThat(isPhonesExist).isFalse();
+    assertThat(isAddressesExist).isFalse();
+    assertThat(isCompaniesExist).isFalse();
+    assertThat(isReviewsExist).isFalse();
+    assertThat(isCartItemsExist).isFalse();
+    assertThat(isWishlistItemsExist).isFalse();
+    assertThat(isOrderExist).isTrue();
+    assertThat(isOrderEventExist).isTrue();
+    assertThat(isIssuerNotificationsExist).isFalse();
+    assertThat(isRecipientNotificationsExist).isFalse();
   }
 
 }

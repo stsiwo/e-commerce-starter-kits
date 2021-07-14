@@ -3,15 +3,19 @@ package com.iwaodev.infrastructure.shipping;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Iterator;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import com.iwaodev.application.iservice.ShippingService;
+import com.iwaodev.application.dto.shipping.RatingDTO;
+import com.iwaodev.application.iservice.CanadaPostService;
 import com.iwaodev.infrastructure.shipping.schema.authreturn.AuthorizedReturn;
 import com.iwaodev.infrastructure.shipping.schema.authreturn.AuthorizedReturnInfo;
+import com.iwaodev.infrastructure.shipping.schema.messages.Messages;
 import com.iwaodev.infrastructure.shipping.schema.ncshipment.NonContractShipment;
 import com.iwaodev.infrastructure.shipping.schema.ncshipment.NonContractShipmentInfo;
 import com.iwaodev.infrastructure.shipping.schema.ncshipment.NonContractShipmentReceipt;
@@ -20,9 +24,11 @@ import com.iwaodev.infrastructure.shipping.schema.ncshipment.NonContractShipment
 import com.iwaodev.infrastructure.shipping.schema.rating.MailingScenario;
 import com.iwaodev.infrastructure.shipping.schema.rating.MailingScenario.Destination;
 import com.iwaodev.infrastructure.shipping.schema.rating.MailingScenario.Destination.Domestic;
+import com.iwaodev.infrastructure.shipping.schema.rating.PriceQuotes.PriceQuote;
 import com.iwaodev.infrastructure.shipping.schema.rating.PriceQuotes;
 import com.iwaodev.infrastructure.shipping.schema.ncshipment.NonContractShipment;
 import com.iwaodev.ui.criteria.shipping.RatingCriteria;
+import com.iwaodev.util.Util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +42,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
-public class ShippingServiceImpl implements ShippingService {
+public class CanadaPostServiceImpl implements CanadaPostService {
 
-  private static final Logger logger = LoggerFactory.getLogger(ShippingServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(CanadaPostServiceImpl.class);
 
   private RestTemplate restTemplate;
 
@@ -50,20 +56,24 @@ public class ShippingServiceImpl implements ShippingService {
 
   private String customerNumber;
 
+  private Util util;
+
   @Autowired
-  public ShippingServiceImpl(@Qualifier("shippingRestTemplate") RestTemplate restTemplate,
+  public CanadaPostServiceImpl(@Qualifier("shippingRestTemplate") RestTemplate restTemplate,
       @Value("${shipping.api.baseurl}") String shippingApiBaseUrl,
-      @Value("${shipping.api.customernumber}") String shippingApiCustomerNumber) {
+      @Value("${shipping.api.customernumber}") String shippingApiCustomerNumber, Util util) {
     this.restTemplate = restTemplate;
     this.ratingUrl = shippingApiBaseUrl + "/rs/ship/price";
     this.nonContractShipmentUrl = shippingApiBaseUrl + "/" + shippingApiCustomerNumber + "/ncshipment";
     this.authorizedReturnUrl = shippingApiBaseUrl + "/rs/" + shippingApiCustomerNumber + "/" + shippingApiCustomerNumber
         + "/authorizedreturn";
     this.customerNumber = shippingApiCustomerNumber;
+    this.util = util;
   }
 
   @Override
-  public PriceQuotes getRating(RatingCriteria criteria) throws JAXBException {
+  public PriceQuotes getRating(Double weight, String destinationPostalCode, String originalPostalCode)
+      throws JAXBException, Exception {
 
     /**
      * construct request body based on this criteria
@@ -74,13 +84,16 @@ public class ShippingServiceImpl implements ShippingService {
     logger.info("customer number (canada post): " + this.customerNumber);
 
     MailingScenario.ParcelCharacteristics parcelCharacteristics = new MailingScenario.ParcelCharacteristics();
-    parcelCharacteristics.setWeight(new BigDecimal(1));
+    /**
+     * prevent the value from overflow the decimal point. use 'setScale'.
+     **/
+    parcelCharacteristics.setWeight(new BigDecimal(weight).setScale(3, RoundingMode.UP));
     mailingScenario.setParcelCharacteristics(parcelCharacteristics);
 
-    mailingScenario.setOriginPostalCode("K2B8J6");
+    mailingScenario.setOriginPostalCode(this.util.formatPostalCode(originalPostalCode));
 
     Domestic domestic = new Domestic();
-    domestic.setPostalCode("J0E1X0");
+    domestic.setPostalCode(this.util.formatPostalCode(destinationPostalCode));
     Destination destination = new Destination();
     destination.setDomestic(domestic);
     mailingScenario.setDestination(destination);
@@ -124,13 +137,53 @@ public class ShippingServiceImpl implements ShippingService {
     /**
      * parse response xml to dto object
      **/
-    PriceQuotes priceQuotes = deserializeXmlStringToObject(response.getBody(), PriceQuotes.class);
+    if (response.getStatusCode().is2xxSuccessful()) {
+      // 2xx
+      PriceQuotes priceQuotes = deserializeXmlStringToObject(response.getBody(), PriceQuotes.class);
+      return priceQuotes;
+    } else {
+      // anything else
+      Messages messageData = deserializeXmlStringToObject(response.getBody(), Messages.class);
+      for (Iterator<Messages.Message> iter = messageData.getMessage().iterator(); iter.hasNext();) {
+        Messages.Message aMessage = (Messages.Message) iter.next();
+        logger.info("Error Code: " + aMessage.getCode());
+        logger.info("Error Msg: " + aMessage.getDescription());
+      }
+      throw new Exception("failed to get rating cost & delivery date");
+    }
 
-    return priceQuotes;
+  }
+
+  private RatingDTO extractRegularParcel(PriceQuotes quotes) {
+    RatingDTO ratingDTO = new RatingDTO();
+    for (PriceQuote quote : quotes.getPriceQuotes()) {
+      if (quote.getServiceName().equals("Regular Parcel")) {
+        logger.info("this is regular parcel");
+        ratingDTO.setEstimatedShippingCost(quote.getPriceDetails().getDue());
+        ratingDTO.setExpectedDeliveryDate(quote.getServiceStandard().getExpectedDeliveryDate().toGregorianCalendar()
+            .toZonedDateTime().toLocalDateTime());
+      }
+    }
+    return ratingDTO;
   }
 
   @Override
-  public NonContractShipmentInfo createNonContractShipment(NonContractShipment shipment) throws JAXBException {
+  public RatingDTO getRegularParcelRating(Double weight, String destinationPostalCode, String originalPostalCode)
+      throws JAXBException, Exception {
+    PriceQuotes priceQuotes = this.getRating(weight, destinationPostalCode, originalPostalCode);
+    return this.extractRegularParcel(priceQuotes);
+  }
+
+  @Override
+  public RatingDTO getRegularParcelRating(RatingCriteria criteria, String originalPostalCode)
+      throws JAXBException, Exception {
+    PriceQuotes priceQuotes = this.getRating(criteria.getParcelWeight(), criteria.getDestinationPostalCode(), originalPostalCode);
+    return this.extractRegularParcel(priceQuotes);
+  }
+
+  @Override
+  public NonContractShipmentInfo createNonContractShipment(NonContractShipment shipment)
+      throws JAXBException, Exception {
 
     /**
      * issue with XmlMapper (e.g., ObjectMapper) from jackson xml library.
@@ -180,7 +233,8 @@ public class ShippingServiceImpl implements ShippingService {
   }
 
   @Override
-  public byte[] getArtifactAfterNonContractShipment(String getArtifactUrl, String acceptHeader) throws JAXBException {
+  public byte[] getArtifactAfterNonContractShipment(String getArtifactUrl, String acceptHeader)
+      throws JAXBException, Exception {
 
     /**
      * prep for post request
@@ -204,7 +258,7 @@ public class ShippingServiceImpl implements ShippingService {
   }
 
   @Override
-  public NonContractShipmentReceipt getNonContractShipmentReceipt(String shipmentId) throws JAXBException {
+  public NonContractShipmentReceipt getNonContractShipmentReceipt(String shipmentId) throws JAXBException, Exception {
 
     /**
      * prep for post request
@@ -235,7 +289,8 @@ public class ShippingServiceImpl implements ShippingService {
 
   @Override
   public NonContractShipmentRefundRequestInfo requestConContractShipmentRefund(
-      NonContractShipmentRefundRequest nonContractShipmentRefundRequest, String requestRefundUrl) throws JAXBException {
+      NonContractShipmentRefundRequest nonContractShipmentRefundRequest, String requestRefundUrl)
+      throws JAXBException, Exception {
 
     /**
      * issue with XmlMapper (e.g., ObjectMapper) from jackson xml library.
@@ -285,7 +340,7 @@ public class ShippingServiceImpl implements ShippingService {
   }
 
   @Override
-  public AuthorizedReturnInfo createAuthrizedReturn(AuthorizedReturn authorizedReturn) throws JAXBException {
+  public AuthorizedReturnInfo createAuthrizedReturn(AuthorizedReturn authorizedReturn) throws JAXBException, Exception {
 
     /**
      * issue with XmlMapper (e.g., ObjectMapper) from jackson xml library.
@@ -335,7 +390,7 @@ public class ShippingServiceImpl implements ShippingService {
 
   @Override
   public byte[] getAuthorizedReturnArtifact(String getAuthorizedReturnArtifactUrl, String acceptHeader)
-      throws JAXBException {
+      throws JAXBException, Exception {
     /**
      * prep for post request
      **/
@@ -348,7 +403,8 @@ public class ShippingServiceImpl implements ShippingService {
     /**
      * request
      **/
-    ResponseEntity<byte[]> response = this.restTemplate.postForEntity(getAuthorizedReturnArtifactUrl, request, byte[].class);
+    ResponseEntity<byte[]> response = this.restTemplate.postForEntity(getAuthorizedReturnArtifactUrl, request,
+        byte[].class);
 
     /**
      * parse response xml to dto object

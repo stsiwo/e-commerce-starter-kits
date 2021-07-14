@@ -155,6 +155,9 @@ export function toStringToDateToString(dateStr: string): string {
 }
 
 export function toDateString(date: Date): string {
+  if (!date) {
+    return ""
+  }
   console.log(date instanceof Date);
   return date.toLocaleDateString("en-US", dateFormatOption)
 }

@@ -78,6 +78,7 @@ const OrderItemForm: React.FunctionComponent<OrderItemFormPropsType> = (props) =
         return (
           <CartItem
             value={cartItem}
+            key={cartItem.cartItemId}
           />
         )
       })

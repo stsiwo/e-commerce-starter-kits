@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.UUID;
+
 import javax.servlet.http.Cookie;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -532,5 +534,29 @@ public class AdminProductVariantEndpointTest {
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
+
+    // association assert
+    // - product (exist)
+    // - product size (exist)
+    // - cartItems (deleted)
+    // - wishlistItems (deleted) 
+    Boolean isProductExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(p) > 0)  then true else false end from products p where p.productId = :productId",
+        Boolean.class).setParameter("productId", UUID.fromString("9e3e67ca-d058-41f0-aad5-4f09c956a81f")).getSingleResult();
+    Boolean isProductSizeExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(ps) > 0)  then true else false end from productSizes ps where ps.productSizeId = :productSizeId",
+        Boolean.class).setParameter("productSizeId", 1L).getSingleResult();
+    Boolean isCartItemExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(c) > 0)  then true else false end from cartItems c where c.cartItemId = :cartItemId",
+        Boolean.class).setParameter("cartItemId", 1L).getSingleResult();
+    Boolean isWishlistItemExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(c) > 0)  then true else false end from wishlistItems c where c.wishlistItemId = :wishlistItemId",
+        Boolean.class).setParameter("wishlistItemId", 1L).getSingleResult();
+
+    assertThat(isProductExist).isTrue();
+    assertThat(isProductSizeExist).isTrue();
+    assertThat(isCartItemExist).isFalse();
+    assertThat(isWishlistItemExist).isFalse();
+
   }
 }

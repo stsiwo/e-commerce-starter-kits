@@ -59,6 +59,8 @@ public class AddressValidationListener {
     if (constraintViolations.size() > 0) {
       throw new AppException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
     }
+
+    logger.info("done valdating this domain for create");
   }
 
   @PreUpdate

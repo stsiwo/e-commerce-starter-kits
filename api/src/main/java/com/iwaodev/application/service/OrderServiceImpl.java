@@ -10,11 +10,14 @@ import java.util.stream.Collectors;
 
 import com.iwaodev.application.dto.order.OrderDTO;
 import com.iwaodev.application.dto.order.OrderEventDTO;
+import com.iwaodev.application.dto.shipping.RatingDTO;
 import com.iwaodev.application.irepository.OrderRepository;
 import com.iwaodev.application.irepository.ProductRepository;
 import com.iwaodev.application.irepository.UserRepository;
+import com.iwaodev.application.iservice.CanadaPostService;
 import com.iwaodev.application.iservice.OrderService;
 import com.iwaodev.application.iservice.PaymentService;
+import com.iwaodev.application.iservice.ShippingService;
 import com.iwaodev.application.mapper.OrderMapper;
 import com.iwaodev.application.specification.factory.OrderSpecificationFactory;
 import com.iwaodev.domain.order.OrderRule;
@@ -89,6 +92,9 @@ public class OrderServiceImpl implements OrderService {
 
   @Autowired
   private OrderEventService orderEventService;
+
+  @Autowired
+  private ShippingService shippingService;
 
   @Override
   public Page<OrderDTO> getAll(OrderQueryStringCriteria criteria, Integer page, Integer limit, OrderSortEnum sort) throws Exception {
@@ -218,6 +224,14 @@ public class OrderServiceImpl implements OrderService {
     // create order details from orderDetailCriteria (mapping is not supported)
     this.assignOrderDetails(criteria, order);
 
+    /**
+     * get shipping cost by send an api request
+     **/
+    logger.info("start save rating info");
+    RatingDTO ratingDTO = this.shippingService.getRating(order.getTotalWeight(), order.getShippingAddress().getPostalCode());
+    order.setShippingCost(ratingDTO.getEstimatedShippingCost());
+    order.setEstimatedDeliveryDate(ratingDTO.getExpectedDeliveryDate());
+
     // create order events
     try {
       this.orderEventService.add(order, OrderStatusEnum.DRAFT, "", customer);
@@ -291,6 +305,14 @@ public class OrderServiceImpl implements OrderService {
 
     // create order details from orderDetailCriteria (mapping is not supported)
     this.assignOrderDetails(criteria, order);
+
+    /**
+     * get shipping cost by send an api request
+     **/
+    logger.info("start save rating info");
+    RatingDTO ratingDTO = this.shippingService.getRating(order.getTotalWeight(), order.getShippingAddress().getPostalCode());
+    order.setShippingCost(ratingDTO.getEstimatedShippingCost());
+    order.setEstimatedDeliveryDate(ratingDTO.getExpectedDeliveryDate());
 
     logger.info("size of order details");
     logger.info("" + order.getOrderDetails().size());
@@ -397,6 +419,9 @@ public class OrderServiceImpl implements OrderService {
             product.getColorOfVariant(orderDetailCriteria.getProductVariantId()),
             product.getSizeOfVariant(orderDetailCriteria.getProductVariantId()), product.getProductName(),
             product.findVariantById(orderDetailCriteria.getProductVariantId()), product, order);
+
+        // set product weight
+        orderDetail.setProductWeight(product.findVariantById(orderDetailCriteria.getProductVariantId()).getVariantWeight(), orderDetailCriteria.getProductQuantity());
 
         order.addOrderDetail(orderDetail);
       } catch (NotFoundException e) {

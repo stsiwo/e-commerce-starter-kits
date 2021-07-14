@@ -18,7 +18,8 @@ import { getNanoId } from 'src/utils';
 import CartItemConfirmCard from './CartItemConfirmCard';
 import CustomerBasicConfirm from './CustomerBasicConfirm';
 import CustomerContactConfirm from './CustomerContactConfirm';
-import { postOrderFetchStatusActions } from 'reducers/slices/app/fetchStatus/order';
+import { checkoutSessionStatusActions } from 'reducers/slices/domain/checkout';
+import { CheckoutSessionStatusEnum } from 'domain/order/types';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -60,6 +61,7 @@ const FinalConfirmForm: React.FunctionComponent<FinalConfirmFormPropsType> = (pr
   const isValidCustomerBasicInfo = useSelector(mSelector.makeAuthValidateCustomerBasicInfoSelector())
   const isValidCustomerShippingAddress = useSelector(mSelector.makeAuthValidateCustomerShippingAddressSelector())
   const isValidCustomerBillingAddress = useSelector(mSelector.makeAuthValidateCustomerBillingAddressSelector())
+  const isRatingSuccess = useSelector(rsSelector.domain.getCheckoutIsRatingSuccess)
 
   // event handler to validate phone & addresses
   const handleValidateClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
@@ -85,6 +87,12 @@ const FinalConfirmForm: React.FunctionComponent<FinalConfirmFormPropsType> = (pr
       result = false
     }
 
+    // validate isRatingSuccess (e.g., estimated shipping cost & delivery date)
+    if (!isRatingSuccess) {
+      message = "Failed to get the estimated shipping cost and delivery date. please try again later."
+      result = false
+    }
+
     if (!result) {
       messageActions.update({
         id: getNanoId(),
@@ -99,11 +107,22 @@ const FinalConfirmForm: React.FunctionComponent<FinalConfirmFormPropsType> = (pr
 
   }
 
-  // wait for the request for stripe client to be done and based on the result, guide the customer to the payment page.
+  /**
+   * wait for the request for stripe client to be done and based on the result, guide the customer to the payment page.
+   **/
   const curRequestStripeClientFetchStatus = useSelector(rsSelector.app.getPostOrderFetchStatus)
+  const curCheckoutOrder = useSelector(rsSelector.domain.getCheckoutOrder);
   React.useEffect(() => {
     if (curRequestStripeClientFetchStatus === FetchStatusEnum.SUCCESS) {
+      console.log("order creation succeeded so update session status and move to payment section.")
+      // update session status
+      dispatch(
+        checkoutSessionStatusActions.update(CheckoutSessionStatusEnum.IN_SESSION)
+      )
+
+      // move to payment section
       props.goToNextStep()
+
     }
   }, [
     curRequestStripeClientFetchStatus 

@@ -24,8 +24,12 @@ import com.iwaodev.infrastructure.model.validator.OnUpdate;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Formula;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Entity(name = "orderDetails")
@@ -34,6 +38,8 @@ import lombok.ToString;
 @EntityListeners(OrderDetailValidationListener.class)
 @ToString
 public class OrderDetail {
+
+  private static final Logger logger = LoggerFactory.getLogger(OrderDetail.class);
 
   @Null(message = "{orderDetail.id.null}", groups = OnCreate.class)
   @NotNull(message = "{orderDetail.id.notnull}", groups = OnUpdate.class)
@@ -63,6 +69,11 @@ public class OrderDetail {
   @NotEmpty(message = "{orderDetail.productName.notempty}")
   @Column(name = "product_name")
   private String productName;
+
+  @NotNull(message = "{orderDetail.productWeight.notnull}")
+  @Setter(value = AccessLevel.NONE)
+  @Column(name = "product_weight")
+  private Double productWeight = 1.00;
 
   // don't make directory setter function at this side (ManyToOne). define the bidirectional setter at (OneToMany) only
   @NotNull(message = "{orderDetail.order.notnull}")
@@ -113,5 +124,21 @@ public class OrderDetail {
     }
     return null;
   }
+
+  /**
+   * set product weight = variant_weight * product_quantity
+   **/
+  public void setProductWeight(Double unitWeight, Integer quantity) {
+    logger.info("start set product weight: ");
+    logger.info("unit weight: " + unitWeight);
+    logger.info("quantity: " + quantity);
+
+    BigDecimal totalWeight = new BigDecimal(unitWeight);
+    Double result = totalWeight.multiply(new BigDecimal(quantity)).doubleValue();
+
+    logger.info("total weight: " + result);
+    this.productWeight = result;
+  }
+
 
 }

@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.http.Cookie;
 
@@ -669,6 +670,19 @@ public class AdminReviewEndpointTest {
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
+
+    // association assert
+    // - product (exist)
+    // - user (exist)
+    Boolean isProductExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(c) > 0)  then true else false end from products c where c.productId = :productId",
+        Boolean.class).setParameter("productId", UUID.fromString("9e3e67ca-d058-41f0-aad5-4f09c956a81f")).getSingleResult();
+    Boolean isUserExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(pi) > 0)  then true else false end from users pi where pi.userId = :userId",
+        Boolean.class).setParameter("userId", UUID.fromString("c7081519-16e5-4f92-ac50-1834001f12b9")).getSingleResult();
+
+    assertThat(isProductExist).isTrue();
+    assertThat(isUserExist).isTrue();
   }
 }
 

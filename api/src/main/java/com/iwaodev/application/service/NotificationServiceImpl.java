@@ -113,9 +113,9 @@ public class NotificationServiceImpl implements NotificationService {
   @Override
   public void deleteIfRead() throws Exception {
 
-    List<Notification> removedNotificationList = this.repository.deleteAllByIsRead(true);
+    this.repository.deleteAllByIsRead(true);
 
-    logger.info("number of notification removed since there are already read: " + removedNotificationList.size());
+    //logger.info("number of notification removed since there are already read: " + removedNotificationList.size());
 
   }
 

@@ -157,6 +157,8 @@ export const rsSelector = {
     getProductCurItems: (state: StateType) => state.domain.products.curItems,
 
     getCheckoutOrder: (state: StateType) => state.domain.checkout.order,
+    getCheckoutIsRatingSuccess: (state: StateType) => state.domain.checkout.isRatingSuccess,
+    getCheckoutSessionStatus: (state: StateType) => state.domain.checkout.sessionStatus,
 
     getNotification: (state: StateType) => state.domain.notifications.data,
     getNotificationPagination: (state: StateType) => state.domain.notifications.pagination,

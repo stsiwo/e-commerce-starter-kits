@@ -3,7 +3,9 @@ package com.iwaodev.infrastructure.specification;
 import java.time.LocalDateTime;
 
 import com.iwaodev.domain.user.UserActiveEnum;
+import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.infrastructure.model.User;
+import com.iwaodev.infrastructure.model.UserType_;
 import com.iwaodev.infrastructure.model.User_;
 
 import org.springframework.data.jpa.domain.Specification;
@@ -93,6 +95,18 @@ public class UserSpecifications {
         return builder.conjunction();
       }
       return builder.like(root.get(User_.userId).as(String.class), "%" + searchQuery + "%");
+    };
+  }
+
+  public static Specification<User> byUserType(UserTypeEnum userType) {
+    return (root, query, builder) -> {
+      if (userType == null) {
+        /**
+         * if paramter is null, we still want to chain specificiation so use 'conjunction()' 
+         **/
+        return builder.conjunction();
+      }
+      return builder.equal(root.join(User_.userType).get(UserType_.userType), userType);
     };
   }
 }

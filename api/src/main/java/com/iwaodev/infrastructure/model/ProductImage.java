@@ -25,7 +25,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @EntityListeners(ProductImageValidationListener.class)
-@Entity(name = "product_images")
+@Entity(name = "productImages")
 public class ProductImage {
 
   @Null(message = "{productImage.id.null}", groups = OnCreate.class)

@@ -32,6 +32,7 @@ public class ProductSize {
   @Column(name = "product_size_description")
   private String productSizeDescription;
 
-  @OneToMany(mappedBy = "productSize", cascade = CascadeType.ALL, orphanRemoval = false)
+  // any change of this entity should not affect to its children
+  @OneToMany(mappedBy = "productSize", cascade = {}, orphanRemoval = false)
   private List<ProductVariant> productVariants = new ArrayList<>();
 }

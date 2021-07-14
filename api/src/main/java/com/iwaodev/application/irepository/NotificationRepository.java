@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, String>, JpaSpecificationExecutor<Notification>, AdvanceNotificationRepository {
@@ -21,7 +22,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Stri
 
   @Modifying
   @Query("delete from notifications n where n.isRead = ?1")
-  List<Notification> deleteAllByIsRead(Boolean isRead);
+  public void deleteAllByIsRead(Boolean isRead);
 
 }
 

@@ -7,9 +7,13 @@ import { api } from 'configs/axiosConfig';
 import { calcSubTotalPriceAmount, calcSubTotalProductNumbers, calcTotalWeight } from 'domain/cart';
 import { useSnackbar } from 'notistack';
 import * as React from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { mSelector } from 'src/selectors/selector';
-import { cadCurrencyFormat } from 'src/utils';
+import { cadCurrencyFormat, getNanoId, toDateString } from 'src/utils';
+import { messageActions } from 'reducers/slices/app';
+import { MessageTypeEnum } from 'src/app';
+import { checkoutIsRatingSuccessActions } from 'reducers/slices/domain/checkout';
+import { RatingCriteria } from 'domain/order/types';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -34,38 +38,58 @@ const CartItemTotal: React.FunctionComponent<CartItemTotalPropsType> = (props) =
 
   // mui: makeStyles
   const classes = useStyles();
-  
-  // snakbar stuff when no phone & addresses are selected
-  const { enqueueSnackbar } = useSnackbar();
+  const dispatch = useDispatch();
 
   // selected cart Items
   const selectedCartItems = useSelector(mSelector.makeSelectedCartItemSelector())
+  const curShippingAddress = useSelector(mSelector.makeAuthShippingAddressSelector())
 
   // shipping cost state
   const [curShippingCost, setShippingCost] = React.useState<number>(0);
+  const [curDeliveryDate, setDeliveryDate] = React.useState<Date>(null);
 
   // request to get appropriate shipping cost
   React.useEffect(() => {
 
+    console.log("total weight: " + calcTotalWeight(selectedCartItems))
+    console.log("postal code: " + curShippingAddress.postalCode)
+
     api.request({
-      method: 'GET',
-      url: API1_URL + `/shipping/rating?weight=${calcTotalWeight(selectedCartItems)}`,
+      method: 'POST',
+      url: API1_URL + `/shipping/rating`,
+      data: {
+        parcelWeight: calcTotalWeight(selectedCartItems), 
+        destinationPostalCode: curShippingAddress.postalCode,
+      } as RatingCriteria
     }).then((data) => {
+      setShippingCost(data.data.estimatedShippingCost);
+      setDeliveryDate(data.data.expectedDeliveryDate);
 
-      setShippingCost(data.data.shippingCost);
+      dispatch(
+        checkoutIsRatingSuccessActions.update(true) 
+      )
 
-      enqueueSnackbar("updated successfully.", { variant: "success" })
     }).catch((error: AxiosError) => {
       // use error.response.data.message from api
-      enqueueSnackbar(error.response.data.message, { variant: "error" })
+      dispatch(
+        messageActions.update({
+          id: getNanoId(),
+          type: MessageTypeEnum.ERROR,
+          message: "failed to get estimated shipping cost and delivery date. please try again later.",
+        })
+      )
     })
   }, [
-  
-  ])
+
+    ])
 
   return (
     <Box component="div">
       <div>
+        <Typography variant="subtitle1" component="h3" align="right" gutterBottom>
+          Estimated Delivery Date: <b>{toDateString(curDeliveryDate)}</b>
+        </Typography>
+        <Divider />
         <Typography variant="subtitle1" component="h3" align="right" gutterBottom>
           Subtotal (<b>{calcSubTotalProductNumbers(selectedCartItems)}</b>  items): $<b>{cadCurrencyFormat(calcSubTotalPriceAmount(selectedCartItems))}</b>
         </Typography>

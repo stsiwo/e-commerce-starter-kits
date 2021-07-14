@@ -9,14 +9,12 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
 import { messageActions } from 'reducers/slices/app';
-import { postOrderFetchStatusActions } from 'reducers/slices/app/fetchStatus/order';
 import { cartItemActions } from 'reducers/slices/domain/cartItem';
-import { checkoutOrderActions } from 'reducers/slices/domain/checkout';
-import { stripeClientSecretActions } from 'reducers/slices/sensitive';
 import { MessageTypeEnum } from 'src/app';
 import { mSelector, rsSelector } from 'src/selectors/selector';
 import { cadCurrencyFormat, getNanoId } from 'src/utils';
-import { resetCheckoutStateActionCreator } from 'reducers/slices/common';
+import { checkoutSessionStatusActions } from 'reducers/slices/domain/checkout';
+import { CheckoutSessionStatusEnum } from 'domain/order/types';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -39,7 +37,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 declare type StripePaymentFormPropsType = {
   goToStep: (step: CheckoutStepEnum) => void
-  setPaymentAttempt: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 /**
@@ -99,29 +96,9 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
     });
 
     // payment done 
-
-    /**
-     * make sure to delete clientSecret. it is sensitive data and should be deleted as soon as you used.
-     *
-     * also, cur order too.
-     * also, post order fetch status too
-     *
-     **/
-    /**
-     * currently, this action (resetCheckoutStatus) is caught by following case reducers:
-     *
-        - stripeClientSecretActions
-        - checkoutOrderActions
-        - postOrderFetchStatusActions
-     *
-     *
-     **/
     dispatch(
-      resetCheckoutStateActionCreator()
+      checkoutSessionStatusActions.update(CheckoutSessionStatusEnum.PAYMENT_ATTEMPTED)
     )
-
-    // prepare for the next payment if failed
-    props.setPaymentAttempt(true);
 
     /**
      * Payment Failed

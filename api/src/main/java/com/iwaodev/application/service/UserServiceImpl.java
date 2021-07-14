@@ -16,6 +16,7 @@ import com.iwaodev.application.mapper.UserMapper;
 import com.iwaodev.application.specification.factory.UserSpecificationFactory;
 import com.iwaodev.domain.user.UserActiveEnum;
 import com.iwaodev.domain.user.UserSortEnum;
+import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.user.UserCriteria;
@@ -69,6 +70,9 @@ public class UserServiceImpl implements UserService {
 
   public Page<UserDTO> getAll(UserQueryStringCriteria criteria, Integer page, Integer limit, UserSortEnum sort) throws Exception {
 
+    // only return member user type (not include admin user)
+    criteria.setUserType(Optional.of(UserTypeEnum.MEMBER));
+
     // get result with repository
     // and map entity to dto with MapStruct
     return this.repository
@@ -77,7 +81,6 @@ public class UserServiceImpl implements UserService {
 
           @Override
           public UserDTO apply(User user) {
-
             return UserMapper.INSTANCE.toUserDTO(user);
           }
         });

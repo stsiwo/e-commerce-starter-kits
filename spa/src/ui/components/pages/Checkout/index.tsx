@@ -17,6 +17,10 @@ import { postSessionTimeoutOrderEventActionCreator } from 'reducers/slices/domai
 import { FetchStatusEnum } from 'src/app';
 import { resetCheckoutStateActionCreator } from 'reducers/slices/common';
 import { putAuthFetchStatusActions } from 'reducers/slices/app/fetchStatus/auth';
+import { CheckoutSessionStatusEnum } from 'domain/order/types';
+import { checkoutSessionStatusActions } from 'reducers/slices/domain/checkout';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 export enum CheckoutStepEnum {
   CUSTOMER_BASIC_INFORMATION = 0,
@@ -31,6 +35,9 @@ const useStyles = makeStyles((theme: Theme) =>
     title: {
       textTransform: "uppercase",
       margin: theme.spacing(6)
+    },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
     },
   }),
 );
@@ -72,17 +79,37 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
   const dispatch = useDispatch()
 
   /**
+   * backdrop while creating a new order.
+   *
+   **/
+  const curPostOrderFetchStatus = useSelector(rsSelector.app.getPostOrderFetchStatus);
+  const curCheckoutOrder = useSelector(rsSelector.domain.getCheckoutOrder);
+  const [curBackdropOpen, setBackdropOpen] = React.useState<boolean>(false);
+  React.useEffect(() => {
+    if (curPostOrderFetchStatus === FetchStatusEnum.FETCHING) {
+      setBackdropOpen(true);
+    } else {
+      setBackdropOpen(false);
+    }
+  }, [
+      curPostOrderFetchStatus
+    ])
+
+  /**
    * session time out stuff.
    *
    * if the customer does not finsih payment in CHECKOUT_SESSION_TIMEOUT, we cancel the final confirm and make the customer start over again. just click the final confirm again though.
    *
    * - this is because to prevent the customer occupies the product stock and make it avaible to the other customers.
    *
+   * if current checkout session status is anything but IN_SESSION, we need to clear session time.
+   *
    **/
-  const curCheckoutOrder = useSelector(rsSelector.domain.getCheckoutOrder);
+  const curCheckoutSessionStatus = useSelector(rsSelector.domain.getCheckoutSessionStatus);
 
   const handleSessionTimeout = () => {
 
+    console.log("session time out")
     dispatch(
       postSessionTimeoutOrderEventActionCreator({
         orderId: curCheckoutOrder.orderId,
@@ -92,57 +119,65 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
 
     // if timeout, get the customer back to final confirm section.
     setActiveStep(CheckoutStepEnum.CUSTOMER_BASIC_INFORMATION)
-  }
 
+    // update sessionStatus (global state)
+    dispatch(
+      checkoutSessionStatusActions.update(CheckoutSessionStatusEnum.EXPIRED)
+    )
+  }
   const sessionTime: number = parseInt(CHECKOUT_SESSION_TIMEOUT)
-  const curPostOrderFetchStatus = useSelector(rsSelector.app.getPostOrderFetchStatus);
-  // add flag to make sure the sessiontimeout only sent once
-  const isSessionTimeoutSent = React.useRef<boolean>(false);
   let timer: ReturnType<typeof setTimeout>;
 
+  /**
+   * if session status is IN_SESSION, start session timeer.
+   *
+   * Otherwise, clear the timer when the following:
+   *  1. session status is either INITIAL, EXPIRED, and PAYMENT_ATTEMPTED
+   *  2. if the user abort this session (e.g., handle this by unsubscribe.
+   *
+   **/
   React.useEffect(() => {
-
-
-    if (!isSessionTimeoutSent.current && curCheckoutOrder && curPostOrderFetchStatus === FetchStatusEnum.SUCCESS) {
-      timer = setTimeout(handleSessionTimeout, sessionTime)
-
-      isSessionTimeoutSent.current = true;
-
-      // don't forget to cancel timer.
-      return () => {
-        clearTimeout(timer);
-      }
+    console.log(curCheckoutSessionStatus)
+    if (curCheckoutSessionStatus === CheckoutSessionStatusEnum.IN_SESSION) {
+      console.log("session status is in_session so start timer")
+      timer = setTimeout(handleSessionTimeout, sessionTime) // this will change session status to be expired.
+    } else {
+      console.log("session status is NOT in_session so clear timer")
+      clearTimeout(timer);
     }
 
+    // don't forget to cancel timer.
+    // if this component is unmounted, this timer is unsubscribed.
+    /**
+     * cleanup function is run every time when dependencies has changed!!!
+     *
+     * this is different from class-based one (e.g., ComponentDidUnmounted), so be careful!!.
+     *
+     * ref: https://stackoverflow.com/questions/57023074/why-is-the-cleanup-function-from-useeffect-called-on-every-render
+     *
+     * how to run the cleanup only when unmount?
+     *  = you can use another useEffect with [] as the 2nd arg so that this will only run only when mount/unmount.
+     *
+     * in this use case, I don't want to run the cleanup every time so comment out and create another useEffect.
+     *
+     **/
+    //return () => {
+    //  console.log("umount so clear timer")
+    //  clearTimeout(timer);
+    //}
   }, [
-      curPostOrderFetchStatus,
-      JSON.stringify(curCheckoutOrder),
+      curCheckoutSessionStatus,
     ])
 
-  // reset session timeout if payment has done regardless of the result.
-  // the above useEffect cancel the timer if this component is unmounted (e.g., payment succeeded and redirected to another page).
-  // but if payment failed and the customer want to try one more time, we need to reset session timeout and use it again.
-  const [isPaymentAttempt, setPaymentAttempt] = React.useState<boolean>(false);
-
+  // cleanup - clear timer
   React.useEffect(() => {
-    
-    if (isPaymentAttempt) {
-
-      console.log("make sure this is called after payment done.")
-
-      // reset variables after payment attempt
+    return () => {
+      console.log("umount so clear timer")
       clearTimeout(timer);
-      isSessionTimeoutSent.current = false;
-
-      // finally set this back to false again for the next payment attempt
-      setPaymentAttempt(false);
-
     }
-  }, [
-    isPaymentAttempt 
-  ])
+  }, [])
 
-  // reset fetch status which affect validating the current section.
+  // reset auth fetch status which affect validating the current section.
   // this is necessary since the customer might come back to the specific section again and again.
   // every time the customer come back, we need to reset the previous state.
   React.useEffect(() => {
@@ -165,34 +200,70 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
      * }, [])
      **/
     dispatch(
-      putAuthFetchStatusActions.clear() 
+      putAuthFetchStatusActions.clear()
     )
-  
-  }, [
-    activeStep 
-  ])
 
-  // if the customer abort (e.g., go to another page) during payment section, we need to reset the checkout state
+  }, [
+      activeStep
+    ])
+
   /**
+   * reset checkout state handling.
+   *
+   * we need to reset the checkout state when following:
+   *  1. payment attempted regardless of the result since each checkout need to be new. (e.g., session status = PAYMENT_ATTEMPTED, EXIPRED)
+   *  2. the customer abort (e.g., go to another page) during payment section, we need to reset the checkout state 
+   *
    * currently, this action (resetCheckoutStatus) is caught by following case reducers:
    *
       - stripeClientSecretActions
       - checkoutOrderActions
       - postOrderFetchStatusActions
+      - checkoutIsRatingSuccess
    *
    *
    **/
   React.useEffect(() => {
-  
-    // unmount only
-    return () => {
+
+    if (curCheckoutSessionStatus === CheckoutSessionStatusEnum.EXPIRED || curCheckoutSessionStatus === CheckoutSessionStatusEnum.PAYMENT_ATTEMPTED) {
+      console.log("reset checkout status since its status is expired or payment_attempted")
       dispatch(
-        resetCheckoutStateActionCreator() 
+        resetCheckoutStateActionCreator()
       )
     }
+    /**
+     * cleanup function is run every time when dependencies has changed!!!
+     *
+     * this is different from class-based one (e.g., ComponentDidUnmounted), so be careful!!.
+     *
+     * ref: https://stackoverflow.com/questions/57023074/why-is-the-cleanup-function-from-useeffect-called-on-every-render
+     *
+     * how to run the cleanup only when unmount?
+     *  = you can use another useEffect with [] as the 2nd arg so that this will only run only when mount/unmount.
+     *
+     * in this use case, I don't want to run the cleanup every time so comment out and create another useEffect.
+     *
+     **/
+    // unmount only
+    //return () => {
+    //  console.log("reset checkout since this user leaves the checkout page")
+    //  dispatch(
+    //    resetCheckoutStateActionCreator()
+    //  )
+    //}
   }, [
-  
-  ])
+      curCheckoutSessionStatus
+    ])
+
+  // only run this clean up when unmount
+  React.useEffect(() => {
+    return () => {
+      console.log("reset checkout since this user leaves the checkout page")
+      dispatch(
+        resetCheckoutStateActionCreator()
+      )
+    }
+  }, [])
 
 
   return (
@@ -258,7 +329,6 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
           <StepLabel>{"Payment"}</StepLabel>
           <StepContent>
             <Payment
-              setPaymentAttempt={setPaymentAttempt}
               goToNextStep={goToNextStep}
               goToPrevStep={goToPrevStep}
               goToStep={goToStep}
@@ -267,6 +337,9 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
           </StepContent>
         </Step>
       </Stepper>
+      <Backdrop className={classes.backdrop} open={curBackdropOpen} >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </React.Fragment>
   )
 }

@@ -17,7 +17,7 @@ import { userPaginationLimitSliceReducer, userPaginationPageSliceReducer, userPa
 import { wishlistItemPaginationLimitSliceReducer, wishlistItemPaginationPageSliceReducer, wishlistItemPaginationTotalElementsSliceReducer, wishlistItemPaginationTotalPagesSliceReducer, wishlistItemQueryEndDateSliceReducer, wishlistItemQueryIsDiscountSliceReducer, wishlistItemQueryMaxPriceSliceReducer, wishlistItemQueryMinPriceSliceReducer, wishlistItemQueryReviewPointSliceReducer, wishlistItemQuerySearchQuerySliceReducer, wishlistItemQuerySortSliceReducer, wishlistItemQueryStartDateSliceReducer, wishlistItemSliceReducer } from './slices/domain/wishlistItem';
 import { stripeClientSecretSliceReducer } from './slices/sensitive';
 import { cartModalSliceReducer, leftNavMenuSliceReducer, rightNavMenuSliceReducer, searchModalSliceReducer } from './slices/ui';
-import { checkoutOrderSliceReducer } from './slices/domain/checkout';
+import { checkoutOrderSliceReducer, checkoutIsRatingSuccessSliceReducer, checkoutSessionStatusSliceReducer } from './slices/domain/checkout';
 import { getNotificationFetchStatusSliceReducer, patchNotificationFetchStatusSliceReducer } from './slices/app/fetchStatus/notification';
 import { notificationSliceReducer, notificationPaginationSliceReducer, notificationCurIndexSliceReducer } from './slices/domain/notification';
 import { getCompanyFetchStatusSliceReducer } from './slices/app/fetchStatus/company';
@@ -257,7 +257,9 @@ const mainReducer = combineReducers({
       curItems: productCurItemsSliceReducer,
     }),
     checkout: combineReducers({
-      order: checkoutOrderSliceReducer
+      sessionStatus: checkoutSessionStatusSliceReducer,
+      order: checkoutOrderSliceReducer,
+      isRatingSuccess: checkoutIsRatingSuccessSliceReducer
     }),
     notifications: combineReducers({
       data: notificationSliceReducer,

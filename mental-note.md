@@ -102,3 +102,25 @@
   ### Test Case
 
     - when you create test cases, it should take it into account that if code is updated, the test case should be failed so that I can realize .. i don't know.
+
+  ### What to Test
+
+    - all use cases if possible (if it is impossble, test the edge case)
+      - including error case.
+
+    - each endpoint (integration test)
+
+      - GET:
+        - filter/sort/pagination
+      
+      - POST/PUT/PATCH
+        - criteria validation
+      
+      - DELETE
+        - check association deletion or no deletion.
+
+
+## Java
+
+  - don't use "Double" because you cannot define the decimal point (e.g., double value might be 3.699999999999999733546474089962430298328399658203125)
+    - use BigDecimal

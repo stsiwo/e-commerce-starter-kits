@@ -368,6 +368,23 @@ public class Order {
     return totalCost;
   }
 
+  public Double getTotalWeight() {
+
+    /**
+     * double cannot do arithmetic operation (e.g., adding). this results a wrong vlaue.
+     * 
+     * - use BigDecimal instead.
+     *
+     **/
+     BigDecimal totalWeight = new BigDecimal(0.0); 
+
+    for (OrderDetail orderDetail: this.orderDetails) {
+        totalWeight = totalWeight.add(new BigDecimal(orderDetail.getProductWeight()));
+    }
+
+    return totalWeight.doubleValue();
+  }
+
   // business behaviors
   public Order raiseTestEvent() {
     logger.info("raise test event at order class");

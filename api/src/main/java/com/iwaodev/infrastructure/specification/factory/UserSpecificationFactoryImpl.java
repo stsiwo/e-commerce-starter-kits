@@ -24,6 +24,7 @@ public class UserSpecificationFactoryImpl implements UserSpecificationFactory {
     return this.specifications.isMemberSince(criteria.getStartDate())
       .and(this.specifications.isMemberBefore(criteria.getEndDate()))
       .and(this.specifications.isUserActiveType(criteria.getActive()))
+      .and(this.specifications.byUserType(criteria.getUserType()))
       .and(
           this.specifications.searchQueryByFirstName(criteria.getSearchQuery())
             .or(this.specifications.searchQueryByLastName(criteria.getSearchQuery()))

@@ -5,7 +5,7 @@ import { normalize, schema } from 'normalizr';
 import { ProductSortEnum } from "domain/product/types";
 import { getNanoId } from "src/utils";
 import { WishlistItemSortEnum } from "domain/wishlist/types";
-import { OrderSortEnum } from "domain/order/types";
+import { OrderSortEnum, CheckoutSessionStatusEnum } from "domain/order/types";
 import { ReviewSortEnum } from "domain/review/type";
 
 /**
@@ -286,7 +286,9 @@ export const initialState: StateType = {
       curItems: [],
     },
     checkout: {
+      sessionStatus: CheckoutSessionStatusEnum.INITIAL,
       order: null,
+      isRatingSuccess: false
     },
     notifications: {
       data: [],

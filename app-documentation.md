@@ -104,6 +104,8 @@
     1. calculate estimated shipping cost and delivery date based on the weight of the product.
       - this price is approximate so not precise.
       - if we add length/width/height to the calculation but if customers buy mutliple items, it is impossible to get the proper length/widht/height so we decided not to include those criteria.
+      - we use Canada Post as a main postal service.
+      - currently, we only estimate shipping cost and develiry date with 'regular parcel' without any options (e.g., no express or any other options).
 
   - the amdin is responsible for taking care of shipping.
     - packing the items

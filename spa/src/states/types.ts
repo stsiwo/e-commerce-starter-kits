@@ -3,7 +3,7 @@ import { AuthType, RequestTrackerType, FetchStatusEnum, MessageTypeEnum, Message
 import { CartItemType } from "domain/cart/types";
 import { WishlistItemType, WishlistItemSortEnum } from "domain/wishlist/types";
 import { UserType, UserSortEnum, AdminCompanyType, UserActiveEnum } from "domain/user/types";
-import { OrderType, OrderSortEnum } from "domain/order/types";
+import { OrderType, OrderSortEnum, CheckoutSessionStatusEnum } from "domain/order/types";
 import { ReviewType, ReviewSortEnum } from "domain/review/type";
 import { NotificationType } from "domain/notification/types";
 
@@ -208,7 +208,9 @@ export declare type DomainStateType = {
     curItems: string[],
   },
   checkout: {
+    sessionStatus: CheckoutSessionStatusEnum
     order: OrderType,
+    isRatingSuccess: boolean
   },
   notifications: {
     data: NotificationType[], 

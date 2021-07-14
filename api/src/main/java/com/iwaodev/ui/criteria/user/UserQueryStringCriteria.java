@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import com.iwaodev.domain.user.UserActiveEnum;
+import com.iwaodev.domain.user.UserTypeEnum;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -15,6 +16,8 @@ public class UserQueryStringCriteria {
   private Optional<String> searchQuery;
 
   private Optional<UserActiveEnum> active;
+
+  private Optional<UserTypeEnum> userType;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private Optional<LocalDateTime> startDate;
@@ -30,6 +33,7 @@ public class UserQueryStringCriteria {
      **/
     this.searchQuery = Optional.empty();
     this.active = Optional.empty();
+    this.userType = Optional.empty();
     this.startDate = Optional.empty();
     this.endDate = Optional.empty();
   }
@@ -48,6 +52,14 @@ public class UserQueryStringCriteria {
 
   public void setActive(Optional<UserActiveEnum> active) {
     this.active = active;
+  }
+
+  public UserTypeEnum getUserType() {
+    return this.userType.orElse(null);
+  }
+
+  public void setUserType(Optional<UserTypeEnum> userType) {
+    this.userType = userType;
   }
 
   public LocalDateTime getStartDate() {

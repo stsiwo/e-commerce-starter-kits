@@ -593,18 +593,8 @@
          <groupId>org.flywaydb</groupId>
          <artifactId>flyway-maven-plugin</artifactId>
          <version>${flyway.version}</version>
-         <executions>
-            <execution>
-               <phase>generate-sources</phase>
-               <goals>
-                  <goal>migrate</goal>
-               </goals>
-            </execution>
-         </executions>
       </plugin>
       -->
-
-
     </plugins>
   </build>
 </project>

@@ -1,14 +1,18 @@
 import DateFnsUtils from '@date-io/date-fns';
+import Backdrop from '@material-ui/core/Backdrop';
 import Box from '@material-ui/core/Box';
 import Checkbox from '@material-ui/core/Checkbox';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import MenuItem from '@material-ui/core/MenuItem';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import Favorite from '@material-ui/icons/Favorite';
+import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { CategoryType, defaultProductOnlyData, defaultProductValidationData, ProductDataType, ProductType, ProductValidationDataType, generateDefaultProductOnlyData } from 'domain/product/types';
+import { CategoryType, defaultProductValidationData, generateDefaultProductOnlyData, ProductDataType, ProductType, ProductValidationDataType } from 'domain/product/types';
 import { useValidation } from 'hooks/validation';
 import { productSchema } from 'hooks/validation/rules';
 import cloneDeep from 'lodash/cloneDeep';
@@ -17,14 +21,10 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCategoryActionCreator } from 'reducers/slices/domain/category';
 import { postProductActionCreator, putProductActionCreator } from 'reducers/slices/domain/product';
+import { FetchStatusEnum } from 'src/app';
 import { mSelector, rsSelector } from 'src/selectors/selector';
 import { renameFile } from 'src/utils';
 import ProductImagesForm from './ProductImagesForm';
-import Favorite from '@material-ui/icons/Favorite';
-import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
-import { FetchStatusEnum } from 'src/app';
-import Backdrop from '@material-ui/core/Backdrop';
-import CircularProgress from '@material-ui/core/CircularProgress';
 
 interface AdminProductFormPropsType {
   product: ProductType
@@ -116,7 +116,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>((props
    * need to do 'merge({}, defaultProductOnlyData, props.product)' since props.product does not include 'productImageFiles'.
    * 
    **/
-  const [curProductState, setProductState] = React.useState<ProductDataType>(props.product ? merge({}, defaultProductOnlyData, props.product) : generateDefaultProductOnlyData());
+  const [curProductState, setProductState] = React.useState<ProductDataType>(props.product ? merge({}, generateDefaultProductOnlyData(), props.product) : generateDefaultProductOnlyData());
 
   // update/create logic for product
   //  - true: create

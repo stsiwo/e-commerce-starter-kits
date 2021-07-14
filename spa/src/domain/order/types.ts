@@ -15,6 +15,13 @@ import { OverridableComponent } from "@material-ui/core/OverridableComponent";
 import { SvgIconTypeMap } from "@material-ui/core/SvgIcon";
 import { UserType, UserAddressType } from "domain/user/types";
 
+export enum CheckoutSessionStatusEnum {
+  INITIAL = "INITIAL",
+  IN_SESSION = "IN_SESSION", 
+  PAYMENT_ATTEMPTED = "PAYMENT_ATTEMPTED",
+  EXPIRED = "EXPIRED",
+}
+
 export enum OrderStatusEnum {
   DRAFT = "DRAFT",
   SESSION_TIMEOUT = "SESSION_TIMEOUT",
@@ -240,6 +247,11 @@ export const defaultOrderEventData: OrderEventType = {
 }
 
 // criteria
+
+export declare type RatingCriteria = {
+  parcelWeight: number
+  destinationPostalCode: string
+}
 
 export declare type SessionTimeoutOrderEventCriteria = {
   orderNumber: string

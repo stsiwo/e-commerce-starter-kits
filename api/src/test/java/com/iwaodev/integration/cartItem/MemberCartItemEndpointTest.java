@@ -390,6 +390,19 @@ public class MemberCartItemEndpointTest {
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
+
+    // association assert
+    // - user (exist)
+    // - product variant (exist) 
+    Boolean isUserExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(u) > 0)  then true else false end from users u where u.userId = :userId",
+        Boolean.class).setParameter("userId", this.authInfo.getAuthUser().getUserId()).getSingleResult();
+    Boolean isProductVariantsExist = this.entityManager.getEntityManager().createQuery(
+        "select case when (count(pv) > 0)  then true else false end from productVariants pv where pv.variantId = :variantId",
+        Boolean.class).setParameter("variantId", 9L).getSingleResult();
+
+    assertThat(isUserExist).isTrue();
+    assertThat(isProductVariantsExist).isTrue();
   }
   
   @Test

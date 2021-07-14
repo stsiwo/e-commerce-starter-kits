@@ -79,9 +79,6 @@ public class UserController {
       @RequestParam(value = "sort", required = false, defaultValue = "DATE_DESC") UserSortEnum sort,
       UserQueryStringCriteria criteria) throws Exception {
 
-    logger.info("user criteria (query string)");
-    logger.info(criteria.toString());
-
     logger.info("user controller cur thread name: " + Thread.currentThread().getName());
 
     return new ResponseEntity<>(this.service.getAll(criteria, page, limit, sort), HttpStatus.OK);

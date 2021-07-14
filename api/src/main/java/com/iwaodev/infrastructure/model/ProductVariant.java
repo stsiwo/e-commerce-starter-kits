@@ -56,7 +56,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @EntityListeners(value = { ProductVariantValidationListener.class, ProductVariantListener.class })
-@Entity(name = "product_variants")
+@Entity(name = "productVariants")
 @FilterDef(
     name = "selectedVariantFilter",
     parameters = @ParamDef(name = "variantIds", type = "long[]")
