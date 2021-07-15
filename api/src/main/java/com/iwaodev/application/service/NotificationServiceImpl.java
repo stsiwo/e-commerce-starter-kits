@@ -121,16 +121,21 @@ public class NotificationServiceImpl implements NotificationService {
 
   @Override
   public void distributeNewProductArriveByTime(LocalDateTime time) throws Exception {
+
+    logger.info("" + time);
     
     // 1 get all products whose release date is today.
     // this products are isPublic true and release date is the given time.
-    List<Product> productList = this.productRepository.findAllNewProductsByTime(time);
+    List<Product> productList = this.productRepository.getAllNewProductByTime(time);
     User admin = this.userRepository.getAdmin().orElseThrow(
         () -> new AppException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
+
+    logger.info("new product size: " + productList.size());
 
     List<Notification> notificationAllList = new ArrayList<>();
     // 2. create notifications to distribute to all member.
     for (Product product : productList) {
+      logger.info("product id: " + product.getProductId());
       try {
         List<Notification> notificationList = this.createNotificationService.createBatch(
             NotificationTypeEnum.NEW_PRODUCT_NOW_ON_SALE,
@@ -144,6 +149,8 @@ public class NotificationServiceImpl implements NotificationService {
       }
 
     }
+
+    logger.info("notification size for new product release: " + notificationAllList.size());
 
     this.repository.saveAll(notificationAllList);
   }

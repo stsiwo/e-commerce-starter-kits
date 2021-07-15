@@ -148,7 +148,7 @@ public class SendReturnRequestSubmittedEmailEventHandlerTest {
      **/
 
     // assert
-    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(recipient.getEmail()), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(recipient.getEmail()), Mockito.anyString(), Mockito.eq(String.format("A Return Request Was Submitted By Customer (Order #: %s)", dummyOrder.getOrderNumber())), Mockito.anyString());
   }
 }
 

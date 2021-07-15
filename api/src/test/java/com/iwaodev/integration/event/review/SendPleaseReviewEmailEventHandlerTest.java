@@ -114,11 +114,13 @@ public class SendPleaseReviewEmailEventHandlerTest {
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.
      *
-     * e.g., even if we call the this.orderRepository before this handler is handled, its variant sold count is updated.
+     * e.g., even if we call the this.orderRepository before this handler is
+     * handled, its variant sold count is updated.
      **/
 
     // assert
-    Mockito.verify(this.emailService, Mockito.never()).send(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+    Mockito.verify(this.emailService, Mockito.never()).send(Mockito.anyString(), Mockito.anyString(),
+        Mockito.anyString(), Mockito.anyString());
   }
 
   @Test
@@ -138,11 +140,13 @@ public class SendPleaseReviewEmailEventHandlerTest {
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.
      *
-     * e.g., even if we call the this.orderRepository before this handler is handled, its variant sold count is updated.
+     * e.g., even if we call the this.orderRepository before this handler is
+     * handled, its variant sold count is updated.
      **/
 
     // assert
-    Mockito.verify(this.emailService, Mockito.never()).send(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+    Mockito.verify(this.emailService, Mockito.never()).send(Mockito.anyString(), Mockito.anyString(),
+        Mockito.anyString(), Mockito.anyString());
   }
 
   @Test
@@ -157,7 +161,8 @@ public class SendPleaseReviewEmailEventHandlerTest {
     Optional<Order> dummyOrderOption = this.orderRepository.findById(dummyOrderId);
     Order dummyOrder = dummyOrderOption.get();
 
-    User recipient = this.userRepository.findById(dummyRecipient).orElseThrow(() -> new Exception("recipient not found."));
+    User recipient = this.userRepository.findById(dummyRecipient)
+        .orElseThrow(() -> new Exception("recipient not found."));
 
     // act & assert
     this.handler.handleEvent(new OrderEventWasAddedEvent(this, dummyOrder));
@@ -165,16 +170,14 @@ public class SendPleaseReviewEmailEventHandlerTest {
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.
      *
-     * e.g., even if we call the this.orderRepository before this handler is handled, its variant sold count is updated.
+     * e.g., even if we call the this.orderRepository before this handler is
+     * handled, its variant sold count is updated.
      **/
 
     // assert
-    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(dummyOrder.getOrderEmail()), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(dummyOrder.getOrderEmail()),
+        Mockito.anyString(),
+        Mockito.eq(String.format("Please Write Your Review About The Order (Order #: %s)", dummyOrder.getOrderNumber())),
+        Mockito.anyString());
   }
 }
-
-
-
-
-
-

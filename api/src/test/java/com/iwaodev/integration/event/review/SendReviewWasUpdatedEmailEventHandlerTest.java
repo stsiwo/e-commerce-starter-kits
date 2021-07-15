@@ -124,7 +124,12 @@ public class SendReviewWasUpdatedEmailEventHandlerTest {
      **/
 
     // assert
-    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(recipient.getEmail()), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+    Mockito.verify(this.emailService, Mockito.times(1))
+      .send(
+          Mockito.eq(recipient.getEmail()), 
+          Mockito.anyString(), 
+          Mockito.eq(String.format("A Review Was Updated By Customer (Review #: %s)", dummyReview.getReviewId())), 
+          Mockito.anyString());
   }
 }
 

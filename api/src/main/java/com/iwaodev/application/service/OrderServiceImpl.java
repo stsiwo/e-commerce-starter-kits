@@ -588,191 +588,191 @@ public class OrderServiceImpl implements OrderService {
    * flow: 1. the customer requests for the return. 2. the admin confirm and add
    * 'RECEIVED_RETURN_REQUEST' order event at the management console. 3. the admin
    **/
-  @Override
-  public void refundOrderAfterShipment(UUID orderId) throws Exception {
+  //@Override
+  //public void refundOrderAfterShipment(UUID orderId) throws Exception {
 
-    /**
-     * get target order
-     * 
-     **/
-    Order order = this.orderRepository.findById(orderId)
-        .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given order does not exist."));
+  //  /**
+  //   * get target order
+  //   * 
+  //   **/
+  //  Order order = this.orderRepository.findById(orderId)
+  //      .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given order does not exist."));
 
-    /**
-     * check eligibility
-     *
-     * - disable this in the case of if admin have to redund even if not eligible to
-     * refund.
-     *
-     * - i guess admin can add any order event as long as it is included
-     * 'nextAddableOrderEventForAdmin' so even if the member can not add
-     * 'return_request', the admin can do so.
-     *
-     **/
-    // LocalDateTime curDateTime = LocalDateTime.now();
-    // if (!order.isEligibleToRefund(curDateTime, this.orderRule.getEligibleDays()))
-    // {
-    // logger.info("sorry, you are not eligible to refund for this order.");
-    // throw new AppException(HttpStatus.BAD_REQUEST,
-    // "sorry, you are not eligible to refund for this order.");
-    // }
+  //  /**
+  //   * check eligibility
+  //   *
+  //   * - disable this in the case of if admin have to redund even if not eligible to
+  //   * refund.
+  //   *
+  //   * - i guess admin can add any order event as long as it is included
+  //   * 'nextAddableOrderEventForAdmin' so even if the member can not add
+  //   * 'return_request', the admin can do so.
+  //   *
+  //   **/
+  //  // LocalDateTime curDateTime = LocalDateTime.now();
+  //  // if (!order.isEligibleToRefund(curDateTime, this.orderRule.getEligibleDays()))
+  //  // {
+  //  // logger.info("sorry, you are not eligible to refund for this order.");
+  //  // throw new AppException(HttpStatus.BAD_REQUEST,
+  //  // "sorry, you are not eligible to refund for this order.");
+  //  // }
 
-    /**
-     * prep refund request to stripe
-     *
-     * - get paymentIntentId from the order
-     **/
-    String paymentIntentId = order.getStripePaymentIntentId();
+  //  /**
+  //   * prep refund request to stripe
+  //   *
+  //   * - get paymentIntentId from the order
+  //   **/
+  //  String paymentIntentId = order.getStripePaymentIntentId();
 
-    /**
-     * send refund request to Stripe
-     *
-     * - error handling esp when failed to refund
-     **/
-    try {
-      this.paymentService.requestRefund(paymentIntentId);
-    } catch (StripeException e) {
-      logger.info(e.getMessage());
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-    }
+  //  /**
+  //   * send refund request to Stripe
+  //   *
+  //   * - error handling esp when failed to refund
+  //   **/
+  //  try {
+  //    this.paymentService.requestRefund(paymentIntentId);
+  //  } catch (StripeException e) {
+  //    logger.info(e.getMessage());
+  //    throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+  //  }
 
-    /**
-     * add an order event (e.g., refund)
-     *
-     * - use RETURNED since the shipment already made.
-     **/
+  //  /**
+  //   * add an order event (e.g., refund)
+  //   *
+  //   * - use RETURNED since the shipment already made.
+  //   **/
 
-    User admin = this.userRepository.getAdmin().orElseThrow(
-        () -> new AppException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
-    try {
-      this.orderEventService.add(order, OrderStatusEnum.RETURNED, "", admin);
-    } catch (DomainException e) {
-      throw new AppException(HttpStatus.BAD_REQUEST, e.getMessage());
-    } catch (NotFoundException e) {
-      throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
-    }
+  //  User admin = this.userRepository.getAdmin().orElseThrow(
+  //      () -> new AppException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
+  //  try {
+  //    this.orderEventService.add(order, OrderStatusEnum.RETURNED, "", admin);
+  //  } catch (DomainException e) {
+  //    throw new AppException(HttpStatus.BAD_REQUEST, e.getMessage());
+  //  } catch (NotFoundException e) {
+  //    throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
+  //  }
 
-    Order savedOrder = this.orderRepository.save(order);
-    /**
-     * bug.
-     *
-     * hibernate return the same child entity twice in child list. e.g, orderEvents:
-     * [ { 101 } , { 102 }, { 102 } ] <- 102 is duplicate.
-     *
-     * workaround: use 'flush'.
-     *
-     * otherwise, you might got an error 'object references an unsaved transient
-     * instance – save the transient instance beforeQuery flushing'.
-     *
-     * - this is because hibernate recognize that the entity change its state again
-     * by calling 'parent.getChildren().size()' wihtout flushing, so be careful!!!!
-     *
-     * ref:
-     * https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
-     *
-     **/
-    this.orderRepository.flush();
+  //  Order savedOrder = this.orderRepository.save(order);
+  //  /**
+  //   * bug.
+  //   *
+  //   * hibernate return the same child entity twice in child list. e.g, orderEvents:
+  //   * [ { 101 } , { 102 }, { 102 } ] <- 102 is duplicate.
+  //   *
+  //   * workaround: use 'flush'.
+  //   *
+  //   * otherwise, you might got an error 'object references an unsaved transient
+  //   * instance – save the transient instance beforeQuery flushing'.
+  //   *
+  //   * - this is because hibernate recognize that the entity change its state again
+  //   * by calling 'parent.getChildren().size()' wihtout flushing, so be careful!!!!
+  //   *
+  //   * ref:
+  //   * https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
+  //   *
+  //   **/
+  //  this.orderRepository.flush();
 
-    this.publisher.publishEvent(new OrderReturnedEvent(this, savedOrder));
+  //  this.publisher.publishEvent(new OrderReturnedEvent(this, savedOrder));
 
-    /**
-     * domain event.
-     * 
-     * - handle shipment logic (e.g., get return label for the order).
-     * 
-     * * Don't complete (RETURNED) here. once the admin makes sure that the item is
-     * returned, get the stock back and add RETURNED order event.
-     *
-     **/
+  //  /**
+  //   * domain event.
+  //   * 
+  //   * - handle shipment logic (e.g., get return label for the order).
+  //   * 
+  //   * * Don't complete (RETURNED) here. once the admin makes sure that the item is
+  //   * returned, get the stock back and add RETURNED order event.
+  //   *
+  //   **/
 
-  }
+  //}
 
-  @Override
-  public void refundBeforeShipment(UUID orderId) throws Exception {
+  //@Override
+  //public void refundBeforeShipment(UUID orderId) throws Exception {
 
-    /**
-     * get target order
-     * 
-     **/
-    Order order = this.orderRepository.findById(orderId)
-        .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given order does not exist."));
+  //  /**
+  //   * get target order
+  //   * 
+  //   **/
+  //  Order order = this.orderRepository.findById(orderId)
+  //      .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given order does not exist."));
 
-    /**
-     * check eligibility
-     *
-     **/
-    // LocalDateTime curDateTime = LocalDateTime.now();
-    // if (!order.isEligibleToRefund(curDateTime, this.orderRule.getEligibleDays()))
-    // {
-    // logger.info("sorry, you are not eligible to refund for this order.");
-    // throw new AppException(HttpStatus.BAD_REQUEST,
-    // "sorry, you are not eligible to refund for this order.");
-    // }
+  //  /**
+  //   * check eligibility
+  //   *
+  //   **/
+  //  // LocalDateTime curDateTime = LocalDateTime.now();
+  //  // if (!order.isEligibleToRefund(curDateTime, this.orderRule.getEligibleDays()))
+  //  // {
+  //  // logger.info("sorry, you are not eligible to refund for this order.");
+  //  // throw new AppException(HttpStatus.BAD_REQUEST,
+  //  // "sorry, you are not eligible to refund for this order.");
+  //  // }
 
-    /**
-     * prep refund request to stripe
-     *
-     * - get paymentIntentId from the order
-     **/
-    String paymentIntentId = order.getStripePaymentIntentId();
+  //  /**
+  //   * prep refund request to stripe
+  //   *
+  //   * - get paymentIntentId from the order
+  //   **/
+  //  String paymentIntentId = order.getStripePaymentIntentId();
 
-    /**
-     * send refund request to Stripe
-     *
-     * - error handling esp when failed to refund
-     **/
-    try {
-      this.paymentService.requestRefund(paymentIntentId);
-    } catch (StripeException e) {
-      logger.info(e.getMessage());
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-    }
+  //  /**
+  //   * send refund request to Stripe
+  //   *
+  //   * - error handling esp when failed to refund
+  //   **/
+  //  try {
+  //    this.paymentService.requestRefund(paymentIntentId);
+  //  } catch (StripeException e) {
+  //    logger.info(e.getMessage());
+  //    throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+  //  }
 
-    /**
-     * add an order event (e.g., refund)
-     *
-     * - use CANCELED since there is no involvement with customer
-     **/
-    User admin = this.userRepository.getAdmin().orElseThrow(
-        () -> new AppException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
-    try {
-      this.orderEventService.add(order, OrderStatusEnum.CANCELED, "", admin);
-    } catch (DomainException e) {
-      throw new AppException(HttpStatus.BAD_REQUEST, e.getMessage());
-    } catch (NotFoundException e) {
-      throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
-    }
+  //  /**
+  //   * add an order event (e.g., refund)
+  //   *
+  //   * - use CANCELED since there is no involvement with customer
+  //   **/
+  //  User admin = this.userRepository.getAdmin().orElseThrow(
+  //      () -> new AppException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
+  //  try {
+  //    this.orderEventService.add(order, OrderStatusEnum.CANCELED, "", admin);
+  //  } catch (DomainException e) {
+  //    throw new AppException(HttpStatus.BAD_REQUEST, e.getMessage());
+  //  } catch (NotFoundException e) {
+  //    throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
+  //  }
 
-    Order savedOrder = this.orderRepository.save(order);
-    /**
-     * bug.
-     *
-     * hibernate return the same child entity twice in child list. e.g, orderEvents:
-     * [ { 101 } , { 102 }, { 102 } ] <- 102 is duplicate.
-     *
-     * workaround: use 'flush'.
-     *
-     * otherwise, you might got an error 'object references an unsaved transient
-     * instance – save the transient instance beforeQuery flushing'.
-     *
-     * - this is because hibernate recognize that the entity change its state again
-     * by calling 'parent.getChildren().size()' wihtout flushing, so be careful!!!!
-     *
-     * ref:
-     * https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
-     *
-     **/
-    this.orderRepository.flush();
+  //  Order savedOrder = this.orderRepository.save(order);
+  //  /**
+  //   * bug.
+  //   *
+  //   * hibernate return the same child entity twice in child list. e.g, orderEvents:
+  //   * [ { 101 } , { 102 }, { 102 } ] <- 102 is duplicate.
+  //   *
+  //   * workaround: use 'flush'.
+  //   *
+  //   * otherwise, you might got an error 'object references an unsaved transient
+  //   * instance – save the transient instance beforeQuery flushing'.
+  //   *
+  //   * - this is because hibernate recognize that the entity change its state again
+  //   * by calling 'parent.getChildren().size()' wihtout flushing, so be careful!!!!
+  //   *
+  //   * ref:
+  //   * https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
+  //   *
+  //   **/
+  //  this.orderRepository.flush();
 
-    this.publisher.publishEvent(new OrderCanceledEvent(this, savedOrder));
+  //  this.publisher.publishEvent(new OrderCanceledEvent(this, savedOrder));
 
-    /**
-     * domain event handlers
-     *
-     * - handle cancelation of this shipment - handle stock back
-     *
-     **/
-  }
+  //  /**
+  //   * domain event handlers
+  //   *
+  //   * - handle cancelation of this shipment - handle stock back
+  //   *
+  //   **/
+  //}
 
   @Override
   public void testEvent() throws Exception {

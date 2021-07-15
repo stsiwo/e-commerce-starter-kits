@@ -99,7 +99,7 @@ public class SendReturnRequestSubmittedEmailEventHandler implements EventHandler
     try {
       logger.info(String.format("To: %s, From: %s", admin.getEmail(), senderEmail));
       this.emailService.send(admin.getEmail(), from,
-          "A Return Request Was Submitted By Customer (Order #: " + order.getOrderNumber() + ")", htmlBody);
+          String.format("A Return Request Was Submitted By Customer (Order #: %s)", order.getOrderNumber()), htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());

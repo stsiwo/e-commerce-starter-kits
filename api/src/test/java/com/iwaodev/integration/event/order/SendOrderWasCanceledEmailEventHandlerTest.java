@@ -144,7 +144,7 @@ public class SendOrderWasCanceledEmailEventHandlerTest {
      **/
 
     // assert
-    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(dummyOrder.getOrderEmail()), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(dummyOrder.getOrderEmail()), Mockito.anyString(), Mockito.eq(String.format("Your Order Was Canceled (Order #: %s)", dummyOrder.getOrderNumber())), Mockito.anyString());
   }
 }
 

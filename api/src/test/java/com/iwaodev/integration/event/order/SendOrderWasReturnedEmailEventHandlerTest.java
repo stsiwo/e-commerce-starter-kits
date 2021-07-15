@@ -144,6 +144,6 @@ public class SendOrderWasReturnedEmailEventHandlerTest {
      **/
 
     // assert
-    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(dummyOrder.getOrderEmail()), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(dummyOrder.getOrderEmail()), Mockito.anyString(), Mockito.eq(String.format("Your Order Was Returned (Order #: %s)", dummyOrder.getOrderNumber())), Mockito.anyString());
   }
 }

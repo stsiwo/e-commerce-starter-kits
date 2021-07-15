@@ -42,7 +42,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
-public class SendOrderSucceededEmailEventHandler implements EventHandler<PaymentSucceededEvent>{
+public class SendOrderSucceededEmailEventHandler implements EventHandler<PaymentSucceededEvent> {
 
   private static final Logger logger = LoggerFactory.getLogger(SendOrderSucceededEmailEventHandler.class);
 
@@ -75,12 +75,11 @@ public class SendOrderSucceededEmailEventHandler implements EventHandler<Payment
 
     // order
     Order order = this.orderRepository.findByStripePaymentIntentId(event.getPaymentIntentId())
-        .orElseThrow(
-            () -> new AppException(HttpStatus.NOT_FOUND, "target order not found by its payment intent id"));
+        .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "target order not found by its payment intent id"));
 
     // BCC
-    User admin = this.userRepository.getAdmin().orElseThrow(
-        () -> new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist"));
+    User admin = this.userRepository.getAdmin()
+        .orElseThrow(() -> new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist"));
     // Sender
     Company company = admin.getCompanies().get(0);
     String senderEmail = "no-reply@" + company.getDomain();
@@ -110,8 +109,8 @@ public class SendOrderSucceededEmailEventHandler implements EventHandler<Payment
     // send it
     try {
       logger.info(String.format("To: %s, From: %s", recipientEmail, senderEmail));
-      this.emailService.send(recipientEmail, from, "Your Order Has Been Confirmed #" + order.getOrderNumber(),
-          htmlBody);
+      this.emailService.send(recipientEmail, from,
+          String.format("Your Order Has Been Confirmed (Order #: %s)", order.getOrderNumber()), htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());

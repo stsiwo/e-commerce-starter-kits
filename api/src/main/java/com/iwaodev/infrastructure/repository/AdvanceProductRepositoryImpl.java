@@ -192,7 +192,20 @@ public class AdvanceProductRepositoryImpl implements AdvanceProductRepository {
   @Override
   public List<ProductVariant> findAllDiscountPassedVariants(LocalDateTime time) {
     return this.entityManager
-        .createQuery("SELECT pv FROM productVariants pv WHERE pv.isDiscount = 1 AND pv.variantDiscountEndDate < :time", ProductVariant.class)
+        .createQuery("SELECT pv FROM productVariants pv WHERE pv.isDiscount = 1 AND pv.variantDiscountEndDate < :time",
+            ProductVariant.class)
+        .setParameter("time", time).getResultList();
+  }
+
+  /**
+   * bug?: createNativeQuery causes NullPointerException.
+   *
+   *
+   **/
+  @Override
+  public List<Product> getAllNewProductByTime(LocalDateTime time) {
+    return (List<Product>) this.entityManager
+        .createQuery("SELECT p FROM products p WHERE DATE(p.releaseDate) = DATE(:time) AND p.isPublic = 1", Product.class)
         .setParameter("time", time).getResultList();
   }
 

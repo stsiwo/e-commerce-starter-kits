@@ -113,6 +113,7 @@ public class SendNewOrderWasPlacedEmailEventHandlerTest {
 
     //User recipient = this.userRepository.findById(dummyRecipient).orElseThrow(() -> new Exception("recipient not found."));
     User recipient = this.userRepository.getAdmin().orElseThrow(() -> new Exception("admin not found.")); 
+    String dummyOrderNumber = "order_w0vDYZvqy_Y";
 
     // act & assert
     this.handler.handleEvent(new PaymentSucceededEvent(this, dummyStripePaymentIntentId, ""));
@@ -124,6 +125,6 @@ public class SendNewOrderWasPlacedEmailEventHandlerTest {
      **/
 
     // assert
-    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(recipient.getEmail()), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(recipient.getEmail()), Mockito.anyString(), Mockito.eq("A New Order Was Placed By Customer (Order #: " + dummyOrderNumber + ")"), Mockito.anyString());
   }
 }

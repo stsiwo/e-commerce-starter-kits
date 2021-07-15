@@ -106,7 +106,7 @@ public class SendPleaseReviewEmailEventHandler implements EventHandler<OrderEven
     // send it
     try {
       logger.info(String.format("To: %s, From: %s", recipientEmail, senderEmail));
-      this.emailService.send(recipientEmail, from, "Your Order Was Canceled (Order #" + order.getOrderNumber(),
+      this.emailService.send(recipientEmail, from, String.format("Please Write Your Review About The Order (Order #: %s)", order.getOrderNumber()),
           htmlBody + ")");
     } catch (MessagingException e) {
       logger.info(e.getMessage());

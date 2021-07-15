@@ -153,7 +153,7 @@ public class SendForgotPasswordEmailEventHandlerTest {
      **/
 
     // assert
-    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(dummyUser.getEmail()), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(dummyUser.getEmail()), Mockito.anyString(), Mockito.eq("Forgot Password Email To Reset Your Password."), Mockito.anyString());
   }
 }
 

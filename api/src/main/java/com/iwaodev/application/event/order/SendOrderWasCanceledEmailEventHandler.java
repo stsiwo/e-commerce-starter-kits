@@ -117,7 +117,7 @@ public class SendOrderWasCanceledEmailEventHandler implements EventHandler<Order
     try {
       logger.info(String.format("To: %s, From: %s", recipientEmail, senderEmail));
       this.emailService.send(recipientEmail, from,
-          "Your Order Was Canceled (Order #" + order.getOrderNumber(), htmlBody + ")");
+          String.format("Your Order Was Canceled (Order #: %s)", order.getOrderNumber()), htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());

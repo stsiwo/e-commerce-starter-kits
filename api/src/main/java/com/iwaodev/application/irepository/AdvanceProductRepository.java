@@ -42,4 +42,6 @@ public interface AdvanceProductRepository {
   public Optional<ProductSize> findProductSizeById(Long id);
 
   public List<ProductVariant> findAllDiscountPassedVariants(LocalDateTime time);
+
+  public List<Product> getAllNewProductByTime(LocalDateTime time);
 }

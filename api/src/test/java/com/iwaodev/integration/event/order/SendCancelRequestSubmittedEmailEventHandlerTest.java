@@ -148,7 +148,8 @@ public class SendCancelRequestSubmittedEmailEventHandlerTest {
      **/
 
     // assert
-    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(recipient.getEmail()), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+    Mockito.verify(this.emailService, Mockito.times(1))
+      .send(Mockito.eq(recipient.getEmail()), Mockito.anyString(), Mockito.eq("A Cancel Request Was Submitted By Customer (Order #: " + dummyOrder.getOrderNumber() + ")"), Mockito.anyString());
   }
 }
 

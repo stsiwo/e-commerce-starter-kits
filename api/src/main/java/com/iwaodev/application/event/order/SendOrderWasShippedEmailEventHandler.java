@@ -117,7 +117,7 @@ public class SendOrderWasShippedEmailEventHandler implements EventHandler<OrderE
     try {
       logger.info(String.format("To: %s, From: %s", recipientEmail, senderEmail));
       this.emailService.send(recipientEmail, from,
-          "Your Order Has Been Shipped #" + order.getOrderNumber(), htmlBody);
+          String.format("Your Order Has Been Shipped (Order #: %s)", order.getOrderNumber()), htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());

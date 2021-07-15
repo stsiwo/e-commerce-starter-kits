@@ -26,6 +26,12 @@
     - MEMBER: a customer who signs up this web app.
     - GUEST: a customer without any membership.
 
+  ## Email Verification
+
+    - we ask each member to verify its email address by sending the verification email.
+
+    - the reason is to improve security and avoid degrade email sending reputation. However, the temporaly user can login, buy, and do the same thing as an active user. so this verification is optional.
+
   ## Deletion Request From A Member
 
     - any member can request for the deletion of his/her membership, but this is a temporary deletion. The admin must delete the account permanently.

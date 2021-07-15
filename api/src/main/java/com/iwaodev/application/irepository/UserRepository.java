@@ -54,7 +54,7 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
    *  - 'active': ACTIVE
    *
    **/
-  @Query(value = "SELECT u FROM users u INNER JOIN u.userType ut WHERE u.active = 'ACTIVE' and ut.userType = ?1")
+  @Query(value = "SELECT u FROM users u INNER JOIN u.userType ut WHERE (u.active = 'ACTIVE' OR u.active = 'TEMP') and ut.userType = ?1")
   List<User> findAvailableAllByType(UserTypeEnum userType);
 }
 

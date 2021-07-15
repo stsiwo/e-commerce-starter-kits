@@ -76,16 +76,16 @@ public interface OrderService {
    *
    * @2021/07/09: use 'RefundPaymentEventHandler' instead.
    **/
-  @Deprecated
-  public void refundOrderAfterShipment(UUID orderId) throws Exception;
+  //@Deprecated
+  //public void refundOrderAfterShipment(UUID orderId) throws Exception;
 
   /**
    * handle refund for a specific order before shipment.
    *
    * @2021/07/09: use 'RefundPaymentEventHandler' instead.
    **/
-  @Deprecated
-  public void refundBeforeShipment(UUID orderId) throws Exception;
+  //@Deprecated
+  //public void refundBeforeShipment(UUID orderId) throws Exception;
 
   /**
    * assign order details of a given order.

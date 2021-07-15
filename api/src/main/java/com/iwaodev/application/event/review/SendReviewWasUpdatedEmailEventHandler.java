@@ -90,7 +90,7 @@ public class SendReviewWasUpdatedEmailEventHandler implements EventHandler<Revie
     try {
       logger.info(String.format("To: %s, From: %s", admin.getEmail(), senderEmail));
       this.emailService.send(admin.getEmail(), from,
-          "A Review Was Updated By Customer (Review #: " + review.getReviewId() + ")", htmlBody);
+          String.format("A Review Was Updated By Customer (Review #: %s)", review.getReviewId()), htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());

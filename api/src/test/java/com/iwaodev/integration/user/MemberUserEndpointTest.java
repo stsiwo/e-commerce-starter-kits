@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwaodev.application.dto.order.OrderDTO;
 import com.iwaodev.application.dto.order.OrderEventDTO;
+import com.iwaodev.application.dto.review.FindReviewDTO;
+import com.iwaodev.application.dto.review.ReviewDTO;
 import com.iwaodev.application.dto.user.PhoneDTO;
 import com.iwaodev.application.dto.user.UserDTO;
 import com.iwaodev.application.iservice.S3Service;
@@ -298,8 +300,10 @@ public class MemberUserEndpointTest {
     dummyUserSignupForm.put("password", "test_PASSWORD");
     // act
     ResultActions resultActions = mvc
-        .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyUserSignupForm.toString())
-            .contentType(MediaType.APPLICATION_JSON).cookie(this.authCookie).cookie(this.csrfCookie)
+        .perform(MockMvcRequestBuilders.put(targetUrl)
+            .content(dummyUserSignupForm.toString())
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie).cookie(this.csrfCookie)
             .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
@@ -934,4 +938,185 @@ public class MemberUserEndpointTest {
         .andDo(print()).andExpect(status().isBadRequest());
 
   }
+
+  // review
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldMemberUserGetReviewByProductIdAndUserId.sql" })
+  public void shouldMemberUserGetReviewByProductIdAndUserId() throws Exception {
+
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String dummyProductIdString = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String dummyProductQueryString = "?productId=" + dummyProductIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/review" + dummyProductQueryString;
+    String dummyReviewIdString = "100"; // check sql
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders
+            .get(targetUrl)
+            .cookie(this.authCookie)
+            .cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    FindReviewDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, FindReviewDTO.class);
+
+    assertThat(responseBody.getIsExist()).isEqualTo(true);
+    assertThat(responseBody.getReview().getReviewId().toString()).isEqualTo(dummyReviewIdString);
+    assertThat(responseBody.getUser().getUserId().toString()).isEqualTo(dummyUserIdString);
+    assertThat(responseBody.getProduct().getProductId().toString()).isEqualTo(dummyProductIdString);
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldMemberUserReturnEmptyReviewByProductIdAndUserId.sql" })
+  public void shouldMemberUserReturnEmptyReviewByProductIdAndUserId() throws Exception {
+
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String dummyProductIdString = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String dummyProductQueryString = "?productId=" + dummyProductIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/review" + dummyProductQueryString;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders
+            .get(targetUrl)
+            .cookie(this.authCookie)
+            .cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    FindReviewDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, FindReviewDTO.class);
+
+    assertThat(responseBody.getIsExist()).isEqualTo(false);
+    assertThat(responseBody.getReview()).isNull();
+    assertThat(responseBody.getUser().getUserId().toString()).isEqualTo(dummyUserIdString);
+    assertThat(responseBody.getProduct().getProductId().toString()).isEqualTo(dummyProductIdString);
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldMemberUserCreateNewReview.sql" })
+  public void shouldMemberUserCreateNewReview(@Value("classpath:/integration/user/shouldMemberUserCreateNewReview.json") Resource dummyFormJsonFile) throws Exception {
+
+    // dummy form json
+    JsonNode dummyFormJson =this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String dummyProductIdString = dummyFormJson.get("productId").asText();
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/reviews";
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders
+            .post(targetUrl)
+            .content(dummyFormJsonString)
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+            .cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ReviewDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ReviewDTO.class);
+
+    assertThat(responseBody.getIsVerified()).isEqualTo(false);
+    assertThat(responseBody.getReviewId()).isNotNull();
+    assertThat(responseBody.getReviewTitle()).isEqualTo(dummyFormJson.get("reviewTitle").asText());
+    assertThat(responseBody.getReviewDescription()).isEqualTo(dummyFormJson.get("reviewDescription").asText());
+    assertThat(responseBody.getReviewPoint().toString()).isEqualTo(dummyFormJson.get("reviewPoint").asText());
+    assertThat(responseBody.getUser().getUserId().toString()).isEqualTo(dummyUserIdString);
+    assertThat(responseBody.getProduct().getProductId().toString()).isEqualTo(dummyProductIdString);
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldMemberUserUpdateNewReview.sql" })
+  public void shouldMemberUserUpdateNewReview(@Value("classpath:/integration/user/shouldMemberUserUpdateNewReview.json") Resource dummyFormJsonFile) throws Exception {
+
+    // dummy form json
+    JsonNode dummyFormJson =this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String dummyProductIdString = dummyFormJson.get("productId").asText();
+    String dummyReviewIdString = "100";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/reviews/" + dummyReviewIdString;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders
+            .put(targetUrl)
+            .content(dummyFormJsonString)
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+            .cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ReviewDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ReviewDTO.class);
+
+    assertThat(responseBody.getIsVerified()).isEqualTo(false);
+    assertThat(responseBody.getReviewId().toString()).isEqualTo("100");
+    assertThat(responseBody.getReviewTitle()).isEqualTo(dummyFormJson.get("reviewTitle").asText());
+    assertThat(responseBody.getReviewDescription()).isEqualTo(dummyFormJson.get("reviewDescription").asText());
+    assertThat(responseBody.getReviewPoint().toString()).isEqualTo(dummyFormJson.get("reviewPoint").asText());
+    assertThat(responseBody.getUser().getUserId().toString()).isEqualTo(dummyUserIdString);
+    assertThat(responseBody.getProduct().getProductId().toString()).isEqualTo(dummyProductIdString);
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldMemberUserDeleteReview.sql" })
+  public void shouldMemberUserDeleteReview() throws Exception {
+
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String dummyReviewIdString = "100"; // check sql
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/reviews/" + dummyReviewIdString;
+
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders
+            .delete(targetUrl)
+            .cookie(this.authCookie)
+            .cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    // assert
+  }
+
 }

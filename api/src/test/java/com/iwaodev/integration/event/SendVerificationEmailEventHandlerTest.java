@@ -155,7 +155,7 @@ public class SendVerificationEmailEventHandlerTest {
      **/
 
     // assert
-    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(dummyUser.getEmail()), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(dummyUser.getEmail()), Mockito.anyString(), Mockito.eq("Verification Email To Activate Your Account."), Mockito.anyString());
   }
 }
 

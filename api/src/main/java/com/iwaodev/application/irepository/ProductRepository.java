@@ -75,6 +75,10 @@ public interface ProductRepository
   @Query(value = "SELECT p FROM products p INNER JOIN p.variants v WHERE v.variantId IN :variantIds")
   List<Product> findAllByVariantIds(@Param("variantIds") List<Long> variantIds);
 
-  @Query(value = "SELECT * FROM products p WHERE DATE(p.release_date) = ?1 AND p.is_public = 1", nativeQuery = true)
-  List<Product> findAllNewProductsByTime(LocalDateTime time);
+  /**
+   * bug?: nativeQuery cause nullpointerexception.
+   *
+   **/
+  //@Query(value = "SELECT p.* FROM products p WHERE DATE(p.release_date) = DATE(?1) AND p.is_public = 1", nativeQuery = true)
+  //List<Product> getAllNewProductByTime(LocalDateTime time);
 }

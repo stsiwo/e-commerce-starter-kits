@@ -2,6 +2,8 @@ package com.iwaodev.integration.schedule;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -20,7 +22,9 @@ import com.iwaodev.application.schedule.notification.NotificationSchedule;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.notification.NotificationTypeEnum;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.exception.NotFoundException;
 import com.iwaodev.infrastructure.model.Notification;
+import com.iwaodev.infrastructure.model.NotificationType;
 import com.iwaodev.infrastructure.model.User;
 
 import org.junit.jupiter.api.Test;
@@ -115,7 +119,6 @@ public class NotificationScheduleTest {
     // arrange
     // act & assert
     String dummyProductName1 = "Test Product Name That Should Be Long One For Testing Purpose.";
-    String dummyProductName2 = "Test Product Name 2";
 
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.
@@ -135,15 +138,32 @@ public class NotificationScheduleTest {
     // assert
     List<User> users = this.userRepository.findAvailableAllByType(UserTypeEnum.MEMBER);
 
+    /**
+     * bug?: 'user.getReceivedNotification()' does not fetch the notitifcaitons.
+     * - you need to fetch it with 'this.notificationRepository.findAll()' first.
+     **/
+    List<Notification> totalNotifications = this.notificationRepository.findAll();
+    logger.info("total notification size: " + totalNotifications.size());
+
+    // get list of notifcationTypes
+    Map<NotificationTypeEnum, NotificationType> notificationTypeList = this.notificationRepository
+        .getListOfNotificationTypes();
+
+    // find target notification type entity
+    NotificationType notificationTypeEntity = Optional.ofNullable(notificationTypeList.get(NotificationTypeEnum.NEW_PRODUCT_NOW_ON_SALE))
+        .orElseThrow(() -> new NotFoundException("target notification type not found"));
+
+    assertThat(users.size()).isEqualTo(3); // including main test member
     for (User user : users) {
+      List<Notification> notifications = user.getReceivedNotifications();
+      logger.info("notification size: " + notifications.size());
       List<String> targetNotifications = user.getReceivedNotifications().stream()
           .filter(notification -> notification.getNotificationType().getNotificationType()
               .equals(NotificationTypeEnum.NEW_PRODUCT_NOW_ON_SALE))
           .map(notification -> notification.getNotificationTitle()).collect(Collectors.toList());
 
-      assertThat(targetNotifications.size()).isEqualTo(2);
-      assertThat(targetNotifications.get(0)).isEqualTo(dummyProductName1);
-      assertThat(targetNotifications.get(1)).isEqualTo(dummyProductName2);
+      assertThat(targetNotifications.size()).isEqualTo(1);
+      assertThat(targetNotifications.get(0)).isEqualTo(notificationTypeEntity.getNotificationTitleTemplate());
     }
 
   }
