@@ -46,6 +46,7 @@ export declare type AppStateType = {
       deleteSingleEvent: FetchStatusEnum
       putEvent: FetchStatusEnum
       postSessionTimeoutEvent: FetchStatusEnum
+      getRating: FetchStatusEnum
     },
     users: {
       get: FetchStatusEnum

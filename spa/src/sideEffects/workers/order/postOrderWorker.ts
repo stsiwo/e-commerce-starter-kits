@@ -119,16 +119,6 @@ export function* postOrderWorker(action: PayloadAction<PostOrderActionType>) {
         postOrderFetchStatusActions.update(FetchStatusEnum.SUCCESS)
       )
 
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.SUCCESS,
-          message: "we confirmed your request.",
-        })
-      )
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       /**
        * update message

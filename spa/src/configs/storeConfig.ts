@@ -16,6 +16,9 @@ export const middleware: any[] = [
   sagaMiddleware  
 ]
 
+/**
+ * TODO: disable redux devtool when production.
+ */
 const composeEnhancers = (<any>window).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 export const store = createStore(rootReducer, initialState as StateType, composeEnhancers(
     applyMiddleware(...middleware)

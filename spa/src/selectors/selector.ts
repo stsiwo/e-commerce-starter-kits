@@ -45,6 +45,7 @@ export const rsSelector = {
     getSearchKeyword: (state: StateType) => state.app.searchKeyword,
     getRequestTracker: (state: StateType) => state.app.requestTracker,
 
+    getRatingFetchStatus: (state: StateType) => state.app.fetchStatus.orders.getRating,
     getPostOrderEventFetchStatus: (state: StateType) => state.app.fetchStatus.orders.postEvent,
     getPutOrderEventFetchStatus: (state: StateType) => state.app.fetchStatus.orders.putEvent,
     getDeleteSingleOrderEventFetchStatus: (state: StateType) => state.app.fetchStatus.orders.deleteSingleEvent,

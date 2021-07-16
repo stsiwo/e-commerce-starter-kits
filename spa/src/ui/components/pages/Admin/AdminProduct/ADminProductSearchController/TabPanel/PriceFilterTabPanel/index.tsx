@@ -1,11 +1,15 @@
-import Box from '@material-ui/core/Box';
-import Slider from '@material-ui/core/Slider';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { productQueryMaxPriceActions, productQueryMinPriceActions } from 'reducers/slices/domain/product';
-import { mSelector } from 'src/selectors/selector';
+import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
+import Slider from "@material-ui/core/Slider";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  productQueryMaxPriceActions,
+  productQueryMinPriceActions,
+} from "reducers/slices/domain/product";
+import { mSelector } from "src/selectors/selector";
 
 //interface PriceFilterTabPanelPropsType {
 //  curMinPrice: number
@@ -14,85 +18,90 @@ import { mSelector } from 'src/selectors/selector';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    box: {
-    },
+    box: {},
     margin: {
       margin: theme.spacing(1),
     },
     contentBox: {
       display: "flex",
       alignItems: "center",
-    }
-  }),
+    },
+  })
 );
 
 const marks = [
   {
     value: 0,
-    label: '$0',
+    label: "$0",
   },
   {
     value: 10,
-    label: '$10',
+    label: "$10",
   },
   {
     value: 20,
-    label: '$20',
+    label: "$20",
   },
   {
     value: 50,
-    label: '$50',
+    label: "$50",
   },
   {
     value: 100,
-    label: '$100',
+    label: "$100",
   },
   {
     value: 200,
-    label: '$200',
+    label: "$200",
   },
   {
     value: 300,
-    label: '$300',
+    label: "$300",
   },
   {
     value: 1000,
-    label: '$1,000',
+    label: "$1,000",
   },
 ];
 
-const PriceFilterTabPanel: React.FunctionComponent<{}> = ({
-}) => {
-
+const PriceFilterTabPanel: React.FunctionComponent<{}> = ({}) => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
   const curMinPrice = useSelector(mSelector.makeProductQueryMinPriceSelector());
   const curMaxPrice = useSelector(mSelector.makeProductQueryMaxPriceSelector());
 
-  const [curPrices, setPrices] = React.useState<number[]>([curMinPrice, curMaxPrice]);
+  const [curPrices, setPrices] = React.useState<number[]>([
+    curMinPrice,
+    curMaxPrice,
+  ]);
 
-  const handleMinChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+  const handleMinChange: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
     const nextPrice = parseInt(e.currentTarget.value);
     dispatch(productQueryMinPriceActions.update(nextPrice));
-  }
+  };
 
-  const handleMaxChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+  const handleMaxChange: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
     const nextPrice = parseInt(e.currentTarget.value);
-    dispatch(productQueryMaxPriceActions.update(nextPrice))
-  }
-
+    dispatch(productQueryMaxPriceActions.update(nextPrice));
+  };
 
   function valuetext(value: number) {
     return `$${value}`;
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, newValue: number[]) => {
-
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    newValue: number[]
+  ) => {
     let nextMinPrice;
     let nextMaxPrice;
 
-    /** 
+    /**
      * if min value exceed the max value, switch it, and vice versa.
      **/
 
@@ -104,15 +113,21 @@ const PriceFilterTabPanel: React.FunctionComponent<{}> = ({
       nextMaxPrice = newValue[0];
     }
 
-    console.log("next min price: " + nextMinPrice)
-    console.log("next max price: " + nextMaxPrice)
+    console.log("next min price: " + nextMinPrice);
+    console.log("next max price: " + nextMaxPrice);
 
     dispatch(productQueryMinPriceActions.update(nextMinPrice));
-    dispatch(productQueryMaxPriceActions.update(nextMaxPrice))
+    dispatch(productQueryMaxPriceActions.update(nextMaxPrice));
 
-    setPrices([nextMinPrice, nextMaxPrice])
-  }
+    setPrices([nextMinPrice, nextMaxPrice]);
+  };
 
+  const handleReset: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (
+    e
+  ) => {
+    dispatch(productQueryMinPriceActions.clear());
+    dispatch(productQueryMaxPriceActions.clear());
+  };
   return (
     <Box p={3}>
       <Typography id="range-slider" gutterBottom>
@@ -127,10 +142,11 @@ const PriceFilterTabPanel: React.FunctionComponent<{}> = ({
         aria-labelledby="range-slider"
         getAriaValueText={valuetext}
       />
+      <Button onClick={handleReset} variant="contained">
+        Reset
+      </Button>
     </Box>
-  )
-}
+  );
+};
 
-export default PriceFilterTabPanel
-
-
+export default PriceFilterTabPanel;

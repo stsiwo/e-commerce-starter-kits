@@ -108,6 +108,7 @@ export const initialState: StateType = {
         deleteSingleEvent: FetchStatusEnum.INITIAL,
         putEvent: FetchStatusEnum.INITIAL,
         postSessionTimeoutEvent: FetchStatusEnum.INITIAL,
+        getRating: FetchStatusEnum.INITIAL,
       },
       users: {
         get: FetchStatusEnum.INITIAL,
