@@ -96,7 +96,7 @@ public class ReviewServiceImpl implements ReviewService {
     // and map entity to dto with MapStruct
     Optional<Review> targetEntityOption = this.repository.findById(id);
 
-    if (targetEntityOption.isEmpty()) {
+    if (!targetEntityOption.isPresent()) {
       logger.info("the given review does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given review does not exist.");
     }
@@ -110,7 +110,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     // if the review already exist, reject. (must be unique about user_id &
     // product_id combination)
-    if (!this.repository.isExist(criteria.getUserId(), criteria.getProductId()).isEmpty()) {
+    if (this.repository.isExist(criteria.getUserId(), criteria.getProductId()).isPresent()) {
       // user not found so return error
       logger.info("the given review already exist.");
       throw new AppException(HttpStatus.CONFLICT, "the given review already exist.");
@@ -118,7 +118,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     Optional<User> customerOption = this.userRepository.findById(criteria.getUserId());
 
-    if (customerOption.isEmpty()) {
+    if (!customerOption.isPresent()) {
       // user not found so return error
       logger.info("the given customer does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given customer does not exist.");
@@ -129,7 +129,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     Optional<Product> productOption = this.productRepository.findById(criteria.getProductId());
 
-    if (productOption.isEmpty()) {
+    if (!productOption.isPresent()) {
       // user not found so return error
       logger.info("the given product does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
@@ -165,7 +165,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     Optional<Review> targetEntityOption = this.repository.findById(id);
 
-    if (targetEntityOption.isEmpty()) {
+    if (!targetEntityOption.isPresent()) {
       logger.info("the given review does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given review does not exist.");
     }
@@ -202,7 +202,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     Optional<Review> targetEntityOption = this.repository.findById(id);
 
-    if (!targetEntityOption.isEmpty()) {
+    if (targetEntityOption.isPresent()) {
       Review targetEntity = targetEntityOption.get();
       this.repository.delete(targetEntity);
     }
@@ -224,7 +224,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     FindReviewDTO findReviewDTO = new FindReviewDTO();
 
-    if (!reviewOption.isEmpty()) {
+    if (reviewOption.isPresent()) {
       findReviewDTO.setIsExist(true);
       findReviewDTO.setReview(ReviewMapper.INSTANCE.toReviewDTO(reviewOption.get()));
     } else {

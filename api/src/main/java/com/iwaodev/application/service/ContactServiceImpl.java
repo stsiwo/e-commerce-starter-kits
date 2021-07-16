@@ -55,7 +55,7 @@ public class ContactServiceImpl implements ContactService {
     Optional<User> adminRecipientOption = this.userRepository.getAdmin();
 
     // if not, return 404
-    if (adminRecipientOption.isEmpty()) {
+    if (!adminRecipientOption.isPresent()) {
       logger.info("the admin user does not exist");
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist");
     }
@@ -79,7 +79,7 @@ public class ContactServiceImpl implements ContactService {
       Optional<User> senderUserOption = this.userRepository.findById(userId);
 
       // if not, return 404
-      if (senderUserOption.isEmpty()) {
+      if (!senderUserOption.isPresent()) {
         logger.info("the user does not exist");
         throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the user does not exist");
       }

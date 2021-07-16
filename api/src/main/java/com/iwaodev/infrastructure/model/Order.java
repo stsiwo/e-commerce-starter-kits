@@ -450,7 +450,7 @@ public class Order {
   public void updateOrderEvent(Long orderEventId, OrderEventCriteria criteria) {
 
     Optional<OrderEvent> eventOption = this.findOrderEventById(orderEventId);
-    if (!eventOption.isEmpty()) {
+    if (eventOption.isPresent()) {
       OrderEvent event = eventOption.get();
 
       // only update note

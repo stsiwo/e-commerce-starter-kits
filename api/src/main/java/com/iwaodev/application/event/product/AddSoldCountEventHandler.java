@@ -54,7 +54,7 @@ public class AddSoldCountEventHandler implements EventHandler<CompletedOrderPaym
 
       Optional<Product> productOption = this.productRepository.findById(productId);
 
-      if (productOption.isEmpty()) {
+      if (!productOption.isPresent()) {
         // product not found so return error
         logger.info("the given product does not exist (productId: " + productId.toString());
         throw new AppException(HttpStatus.NOT_FOUND, "the given customer does not exist.");

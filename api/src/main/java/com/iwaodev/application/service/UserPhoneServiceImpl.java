@@ -36,7 +36,7 @@ public class UserPhoneServiceImpl implements UserPhoneService {
 
     Optional<User> targetUserOption = this.repository.findById(userId);
 
-    if (targetUserOption.isEmpty()) {
+    if (!targetUserOption.isPresent()) {
       logger.info("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
@@ -62,7 +62,7 @@ public class UserPhoneServiceImpl implements UserPhoneService {
     // check if the target user exist
     Optional<User> targetUserOption = this.repository.findById(userId);
 
-    if (targetUserOption.isEmpty()) {
+    if (!targetUserOption.isPresent()) {
       logger.info("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
@@ -101,7 +101,7 @@ public class UserPhoneServiceImpl implements UserPhoneService {
     // check if the target user exist
     Optional<User> targetUserOption = this.repository.findById(userId);
 
-    if (targetUserOption.isEmpty()) {
+    if (!targetUserOption.isPresent()) {
       logger.info("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
@@ -144,7 +144,7 @@ public class UserPhoneServiceImpl implements UserPhoneService {
     // check if the target user exist
     Optional<User> targetUserOption = this.repository.findById(userId);
 
-    if (targetUserOption.isEmpty()) {
+    if (!targetUserOption.isPresent()) {
       logger.info("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
@@ -188,7 +188,7 @@ public class UserPhoneServiceImpl implements UserPhoneService {
     // check if the target user exist
     Optional<User> targetUserOption = this.repository.findById(userId);
 
-    if (targetUserOption.isEmpty()) {
+    if (!targetUserOption.isPresent()) {
       logger.info("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }

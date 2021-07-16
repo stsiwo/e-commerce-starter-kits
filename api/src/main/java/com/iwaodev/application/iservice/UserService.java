@@ -33,12 +33,4 @@ public interface UserService {
 
   public byte[] getAvatarImage(UUID userId, String imageName) throws Exception;
 
-  /**
-   * check a user try to access its own data or other's data.
-   *  - if same, return true.
-   *  - if not, return false
-   **/
-  @Deprecated
-  public boolean isSameAsAuthenticatedUser(User authUser, UUID id) throws Exception;
-
 }

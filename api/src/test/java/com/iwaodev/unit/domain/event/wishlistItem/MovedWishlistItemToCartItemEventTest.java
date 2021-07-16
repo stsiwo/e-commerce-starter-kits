@@ -70,7 +70,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * - the idea is that get all event handlers of specific event with reflections and compare it.
  *
  **/
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("unittest")
 // @EnableTransactionManagement

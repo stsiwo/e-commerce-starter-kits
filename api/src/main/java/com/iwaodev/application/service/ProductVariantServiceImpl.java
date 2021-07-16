@@ -41,7 +41,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
     Optional<Product> targetEntityOption = this.repository.findById(productId);
 
-    if (targetEntityOption.isEmpty()) {
+    if (!targetEntityOption.isPresent()) {
       logger.info("the given product does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
@@ -169,7 +169,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
     Optional<Product> targetEntityOption = this.repository.findById(productId);
 
-    if (!targetEntityOption.isEmpty()) {
+    if (targetEntityOption.isPresent()) {
 
       Product targetEntity = targetEntityOption.get();
 

@@ -110,7 +110,7 @@ public class UserCartItemServiceImpl implements UserCartItemService {
     // check user exists
     Optional<User> targetUserOption = this.userRepository.findById(criteria.getUserId());
 
-    if (targetUserOption.isEmpty()) {
+    if (!targetUserOption.isPresent()) {
       logger.info("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
@@ -118,7 +118,7 @@ public class UserCartItemServiceImpl implements UserCartItemService {
     // check user exists
     Optional<Product> targetProductOption = this.productRepository.findByVariantId(criteria.getVariantId());
 
-    if (targetProductOption.isEmpty()) {
+    if (!targetProductOption.isPresent()) {
       logger.info("the given product or its variant does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product or its variant does not exist.");
     }
@@ -126,7 +126,7 @@ public class UserCartItemServiceImpl implements UserCartItemService {
     // check cart item already exist
     Optional<CartItem> option = this.cartItemRepository.findByVariantIdAndUserId(criteria.getVariantId(), criteria.getUserId());
 
-    if (!option.isEmpty()) {
+    if (option.isPresent()) {
       logger.info("target cart item already exist");
       throw new AppException(HttpStatus.CONFLICT, "target cart item already exist.");
     }
@@ -172,7 +172,7 @@ public class UserCartItemServiceImpl implements UserCartItemService {
     // check user exists
     Optional<CartItem> targetCartItemOption = this.cartItemRepository.findById(criteria.getCartItemId());
 
-    if (targetCartItemOption.isEmpty()) {
+    if (!targetCartItemOption.isPresent()) {
       logger.info("the given cart item does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given cart item does not exist.");
     }
@@ -212,7 +212,7 @@ public class UserCartItemServiceImpl implements UserCartItemService {
     // check user exists
     Optional<CartItem> targetCartItemOption = this.cartItemRepository.findById(cartItemId);
 
-    if (!targetCartItemOption.isEmpty()) {
+    if (targetCartItemOption.isPresent()) {
       this.cartItemRepository.delete(targetCartItemOption.get());
 
       // #TODO: might be better to return the rest of cartItem items of this user

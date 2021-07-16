@@ -465,13 +465,13 @@ public class User {
   public String getSelectedPhoneNumber() {
     // could be null
     Optional<Phone> selectedPhoneOption = this.phones.stream().filter(phone -> phone.getIsSelected()).findFirst();
-    return (selectedPhoneOption.isEmpty()) ? "" : selectedPhoneOption.get().getPhoneNumber();
+    return (!selectedPhoneOption.isPresent()) ? "" : selectedPhoneOption.get().getPhoneNumber();
   }
 
   public String getSelectedPhoneNumberWithCountryCode() {
     // could be null
     Optional<Phone> selectedPhoneOption = this.phones.stream().filter(phone -> phone.getIsSelected()).findFirst();
-    return (selectedPhoneOption.isEmpty()) ? "" : selectedPhoneOption.get().getCountryCode() + " " +  selectedPhoneOption.get().getPhoneNumber();
+    return (!selectedPhoneOption.isPresent()) ? "" : selectedPhoneOption.get().getCountryCode() + " " +  selectedPhoneOption.get().getPhoneNumber();
   }
 
   /**

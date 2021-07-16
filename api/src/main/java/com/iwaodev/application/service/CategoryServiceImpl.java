@@ -92,7 +92,7 @@ public class CategoryServiceImpl implements CategoryService {
     // and map entity to dto with MapStruct
     Optional<Category> targetEntityOption = this.repository.findById(id);
 
-    if (targetEntityOption.isEmpty()) {
+    if (!targetEntityOption.isPresent()) {
       logger.info("the given address does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given address does not exist.");
     }
@@ -129,7 +129,7 @@ public class CategoryServiceImpl implements CategoryService {
     // completely delete user data
     Optional<Category> targetEntityOption = this.repository.findById(id);
 
-    if (!targetEntityOption.isEmpty()) {
+    if (targetEntityOption.isPresent()) {
       Category targetEntity = targetEntityOption.get();
 
       if (targetEntity.getProducts().size() > 0) {

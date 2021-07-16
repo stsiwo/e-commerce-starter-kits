@@ -114,7 +114,7 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
     // check user exists
     Optional<User> targetUserOption = this.userRepository.findById(userId);
 
-    if (targetUserOption.isEmpty()) {
+    if (!targetUserOption.isPresent()) {
       logger.info("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
@@ -122,7 +122,7 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
     // check user exists
     Optional<Product> targetProductOption = this.productRepository.findByVariantId(variantId);
 
-    if (targetProductOption.isEmpty()) {
+    if (!targetProductOption.isPresent()) {
       logger.info("the given product or its variant does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product or its variant does not exist.");
     }
@@ -132,7 +132,7 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
     // check cart item already exist
     Optional<WishlistItem> option = this.wishlistItemRepository.findByVariantIdAndUserId(variantId, userId);
 
-    if (!option.isEmpty()) {
+    if (option.isPresent()) {
       logger.info("target wishlist item already exist");
       throw new AppException(HttpStatus.CONFLICT, "target wishlist item already exist.");
     }
@@ -180,7 +180,7 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
     // check wishlistItem exists
     Optional<WishlistItem> targetWishlistItemOption = this.wishlistItemRepository.findById(wishlistItemId);
 
-    if (targetWishlistItemOption.isEmpty()) {
+    if (!targetWishlistItemOption.isPresent()) {
       logger.info("the target wishlist item does not exist.");
       throw new AppException(HttpStatus.NOT_FOUND, "the target wishlist item does not exist.");
     }
@@ -200,7 +200,7 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
     // check user exists
     Optional<WishlistItem> targetWishlistItemOption = this.wishlistItemRepository.findById(wishlistItemItemId);
 
-    if (!targetWishlistItemOption.isEmpty()) {
+    if (targetWishlistItemOption.isPresent()) {
       this.wishlistItemRepository.delete(targetWishlistItemOption.get());
 
       // #TODO: might be better to return the rest of wishlistItem items of this user

@@ -22,7 +22,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-//@RunWith(SpringRunner.class)
+//////@RunWith(SpringRunner.class)
 ///**
 // * this allows you to use TestEntityManager instead of EntityManager.
 // *

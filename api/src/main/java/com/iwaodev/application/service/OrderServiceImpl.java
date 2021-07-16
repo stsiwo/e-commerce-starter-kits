@@ -121,7 +121,7 @@ public class OrderServiceImpl implements OrderService {
 
     Optional<User> targetEntityOption = this.userRepository.findById(userId);
 
-    if (targetEntityOption.isEmpty()) {
+    if (!targetEntityOption.isPresent()) {
       logger.info("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
@@ -171,7 +171,7 @@ public class OrderServiceImpl implements OrderService {
     // and map entity to dto with MapStruct
     Optional<Order> targetEntityOption = this.orderRepository.findById(orderId);
 
-    if (targetEntityOption.isEmpty()) {
+    if (!targetEntityOption.isPresent()) {
       logger.info("the given order does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given order does not exist.");
     }
@@ -789,7 +789,7 @@ public class OrderServiceImpl implements OrderService {
      **/
     Optional<Order> orderOption = this.orderRepository.findById(orderId);
 
-    if (orderOption.isEmpty()) {
+    if (!orderOption.isPresent()) {
       // user not found so return error
       logger.info("the target order does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given order does not exist.");
@@ -847,7 +847,7 @@ public class OrderServiceImpl implements OrderService {
      **/
     Optional<Order> orderOption = this.orderRepository.findById(orderId);
 
-    if (orderOption.isEmpty()) {
+    if (!orderOption.isPresent()) {
       // user not found so return error
       logger.info("the target order does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given order does not exist.");

@@ -44,9 +44,9 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
     Optional<User> targetUserOption = this.userRepository.getByEmail(email);
 
     logger.info("forgot password user? null?");
-    logger.info("" + targetUserOption.isEmpty());
+    logger.info("" + targetUserOption.isPresent());
 
-    if (!targetUserOption.isEmpty()) {
+    if (targetUserOption.isPresent()) {
       logger.info("target forgot password user exist");
 
       User targetUser = targetUserOption.get();
@@ -66,7 +66,7 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
     // find the user by this email
     Optional<User> targetUserOption = this.userRepository.findByForgotPasswordToken(criteria.getToken());
 
-    if (targetUserOption.isEmpty()) {
+    if (!targetUserOption.isPresent()) {
       /**
        * true message is 'the given user does not exist' but to improve the security, we hide the message and return the below message instead.
        * 

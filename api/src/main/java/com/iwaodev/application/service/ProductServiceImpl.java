@@ -136,7 +136,7 @@ public class ProductServiceImpl implements ProductService {
     // and map entity to dto with MapStruct
     Optional<Product> targetEntityOption = this.repository.findById(id);
 
-    if (targetEntityOption.isEmpty()) {
+    if (!targetEntityOption.isPresent()) {
       logger.info("the given product does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
@@ -152,7 +152,7 @@ public class ProductServiceImpl implements ProductService {
     // and map entity to dto with MapStruct
     Optional<Product> targetEntityOption = this.repository.findByPath(path);
 
-    if (targetEntityOption.isEmpty()) {
+    if (!targetEntityOption.isPresent()) {
       logger.info("the given product does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
@@ -168,7 +168,7 @@ public class ProductServiceImpl implements ProductService {
     // and map entity to dto with MapStruct
     Optional<Product> targetEntityOption = this.repository.findByPathOrId(path);
 
-    if (targetEntityOption.isEmpty()) {
+    if (!targetEntityOption.isPresent()) {
       logger.info("the given product does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
@@ -188,7 +188,7 @@ public class ProductServiceImpl implements ProductService {
     // and map entity to dto with MapStruct
     Optional<Product> targetEntityOption = this.repository.findPublicByPathOrId(path);
 
-    if (targetEntityOption.isEmpty()) {
+    if (!targetEntityOption.isPresent()) {
       logger.info("the given product does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
@@ -285,7 +285,7 @@ public class ProductServiceImpl implements ProductService {
 
       // if file exists, we need to save it to local directory and save its public
       // path to its product iamge entity
-      if (!fileOption.isEmpty()) {
+      if (fileOption.isPresent()) {
 
         logger.info("file exists, so save it.");
 
@@ -347,7 +347,7 @@ public class ProductServiceImpl implements ProductService {
 
     Optional<Product> targetEntityOption = this.repository.findById(id);
 
-    if (targetEntityOption.isEmpty()) {
+    if (!targetEntityOption.isPresent()) {
       logger.info("the given product does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
@@ -431,7 +431,7 @@ public class ProductServiceImpl implements ProductService {
           .findFirst();
 
       // should exist otherwise your logic is wrong.
-      if (oldProductImageOption.isEmpty()) {
+      if (!oldProductImageOption.isPresent()) {
         logger.info("the given product image does not exist");
         throw new AppException(HttpStatus.NOT_FOUND, "the given product image does not exist.");
       }
@@ -479,7 +479,7 @@ public class ProductServiceImpl implements ProductService {
        * update image
        **/
       // product image
-      if (!fileOption.isEmpty()) {
+      if (fileOption.isPresent()) {
 
         logger.info("need to add new file");
 
@@ -552,7 +552,7 @@ public class ProductServiceImpl implements ProductService {
 
     Optional<Product> targetEntityOption = this.repository.findById(id);
 
-    if (!targetEntityOption.isEmpty()) {
+    if (targetEntityOption.isPresent()) {
       Product targetEntity = targetEntityOption.get();
 
       logger.info("target product id to be deleted: " + targetEntity.getProductId().toString());

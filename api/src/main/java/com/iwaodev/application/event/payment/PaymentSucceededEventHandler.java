@@ -76,7 +76,7 @@ public class PaymentSucceededEventHandler implements EventHandler<PaymentSucceed
     // target order from db
     Optional<Order> orderOption = this.orderRepository.findByStripePaymentIntentId(event.getPaymentIntentId());
 
-    if (orderOption.isEmpty()) {
+    if (!orderOption.isPresent()) {
       throw new AppException(HttpStatus.NOT_FOUND, "target order not found by its payment intent id");
     }
 
@@ -85,7 +85,7 @@ public class PaymentSucceededEventHandler implements EventHandler<PaymentSucceed
     Optional<User> userOption = this.userRepository.findByStipeCustomerId(event.getStripeCustomerId());
 
     // make sure the order' user == request user
-    if (!userOption.isEmpty()) {
+    if (userOption.isPresent()) {
       if (!order.getUser().getUserId().equals(userOption.get().getUserId())) {
         throw new AppException(HttpStatus.BAD_REQUEST, "you cannot update an order for other member.");
       }
@@ -94,7 +94,7 @@ public class PaymentSucceededEventHandler implements EventHandler<PaymentSucceed
 
     // add new order event
     try {
-      if (userOption.isEmpty()) {
+      if (!userOption.isPresent()) {
         logger.info("this is guest user");
         orderEventService.add(order, OrderStatusEnum.ORDERED, "", (User) null);
         orderEventService.add(order, OrderStatusEnum.PAID, "", (User)null);
@@ -132,7 +132,7 @@ public class PaymentSucceededEventHandler implements EventHandler<PaymentSucceed
     this.orderRepository.flush();
 
     // remove selected cart item from cart if the customer is member
-    if (!userOption.isEmpty()) {
+    if (userOption.isPresent()) {
 
       User user = userOption.get();
 
@@ -150,7 +150,7 @@ public class PaymentSucceededEventHandler implements EventHandler<PaymentSucceed
     Notification notification;
 
     try {
-      if (!userOption.isEmpty()) {
+      if (userOption.isPresent()) {
         User user = userOption.get();
         // member
         notification = this.createNotificationService.create(NotificationTypeEnum.ORDER_WAS_PLACED_BY_MEMBER,

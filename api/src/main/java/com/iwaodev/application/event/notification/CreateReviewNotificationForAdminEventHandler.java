@@ -53,7 +53,7 @@ public class CreateReviewNotificationForAdminEventHandler implements EventHandle
       // member user
       Notification notification = this.createNotificationService.create(
           NotificationTypeEnum.REVIEW_WAS_UPDATED_BY_MEMBER,
-          String.format("A new review (review#: %s) was submitted by %s. Please check the link for more detail.",
+          String.format("A review (review#: %s) was submitted by %s. Please check the link for more detail.",
               event.getReview().getReviewId(), event.getReview().getUser().getFullName()),
           event.getReview().getUser(), admin,
           String.format("/admin/reviews?reviewId=%s", event.getReview().getReviewId()), "");

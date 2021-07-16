@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
     // and map entity to dto with MapStruct
     Optional<User> targetEntityOption = this.repository.findById(id);
 
-    if (targetEntityOption.isEmpty()) {
+    if (!targetEntityOption.isPresent()) {
       logger.info("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService {
     Optional<User> targetEntityOption = this.repository.findById(id);
 
     // if not, return 404
-    if (targetEntityOption.isEmpty()) {
+    if (!targetEntityOption.isPresent()) {
       logger.info("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
@@ -176,7 +176,7 @@ public class UserServiceImpl implements UserService {
 
     Optional<User> targetEntityOption = this.repository.findById(id);
 
-    if (targetEntityOption.isEmpty()) {
+    if (!targetEntityOption.isPresent()) {
       logger.info("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
@@ -197,7 +197,7 @@ public class UserServiceImpl implements UserService {
     // completely delete user data
     Optional<User> targetEntityOption = this.repository.findById(id);
 
-    if (!targetEntityOption.isEmpty()) {
+    if (targetEntityOption.isPresent()) {
       User targetEntity = targetEntityOption.get();
       // delete s3 directory of this user also.
       String userDirectoryKey = this.userFilePath + "/" + targetEntity.getUserId().toString();
@@ -207,34 +207,12 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  @Deprecated
-  public boolean isSameAsAuthenticatedUser(org.springframework.security.core.userdetails.User authUser, UUID id) throws Exception {
-
-    // get result with repository
-    // and map entity to dto with MapStruct
-    Optional<User> targetEntityOption = this.repository.findById(id);
-
-    if (targetEntityOption.isEmpty()) {
-      logger.info("the given user does not exist");
-      throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
-    }
-
-    logger.info("auth user email: " + authUser.getUsername());
-    logger.info("target user email: " + targetEntityOption.get().getEmail());
-
-    /**
-     * don't confused with 'getUsername()'. it contains the email of the user.
-     **/
-    return authUser.getUsername() == targetEntityOption.get().getEmail();
-  }
-
-  @Override
   public String uploadAvatarImage(UUID userId, MultipartFile file) throws Exception {
 
     // find the user
     Optional<User> targetEntityOption = this.repository.findById(userId);
 
-    if (targetEntityOption.isEmpty()) {
+    if (!targetEntityOption.isPresent()) {
       logger.info("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
@@ -286,7 +264,7 @@ public class UserServiceImpl implements UserService {
     // find the user
     Optional<User> targetEntityOption = this.repository.findById(userId);
 
-    if (targetEntityOption.isEmpty()) {
+    if (!targetEntityOption.isPresent()) {
       logger.info("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }

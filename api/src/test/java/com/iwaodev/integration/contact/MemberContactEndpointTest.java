@@ -63,7 +63,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 // this is alias to SpringJUnit4ClassRunner
-@RunWith(SpringRunner.class)
+////@RunWith(SpringRunner.class)
 /**
  * this allows you to use TestEntityManager instead of EntityManager.
  *

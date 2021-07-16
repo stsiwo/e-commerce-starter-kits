@@ -57,7 +57,7 @@ public class SendVerificationEmailEventHandler implements EventHandler<Generated
     Optional<User> adminRecipientOption = this.userRepository.getAdmin();
 
     // if not, return 404
-    if (adminRecipientOption.isEmpty()) {
+    if (!adminRecipientOption.isPresent()) {
       logger.info("the admin user does not exist");
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist");
     }

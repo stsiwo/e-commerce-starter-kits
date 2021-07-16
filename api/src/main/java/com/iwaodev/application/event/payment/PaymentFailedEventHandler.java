@@ -67,7 +67,7 @@ public class PaymentFailedEventHandler implements EventHandler<PaymentFailedEven
     // target order from db
     Optional<Order> orderOption = this.orderRepository.findByStripePaymentIntentId(event.getPaymentIntentId());
 
-    if (orderOption.isEmpty()) {
+    if (!orderOption.isPresent()) {
       throw new AppException(HttpStatus.NOT_FOUND, "target order not found by its payment intent id");
     }
 
@@ -78,7 +78,7 @@ public class PaymentFailedEventHandler implements EventHandler<PaymentFailedEven
 
     Order order = orderOption.get();
     // make sure the order' user == request user
-    if (!userOption.isEmpty()) {
+    if (userOption.isPresent()) {
       if (!order.getUser().getUserId().equals(userOption.get().getUserId())) {
         throw new AppException(HttpStatus.BAD_REQUEST, "you cannot update an order for other member.");
       }
@@ -87,7 +87,7 @@ public class PaymentFailedEventHandler implements EventHandler<PaymentFailedEven
     logger.info("before orderEventService.add");
     // add new order event
     try {
-      if (userOption.isEmpty()) {
+      if (!userOption.isPresent()) {
         logger.info("this is guest user");
         orderEventService.add(order, OrderStatusEnum.ORDERED, "", (User)null);
         orderEventService.add(order, OrderStatusEnum.PAYMENT_FAILED, "", (User)null);
