@@ -2,6 +2,7 @@ package com.iwaodev.config.filter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.UUID;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -10,7 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.config.ApiTokenCookieConfig;
+import com.iwaodev.config.SpringSecurityUser;
 import com.iwaodev.config.SpringSecurityUserDetailsService;
 import com.iwaodev.config.service.CookieService;
 import com.iwaodev.ui.response.BaseResponse;
@@ -68,7 +71,7 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
    * need to validate jwt then if it is not valid, throws
    * 'InvalidJWTTokenException'.
    *
-   * also, retrieve email from jwt cookie and then find the user based on the
+   * also, retrieve user id from jwt cookie and then find the user based on the
    * email.
    *
    * @2021/07/02
@@ -95,7 +98,7 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
           .findFirst().orElse(null);
     }
 
-    String userEmail = null;
+    UUID userId = null;
     String jwt = null;
 
     boolean isGuest = true;
@@ -104,13 +107,16 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
       jwt = apiTokenCookie.getValue();
 
       try {
-        userEmail = jwtUtil.extractUserEmail(jwt);
-      } catch (MalformedJwtException e) {
-        // force logout e.g., delete 'api-token' cookie
-        this.eraseCookie(request, response);
-        // return error response
-        this.errorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "invalid jwt token. please login again.");
-      } catch (ExpiredJwtException e) {
+        String userIdString = this.jwtUtil.extractUserId(jwt);
+        logger.info("extracted user id: " + userIdString);
+        /**
+         * this throws java.lang.IllegalArgumentException: Invalid UUID string: invalid if the string is not uuid string
+         */
+        userId = UUID.fromString(userIdString);
+        logger.info("after convert user id to uuid");
+      } catch (Exception e) {
+        logger.info("error during extract user id from jwt in the request");
+        logger.info(e.getMessage());
         // force logout e.g., delete 'api-token' cookie
         this.eraseCookie(request, response);
         // return error response
@@ -127,18 +133,18 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
     if (!isGuest) {
 
       logger.debug("extracted jwt: " + jwt);
-      logger.debug("user email: " + userEmail);
+      logger.debug("user userId: " + userId);
 
-      if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+      if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+        UserDetails userDetails = this.userDetailsService.loadUserByUsername(userId.toString());
 
-        // validate jwt if it is not expired & user email match
-        if (jwtUtil.validateToken(jwt, userDetails)) {
+        // validate jwt if it is not expired & user id match
+        if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
           logger.debug("jwt is valid so let's move to the next filter.");
 
           UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-              userDetails, null, userDetails.getAuthorities());
+                  userDetails, null, userDetails.getAuthorities());
           usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
           SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 

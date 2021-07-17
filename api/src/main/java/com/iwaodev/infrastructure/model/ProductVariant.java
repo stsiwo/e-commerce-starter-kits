@@ -230,7 +230,13 @@ public class ProductVariant {
 
   public BigDecimal getCurrentPrice() {
 
-    if (this.getIsDiscount() && this.variantDiscountStartDate.isBefore(LocalDateTime.now()) && this.variantDiscountEndDate.isAfter(LocalDateTime.now())) {
+    if (this.getIsDiscount() &&
+            // before or equal to include the edge date
+            (this.variantDiscountStartDate.toLocalDate().isBefore(LocalDateTime.now().toLocalDate()) ||
+            this.variantDiscountStartDate.toLocalDate().isEqual(LocalDateTime.now().toLocalDate())) &&
+            (this.variantDiscountEndDate.toLocalDate().isAfter(LocalDateTime.now().toLocalDate()) ||
+            this.variantDiscountEndDate.toLocalDate().isEqual(LocalDateTime.now().toLocalDate()))
+    ) {
       return this.getVariantDiscountPrice();
     } 
 

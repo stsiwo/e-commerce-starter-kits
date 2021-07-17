@@ -1,16 +1,25 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import { CategoryDataType, CategoryType, CategoryValidationDataType, defaultCategoryValidationData, generateDefaultCategoryData } from 'domain/product/types';
-import { useValidation } from 'hooks/validation';
-import { categorySchema } from 'hooks/validation/rules';
-import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { postCategoryActionCreator, putCategoryActionCreator } from 'reducers/slices/domain/category';
-import { mSelector } from 'src/selectors/selector';
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import {
+  CategoryDataType,
+  CategoryType,
+  CategoryValidationDataType,
+  defaultCategoryValidationData,
+  generateDefaultCategoryData,
+} from "domain/product/types";
+import { useValidation } from "hooks/validation";
+import { categorySchema } from "hooks/validation/rules";
+import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  postCategoryActionCreator,
+  putCategoryActionCreator,
+} from "reducers/slices/domain/category";
+import { mSelector } from "src/selectors/selector";
 
 interface AdminCategoryFormPropsType {
-  category: CategoryType
-  ref: React.MutableRefObject<any>
+  category: CategoryType;
+  ref: React.MutableRefObject<any>;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -20,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     subtitle: {
       margin: theme.spacing(1, 0),
-      fontWeight: theme.typography.fontWeightBold
+      fontWeight: theme.typography.fontWeightBold,
     },
     txtFieldBase: {
       width: "80%",
@@ -39,11 +48,9 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: 600,
       minWidth: 280,
     },
-    productDateInput: {
-    },
-    actionBox: {
-    },
-  }),
+    productDateInput: {},
+    actionBox: {},
+  })
 );
 
 /**
@@ -63,137 +70,145 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  *    - 6. display result popup message
  **/
-const AdminCategoryForm = React.forwardRef<any, AdminCategoryFormPropsType>((props, ref) => {
+const AdminCategoryForm = React.forwardRef<any, AdminCategoryFormPropsType>(
+  (props, ref) => {
+    // mui: makeStyles
+    const classes = useStyles();
 
-  // mui: makeStyles
-  const classes = useStyles();
+    // auth
+    const auth = useSelector(mSelector.makeAuthSelector());
 
-  // auth
-  const auth = useSelector(mSelector.makeAuthSelector())
+    const dispatch = useDispatch();
 
-  const dispatch = useDispatch()
+    // temp user account state
+    const [curCategoryState, setCategoryState] =
+      React.useState<CategoryDataType>(
+        props.category ? props.category : generateDefaultCategoryData()
+      );
 
-  // temp user account state
-  const [curCategoryState, setCategoryState] = React.useState<CategoryDataType>(props.category ? props.category : generateDefaultCategoryData());
+    // update/create logic for product
+    //  - true: create
+    //  - false: update
+    // if props.product exists, it updates, otherwise, new
+    const [isNew, setNew] = React.useState<boolean>(
+      props.category ? false : true
+    );
 
-  // update/create logic for product
-  //  - true: create
-  //  - false: update
-  // if props.product exists, it updates, otherwise, new
-  const [isNew, setNew] = React.useState<boolean>(props.category ? false : true);
+    // validation logic (should move to hooks)
+    const [curCategoryValidationState, setCategoryValidationState] =
+      React.useState<CategoryValidationDataType>(defaultCategoryValidationData);
 
-  // validation logic (should move to hooks)
-  const [curCategoryValidationState, setCategoryValidationState] = React.useState<CategoryValidationDataType>(defaultCategoryValidationData);
+    const { updateValidationAt, updateAllValidation, isValidSync } =
+      useValidation({
+        curDomain: curCategoryState,
+        curValidationDomain: curCategoryValidationState,
+        schema: categorySchema,
+        setValidationDomain: setCategoryValidationState,
+        defaultValidationDomain: defaultCategoryValidationData,
+      });
 
-  const { updateValidationAt, updateAllValidation, isValidSync } = useValidation({
-    curDomain: curCategoryState,
-    curValidationDomain: curCategoryValidationState,
-    schema: categorySchema,
-    setValidationDomain: setCategoryValidationState,
-    defaultValidationDomain: defaultCategoryValidationData,
-  })
+    // event handlers
+    const handleCategoryNameInputChangeEvent: React.EventHandler<
+      React.ChangeEvent<HTMLInputElement>
+    > = (e) => {
+      const nextCategoryName = e.currentTarget.value;
+      updateValidationAt("categoryName", e.currentTarget.value);
+      setCategoryState((prev: CategoryDataType) => ({
+        ...prev,
+        categoryName: nextCategoryName,
+      }));
+    };
 
-  // event handlers
-  const handleCategoryNameInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCategoryName = e.currentTarget.value
-    updateValidationAt("categoryName", e.currentTarget.value);
-    setCategoryState((prev: CategoryDataType) => ({
-      ...prev,
-      categoryName: nextCategoryName
-    }));
-  }
+    const handleCategoryDescriptionInputChangeEvent: React.EventHandler<
+      React.ChangeEvent<HTMLInputElement>
+    > = (e) => {
+      const nextCategoryDescription = e.currentTarget.value;
+      updateValidationAt("categoryDescription", e.currentTarget.value);
+      setCategoryState((prev: CategoryDataType) => ({
+        ...prev,
+        categoryDescription: nextCategoryDescription,
+      }));
+    };
 
-  const handleCategoryDescriptionInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCategoryDescription = e.currentTarget.value
-    updateValidationAt("categoryDescription", e.currentTarget.value);
-    setCategoryState((prev: CategoryDataType) => ({
-      ...prev,
-      categoryDescription: nextCategoryDescription
-    }));
-  }
+    const handleCategoryPathInputChangeEvent: React.EventHandler<
+      React.ChangeEvent<HTMLInputElement>
+    > = (e) => {
+      const nextCategoryPath = e.currentTarget.value;
+      updateValidationAt("categoryPath", e.currentTarget.value);
+      setCategoryState((prev: CategoryDataType) => ({
+        ...prev,
+        categoryPath: nextCategoryPath,
+      }));
+    };
 
-  const handleCategoryPathInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCategoryPath = e.currentTarget.value
-    updateValidationAt("categoryPath", e.currentTarget.value);
-    setCategoryState((prev: CategoryDataType) => ({
-      ...prev,
-      categoryPath: nextCategoryPath
-    }));
-  }
+    /**
+     * call child function from parent
+     *
+     * ref: https://stackoverflow.com/questions/37949981/call-child-method-from-parent
+     *
+     **/
+    React.useImperativeHandle(ref, () => ({
+      // event handler to submit
+      handleSaveClickEvent: (e: React.MouseEvent<HTMLButtonElement>) => {
+        const isValid: boolean = isValidSync(curCategoryState);
 
-  /**
-   * call child function from parent 
-   *
-   * ref: https://stackoverflow.com/questions/37949981/call-child-method-from-parent
-   *
-   **/
-  React.useImperativeHandle(ref, () => ({
+        console.log(isValid);
 
-    // event handler to submit
-    handleSaveClickEvent: (e: React.MouseEvent<HTMLButtonElement>) => {
-
-      const isValid: boolean = isValidSync(curCategoryState)
-
-      console.log(isValid);
-
-      if (isValid) {
-        // pass 
-        console.log("passed")
-        if (isNew) {
-          console.log("new category creation")
-          // request
-          dispatch(
-            postCategoryActionCreator(curCategoryState) 
-          )
-
+        if (isValid) {
+          // pass
+          console.log("passed");
+          if (isNew) {
+            console.log("new category creation");
+            // request
+            dispatch(postCategoryActionCreator(curCategoryState));
+          } else {
+            console.log("update category");
+            // request
+            dispatch(putCategoryActionCreator(curCategoryState));
+          }
         } else {
-          console.log("update category")
-          // request
-          dispatch(
-            putCategoryActionCreator(curCategoryState) 
-          )
+          console.log("failed");
+          updateAllValidation();
         }
-      } else {
-        console.log("failed")
-        updateAllValidation()
-      }
-    }
+      },
+    }));
 
-  }))
+    return (
+      <form className={classes.form} noValidate autoComplete="off">
+        <TextField
+          id="category-name"
+          label="Name"
+          className={`${classes.txtFieldBase}`}
+          value={curCategoryState.categoryName}
+          onChange={handleCategoryNameInputChangeEvent}
+          helperText={curCategoryValidationState.categoryName}
+          error={curCategoryValidationState.categoryName !== ""}
+        />
+        <TextField
+          id="category-description"
+          label="Description"
+          multiline
+          rows={4}
+          className={`${classes.descriptionInput}`}
+          value={curCategoryState.categoryDescription}
+          onChange={handleCategoryDescriptionInputChangeEvent}
+          helperText={curCategoryValidationState.categoryDescription}
+          error={curCategoryValidationState.categoryDescription !== ""}
+        />
+        <TextField
+          id="category-path"
+          label="Path"
+          // want to disable auto-capitalization
+          type="email"
+          className={`${classes.txtFieldBase}`}
+          value={curCategoryState.categoryPath}
+          onChange={handleCategoryPathInputChangeEvent}
+          helperText={curCategoryValidationState.categoryPath}
+          error={curCategoryValidationState.categoryPath !== ""}
+        />
+      </form>
+    );
+  }
+);
 
-  return (
-    <form className={classes.form} noValidate autoComplete="off">
-      <TextField
-        id="category-name"
-        label="Name"
-        className={`${classes.txtFieldBase}`}
-        value={curCategoryState.categoryName}
-        onChange={handleCategoryNameInputChangeEvent}
-        helperText={curCategoryValidationState.categoryName}
-        error={curCategoryValidationState.categoryName !== ""}
-      />
-      <TextField
-        id="category-description"
-        label="Description"
-        multiline
-        rows={4}
-        className={`${classes.descriptionInput}`}
-        value={curCategoryState.categoryDescription}
-        onChange={handleCategoryDescriptionInputChangeEvent}
-        helperText={curCategoryValidationState.categoryDescription}
-        error={curCategoryValidationState.categoryDescription !== ""}
-      />
-      <TextField
-        id="category-path"
-        label="Path"
-        className={`${classes.txtFieldBase}`}
-        value={curCategoryState.categoryPath}
-        onChange={handleCategoryPathInputChangeEvent}
-        helperText={curCategoryValidationState.categoryPath}
-        error={curCategoryValidationState.categoryPath !== ""}
-      />
-    </form>
-  )
-})
-
-export default AdminCategoryForm
+export default AdminCategoryForm;

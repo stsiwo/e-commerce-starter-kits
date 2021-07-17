@@ -2,6 +2,7 @@ package com.iwaodev.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -28,6 +29,9 @@ public class SpringSecurityUserDetailsService implements UserDetailsService {
   private UserRepository userRepository;
 
   /**
+   *  load user by user id (not username).
+   *
+   *
    * DON'T throw 'UsernameNotFoundException' since it is converted to 'BadCredentialException'. I don't know why.
    *
    * - this is because 'hideUserNotFoundExceptions' property. that's why it converts to 'badCredentialException'. 
@@ -37,9 +41,16 @@ public class SpringSecurityUserDetailsService implements UserDetailsService {
    *   - ref: https://github.com/spring-projects/spring-security/blob/main/core/src/main/java/org/springframework/security/authentication/dao/AbstractUserDetailsAuthenticationProvider.java
    *
    * instead, use 'RunTimeException' so that it is caught by 'authenticationEntryPoint' handler (see SpringSecurityConfig.java).
+   *
+   * @2021/07/17
+   *  change from email to userId for username and subject value in jwt.
+   *
+   *  this is because of the following issues:
+   *    1. security issue. it is not good practice to include sensistive information inside jwt since jwt is decoded outside.
+   *    2. if a member change the email address, the subject value (e.g., email) is obsolete and make the member impossible to access their protected resource unless we force him to log out and login again.
    **/
   @Override
-  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+  public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
 
     logger.info("start load user by user name");
 
@@ -49,7 +60,7 @@ public class SpringSecurityUserDetailsService implements UserDetailsService {
     /**
      * - only 'ACTIVE'/'TEMP'
      **/
-    com.iwaodev.infrastructure.model.User loginUser = this.userRepository.findActiveOrTempByEmail(email);
+    com.iwaodev.infrastructure.model.User loginUser = this.userRepository.findActiveOrTempById(UUID.fromString(userId));
 
     /**
      * if the user is not found
@@ -64,7 +75,7 @@ public class SpringSecurityUserDetailsService implements UserDetailsService {
     /**
      * prepare granded authority
      **/
-    String role = this.userRepository.getUserRole(email);
+    String role = this.userRepository.getUserRole(UUID.fromString(userId));
 
     if (role == null) {
       throw new UsernameNotFoundException("the user does not have any role. this shouldn't be happened.");
@@ -80,9 +91,10 @@ public class SpringSecurityUserDetailsService implements UserDetailsService {
 
     /**
      * construct UserDetails for return
+     *
+     * user userid as username of SpringSecurityUser. be careful.
      **/
-    UserDetails userDetails = new SpringSecurityUser(loginUser.getUserId(), loginUser.getEmail(),
-        loginUser.getPassword(), grantList);
+    UserDetails userDetails = new SpringSecurityUser(loginUser.getUserId(), loginUser.getUserId().toString(), loginUser.getPassword(), grantList);
 
     logger.info("start returning this userDetails");
 

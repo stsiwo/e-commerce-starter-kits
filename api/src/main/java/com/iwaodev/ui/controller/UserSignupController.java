@@ -61,8 +61,8 @@ public class UserSignupController {
     UserDTO user = this.service.signup(criteria);
 
     // create api token
-    // userDetails: userName -> email
-    final String jwt = this.jwtUtil.generateToken(user.getEmail());
+    // userDetails: userName -> userId
+    final String jwt = this.jwtUtil.generateToken(user.getUserId().toString());
 
     this.authenticationService.assignApiTokenCookieToResponse(jwt, response);
     String csrfToken = this.authenticationService.assignCsrfTokenCookieToResponse(response);

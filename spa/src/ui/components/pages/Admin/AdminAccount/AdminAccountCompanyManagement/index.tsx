@@ -1,21 +1,25 @@
-import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardHeader from '@material-ui/core/CardHeader';
-import Grid from '@material-ui/core/Grid';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
-import { AdminCompanyFormDataType, AdminCompanyFormValidationDataType, defaultAdminCompanyFormValidationData } from 'domain/user/types';
-import { useValidation } from 'hooks/validation';
-import { companySchema } from 'hooks/validation/rules';
-import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { putAuthCompanyActionCreator } from 'reducers/slices/app';
-import { mSelector } from 'src/selectors/selector';
-import { getProvinceList, getCountryList } from 'src/utils';
-import MenuItem from '@material-ui/core/MenuItem';
+import Button from "@material-ui/core/Button";
+import Card from "@material-ui/core/Card";
+import CardActions from "@material-ui/core/CardActions";
+import CardContent from "@material-ui/core/CardContent";
+import CardHeader from "@material-ui/core/CardHeader";
+import Grid from "@material-ui/core/Grid";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
+import {
+  AdminCompanyFormDataType,
+  AdminCompanyFormValidationDataType,
+  defaultAdminCompanyFormValidationData,
+} from "domain/user/types";
+import { useValidation } from "hooks/validation";
+import { companySchema } from "hooks/validation/rules";
+import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { putAuthCompanyActionCreator } from "reducers/slices/app";
+import { mSelector } from "src/selectors/selector";
+import { getProvinceList, getCountryList } from "src/utils";
+import MenuItem from "@material-ui/core/MenuItem";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -35,13 +39,11 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: 400,
     },
     actionBox: {
-      textAlign: "center"
+      textAlign: "center",
     },
-    gridBox: {
-    },
-    gridItem: {
-    }
-  }),
+    gridBox: {},
+    gridItem: {},
+  })
 );
 
 /**
@@ -62,203 +64,220 @@ const useStyles = makeStyles((theme: Theme) =>
  *    - 6. display result popup message
  **/
 const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
-
   // mui: makeStyles
   const classes = useStyles();
 
   // auth
-  const auth = useSelector(mSelector.makeAuthSelector())
+  const auth = useSelector(mSelector.makeAuthSelector());
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   // temp user account state
-  const [curAdminCompanyFormState, setAdminCompanyFormState] = React.useState<AdminCompanyFormDataType>(
-    auth.user.companies[0]
-  );
+  const [curAdminCompanyFormState, setAdminCompanyFormState] =
+    React.useState<AdminCompanyFormDataType>(auth.user.companies[0]);
 
   // validation logic (should move to hooks)
-  const [curAdminCompanyFormValidationState, setAdminCompanyFormValidationState] = React.useState<AdminCompanyFormValidationDataType>(defaultAdminCompanyFormValidationData);
+  const [
+    curAdminCompanyFormValidationState,
+    setAdminCompanyFormValidationState,
+  ] = React.useState<AdminCompanyFormValidationDataType>(
+    defaultAdminCompanyFormValidationData
+  );
 
-  const { updateValidationAt, updateAllValidation, isValidSync } = useValidation({
-    curDomain: curAdminCompanyFormState,
-    curValidationDomain: curAdminCompanyFormValidationState,
-    schema: companySchema,
-    setValidationDomain: setAdminCompanyFormValidationState,
-    defaultValidationDomain: defaultAdminCompanyFormValidationData,
-  })
+  const { updateValidationAt, updateAllValidation, isValidSync } =
+    useValidation({
+      curDomain: curAdminCompanyFormState,
+      curValidationDomain: curAdminCompanyFormValidationState,
+      schema: companySchema,
+      setValidationDomain: setAdminCompanyFormValidationState,
+      defaultValidationDomain: defaultAdminCompanyFormValidationData,
+    });
 
   // event handlers
-  const handleCompanyNameInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCompanyName = e.target.value
+  const handleCompanyNameInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextCompanyName = e.target.value;
     updateValidationAt("companyName", e.target.value);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      companyName: nextCompanyName
+      companyName: nextCompanyName,
     }));
+  };
 
-  }
-
-  const handleDescriptionInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextDescription = e.target.value
+  const handleDescriptionInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextDescription = e.target.value;
     updateValidationAt("companyDescription", e.target.value);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      companyDescription: nextDescription
+      companyDescription: nextDescription,
     }));
+  };
 
-  }
-
-
-  const handleCompanyEmailInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCompanyEmail = e.target.value
+  const handleCompanyEmailInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextCompanyEmail = e.target.value;
     updateValidationAt("companyEmail", e.target.value);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      companyEmail: nextCompanyEmail
+      companyEmail: nextCompanyEmail,
     }));
+  };
 
-  }
-
-
-  const handlePhoneNumberInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextPhoneNumber = e.target.value
+  const handlePhoneNumberInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextPhoneNumber = e.target.value;
     updateValidationAt("phoneNumber", e.target.value);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      phoneNumber: nextPhoneNumber
+      phoneNumber: nextPhoneNumber,
     }));
+  };
 
-  }
-
-
-  const handleCountryCodeInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextCountryCode = e.target.value
+  const handleCountryCodeInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextCountryCode = e.target.value;
     updateValidationAt("countryCode", nextCountryCode);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      countryCode: nextCountryCode
+      countryCode: nextCountryCode,
     }));
+  };
 
-  }
-
-  const handleAddress1InputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextAddress1 = e.target.value
+  const handleAddress1InputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextAddress1 = e.target.value;
     updateValidationAt("address1", e.target.value);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      address1: nextAddress1
+      address1: nextAddress1,
     }));
+  };
 
-  }
-
-  const handleAddress2InputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextAddress2 = e.target.value
+  const handleAddress2InputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextAddress2 = e.target.value;
     updateValidationAt("address2", e.target.value);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      address2: nextAddress2
+      address2: nextAddress2,
     }));
+  };
 
-  }
-
-  const handleCityInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+  const handleCityInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
     // don't use 'currentTarget' for select (esp with material ui)
-    const nextCity = e.target.value
+    const nextCity = e.target.value;
     updateValidationAt("city", nextCity);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      city: nextCity
+      city: nextCity,
     }));
+  };
 
-  }
-
-  const handleProvinceInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+  const handleProvinceInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
     // don't use 'currentTarget' for select (esp with material ui)
-    const nextProvince = e.target.value
+    const nextProvince = e.target.value;
     updateValidationAt("province", nextProvince);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      province: nextProvince
+      province: nextProvince,
     }));
+  };
 
-  }
-
-  const handleCountryInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+  const handleCountryInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
     // don't use 'currentTarget' for select (esp material-ui)
-    const nextCountry = e.target.value
+    const nextCountry = e.target.value;
     updateValidationAt("country", nextCountry);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      country: nextCountry
+      country: nextCountry,
     }));
+  };
 
-  }
-
-  const handlePostalCodeInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+  const handlePostalCodeInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
     // don't use 'currentTarget' for select (esp material-ui)
-    const nextPostalCode = e.target.value
+    const nextPostalCode = e.target.value;
     updateValidationAt("postalCode", e.currentTarget.value);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      postalCode: nextPostalCode
+      postalCode: nextPostalCode,
     }));
+  };
 
-  }
-
-  const handleFacebookLinkInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+  const handleFacebookLinkInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
     // don't use 'currentTarget' for select (esp with material ui)
-    const nextFacebookLink = e.target.value
+    const nextFacebookLink = e.target.value;
     updateValidationAt("facebookLink", nextFacebookLink);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      facebookLink: nextFacebookLink
+      facebookLink: nextFacebookLink,
     }));
+  };
 
-  }
-
-  const handleInstagramLinkInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+  const handleInstagramLinkInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
     // don't use 'currentTarget' for select (esp with material ui)
-    const nextInstagramLink = e.target.value
+    const nextInstagramLink = e.target.value;
     updateValidationAt("instagramLink", nextInstagramLink);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      instagramLink: nextInstagramLink
+      instagramLink: nextInstagramLink,
     }));
+  };
 
-  }
-
-  const handleTwitterLinkInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+  const handleTwitterLinkInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
     // don't use 'currentTarget' for select (esp with material ui)
-    const nextTwitterLink = e.target.value
+    const nextTwitterLink = e.target.value;
     updateValidationAt("twitterLink", nextTwitterLink);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      twitterLink: nextTwitterLink
+      twitterLink: nextTwitterLink,
     }));
+  };
 
-  }
-
-  const handleYoutubeLinkInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+  const handleYoutubeLinkInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
     // don't use 'currentTarget' for select (esp with material ui)
-    const nextYoutubeLink = e.target.value
+    const nextYoutubeLink = e.target.value;
     updateValidationAt("youtubeLink", nextYoutubeLink);
     setAdminCompanyFormState((prev: AdminCompanyFormDataType) => ({
       ...prev,
-      youtubeLink: nextYoutubeLink
+      youtubeLink: nextYoutubeLink,
     }));
-
-  }
+  };
 
   // event handler to submit
-  const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
-
-    const isValid: boolean = isValidSync(curAdminCompanyFormState)
+  const handleUserAccountSaveClickEvent: React.EventHandler<
+    React.MouseEvent<HTMLButtonElement>
+  > = async (e) => {
+    const isValid: boolean = isValidSync(curAdminCompanyFormState);
 
     console.log(isValid);
 
     if (isValid) {
-      // pass 
-      console.log("passed")
+      // pass
+      console.log("passed");
 
       dispatch(
         putAuthCompanyActionCreator({
@@ -280,38 +299,29 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
           youtubeLink: curAdminCompanyFormState.youtubeLink,
         })
       );
-
     } else {
-      updateAllValidation()
+      updateAllValidation();
     }
-  }
-
+  };
 
   return (
     <Card className={classes.root}>
       <CardHeader
         titleTypographyProps={{
-          variant: 'h6',
+          variant: "h6",
         }}
         subheaderTypographyProps={{
-          variant: 'body1'
+          variant: "body1",
         }}
         title="Company"
-        subheader={"Enter your company information. These information is used to describe your company in this website and shipping information when integrating with any postal company API."}
+        subheader={
+          "Enter your company information. These information is used to describe your company in this website and shipping information when integrating with any postal company API."
+        }
       />
       <CardContent>
         <form className={classes.form} noValidate autoComplete="off">
-          <Grid
-            container
-            className={classes.gridBox}
-            justify="center"
-          >
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              className={classes.gridItem}
-            >
+          <Grid container className={classes.gridBox} justify="center">
+            <Grid item xs={12} sm={6} className={classes.gridItem}>
               <Typography variant="h6" component="h6" align="left" gutterBottom>
                 {"Basic Info"}
               </Typography>
@@ -323,7 +333,6 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
                 onChange={handleCompanyNameInputChangeEvent}
                 helperText={curAdminCompanyFormValidationState.companyName}
                 error={curAdminCompanyFormValidationState.companyName !== ""}
-
               />
               <TextField
                 id="company-description"
@@ -333,14 +342,18 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
                 className={classes.formControl}
                 value={curAdminCompanyFormState.companyDescription}
                 onChange={handleDescriptionInputChangeEvent}
-                helperText={curAdminCompanyFormValidationState.companyDescription}
-                error={curAdminCompanyFormValidationState.companyDescription !== ""}
+                helperText={
+                  curAdminCompanyFormValidationState.companyDescription
+                }
+                error={
+                  curAdminCompanyFormValidationState.companyDescription !== ""
+                }
               />
               <TextField
                 id="company-email"
                 label="Email"
                 type="email"
-                placeholder={'use the domain which matches with this web app.'}
+                placeholder={"use the domain which matches with this web app."}
                 className={classes.formControl}
                 value={curAdminCompanyFormState.companyEmail}
                 onChange={handleCompanyEmailInputChangeEvent}
@@ -370,12 +383,7 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
                 error={curAdminCompanyFormValidationState.countryCode !== ""}
               />
             </Grid>
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              className={classes.gridItem}
-            >
+            <Grid item xs={12} sm={6} className={classes.gridItem}>
               <Typography variant="h6" component="h6" align="left" gutterBottom>
                 {"Address"}
               </Typography>
@@ -449,51 +457,54 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
                 error={curAdminCompanyFormValidationState.postalCode !== ""}
               />
             </Grid>
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              className={classes.gridItem}
-            >
+            <Grid item xs={12} sm={6} className={classes.gridItem}>
               <Typography variant="h6" component="h6" align="left" gutterBottom>
                 {"SNS Link"}
               </Typography>
               <TextField
                 id="facebook-link"
                 label="FacebookLink"
+                type="url"
                 className={`${classes.formControl} ${classes.formLink}`}
                 value={curAdminCompanyFormState.facebookLink}
                 onChange={handleFacebookLinkInputChangeEvent}
                 helperText={curAdminCompanyFormValidationState.facebookLink}
                 error={curAdminCompanyFormValidationState.facebookLink !== ""}
-              />< br/>
+              />
+              <br />
               <TextField
                 id="instagram-link"
                 label="Instagram Link"
+                type="url"
                 className={`${classes.formControl} ${classes.formLink}`}
                 value={curAdminCompanyFormState.instagramLink}
                 onChange={handleInstagramLinkInputChangeEvent}
                 helperText={curAdminCompanyFormValidationState.instagramLink}
                 error={curAdminCompanyFormValidationState.instagramLink !== ""}
-              />< br/>
+              />
+              <br />
               <TextField
                 id="twitter-link"
                 label="Twitter Link"
+                type="url"
                 className={`${classes.formControl} ${classes.formLink}`}
                 value={curAdminCompanyFormState.twitterLink}
                 onChange={handleTwitterLinkInputChangeEvent}
                 helperText={curAdminCompanyFormValidationState.twitterLink}
                 error={curAdminCompanyFormValidationState.twitterLink !== ""}
-              />< br/>
+              />
+              <br />
               <TextField
                 id="youtube-link"
                 label="Youtube Link"
+                type="url"
                 className={`${classes.formControl} ${classes.formLink}`}
                 value={curAdminCompanyFormState.youtubeLink}
                 onChange={handleYoutubeLinkInputChangeEvent}
                 helperText={curAdminCompanyFormValidationState.youtubeLink}
                 error={curAdminCompanyFormValidationState.youtubeLink !== ""}
-              />< br/>
+              />
+              <br />
             </Grid>
           </Grid>
         </form>
@@ -504,11 +515,7 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
         </Button>
       </CardActions>
     </Card>
-  )
-}
+  );
+};
 
-export default AdminAccountCompanyManagement
-
-
-
-
+export default AdminAccountCompanyManagement;

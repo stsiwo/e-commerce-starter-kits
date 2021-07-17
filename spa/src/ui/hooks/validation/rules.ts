@@ -305,6 +305,22 @@ export const companySchema = yup.object().shape({
   ).required(),
   country: yup.string().matches(get2AlphaCountryCodeRegex(), "invalid country format. please choose from available option.").required(),
   postalCode: yup.string().matches(/^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9]$/, "invalid format. proper format: 'A1A 2B2'").required(),
+  facebookLink: yup.string().matches(
+    /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
+    'invalid url.'
+  ).optional(),
+  instagramLink: yup.string().matches(
+    /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
+    'invalid url.'
+  ).optional(),
+  twitterLink: yup.string().matches(
+    /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
+    'invalid url.'
+  ).optional(),
+  youtubeLink: yup.string().matches(
+    /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
+    'invalid url.'
+  ).optional()
 })
 
 // forgot password 

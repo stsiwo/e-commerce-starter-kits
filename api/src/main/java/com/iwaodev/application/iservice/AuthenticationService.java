@@ -9,7 +9,7 @@ public interface AuthenticationService {
   /**
    * login 
    **/
-  public AuthenticationResponse login(String userName, String email, HttpServletResponse response) throws Exception;
+  public AuthenticationResponse login(String email, HttpServletResponse response) throws Exception;
 
   /**
    * assign jwt cookies to response

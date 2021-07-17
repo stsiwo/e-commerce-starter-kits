@@ -61,17 +61,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private CookieService cookieService;
 
   @Override
-  public AuthenticationResponse login(String userName, String email, HttpServletResponse response) throws Exception {
-
-    final String jwt = this.jwtUtil.generateToken(userName);
-
-    this.assignApiTokenCookieToResponse(jwt, response);
-    String csrfToken = this.assignCsrfTokenCookieToResponse(response);
+  public AuthenticationResponse login(String email, HttpServletResponse response) throws Exception {
 
     /**
      * find the user for response
      **/
     User user = this.userRepository.findActiveOrTempByEmail(email);
+
+    /**
+     * create jwt cookie and assign to this response
+     */
+    final String jwt = this.jwtUtil.generateToken(user.getUserId().toString());
+
+    this.assignApiTokenCookieToResponse(jwt, response);
+    String csrfToken = this.assignCsrfTokenCookieToResponse(response);
 
     /**
      * fetch its child entities manually because of lazy loading.

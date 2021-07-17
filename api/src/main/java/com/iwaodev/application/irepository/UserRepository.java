@@ -31,11 +31,25 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
   @Query(value = "SELECT ut.user_type FROM user_types ut INNER JOIN users u ON u.user_type_id = ut.user_type_id WHERE u.email = ?1", nativeQuery = true)
   String getUserRole(String email);
 
+  /**
+   * bugs: when use nativeQuery with UUID parameter does not return any entity.
+   * workaournd: use HQL.
+   */
+  @Query(value = "SELECT ut.userType FROM users u INNER JOIN u.userType ut WHERE u.userId = ?1")
+  String getUserRole(UUID userId);
+
   @Query(value = "SELECT * FROM users u WHERE u.email = ?1 AND u.active = 'ACTIVE'", nativeQuery = true)
   User findActiveByEmail(String email);
 
   @Query(value = "SELECT * FROM users u WHERE u.email = ?1 AND (u.active = 'ACTIVE' OR u.active = 'TEMP')", nativeQuery = true)
   User findActiveOrTempByEmail(String email);
+
+  /**
+   * bugs: when use nativeQuery with UUID parameter does not return any entity.
+   * workaournd: use HQL.
+   */
+  @Query(value = "SELECT u FROM users u WHERE u.userId = ?1 AND (u.active = 'ACTIVE' OR u.active = 'TEMP')")
+  User findActiveOrTempById(UUID userId);
 
   @Query(value = "SELECT u FROM users u WHERE u.stripeCustomerId = ?1")
   Optional<User> findByStipeCustomerId(String stripeCustomerId);

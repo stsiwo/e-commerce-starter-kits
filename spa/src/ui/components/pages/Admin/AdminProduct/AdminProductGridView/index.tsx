@@ -1,38 +1,52 @@
-import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardHeader from '@material-ui/core/CardHeader';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import IconButton from '@material-ui/core/IconButton';
-import Link from '@material-ui/core/Link';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import { DataGrid, GridCellParams, GridColDef, GridPageChangeParams, GridRowsProp } from '@material-ui/data-grid';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import EditIcon from '@material-ui/icons/Edit';
-import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
-import { ProductType } from 'domain/product/types';
-import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import Button from "@material-ui/core/Button";
+import Card from "@material-ui/core/Card";
+import CardActions from "@material-ui/core/CardActions";
+import CardContent from "@material-ui/core/CardContent";
+import CardHeader from "@material-ui/core/CardHeader";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import IconButton from "@material-ui/core/IconButton";
+import Link from "@material-ui/core/Link";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridPageChangeParams,
+  GridRowsProp,
+} from "@material-ui/data-grid";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
+import EditIcon from "@material-ui/icons/Edit";
+import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
+import { ProductType } from "domain/product/types";
+import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link as RRLink } from "react-router-dom";
-import { deleteSingleProductActionCreator, fetchProductActionCreator, productPaginationPageActions, productQuerySearchQueryActions } from 'reducers/slices/domain/product';
-import { mSelector, rsSelector } from 'src/selectors/selector';
-import AdminProductFormDialog from '../AdminProductFormDialog';
-import AdminProductSearchController from '../ADminProductSearchController';
-import { FetchStatusEnum } from 'src/app';
-import Box from '@material-ui/core/Box';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import SearchForm from 'components/common/SearchForm';
-import { useLocation } from 'react-router';
-import { deleteProductFetchStatusActions, deleteSingleProductFetchStatusActions, putProductFetchStatusActions, postProductFetchStatusActions } from 'reducers/slices/app/fetchStatus/product';
+import {
+  deleteSingleProductActionCreator,
+  fetchProductActionCreator,
+  productPaginationPageActions,
+  productQuerySearchQueryActions,
+} from "reducers/slices/domain/product";
+import { mSelector, rsSelector } from "src/selectors/selector";
+import AdminProductFormDialog from "../AdminProductFormDialog";
+import AdminProductSearchController from "../ADminProductSearchController";
+import { FetchStatusEnum } from "src/app";
+import Box from "@material-ui/core/Box";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import SearchForm from "components/common/SearchForm";
+import { useLocation } from "react-router";
+import {
+  deleteProductFetchStatusActions,
+  deleteSingleProductFetchStatusActions,
+  putProductFetchStatusActions,
+  postProductFetchStatusActions,
+} from "reducers/slices/app/fetchStatus/product";
 
-declare type AdminProductGridViewPropsType = {
-}
-
+declare type AdminProductGridViewPropsType = {};
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -50,10 +64,9 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: "center",
       flexDirection: "column",
     },
-    media: {
-    },
+    media: {},
     actionBox: {
-      textAlign: "center"
+      textAlign: "center",
     },
     searchBox: {
       display: "flex",
@@ -64,11 +77,12 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     cardContentBox: {
       paddingTop: 0,
-    }
-  }),
+    },
+  })
 );
 
 const generateRows: (domains: ProductType[]) => GridRowsProp = (domains) => {
+  console.log("generateRows: does not update rows? how come");
   return domains.map((domain: ProductType) => {
     return {
       id: domain.productId,
@@ -84,38 +98,46 @@ const generateRows: (domains: ProductType[]) => GridRowsProp = (domains) => {
         productId: domain.productId,
       },
       actions: domain.productId,
-    }
+    };
   });
-}
+};
 
-const generateColumns: (onEdit: React.EventHandler<React.MouseEvent<HTMLButtonElement>>, onDelete: React.EventHandler<React.MouseEvent<HTMLButtonElement>>) => GridColDef[] = (onEdit, onDelete) => {
+const generateColumns: (
+  onEdit: React.EventHandler<React.MouseEvent<HTMLButtonElement>>,
+  onDelete: React.EventHandler<React.MouseEvent<HTMLButtonElement>>
+) => GridColDef[] = (onEdit, onDelete) => {
   return [
-    { field: 'name', headerName: 'Name', width: 150 },
-    { field: 'unitPrice', headerName: 'Unit Price', width: 150 },
-    { field: 'path', headerName: 'Path', width: 150 },
-    { field: 'category', headerName: 'Category', width: 150 },
-    { field: 'discount', headerName: 'Discount', width: 150 },
-    { field: 'releaseDate', headerName: 'Release Date', width: 150 },
-    { field: 'publish', headerName: 'Publish', width: 150 },
+    { field: "name", headerName: "Name", width: 150 },
+    { field: "unitPrice", headerName: "Unit Price", width: 150 },
+    { field: "path", headerName: "Path", width: 150 },
+    { field: "category", headerName: "Category", width: 150 },
+    { field: "discount", headerName: "Discount", width: 150 },
+    { field: "releaseDate", headerName: "Release Date", width: 150 },
+    { field: "publish", headerName: "Publish", width: 150 },
     {
-      field: 'variants',
-      headerName: 'Variants',
+      field: "variants",
+      headerName: "Variants",
       width: 150,
       renderCell: (params: GridCellParams) => {
-        const count = (params.value as { count: number, productId: string }).count
-        const productId = (params.value as { count: number, productId: string }).productId
+        const count = (params.value as { count: number; productId: string })
+          .count;
+        const productId = (params.value as { count: number; productId: string })
+          .productId;
         return (
           <React.Fragment>
-            <Link component={RRLink} to={`/admin/product-variants?productId=${productId}`}>
+            <Link
+              component={RRLink}
+              to={`/admin/product-variants?productId=${productId}`}
+            >
               {count}
             </Link>
           </React.Fragment>
-        )
+        );
       },
     },
     {
-      field: 'actions',
-      headerName: 'Actions',
+      field: "actions",
+      headerName: "Actions",
       width: 150,
       renderCell: (params: GridCellParams) => (
         <React.Fragment>
@@ -126,10 +148,10 @@ const generateColumns: (onEdit: React.EventHandler<React.MouseEvent<HTMLButtonEl
             <RemoveCircleIcon />
           </IconButton>
         </React.Fragment>
-      )
+      ),
     },
-  ]
-}
+  ];
+};
 
 // A custom hook that builds on useLocation to parse
 // the query string for you.
@@ -141,221 +163,244 @@ function useQuery() {
  * admin product management component
  *
  **/
-const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsType> = (props) => {
+const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsType> =
+  (props) => {
+    // mui: makeStyles
+    const classes = useStyles();
 
-  // mui: makeStyles
-  const classes = useStyles();
+    const dispatch = useDispatch();
 
-  const dispatch = useDispatch()
+    const curProductList = useSelector(
+      mSelector.makeProductWithoutCacheSelector()
+    );
 
-  const curProductList = useSelector(mSelector.makeProductWithoutCacheSelector())
+    // cur selected product item
+    const [curProduct, setProduct] = React.useState<ProductType>(null);
 
-  // cur selected product item
-  const [curProduct, setProduct] = React.useState<ProductType>(null);
+    const pagination = useSelector(mSelector.makeProductPaginationSelector());
 
-  const pagination = useSelector(mSelector.makeProductPaginationSelector())
+    const curQueryString = useSelector(mSelector.makeProductQuerySelector());
 
-  const curQueryString = useSelector(mSelector.makeProductQuerySelector())
+    // fetch product
+    React.useEffect(() => {
+      dispatch(fetchProductActionCreator());
+    }, [JSON.stringify(curQueryString), pagination.page]);
 
-  // fetch product
-  React.useEffect(() => {
-    dispatch(fetchProductActionCreator())
-  }, [
-      JSON.stringify(curQueryString),
-      pagination.page
-    ])
+    // spa url query string
+    const query = useQuery();
+    const searchQuery = query.get("searchQuery");
+    React.useEffect(() => {
+      if (searchQuery) {
+        dispatch(productQuerySearchQueryActions.update(searchQuery));
+      }
+    }, []);
 
-  // spa url query string 
-  const query = useQuery()
-  const searchQuery = query.get("searchQuery")
-  React.useEffect(() => {
-    if (searchQuery) {
-      dispatch(
-        productQuerySearchQueryActions.update(searchQuery)
-      )
-    }
-  }, [])
+    const [curFormOpen, setFormOpen] = React.useState<boolean>(false);
 
-  const [curFormOpen, setFormOpen] = React.useState<boolean>(false);
+    const handleNewFormToggleBtnClickEvent: React.EventHandler<
+      React.MouseEvent<HTMLButtonElement>
+    > = async (e) => {
+      setFormOpen(!curFormOpen);
+      // set null to make 'isNew' true
+      setProduct(null);
+    };
 
-  const handleNewFormToggleBtnClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
-    setFormOpen(!curFormOpen)
-    // set null to make 'isNew' true
-    setProduct(null); 
-  }
+    // deletion dialog stuff
+    const [curDeleteDialogOpen, setDeleteDialogOpen] =
+      React.useState<boolean>(false);
 
-  // deletion dialog stuff
-  const [curDeleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(false);
-
-  const handleDeletionCancel: React.EventHandler<React.MouseEvent<HTMLElement>> = (e) => {
-    setDeleteDialogOpen(false);
-  }
-
-  const handleDeletionOk: React.EventHandler<React.MouseEvent<HTMLElement>> = (e) => {
-
-    // request
-    dispatch(
-      deleteSingleProductActionCreator({ productId: curProduct.productId })
-    )
-  }
-
-  // grid event handler stuff
-  const handleEditClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-
-    const productId = e.currentTarget.getAttribute("data-product-id")
-
-    const targetProduct = curProductList.find((product: ProductType) => product.productId == productId)
-
-    setProduct(targetProduct);
-
-    setFormOpen(true);
-
-  }
-
-  const handleDeleteClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    setDeleteDialogOpen(true);
-
-    const productId = e.currentTarget.getAttribute("data-product-id")
-
-    const targetProduct = curProductList.find((product: ProductType) => product.productId == productId)
-
-    setProduct(targetProduct);
-  }
-
-  const handlePageChange = (param: GridPageChangeParams) => {
-    // need to decrement since we incremented when display
-    const nextPage = param.page;
-
-    dispatch(productPaginationPageActions.update(nextPage))
-  }
-
-  /**
-   * search query stuffs
-   **/
-  const handleSearchChange = (value: string) => {
-    dispatch(
-      productQuerySearchQueryActions.update(value)
-    )
-  }
-
-  // fetch result
-  // fetch order fetching result
-  const curFetchProductStatus = useSelector(mSelector.makeFetchProductFetchStatusSelector())
-
-  // close form dialog only when success for post/put/delete
-  const curPostFetchStatus = useSelector(rsSelector.app.getPostProductFetchStatus);
-  const curPutFetchStatus = useSelector(rsSelector.app.getPutProductFetchStatus);
-  const curDeleteSingleFetchStatus = useSelector(rsSelector.app.getDeleteSingleProductFetchStatus);
-  React.useEffect(() => {
-    if (
-      curPostFetchStatus === FetchStatusEnum.SUCCESS ||
-      curPutFetchStatus === FetchStatusEnum.SUCCESS ||
-      curDeleteSingleFetchStatus === FetchStatusEnum.SUCCESS
-    ) {
-      setFormOpen(false);
+    const handleDeletionCancel: React.EventHandler<
+      React.MouseEvent<HTMLElement>
+    > = (e) => {
       setDeleteDialogOpen(false);
+    };
 
-      dispatch(
-        postProductFetchStatusActions.clear()
-      )
-      dispatch(
-        putProductFetchStatusActions.clear()
-      )
-      dispatch(
-        deleteSingleProductFetchStatusActions.clear()
-      )
-    }
-  })
+    const handleDeletionOk: React.EventHandler<React.MouseEvent<HTMLElement>> =
+      (e) => {
+        // request
+        dispatch(
+          deleteSingleProductActionCreator({ productId: curProduct.productId })
+        );
+      };
 
-  return (
-    <Card className={classes.root}>
-      <CardHeader
-        className={classes.cardHeader}
-        titleTypographyProps={{
-          variant: 'h6',
-        }}
-        subheaderTypographyProps={{
-          variant: 'body1'
-        }}
-        title="Product List"
-        action={
-          <IconButton aria-label="add" onClick={handleNewFormToggleBtnClickEvent}>
-            <AddCircleIcon />
-          </IconButton>
-        }
-      />
-      <CardContent
-        className={classes.cardContentBox}
-      >
-        <Box className={classes.searchBox}>
-          <SearchForm searchQuery={curQueryString.searchQuery} onChange={handleSearchChange} label={"search"} />
-        </Box>
-        <AdminProductSearchController />
-        {(curFetchProductStatus === FetchStatusEnum.FETCHING &&
-          <Box className={classes.loadingBox}>
-            <CircularProgress />
+    // grid event handler stuff
+    const handleEditClick: React.EventHandler<
+      React.MouseEvent<HTMLButtonElement>
+    > = (e) => {
+      const productId = e.currentTarget.getAttribute("data-product-id");
+
+      const targetProduct = curProductList.find(
+        (product: ProductType) => product.productId == productId
+      );
+
+      setProduct(targetProduct);
+
+      setFormOpen(true);
+    };
+
+    const handleDeleteClick: React.EventHandler<
+      React.MouseEvent<HTMLButtonElement>
+    > = (e) => {
+      setDeleteDialogOpen(true);
+
+      const productId = e.currentTarget.getAttribute("data-product-id");
+
+      const targetProduct = curProductList.find(
+        (product: ProductType) => product.productId == productId
+      );
+
+      setProduct(targetProduct);
+    };
+
+    const handlePageChange = (param: GridPageChangeParams) => {
+      // need to decrement since we incremented when display
+      const nextPage = param.page;
+
+      dispatch(productPaginationPageActions.update(nextPage));
+    };
+
+    /**
+     * search query stuffs
+     **/
+    const handleSearchChange = (value: string) => {
+      dispatch(productQuerySearchQueryActions.update(value));
+    };
+
+    // fetch result
+    // fetch order fetching result
+    const curFetchProductStatus = useSelector(
+      mSelector.makeFetchProductFetchStatusSelector()
+    );
+
+    // close form dialog only when success for post/put/delete
+    const curPostFetchStatus = useSelector(
+      rsSelector.app.getPostProductFetchStatus
+    );
+    const curPutFetchStatus = useSelector(
+      rsSelector.app.getPutProductFetchStatus
+    );
+    const curDeleteSingleFetchStatus = useSelector(
+      rsSelector.app.getDeleteSingleProductFetchStatus
+    );
+    React.useEffect(() => {
+      if (
+        curPostFetchStatus === FetchStatusEnum.SUCCESS ||
+        curPutFetchStatus === FetchStatusEnum.SUCCESS ||
+        curDeleteSingleFetchStatus === FetchStatusEnum.SUCCESS
+      ) {
+        setFormOpen(false);
+        setDeleteDialogOpen(false);
+
+        dispatch(postProductFetchStatusActions.clear());
+        dispatch(putProductFetchStatusActions.clear());
+        dispatch(deleteSingleProductFetchStatusActions.clear());
+      }
+    });
+
+    return (
+      <Card className={classes.root}>
+        <CardHeader
+          className={classes.cardHeader}
+          titleTypographyProps={{
+            variant: "h6",
+          }}
+          subheaderTypographyProps={{
+            variant: "body1",
+          }}
+          title="Product List"
+          action={
+            <IconButton
+              aria-label="add"
+              onClick={handleNewFormToggleBtnClickEvent}
+            >
+              <AddCircleIcon />
+            </IconButton>
+          }
+        />
+        <CardContent className={classes.cardContentBox}>
+          <Box className={classes.searchBox}>
+            <SearchForm
+              searchQuery={curQueryString.searchQuery}
+              onChange={handleSearchChange}
+              label={"search"}
+            />
           </Box>
-        )}
-        {(curFetchProductStatus === FetchStatusEnum.SUCCESS &&
-          <DataGrid
-            rows={generateRows(curProductList)}
-            columns={generateColumns(handleEditClick, handleDeleteClick)}
-            page={pagination.page} // don't forget to increment when display
-            pageSize={pagination.limit}
-            rowCount={pagination.totalElements}
-            onPageChange={handlePageChange}
-            autoHeight
-          // not gonna use pagination of this DataGrid
-          />
-        )}
-        {(curFetchProductStatus === FetchStatusEnum.FAILED &&
-          <Box className={classes.loadingBox}>
-            <Typography variant="body1" component="h2" >
-              {"failed to fetch data... please try again..."}
+          <AdminProductSearchController />
+          {curFetchProductStatus === FetchStatusEnum.FETCHING && (
+            <Box className={classes.loadingBox}>
+              <CircularProgress />
+            </Box>
+          )}
+          {curFetchProductStatus === FetchStatusEnum.SUCCESS && (
+            <DataGrid
+              rows={generateRows(curProductList)}
+              columns={generateColumns(handleEditClick, handleDeleteClick)}
+              page={pagination.page} // don't forget to increment when display
+              pageSize={pagination.limit}
+              rowCount={pagination.totalElements}
+              onPageChange={handlePageChange}
+              autoHeight
+            />
+          )}
+          {curFetchProductStatus === FetchStatusEnum.FAILED && (
+            <Box className={classes.loadingBox}>
+              <Typography variant="body1" component="h2">
+                {"failed to fetch data... please try again..."}
+              </Typography>
+            </Box>
+          )}
+        </CardContent>
+        <CardActions disableSpacing></CardActions>
+        {/** update/create product (without its variants) **/}
+        <AdminProductFormDialog
+          curFormOpen={curFormOpen}
+          setFormOpen={setFormOpen}
+          curProduct={curProduct}
+        />
+        {/** onDelete confiramtion dialog **/}
+        <Dialog
+          disableBackdropClick
+          disableEscapeKeyDown
+          maxWidth="xs"
+          aria-labelledby="product-deletion-dialog"
+          open={curDeleteDialogOpen}
+        >
+          <DialogTitle id="product-deletion-dialog">
+            Product Deletion
+          </DialogTitle>
+          <DialogContent dividers>
+            <Typography
+              variant="body1"
+              component="p"
+              align="left"
+              className={null}
+            >
+              {"Do you want to delete this product permenently?"}
             </Typography>
-          </Box>
-        )}
-      </CardContent>
-      <CardActions disableSpacing>
-      </CardActions>
-      {/** update/create product (without its variants) **/}
-      <AdminProductFormDialog
-        curFormOpen={curFormOpen}
-        setFormOpen={setFormOpen}
-        curProduct={curProduct}
-      />
-      {/** onDelete confiramtion dialog **/}
-      <Dialog
-        disableBackdropClick
-        disableEscapeKeyDown
-        maxWidth="xs"
-        aria-labelledby="product-deletion-dialog"
-        open={curDeleteDialogOpen}
-      >
-        <DialogTitle id="product-deletion-dialog">Product Deletion</DialogTitle>
-        <DialogContent dividers>
-          <Typography variant="body1" component="p" align="left" className={null} >
-            {"Do you want to delete this product permenently?"}
-          </Typography>
-          <Typography variant="body1" component="p" align="left" className={null} >
-            Product Name: <b>{curProduct && curProduct.productName}</b>
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button autoFocus onClick={handleDeletionCancel} variant="contained">
-            Cancel
-          </Button>
-          <Button onClick={handleDeletionOk} variant="contained">
-            Ok
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Card>
-  )
-}
+            <Typography
+              variant="body1"
+              component="p"
+              align="left"
+              className={null}
+            >
+              Product Name: <b>{curProduct && curProduct.productName}</b>
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              autoFocus
+              onClick={handleDeletionCancel}
+              variant="contained"
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleDeletionOk} variant="contained">
+              Ok
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Card>
+    );
+  };
 
-export default AdminProductGridView
-
-
-
-
+export default AdminProductGridView;

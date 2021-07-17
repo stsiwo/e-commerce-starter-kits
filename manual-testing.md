@@ -35,13 +35,44 @@
     - [] if the customer abort the session (e.g., moves to another page), reset all checkout state and the session.
     - [] when payment done regardless of the result, reset all checkout state and the session.
     - [] when payment succeeded, make sure the cart item is removed from the cart.
+    - [] when payment succeeded, make sure the product variant stock is decreased by the quantity.
+    
 
 
+  ## Products & Variants
+
+    - [] make sure 
     
   
+  ## Users
 
 
   ## Common
+
+    ### Sign Up
+     
+    - [] input validation (e.g., email, password, name and so on)
+    - [] receive a verification email from the app
+    - [] can verify when click the link of the verification email.
+    - [] if customer click the link of the verification email when he does not log in, the app should ask him to login first, then verify.
+    - [] re-verify process if the verification token expired.
+    - [] can sign up with verified status.
+   
+    ### Login 
+
+    - [] input validation
+    - [] the max login attempt is 10
+    - [] if a user exceeds the max login attemp, he has to wait in 30mins.
+    - [] a user can login.
+
+    ### Forgot & Reset Password 
+
+    - [] input validation (e.g., email) when sending the request
+    - [] the user receives the reset password email when he sends the request.
+    - [] re-forgot & reset password process if the token expired
+    - [] input validation (e.g., password) when sending the reeset password
+    - [] can reset password.
+    
 
     ### Phone Validation
 

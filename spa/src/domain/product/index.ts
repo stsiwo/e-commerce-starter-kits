@@ -22,7 +22,7 @@ export function filterUniqueVariantSizes(product: ProductType): ProductVariantSi
 export function isExceedStock(amount: number, variantId: string, product: ProductType): boolean {
   const targetVariant = product.variants.find((variant: ProductVariantType) => variant.variantId == variantId);
 
-  return amount > targetVariant.variantStock
+  return amount >= targetVariant.variantStock
 }
 
 // return the filtered variant as array
