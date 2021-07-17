@@ -7,6 +7,12 @@
 
       - 30 days after the delivery
 
+## Security
+
+  ### Login Attempt 
+
+    - the max number of login attempt is 10, and if exceeding this number, the user cannot login in 30mins.
+
 ## Users
 
   ### User Active Status
