@@ -62,6 +62,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -121,6 +122,9 @@ public class MemberUserEndpointTest {
 
   @MockBean
   private ApplicationEventPublisher publisher;
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
   /**
    * don't use this. this cause my app run in a independent server so we couldn't
@@ -314,12 +318,132 @@ public class MemberUserEndpointTest {
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
-
     assertThat(responseBody.getUserId().toString()).isEqualTo(this.authInfo.getAuthUser().getUserId().toString());
+    assertThat(responseBody.getFirstName()).isEqualTo(dummyUserSignupForm.get("firstName"));
     assertThat(responseBody.getLastName()).isEqualTo(dummyUserSignupForm.get("lastName"));
+    assertThat(responseBody.getEmail()).isEqualTo(dummyUserSignupForm.get("email"));
+    // since the user change the email, need to set active = temp
+    assertThat(responseBody.getActive()).isEqualTo(UserActiveEnum.TEMP);
+
+    // password
+    User updatedUser = this.entityManager.getEntityManager()
+            .createQuery("select u from users u where u.userId = :userId", User.class)
+            .setParameter("userId", UUID.fromString(dummyUserIdString))
+            .getSingleResult();
+
+    // to verify the bcrypted (hash) password, use 'matches(<raw_password>, <encrypted_password>)'
+    assertThat(this.passwordEncoder.matches(dummyUserSignupForm.get("password").toString(), updatedUser.getPassword())).isTrue();
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldMemberUserWhoVerifiedEmailUpdateItsOwnDataWithoutEmail.sql" })
+  public void shouldMemberUserWhoVerifiedEmailUpdateItsOwnDataWithoutEmail() throws Exception {
+
+    // dummy form json
+    // JsonNode dummyFormJson =
+    // this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+
+    // String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
+
+    JSONObject dummyUserSignupForm = new JSONObject();
+    dummyUserSignupForm.put("userId", dummyUserIdString);
+    dummyUserSignupForm.put("firstName", "updated first name");
+    dummyUserSignupForm.put("lastName", "updated last name");
+    dummyUserSignupForm.put("email", "test_member@test.com"); // <- keep the same address
+    dummyUserSignupForm.put("password", "test_PASSWORD");
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.put(targetUrl)
+                    .content(dummyUserSignupForm.toString())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(this.authCookie).cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    UserDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, UserDTO.class);
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.getUserId().toString()).isEqualTo(this.authInfo.getAuthUser().getUserId().toString());
+    assertThat(responseBody.getFirstName()).isEqualTo(dummyUserSignupForm.get("firstName"));
+    assertThat(responseBody.getLastName()).isEqualTo(dummyUserSignupForm.get("lastName"));
+    assertThat(responseBody.getEmail()).isEqualTo(dummyUserSignupForm.get("email"));
+    // since the user change the email, need to set active = temp
+    assertThat(responseBody.getActive()).isEqualTo(UserActiveEnum.ACTIVE);
+    // password
+    User updatedUser = this.entityManager.getEntityManager()
+            .createQuery("select u from users u where u.userId = :userId", User.class)
+            .setParameter("userId", UUID.fromString(dummyUserIdString))
+            .getSingleResult();
+
+    // to verify the bcrypted (hash) password, use 'matches(<raw_password>, <encrypted_password>)'
+    assertThat(this.passwordEncoder.matches(dummyUserSignupForm.get("password").toString(), updatedUser.getPassword())).isTrue();
 
   }
 
+  @Test
+  // @Sql(scripts = {
+  // "classpath:/integration/user/shouldMemberUserUpdateItsOwnData.sql" })
+  public void shouldMemberUserUpdateItsOwnDataWithoutPassword() throws Exception {
+
+    // dummy form json
+    // JsonNode dummyFormJson =
+    // this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+
+    // String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
+    String dummyPassword = "test_PASSWORD";
+
+    JSONObject dummyUserSignupForm = new JSONObject();
+    dummyUserSignupForm.put("userId", dummyUserIdString);
+    dummyUserSignupForm.put("firstName", "updated first name");
+    dummyUserSignupForm.put("lastName", "updated last name");
+    dummyUserSignupForm.put("email", "test_member@test.com"); // <- keep the same address
+    //dummyUserSignupForm.put("password", "test_PASSWORD"); // <- ignore password so the same
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.put(targetUrl)
+                    .content(dummyUserSignupForm.toString())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(this.authCookie).cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    UserDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, UserDTO.class);
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.getUserId().toString()).isEqualTo(this.authInfo.getAuthUser().getUserId().toString());
+    assertThat(responseBody.getFirstName()).isEqualTo(dummyUserSignupForm.get("firstName"));
+    assertThat(responseBody.getLastName()).isEqualTo(dummyUserSignupForm.get("lastName"));
+    assertThat(responseBody.getEmail()).isEqualTo(dummyUserSignupForm.get("email"));
+    // this user does not verify the email so its active = temp and this request does not change the the email and ends up 'temp'
+    assertThat(responseBody.getActive()).isEqualTo(UserActiveEnum.TEMP);
+    // password
+    User updatedUser = this.entityManager.getEntityManager()
+            .createQuery("select u from users u where u.userId = :userId", User.class)
+            .setParameter("userId", UUID.fromString(dummyUserIdString))
+            .getSingleResult();
+
+    // to verify the bcrypted (hash) password, use 'matches(<raw_password>, <encrypted_password>)'
+    assertThat(this.passwordEncoder.matches(dummyPassword, updatedUser.getPassword())).isTrue();
+
+  }
   @Test
   // @Sql(scripts = {
   // "classpath:/integration/user/shouldMemberUserUpdateOnlyNotNullProperty.sql"

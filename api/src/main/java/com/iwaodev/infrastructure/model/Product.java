@@ -21,11 +21,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 
 import com.iwaodev.domain.product.validator.ProductValidation;
 import com.iwaodev.exception.NotFoundException;
@@ -64,15 +60,18 @@ public class Product {
   private UUID productId;
 
   @NotEmpty(message = "{product.productName.notempty}")
+  @Size(max = 500, message = "{product.productName.max500}")
   @Column(name = "product_name")
   private String productName;
 
   @NotEmpty(message = "{product.productDescription.notempty}")
+  @Size(max = 10000, message = "{product.productDescription.max10000}")
   @Column(name = "product_description")
   private String productDescription;
 
   @NotEmpty(message = "{product.productPath.notempty}")
   @Pattern(regexp = "^[a-zA-Z0-9-_]*$", message = "{product.productPath.invalidformat}")
+  @Size(max = 100, message = "{product.productPath.max100}")
   @Column(name = "product_path", unique = true)
   private String productPath;
 
@@ -122,7 +121,7 @@ public class Product {
   // overall result if discount exist through its variants
   // - use 'left' isntead of 'inner' to cover the case if a product does not have
   // any variants.
-  @Formula("(select exists (select 1 from products p left join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id and (pv.is_discount = 1) and (pv.variant_discount_start_date < CURRENT_TIMESTAMP() and CURRENT_TIMESTAMP() < pv.variant_discount_end_date)))")
+  @Formula("(select exists (select 1 from products p left join product_variants pv on pv.product_id = p.product_id where p.product_id = product_id and (pv.is_discount = 1) and (DATE(pv.variant_discount_start_date) <= DATE(CURRENT_TIMESTAMP()) and DATE(CURRENT_TIMESTAMP()) <= DATE(pv.variant_discount_end_date))))")
   private Boolean isDiscountAvailable;
 
   @NotNull(message = "{product.category.notnull}")
@@ -149,6 +148,7 @@ public class Product {
   @Column(name = "release_date")
   private LocalDateTime releaseDate;
 
+  @Size(max = 10000, message = "{product.note.max10000}")
   @Column(name = "note")
   private String note;
 

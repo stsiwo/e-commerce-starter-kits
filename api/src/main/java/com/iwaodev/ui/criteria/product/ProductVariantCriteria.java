@@ -5,11 +5,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
+import javax.validation.constraints.*;
 
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
@@ -51,6 +47,7 @@ public class ProductVariantCriteria {
   @NotNull(message = "{productVariant.isDiscount.notnull}")
   private Boolean isDiscount;
 
+  @Size(max = 10000, message = "{productVariant.note.max10000}")
   private String note;
 
   @NotEmpty(message = "{productVariant.variantColor.notempty}")
@@ -62,18 +59,22 @@ public class ProductVariantCriteria {
 
   @NotNull(message = "{productVariant.variantWeight.notnull}")
   @Digits(integer = 6, fraction = 3, message = "{productVariant.variantWeight.notnull}")
+  @DecimalMin(value = "0.01", message = "{productVariant.variantWeight.min001}", inclusive = true)
   private Double variantWeight;
 
   @NotNull(message = "{productVariant.variantHeight.notnull}")
   @Digits(integer = 6, fraction = 3, message = "{productVariant.variantHeight.notnull}")
+  @DecimalMin(value = "1.00", message = "{productVariant.variantHeight.min1}", inclusive = true)
   private Double variantHeight;
 
   @NotNull(message = "{productVariant.variantLength.notnull}")
   @Digits(integer = 6, fraction = 3, message = "{productVariant.variantLength.notnull}")
+  @DecimalMin(value = "1.00", message = "{productVariant.variantLength.min1}", inclusive = true)
   private Double variantWidth;
 
   @NotNull(message = "{productVariant.variantWidth.notnull}")
   @Digits(integer = 6, fraction = 3, message = "{productVariant.variantWidth.notnull}")
+  @DecimalMin(value = "1.00", message = "{productVariant.variantWidth.min1}", inclusive = true)
   private Double variantLength;
 
   @NotNull(message = "{productVariant.productId.notnull}")

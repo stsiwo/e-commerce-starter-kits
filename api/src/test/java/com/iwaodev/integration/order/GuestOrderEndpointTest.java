@@ -203,7 +203,7 @@ public class GuestOrderEndpointTest {
       } else if (orderDetailDTO.getProductVariant().getVariantId().toString().equals("6")) {
         assertThat(orderDetailDTO.getProductWeight()).isEqualTo(0.6);
       } else if (orderDetailDTO.getProductVariant().getVariantId().toString().equals("11")) {
-        assertThat(new BigDecimal(orderDetailDTO.getProductWeight()).setScale(1, RoundingMode.UP)).isEqualTo(new BigDecimal(2.1).setScale(1, RoundingMode.DOWN));
+        assertThat(new BigDecimal(orderDetailDTO.getProductWeight()).setScale(1, RoundingMode.HALF_UP)).isEqualTo(new BigDecimal(2.1).setScale(1, RoundingMode.HALF_UP));
       }
     }
 

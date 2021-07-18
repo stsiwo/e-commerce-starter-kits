@@ -52,8 +52,16 @@ public class WishlistItemSpecifications {
       // cheapst price ---> min price ---> highest price => that product should be
       // included.
 
+      /**
+       * TODO: issue.
+       *  - you cannot use @Transient field in this JPA specification.
+       *  - in this case, you cannot get 'currentPrice' since this is transient.
+       *
+       *  for now. just use 'regularPrice' for the alternative, but if you know the solution, this should be fixed.
+       */
+
       return builder.greaterThanOrEqualTo(
-          root.join(WishlistItem_.variant).join(ProductVariant_.product).get(Product_.highestPrice), minPrice);
+          root.join(WishlistItem_.variant).get(ProductVariant_.regularPrice), minPrice);
     };
   }
 
@@ -68,8 +76,16 @@ public class WishlistItemSpecifications {
       }
       // cheapest price --> max price ---> highest price => that product should be
       // included.
+      /**
+       * TODO: issue.
+       *  - you cannot use @Transient field in this JPA specification.
+       *  - in this case, you cannot get 'currentPrice' since this is transient.
+       *
+       *  for now. just use 'regularPrice' for the alternative, but if you know the solution, this should be fixed.
+       */
+
       return builder.lessThanOrEqualTo(
-          root.join(WishlistItem_.variant).join(ProductVariant_.product).get(Product_.cheapestPrice), maxPrice);
+          root.join(WishlistItem_.variant).get(ProductVariant_.regularPrice), maxPrice);
     };
   }
 

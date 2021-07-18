@@ -1,7 +1,6 @@
 package com.iwaodev.ui.criteria.shipping;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 
 import org.springframework.validation.annotation.Validated;
 
@@ -17,11 +16,13 @@ import lombok.ToString;
 @Validated
 public class RatingCriteria {
 
-  @NotNull(message = "parcel weight can not be null.")
-  @Min(value = 0, message = "The value must be greater than or equal 0")
+  @NotNull(message = "{rating.parcelWeight.notnull}")
+  @Digits(integer = 6, fraction = 3, message = "{rating.parcelWeight.invalidformat}")
+  @DecimalMin(value = "0.01", message = "{rating.variantWeight.min001}", inclusive = true)
   private Double parcelWeight;
 
-  @NotNull(message = "destination postal code must not be null.")
+  @NotEmpty(message = "{rating.destinationPostalCode.notempty}")
+  @Size(max = 20, message = "{rating.destinationPostalCode.max20}")
   private String destinationPostalCode;
 }
 

@@ -2,6 +2,7 @@ package com.iwaodev.ui.criteria.order;
 
 import java.util.UUID;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
@@ -30,6 +31,7 @@ public class OrderDetailCriteria {
 
   @NotNull(message = "{orderDetail.productQuantity.notnull}")
   @Min(value = 1, message = "{orderDetail.productQuantity.min1}")
+  @Max(value = 10, message = "{orderDetail.productQuantity.max10}")
   private Integer productQuantity;
 
   @NotNull(message = "{orderDetail.product.notnull}", groups = OnCreate.class)

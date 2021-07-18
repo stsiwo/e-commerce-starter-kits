@@ -67,7 +67,7 @@ public class OrderEventValidationValidator implements ConstraintValidator<OrderE
       HibernateConstraintValidatorContext hibernateConstraintValidatorContext = context
           .unwrap(HibernateConstraintValidatorContext.class);
       hibernateConstraintValidatorContext.disableDefaultConstraintViolation();
-      hibernateConstraintValidatorContext.addMessageParameter("0", domain.getOrderStatus()).addMessageParameter("1", orderEventInfo.addableByToString()).buildConstraintViolationWithTemplate("{orderEvent.orderStatus.notnull}").addConstraintViolation();
+      hibernateConstraintValidatorContext.addMessageParameter("0", domain.getOrderStatus()).addMessageParameter("1", orderEventInfo.addableByToString()).buildConstraintViolationWithTemplate("{orderEvent.orderStatus.notaddablebythisuser}").addConstraintViolation();
       return false;
     }
 

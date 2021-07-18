@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -23,7 +24,7 @@ public class ReviewQueryStringCriteria {
   private String searchQuery;
 
   @Min(value = 0, message = "The review point must be greater than or equal 0")
-  @Max(value = 5, message = "The review point must be less than or equal 5")
+  @Size(max = 5, message = "The review point must be less than or equal 5")
   private Double reviewPoint;
 
   private Boolean isVerified;

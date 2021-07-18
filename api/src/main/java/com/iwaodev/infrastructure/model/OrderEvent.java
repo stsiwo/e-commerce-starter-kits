@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Size;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
@@ -55,6 +56,7 @@ public class OrderEvent {
   @Column(name = "undoable")
   private Boolean undoable;
 
+  @Size(max = 1000, message = "{orderEvent.note.max1000}")
   @Column(name = "note")
   private String note;
 

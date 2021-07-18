@@ -24,12 +24,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.PostLoad;
 import javax.persistence.Transient;
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.iwaodev.domain.order.OrderStatusEnum;
@@ -110,15 +105,18 @@ public class Order {
   private String note;
 
   @NotEmpty(message = "{order.orderFirstName.notempty}")
+  @Size(max = 100, message = "{order.orderFirstName.max100}")
   @Column(name = "order_first_name")
   private String orderFirstName;
 
   @NotEmpty(message = "{order.orderLastName.notempty}")
+  @Size(max = 100, message = "{order.orderLastName.max100}")
   @Column(name = "order_last_name")
   private String orderLastName;
 
   @NotEmpty(message = "{order.email.notempty}")
   @Email(message = "{order.email.invalidformat}")
+  @Size(max = 100, message = "{order.email.max100}")
   @Column(name = "order_email")
   private String orderEmail;
 
@@ -193,6 +191,7 @@ public class Order {
   @Column(name = "is_guest")
   private Boolean isGuest;
 
+  @NotNull(message = "{order.estimatedDeliveryDate.notnull}")
   @Column(name = "estimated_delivery_date")
   private LocalDateTime estimatedDeliveryDate;
 

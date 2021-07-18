@@ -2,12 +2,7 @@ package com.iwaodev.ui.criteria.review;
 
 import java.util.UUID;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
+import javax.validation.constraints.*;
 
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
@@ -29,6 +24,7 @@ public class ReviewCriteria {
   private Long reviewId;
   
   @NotEmpty(message = "{review.title.notempty}")
+  @Size(max = 500, message = "{review.title.max500}")
   private String reviewTitle;
 
   @NotNull(message = "{review.point.notnull}")
@@ -36,11 +32,13 @@ public class ReviewCriteria {
   @DecimalMax(value = "5.0", message = "{review.point.max5}")
   private Double reviewPoint;
 
-  @NotEmpty(message = "{review.descripiton.notempty}")
+  @NotEmpty(message = "{review.reviewDescription.notempty}")
+  @Size(max = 10000, message = "{review.reviewDescription.max10000}")
   private String reviewDescription;
 
   private Boolean isVerified;
 
+  @Size(max = 10000, message = "{review.note.max10000}")
   private String note;
 
   @NotNull(message = "{review.product.notnull}")

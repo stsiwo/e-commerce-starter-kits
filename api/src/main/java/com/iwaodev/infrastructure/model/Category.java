@@ -12,10 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 
 import com.iwaodev.infrastructure.model.listener.CategoryValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
@@ -44,16 +41,19 @@ public class Category {
 
   // unique validation at service layer
   @NotEmpty(message = "{category.name.notempty}")
+  @Size(max = 100, message = "{category.name.max100}")
   @Column(name = "category_name", unique = true)
   private String categoryName;
 
   @NotEmpty(message = "{category.description.notempty}")
+  @Size(max = 10000, message = "{category.description.max10000}")
   @Column(name = "category_description")
   private String categoryDescription;
 
   // unique validation at service layer
   @NotEmpty(message = "{category.path.notempty}")
   @Pattern(regexp = "^[a-zA-Z0-9-_]*$", message = "{category.path.invalidformat}")
+  @Size(max = 100, message = "{category.path.max100}")
   @Column(name = "category_path", unique = true)
   private String categoryPath;
 

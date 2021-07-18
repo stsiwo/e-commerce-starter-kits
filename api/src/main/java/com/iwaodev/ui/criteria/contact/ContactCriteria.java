@@ -1,6 +1,7 @@
 package com.iwaodev.ui.criteria.contact;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
 import javax.validation.constraints.NotEmpty;
 
 import org.springframework.validation.annotation.Validated;
@@ -15,23 +16,28 @@ import lombok.ToString;
 @Validated
 public class ContactCriteria {
 
-  @NotEmpty(message = "first name can not be null.")
+  @NotEmpty(message = "{contact.firstName.notempty}")
+  @Size(max = 100, message = "{contact.firstName.max100}")
   private String firstName;
 
-  @NotEmpty(message = "last name can not be null.")
+  @NotEmpty(message = "{contact.lastName.notempty}")
+  @Size(max = 100, message = "{contact.lastName.max100}")
   private String lastName;
 
-  @NotEmpty(message = "email can not be null.")
-  @Email(message = "email must be valid format.")
+  @NotEmpty(message = "{contact.email.notempty}")
+  @Email(message = "{contact.email.invalidformat}")
+  @Size(max = 100, message = "{contact.email.max100}")
   private String email;
 
-  @NotEmpty(message = "title can not be null.")
+  @NotEmpty(message = "{contact.title.notempty}")
+  @Size(max = 500, message = "{contact.title.max500}")
   private String title;
 
-  @NotEmpty(message = "description can not be null.")
+  @NotEmpty(message = "{contact.description.notempty}")
+  @Size(max = 10000, message = "{contact.description.max10000}")
   private String description;
 
-  @NotEmpty(message = "recaptcha token can not be null.")
+  @NotEmpty(message = "{contact.recaptchaToken.notempty}")
   private String recaptchaToken;
 
 }

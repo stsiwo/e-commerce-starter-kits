@@ -3,7 +3,9 @@ package com.iwaodev.ui.criteria.order;
 import java.util.UUID;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.validation.annotation.Validated;
 
@@ -23,17 +25,20 @@ import lombok.ToString;
 @Validated
 public class CustomerCriteria {
 
-  @NotEmpty(message = "user id can not be null.")
+  @NotNull(message = "{user.id.notnull}")
   private UUID userId;
   
-  @NotEmpty(message = "first name can not be null.")
+  @NotEmpty(message = "{user.firstName.notempty}")
+  @Size(max = 100, message = "{user.firstName.max100}")
   private String firstName;
 
-  @NotEmpty(message = "last name can not be null.")
+  @NotEmpty(message = "{user.lastName.notempty}")
+  @Size(max = 100, message = "{user.lastName.max100}")
   private String lastName;
 
-  @NotEmpty(message = "email can not be null.")
-  @Email(message = "email can be valid format.")
+  @NotEmpty(message = "{user.email.notempty}")
+  @Email(message = "{user.email.invalidformat}")
+  @Size(max = 100, message = "{user.email.max100}")
   private String email;
 
 }

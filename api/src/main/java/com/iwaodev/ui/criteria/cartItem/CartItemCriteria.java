@@ -2,6 +2,7 @@ package com.iwaodev.ui.criteria.cartItem;
 
 import java.util.UUID;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
@@ -27,7 +28,7 @@ public class CartItemCriteria {
 
   @NotNull(message = "{cartItem.user.notnull}")
   private UUID userId; 
-  
+
   @NotNull(message = "{cartItem.variant.notnull}")
   private Long variantId;
 
@@ -35,6 +36,7 @@ public class CartItemCriteria {
 
   @NotNull(message = "{cartItem.quantity.notnull}")
   @Min(value = 1, message = "{cartItem.quantity.min1}")
+  @Max(value = 10, message = "{cartItem.quantity.max10}")
   private Integer quantity;
 }
 

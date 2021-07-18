@@ -11,11 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
+import javax.validation.constraints.*;
 
 import com.iwaodev.infrastructure.model.listener.ReviewValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
@@ -60,10 +56,12 @@ public class Review {
   private Double reviewPoint;
 
   @NotEmpty(message = "{review.title.notempty}")
+  @Size(max = 500, message = "{review.title.max500}")
   @Column(name = "review_title")
   private String reviewTitle;
 
   @NotEmpty(message = "{review.descripiton.notempty}")
+  @Size(max = 10000, message = "{review.reviewDescription.max10000}")
   @Column(name = "review_description")
   private String reviewDescription;
 
@@ -72,6 +70,7 @@ public class Review {
   private Boolean isVerified;
 
   // only admin can see this.
+  @Size(max = 10000, message = "{review.note.max10000}")
   @Column(name = "note")
   private String note;
 

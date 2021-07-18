@@ -1,10 +1,6 @@
 package com.iwaodev.ui.criteria.user;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
@@ -28,14 +24,18 @@ public class UserAddressCriteria {
   private Long addressId;
 
   @NotEmpty(message = "{address.address1.notempty}")
+  @Size(max = 100, message = "{address.address1.max100}")
   private String address1;
 
+  @Size(max = 100, message = "{address.address2.max100}")
   private String address2;
 
   @NotEmpty(message = "{address.city.notempty}")
+  @Size(max = 100, message = "{address.city.max100}")
   private String city;
 
   @NotEmpty(message = "{address.province.notempty}")
+  @Size(max = 100, message = "{address.province.max100}")
   private String province;
 
   @NotEmpty(message = "{address.country.notempty}")
@@ -44,6 +44,7 @@ public class UserAddressCriteria {
 
   @NotEmpty(message = "{address.postalCode.notempty}")
   @Pattern( regexp = "^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9]$", message = "{address.postalCode.invalidformat}")
+  @Size(max = 20, message = "{address.postalCode.max20}")
   private String postalCode;
 
   private Boolean isBillingAddress;

@@ -332,7 +332,7 @@ public class MemberCartItemEndpointTest {
     dummyFormJson.put("cartItemId", dummyCartItemId);
     dummyFormJson.put("variantId", dummyVariantId);
     dummyFormJson.put("userId", this.authInfo.getAuthUser().getUserId().toString());
-    dummyFormJson.put("quantity", 33);
+    dummyFormJson.put("quantity", 9);
     dummyFormJson.put("isSelected", true);
 
     // act
@@ -358,12 +358,44 @@ public class MemberCartItemEndpointTest {
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
     assertThat(responseBody.getCartItemId().toString()).isEqualTo(dummyCartItemId);
-    assertThat(responseBody.getQuantity()).isEqualTo(33);
+    assertThat(responseBody.getQuantity()).isEqualTo(9);
     assertThat(responseBody.getIsSelected()).isEqualTo(true);
     assertThat(responseBody.getProduct().getVariants().size()).isEqualTo(1);
     assertThat(responseBody.getProduct().getVariants().get(0).getVariantId().toString()).isEqualTo(dummyVariantId);
   }
 
+  @Test
+  @Sql(scripts = { "classpath:/integration/cartItem/shouldNotMemberUserPutSingleProductInCartSinceTooManyQuantity.sql" })
+  public void shouldNotMemberUserPutSingleProductInCartSinceTooManyQuantity() throws Exception {
+
+    // make sure product, variant, user id match with sql script
+
+    // arrange
+    String dummyCartItemId = "12";
+    String dummyVariantId = "9";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyCartItemId;
+    JSONObject dummyFormJson = new JSONObject();
+    dummyFormJson.put("cartItemId", dummyCartItemId);
+    dummyFormJson.put("variantId", dummyVariantId);
+    dummyFormJson.put("userId", this.authInfo.getAuthUser().getUserId().toString());
+    dummyFormJson.put("quantity", 20);
+    dummyFormJson.put("isSelected", true);
+
+    // act
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .put(targetUrl) // put single cart item
+                    .content(dummyFormJson.toString())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isBadRequest());
+
+  }
   @Test
   @Sql(scripts = { "classpath:/integration/cartItem/shouldMemberUserDeleteSingleProductInCart.sql" })
   public void shouldMemberUserDeleteSingleProductInCart() throws Exception {

@@ -83,7 +83,16 @@
 
     - a product is able to have as many variant (e.g., different color and size) as you like.
 
+    - weight, length, width, and height are used for calculating shipping info (e.g., rating).
+
+      - weight >= 0.01 kg
+      - length >= 1 cm
+      - width >= 1 cm
+      - height >= 1 cm
+
   ### Product Price
+
+    - the price must be >= 1.0
 
     - there are three types of the price:
 
@@ -109,6 +118,22 @@
           - variant unit price: $30.00 
           - disount price: $25.00 => this variant price is $25.00 during the discount period.
 
+
+  ### Discount
+
+    - a product variant can be discount if the following conditions are met:
+      1. discount checkbox is checked.
+      2. the current date is during the discount start date and end date (inclusive).
+      
+        ex)
+          start date: 2021/07/17 
+          end date: 2021/07/17
+            => discount is available only 2021/07/17 
+
+        ex)
+          start date: 2021/07/17
+          end date: 2021/07/20
+            => discount is available during 2021/07/17 ~ 2021/07/20 (not 2021/07/16 and 2021/07/21)
 ## Shipping
 
   - the current version of this app does not fully support shipping feature. We only support the following features:
@@ -175,6 +200,13 @@
 
     - the app automatically send an email to ask them to write a review.
     - every time the customer create/update a review, the admin must verify the review to be published.
+
+## Cart Items
+
+  - you can keep product variants in your cart to buy it.
+
+  - max number of cart items is 5.
+  - max number of quantity of a cart item is 10.
   
 ## Admin
 

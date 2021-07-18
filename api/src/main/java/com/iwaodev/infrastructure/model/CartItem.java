@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
@@ -68,6 +69,7 @@ public class CartItem implements Serializable {
 
   @NotNull(message = "{cartItem.variant.notnull}")
   @ManyToOne
+  // variant should not be modified when the variant_id on this table is updated.
   @JoinColumn(name = "variant_id", insertable = true, updatable = false)
   private ProductVariant variant;
 
@@ -77,6 +79,7 @@ public class CartItem implements Serializable {
 
   @NotNull(message = "{cartItem.quantity.notnull}")
   @Min(value = 1, message = "{cartItem.quantity.min1}")
+  @Max(value = 10, message = "{cartItem.quantity.max10}")
   @Column(name = "quantity")
   private Integer quantity;
 

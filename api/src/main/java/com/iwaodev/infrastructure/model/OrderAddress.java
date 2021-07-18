@@ -8,10 +8,7 @@ import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.iwaodev.infrastructure.model.listener.OrderAddressValidationListener;
@@ -40,17 +37,21 @@ public class OrderAddress {
   private String orderAddressId;
 
   @NotEmpty(message = "{address.address1.notempty}")
+  @Size(max = 100, message = "{address.address1.max100}")
   @Column(name="address_1")
   private String address1;
 
+  @Size(max = 100, message = "{address.address2.max100}")
   @Column(name="address_2")
   private String address2;
 
   @NotEmpty(message = "{address.city.notempty}")
+  @Size(max = 100, message = "{address.city.max100}")
   @Column(name="city")
   private String city;
 
   @NotEmpty(message = "{address.province.notempty}")
+  @Size(max = 100, message = "{address.province.max100}")
   @Column(name="province")
   private String province;
 
@@ -61,6 +62,7 @@ public class OrderAddress {
 
   @NotEmpty(message = "{address.postalCode.notempty}")
   @Pattern( regexp = "^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9]$", message = "{address.postalCode.invalidformat}")
+  @Size(max = 20, message = "{address.postalCode.max20}")
   @Column(name="postal_code")
   private String postalCode;
 

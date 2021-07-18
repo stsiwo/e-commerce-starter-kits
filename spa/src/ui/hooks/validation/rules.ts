@@ -17,9 +17,16 @@ import { get2AlphaCountryCodeRegex, getProvinceList, isBeforeOrEqualDateOf, isVa
  **/
 
 export const userAccountSchema = yup.object().shape({
-  firstName: yup.string().required(),
-  lastName: yup.string().required(),
-  email: yup.string().required().email(),
+  firstName: yup.string()
+    .test('len', 'must be less than or equal to 100', val => val.length <= 100)
+    .required(),
+  lastName: yup.string()
+    .test('len', 'must be less than or equal to 100', val => val.length <= 100)
+    .required(),
+  email: yup.string()
+    .test('len', 'must be less than or equal to 100', val => val.length <= 100)
+    .required()
+    .email(),
   /**
    * password.
    * 
@@ -31,7 +38,11 @@ export const userAccountSchema = yup.object().shape({
    *   - no space
    *
    **/
-  password: yup.lazy((value) => value ? yup.string().min(8, "password must be at least 8 characters").matches(/^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/, "cannot include space and must include at least one upper case and lowercase char.").required("password is required") : yup.string().notRequired()),
+  password: yup.lazy((value) => value ? yup.string()
+    .test('len', 'must be less than or equal to 100', val => val.length <= 100)
+    .min(8, "password must be at least 8 characters")
+    .matches(/^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/, "cannot include space and must include at least one upper case and lowercase char.")
+    .required("password is required") : yup.string().notRequired()),
   confirm: yup.lazy((cf) => {
     return yup.string().when('password', {
       is: (pw: string) => pw || (!pw && cf),
@@ -51,13 +62,21 @@ export const userAccountPhoneSchema = yup.object().shape({
 
 export const userActiveStatusAccountSchema = yup.object().shape({
   active: yup.string().required(),
-  activeNote: yup.string().optional(),
+  activeNote: yup.string()
+    .test('len', 'must be less than or equal to 1000', val => val.length <= 1000)
+    .optional(),
 })
 
 export const userAccountAddressSchema = yup.object().shape({
-  address1: yup.string().required(),
-  address2: yup.string().optional().nullable(),
-  city: yup.string().required(),
+  address1: yup.string()
+    .test('len', 'must be less than or equal to 100', val => val.length <= 100)
+    .required(),
+  address2: yup.string()
+    .test('len', 'must be less than or equal to 100', val => val.length <= 100)
+    .optional().nullable(),
+  city: yup.string()
+    .test('len', 'must be less than or equal to 100', val => val.length <= 100)
+    .required(),
   province: yup.string().test(
     'province-list-contain',
     'province does not exist.',
@@ -75,21 +94,43 @@ export const userAccountAddressSchema = yup.object().shape({
 })
 
 export const adminLoginSchema = yup.object().shape({
-  email: yup.string().required().email(),
-  password: yup.string().min(8, "password must be at least 8 characters").matches(/^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/, "cannot include space and must include at least one upper case and lowercase char.").required("password is required"),
+  email: yup.string()
+    .test('len', 'must be less than or equal to 100', val => val.length <= 100)
+    .required().email(),
+  password: yup.string()
+    .test('len', 'must be less than or equal to 100', val => val.length <= 100)
+    .min(8, "password must be at least 8 characters")
+    .matches(/^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/, "cannot include space and must include at least one upper case and lowercase char.")
+    .required("password is required"),
 })
 
 export const memberSignupSchema = yup.object().shape({
-  firstName: yup.string().required(),
-  lastName: yup.string().required(),
-  email: yup.string().required().email(),
-  password: yup.string().min(8, "password must be at least 8 characters").matches(/^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/, "cannot include space and must include at least one upper case and lowercase char.").required("password is required"),
-  confirm: yup.string().required().oneOf([yup.ref('password'), null], "password must match")
+  firstName: yup.string()
+    .test('len', 'must be less than or equal to 100', val => val.length <= 100)
+    .required(),
+  lastName: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .required(),
+  email: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .required().email(),
+  password: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .min(8, "password must be at least 8 characters").matches(/^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/, "cannot include space and must include at least one upper case and lowercase char.").required("password is required"),
+  confirm: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .required().oneOf([yup.ref('password'), null], "password must match")
 })
 
 export const memberLoginSchema = yup.object().shape({
-  email: yup.string().required().email(),
-  password: yup.string().min(8, "password must be at least 8 characters").matches(/^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/, "cannot include space and must include at least one upper case and lowercase char.").required("password is required"),
+  email: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .required().email(),
+  password: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .min(8, "password must be at least 8 characters")
+    .matches(/^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/, "cannot include space and must include at least one upper case and lowercase char.")
+    .required("password is required"),
 })
 
 // products
@@ -174,18 +215,70 @@ export const productVariantSchema = yup.object().shape({
     }).optional().nullable(),
   variantStock: yup.number().min(0).required(),
   isDiscount: yup.bool().optional().nullable(),
-  note: yup.string().optional().nullable(),
-  variantWeight: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,3})?$/, "invalid kg format. please enter currency (e.g., 3.120, 12.000, and so on)").required(),
-  variantHeight: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,3})?$/, "invalid cm format. please enter currency (e.g., 3.120, 12.000, and so on)").required(),
-  variantLength: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,3})?$/, "invalid cm format. please enter currency (e.g., 3.120, 12.000, and so on)").required(),
-  variantWidth: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,3})?$/, "invalid cm format. please enter currency (e.g., 3.120, 12.000, and so on)").required(),
+  note: yup.string()
+    .test('len', 'must be less than or equal to 10000 chars', val => val.length <= 10000)
+    .optional().nullable(),
+  variantWeight: yup.string()
+    .matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,3})?$/, "invalid kg format. please enter currency (e.g., 3.120, 12.000, and so on)")
+    .test("min-001", "weight must be greater than or equal to 0.01", 
+    function(value: string){
+      if (value) {
+        const num: number = parseFloat(value);
+        if (num < 0.01) {
+          return false
+        }
+      }
+      return true
+    }).required(),
+  variantHeight: yup.string()
+    .matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,3})?$/, "invalid cm format. please enter currency (e.g., 3.120, 12.000, and so on)")
+    .test("min-1-height", "height must be greater than or equal to 1.00", 
+    function(value: string){
+      if (value) {
+        const num: number = parseFloat(value);
+        if (num < 1.00) {
+          return false
+        }
+      }
+      return true
+    }).required(),
+  variantLength: yup.string()
+    .matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,3})?$/, "invalid cm format. please enter currency (e.g., 3.120, 12.000, and so on)")
+    .test("min-1-length", "height must be greater than or equal to 1.00", 
+    function(value: string){
+      if (value) {
+        const num: number = parseFloat(value);
+        if (num < 1.00) {
+          return false
+        }
+      }
+      return true
+    }).required(),
+  variantWidth: yup.string()
+  .matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,3})?$/, "invalid cm format. please enter currency (e.g., 3.120, 12.000, and so on)")
+    .test("min-1-width", "height must be greater than or equal to 1.00", 
+    function(value: string){
+      if (value) {
+        const num: number = parseFloat(value);
+        if (num < 1.00) {
+          return false
+        }
+      }
+      return true
+    }).required(),
 })
 
 export const productSchema = yup.object().shape({
-  productName: yup.string().required(),
-  productDescription: yup.string().required(),
+  productName: yup.string()
+    .test('len', 'must be less than or equal to 500 chars', val => val.length <= 500)
+    .required(),
+  productDescription: yup.string()
+    .test('len', 'must be less than or equal to 10000 chars', val => val.length <= 10000)
+    .required(),
   productBaseUnitPrice: yup.string().matches(/^(?=.*?\d)^\$?(([1-9]\d{0,2}(,\d{3})*)|\d+)?(\.\d{1,2})?$/, "invalid currency format. please enter currency (e.g., 3.12, 12.00, and so on)").required(),
-  productPath: yup.string().matches(/^[a-zA-Z0-9-_]*$/, "only alphabetics, numbers, underscore (_) and hyphen (-) are availble.").required(),
+  productPath: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .matches(/^[a-zA-Z0-9-_]*$/, "only alphabetics, numbers, underscore (_) and hyphen (-) are availble.").required(),
   productImages: yup.array().test(
     'has-first-element',
     'the primary product image (1st image) is required.',
@@ -252,44 +345,78 @@ export const productSchema = yup.object().shape({
     categoryId: yup.string().required()
   }).nullable(),
   productVariants: yup.array().of(productVariantSchema),
-  note: yup.string().optional().nullable(),
+  note: yup.string()
+    .test('len', 'must be less than or equal to 10000 chars', val => val.length <= 10000)
+    .optional().nullable(),
 })
 
 // categories
 export const categorySchema = yup.object().shape({
-  categoryName: yup.string().required(),
-  categoryDescription: yup.string().required(),
+  categoryName: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .required(),
+  categoryDescription: yup.string()
+    .test('len', 'must be less than or equal to 10000 chars', val => val.length <= 10000)
+    .required(),
   categoryPath: yup.string().matches(/^[a-zA-Z0-9-_]*$/, "only alphabetics, numbers, underscore (_) and hyphen (-) are availble.").required(),
 })
 
 // reviews
 export const reviewSchema = yup.object().shape({
   reviewPoint: yup.number().min(0).max(5).required(),
-  reviewTitle: yup.string().required(),
-  reviewDescription: yup.string().required(),
+  reviewTitle: yup.string()
+    .test('len', 'must be less than or equal to 500 chars', val => val.length <= 500)
+    .required(),
+  reviewDescription: yup.string()
+    .test('len', 'must be less than or equal to 10000 chars', val => val.length <= 10000)
+    .required(),
   isVerified: yup.bool().required(),
-  note: yup.string().optional().nullable(),
+  note: yup.string()
+    .test('len', 'must be less than or equal to 10000 chars', val => val.length <= 10000)
+    .optional().nullable(),
 })
 
 // contact 
 export const contactSchema = yup.object().shape({
-  firstName: yup.string().required(),
-  lastName: yup.string().required(),
-  email: yup.string().required().email(),
-  title: yup.string().required(),
-  description: yup.string().required(),
+  firstName: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .required(),
+  lastName: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .required(),
+  email: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .required().email(),
+  title: yup.string()
+    .test('len', 'must be less than or equal to 500 chars', val => val.length <= 500)
+    .required(),
+  description: yup.string()
+    .test('len', 'must be less than or equal to 10000 chars', val => val.length <= 10000)
+    .required(),
 })
 
 // admin company
 export const companySchema = yup.object().shape({
-  companyName: yup.string().required(),
-  companyDescription: yup.string().required(),
-  companyEmail: yup.string().required().email(),
+  companyName: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .required(),
+  companyDescription: yup.string()
+    .test('len', 'must be less than or equal to 10000 chars', val => val.length <= 10000)
+    .required(),
+  companyEmail: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .required().email(),
   phoneNumber: yup.string().matches(/^[0-9]{10}$/, "invalid format. please enter only number (no '-', '(', ')')").required(),
   countryCode: yup.string().matches(/^(\+?\d{1,3}|\\d{1,4})$/, "invalid format. proper format: '+1', '+12'").required(),
-  address1: yup.string().required(),
-  address2: yup.string().optional().nullable(),
-  city: yup.string().required(),
+  address1: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .required(),
+  address2: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .optional().nullable(),
+  city: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .required(),
   province: yup.string().test(
     'province-list-contain',
     'province does not exist. please choose from available option.',
@@ -305,19 +432,27 @@ export const companySchema = yup.object().shape({
   ).required(),
   country: yup.string().matches(get2AlphaCountryCodeRegex(), "invalid country format. please choose from available option.").required(),
   postalCode: yup.string().matches(/^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9]$/, "invalid format. proper format: 'A1A 2B2'").required(),
-  facebookLink: yup.string().matches(
+  facebookLink: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .matches(
+    /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
+    'invalid url.'
+    ).optional(),
+  instagramLink: yup.string()
+  .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+  .matches(
     /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
     'invalid url.'
   ).optional(),
-  instagramLink: yup.string().matches(
+  twitterLink: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+  .matches(
     /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
     'invalid url.'
   ).optional(),
-  twitterLink: yup.string().matches(
-    /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
-    'invalid url.'
-  ).optional(),
-  youtubeLink: yup.string().matches(
+  youtubeLink: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+  .matches(
     /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
     'invalid url.'
   ).optional()
@@ -325,12 +460,18 @@ export const companySchema = yup.object().shape({
 
 // forgot password 
 export const forgotPasswordSchema = yup.object().shape({
-  email: yup.string().required().email(),
+  email: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .required().email(),
 })
 
 // reset password
 export const resetPasswordSchema = yup.object().shape({
-  password: yup.string().min(8, "password must be at least 8 characters").matches(/^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/, "cannot include space and must include at least one upper case and lowercase char.").required("password is required"),
-  confirm: yup.string().required().oneOf([yup.ref('password'), null], "password must match")
+  password: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .min(8, "password must be at least 8 characters").matches(/^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/, "cannot include space and must include at least one upper case and lowercase char.").required("password is required"),
+  confirm: yup.string()
+    .test('len', 'must be less than or equal to 100 chars', val => val.length <= 100)
+    .required().oneOf([yup.ref('password'), null], "password must match")
 })
 

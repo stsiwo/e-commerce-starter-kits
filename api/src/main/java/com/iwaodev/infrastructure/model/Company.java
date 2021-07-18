@@ -9,11 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 
 import com.iwaodev.infrastructure.model.listener.CompanyValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
@@ -37,16 +33,19 @@ public class Company {
   @Column(name="company_id")
   private Long companyId;
 
-  @NotEmpty(message = "{company.name.notempty}")
+  @NotEmpty(message = "{company.companyName.notempty}")
+  @Size(max = 100, message = "{company.companyName.max100}")
   @Column(name="company_name")
   private String companyName;
 
-  @NotEmpty(message = "{company.description.notempty}")
+  @NotEmpty(message = "{company.companyDescription.notempty}")
+  @Size(max = 10000, message = "{company.companyDescription.max10000}")
   @Column(name="company_description")
   private String companyDescription;
 
-  @NotEmpty(message = "{company.email.notempty}")
-  @Email(message = "{company.email.invalidformat}")
+  @NotEmpty(message = "{company.companyEmail.notempty}")
+  @Email(message = "{company.companyEmail.invalidformat}")
+  @Size(max = 100, message = "{company.companyEmail.max100}")
   @Column(name="company_email")
   private String companyEmail;
 
@@ -61,39 +60,53 @@ public class Company {
   private String countryCode;
 
   @NotEmpty(message = "{address.address1.notempty}")
+  @Size(max = 100, message = "{address.address1.max100}")
   @Column(name="address_1")
   private String address1;
 
+  @Size(max = 100, message = "{address.address2.max100}")
   @Column(name="address_2")
   private String address2;
 
   @NotEmpty(message = "{address.city.notempty}")
+  @Size(max = 100, message = "{address.city.max100}")
   @Column(name="city")
   private String city;
 
   @NotEmpty(message = "{address.province.notempty}")
+  @Size(max = 100, message = "{address.province.max100}")
   @Column(name="province")
   private String province;
 
   @NotEmpty(message = "{address.country.notempty}")
+  @Size( max = 2, min = 2, message = "{address.country.size2}")
   // store country code (2 char) for shipping api (Canada Post)
   @Column(name="country")
   private String country; // is there any type for country like Locale
 
   @NotEmpty(message = "{address.postalCode.notempty}")
   @Pattern( regexp = "^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9]$", message = "{address.postalCode.invalidformat}")
+  @Size(max = 20, message = "{address.postalCode.max20}")
   @Column(name="postal_code")
   private String postalCode;
 
+  @Pattern( regexp = "((https?):\\/\\/)?(www.)?[a-z0-9]+(\\.[a-z]{2,}){1,3}(#?\\/?[a-zA-Z0-9#]+)*\\/?(\\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$", message = "{link.facebook.invalidformat}")
+  @Size(max = 100, message = "{link.facebook.max100}")
   @Column(name="facebook_link")
   private String facebookLink;
 
+  @Pattern( regexp = "((https?):\\/\\/)?(www.)?[a-z0-9]+(\\.[a-z]{2,}){1,3}(#?\\/?[a-zA-Z0-9#]+)*\\/?(\\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$", message = "{link.instagram.invalidformat}")
+  @Size(max = 100, message = "{link.instagram.max100}")
   @Column(name="instagram_link")
   private String instagramLink;
 
+  @Pattern( regexp = "((https?):\\/\\/)?(www.)?[a-z0-9]+(\\.[a-z]{2,}){1,3}(#?\\/?[a-zA-Z0-9#]+)*\\/?(\\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$", message = "{link.twitter.invalidformat}")
+  @Size(max = 100, message = "{link.twitter.max100}")
   @Column(name="twitter_link")
   private String twitterLink;
 
+  @Pattern( regexp = "((https?):\\/\\/)?(www.)?[a-z0-9]+(\\.[a-z]{2,}){1,3}(#?\\/?[a-zA-Z0-9#]+)*\\/?(\\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$", message = "{link.youtube.invalidformat}")
+  @Size(max = 100, message = "{link.youtube.max100}")
   @Column(name="youtube_link")
   private String youtubeLink;
 

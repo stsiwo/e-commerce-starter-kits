@@ -19,10 +19,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
+import javax.validation.constraints.*;
 
 import com.iwaodev.domain.user.UserActiveEnum;
 import com.iwaodev.domain.user.validator.PhoneValidation;
@@ -62,19 +59,24 @@ public class User {
   private UUID userId;
 
   @NotEmpty(message = "{user.firstName.notempty}")
+  @Size(max = 100, message = "{user.firstName.max100}")
   @Column(name = "first_name")
   private String firstName;
 
   @NotEmpty(message = "{user.lastName.notempty}")
+  @Size(max = 100, message = "{user.lastName.max100}")
   @Column(name = "last_name")
   private String lastName;
 
   @NotEmpty(message = "{user.email.notempty}")
   @Email(message = "{user.email.invalidformat}")
+  @Size(max = 100, message = "{user.email.max100}")
   @Column(name = "email")
   private String email;
 
   @NotEmpty(message = "{user.password.notempty}")
+  // not set this Size since encoding
+  //@Size(value = 100, message = "{user.password.max100}")
   @Column(name = "password")
   /**
    * use Spring Security instead
@@ -108,6 +110,7 @@ public class User {
   @Column(name = "active")
   private UserActiveEnum active;
 
+  @Size(max = 1000, message = "{user.activeNote.max1000}")
   @Column(name = "active_note")
   private String activeNote;
 

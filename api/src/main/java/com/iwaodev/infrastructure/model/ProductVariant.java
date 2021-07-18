@@ -21,11 +21,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
+import javax.validation.constraints.*;
 
 import com.iwaodev.domain.product.validator.ProductVariantValidation;
 import com.iwaodev.infrastructure.model.listener.ProductVariantListener;
@@ -104,6 +100,7 @@ public class ProductVariant {
   @Column(name = "sold_count")
   private Integer soldCount = 0;
 
+  @Size(max = 10000, message = "{productVariant.note.max10000}")
   @Column(name = "note")
   private String note;
 
@@ -113,23 +110,27 @@ public class ProductVariant {
 
   @NotNull(message = "{productVariant.variantWeight.notnull}")
   @Digits(integer = 6, fraction = 3, message = "{productVariant.variantWeight.invalidformat}")
+  @DecimalMin(value = "0.01", message = "{productVariant.variantWeight.min001}", inclusive = true)
   @Column(name = "variant_weight")
-  private Double variantWeight = 0.5; // kg
+  private Double variantWeight = 0.01; // kg
 
   @NotNull(message = "{productVariant.variantHeight.notnull}")
   @Digits(integer = 6, fraction = 3, message = "{productVariant.variantHeight.invalidformat}")
+  @DecimalMin(value = "1.00", message = "{productVariant.variantHeight.min1}", inclusive = true)
   @Column(name = "variant_height")
-  private Double variantHeight = 5.0; // cm
+  private Double variantHeight = 1.0; // cm
 
   @NotNull(message = "{productVariant.variantLength.notnull}")
   @Digits(integer = 6, fraction = 3, message = "{productVariant.variantLength.invalidformat}")
+  @DecimalMin(value = "1.00", message = "{productVariant.variantLength.min1}", inclusive = true)
   @Column(name = "variant_length")
-  private Double variantLength = 5.0; // cm
+  private Double variantLength = 1.0; // cm
 
   @NotNull(message = "{productVariant.variantWidth.notnull}")
   @Digits(integer = 6, fraction = 3, message = "{productVariant.variantWidth.invalidformat}")
+  @DecimalMin(value = "1.00", message = "{productVariant.variantWidth.min1}", inclusive = true)
   @Column(name = "variant_width")
-  private Double variantWidth = 5.0; // cm
+  private Double variantWidth = 1.0; // cm
 
   @CreationTimestamp
   @Column(name = "created_at")
@@ -183,7 +184,7 @@ public class ProductVariant {
    * whether this variant is disount or not.
    *
    **/
-  @Formula("(select exists (select 1 from products p inner join product_variants pv on pv.product_id = p.product_id where pv.variant_id = variant_id and (pv.is_discount = 1) and (pv.variant_discount_start_date < CURRENT_TIMESTAMP() and CURRENT_TIMESTAMP() < pv.variant_discount_end_date)))")
+  @Formula("(select exists (select 1 from products p inner join product_variants pv on pv.product_id = p.product_id where pv.variant_id = variant_id and (pv.is_discount = 1) and (DATE(pv.variant_discount_start_date) <= DATE(CURRENT_TIMESTAMP()) and DATE(CURRENT_TIMESTAMP()) <= DATE(pv.variant_discount_end_date))))")
   private Boolean isDiscountAvailable;
 
   /**
@@ -228,15 +229,34 @@ public class ProductVariant {
   //  }
   //}
 
-  public BigDecimal getCurrentPrice() {
-
-    if (this.getIsDiscount() &&
+  /**
+   * check this variant is discount or not including its discount date.
+   *
+   * use this as a core of place to make sure the availability.
+   *
+   * also, make sure to change the 'isDiscountAvailable' sql statement above if the logic change.
+   * you need to change the following sqls:
+   *  - Product.isAvailableDiscount
+   *  - ProductVariant.isAvailableDisoucnt
+   *
+   * current conditions are following:
+   *  1. isDiscount = true
+   *  2. current date is during the discount start date and end date. (inclusive)
+   *
+   * @return boolean
+   */
+  public boolean checkDiscountAvailable() {
+    return this.getIsDiscount() &&
             // before or equal to include the edge date
             (this.variantDiscountStartDate.toLocalDate().isBefore(LocalDateTime.now().toLocalDate()) ||
-            this.variantDiscountStartDate.toLocalDate().isEqual(LocalDateTime.now().toLocalDate())) &&
+                    this.variantDiscountStartDate.toLocalDate().isEqual(LocalDateTime.now().toLocalDate())) &&
             (this.variantDiscountEndDate.toLocalDate().isAfter(LocalDateTime.now().toLocalDate()) ||
-            this.variantDiscountEndDate.toLocalDate().isEqual(LocalDateTime.now().toLocalDate()))
-    ) {
+                    this.variantDiscountEndDate.toLocalDate().isEqual(LocalDateTime.now().toLocalDate()));
+  }
+
+  public BigDecimal getCurrentPrice() {
+
+    if (this.checkDiscountAvailable()) {
       return this.getVariantDiscountPrice();
     } 
 

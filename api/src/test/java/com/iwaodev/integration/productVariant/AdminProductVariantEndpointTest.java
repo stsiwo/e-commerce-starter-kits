@@ -4,12 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.servlet.http.Cookie;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.iwaodev.application.dto.product.ProductDTO;
 import com.iwaodev.application.dto.productVariant.ProductVariantDTO;
 import com.iwaodev.auth.AuthenticateTestUser;
@@ -262,6 +264,57 @@ public class AdminProductVariantEndpointTest {
     assertThat(responseBody.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantDiscountPrice").asText());
   }
 
+  /**
+   * this means discountStartDate and discountEndDate are the same date.
+   * @param dummyFormJsonFile
+   * @throws Exception
+   */
+  @Test
+  @Sql(scripts = { "classpath:/integration/productVariant/shouldAdminUserCreateNewProductVariantWithDiscountTrueSinceSingleDayDiscount.sql" })
+  public void shouldAdminUserCreateNewProductVariantWithDiscountTrueSinceSingleDayDiscount(
+          @Value("classpath:/integration/productVariant/shouldAdminUserCreateNewProductVariantWithDiscountTrueSinceSingleDayDiscount.json") Resource dummyFormJsonFile)
+          throws Exception {
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+
+    /**
+     * value of discountStartDate and discountEndDate is overridden so be careful.
+     */
+
+    // override discountStartDate and discountEndDate
+    ObjectNode tempObject = ((ObjectNode) dummyFormJson).put("variantDiscountStartDate", LocalDateTime.now().toString());
+    tempObject = ((ObjectNode) dummyFormJson).put("variantDiscountEndDate", LocalDateTime.now().toString());
+    // must be after the override.
+    String dummyFormJsonString = tempObject.toString();
+
+    // arrange
+    String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId);
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+            .post(targetUrl) // create
+            .content(dummyFormJsonString)
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+            .cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductVariantDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductVariantDTO.class);
+
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.getVariantId()).isNotNull();
+    assertThat(responseBody.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
+    // regular price = 10.00 (make sure match with sql & json)
+    //assertThat(responseBody.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
+    assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(true);
+    assertThat(responseBody.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantDiscountPrice").asText());
+  }
   @Test
   @Sql(scripts = { "classpath:/integration/productVariant/shouldAdminUserCreateNewProductVariantWithProductBaseUnitPrice.sql" })
   public void shouldAdminUserCreateNewProductVariantWithProductBaseUnitPrice(

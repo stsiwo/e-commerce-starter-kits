@@ -1,6 +1,7 @@
 package com.iwaodev.infrastructure.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -11,11 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
+import javax.validation.constraints.*;
 
 import com.iwaodev.infrastructure.model.listener.OrderDetailValidationListener;
 import com.iwaodev.infrastructure.model.validator.OnCreate;
@@ -50,6 +47,7 @@ public class OrderDetail {
 
   @NotNull(message = "{orderDetail.productQuantity.notnull}")
   @Min(value = 1, message = "{orderDetail.productQuantity.min1}")
+  @Max(value = 10, message = "{orderDetail.productQuantity.max10}")
   @Column(name = "product_quantity")
   private Integer productQuantity;
 
@@ -67,13 +65,16 @@ public class OrderDetail {
   private String productSize;
 
   @NotEmpty(message = "{orderDetail.productName.notempty}")
+  @Size(max = 500, message = "{product.productName.max500}")
   @Column(name = "product_name")
   private String productName;
 
   @NotNull(message = "{orderDetail.productWeight.notnull}")
+  @Digits(integer = 6, fraction = 3, message = "{orderDetail.productWeight.invalidformat}")
+  @DecimalMin(value = "0.01", message = "{orderDetail.productWeight.min001}", inclusive = true)
   @Setter(value = AccessLevel.NONE)
   @Column(name = "product_weight")
-  private Double productWeight = 1.00;
+  private Double productWeight = 0.01;
 
   // don't make directory setter function at this side (ManyToOne). define the bidirectional setter at (OneToMany) only
   @NotNull(message = "{orderDetail.order.notnull}")
@@ -129,14 +130,9 @@ public class OrderDetail {
    * set product weight = variant_weight * product_quantity
    **/
   public void setProductWeight(Double unitWeight, Integer quantity) {
-    logger.info("start set product weight: ");
-    logger.info("unit weight: " + unitWeight);
-    logger.info("quantity: " + quantity);
-
     BigDecimal totalWeight = new BigDecimal(unitWeight);
-    Double result = totalWeight.multiply(new BigDecimal(quantity)).doubleValue();
-
-    logger.info("total weight: " + result);
+    Double result = totalWeight.multiply(new BigDecimal(quantity)).setScale(3, RoundingMode.HALF_UP).doubleValue();
+    logger.info("product weight: " + result);
     this.productWeight = result;
   }
 

@@ -3,6 +3,7 @@ package com.iwaodev.ui.criteria.user;
 import java.util.UUID;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -24,13 +25,16 @@ public class UserCriteria {
   private UUID userId;
   
   @NotEmpty(message = "{user.firstName.notempty}")
+  @Size(max = 100, message = "{user.firstName.max100}")
   private String firstName;
 
   @NotEmpty(message = "{user.lastName.notempty}")
+  @Size(max = 100, message = "{user.lastName.max100}")
   private String lastName;
 
   @NotEmpty(message = "{user.email.notempty}")
   @Email(message = "{user.email.invalidformat}")
+  @Size(max = 100, message = "{user.email.max100}")
   private String email;
 
   /**
@@ -43,5 +47,6 @@ public class UserCriteria {
    * 
    **/
   @Password(message = "{user.password.invalidformat}")
+  @Size(max = 100, message = "{user.password.max100}")
   private String password;
 }

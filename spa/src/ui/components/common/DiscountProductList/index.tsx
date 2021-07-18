@@ -11,6 +11,11 @@ import { mSelector } from "src/selectors/selector";
 import ProductCard from "../ProductCard";
 import { fetchPublicProductActionCreator } from "reducers/slices/domain/product";
 import SingleLineList from "../SingleLineList";
+import { api } from "configs/axiosConfig";
+import { messageActions } from "reducers/slices/app";
+import { getNanoId } from "src/utils";
+import { FetchStatusEnum, MessageTypeEnum } from "src/app";
+import { AxiosError } from "axios";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -38,11 +43,26 @@ const BrandNewProduct: React.FunctionComponent<{}> = (props) => {
 
   const dispatch = useDispatch();
 
-  const curDomains = useSelector(mSelector.makeProductWithoutCacheSelector());
+  const [curDomains, setDomains] = React.useState<ProductType[]>([]);
+  const [curFetchStatus, setFetchStatus] = React.useState<FetchStatusEnum>(
+    FetchStatusEnum.INITIAL
+  );
 
   // fetch new blogs only once
   React.useEffect(() => {
-    dispatch(fetchPublicProductActionCreator());
+    setFetchStatus(FetchStatusEnum.FETCHING);
+    api
+      .request({
+        method: "GET",
+        url: API1_URL + `/products/public?isDiscount=true`,
+      })
+      .then((data) => {
+        setFetchStatus(FetchStatusEnum.SUCCESS);
+        setDomains(data.data.content);
+      })
+      .catch((error: AxiosError) => {
+        setFetchStatus(FetchStatusEnum.FAILED);
+      });
   }, []);
 
   const renderDomains: () => React.ReactNode = () => {
@@ -59,12 +79,12 @@ const BrandNewProduct: React.FunctionComponent<{}> = (props) => {
         align="center"
         className={classes.title}
       >
-        {"Brand New"}
+        {"Discount"}
       </Typography>
       <SingleLineList renderDomainFunc={renderDomains} />
       <Box component="div" className={classes.moreBtnBox}>
         <Button component={RRLink} to={`/search`} variant="contained">
-          More Brad New Products
+          More Discount Products
         </Button>
       </Box>
     </Box>

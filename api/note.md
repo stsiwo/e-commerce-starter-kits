@@ -395,6 +395,19 @@
       - https://spring.io/blog/2011/04/26/advanced-spring-data-jpa-specifications-and-querydsl/
       - https://github.com/querydsl/querydsl 
 
+  ## @Transient vs @Formula
+
+    - both have benefits and drawbacks.
+
+      - @Transient: 
+        - no sql required => easy to test
+        - you cannot use Specification or any Hibernated related stuff since the field is not stored in db
+
+      - @Formula:
+        - require sql => hard to test & might duplicate business logic since you cannot abstract the logic.
+        - you can use Specification or any Hibernate related stuff.
+
+
   ## Specification with Filtering Children Association (One-To-Many).
 
     - looks like this is impossible to do this. this will return the parent entity if one of child entity meets a condition.

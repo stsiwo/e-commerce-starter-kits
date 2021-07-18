@@ -4,11 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 
 import com.iwaodev.infrastructure.model.validator.OnCreate;
 import com.iwaodev.infrastructure.model.validator.OnUpdate;
@@ -44,13 +40,16 @@ public class OrderCriteria {
   private String note;
 
   @NotEmpty(message = "{order.orderFirstName.notempty}")
+  @Size(max = 100, message = "{order.orderFirstName.max100}")
   private String orderFirstName;
 
   @NotEmpty(message = "{order.orderLastName.notempty}")
+  @Size(max = 100, message = "{order.orderLastName.max100}")
   private String orderLastName;
 
   @NotEmpty(message = "{order.email.notempty}")
   @Email(message = "{order.email.invalidformat}")
+  @Size(max = 100, message = "{order.email.max100}")
   private String orderEmail;
 
   @NotEmpty(message = "{order.orderPhone.notempty}")

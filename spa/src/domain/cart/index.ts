@@ -40,6 +40,20 @@ export const validateCartItemsForCheckout: (cartItems: CartItemType[]) => boolea
   return selectedItems.length > 0;
 }
 
+/**
+ * validate the quantity of a cart item.
+ * 
+ * conditions:
+ *  - a quantity > 0
+ *  - a quantity < 10
+ * 
+ * 
+ * @param (number) quantity 
+ * @returns boolean
+ */
+export const validateQuantity: (quantity: number) => boolean = (quantity) => {
+  return 1 < quantity && quantity < 10
+}
 
 
 /**

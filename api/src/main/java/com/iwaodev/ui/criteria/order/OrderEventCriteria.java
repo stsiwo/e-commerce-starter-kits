@@ -2,7 +2,9 @@ package com.iwaodev.ui.criteria.order;
 
 import java.util.UUID;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import com.iwaodev.domain.order.OrderStatusEnum;
 
@@ -43,6 +45,7 @@ public class OrderEventCriteria {
   private UUID userId;
 
   // optional
+  @Size(max = 1000, message = "{orderEvent.note.max1000}")
   private String note;
 
 }
