@@ -45,6 +45,11 @@
 
       - test is the key to make our development effcient and generate long-term benefits (e.g., maintanability).
 
+## Skills
+
+   - comes up with as less-effort & effecient solution as you can.
+      - esp, when you update an existing web app, you need to comes up with the solution wihtout modify the internal architecture and following the architecture.
+
 ## Design Carefully
 
   - design carefully based on the following rules:

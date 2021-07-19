@@ -1,17 +1,42 @@
 # Documentation of This Web Ecommerce App
 
 
+## Preparation
+
+  - the admin is required for the following configuration in order to use this app:
+
+    1. create an account for Canada Post Developer Program and register for Small Business Program.
+      - currently, test api key is enough to send request to Canada Post API since we only use rating.
+    2. create an account for Stripe to handle payment.
+
 ## Policies
 
   - refund policy:
 
       - 30 days after the delivery
 
+  - supported countries:
+
+      - domestic only (currently)
+
 ## Security
 
   ### Login Attempt 
 
     - the max number of login attempt is 10, and if exceeding this number, the user cannot login in 30mins.
+
+  ### Payment
+
+    - we try to implement more secure payment flow by following:
+       1. enable Address Verfication (AVS) e.g, require customers to enter the postal code and the transaction is declined if the postal code does not match with the file.
+        - this feature depends on the country where it is supported or not.
+
+        - A payment can still be successful even if the CVC or postal code check fails. This is because card issuers take many signals into account when making a decision about whether to approve or decline a payment. In some cases, a card issuer may still approve a payment they consider legitimate, even if the CVC or postal code verification check fails.
+
+      2. not explicitly block the card from outside Canada.
+
+        - TODO: might need to fix this. what about the customer who owns a credit card issued in a foreign country, brings it to Canada? we should not accept this card as payment method since postal code is different unless he change the postal code of the card.
+          - you might need to enable country field in billing address to solve this issue.
 
 ## Users
 

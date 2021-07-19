@@ -1,14 +1,24 @@
-import DateFnsUtils from '@date-io/date-fns';
-import Box from '@material-ui/core/Box';
-import Grid from '@material-ui/core/Grid';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
-import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { productQueryStartDateActions, productQueryEndDateActions } from 'reducers/slices/domain/product';
-import { mSelector } from 'src/selectors/selector';
-import { orderQueryEndDateActions, orderQueryStartDateActions } from 'reducers/slices/domain/order';
+import DateFnsUtils from "@date-io/date-fns";
+import Box from "@material-ui/core/Box";
+import Grid from "@material-ui/core/Grid";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import {
+  KeyboardDatePicker,
+  MuiPickersUtilsProvider,
+} from "@material-ui/pickers";
+import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  productQueryStartDateActions,
+  productQueryEndDateActions,
+} from "reducers/slices/domain/product";
+import { mSelector } from "src/selectors/selector";
+import {
+  orderQueryEndDateActions,
+  orderQueryStartDateActions,
+} from "reducers/slices/domain/order";
+import Button from "@material-ui/core/Button";
 
 //interface ReleaseDateFilterTabPanelPropsType {
 //  curStartDate: Date
@@ -17,9 +27,8 @@ import { orderQueryEndDateActions, orderQueryStartDateActions } from 'reducers/s
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    box: {
-    },
-  }),
+    box: {},
+  })
 );
 
 /**
@@ -30,21 +39,19 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  *  - you also need to install @date-io/date-fns or other peer dependency
  *
- *  TODO: 
+ *  TODO:
  *
  *    - disable the date before start date when updating end date
  *
  **/
 
-const OrderDateFilterTabPanel: React.FunctionComponent<{}> = ({
-}) => {
-
+const OrderDateFilterTabPanel: React.FunctionComponent<{}> = ({}) => {
   const classes = useStyles();
 
   const dispatch = useDispatch();
 
-  const curStartDate = useSelector(mSelector.makeOrderQueryStartDateSelector())
-  const curEndDate = useSelector(mSelector.makeOrderQueryEndDateSelector())
+  const curStartDate = useSelector(mSelector.makeOrderQueryStartDateSelector());
+  const curEndDate = useSelector(mSelector.makeOrderQueryEndDateSelector());
 
   const handleStartDateChange = (date: Date | null) => {
     dispatch(orderQueryStartDateActions.update(date));
@@ -52,6 +59,13 @@ const OrderDateFilterTabPanel: React.FunctionComponent<{}> = ({
 
   const handleEndDateChange = (date: Date | null) => {
     dispatch(orderQueryEndDateActions.update(date));
+  };
+
+  const handleReset: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (
+    e
+  ) => {
+    dispatch(orderQueryStartDateActions.clear());
+    dispatch(orderQueryEndDateActions.clear());
   };
 
   return (
@@ -69,7 +83,7 @@ const OrderDateFilterTabPanel: React.FunctionComponent<{}> = ({
             value={curStartDate}
             onChange={handleStartDateChange}
             KeyboardButtonProps={{
-              'aria-label': 'change date',
+              "aria-label": "change date",
             }}
           />
           <KeyboardDatePicker
@@ -80,16 +94,16 @@ const OrderDateFilterTabPanel: React.FunctionComponent<{}> = ({
             value={curEndDate}
             onChange={handleEndDateChange}
             KeyboardButtonProps={{
-              'aria-label': 'change date',
+              "aria-label": "change date",
             }}
           />
         </Grid>
       </MuiPickersUtilsProvider>
+      <Button onClick={handleReset} variant="contained">
+        Reset
+      </Button>
     </Box>
-  )
-}
+  );
+};
 
-export default OrderDateFilterTabPanel
-
-
-
+export default OrderDateFilterTabPanel;

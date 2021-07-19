@@ -44,4 +44,6 @@ public interface AdvanceProductRepository {
   public List<ProductVariant> findAllDiscountPassedVariants(LocalDateTime time);
 
   public List<Product> getAllNewProductByTime(LocalDateTime time);
+
+  public Boolean isOutOfStock(Long variantId);
 }

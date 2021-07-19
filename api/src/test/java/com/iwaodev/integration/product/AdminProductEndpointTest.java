@@ -8,9 +8,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.Cookie;
@@ -25,6 +23,7 @@ import com.iwaodev.auth.AuthenticateTestUser;
 import com.iwaodev.auth.AuthenticationInfo;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.infrastructure.model.Review;
 import com.iwaodev.ui.response.ErrorBaseResponse;
 import com.iwaodev.util.ResourceReader;
 
@@ -288,6 +287,7 @@ public class AdminProductEndpointTest {
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
     assertThat(responseBody.getProductId()).isNotNull();
     assertThat(responseBody.getProductName()).isEqualTo(dummyFormJson.get("productName").asText());
+    assertThat(responseBody.getAverageReviewPoint()).isEqualTo(0.0D);
     assertThat(responseBody.getCategory().getCategoryId().toString())
         .isEqualTo(dummyFormJson.get("category").get("categoryId").asText());
     assertThat(responseBody.getCheapestPrice()).isEqualTo(responseBody.getProductBaseUnitPrice());
@@ -373,6 +373,7 @@ public class AdminProductEndpointTest {
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
     assertThat(responseBody.getProductId()).isNotNull();
     assertThat(responseBody.getProductName()).isEqualTo(dummyFormJson.get("productName").asText());
+    assertThat(responseBody.getAverageReviewPoint()).isEqualTo(0.0D);
     assertThat(responseBody.getCategory().getCategoryId().toString())
         .isEqualTo(dummyFormJson.get("category").get("categoryId").asText());
     assertThat(responseBody.getCheapestPrice()).isEqualTo(responseBody.getProductBaseUnitPrice());
@@ -548,6 +549,8 @@ public class AdminProductEndpointTest {
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
     assertThat(responseBody.getProductId()).isNotNull();
     assertThat(responseBody.getProductName()).isEqualTo(dummyFormJson.get("productName").asText());
+    // check the sql file to get each review point (only verified)
+    assertThat(responseBody.getAverageReviewPoint()).isEqualTo(Arrays.asList(3.9, 4.9).stream().mapToDouble(val -> val).average().orElse(0.0));
     assertThat(responseBody.getCategory().getCategoryId().toString())
         .isEqualTo(dummyFormJson.get("category").get("categoryId").asText());
     assertThat(responseBody.getCheapestPrice()).isEqualTo(new BigDecimal("123.0"));

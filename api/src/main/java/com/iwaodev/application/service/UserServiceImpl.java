@@ -133,11 +133,11 @@ public class UserServiceImpl implements UserService {
       throw new AppException(HttpStatus.BAD_REQUEST, "this email already taken.");
     }
 
-
     /**
      * if email is updated, we need to set active = temp and requires the user to verify again.
      */
     if (!targetEntity.getEmail().equals(criteria.getEmail())) {
+      logger.info("email is updated so turn active to 'temp' and ask him to verify again.");
       targetEntity.setEmail(criteria.getEmail());
       targetEntity.setActive(UserActiveEnum.TEMP);
     }

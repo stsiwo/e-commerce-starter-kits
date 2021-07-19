@@ -404,6 +404,71 @@ public class AdminOrderEndpointTest {
   }
 
   @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldAdminSortByDateDesc.sql" })
+  public void shouldAdminSortByDateDesc() throws Exception {
+
+    String searchQuery = "?sort=DATE_DESC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQuery;
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.get(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
+
+    logger.info("order events in reaponse");
+
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getCreatedAt()).isAfter(responseBody[next].getCreatedAt());
+      }
+    }
+
+  }
+  // sort: date asc
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldAdminSortByDateAsc.sql" })
+  public void shouldAdminSortByDateAsc() throws Exception {
+
+    String searchQuery = "?sort=DATE_ASC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQuery;
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.get(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
+
+    logger.info("order events in reaponse");
+
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getCreatedAt()).isBeforeOrEqualTo(responseBody[next].getCreatedAt());
+      }
+    }
+
+  }
+  @Test
   @Sql(scripts = { "classpath:/integration/order/shouldAdminCreateOrderEventSuccessfully.sql" })
   public void shouldAdminCreateOrderEventSuccessfully(
       @Value("classpath:/integration/order/shouldAdminCreateOrderEventSuccessfully.json") Resource dummyFormJsonFile)

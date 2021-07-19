@@ -208,6 +208,67 @@ public class AdminCategoryEndpointTest {
     }
   }
 
+  // sort: alphabetic asc
+  @Test
+  @Sql(scripts = { "classpath:/integration/category/shouldAdminSortByName.sql" })
+  public void shouldAdminSortByName() throws Exception {
+
+    // arrange
+    String searchQuery = "?sort=ALPHABETIC_ASC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQuery;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+            .cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    CategoryDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), CategoryDTO[].class);
+
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getCategoryName()).isLessThanOrEqualTo(responseBody[next].getCategoryName());
+      }
+    }
+  }
+
+  // sort: alphabetic desc
+  @Test
+  @Sql(scripts = { "classpath:/integration/category/shouldAdminSortByDescName.sql" })
+  public void shouldAdminSortByDescName() throws Exception {
+
+    // arrange
+    String searchQuery = "?sort=ALPHABETIC_DESC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQuery;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get(targetUrl)
+            .cookie(this.authCookie)
+            .cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    CategoryDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), CategoryDTO[].class);
+
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getCategoryName()).isGreaterThanOrEqualTo(responseBody[next].getCategoryName());
+      }
+    }
+  }
   @Test
   public void shouldAdminCreateNewCategory(
       @Value("classpath:/integration/category/shouldAdminCreateNewCategory.json") Resource dummyFormJsonFile)

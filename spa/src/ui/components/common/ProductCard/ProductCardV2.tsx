@@ -52,6 +52,9 @@ const useStyles = makeStyles((theme: Theme) =>
     title: {
       fontSize: "1rem",
     },
+    price: {
+      color: theme.palette.fifth.main,
+    },
   })
 );
 
@@ -81,7 +84,7 @@ const ProductCardV2: React.FunctionComponent<ProductCardV2PropsType> = ({
           >
             {product.productName}
           </Typography>
-          <Typography variant="body2" color="primary" component="p">
+          <Typography variant="body2" component="p" className={classes.price}>
             <b>${cadCurrencyFormat(product.cheapestPrice)} ~</b>
           </Typography>
         </CardContent>

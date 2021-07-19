@@ -41,19 +41,33 @@ export const validateCartItemsForCheckout: (cartItems: CartItemType[]) => boolea
 }
 
 /**
- * validate the quantity of a cart item.
+ * validate if the quantity reaches its max 
  * 
  * conditions:
- *  - a quantity > 0
- *  - a quantity < 10
+ *  - a quantity < 10 
  * 
  * 
- * @param (number) quantity 
+ * @param (number) quantity: current quantity of a cart item (not next)
  * @returns boolean
  */
-export const validateQuantity: (quantity: number) => boolean = (quantity) => {
-  return 1 < quantity && quantity < 10
+export const isReachMaxQuantity: (quantity: number) => boolean = (quantity) => {
+  return quantity >= 10
 }
+
+/**
+ * validate if the quantity reaches its min 
+ * 
+ * conditions:
+ *  - a quantity > 1 
+ * 
+ * 
+ * @param (number) quantity: current quantity of a cart item (not next)
+ * @returns boolean
+ */
+export const isReachMinQuantity: (quantity: number) => boolean = (quantity) => {
+  return quantity <= 1
+}
+
 
 
 /**

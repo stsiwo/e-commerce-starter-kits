@@ -11,6 +11,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
+import java.time.LocalDateTime;
+
 @Mapper
 public interface WishlistItemMapper {
 
@@ -29,6 +31,15 @@ public interface WishlistItemMapper {
         return ProductMapper.INSTANCE.toProductDTO(variant.getProduct()); 
     }
 
+  /**
+   * bug?: LocalDateTime is not mapped correctly so you need to explicitly set this.
+   */
+  @Named("createdAtToCreatedAt")
+  public static LocalDateTime createdAtToCreatedAt(LocalDateTime createdAt) {
+    return createdAt;
+  }
+
+  @Mapping(source = "createdAt", target = "createdAt", qualifiedByName = "createdAtToCreatedAt")
   @Mapping(source = "variant", target = "product", qualifiedByName = "variantToProduct")
   WishlistItemDTO toWishlistItemDTO(WishlistItem wishlistItem);
 

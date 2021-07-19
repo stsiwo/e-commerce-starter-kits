@@ -7,12 +7,14 @@ import { createMuiTheme } from '@material-ui/core/styles';
  *  secondary: BBDFC8 (thin green)
  *  third: F0E5D8 (thin orange)
  *  fourth: 75CFB8 (thick green)
+ *  fifthColor: b8860b (more thick orange) - use this when you want highlight
  *
  **/
 const primeColor = "#FFC478";
 const secondaryColor = "#BBDFC8";
 const thirdColor = "#F0E5D8";
 const fourthColor = "#75CFB8";  
+const fifthColor = "#B8860B";
 
 /**
  * add additional theme property
@@ -23,11 +25,13 @@ declare module "@material-ui/core/styles/createPalette" {
     headerBackground: Palette['background']
     third: Palette['primary']
     fourth: Palette['primary']
+    fifth: Palette['primary']
   }
   interface PaletteOptions {
     headerBackground: PaletteOptions['background'];
     third: PaletteOptions['primary']
     fourth: PaletteOptions['primary']
+    fifth: PaletteOptions['primary']
   }
 }
 
@@ -126,6 +130,9 @@ export const theme = createMuiTheme({
     },
     fourth: {
       main: fourthColor
+    },
+    fifth: {
+      main: fifthColor
     },
     background: {
     },

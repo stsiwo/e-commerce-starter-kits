@@ -516,6 +516,146 @@ public class AdminReviewEndpointTest {
     }
   }
 
+  // sort: date_desc
+  @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminSortByDateDesc.sql" })
+  public void shouldAdminSortByDateDesc(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnReview.json") Resource dummyFormJsonFile*/) throws Exception {
+
+    // arrange
+    String dummyQueryString = "?sort=DATE_DESC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyQueryString;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .get(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ReviewDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ReviewDTO[].class);
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getCreatedAt()).isAfter(responseBody[next].getCreatedAt());
+      }
+    }
+  }
+  // sort: date_asc
+  @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminSortByDateAsc.sql" })
+  public void shouldAdminSortByDateAsc(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnReview.json") Resource dummyFormJsonFile*/) throws Exception {
+
+    // arrange
+    String dummyQueryString = "?sort=DATE_ASC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyQueryString;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .get(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ReviewDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ReviewDTO[].class);
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getCreatedAt()).isBefore(responseBody[next].getCreatedAt());
+      }
+    }
+  }
+  // sort: review_point_desc
+  @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminSortByReviewPointDesc.sql" })
+  public void shouldAdminSortByReviewPointDesc(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnReview.json") Resource dummyFormJsonFile*/) throws Exception {
+
+    // arrange
+    String dummyQueryString = "?sort=REVIEW_POINT_DESC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyQueryString;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .get(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ReviewDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ReviewDTO[].class);
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getReviewPoint()).isGreaterThanOrEqualTo(responseBody[next].getReviewPoint());
+      }
+    }
+  }
+  // sort: review_point_asc
+  @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminSortByReviewPointAsc.sql" })
+  public void shouldAdminSortByReviewPointAsc(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnReview.json") Resource dummyFormJsonFile*/) throws Exception {
+
+    // arrange
+    String dummyQueryString = "?sort=REVIEW_POINT_ASC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyQueryString;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .get(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ReviewDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ReviewDTO[].class);
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getReviewPoint()).isLessThanOrEqualTo(responseBody[next].getReviewPoint());
+      }
+    }
+  }
   @Test
   @Sql(scripts = { "classpath:/integration/review/shouldAdminCreateNewReview.sql" })
   public void shouldAdminCreateNewReview(@Value("classpath:/integration/review/shouldAdminCreateNewReview.json") Resource dummyFormJsonFile) throws Exception {

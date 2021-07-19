@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -468,7 +469,220 @@ public class MemberWishlistItemEndpointTest {
       assertThat(wishlistItemDTO.getProduct().getReleaseDate()).isBefore(dummyQueryStringParamValue);
     }
   }
+  @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserSortWishlistItemByDescDate.sql" })
+  public void shouldMemberUserSortWishlistItemByDescDate() throws Exception {
 
+    // arrange
+    String searchQueryString = "?sort=DATE_DESC";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .get(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    WishlistItemDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), WishlistItemDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getCreatedAt()).isAfter(responseBody[next].getCreatedAt());
+      }
+    }
+  }
+
+  // sort: asc date
+  @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserSortWishlistItemByAscDate.sql" })
+  public void shouldMemberUserSortWishlistItemByAscDate() throws Exception {
+
+    // arrange
+    String searchQueryString = "?sort=DATE_ASC";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .get(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    WishlistItemDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), WishlistItemDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getCreatedAt()).isBefore(responseBody[next].getCreatedAt());
+      }
+    }
+  }
+
+  // sort: asc date
+  @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserSortWishlistItemByCheapPrice.sql" })
+  public void shouldMemberUserSortWishlistItemByCheapPrice() throws Exception {
+
+    // arrange
+    String searchQueryString = "?sort=PRICE_ASC";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .get(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    WishlistItemDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), WishlistItemDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getProduct().getVariants().get(0).getRegularPrice()).isLessThanOrEqualTo(responseBody[next].getProduct().getVariants().get(0).getRegularPrice());
+      }
+    }
+  }
+
+  // sort: price desc
+  @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserSortWishlistItemByExpensivePrice.sql" })
+  public void shouldMemberUserSortWishlistItemByExpensivePrice() throws Exception {
+
+    // arrange
+    String searchQueryString = "?sort=PRICE_DESC";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .get(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    WishlistItemDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), WishlistItemDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getProduct().getVariants().get(0).getRegularPrice()).isGreaterThanOrEqualTo(responseBody[next].getProduct().getVariants().get(0).getRegularPrice());
+      }
+    }
+  }
+
+  // sort: alpha asc
+  @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserSortWishlistItemByAscAlphabetic.sql" })
+  public void shouldMemberUserSortWishlistItemByAscAlphabetic() throws Exception {
+
+    // arrange
+    String searchQueryString = "?sort=ALPHABETIC_ASC";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .get(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    WishlistItemDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), WishlistItemDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getProduct().getProductName()).isLessThanOrEqualTo(responseBody[next].getProduct().getProductName());
+      }
+    }
+  }
+
+  // sort: alpha desc
+  @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserSortWishlistItemByDescAlphabetic.sql" })
+  public void shouldMemberUserSortWishlistItemByDescAlphabetic() throws Exception {
+
+    // arrange
+    String searchQueryString = "?sort=ALPHABETIC_DESC";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .get(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    WishlistItemDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), WishlistItemDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getProduct().getProductName()).isGreaterThanOrEqualTo(responseBody[next].getProduct().getProductName());
+      }
+    }
+  }
   @Test
   @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserAddProductInWishlistItem.sql" })
   public void shouldMemberUserAddProductInWishlistItem() throws Exception {
@@ -576,6 +790,32 @@ public class MemberWishlistItemEndpointTest {
     //assertThat(exist.intValue()).isEqualTo(1);
     
     Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(MovedWishlistItemToCartItemEvent.class));
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldNotMemberUserMoveWishlistItemToCartItemSinceOutOfStock.sql" })
+  public void shouldNotMemberUserMoveWishlistItemToCartItemSinceOutOfStock() throws Exception {
+
+    // make sure product, variant, user id match with sql script
+
+    // arrange
+    String dummyWishlistItemId = "10";
+    Long dummyVariantId = 2L;
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyWishlistItemId;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .patch(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isBadRequest());
+
+    Mockito.verify(this.publisher, Mockito.never()).publishEvent(Mockito.any(MovedWishlistItemToCartItemEvent.class));
   }
 
 

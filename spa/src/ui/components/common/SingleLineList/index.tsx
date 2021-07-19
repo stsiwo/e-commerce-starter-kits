@@ -1,28 +1,27 @@
-import Box from '@material-ui/core/Box';
-import IconButton from '@material-ui/core/IconButton';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { classnames } from '@material-ui/data-grid';
-import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
-import NavigateNextIcon from '@material-ui/icons/NavigateNext';
-import { useResponsive } from 'hooks/responsive';
-import * as React from 'react';
+import Box from "@material-ui/core/Box";
+import IconButton from "@material-ui/core/IconButton";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { classnames } from "@material-ui/data-grid";
+import PlayCircleFilledIcon from "@material-ui/icons/PlayCircleFilled";
+import { useResponsive } from "hooks/responsive";
+import * as React from "react";
 
 declare type SingleLineListPropsType = {
-  renderDomainFunc: () => React.ReactNode
-  wrapperClassName?: string
-  outerClassName?: string
-  innerClassName?: string
-}
+  renderDomainFunc: () => React.ReactNode;
+  wrapperClassName?: string;
+  outerClassName?: string;
+  innerClassName?: string;
+};
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    wrapper: {
-    },
+    wrapper: {},
     outerBox: {
       position: "relative",
       padding: `${theme.spacing(1)}px ${theme.spacing(3)}px`,
       maxWidth: theme.breakpoints.values.lg,
       width: "90vw",
+      minWidth: 310,
     },
     innerBox: {
       display: "flex",
@@ -30,18 +29,19 @@ const useStyles = makeStyles((theme: Theme) =>
       overflow: "auto",
 
       /* hide scroll (horizontal) bar */
-      scrollbarWidth: "none", /* Firefox */
-      '-ms-overflow-style': "none" , /* Internet Explorer 10+ */
+      scrollbarWidth: "none" /* Firefox */,
+      "-ms-overflow-style": "none" /* Internet Explorer 10+ */,
 
-      '&::-webkit-scrollbar': { /* WebKit */
-        width: 0,
+      "&::-webkit-scrollbar": {
+        /* WebKit */ width: 0,
         height: 0,
       },
 
       /* set list item flex-basic otherwise it shrinks. */
-      '& > *': {
-        flex: "0 0 300px", 
-      }
+      "& > *": {
+        flex: "0 0 300px",
+        margin: 5,
+      },
     },
     btnBox: {
       position: "absolute",
@@ -53,7 +53,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     leftBtnBox: {
       left: 0,
-
     },
     rightBtnBox: {
       right: 0,
@@ -64,18 +63,17 @@ const useStyles = makeStyles((theme: Theme) =>
       bottom: "50%",
       transform: "translateY(-50%)",
     },
-    leftBtn: {
-    },
-    rightBtn: {
-    }
-  }),
+    leftBtn: {},
+    rightBtn: {},
+  })
 );
 
 /**
  *
  **/
-const SingleLineList: React.FunctionComponent<SingleLineListPropsType> = (props) => {
-
+const SingleLineList: React.FunctionComponent<SingleLineListPropsType> = (
+  props
+) => {
   const classes = useStyles();
 
   /**
@@ -87,29 +85,36 @@ const SingleLineList: React.FunctionComponent<SingleLineListPropsType> = (props)
   /**
    * event handler when click left arrow
    **/
-  const handleLeftArrowIconClickEvent: React.EventHandler<React.MouseEvent<HTMLElement>> = React.useCallback((e) => {
-
-    if (innerBoxRef.current) {
-      innerBoxRef.current.scrollBy({
-        behavior: "smooth",
-        left: -300,
-      })
-    }
-
-  }, [innerBoxRef])
+  const handleLeftArrowIconClickEvent: React.EventHandler<
+    React.MouseEvent<HTMLElement>
+  > = React.useCallback(
+    (e) => {
+      if (innerBoxRef.current) {
+        innerBoxRef.current.scrollBy({
+          behavior: "smooth",
+          left: -300,
+        });
+      }
+    },
+    [innerBoxRef]
+  );
 
   /**
    * event handler when click right arrow
    **/
-  const handleRightArrowIconClickEvent: React.EventHandler<React.MouseEvent<HTMLElement>> = React.useCallback((e) => {
-
-    if (innerBoxRef.current) {
-      innerBoxRef.current.scrollBy({
-        behavior: "smooth",
-        left: 300,
-      })
-    }
-  }, [innerBoxRef])
+  const handleRightArrowIconClickEvent: React.EventHandler<
+    React.MouseEvent<HTMLElement>
+  > = React.useCallback(
+    (e) => {
+      if (innerBoxRef.current) {
+        innerBoxRef.current.scrollBy({
+          behavior: "smooth",
+          left: 300,
+        });
+      }
+    },
+    [innerBoxRef]
+  );
 
   /**
    * side effect to close unnecessary arrows
@@ -117,20 +122,26 @@ const SingleLineList: React.FunctionComponent<SingleLineListPropsType> = (props)
    *  - if scrollbar, need to show arrows, otherwise, no arrows
    *  - ref: https://stackoverflow.com/questions/4880381/check-whether-html-element-has-scrollbars
    **/
-  const responsive = useResponsive()
-  const [isNeedArrows, setNeedArrows] = React.useState<boolean>(false)
-  const [curScrollPos, setScrollPos] = React.useState<number>(0)
+  const responsive = useResponsive();
+  const [isNeedArrows, setNeedArrows] = React.useState<boolean>(true);
+
   React.useEffect(() => {
     if (outerBoxRef.current && innerBoxRef.current) {
       if (innerBoxRef.current.scrollWidth > innerBoxRef.current.clientWidth) {
         // need to have scroll
-        setNeedArrows(true)
+        setNeedArrows(true);
       } else {
         // don't need it
-        setNeedArrows(false)
+        setNeedArrows(false);
       }
     }
-  }, [outerBoxRef, innerBoxRef, isNeedArrows, responsive.currentScreenWidth, setNeedArrows])
+  }, [
+    outerBoxRef,
+    innerBoxRef,
+    isNeedArrows,
+    responsive.currentScreenWidth,
+    setNeedArrows,
+  ]);
 
   /**
    * remove arrows if scroll position is on the edge
@@ -138,11 +149,14 @@ const SingleLineList: React.FunctionComponent<SingleLineListPropsType> = (props)
    *  - use 'scroll' event handler to detect cur scroll position and remove unnecessary arrow
    *  - initial scroll position is 0 so default values for its state is 'false' and 'true'
    **/
-  const [isNeedLeftArrow, setNeedLeftArrow] = React.useState<boolean>(false)
-  const [isNeedRightArrow, setNeedRightArrow] = React.useState<boolean>(true)
-  const handleScrollChangeEvent: React.EventHandler<React.UIEvent<HTMLDivElement>> = (e) => {
-    const curScrollPos = e.currentTarget.scrollLeft
-    const maxScrollPos = e.currentTarget.scrollWidth - e.currentTarget.clientWidth
+  const [isNeedLeftArrow, setNeedLeftArrow] = React.useState<boolean>(false);
+  const [isNeedRightArrow, setNeedRightArrow] = React.useState<boolean>(true);
+  const handleScrollChangeEvent: React.EventHandler<
+    React.UIEvent<HTMLDivElement>
+  > = (e) => {
+    const curScrollPos = e.currentTarget.scrollLeft;
+    const maxScrollPos =
+      e.currentTarget.scrollWidth - e.currentTarget.clientWidth;
     if (curScrollPos == 0) {
       setNeedLeftArrow(false);
     } else if (curScrollPos == maxScrollPos) {
@@ -151,27 +165,39 @@ const SingleLineList: React.FunctionComponent<SingleLineListPropsType> = (props)
       setNeedLeftArrow(true);
       setNeedRightArrow(true);
     }
-  }
+  };
 
   return (
     <div className={classnames(classes.wrapper)}>
       <div className={classnames(classes.outerBox)} ref={outerBoxRef}>
-        <div className={classnames(classes.innerBox)} ref={innerBoxRef} onScroll={handleScrollChangeEvent}>
+        <div
+          className={classnames(classes.innerBox)}
+          ref={innerBoxRef}
+          onScroll={handleScrollChangeEvent}
+        >
           {props.renderDomainFunc()}
         </div>
-        {(isNeedArrows &&
+        {isNeedArrows && (
           <React.Fragment>
-            {(isNeedLeftArrow &&
+            {isNeedLeftArrow && (
               <Box className={classnames(classes.btnBox, classes.leftBtnBox)}>
-                <IconButton className={classnames(classes.btn, classes.leftBtn)} onClick={handleLeftArrowIconClickEvent} >
-                  <NavigateBeforeIcon />
+                <IconButton
+                  className={classnames(classes.btn, classes.leftBtn)}
+                  onClick={handleLeftArrowIconClickEvent}
+                >
+                  <PlayCircleFilledIcon
+                    style={{ transform: "rotate(180deg)" }}
+                  />
                 </IconButton>
               </Box>
             )}
-            {(isNeedRightArrow &&
+            {isNeedRightArrow && (
               <Box className={classnames(classes.btnBox, classes.rightBtnBox)}>
-                <IconButton className={classnames(classes.btn, classes.rightBtn)} onClick={handleRightArrowIconClickEvent} >
-                  <NavigateNextIcon />
+                <IconButton
+                  className={classnames(classes.btn, classes.rightBtn)}
+                  onClick={handleRightArrowIconClickEvent}
+                >
+                  <PlayCircleFilledIcon />
                 </IconButton>
               </Box>
             )}
@@ -179,11 +205,7 @@ const SingleLineList: React.FunctionComponent<SingleLineListPropsType> = (props)
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SingleLineList
-
-
-
-
+export default SingleLineList;

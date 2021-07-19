@@ -26,7 +26,7 @@ export enum OrderStatusEnum {
   DRAFT = "DRAFT",
   SESSION_TIMEOUT = "SESSION_TIMEOUT",
   ORDERED = "ORDERED",
-  FAILED_PAYMENT = "FAILED_PAYMENT",
+  PAYMENT_FAILED = "PAYMENT_FAILED",
   PAID = "PAID",
   CANCEL_REQUEST = "CANCEL_REQUEST",
   RECEIVED_CANCEL_REQUEST = "RECEIVED_CANCEL_REQUEST",
@@ -46,7 +46,7 @@ export declare type OrderStatusLabelListType = {
 export const orderStatusLabelList: OrderStatusLabelListType = {
   [OrderStatusEnum.DRAFT]: "Draft",
   [OrderStatusEnum.ORDERED]: "Ordered",
-  [OrderStatusEnum.FAILED_PAYMENT]: "Failed Payment",
+  [OrderStatusEnum.PAYMENT_FAILED]: "Failed Payment",
   [OrderStatusEnum.PAID]: "Paid",
   [OrderStatusEnum.CANCEL_REQUEST]: "Cancel Request",
   [OrderStatusEnum.RECEIVED_CANCEL_REQUEST]: "Received Cancel Request",
@@ -89,7 +89,7 @@ export const orderStatusBagList: OrderStatusBagListType = {
     icon: DraftsIcon,
     color: theme.palette.success.main
   },
-  [OrderStatusEnum.FAILED_PAYMENT]: {
+  [OrderStatusEnum.PAYMENT_FAILED]: {
     label: "Failed Payment:(",
     defaultNote: "the customer failed payment.",
     icon: PaymentIcon,

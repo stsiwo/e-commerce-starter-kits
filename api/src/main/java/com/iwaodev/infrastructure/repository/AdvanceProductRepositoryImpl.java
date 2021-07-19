@@ -209,4 +209,11 @@ public class AdvanceProductRepositoryImpl implements AdvanceProductRepository {
         .setParameter("time", time).getResultList();
   }
 
+  @Override
+  public Boolean isOutOfStock(Long variantId) {
+    return this.entityManager.createQuery(
+            "select case when (pv.variantStock <= 0)  then true else false end from products p INNER JOIN p.variants pv WHERE pv.variantId = :variantId",
+            Boolean.class).setParameter("variantId", variantId).getSingleResult();
+  }
+
 }

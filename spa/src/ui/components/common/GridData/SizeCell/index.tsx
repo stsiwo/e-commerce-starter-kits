@@ -1,9 +1,9 @@
-import Avatar from '@material-ui/core/Avatar';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import * as React from 'react';
+import Avatar from "@material-ui/core/Avatar";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import * as React from "react";
 
 interface SizeCellPropsType {
-  value: string
+  value: string;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -14,8 +14,9 @@ const useStyles = makeStyles((theme: Theme) =>
       height: 25,
       margin: theme.spacing(0, 1),
       fontSize: "15px",
+      color: theme.palette.fifth.main,
     },
-  }),
+  })
 );
 
 /**
@@ -23,18 +24,9 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  **/
 const SizeCell: React.FunctionComponent<SizeCellPropsType> = (props) => {
-
   const classes = useStyles();
 
-  return (
-    <Avatar
-      className={classes.root}
-    >
-      {props.value}
-    </Avatar>
-  )
-}
+  return <Avatar className={classes.root}>{props.value}</Avatar>;
+};
 
-export default SizeCell
-
-
+export default SizeCell;

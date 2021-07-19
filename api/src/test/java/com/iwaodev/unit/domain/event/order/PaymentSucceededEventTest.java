@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.iwaodev.application.event.EventHandler;
+import com.iwaodev.application.event.cartItem.RemoveCartItemIfStockZeroEventHandler;
 import com.iwaodev.application.event.notification.CreateOrderEventNotificationEventHandler;
 import com.iwaodev.application.event.order.RefundPaymentEventHandler;
 import com.iwaodev.application.event.order.SendCancelRequestWasConfirmedEmailEventHandler;
@@ -145,6 +146,7 @@ public class PaymentSucceededEventTest {
     registeredEventHandlers.add(SendNewOrderWasPlacedEmailEventHandler.class);
     registeredEventHandlers.add(SendOrderSucceededEmailEventHandler.class);
     registeredEventHandlers.add(PaymentSucceededEventHandler.class);
+    registeredEventHandlers.add(RemoveCartItemIfStockZeroEventHandler.class);
 
     Set<Class<? extends EventHandler>> result = this.testUtil.getAllEventHandlerOfEvent(PaymentSucceededEvent.class);
 

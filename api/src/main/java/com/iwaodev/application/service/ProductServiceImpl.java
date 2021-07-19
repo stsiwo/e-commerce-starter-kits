@@ -22,6 +22,7 @@ import com.iwaodev.domain.product.ProductSortEnum;
 import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.Product;
 import com.iwaodev.infrastructure.model.ProductImage;
+import com.iwaodev.infrastructure.model.Review;
 import com.iwaodev.ui.criteria.product.ProductCriteria;
 import com.iwaodev.ui.criteria.product.ProductImageCriteria;
 import com.iwaodev.ui.criteria.product.ProductQueryStringCriteria;
@@ -115,9 +116,9 @@ public class ProductServiceImpl implements ProductService {
   private Sort getSort(ProductSortEnum sortEnum) {
 
     if (sortEnum == ProductSortEnum.DATE_DESC) {
-      return Sort.by("createdAt").descending();
+      return Sort.by("releaseDate").descending();
     } else if (sortEnum == ProductSortEnum.DATE_ASC) {
-      return Sort.by("createdAt").ascending();
+      return Sort.by("releaseDate").ascending();
     } else if (sortEnum == ProductSortEnum.ALPHABETIC_ASC) {
       return Sort.by("productName").ascending();
     } else if (sortEnum == ProductSortEnum.ALPHABETIC_DESC) {
@@ -353,7 +354,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     Product oldEntity = targetEntityOption.get();
-
     // make sure criteria has product id
     criteria.setProductId(id);
 
@@ -372,8 +372,15 @@ public class ProductServiceImpl implements ProductService {
     // update product images
     this.updateImages(id, files, oldEntity.getProductImages(), newEntity.getProductImages());
 
+    /**
+     * any nested association must be explicitly set otherwise, it does not return the associations.
+     * so be careful.
+     *
+     * i guess i need to find more better way to update this entity.
+     */
     // transfer variants from old to new too
     newEntity.setVariants(oldEntity.getVariants());
+    newEntity.setReviews(oldEntity.getReviews());
 
     // unit price must be greater than the discount price at any variant if it does
     // not has its own unit price validaiton

@@ -362,6 +362,139 @@ public class AdminUserEndpointTest {
     }
   }
 
+  // sort: date_desc
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldAdminUserSortByDateDesc.sql" })
+  public void shouldAdminUserSortByDateDesc() throws Exception {
+
+    // arrange
+    String searchQueryQueryString = "?sort=DATE_DESC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQueryQueryString;
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.get(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    UserDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), UserDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    assertThat(responseBody.length).isLessThan(4);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getCreatedAt()).isAfter(responseBody[next].getCreatedAt());
+      }
+    }
+  }
+
+  // sort: date_asc
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldAdminUserSortByDateAsc.sql" })
+  public void shouldAdminUserSortByDateAsc() throws Exception {
+
+    // arrange
+    String searchQueryQueryString = "?sort=DATE_ASC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQueryQueryString;
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.get(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    UserDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), UserDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    assertThat(responseBody.length).isLessThan(4);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getCreatedAt()).isBefore(responseBody[next].getCreatedAt());
+      }
+    }
+  }
+  // sort: alphabetic_asc
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldAdminUserSortByAlphabeticAsc.sql" })
+  public void shouldAdminUserSortByAlphabeticAsc() throws Exception {
+
+    // arrange
+    String searchQueryQueryString = "?sort=ALPHABETIC_ASC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQueryQueryString;
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.get(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    UserDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), UserDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    assertThat(responseBody.length).isLessThan(4);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getFirstName()).isLessThanOrEqualTo(responseBody[next].getFirstName());
+      }
+    }
+  }
+  // sort: alphabetic_desc
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldAdminUserSortByAlphabeticDesc.sql" })
+  public void shouldAdminUserSortByAlphabeticDesc() throws Exception {
+
+    // arrange
+    String searchQueryQueryString = "?sort=ALPHABETIC_DESC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + searchQueryQueryString;
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.get(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    UserDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), UserDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    assertThat(responseBody.length).isLessThan(4);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getFirstName()).isGreaterThanOrEqualTo(responseBody[next].getFirstName());
+      }
+    }
+  }
   @Test
   @Sql(scripts = { "classpath:/integration/user/shouldAdminUserAccessSpecificUser.sql" })
   public void shouldAdminUserAccessSpecificUser() throws Exception {

@@ -458,6 +458,201 @@ public class GuestProductEndpointTest {
     }
   }
 
+  // sort: date_desc
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldGuestUserSortByDateDesc.sql" })
+  public void shouldGuestUserSortByDateDesc() throws Exception {
+
+    // arrange
+    String searchQueryString = "?sort=DATE_DESC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/public" + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .get(targetUrl)
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ProductDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getCreatedAt()).isAfterOrEqualTo(responseBody[next].getCreatedAt());
+      }
+    }
+  }
+
+  // sort: date_asc
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldGuestUserSortByDateAsc.sql" })
+  public void shouldGuestUserSortByDateAsc() throws Exception {
+
+    // arrange
+    String searchQueryString = "?sort=DATE_ASC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/public" + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .get(targetUrl)
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ProductDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getCreatedAt()).isBeforeOrEqualTo(responseBody[next].getCreatedAt());
+      }
+    }
+  }
+
+  // sort: Name_asc
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldGuestUserSortByNameAsc.sql" })
+  public void shouldGuestUserSortByNameAsc() throws Exception {
+
+    // arrange
+    String searchQueryString = "?sort=ALPHABETIC_ASC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/public" + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .get(targetUrl)
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ProductDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getProductName()).isLessThanOrEqualTo(responseBody[next].getProductName());
+      }
+    }
+  }
+  // sort: Name_desc
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldGuestUserSortByNameDesc.sql" })
+  public void shouldGuestUserSortByNameDesc() throws Exception {
+
+    // arrange
+    String searchQueryString = "?sort=ALPHABETIC_DESC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/public" + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .get(targetUrl)
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ProductDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getProductName()).isGreaterThanOrEqualTo(responseBody[next].getProductName());
+      }
+    }
+  }
+
+  // sort: price_asc
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldGuestUserSortByPriceAsc.sql" })
+  public void shouldGuestUserSortByPriceAsc() throws Exception {
+
+    // arrange
+    String searchQueryString = "?sort=PRICE_ASC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/public" + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .get(targetUrl)
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ProductDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getProductBaseUnitPrice()).isLessThanOrEqualTo(responseBody[next].getProductBaseUnitPrice());
+      }
+    }
+  }
+  // sort: price_desc
+  @Test
+  @Sql(scripts = { "classpath:/integration/product/shouldGuestUserSortByPriceDesc.sql" })
+  public void shouldGuestUserSortByPriceDesc() throws Exception {
+
+    // arrange
+    String searchQueryString = "?sort=PRICE_DESC";
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/public" + searchQueryString;
+
+    // act
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .get(targetUrl)
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ProductDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ProductDTO[].class);
+
+    // assert
+    assertThat(responseBody.length).isGreaterThan(0);
+    for (int i = 0; i < responseBody.length; i++) {
+      int next = i+1;
+      if (next < responseBody.length) {
+        assertThat(responseBody[i].getProductBaseUnitPrice()).isGreaterThanOrEqualTo(responseBody[next].getProductBaseUnitPrice());
+      }
+    }
+  }
   @Test
   @Sql(scripts = { "classpath:/integration/product/shouldGuestUserPaginateProductList.sql" })
   public void shouldGuestUserPaginateProductList() throws Exception {

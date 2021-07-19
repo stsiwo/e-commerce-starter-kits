@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -29,6 +30,9 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long>, JpaSp
   @Query(value = "SELECT c FROM cartItems c WHERE c.user.userId = ?1")
   List<CartItem> getAllByUserId(UUID userId);
 
+  @Query(value = "SELECT c FROM cartItems c inner join c.variant v WHERE v.variantId = ?1")
+  List<CartItem> getAllByVariantId(Long variantId);
+
   /**
    * if a given variant with a given user exists, return true.
    *
@@ -40,5 +44,13 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long>, JpaSp
 
   @Query(value = "SELECT w FROM cartItems w WHERE w.variant.variantId = ?1 AND w.user.userId = ?2")
   Optional<CartItem> findByVariantIdAndUserId(Long variantId, UUID userId);
+
+  /**
+   * bulk (scalable) delete.
+   * @param ids
+   */
+  @Modifying
+  @Query("delete from cartItems c where c.cartItemId in ?1")
+  void deleteCartItems(List<Long> ids);
 }
 

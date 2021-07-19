@@ -84,8 +84,9 @@ public class Product {
   @Column(name = "is_public")
   private Boolean isPublic = false;
 
-  @Formula("(select avg(r.review_point) from products p inner join reviews r on r.product_id = p.product_id where p.product_id = product_id)")
-  private Double averageReviewPoint = 0.0D;
+  // grab only verified review
+  @Formula("(select ifnull(avg(r.review_point), 0.0) from products p inner join reviews r on r.product_id = p.product_id where r.is_verified = 1 and p.product_id = product_id)")
+  private Double averageReviewPoint = 0.0D; // <- this default value does not work. you need to specify the default value in sql.
 
   // assuming discount_price is null if isDiscount = false
   // also, you need to isDiscount false when passed the end date and make discount

@@ -48,7 +48,7 @@ import uniqBy from "lodash/uniqBy";
 import { ReviewType } from "domain/review/type";
 import SingleLineList from "components/common/SingleLineList";
 import ReviewCard from "components/common/ReviewCard";
-import { validateQuantity } from "domain/cart";
+import { isReachMaxQuantity, isReachMinQuantity } from "domain/cart";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -209,7 +209,7 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
   const handleQtyInc: React.EventHandler<React.MouseEvent<HTMLButtonElement>> =
     (e) => {
       // max quantity = 10
-      if (!validateQuantity(curQty)) {
+      if (isReachMaxQuantity(curQty)) {
         return false;
       }
 
@@ -224,7 +224,7 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
   const handleQtyDec: React.EventHandler<React.MouseEvent<HTMLButtonElement>> =
     (e) => {
       // min quantity = 1
-      if (!validateQuantity(curQty)) {
+      if (isReachMinQuantity(curQty)) {
         return false;
       }
 
@@ -307,6 +307,17 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
   );
   const handleAddCart: React.EventHandler<React.MouseEvent<HTMLButtonElement>> =
     (e) => {
+      // not allow if out of stock
+      if (curStockBag.enum === ProductStockEnum.OUT_OF_STOCK) {
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.ERROR,
+            message: "the product does not have any stock.",
+          })
+        );
+      }
+
       if (auth.userType === UserTypeEnum.GUEST) {
         // validation
         if (isMaxCartItems) {
@@ -718,7 +729,11 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
               {props.product.note}
             </Typography>
             <Box component="div" className={classes.controllerBox}>
-              <Button onClick={handleAddCart} variant="contained">
+              <Button
+                disabled={curStockBag.enum === ProductStockEnum.OUT_OF_STOCK}
+                onClick={handleAddCart}
+                variant="contained"
+              >
                 {"Add to Cart"}
               </Button>
               {auth.userType === UserTypeEnum.MEMBER && (
@@ -727,6 +742,7 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
                 </Button>
               )}
               <Button onClick={handleBuyNow} variant="contained">
+                disabled={curStockBag.enum === ProductStockEnum.OUT_OF_STOCK}
                 {"buy now"}
               </Button>
             </Box>

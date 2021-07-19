@@ -67,7 +67,6 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
           public WishlistItemDTO apply(WishlistItem wishlistItem) {
             ProductVariant targetVariant = wishlistItem.getVariant();
             WishlistItemDTO tempWishlistItemDTO = WishlistItemMapper.INSTANCE.toWishlistItemDTO(wishlistItem);
-
             /**
              * what this is doing: filtering variants.
              *
@@ -102,9 +101,9 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
     } else if (sortEnum == ProductSortEnum.ALPHABETIC_DESC) {
       return Sort.by("variant.product.productName").descending();
     } else if (sortEnum == ProductSortEnum.PRICE_ASC) {
-      return Sort.by("variant.product.cheapestPrice").ascending();
+      return Sort.by("variant.regularPrice").ascending();
     } else {
-      return Sort.by("variant.product.cheapestPrice").descending();
+      return Sort.by("variant.regularPrice").descending();
     }
   }
 
@@ -186,6 +185,11 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
     }
 
     WishlistItem wishlistItem = targetWishlistItemOption.get();
+
+    // if this variant does not have stock return bad_request.
+    if (this.productRepository.isOutOfStock(wishlistItem.getVariant().getVariantId())) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "the variant does not have any stock.");
+    }
 
     Long variantId = wishlistItem.getVariant().getVariantId();
 

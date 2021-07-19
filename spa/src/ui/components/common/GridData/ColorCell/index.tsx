@@ -1,11 +1,11 @@
-import Avatar from '@material-ui/core/Avatar';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import * as React from 'react';
-import Badge from '@material-ui/core/Badge';
+import Avatar from "@material-ui/core/Avatar";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import * as React from "react";
+import Badge from "@material-ui/core/Badge";
 
 interface ColorCellPropsType {
-  value: string
-  checked?: boolean
+  value: string;
+  checked?: boolean;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme: Theme) =>
       height: 25,
       margin: theme.spacing(0, 1),
     },
-  }),
+  })
 );
 
 /**
@@ -25,7 +25,6 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  **/
 const ColorCell: React.FunctionComponent<ColorCellPropsType> = (props) => {
-
   const classes = useStyles();
 
   if (props.checked) {
@@ -34,28 +33,25 @@ const ColorCell: React.FunctionComponent<ColorCellPropsType> = (props) => {
         <Avatar
           className={classes.root}
           style={{
-            backgroundColor: props.value
+            backgroundColor: props.value,
           }}
         >
           {""}
         </Avatar>
       </Badge>
-    )
+    );
   }
 
   return (
     <Avatar
       className={classes.root}
       style={{
-        backgroundColor: props.value
+        backgroundColor: props.value,
       }}
     >
       {""}
     </Avatar>
-  )
-}
+  );
+};
 
-export default ColorCell
-
-
-
+export default ColorCell;
