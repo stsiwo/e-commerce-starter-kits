@@ -75,6 +75,30 @@ My goal is to develop a maintainable, testable, and scalable application as much
   - [Docker-Compose](https://docs.docker.com/compose/)
   - [MySQL](https://www.mysql.com/)
 
+## Architecture
+
+### Front End
+
+I separate each responsibility into different modules:
+
+  - UI Components: display UI to users.
+  - Redux-Saga Workers: handle side effects (e.g., CRUD operation to back-end API).
+  - Redux Store: keep the state.
+  - Selectors: filter, sort, or calculate the state as UI components desire. 
+
+![alt text](https://github.com/stsiwo/e-commerce-starter-kits/blob/main/front-end-architecture.png "Architecture Front End 1")
+
+### Flow
+
+Here is a typical flow of how each component interacts with the other.
+
+  1. Users trigger an event and run the event handler, or we need initial prep (e.g., useEffect).
+  2. Dispatch an action.
+  3. If it does not need side effects, move to step 5.
+  4. If we need to have side effects (e.g., CRUD operation to back-end API), use watchers and workers in Redux-Saga.
+  5. The Redux store receives the updated data and updates the state.
+  6. Any UI component, which subscribes to updated data, is updated through its selector where you can filter, sort, or calculate the state if necessary. 
+
 ## Refs
 
   - rechaptch management console: https://www.google.com/u/2/recaptcha/admin/site/459661075 (need to login as satoshi@iwaodev.com)
