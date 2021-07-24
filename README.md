@@ -99,6 +99,10 @@ Here is a typical flow of how each component interacts with the other.
   5. The Redux store receives the updated data and updates the state.
   6. Any UI component, which subscribes to updated data, is updated through its selector where you can filter, sort, or calculate the state if necessary. 
 
+## Back End
+
+![alt text](https://github.com/stsiwo/e-commerce-starter-kits/blob/main/back-end-architecture.png "Architecture Back End 1")
+
 ## Refs
 
   - rechaptch management console: https://www.google.com/u/2/recaptcha/admin/site/459661075 (need to login as satoshi@iwaodev.com)
