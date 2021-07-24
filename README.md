@@ -1,5 +1,6 @@
 # e-commerce-starter-kits
-e-commerce web app with React + Java + Spring + Docker
+
+  An e-commerce web application integrated with [Stripe](https://stripe.com/en-ca) as a payment system 
 
 ## Refs
 
