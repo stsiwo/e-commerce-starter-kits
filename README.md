@@ -50,7 +50,7 @@ My goal is to develop a maintainable, testable, and scalable application as much
 
 ### Back End
 
-  - [JDK 11](https://openjdk.java.net/projects/jdk/11/)
+  - [Open JDK 11](https://openjdk.java.net/projects/jdk/11/)
   - [Spring Boot](https://spring.io/projects/spring-boot)
   - [Hibernate](https://hibernate.org/)
   - [Lombok](https://projectlombok.org/)
