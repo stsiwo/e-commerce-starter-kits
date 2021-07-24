@@ -1,40 +1,77 @@
 # e-commerce-starter-kits
 
-  An e-commerce web application integrated with [Stripe](https://stripe.com/en-ca) as a payment system 
+## Description
+
+An e-commerce web application integrated with [Stripe](https://stripe.com/en-ca) as a payment system and [Canada Post](https://www.canadapost-postescanada.ca/cpc/en/home.page) as a postal service.
+
+## End-User Features
+
+  - __Role Management__: guest, member, and admin roles.
+  - __Wishlist Management__: members can save products for later.
+  - __Cart Management__: guests/members can keep products for their checkout.
+  - __Checkout & Online Payment__: guests/members can buy products online.
+  - __Order History Management__: members can view their orders, and they can update an order event if applicable.
+  - __Product Search__: guests/members can search/filter/sort products.
+  - __Account Management__: members/admin can manage their account information (e.g., avatar, basic info, billing/shipping address, phone, and account deletion)
+  - __Product Management__: the admin can CRUD products. 
+  - __Category Management__: the admin can CRUD categories.
+  - __Order Management__: the admin can manage all of the orders by customers.
+  - __Review Management__: the admin can manage all of the reviews by customers
+  - __Customer Management__: the admin can CRUD customers.
+  - __Login Attempt Limitation__: prevent brute force attack.
+  - __Email Verification__: protect email reputation.
+  - __Notifications__: members/admin can receive in-app notifications when a crucial event happens  (e.g., a new order was placed, your order was shipped, and so on)
+  - __Contact__: guests/members can use the contact form to send inquiries.
+  - __Email__: guests/members/admin can receive emails when a crucial event happens (e.g., a new order was placed, your order was shipped, and so on)
+  - __Rating__: guests/members can get the estimated shipping cost & delivery date when checkout (integration with Canada Post API).
+
+## Developer Features
+
+  - Daily Backup: automate daily backup with [this docker image](https://github.com/databacker/mysql-backup)
+  - [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin): admin web interface tool to manage my back-end API.  
+
+## Tech Stack
+
+### Front End
+
+  - [ReactJS](https://reactjs.org/)
+  - [Webpack](https://webpack.js.org/)
+  - [Material-UI](https://material-ui.com/)
+  - [TypeScript](https://www.typescriptlang.org/)
+  - [Redux](https://redux.js.org/)
+  - [Redux-Saga](https://redux-saga.js.org/)
+  - [Jest](https://jestjs.io/)
+  - [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
+  - [Nginx](https://www.nginx.com/)
+
+### Back End
+
+  - [JDK 11](https://openjdk.java.net/projects/jdk/11/)
+  - [Spring Boot](https://spring.io/projects/spring-boot)
+  - [Hibernate](https://hibernate.org/)
+  - [Lombok](https://projectlombok.org/)
+  - [MapStruct](https://mapstruct.org/)
+  - [AspectJ](https://www.eclipse.org/aspectj/)
+  - [Flyway](https://flywaydb.org/)
+  - [Spring Security](https://spring.io/projects/spring-security)
+  - [Jacoco](https://www.eclemma.org/jacoco/)
+  - [JUnit](https://junit.org/junit4/)
+	
+
+### Infrastructure
+
+  - [AWS EC2](https://aws.amazon.com/ec2/?ec2-whats-new.sort-by=item.additionalFields.postDateTime&ec2-whats-new.sort-order=desc)
+  - [AWS Route53](https://aws.amazon.com/route53/)
+  - [AWS SNS](https://aws.amazon.com/sns/?whats-new-cards.sort-by=item.additionalFields.postDateTime&whats-new-cards.sort-order=desc)
+  - [AWS SES](https://aws.amazon.com/ses/)
+  - [AWS S3](https://aws.amazon.com/s3/)
+  - [AWS CloudWatch](https://aws.amazon.com/cloudwatch/)
+  - [AWS Lambda](https://aws.amazon.com/lambda/)
+  - [Docker](https://www.docker.com/)
+  - [Docker-Compose](https://docs.docker.com/compose/)
+  - [MySQL](https://www.mysql.com/)
 
 ## Refs
 
   - rechaptch management console: https://www.google.com/u/2/recaptcha/admin/site/459661075 (need to login as satoshi@iwaodev.com)
 
-## Frontend Tech Stack
-
-  - TypeScript
-  - Webpack
-  - React
-  - Redux
-  - Redux-Saga
-  - styled-components
-  - Material-UI
-
-## Backend Tech Stack
-
-  - Java 
-  - Spring (Web Framework)
-  - Redis (Session Management)
-  - Nginx (Web Server)
-
-## Infrastructure
-
-  - Docker
-  - Docker Compose
-
-## NOTE
-
-  - How to prevent a user from accessing other user's data.
-
-    - https://stackoverflow.com/questions/51712724/how-to-allow-a-user-only-access-their-own-data-in-spring-boot-spring-security
-
-  - How to deal with DELETE http method with request body?
-
-    - https://stackoverflow.com/questions/299628/is-an-entity-body-allowed-for-an-http-delete-request#:~:text=Yes%20it%20is%20allowed%20to,not%20including%20a%20request%20body.
-    - honestly, it is unclear to me. some clients can't send DELETE request with the body or some web server ignores the body when passing to the backend app     
