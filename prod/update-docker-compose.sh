@@ -33,6 +33,10 @@ docker pull stsiwo/ec-db
 
 echo "start update docker-compose"
 # update docker-compose
+docker-compose -f /home/ubuntu/prod/docker-compose.secret.yml -f /home/ubuntu/prod/docker-compose.yml down --remove-orphans 
+
+systemctl restart docker
+
 docker-compose -f /home/ubuntu/prod/docker-compose.secret.yml -f /home/ubuntu/prod/docker-compose.yml up -d
 
 echo "clean up the unused docker components"

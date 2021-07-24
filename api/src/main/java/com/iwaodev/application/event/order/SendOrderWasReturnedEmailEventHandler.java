@@ -53,6 +53,18 @@ public class SendOrderWasReturnedEmailEventHandler implements EventHandler<Order
    * include following: - greeting. - a list of items. - total price. (subtotal,
    * shipping cost, tax cost) - estimated delivery.
    **/
+  /**
+   * when use @TransactionalEventListener with CrudRepository to persist data, this event handler must be under a transactional. Otherwise, it won't save it.
+   *
+   * you have two choices:
+   *
+   *  1. TransactionPhase.BEFORE_COMMIT
+   *  2. @Transactional(propagation = Propagation.REQUIRES_NEW)
+   *
+   *  default (e.g., AFTER_COMMIT) won't work since the transaction is done already.
+   *
+   * ref: https://stackoverflow.com/questions/44752567/save-data-in-a-method-of-eventlistener-or-transactionaleventlistener
+   */
   @Async
   @TransactionalEventListener
   public void handleEvent(OrderEventWasAddedEvent event) throws AppException {

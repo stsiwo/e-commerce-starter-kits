@@ -1,13 +1,14 @@
-import { ThemeProvider } from '@material-ui/core';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Content from 'components/pages/Content';
-import { store } from 'configs/storeConfig';
-import { SnackbarProvider } from 'notistack';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
+import { ThemeProvider } from "@material-ui/core";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import DefaultHead from "components/head/DefaultHead";
+import Content from "components/pages/Content";
+import { store } from "configs/storeConfig";
+import { SnackbarProvider } from "notistack";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import { Provider } from "react-redux";
 import { useLocation } from "react-router";
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router } from "react-router-dom";
 /**
  * dev env only
  **/
@@ -15,8 +16,8 @@ import { BrowserRouter as Router } from 'react-router-dom';
 /**
  * scroll polyfill
  **/
-import smoothscroll from 'smoothscroll-polyfill';
-import { theme } from 'ui/css/theme';
+import smoothscroll from "smoothscroll-polyfill";
+import { theme } from "ui/css/theme";
 
 smoothscroll.polyfill();
 
@@ -25,21 +26,19 @@ smoothscroll.polyfill();
  * https://reacttraining.com/react-router/web/guides/scroll-restoration
  **/
 const ScrollToTop: React.FunctionComponent<{}> = (props) => {
-
-  const { pathname } = useLocation()
+  const { pathname } = useLocation();
 
   React.useEffect(() => {
     window.scrollTo({
       behavior: "smooth",
       top: 0,
-    })
-  }, [pathname])
+    });
+  }, [pathname]);
 
-  return null
-}
+  return null;
+};
 
 const Index = (props: any) => {
-
   return (
     <React.Fragment>
       <Router>
@@ -48,9 +47,10 @@ const Index = (props: any) => {
           <SnackbarProvider maxSnack={3}>
             <CssBaseline>
               <Provider store={store}>
-                  <ScrollToTop />
-                  <Content />
-                  {/**(RoleSwitch &&
+                <ScrollToTop />
+                <DefaultHead />
+                <Content />
+                {/**(RoleSwitch &&
                   <RoleSwitch />
                 )**/}
               </Provider>
@@ -62,7 +62,4 @@ const Index = (props: any) => {
   );
 };
 
-ReactDOM.render(
-  <Index />
-  , document.getElementById('root')
-)
+ReactDOM.render(<Index />, document.getElementById("root"));

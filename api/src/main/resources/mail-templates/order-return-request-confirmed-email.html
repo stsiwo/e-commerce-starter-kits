@@ -48,9 +48,9 @@
     </style>
   </head>
   <body>
-    <p th:text="${'Hi ' + order.orderFirstName + ' ' + order.orderLastName}"></p><br />
+    <p th:text="${'Hi ' + order.orderFirstName + ' ' + order.orderLastName}"></p>
 
-    <p>Your return request was confirmed. Please be patient until we process the request for following order:</p><br />
+    <p>Your return request was confirmed. Please be patient until we process the request for following order:</p>
     
     <h4>Customer Information</h4>
     <p>Name: <b th:text="${order.orderFirstName + ' ' + order.orderLastName}"></b></p>
@@ -63,7 +63,7 @@
 
     <h4>Items Information</h4>
     <p>Order #: <b th:text="${order.orderNumber}"></b></p>
-    <p th:if="${order.estimatedDeliveryDate != null}">Estimated Delivery Date: <b th:text="${order.estimatedDeliveryDate}">N/A</b></p>
+    <p th:if="${order.estimatedDeliveryDate != null}">Estimated Delivery Date: <b th:text="${order.displayEstimatedDeliveryDate()}">N/A</b></p>
     <table class="styled-table">
      <thead>
          <tr>

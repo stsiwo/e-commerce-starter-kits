@@ -234,17 +234,18 @@ export declare type OrderType = {
   nextAdminOrderEventOptions: OrderStatusEnum[],
   nextMemberOrderEventOptions: OrderStatusEnum[],
   latestOrderEvent: OrderEventType,
+  stripePaymentIntentId: string
 }
 
 // form & input state
-export const defaultOrderEventData: OrderEventType = {
+export const generateDefaultOrderEventData: () => OrderEventType = () => ({
   createdAt: null,
   undoable: false,
   user: null,
   orderId: "",
   orderStatus: null,
   note: "",
-}
+})
 
 // criteria
 

@@ -123,6 +123,19 @@ public class ReviewSpecifications {
     };
   }
 
+  public static Specification<Review> searchQueryByReviewId(String searchQuery) {
+    return (root, query, builder) -> {
+      if (searchQuery == null) {
+        /**
+         * if paramter is null, we still want to chain specificiation so use
+         * 'conjunction()'
+         **/
+        return builder.conjunction();
+      }
+      return builder.like(root.get(Review_.reviewId).as(String.class), "%" + searchQuery + "%");
+    };
+  }
+
   public static Specification<Review> createdDateAfter(LocalDateTime startDate) {
     return (root, query, builder) -> {
       if (startDate == null) {

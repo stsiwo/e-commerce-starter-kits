@@ -17,51 +17,70 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
  * create a notification for an review was verified.
- *
- * 
+ * <p>
+ * <p>
  * don't forget implements EventHandler<E>. this is used for testing.
- *
  **/
 @Service
-public class CreateReviewVerifiedNotificationForMemberEventHandler implements EventHandler<ReviewWasVerifiedByAdminEvent>{
+public class CreateReviewVerifiedNotificationForMemberEventHandler implements EventHandler<ReviewWasVerifiedByAdminEvent> {
 
-  private static final Logger logger = LoggerFactory
-      .getLogger(CreateReviewVerifiedNotificationForMemberEventHandler.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(CreateReviewVerifiedNotificationForMemberEventHandler.class);
 
-  @Autowired
-  private CreateNotificationService createNotificationService;
+    @Autowired
+    private CreateNotificationService createNotificationService;
 
-  @Autowired
-  private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-  @Autowired
-  private NotificationRepository notificationRepository;
+    @Autowired
+    private NotificationRepository notificationRepository;
 
-  @Async
-  @TransactionalEventListener()
-  public void handleEvent(ReviewWasVerifiedByAdminEvent event) throws AppException {
-    logger.info("start CreateReviewVerifiedNotificationForMemberEventHandler");
-    logger.info(Thread.currentThread().getName());
+    /**
+     * create a notification when the admin review the product for the customer.
+     *
+     * @param event
+     * @throws AppException
+     */
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    public void handleEvent(ReviewWasVerifiedByAdminEvent event) throws AppException {
+        logger.info("start CreateReviewVerifiedNotificationForMemberEventHandler");
+        logger.info(Thread.currentThread().getName());
 
-    User admin = this.userRepository.getAdmin().orElseThrow(
-        () -> new AppException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
+        /**
+         * when use @TransactionalEventListener with CrudRepository to persist data, this event handler must be under a transactional. Otherwise, it won't save it.
+         *
+         * you have two choices:
+         *
+         *  1. TransactionPhase.BEFORE_COMMIT
+         *  2. @Transactional(propagation = Propagation.REQUIRES_NEW)
+         *
+         *  default (e.g., AFTER_COMMIT) won't work since the transaction is done already.
+         *
+         * ref: https://stackoverflow.com/questions/44752567/save-data-in-a-method-of-eventlistener-or-transactionaleventlistener
+         */
 
-    try {
-      // member user
-      Notification notification = this.createNotificationService.create(
-          NotificationTypeEnum.REVIEW_WAS_VERIFIED_BY_ADMIN,
-          String.format("Your review (review#: %s) for %s was verified. Thank you for your review.",
-              event.getReview().getReviewId(), event.getReview().getProduct().getProductName()),
-          admin, event.getReview().getUser(),
-          String.format("/products/%s", event.getReview().getProduct().getProductPath()), "");
+        User admin = this.userRepository.getAdmin().orElseThrow(
+                () -> new AppException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
 
-      this.notificationRepository.save(notification);
-    } catch (NotFoundException e) {
-      throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
+        try {
+            // member user
+            Notification notification = this.createNotificationService.create(
+                    NotificationTypeEnum.REVIEW_WAS_VERIFIED_BY_ADMIN,
+                    String.format("Your review (review#: %s) for %s was verified. Thank you for your review.",
+                            event.getReview().getReviewId(), event.getReview().getProduct().getProductName()),
+                    admin, event.getReview().getUser(),
+                    String.format("/products/%s", event.getReview().getProduct().getProductPath()), "");
+
+            this.notificationRepository.save(notification);
+        } catch (NotFoundException e) {
+            throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
-  }
 }

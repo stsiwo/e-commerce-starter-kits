@@ -1,18 +1,22 @@
-import Grid from '@material-ui/core/Grid';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import Pagination from '@material-ui/lab/Pagination';
-import SearchController from 'components/common/SearchController';
-import SearchResult from 'components/common/SearchResult';
-import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchPublicProductActionCreator, productPaginationPageActions, productQuerySearchQueryActions } from 'reducers/slices/domain/product';
-import { mSelector } from 'src/selectors/selector';
-import SearchForm from 'components/common/SearchForm';
-import Box from '@material-ui/core/Box';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { FetchStatusEnum } from 'src/app';
-import Typography from '@material-ui/core/Typography';
-import { useLocation } from 'react-router';
+import Grid from "@material-ui/core/Grid";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import Pagination from "@material-ui/lab/Pagination";
+import SearchController from "components/common/SearchController";
+import SearchResult from "components/common/SearchResult";
+import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchPublicProductActionCreator,
+  productPaginationPageActions,
+  productQuerySearchQueryActions,
+} from "reducers/slices/domain/product";
+import { mSelector } from "src/selectors/selector";
+import SearchForm from "components/common/SearchForm";
+import Box from "@material-ui/core/Box";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { FetchStatusEnum } from "src/app";
+import Typography from "@material-ui/core/Typography";
+import { useLocation } from "react-router";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -30,7 +34,7 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: "center",
       flexDirection: "column",
     },
-  }),
+  })
 );
 
 // A custom hook that builds on useLocation to parse
@@ -44,73 +48,71 @@ function useQuery() {
  *
  **/
 const ProductSearch: React.FunctionComponent<{}> = (props) => {
+  const classes = useStyles();
 
-  const classes = useStyles()
-
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   // filter/sort/pagination
   const curDomains = useSelector(mSelector.makeProductWithoutCacheSelector());
 
-  const curQuery = useSelector(mSelector.makeProductQuerySelector())
+  const curQuery = useSelector(mSelector.makeProductQuerySelector());
 
-
-  // spa url query string 
-  const query = useQuery()
-  const searchQuery = query.get("searchQuery")
+  // spa url query string
+  const query = useQuery();
+  const searchQuery = query.get("searchQuery");
   React.useEffect(() => {
     if (searchQuery) {
-      dispatch(
-        productQuerySearchQueryActions.update(searchQuery)
-      )
+      dispatch(productQuerySearchQueryActions.update(searchQuery));
     }
-  }, [])
-
+  }, [searchQuery]);
 
   // pagination
-  const curPagination = useSelector(mSelector.makeProductPaginationSelector())
-  const handlePaginationChange = (event: React.ChangeEvent<unknown>, value: number) => {
-
+  const curPagination = useSelector(mSelector.makeProductPaginationSelector());
+  const handlePaginationChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
     // need to decrement since we incremented when display
     const nextPage = value - 1;
 
-    dispatch(productPaginationPageActions.update(nextPage))
+    dispatch(productPaginationPageActions.update(nextPage));
   };
 
   // api request every time query/page changes
   React.useEffect(() => {
-    dispatch(fetchPublicProductActionCreator())
-  }, [
-      JSON.stringify(curQuery),
-      curPagination.page,
-    ])
+    dispatch(fetchPublicProductActionCreator());
+  }, [JSON.stringify(curQuery), curPagination.page]);
 
   /**
    * search query stuffs
    **/
   const handleSearchChange = (value: string) => {
-    dispatch(
-      productQuerySearchQueryActions.update(value)
-    )
-  }
+    dispatch(productQuerySearchQueryActions.update(value));
+  };
 
   // fetch result
   // fetch order fetching result
-  const curFetchProductStatus = useSelector(mSelector.makeFetchPublicProductFetchStatusSelector())
+  const curFetchProductStatus = useSelector(
+    mSelector.makeFetchPublicProductFetchStatusSelector()
+  );
 
   // useEffect to send request every time its dependency updated
   return (
     <React.Fragment>
       <Box className={classes.searchBox}>
-        <SearchForm searchQuery={curQuery.searchQuery} onChange={handleSearchChange} label={"search..."} />
+        <SearchForm
+          searchQuery={curQuery.searchQuery}
+          onChange={handleSearchChange}
+          label={"search..."}
+        />
       </Box>
       <SearchController />
-      {(curFetchProductStatus === FetchStatusEnum.FETCHING &&
+      {curFetchProductStatus === FetchStatusEnum.FETCHING && (
         <Box className={classes.loadingBox}>
           <CircularProgress />
         </Box>
       )}
-      {(curFetchProductStatus === FetchStatusEnum.SUCCESS &&
+      {curFetchProductStatus === FetchStatusEnum.SUCCESS && (
         <React.Fragment>
           <SearchResult products={curDomains} />
           <Grid
@@ -131,17 +133,15 @@ const ProductSearch: React.FunctionComponent<{}> = (props) => {
           </Grid>
         </React.Fragment>
       )}
-      {(curFetchProductStatus === FetchStatusEnum.FAILED &&
+      {curFetchProductStatus === FetchStatusEnum.FAILED && (
         <Box className={classes.loadingBox}>
-          <Typography variant="body1" component="h2" >
+          <Typography variant="body1" component="h2">
             {"failed to fetch data... please try again..."}
           </Typography>
         </Box>
       )}
     </React.Fragment>
-  )
-}
+  );
+};
 
-export default ProductSearch
-
-
+export default ProductSearch;

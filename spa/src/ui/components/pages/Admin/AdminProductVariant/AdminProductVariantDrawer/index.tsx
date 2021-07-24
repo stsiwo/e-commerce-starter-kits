@@ -1,14 +1,19 @@
-import Drawer from '@material-ui/core/Drawer';
-import { createStyles, makeStyles, Theme, useTheme } from '@material-ui/core/styles';
-import * as React from 'react';
-import AdminProductVariantForm from '../AdminProductVariantForm';
-import { ProductVariantType } from 'domain/product/types';
+import Drawer from "@material-ui/core/Drawer";
+import {
+  createStyles,
+  makeStyles,
+  Theme,
+  useTheme,
+} from "@material-ui/core/styles";
+import * as React from "react";
+import AdminProductVariantForm from "../AdminProductVariantForm";
+import { ProductVariantType } from "domain/product/types";
 
 declare type AdminProductVariantFormDrawerPropsType = {
-  curFormOpen: boolean
-  setFormOpen: React.Dispatch<React.SetStateAction<boolean>>
-  productVariant: ProductVariantType
-}
+  curFormOpen: boolean;
+  setFormOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  productVariant: ProductVariantType;
+};
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -30,61 +35,63 @@ const useStyles = makeStyles((theme: Theme) =>
       fontWeight: theme.typography.fontWeightBold,
     },
     toggleBtnBox: {
-      position: 'fixed',
-      bottom: '10px',
-      right: '10px',
+      position: "fixed",
+      bottom: "10px",
+      right: "10px",
     },
-  }),
+  })
 );
 
-const AdminProductVariantFormDrawer: React.FunctionComponent<AdminProductVariantFormDrawerPropsType> = (props) => {
+const AdminProductVariantFormDrawer: React.FunctionComponent<AdminProductVariantFormDrawerPropsType> =
+  (props) => {
+    // used to switch 'permanent' or 'temporary' nav menu based on this screen size
+    const theme = useTheme();
 
-  // used to switch 'permanent' or 'temporary' nav menu based on this screen size 
-  const theme = useTheme();
+    const classes = useStyles();
 
+    const toggleDrawer =
+      (nextOpen: boolean) =>
+      (event: React.KeyboardEvent | React.MouseEvent) => {
+        if (
+          event &&
+          event.type === "keydown" &&
+          ((event as React.KeyboardEvent).key === "Tab" ||
+            (event as React.KeyboardEvent).key === "Shift")
+        ) {
+          return;
+        }
 
-  const classes = useStyles();
+        props.setFormOpen(nextOpen);
+      };
 
-  const toggleDrawer = (nextOpen: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
+    const handleNavToggleClickEvent: React.EventHandler<
+      React.MouseEvent<HTMLButtonElement>
+    > = (e) => {
+      props.setFormOpen(!props.curFormOpen);
+    };
 
-    if (
-      event &&
-      event.type === 'keydown' &&
-      ((event as React.KeyboardEvent).key === 'Tab' ||
-        (event as React.KeyboardEvent).key === 'Shift')
-    ) {
-      return;
-    }
+    // render function
 
-    props.setFormOpen(nextOpen);
-  }
+    // render nav items
+    return (
+      <React.Fragment>
+        <Drawer
+          className={classes.drawer}
+          variant={"temporary"}
+          anchor="right"
+          open={props.curFormOpen}
+          onClose={toggleDrawer(false)}
+          classes={{
+            paper: classes.drawerPaper,
+          }}
+        >
+          <AdminProductVariantForm
+            productVariant={props.productVariant}
+            open={props.curFormOpen}
+          />
+        </Drawer>
+      </React.Fragment>
+    );
+  };
 
-  const handleNavToggleClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-    props.setFormOpen(!props.curFormOpen);
-  }
-
-  // render function
-
-  // render nav items
-  return (
-    <React.Fragment>
-      <Drawer
-        className={classes.drawer}
-        variant={'temporary'}
-        anchor="right"
-        open={props.curFormOpen}
-        onClose={toggleDrawer(false)}
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-      >
-        <AdminProductVariantForm productVariant={props.productVariant}/>
-      </Drawer>
-    </React.Fragment>
-  )
-}
-
-export default AdminProductVariantFormDrawer
-
-
-
+export default AdminProductVariantFormDrawer;

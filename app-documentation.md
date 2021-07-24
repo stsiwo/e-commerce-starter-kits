@@ -9,6 +9,16 @@
       - currently, test api key is enough to send request to Canada Post API since we only use rating.
     2. create an account for Stripe to handle payment.
 
+    3. aws setup.
+      - route53 
+        - register and create a new domain.
+      - ec2
+        -  
+      - ses
+        - get out of sandbox to send email to anymous users 
+
+    4. create an email with the domain you registered with aws
+
 ## Policies
 
   - refund policy:
@@ -27,6 +37,19 @@
 
   ### Payment
 
+
+## Payment
+
+  - we integrate Stripe as our payment system.
+
+  - this app automatically manage payment and refund.
+
+    - payment: when a customer purchase items, the payment is done via this app.
+
+    - refund: when a customer want to cancel/return the items, they can send cancel/return reuquest to the admin. then the admin can decide the refund.
+
+  ### Security
+
     - we try to implement more secure payment flow by following:
        1. enable Address Verfication (AVS) e.g, require customers to enter the postal code and the transaction is declined if the postal code does not match with the file.
         - this feature depends on the country where it is supported or not.
@@ -37,6 +60,11 @@
 
         - TODO: might need to fix this. what about the customer who owns a credit card issued in a foreign country, brings it to Canada? we should not accept this card as payment method since postal code is different unless he change the postal code of the card.
           - you might need to enable country field in billing address to solve this issue.
+
+  ### Dispute
+
+    - basic: https://stripe.com/docs/disputes#refunding-disputed-payments
+    - read this: https://stripe.com/docs/disputes/responding
 
 ## Users
 
@@ -185,7 +213,102 @@
     - when member uesr wants to do soemthing (e.g. return/cancel the order), the admin communicate with them via email/order management page.
 
     - type of order events:
-      - <put_list_of_order_event_here>
+
+      - DRAFT : created when a customer did the final confirm (e.g., create a payment intent in Stripe and the session start at front-end), 
+        - addable by MEMBER/GUEST
+        - next order event by ADMIN: ERROR
+        - next order event by GUEST/MEMBER: none
+        - undoable: false (e.g., cannot delete it)
+
+        * note: this order event is automatically added by the app but display the specific user type (customer/amdin) on the screen.
+
+      - SESSION_TIMEOUT : created when a customer's session is time out.
+        - addable by MEMBER/GUEST
+        - next order event by ADMIN: , ERROR
+        - next order event by GUEST/MEMBER: none
+        - undoable: false (e.g., cannot delete it)
+
+        * note: this order event is automatically added by the app but display the specific user type (customer/amdin) on the screen.
+
+      - ORDERED : created when a customer ordered successfully.
+        - addable by MEMBER/GUEST
+        - next order event by ADMIN: , ERROR
+        - next order event by GUEST/MEMBER: none
+        - undoable: false (e.g., cannot delete it)
+
+        * note: this order event is automatically added by the app but display the specific user type (customer/amdin) on the screen.
+
+      - PAYMENT_FAILED : created when a customer failed to pay.
+        - addable by MEMBER/GUEST
+        - next order event by ADMIN: , ERROR
+        - next order event by GUEST/MEMBER: none
+        - undoable: false (e.g., cannot delete it)
+
+        * note: this order event is automatically added by the app but display the specific user type (customer/amdin) on the screen.
+
+      - PAID : created when a customer ordered paid successfully.
+        - addable by MEMBER/GUEST
+        - next order event by ADMIN: SHIPPED, CANCEL_REQUEST, ERROR
+        - next order event by GUEST/MEMBER: CALCEL_REQUEST 
+        - undoable: false (e.g., cannot delete it)
+
+        * note: this order event is automatically added by the app but display the specific user type (customer/amdin) on the screen.
+
+      - CANCEL_REQUEST : created when a customer sent a cancel request. 
+        - addable by MEMBER/ADMIN
+        - next order event by ADMIN: RECEIVED_CANCEL_REQUEST, ERROR
+        - next order event by GUEST/MEMBER: NONE
+        - undoable: true (e.g., cannot delete it)
+
+      - RECEIVED_CANCEL_REQUEST : created when the admin confirmed the cancel request.
+        - addable by ADMIN
+        - next order event by ADMIN: CANCELED, ERROR
+        - next order event by GUEST/MEMBER: NONE
+        - undoable: true (e.g., cannot delete it)
+
+      - CANCELED : created when the admin canceled the order (e.g, refund).
+        - addable by ADMIN
+        - next order event by ADMIN: ERROR
+        - next order event by GUEST/MEMBER: NONE
+        - undoable: false (e.g., cannot delete it)
+
+      - SHIPPED: created when the admin shipped the package.
+        - addable by ADMIN
+        - next order event by ADMIN: DELIVERED, RETURN_REQUEST, ERROR
+        - next order event by GUEST/MEMBER: RETURN_REQUEST
+        - undoable: true (e.g., cannot delete it)
+
+      - RETURN_REQUEST: created when a customer sent a return request.
+        - addable by MEMBER/ADMIN
+        - next order event by ADMIN: RECEIVED_RETURN_REQUEST, ERROR
+        - next order event by GUEST/MEMBER: none 
+        - undoable: true (e.g., cannot delete it)
+
+
+      - RECEIVED_RETURN_REQUEST: created when the admin confirmed the return request.
+        - addable by ADMIN
+        - next order event by ADMIN: RETURNED, ERROR
+        - next order event by GUEST/MEMBER: none 
+        - undoable: true (e.g., cannot delete it)
+
+      - RETURNED: created when the admin confirmed the return request.
+        - addable by ADMIN
+        - next order event by ADMIN: ERROR
+        - next order event by GUEST/MEMBER: none 
+        - undoable: false (e.g., cannot delete it)
+
+      - DELIVERED: created when the package is delivered.
+        - addable by ADMIN
+        - next order event by ADMIN: RETURN_REQUEST, ERROR
+        - next order event by GUEST/MEMBER: RETURN_REQUEST 
+        - undoable: true (e.g., cannot delete it)
+
+      - ERROR: created when the admin add error on the order. 
+        - addable by ADMIN
+        - next order event by ADMIN: none 
+        - next order event by GUEST/MEMBER none:
+        - undoable: true (e.g., cannot delete it)
+
 
     - the admin can add any order events except for draft, ordered, and paid, but the order is matter. for example, you cannot add paid order event before shipping.
 
@@ -218,6 +341,60 @@
           - this event is undoable (e.g., if you cancel the order, you cannot cancel the cancellation). 
         4. finally, the customer receive the refund processed by Stripe.
 
+## Email 
+
+  - we will send an email to the appropriate user when the following events happens:
+
+    - orders
+
+      - to admin
+
+        - when a new order was placed by a customer.
+        - when a customer submit a cancel request.
+        - when a customer submit a return request.
+
+      - to customers
+
+        - when a new order was placed by the customer as conformation.
+        - when the admin shipped items. 
+        - when the admin confirms a cancel request.
+        - when the admin canceled an order.
+        - when the admin confirms a return request.
+        - when the admin returned an order.
+    
+    - reviews
+      
+      - to admin
+
+        - when a member submit/update a review.
+  
+      - to customers
+
+        - when the admin verified a review.
+
+    - members
+
+      - to memebrs
+
+        - when a member request re-issue a verification email.
+        - when a member request a forgot-password email.
+
+  - additinally, our payment system (e.g., Stripe) automatically send an email when the following events:
+
+    - to customers
+
+      - when a payment was succeeded. it contains a receipt.
+      - when a payment was refund. it contains a recipt.
+
+  - the admin receives an email to the following email addresses:
+
+    - basic email address.
+    - company email address.
+    
+
+## Notifications
+
+  - we will send a notification to the approprite user when the following events happens:
 
 ## Reviews
 

@@ -539,4 +539,11 @@ public class Product {
       this.setIsPublic(true);
     }
   }
+
+  /**
+   * check this product has at least one variant.
+   */
+  public boolean hasVariants() {
+    return this.variants.size() > 0;
+  }
 }

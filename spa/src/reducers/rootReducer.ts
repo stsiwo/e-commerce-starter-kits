@@ -36,6 +36,14 @@ import { PayloadAction } from '@reduxjs/toolkit';
  *
  **/
 export const rootReducer = (state: StateType, action: PayloadAction<any>) => {
+
+  console.log("start root reducers");
+
+  console.log("current state");
+  console.log(state)
+  console.log("current action");
+  console.log(action)
+
   if (action.type === "root/reset/all") {
     return mainReducer(undefined, action);
   }

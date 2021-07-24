@@ -138,8 +138,13 @@ public class GuestContactEndpointTest {
     // act
     mvc.perform(MockMvcRequestBuilders
         .post(targetUrl)
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(dummyUserSignupForm.toString())
+        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("firstName", dummyUserSignupForm.get("firstName").toString())
+            .param("lastName", dummyUserSignupForm.get("lastName").toString())
+            .param("email", dummyUserSignupForm.get("email").toString())
+            .param("title", dummyUserSignupForm.get("title").toString())
+            .param("description", dummyUserSignupForm.get("description").toString())
+            .param("recaptchaToken", dummyUserSignupForm.get("recaptchaToken").toString())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk());
@@ -168,8 +173,13 @@ public class GuestContactEndpointTest {
     // act
     mvc.perform(MockMvcRequestBuilders
         .post(targetUrl)
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(dummyUserSignupForm.toString())
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("firstName", dummyUserSignupForm.get("firstName").toString())
+            .param("lastName", dummyUserSignupForm.get("lastName").toString())
+            .param("email", dummyUserSignupForm.get("email").toString())
+            .param("title", dummyUserSignupForm.get("title").toString())
+            .param("description", dummyUserSignupForm.get("description").toString())
+            .param("recaptchaToken", dummyUserSignupForm.get("recaptchaToken").toString())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isBadRequest());
@@ -198,8 +208,13 @@ public class GuestContactEndpointTest {
     // act
     mvc.perform(MockMvcRequestBuilders
         .post(targetUrl)
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(dummyUserSignupForm.toString())
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .param("firstName", dummyUserSignupForm.get("firstName").toString())
+            .param("lastName", dummyUserSignupForm.get("lastName").toString())
+            .param("email", dummyUserSignupForm.get("email").toString())
+            .param("title", dummyUserSignupForm.get("title").toString())
+            .param("description", dummyUserSignupForm.get("description").toString())
+            .param("recaptchaToken", dummyUserSignupForm.get("recaptchaToken").toString())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isInternalServerError());

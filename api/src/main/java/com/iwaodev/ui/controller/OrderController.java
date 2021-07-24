@@ -149,7 +149,7 @@ public class OrderController {
     criteria.setUserId(authUser.getId());
 
 	  return new ResponseEntity<>(
-        this.service.addOrderEvent(orderId, criteria),
+        this.service.addOrderEventByAdmin(orderId, criteria),
         HttpStatus.OK
         );
   }

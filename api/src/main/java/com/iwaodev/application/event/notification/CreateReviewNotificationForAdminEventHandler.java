@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
@@ -40,27 +41,41 @@ public class CreateReviewNotificationForAdminEventHandler implements EventHandle
   @Autowired
   private NotificationRepository notificationRepository;
 
-  @Async
-  @TransactionalEventListener()
+  //@Async
+  @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
   public void handleEvent(NewReviewWasSubmittedEvent event) throws AppException {
     logger.info("start CreateReviewEventNotificationEventHandler");
     logger.info(Thread.currentThread().getName());
 
+    /**
+     * when use @TransactionalEventListener with CrudRepository to persist data, this event handler must be under a transactional. Otherwise, it won't save it.
+     *
+     * you have two choices:
+     *
+     *  1. TransactionPhase.BEFORE_COMMIT
+     *  2. @Transactional(propagation = Propagation.REQUIRES_NEW)
+     *
+     *  default (e.g., AFTER_COMMIT) won't work since the transaction is done already.
+     *
+     * ref: https://stackoverflow.com/questions/44752567/save-data-in-a-method-of-eventlistener-or-transactionaleventlistener
+     */
     User admin = this.userRepository.getAdmin().orElseThrow(
         () -> new AppException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
-
+    Notification notification;
     try {
       // member user
-      Notification notification = this.createNotificationService.create(
+        notification = this.createNotificationService.create(
           NotificationTypeEnum.REVIEW_WAS_UPDATED_BY_MEMBER,
           String.format("A review (review#: %s) was submitted by %s. Please check the link for more detail.",
               event.getReview().getReviewId(), event.getReview().getUser().getFullName()),
           event.getReview().getUser(), admin,
           String.format("/admin/reviews?reviewId=%s", event.getReview().getReviewId()), "");
 
-      this.notificationRepository.save(notification);
+
     } catch (NotFoundException e) {
       throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
     }
+    Notification savedEntity = this.notificationRepository.save(notification);
+    logger.info("saved successfully (ntf id: " + notification.getNotificationId() + ")");
   }
 }

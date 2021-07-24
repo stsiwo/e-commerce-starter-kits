@@ -182,9 +182,13 @@ public class ProductVariantServiceImpl implements ProductVariantService {
       // recalculate 'cheapestPrice' and 'highestPrice'
       targetEntity.setUp();
 
+      // if the product does not have any variant after this deletion, make public disable to follow the business rule.
+      if (!targetEntity.hasVariants()) {
+        targetEntity.setIsPublic(false);
+      }
+
       // save it
       this.repository.save(targetEntity);
     }
-
   }
 }

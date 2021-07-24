@@ -3,6 +3,9 @@
 # vim
 *.swp
 *.swo
+*.swn
+*.swl
+*.swm
 
 # env
 .env.*

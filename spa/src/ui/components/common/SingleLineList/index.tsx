@@ -127,10 +127,15 @@ const SingleLineList: React.FunctionComponent<SingleLineListPropsType> = (
 
   React.useEffect(() => {
     if (outerBoxRef.current && innerBoxRef.current) {
+      console.log("inner box scroll width: " + innerBoxRef.current.scrollWidth);
+      console.log("inner box client width: " + innerBoxRef.current.clientWidth);
+      console.log("are arrows need?");
       if (innerBoxRef.current.scrollWidth > innerBoxRef.current.clientWidth) {
+        console.log("yes");
         // need to have scroll
         setNeedArrows(true);
       } else {
+        console.log("no");
         // don't need it
         setNeedArrows(false);
       }
@@ -138,6 +143,8 @@ const SingleLineList: React.FunctionComponent<SingleLineListPropsType> = (
   }, [
     outerBoxRef,
     innerBoxRef,
+    ...(innerBoxRef.current ? [innerBoxRef.current.scrollWidth] : []),
+    ...(innerBoxRef.current ? [innerBoxRef.current.clientWidth] : []),
     isNeedArrows,
     responsive.currentScreenWidth,
     setNeedArrows,

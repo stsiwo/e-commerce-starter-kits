@@ -1,13 +1,13 @@
-import Box from '@material-ui/core/Box';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import { OrderType } from 'domain/order/types';
-import * as React from 'react';
-import { cadCurrencyFormat } from 'src/utils';
+import Box from "@material-ui/core/Box";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import { OrderType } from "domain/order/types";
+import * as React from "react";
+import { cadCurrencyFormat } from "src/utils";
 
 interface OrderDetailPropsType {
-  order: OrderType
+  order: OrderType;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -20,15 +20,16 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     textField: {
       margin: theme.spacing(1),
-    }
-  }),
+    },
+  })
 );
 
 /**
  * order detail component
  **/
-const OrderDetail: React.FunctionComponent<OrderDetailPropsType> = ({ order }) => {
-
+const OrderDetail: React.FunctionComponent<OrderDetailPropsType> = ({
+  order,
+}) => {
   const classes = useStyles();
 
   return (
@@ -39,6 +40,15 @@ const OrderDetail: React.FunctionComponent<OrderDetailPropsType> = ({ order }) =
           label="Order #"
           className={`${classes.textField}`}
           value={order.orderNumber}
+          inputProps={{
+            readOnly: true,
+          }}
+        />
+        <TextField
+          id="stripe-order-id"
+          label="Stripe Order #"
+          className={`${classes.textField}`}
+          value={order.stripePaymentIntentId}
           inputProps={{
             readOnly: true,
           }}
@@ -77,7 +87,9 @@ const OrderDetail: React.FunctionComponent<OrderDetailPropsType> = ({ order }) =
           id="order-total-cost"
           label="Total Cost"
           className={`${classes.textField}`}
-          value={cadCurrencyFormat(order.taxCost + order.productCost + order.shippingCost)}
+          value={cadCurrencyFormat(
+            order.taxCost + order.productCost + order.shippingCost
+          )}
           inputProps={{
             readOnly: true,
             startAdornment: <InputAdornment position="start">$</InputAdornment>,
@@ -85,7 +97,7 @@ const OrderDetail: React.FunctionComponent<OrderDetailPropsType> = ({ order }) =
         />
       </Box>
     </React.Fragment>
-  )
-}
+  );
+};
 
-export default OrderDetail
+export default OrderDetail;

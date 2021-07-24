@@ -1,25 +1,40 @@
-import DateFnsUtils from '@date-io/date-fns';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormLabel from '@material-ui/core/FormLabel';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import MenuItem from '@material-ui/core/MenuItem';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
-import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { defaultProductVariantValidationData, ProductVariantDataType, ProductVariantSizeType, ProductVariantType, ProductVariantValidationDataType, productVariantSizeObj, generateDefaultProductVariantData } from 'domain/product/types';
-import { useValidation } from 'hooks/validation';
-import { productVariantSchema } from 'hooks/validation/rules';
-import * as React from 'react';
-import { ChromePicker, ColorResult } from 'react-color';
-import { useDispatch, useSelector } from 'react-redux';
-import { useLocation } from 'react-router';
-import { postProductVariantActionCreator, putProductVariantActionCreator } from 'reducers/slices/domain/product';
-import { mSelector } from 'src/selectors/selector';
+import DateFnsUtils from "@date-io/date-fns";
+import Checkbox from "@material-ui/core/Checkbox";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormLabel from "@material-ui/core/FormLabel";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import MenuItem from "@material-ui/core/MenuItem";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
+import {
+  KeyboardDatePicker,
+  MuiPickersUtilsProvider,
+} from "@material-ui/pickers";
+import {
+  defaultProductVariantValidationData,
+  ProductVariantDataType,
+  ProductVariantSizeType,
+  ProductVariantType,
+  ProductVariantValidationDataType,
+  productVariantSizeObj,
+  generateDefaultProductVariantData,
+} from "domain/product/types";
+import { useValidation } from "hooks/validation";
+import { productVariantSchema } from "hooks/validation/rules";
+import * as React from "react";
+import { ChromePicker, ColorResult } from "react-color";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router";
+import {
+  postProductVariantActionCreator,
+  putProductVariantActionCreator,
+} from "reducers/slices/domain/product";
+import { mSelector } from "src/selectors/selector";
 
 interface AdminProductVariantFormPropsType {
-  productVariant: ProductVariantType
+  productVariant: ProductVariantType;
+  open: boolean;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -29,7 +44,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     subtitle: {
       margin: theme.spacing(1, 0),
-      fontWeight: theme.typography.fontWeightBold
+      fontWeight: theme.typography.fontWeightBold,
     },
     noteMsg: {
       color: theme.palette.secondary.main,
@@ -67,11 +82,9 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: 200,
       minWidth: 200,
     },
-    productDateInput: {
-    },
-    actionBox: {
-    },
-  }),
+    productDateInput: {},
+    actionBox: {},
+  })
 );
 
 // A custom hook that builds on useLocation to parse
@@ -97,163 +110,217 @@ function useQuery() {
  *
  *    - 6. display result popup message
  **/
-const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPropsType>((props, ref) => {
-
+const AdminProductVariantForm = React.forwardRef<
+  any,
+  AdminProductVariantFormPropsType
+>((props, ref) => {
   // mui: makeStyles
   const classes = useStyles();
 
   // query params
   const query = useQuery();
-  const targetProductId = query.get("productId")
+  const targetProductId = query.get("productId");
 
   // auth
-  const auth = useSelector(mSelector.makeAuthSelector())
+  const auth = useSelector(mSelector.makeAuthSelector());
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   // update/create logic for product
   //  - true: create
   //  - false: update
   // if props.product exists, it updates, otherwise, new
-  const [isNew, setNew] = React.useState<boolean>(props.productVariant ? false : true);
+  const [isNew, setNew] = React.useState<boolean>(true);
 
   // temp user account state
-  const [curProductVariantState, setProductVariantState] = React.useState<ProductVariantDataType>(props.productVariant ? props.productVariant : generateDefaultProductVariantData());
+  const [curProductVariantState, setProductVariantState] =
+    React.useState<ProductVariantDataType>(generateDefaultProductVariantData());
+
+  // switch update/create
+  React.useEffect(() => {
+    /**
+     * need this 'props.open' since if user open 'edit' after the anotehr 'edit', it still previous input exists.
+     * so every time form is open, we need to set target entity state.
+     */
+    if (props.open) {
+      if (props.productVariant) {
+        setNew(false);
+        setProductVariantState(props.productVariant);
+      } else {
+        setNew(true);
+        setProductVariantState(generateDefaultProductVariantData());
+      }
+    }
+  }, [JSON.stringify(props.productVariant), props.open]);
 
   // validation logic (should move to hooks)
-  const [curProductVariantValidationState, setProductVariantValidationState] = React.useState<ProductVariantValidationDataType>(defaultProductVariantValidationData);
+  const [curProductVariantValidationState, setProductVariantValidationState] =
+    React.useState<ProductVariantValidationDataType>(
+      defaultProductVariantValidationData
+    );
 
-  const { updateValidationAt, updateAllValidation, updateValidationAtMultiple, isValidSync } = useValidation({
+  const {
+    updateValidationAt,
+    updateAllValidation,
+    updateValidationAtMultiple,
+    isValidSync,
+  } = useValidation({
     curDomain: curProductVariantState,
     curValidationDomain: curProductVariantValidationState,
     schema: productVariantSchema,
     setValidationDomain: setProductVariantValidationState,
     defaultValidationDomain: defaultProductVariantValidationData,
-  })
+  });
 
   // unit price disable stuff
-  const [curUnitPriceDisable, setUnitPriceDisable] = React.useState<boolean>(false);
+  const [curUnitPriceDisable, setUnitPriceDisable] =
+    React.useState<boolean>(false);
 
-  const handleUnitPriceDisable: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextProductVariantUnitPriceDisable: boolean = e.currentTarget.checked
-    setUnitPriceDisable(nextProductVariantUnitPriceDisable)
+  const handleUnitPriceDisable: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextProductVariantUnitPriceDisable: boolean = e.currentTarget.checked;
+    setUnitPriceDisable(nextProductVariantUnitPriceDisable);
     if (nextProductVariantUnitPriceDisable) {
       setProductVariantState((prev: ProductVariantDataType) => ({
         ...prev,
         variantUnitPrice: null,
-      }))
+      }));
     } else {
       setProductVariantState((prev: ProductVariantDataType) => ({
         ...prev,
         variantUnitPrice: 1,
-      }))
+      }));
     }
-  }
+  };
 
   // test product variant size list
   // #TODO: replace with real one when you are ready
-  const productVariantSizeList = Object.values(productVariantSizeObj)
+  const productVariantSizeList = Object.values(productVariantSizeObj);
 
   // event handlers
-  const handleProductVariantUnitPriceInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextVariantUnitPrice = e.target.value
+  const handleProductVariantUnitPriceInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextVariantUnitPrice = e.target.value;
     // must not be null
     updateValidationAt("variantUnitPrice", nextVariantUnitPrice);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
-      variantUnitPrice: parseInt(nextVariantUnitPrice)
+      variantUnitPrice: parseInt(nextVariantUnitPrice),
     }));
-  }
+  };
 
   // event handlers
-  const handleProductVariantSizeInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
+  const handleProductVariantSizeInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
     /**
      * DON'T user 'e.currentTarget' for select
      **/
-    const nextVariantSize = productVariantSizeList.find((size: ProductVariantSizeType) => e.target.value === size.productSizeId)
+    const nextVariantSize = productVariantSizeList.find(
+      (size: ProductVariantSizeType) => e.target.value === size.productSizeId
+    );
     // must not be null
     updateValidationAt("productSize", e.target.value);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
-      productSize: nextVariantSize
+      productSize: nextVariantSize,
     }));
-  }
+  };
 
-  const handleProductVariantColorInputChangeEvent: (color: ColorResult, event: React.ChangeEvent<HTMLInputElement>) => void = (color, event) => {
+  const handleProductVariantColorInputChangeEvent: (
+    color: ColorResult,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => void = (color, event) => {
     updateValidationAt("variantColor", color.hex);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
       variantColor: color.hex,
     }));
-  }
+  };
 
   // event handlers
-  const handleProductVariantStockInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextVariantStock = e.target.value
+  const handleProductVariantStockInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextVariantStock = e.target.value;
     // must not be null
     updateValidationAt("variantStock", nextVariantStock);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
-      variantStock: parseInt(nextVariantStock)
+      variantStock: parseInt(nextVariantStock),
     }));
-  }
+  };
 
-  const handleProductVariantWeightInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextVariantWeight = e.target.value
+  const handleProductVariantWeightInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextVariantWeight = e.target.value;
     // must not be null
     updateValidationAt("variantWeight", nextVariantWeight);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
-      variantWeight: parseFloat(nextVariantWeight)
+      variantWeight: parseFloat(nextVariantWeight),
     }));
-  }
+  };
 
-  const handleProductVariantLengthInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextVariantLength = e.target.value
+  const handleProductVariantLengthInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextVariantLength = e.target.value;
     // must not be null
     updateValidationAt("variantLength", nextVariantLength);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
-      variantLength: parseFloat(nextVariantLength)
+      variantLength: parseFloat(nextVariantLength),
     }));
-  }
+  };
 
-  const handleProductVariantWidthInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextVariantWidth = e.target.value
+  const handleProductVariantWidthInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextVariantWidth = e.target.value;
     // must not be null
     updateValidationAt("variantWidth", nextVariantWidth);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
-      variantWidth: parseFloat(nextVariantWidth)
+      variantWidth: parseFloat(nextVariantWidth),
     }));
-  }
+  };
 
-  const handleProductVariantHeightInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextVariantHeight = e.target.value
+  const handleProductVariantHeightInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextVariantHeight = e.target.value;
     // must not be null
     updateValidationAt("variantHeight", nextVariantHeight);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
-      variantHeight: parseFloat(nextVariantHeight)
+      variantHeight: parseFloat(nextVariantHeight),
     }));
-  }
+  };
 
-  const handleProductVariantDiscountChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextProductVariantDiscount: boolean = e.currentTarget.checked
+  const handleProductVariantDiscountChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextProductVariantDiscount: boolean = e.currentTarget.checked;
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
       isDiscount: nextProductVariantDiscount,
     }));
-  }
+  };
 
-  const handleProductVariantDiscountPriceInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextProductVariantDiscountPrice = e.target.value
+  const handleProductVariantDiscountPriceInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextProductVariantDiscountPrice = e.target.value;
     updateValidationAt("variantDiscountPrice", nextProductVariantDiscountPrice);
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
       variantDiscountPrice: parseFloat(nextProductVariantDiscountPrice),
     }));
-  }
+  };
 
   const handleProductVariantDiscountStartDateChange = (date: Date | null) => {
     setProductVariantState((prev: ProductVariantDataType) => ({
@@ -263,7 +330,6 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
   };
 
   const handleProductVariantDiscountEndDateChange = (date: Date | null) => {
-
     setProductVariantState((prev: ProductVariantDataType) => ({
       ...prev,
       variantDiscountEndDate: date,
@@ -274,75 +340,79 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
    * validation for multiple fields together
    **/
   React.useEffect(() => {
-
     updateValidationAtMultiple([
       {
         key: "variantDiscountStartDate",
-        value: curProductVariantState.variantDiscountStartDate
+        value: curProductVariantState.variantDiscountStartDate,
       },
       {
         key: "variantDiscountEndDate",
-        value: curProductVariantState.variantDiscountEndDate
+        value: curProductVariantState.variantDiscountEndDate,
       },
-    ])
+    ]);
   }, [
     curProductVariantState.variantDiscountStartDate,
-    curProductVariantState.variantDiscountEndDate
-  ])
+    curProductVariantState.variantDiscountEndDate,
+  ]);
 
   /**
-   * call child function from parent 
+   * call child function from parent
    *
    * ref: https://stackoverflow.com/questions/37949981/call-child-method-from-parent
    *
    **/
   React.useImperativeHandle(ref, () => ({
-
     // event handler to submit
     handleSaveClickEvent: (e: React.MouseEvent<HTMLButtonElement>) => {
-
-      const isValid: boolean = isValidSync(curProductVariantState)
+      const isValid: boolean = isValidSync(curProductVariantState);
 
       console.log(isValid);
 
       if (isValid) {
-        // pass 
-        console.log("passed")
+        // pass
+        console.log("passed");
 
         if (isNew) {
-          console.log("new product creation")
+          console.log("new product creation");
           // request
           dispatch(
             postProductVariantActionCreator({
               ...curProductVariantState,
               // if user check 'same of product unit price', don't send variant unit price. instead send null.
-              variantUnitPrice: curUnitPriceDisable ? null : curProductVariantState.variantUnitPrice, 
+              variantUnitPrice: curUnitPriceDisable
+                ? null
+                : curProductVariantState.variantUnitPrice,
               // if isDiscount = false, don't send variant discount price.
-              variantDiscountPrice: curProductVariantState.isDiscount ? curProductVariantState.variantDiscountPrice : null, 
+              variantDiscountPrice: curProductVariantState.isDiscount
+                ? curProductVariantState.variantDiscountPrice
+                : null,
               productId: targetProductId,
             })
-          )
-
+          );
         } else {
-          console.log("new product creation")
+          console.log("new product creation");
           // request
           dispatch(
             putProductVariantActionCreator({
               ...curProductVariantState,
               // if user check 'same of product unit price', don't send variant unit price. instead send null.
-              variantUnitPrice: curUnitPriceDisable ? null : curProductVariantState.variantUnitPrice, 
+              variantUnitPrice: curUnitPriceDisable
+                ? null
+                : curProductVariantState.variantUnitPrice,
               // if isDiscount = false, don't send variant discount price.
-              variantDiscountPrice: curProductVariantState.isDiscount ? curProductVariantState.variantDiscountPrice : null, 
+              variantDiscountPrice: curProductVariantState.isDiscount
+                ? curProductVariantState.variantDiscountPrice
+                : null,
               productId: targetProductId,
             })
-          )
+          );
         }
       } else {
-        console.log("failed")
-        updateAllValidation()
+        console.log("failed");
+        updateAllValidation();
       }
-    }
-  }))
+    },
+  }));
 
   return (
     <form className={classes.form} noValidate autoComplete="off">
@@ -371,14 +441,17 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
           />
         }
         label={
-          <Typography variant="subtitle2" component="span" color="textSecondary">
+          <Typography
+            variant="subtitle2"
+            component="span"
+            color="textSecondary"
+          >
             {"Same as Product Base?"}
           </Typography>
         }
-      /><br />
-      <FormLabel>
-        {"Variant Color"}
-      </FormLabel>
+      />
+      <br />
+      <FormLabel>{"Variant Color"}</FormLabel>
       <ChromePicker
         color={curProductVariantState.variantColor}
         onChangeComplete={handleProductVariantColorInputChangeEvent}
@@ -388,7 +461,11 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
         label="Size"
         className={`${classes.txtFieldBase} ${classes.productSizeInput}`}
         select
-        value={curProductVariantState.productSize ? curProductVariantState.productSize.productSizeId : "1"}
+        value={
+          curProductVariantState.productSize
+            ? curProductVariantState.productSize.productSizeId
+            : "1"
+        }
         onChange={handleProductVariantSizeInputChangeEvent}
         helperText={curProductVariantValidationState.productSize}
         error={curProductVariantValidationState.productSize !== ""}
@@ -398,7 +475,8 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
             {size.productSizeName}
           </MenuItem>
         ))}
-      </TextField><br />
+      </TextField>
+      <br />
       <TextField
         id="product-variant-stock"
         label="Stock"
@@ -408,7 +486,8 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
         onChange={handleProductVariantStockInputChangeEvent}
         helperText={curProductVariantValidationState.variantStock}
         error={curProductVariantValidationState.variantStock !== ""}
-      /><br />
+      />
+      <br />
       <TextField
         id="product-variant-weight"
         label="Weight"
@@ -460,7 +539,8 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
         InputProps={{
           endAdornment: <InputAdornment position="end">Cm</InputAdornment>,
         }}
-      /><br />
+      />
+      <br />
       <FormControlLabel
         control={
           <Checkbox
@@ -471,7 +551,8 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
           />
         }
         label="Variant Discount?"
-      /><br />
+      />
+      <br />
       <TextField
         id="product-variant-discount-price"
         label="Discount Price"
@@ -485,7 +566,8 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
         InputProps={{
           startAdornment: <InputAdornment position="start">$</InputAdornment>,
         }}
-      /><br />
+      />
+      <br />
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <KeyboardDatePicker
           margin="normal"
@@ -496,9 +578,11 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
           onChange={handleProductVariantDiscountStartDateChange}
           disabled={!curProductVariantState.isDiscount}
           helperText={curProductVariantValidationState.variantDiscountStartDate}
-          error={curProductVariantValidationState.variantDiscountStartDate !== ""}
+          error={
+            curProductVariantValidationState.variantDiscountStartDate !== ""
+          }
           KeyboardButtonProps={{
-            'aria-label': 'change date',
+            "aria-label": "change date",
           }}
           className={classes.productDateInput}
         />
@@ -513,13 +597,13 @@ const AdminProductVariantForm = React.forwardRef<any, AdminProductVariantFormPro
           helperText={curProductVariantValidationState.variantDiscountEndDate}
           error={curProductVariantValidationState.variantDiscountEndDate !== ""}
           KeyboardButtonProps={{
-            'aria-label': 'change date',
+            "aria-label": "change date",
           }}
           className={classes.productDateInput}
         />
       </MuiPickersUtilsProvider>
     </form>
-  )
-})
+  );
+});
 
-export default AdminProductVariantForm
+export default AdminProductVariantForm;

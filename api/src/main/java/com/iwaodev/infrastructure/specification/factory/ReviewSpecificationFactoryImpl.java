@@ -16,27 +16,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReviewSpecificationFactoryImpl implements ReviewSpecificationFactory {
 
-  private ReviewSpecifications specifications;
+    private ReviewSpecifications specifications;
 
-  @Autowired
-  public ReviewSpecificationFactoryImpl(ReviewSpecifications specifications) {
-    this.specifications = specifications;
-  }
+    @Autowired
+    public ReviewSpecificationFactoryImpl(ReviewSpecifications specifications) {
+        this.specifications = specifications;
+    }
 
-	@Override
-	public Specification<Review> build(ReviewQueryStringCriteria criteria) {
-    return this.specifications.isBlongToUserOf(criteria.getUserId())
-      .and(this.specifications.isBlongToProductOf(criteria.getProductId()))
-      .and(this.specifications.isGreaterThanReviewPointOf(criteria.getReviewPoint()))
-      .and(this.specifications.isVerify(criteria.getIsVerified()))
-      .and(this.specifications.createdDateAfter(criteria.getStartDate()))
-      .and(this.specifications.createdDateBefore(criteria.getEndDate()))
-      .and(
-          this.specifications.searchQueryByReviewTitle(criteria.getSearchQuery())
-            .or(this.specifications.searchQueryByReviewDescription(criteria.getSearchQuery()))
-            .or(this.specifications.searchQueryByUserId(criteria.getSearchQuery()))
-            .or(this.specifications.searchQueryByProductId(criteria.getSearchQuery()))
-          );
-	}
+    @Override
+    public Specification<Review> build(ReviewQueryStringCriteria criteria) {
+        return this.specifications.isBlongToUserOf(criteria.getUserId())
+                .and(this.specifications.isBlongToProductOf(criteria.getProductId()))
+                .and(this.specifications.isGreaterThanReviewPointOf(criteria.getReviewPoint()))
+                .and(this.specifications.isVerify(criteria.getIsVerified()))
+                .and(this.specifications.createdDateAfter(criteria.getStartDate()))
+                .and(this.specifications.createdDateBefore(criteria.getEndDate()))
+                .and(
+                        this.specifications.searchQueryByReviewTitle(criteria.getSearchQuery())
+                                .or(this.specifications.searchQueryByReviewDescription(criteria.getSearchQuery()))
+                                .or(this.specifications.searchQueryByUserId(criteria.getSearchQuery()))
+                                .or(this.specifications.searchQueryByProductId(criteria.getSearchQuery()))
+                                .or(this.specifications.searchQueryByReviewId(criteria.getSearchQuery()))
+                );
+    }
 }
 

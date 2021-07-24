@@ -189,7 +189,7 @@ export const initialState: StateType = {
       },
       pagination: {
         page: 0, // start from 0 (not 1)
-        limit: 10,
+        limit: 20,
         totalPages: 1,
         totalElements: 0,
       },
@@ -199,7 +199,7 @@ export const initialState: StateType = {
       data: [],
       pagination: {
         page: 0, // start from 0 (not 1)
-        limit: 10,
+        limit: 20,
         totalPages: 1,
         totalElements: 0,
       },
@@ -225,7 +225,7 @@ export const initialState: StateType = {
       },
       pagination: {
         page: 0, // start from 0 (not 1)
-        limit: 10,
+        limit: 20,
         totalPages: 1,
         totalElements: 0,
       },
@@ -241,7 +241,7 @@ export const initialState: StateType = {
       },
       pagination: {
         page: 0, // start from 0 (not 1)
-        limit: 10,
+        limit: 20,
         totalPages: 1,
         totalElements: 0,
       },
@@ -250,7 +250,7 @@ export const initialState: StateType = {
       data: [],
       pagination: {
         page: 0, // start from 0 (not 1)
-        limit: 10,
+        limit: 20,
         totalPages: 1,
         totalElements: 0,
       },

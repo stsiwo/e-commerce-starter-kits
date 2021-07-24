@@ -53,9 +53,9 @@
         admin
         link: admin order management
     -->
-    <p th:text="${'Hi Admin ' + admin.firstName + ' ' + admin.lastName}"></p><br />
+    <p th:text="${'Hi Admin ' + admin.firstName + ' ' + admin.lastName}"></p>
 
-    <p>A cancel reqeust was submitted by a customer. Please refer to the detail below:</p><br />
+    <p>A cancel reqeust was submitted by a customer. Please refer to the detail below:</p>
     
     <h4>Customer Information</h4>
     <p>Name: <b th:text="${order.orderFirstName + ' ' + order.orderLastName}"></b></p>
@@ -68,6 +68,7 @@
 
     <h4>Items Information</h4>
     <p>Order #: <b th:text="${order.orderNumber}"></b></p>
+    <p th:if="${order.estimatedDeliveryDate != null}">Estimated Delivery Date: <b th:text="${order.displayEstimatedDeliveryDate()}">N/A</b></p>
     <table class="styled-table">
      <thead>
          <tr>

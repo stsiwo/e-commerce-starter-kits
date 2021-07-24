@@ -35,6 +35,15 @@ export function toAddressString(address: UserAddressType): string {
   return `${address.address1} ${address.address2} ${address.city} ${address.province} ${address.country} ${address.postalCode}`
 }
 
+export function toAddressStringWithNewLine(address: UserAddressType): string {
+  return `${address.address1} ${address.address2}\n${address.city}, ${address.province} ${address.postalCode}\n${address.country}`
+}
+
+export function toCompanyAddressStringWithNewLine(address1: string, address2: string, city: string, province: string, postalCode: string, country: string): string {
+  return `${address1} ${address2}<br />${city}, ${province} ${postalCode}<br />${country}`
+}
+
+
 
 export function toPhoneString(phone: UserPhoneType): string {
   return `${phone.countryCode} ${phone.phoneNumber}`

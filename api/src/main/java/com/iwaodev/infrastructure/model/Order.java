@@ -2,6 +2,7 @@ package com.iwaodev.infrastructure.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +28,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+import com.iwaodev.domain.order.OrderEventBag;
 import com.iwaodev.domain.order.OrderStatusEnum;
 import com.iwaodev.domain.order.validator.OrderValidation;
 import com.iwaodev.infrastructure.model.listener.OrderListener;
@@ -63,12 +65,13 @@ import lombok.ToString;
 @Entity(name = "orders")
 public class Order {
 
+  /**
+   * you cannot use @Autowired in Hibernate Entity. be careful.
+   */
+
   private static final Logger logger = LoggerFactory.getLogger(Order.class);
 
-  private static final OrderStatusEnum[] deletableOrderStatusList = new OrderStatusEnum[] {
-      OrderStatusEnum.CANCEL_REQUEST, OrderStatusEnum.RECEIVED_CANCEL_REQUEST, OrderStatusEnum.DELIVERED,
-      OrderStatusEnum.RETURN_REQUEST, OrderStatusEnum.RECEIVED_RETURN_REQUEST, OrderStatusEnum.SHIPPED,
-      OrderStatusEnum.ERROR, };
+  private static final OrderEventBag orderEventBag = new OrderEventBag();
 
   @NotNull(message = "{order.id.notnull}", groups = OnUpdate.class)
   @Null(message = "{order.id.null}", groups = OnCreate.class)
@@ -519,150 +522,22 @@ public class Order {
     logger.info("before setlatestorderevent");
     this.setLatestOrderEvent(latestEvent);
     logger.info("before setnextadminorder");
-    this.setNextAdminOrderEventOptions(this.getNextAddableOrderEventStatusForAdmin(latestEvent.getOrderStatus()));
+    this.setNextAdminOrderEventOptions(this.orderEventBag.map.get(latestEvent.getOrderStatus()).getNextAddableEventsForAdmin());
     logger.info("before setnextmemberorder");
-    this.setNextMemberOrderEventOptions(this.getNextAddableOrderEventStatusForMember(latestEvent.getOrderStatus()));
+    this.setNextMemberOrderEventOptions(this.orderEventBag.map.get(latestEvent.getOrderStatus()).getNextAddableEventsForMember());
     logger.info("done");
   }
 
   public boolean isAddableAsNextForAdmin(OrderStatusEnum curOrderStatus, OrderStatusEnum latestOrderStatus) {
-    List<OrderStatusEnum> addableOrderStatusList = this.getNextAddableOrderEventStatusForAdmin(latestOrderStatus);
+    List<OrderStatusEnum> addableOrderStatusList = this.orderEventBag.map.get(latestOrderStatus).getNextAddableEventsForAdmin();
     return addableOrderStatusList.contains(curOrderStatus);
   }
 
   public boolean isAddableAsNextForMember(OrderStatusEnum curOrderStatus, OrderStatusEnum latestOrderStatus) {
-    List<OrderStatusEnum> addableOrderStatusList = this.getNextAddableOrderEventStatusForMember(latestOrderStatus);
+    List<OrderStatusEnum> addableOrderStatusList = this.orderEventBag.map.get(latestOrderStatus).getNextAddableEventsForMember();
     return addableOrderStatusList.contains(curOrderStatus);
   }
 
-  /**
-   * get a list of the next available order event for admin.
-   *
-   **/
-  public List<OrderStatusEnum> getNextAddableOrderEventStatusForAdmin(OrderStatusEnum curOrderStatus) {
-    if (curOrderStatus.equals(OrderStatusEnum.DRAFT)) {
-      return new ArrayList<OrderStatusEnum>() {
-        {
-          add(OrderStatusEnum.ORDERED);
-          add(OrderStatusEnum.SESSION_TIMEOUT);
-          add(OrderStatusEnum.ERROR);
-        }
-      };
-    } else if (curOrderStatus.equals(OrderStatusEnum.SESSION_TIMEOUT)) {
-      return new ArrayList<OrderStatusEnum>() {
-        {
-          add(OrderStatusEnum.ERROR);
-        }
-      };
-    } else if (curOrderStatus.equals(OrderStatusEnum.ORDERED)) {
-      return new ArrayList<OrderStatusEnum>() {
-        {
-          add(OrderStatusEnum.PAYMENT_FAILED);
-          add(OrderStatusEnum.PAID);
-          add(OrderStatusEnum.ERROR);
-        }
-      };
-    } else if (curOrderStatus.equals(OrderStatusEnum.PAYMENT_FAILED)) {
-      return new ArrayList<OrderStatusEnum>() {
-        {
-          add(OrderStatusEnum.ERROR);
-        }
-      };
-    } else if (curOrderStatus.equals(OrderStatusEnum.PAID)) {
-      return new ArrayList<OrderStatusEnum>() {
-        {
-          add(OrderStatusEnum.SHIPPED);
-          add(OrderStatusEnum.CANCEL_REQUEST);
-          add(OrderStatusEnum.ERROR);
-        }
-      };
-    } else if (curOrderStatus.equals(OrderStatusEnum.CANCEL_REQUEST)) {
-      return new ArrayList<OrderStatusEnum>() {
-        {
-          add(OrderStatusEnum.RECEIVED_CANCEL_REQUEST);
-          add(OrderStatusEnum.ERROR);
-        }
-      };
-    } else if (curOrderStatus.equals(OrderStatusEnum.RECEIVED_CANCEL_REQUEST)) {
-      return new ArrayList<OrderStatusEnum>() {
-        {
-          add(OrderStatusEnum.CANCELED);
-          add(OrderStatusEnum.ERROR);
-        }
-      };
-    } else if (curOrderStatus.equals(OrderStatusEnum.CANCELED)) {
-      return new ArrayList<OrderStatusEnum>() {
-        {
-          add(OrderStatusEnum.ERROR);
-        }
-      };
-    } else if (curOrderStatus.equals(OrderStatusEnum.SHIPPED)) {
-      return new ArrayList<OrderStatusEnum>() {
-        {
-          add(OrderStatusEnum.DELIVERED);
-          add(OrderStatusEnum.RETURN_REQUEST);
-          add(OrderStatusEnum.ERROR);
-        }
-      };
-    } else if (curOrderStatus.equals(OrderStatusEnum.RETURN_REQUEST)) {
-      return new ArrayList<OrderStatusEnum>() {
-        {
-          add(OrderStatusEnum.RECEIVED_RETURN_REQUEST);
-          add(OrderStatusEnum.ERROR);
-        }
-      };
-    } else if (curOrderStatus.equals(OrderStatusEnum.RECEIVED_RETURN_REQUEST)) {
-      return new ArrayList<OrderStatusEnum>() {
-        {
-          add(OrderStatusEnum.RETURNED);
-          add(OrderStatusEnum.ERROR);
-        }
-      };
-    } else if (curOrderStatus.equals(OrderStatusEnum.RETURNED)) {
-      return new ArrayList<OrderStatusEnum>() {
-        {
-          add(OrderStatusEnum.ERROR);
-        }
-      };
-    } else if (curOrderStatus.equals(OrderStatusEnum.DELIVERED)) {
-      return new ArrayList<OrderStatusEnum>() {
-        {
-          add(OrderStatusEnum.RETURN_REQUEST);
-          add(OrderStatusEnum.ERROR);
-        }
-      };
-    } else {
-      return new ArrayList<OrderStatusEnum>();
-    }
-  }
-
-  /**
-   * get a list of the next available order event for member.
-   *
-   **/
-  public List<OrderStatusEnum> getNextAddableOrderEventStatusForMember(OrderStatusEnum curOrderStatus) {
-    if (curOrderStatus.equals(OrderStatusEnum.PAID)) {
-      return new ArrayList<OrderStatusEnum>() {
-        {
-          add(OrderStatusEnum.CANCEL_REQUEST);
-        }
-      };
-    } else if (curOrderStatus.equals(OrderStatusEnum.SHIPPED)) {
-      return new ArrayList<OrderStatusEnum>() {
-        {
-          add(OrderStatusEnum.RETURN_REQUEST);
-        }
-      };
-    } else if (curOrderStatus.equals(OrderStatusEnum.DELIVERED)) {
-      return new ArrayList<OrderStatusEnum>() {
-        {
-          add(OrderStatusEnum.RETURN_REQUEST);
-        }
-      };
-    } else {
-      return new ArrayList<OrderStatusEnum>();
-    }
-  }
 
   public boolean isAddableByMember(OrderEvent orderEvent) {
     return orderEvent.isAddableByMember();
@@ -681,13 +556,7 @@ public class Order {
     OrderEvent event = new OrderEvent();
     event.setOrderStatus(orderStatus);
     event.setNote(note);
-
-    if (Arrays.asList(this.deletableOrderStatusList).contains(orderStatus)) {
-      event.setUndoable(true);
-    } else {
-      event.setUndoable(false);
-    }
-
+    event.setUndoable(orderEventBag.map.get(orderStatus).getIsUndoable());
     return event;
   }
 
@@ -708,4 +577,11 @@ public class Order {
     return this.getTotalCost().longValue() * 100;
   }
 
+  /**
+   *  show string format (12th June 2021) of estimatedDeliveryDate field.
+   *
+   */
+  public String displayEstimatedDeliveryDate() {
+    return this.estimatedDeliveryDate.toLocalDate().format(DateTimeFormatter.ofPattern("dd-MMM-yyyy"));
+  }
 }

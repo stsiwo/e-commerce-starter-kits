@@ -262,9 +262,16 @@ public class ProductVariant {
 
     if (this.getVariantUnitPrice() != null) {
       return this.getVariantUnitPrice();
-    } 
+    }
 
-    return this.product.getProductBaseUnitPrice();
+    /**
+     * when deleting product variant, it will complain about nullpointerexception for 'this.product'.
+     */
+    if (this.product != null)  {
+      return this.product.getProductBaseUnitPrice();
+    }
+
+    return BigDecimal.valueOf(0.00);
   }
 
   public boolean isHasOwnPrice() {

@@ -1,44 +1,50 @@
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Grid from '@material-ui/core/Grid';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
-import Rating from '@material-ui/lab/Rating';
-import { AxiosError } from 'axios';
-import UserCard from 'components/common/UserCard';
-import ReviewProductHorizontalCard from 'components/pages/Admin/AdminReview/AdminReviewForm/ReviewProductHorizontalCard';
-import { api } from 'configs/axiosConfig';
-import { defaultReviewValidationData, ReviewDataType, ReviewType, ReviewValidationDataType } from 'domain/review/type';
-import { useValidation } from 'hooks/validation';
-import { reviewSchema } from 'hooks/validation/rules';
-import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router';
-import { messageActions } from 'reducers/slices/app';
-import { postReviewActionCreator, putReviewActionCreator } from 'reducers/slices/domain/review';
-import { MessageTypeEnum } from 'src/app';
-import { mSelector } from 'src/selectors/selector';
-import { getNanoId } from 'src/utils';
-import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
+import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import Grid from "@material-ui/core/Grid";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
+import Rating from "@material-ui/lab/Rating";
+import { AxiosError } from "axios";
+import UserCard from "components/common/UserCard";
+import ReviewProductHorizontalCard from "components/pages/Admin/AdminReview/AdminReviewForm/ReviewProductHorizontalCard";
+import { api } from "configs/axiosConfig";
+import {
+  defaultReviewValidationData,
+  ReviewDataType,
+  ReviewType,
+  ReviewValidationDataType,
+} from "domain/review/type";
+import { useValidation } from "hooks/validation";
+import { reviewSchema } from "hooks/validation/rules";
+import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router";
+import { messageActions } from "reducers/slices/app";
+import {
+  postReviewActionCreator,
+  putReviewActionCreator,
+} from "reducers/slices/domain/review";
+import { MessageTypeEnum } from "src/app";
+import { mSelector } from "src/selectors/selector";
+import { getNanoId } from "src/utils";
+import VerifiedUserIcon from "@material-ui/icons/VerifiedUser";
 
 interface ReviewFormPropsType {
-  review: ReviewType
-  isNew: boolean
+  review: ReviewType;
+  isNew: boolean;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    orderDetailBox: {
-
-    },
+    orderDetailBox: {},
     title: {
       textAlign: "center",
-      fontWeight: theme.typography.fontWeightBold
+      fontWeight: theme.typography.fontWeightBold,
     },
     form: {
       margin: theme.spacing(1),
@@ -49,14 +55,14 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: 500,
       margin: theme.spacing(1, 0, 1, 0),
     },
-    actionBox: {
-    },
+    actionBox: {},
     reviewStatus: {
+      margin: `${theme.spacing(1)}px 0`,
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-    }
-  }),
+    },
+  })
 );
 
 /**
@@ -77,13 +83,12 @@ const useStyles = makeStyles((theme: Theme) =>
  *    - 6. display result popup message
  **/
 const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
-
   // mui: makeStyles
   const classes = useStyles();
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const history = useHistory()
+  const history = useHistory();
 
   const auth = useSelector(mSelector.makeAuthSelector());
 
@@ -93,59 +98,69 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
   // if props.product exists, it updates, otherwise, new
   const [isNew, setNew] = React.useState<boolean>(props.isNew);
   // temp user account state
-  const [curReviewState, setReviewState] = React.useState<ReviewDataType>(props.review);
+  const [curReviewState, setReviewState] = React.useState<ReviewDataType>(
+    props.review
+  );
 
   // validation logic (should move to hooks)
-  const [curReviewValidationState, setReviewValidationState] = React.useState<ReviewValidationDataType>(defaultReviewValidationData);
+  const [curReviewValidationState, setReviewValidationState] =
+    React.useState<ReviewValidationDataType>(defaultReviewValidationData);
 
-  const { updateValidationAt, updateAllValidation, isValidSync } = useValidation({
-    curDomain: curReviewState,
-    curValidationDomain: curReviewValidationState,
-    schema: reviewSchema,
-    setValidationDomain: setReviewValidationState,
-    defaultValidationDomain: defaultReviewValidationData,
-  })
+  const { updateValidationAt, updateAllValidation, isValidSync } =
+    useValidation({
+      curDomain: curReviewState,
+      curValidationDomain: curReviewValidationState,
+      schema: reviewSchema,
+      setValidationDomain: setReviewValidationState,
+      defaultValidationDomain: defaultReviewValidationData,
+    });
 
   // event handlers
-  const handleReviewTitleInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextReviewTitle = e.currentTarget.value
+  const handleReviewTitleInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextReviewTitle = e.currentTarget.value;
     updateValidationAt("reviewTitle", e.currentTarget.value);
     setReviewState((prev: ReviewDataType) => ({
       ...prev,
-      reviewTitle: nextReviewTitle
+      reviewTitle: nextReviewTitle,
     }));
-  }
+  };
 
-  const handleReviewDescriptionInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextReviewDescription = e.currentTarget.value
+  const handleReviewDescriptionInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextReviewDescription = e.currentTarget.value;
     updateValidationAt("reviewDescription", e.currentTarget.value);
     setReviewState((prev: ReviewDataType) => ({
       ...prev,
-      reviewDescription: nextReviewDescription
+      reviewDescription: nextReviewDescription,
     }));
-  }
+  };
 
-  const handleReviewPointInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextReviewPoint = e.currentTarget.value
+  const handleReviewPointInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextReviewPoint = e.currentTarget.value;
     updateValidationAt("reviewPoint", e.currentTarget.value);
     setReviewState((prev: ReviewDataType) => ({
       ...prev,
-      reviewPoint: parseFloat(nextReviewPoint)
+      reviewPoint: parseFloat(nextReviewPoint),
     }));
-  }
+  };
 
   // event handler to submit
   const handleSaveClickEvent = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const isValid: boolean = isValidSync(curReviewState)
+    const isValid: boolean = isValidSync(curReviewState);
 
     console.log(isValid);
 
     if (isValid) {
-      // pass 
-      console.log("passed")
+      // pass
+      console.log("passed");
 
       if (isNew) {
-        console.log("new review")
+        console.log("new review");
         dispatch(
           postReviewActionCreator({
             isVerified: false, // make sure this (member can't edit this) and every time and every time user edit this, need verfication from the admin to publish
@@ -153,12 +168,12 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
             reviewDescription: curReviewState.reviewDescription,
             note: curReviewState.note, // keep this. but this is not editable my member and not visible by member.
             reviewPoint: curReviewState.reviewPoint,
-            productId: curReviewState.product.productId,  // assign explicitly in teh case of new
+            productId: curReviewState.product.productId, // assign explicitly in teh case of new
             userId: curReviewState.user.userId,
           })
         );
       } else {
-        console.log("update review")
+        console.log("update review");
         dispatch(
           putReviewActionCreator({
             reviewId: curReviewState.reviewId,
@@ -167,31 +182,34 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
             reviewDescription: curReviewState.reviewDescription,
             note: curReviewState.note, // keep this. but this is not editable my member and not visible by member.
             reviewPoint: curReviewState.reviewPoint,
-            productId: curReviewState.product.productId,  // assign explicitly in teh case of new
+            productId: curReviewState.product.productId, // assign explicitly in teh case of new
             userId: curReviewState.user.userId,
           })
         );
       }
-
     } else {
-      console.log("failed")
-      updateAllValidation()
+      console.log("failed");
+      updateAllValidation();
     }
-  }
+  };
 
   // deleting stuff
-  const [curDeleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(false);
+  const [curDeleteDialogOpen, setDeleteDialogOpen] =
+    React.useState<boolean>(false);
 
   const handleDeleteClick = (e: React.MouseEvent<HTMLElement>) => {
     setDeleteDialogOpen(true);
-  }
+  };
 
-  const handleDeletionCancel: React.EventHandler<React.MouseEvent<HTMLElement>> = (e) => {
+  const handleDeletionCancel: React.EventHandler<
+    React.MouseEvent<HTMLElement>
+  > = (e) => {
     setDeleteDialogOpen(false);
-  }
+  };
 
-  const handleDeletionOk: React.EventHandler<React.MouseEvent<HTMLElement>> = (e) => {
-
+  const handleDeletionOk: React.EventHandler<React.MouseEvent<HTMLElement>> = (
+    e
+  ) => {
     /**
      * use different endpoint rather than /reviews like PUT, POST
      *
@@ -200,42 +218,43 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
      **/
 
     // request
-    api.request({
-      method: 'DELETE',
-      url: API1_URL + `/users/${curReviewState.user.userId}/reviews/${curReviewState.reviewId}`,
-    }).then((data) => {
+    api
+      .request({
+        method: "DELETE",
+        url:
+          API1_URL +
+          `/users/${curReviewState.user.userId}/reviews/${curReviewState.reviewId}`,
+      })
+      .then((data) => {
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.SUCCESS,
+            message: data.data.message,
+          })
+        );
 
-      dispatch(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.SUCCESS,
-          message: data.data.message,
-        })
-      )
-
-      history.push("/orders");
-
-    }).catch((error: AxiosError) => {
-      dispatch(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: error.response.data.message,
-        })
-      )
-    })
-  }
+        history.push("/orders");
+      })
+      .catch((error: AxiosError) => {
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.ERROR,
+            message: error.response.data.message,
+          })
+        );
+      });
+  };
 
   return (
-    <Grid
-      container
-      justify="center"
-    >
-      <Grid
-        item
-        xs={12}
-      >
-        <Typography variant="subtitle1" component="h6" className={classes.title}>
+    <Grid container justify="center">
+      <Grid item xs={12}>
+        <Typography
+          variant="subtitle1"
+          component="h6"
+          className={classes.title}
+        >
           {"Reviewing Customer"}
         </Typography>
         <UserCard
@@ -246,41 +265,45 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
           avatarImagePath={curReviewState.user.avatarImagePath}
         />
       </Grid>
-      <Grid
-        item
-        xs={12}
-      >
-        <Typography variant="subtitle1" component="h6" className={classes.title}>
+      <Grid item xs={12}>
+        <Typography
+          variant="subtitle1"
+          component="h6"
+          className={classes.title}
+        >
           {"Reviewed Product"}
         </Typography>
-        <ReviewProductHorizontalCard
-          product={props.review.product}
-        />
+        <ReviewProductHorizontalCard product={props.review.product} />
       </Grid>
-      <Grid
-        item
-        xs={12}
-      >
-        <Typography variant="subtitle1" component="h6" className={classes.title}>
+      <Grid item xs={12}>
+        <Typography
+          variant="subtitle1"
+          component="h6"
+          className={classes.title}
+        >
           {"Current Review Status"}
         </Typography>
         <Box className={classes.reviewStatus}>
-          <VerifiedUserIcon color={curReviewState.isVerified ? "primary" : "disabled" } /> 
+          <VerifiedUserIcon
+            color={curReviewState.isVerified ? "primary" : "disabled"}
+          />
           <Typography variant="body2" component="p" className={classes.title}>
             {curReviewState.isVerified ? "Approved" : "Pending"}
           </Typography>
         </Box>
       </Grid>
-      <Grid
-        item
-        xs={12}
-        className={classes.orderDetailBox}
-      >
-        <Typography variant="subtitle1" component="h6" className={classes.title}>
+      <Grid item xs={12} className={classes.orderDetailBox}>
+        <Typography
+          variant="subtitle1"
+          component="h6"
+          className={classes.title}
+        >
           {"Review Form"}
         </Typography>
         <form className={classes.form} noValidate autoComplete="off">
-          <Typography component="legend">click/touch stars to rate this product.</Typography>
+          <Typography component="legend">
+            click/touch stars to rate this product.
+          </Typography>
           <Rating
             name="review-point"
             precision={0.1}
@@ -288,7 +311,8 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
             onChange={handleReviewPointInputChangeEvent}
             className={`${classes.txtFieldBase}`}
             size="large"
-          /><br />
+          />
+          <br />
           <TextField
             id="review-title"
             label="Review Title"
@@ -297,7 +321,8 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
             onChange={handleReviewTitleInputChangeEvent}
             helperText={curReviewValidationState.reviewTitle}
             error={curReviewValidationState.reviewTitle !== ""}
-          /><br />
+          />
+          <br />
           <TextField
             id="review-description"
             label="Review Description"
@@ -308,9 +333,10 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
             onChange={handleReviewDescriptionInputChangeEvent}
             helperText={curReviewValidationState.reviewDescription}
             error={curReviewValidationState.reviewDescription !== ""}
-          /><br />
+          />
+          <br />
           <Box component="div" className={classes.actionBox}>
-            {(!props.isNew &&
+            {!props.isNew && (
               <Button onClick={handleDeleteClick} variant="contained">
                 Delete
               </Button>
@@ -327,14 +353,25 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
             aria-labelledby="product-deletion-dialog"
             open={curDeleteDialogOpen}
           >
-            <DialogTitle id="product-deletion-dialog">Product Deletion</DialogTitle>
+            <DialogTitle id="product-deletion-dialog">
+              Product Deletion
+            </DialogTitle>
             <DialogContent dividers>
-              <Typography variant="body1" component="p" align="left" className={null} >
+              <Typography
+                variant="body1"
+                component="p"
+                align="left"
+                className={null}
+              >
                 {"Do you want to delete this review permenently?"}
               </Typography>
             </DialogContent>
             <DialogActions>
-              <Button autoFocus onClick={handleDeletionCancel} variant="contained">
+              <Button
+                autoFocus
+                onClick={handleDeletionCancel}
+                variant="contained"
+              >
                 Cancel
               </Button>
               <Button onClick={handleDeletionOk} variant="contained">
@@ -345,9 +382,7 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
         </form>
       </Grid>
     </Grid>
-  )
-}
+  );
+};
 
-export default ReviewForm
-
-
+export default ReviewForm;

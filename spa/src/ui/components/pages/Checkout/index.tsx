@@ -195,7 +195,7 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
   // cleanup - clear timer
   React.useEffect(() => {
     return () => {
-      console.log("umount so clear timer");
+      console.log("umount so reset timer");
       clearTimeout(timer);
     };
   }, []);

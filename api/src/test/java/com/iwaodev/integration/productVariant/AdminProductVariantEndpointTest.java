@@ -18,6 +18,7 @@ import com.iwaodev.auth.AuthenticateTestUser;
 import com.iwaodev.auth.AuthenticationInfo;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.infrastructure.model.Product;
 import com.iwaodev.util.ResourceReader;
 
 import org.junit.jupiter.api.Test;
@@ -592,7 +593,8 @@ public class AdminProductVariantEndpointTest {
     // - product (exist)
     // - product size (exist)
     // - cartItems (deleted)
-    // - wishlistItems (deleted) 
+    // - wishlistItems (deleted)
+    // - orderdetails (exists)
     Boolean isProductExist = this.entityManager.getEntityManager().createQuery(
         "select case when (count(p) > 0)  then true else false end from products p where p.productId = :productId",
         Boolean.class).setParameter("productId", UUID.fromString("9e3e67ca-d058-41f0-aad5-4f09c956a81f")).getSingleResult();
@@ -605,11 +607,70 @@ public class AdminProductVariantEndpointTest {
     Boolean isWishlistItemExist = this.entityManager.getEntityManager().createQuery(
         "select case when (count(c) > 0)  then true else false end from wishlistItems c where c.wishlistItemId = :wishlistItemId",
         Boolean.class).setParameter("wishlistItemId", 1L).getSingleResult();
+    Boolean isOrderDetailExist = this.entityManager.getEntityManager().createQuery(
+            "select case when (count(od) > 0)  then true else false end from orderDetails od where od.orderDetailId = :orderDetailId",
+            Boolean.class).setParameter("orderDetailId", 1L).getSingleResult();
 
     assertThat(isProductExist).isTrue();
     assertThat(isProductSizeExist).isTrue();
     assertThat(isCartItemExist).isFalse();
     assertThat(isWishlistItemExist).isFalse();
+    assertThat(isOrderDetailExist).isTrue();
+
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/productVariant/shouldAdminUserDeleteProductVariantAndMakeIsPublicFalseSinceNoVariantAnyMore.sql" })
+  public void shouldAdminUserDeleteProductVariantAndMakeIsPublicFalseSinceNoVariantAnyMore() throws Exception {
+
+    // arrange
+    String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String dummyProductVariantId = "1";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId) + "/" + dummyProductVariantId;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+            .delete(targetUrl) // delete
+            .cookie(this.authCookie)
+            .cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    Product targetProduct = this.entityManager.getEntityManager().createQuery("select p from products p where p.productId = :productId", Product.class).setParameter("productId", UUID.fromString(dummyProductId)).getSingleResult();
+    assertThat(targetProduct.getIsPublic()).isFalse();
+
+    // association assert
+    // - product (exist)
+    // - product size (exist)
+    // - cartItems (deleted)
+    // - wishlistItems (deleted)
+    // - orderdetails (exists)
+    Boolean isProductExist = this.entityManager.getEntityManager().createQuery(
+            "select case when (count(p) > 0)  then true else false end from products p where p.productId = :productId",
+            Boolean.class).setParameter("productId", UUID.fromString("9e3e67ca-d058-41f0-aad5-4f09c956a81f")).getSingleResult();
+    Boolean isProductSizeExist = this.entityManager.getEntityManager().createQuery(
+            "select case when (count(ps) > 0)  then true else false end from productSizes ps where ps.productSizeId = :productSizeId",
+            Boolean.class).setParameter("productSizeId", 1L).getSingleResult();
+    Boolean isCartItemExist = this.entityManager.getEntityManager().createQuery(
+            "select case when (count(c) > 0)  then true else false end from cartItems c where c.cartItemId = :cartItemId",
+            Boolean.class).setParameter("cartItemId", 1L).getSingleResult();
+    Boolean isWishlistItemExist = this.entityManager.getEntityManager().createQuery(
+            "select case when (count(c) > 0)  then true else false end from wishlistItems c where c.wishlistItemId = :wishlistItemId",
+            Boolean.class).setParameter("wishlistItemId", 1L).getSingleResult();
+    Boolean isOrderDetailExist = this.entityManager.getEntityManager().createQuery(
+            "select case when (count(od) > 0)  then true else false end from orderDetails od where od.orderDetailId = :orderDetailId",
+            Boolean.class).setParameter("orderDetailId", 1L).getSingleResult();
+
+    assertThat(isProductExist).isTrue();
+    assertThat(isProductSizeExist).isTrue();
+    assertThat(isCartItemExist).isFalse();
+    assertThat(isWishlistItemExist).isFalse();
+    assertThat(isOrderDetailExist).isTrue();
 
   }
 }

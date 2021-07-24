@@ -111,7 +111,7 @@ export const theme = createMuiTheme({
       root: {
         backgroundColor: "transparent",
       }
-    }
+    },
     //MuiCollapse:  {
     //  container: {
     //    backgroundColor: "#FFFFFF"

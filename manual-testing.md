@@ -43,9 +43,35 @@
 
     - [] make sure 
     
+
+ ## Orders
+
+  ### Admin
+
+    #### GridView
+
+    - [] order pagination 
+    - [] display correct & formatted data on each cell.
+
+    #### Edit
+
+    - [] can edit an existing order event. ('note' field only)
+    - [] can delete an existing order if the one is deletable.
+    
+      ##### Timeline
+
+        - [] any latest order event cannot be DRAFT/ORDERED after the checkout. (e.g., it must be either SESSION_TIMEOUT, PAYMENT_FAILED, PAID)
+        - [] the admin can add/delete/update appropriate order event based on the latest order event (see app-document.md#ORDERS more detail)
+        - [] only the latest order event can be deleted if the order event is undoable.
+
+  ## Members
+
+    - [] members can add either CANCEL_REQUEST/RETURN_REQUEST
+    - [] CANCEL_REQUEST order event can be added only when the latest (previous) order event is PAID
+    - [] RETURN_REQUEST order event can be added only when the latest (previous) order event is SHIPPED/DELIVERED
+    - [] members cannot edit existing order events
   
   ## Users
-
 
   ## Common
 

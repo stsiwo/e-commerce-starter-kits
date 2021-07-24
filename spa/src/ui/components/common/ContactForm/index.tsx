@@ -1,25 +1,29 @@
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import { AxiosError } from 'axios';
-import { api } from 'configs/axiosConfig';
-import { ContactFormDataType, ContactFormValidationDataType, defaultContactFormValidationData, generateDefaultContactFormData } from 'domain/user/types';
-import { useValidation } from 'hooks/validation';
-import { contactSchema } from 'hooks/validation/rules';
-import { useSnackbar } from 'notistack';
-import * as React from 'react';
-import { useDispatch } from 'react-redux';
-import FormLabel from '@material-ui/core/FormLabel';
-import { messageActions } from 'reducers/slices/app';
-import { getNanoId } from 'src/utils';
-import { MessageTypeEnum } from 'src/app';
+import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
+import FormLabel from "@material-ui/core/FormLabel";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import { AxiosError } from "axios";
+import { api } from "configs/axiosConfig";
+import {
+  ContactFormDataType,
+  ContactFormValidationDataType,
+  defaultContactFormValidationData,
+  generateDefaultContactFormData,
+} from "domain/user/types";
+import { useValidation } from "hooks/validation";
+import { contactSchema } from "hooks/validation/rules";
+import * as React from "react";
+import { useDispatch } from "react-redux";
+import { messageActions } from "reducers/slices/app";
+import { MessageTypeEnum } from "src/app";
+import { getNanoId } from "src/utils";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     title: {
       textTransform: "uppercase",
-      margin: theme.spacing(6)
+      margin: theme.spacing(6),
     },
     form: {
       margin: theme.spacing(1),
@@ -39,7 +43,7 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "80%",
     },
     recaptchaBox: {
-      '& > div': {
+      "& > div": {
         margin: `${theme.spacing(2)}px auto`,
       },
     },
@@ -47,7 +51,7 @@ const useStyles = makeStyles((theme: Theme) =>
       textAlign: "center",
       margin: `${theme.spacing(2)}px 0`,
     },
-  }),
+  })
 );
 
 /**
@@ -55,76 +59,87 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  **/
 const ContactForm: React.FunctionComponent<{}> = (props) => {
-
   const classes = useStyles();
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
+  const [curContactFormState, setContactFormState] =
+    React.useState<ContactFormDataType>(generateDefaultContactFormData());
 
-  const [curContactFormState, setContactFormState] = React.useState<ContactFormDataType>(generateDefaultContactFormData())
+  const [curContactFormValidationState, setContactFormValidationState] =
+    React.useState<ContactFormValidationDataType>(
+      defaultContactFormValidationData
+    );
 
-  const [curContactFormValidationState, setContactFormValidationState] = React.useState<ContactFormValidationDataType>(defaultContactFormValidationData)
-
-  const { updateValidationAt, updateAllValidation, isValidSync } = useValidation({
-    curDomain: curContactFormState,
-    curValidationDomain: curContactFormValidationState,
-    schema: contactSchema,
-    setValidationDomain: setContactFormValidationState,
-    defaultValidationDomain: defaultContactFormValidationData,
-  })
+  const { updateValidationAt, updateAllValidation, isValidSync } =
+    useValidation({
+      curDomain: curContactFormState,
+      curValidationDomain: curContactFormValidationState,
+      schema: contactSchema,
+      setValidationDomain: setContactFormValidationState,
+      defaultValidationDomain: defaultContactFormValidationData,
+    });
 
   // event handlers
-  const handleFirstNameInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextFirstName = e.currentTarget.value
+  const handleFirstNameInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextFirstName = e.currentTarget.value;
     updateValidationAt("firstName", e.currentTarget.value);
     setContactFormState((prev: ContactFormDataType) => ({
       ...prev,
-      firstName: nextFirstName
+      firstName: nextFirstName,
     }));
-  }
+  };
 
-  const handleLastNameInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextLastName = e.currentTarget.value
+  const handleLastNameInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextLastName = e.currentTarget.value;
     updateValidationAt("lastName", e.currentTarget.value);
     setContactFormState((prev: ContactFormDataType) => ({
       ...prev,
-      lastName: nextLastName
+      lastName: nextLastName,
     }));
-  }
+  };
 
-  const handleEmailInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextEmail = e.currentTarget.value
+  const handleEmailInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextEmail = e.currentTarget.value;
     updateValidationAt("email", e.currentTarget.value);
     setContactFormState((prev: ContactFormDataType) => ({
       ...prev,
-      email: nextEmail
+      email: nextEmail,
     }));
-  }
+  };
 
-  const handleTitleInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextTitle = e.currentTarget.value
+  const handleTitleInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextTitle = e.currentTarget.value;
     updateValidationAt("title", e.currentTarget.value);
     setContactFormState((prev: ContactFormDataType) => ({
       ...prev,
-      title: nextTitle
+      title: nextTitle,
     }));
-  }
+  };
 
-  const handleDescriptionInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextDescription = e.currentTarget.value
+  const handleDescriptionInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextDescription = e.currentTarget.value;
     updateValidationAt("description", e.currentTarget.value);
     setContactFormState((prev: ContactFormDataType) => ({
       ...prev,
-      description: nextDescription
+      description: nextDescription,
     }));
-  }
+  };
 
   // event handler to submit
-  const handleContactSendClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
-
+  const handleContactSendClickEvent: React.EventHandler<
+    React.MouseEvent<HTMLButtonElement>
+  > = async (e) => {
     // recaptcha validation
     const recaptchaToken = grecaptcha.getResponse();
 
@@ -133,75 +148,66 @@ const ContactForm: React.FunctionComponent<{}> = (props) => {
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: "please verify the reCaptch first before submit.", 
+          message: "please verify the reCaptch first before submit.",
         })
-      )
+      );
+      return false;
     }
 
-    const isValid: boolean = isValidSync(curContactFormState)
+    const isValid: boolean = isValidSync(curContactFormState);
 
     console.log(isValid);
 
     if (isValid) {
+      // pass
+      console.log("passed");
 
-      // pass 
-      console.log("passed")
+      //const body = {
+      //  ...curContactFormState, // application/json since object
+      //  recaptchaToken: recaptchaToken,
+      //};
 
-      console.log("new product creation")
+      const form = new URLSearchParams();
+      form.append("firstName", curContactFormState.firstName);
+      form.append("lastName", curContactFormState.lastName);
+      form.append("email", curContactFormState.email);
+      form.append("title", curContactFormState.title);
+      form.append("description", curContactFormState.description);
+      form.append("recaptchaToken", recaptchaToken);
+
       // request
-      api.request({
-        method: 'POST',
-        url: API1_URL + `/contact`,
-        data: {
-          ...curContactFormState, // application/json since object
-          recaptchaToken: recaptchaToken,
-        },
-      }).then((data) => {
-
-        dispatch(
-          messageActions.update({
-            id: getNanoId(),
-            type: MessageTypeEnum.SUCCESS,
-            message: "your request has submitted successfully."
-          })
-        )
-        enqueueSnackbar("updated successfully.", { variant: "success" })
-      }).catch((error: AxiosError) => {
-        dispatch(
-          messageActions.update({
-            id: getNanoId(),
-            type: MessageTypeEnum.ERROR,
-            message: error.response.data.message,
-          })
-        )
-      })
-
+      api
+        .request({
+          method: "POST",
+          url: API1_URL + `/contact`,
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          data: form,
+        })
+        .then((data) => {
+          dispatch(
+            messageActions.update({
+              id: getNanoId(),
+              type: MessageTypeEnum.SUCCESS,
+              message: "your request has submitted successfully.",
+            })
+          );
+        })
+        .catch((error: AxiosError) => {
+          dispatch(
+            messageActions.update({
+              id: getNanoId(),
+              type: MessageTypeEnum.ERROR,
+              message: error.response.data.message,
+            })
+          );
+        });
     } else {
-      console.log("failed")
-      updateAllValidation()
+      console.log("failed");
+      updateAllValidation();
     }
-  }
-
-  /**
-   * bugs? reCAP widget is not showed correctly when router page change.
-   * ex) landing page -> contact page => widget does not show. but after refreshing at contact page, it show the widget
-   * workaround: load this script at the contact component internally here.
-   **/
-  React.useEffect(() => {
-    const script = document.createElement('script');
-
-    script.src = "https://www.google.com/recaptcha/api.js";
-    script.async = true;
-    script.defer = true;
-
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    }
-
-  }, []);
-
+  };
 
   return (
     <form className={classes.form} noValidate autoComplete="off">
@@ -213,7 +219,6 @@ const ContactForm: React.FunctionComponent<{}> = (props) => {
         onChange={handleFirstNameInputChangeEvent}
         helperText={curContactFormValidationState.firstName}
         error={curContactFormValidationState.firstName !== ""}
-
       />
       <TextField
         id="last-name"
@@ -233,7 +238,8 @@ const ContactForm: React.FunctionComponent<{}> = (props) => {
         onChange={handleEmailInputChangeEvent}
         helperText={curContactFormValidationState.email}
         error={curContactFormValidationState.email !== ""}
-      /><br />
+      />
+      <br />
       <TextField
         id="title"
         label="Title"
@@ -242,7 +248,8 @@ const ContactForm: React.FunctionComponent<{}> = (props) => {
         onChange={handleTitleInputChangeEvent}
         helperText={curContactFormValidationState.title}
         error={curContactFormValidationState.title !== ""}
-      /><br />
+      />
+      <br />
       <TextField
         id="description"
         label="Description"
@@ -255,16 +262,17 @@ const ContactForm: React.FunctionComponent<{}> = (props) => {
         error={curContactFormValidationState.description !== ""}
       />
       <FormLabel component="legend">ReCaptcha</FormLabel>
-      <div className={`g-recaptcha ${classes.recaptchaBox}`} data-sitekey={RECAPTCHA_SITE_KEY}></div>
+      <div
+        className={`g-recaptcha ${classes.recaptchaBox}`}
+        data-sitekey={RECAPTCHA_SITE_KEY}
+      ></div>
       <Box component="div" className={classes.actionBox}>
         <Button onClick={handleContactSendClickEvent} variant="contained">
           Send
         </Button>
       </Box>
     </form>
-  )
-}
+  );
+};
 
-export default ContactForm
-
-
+export default ContactForm;

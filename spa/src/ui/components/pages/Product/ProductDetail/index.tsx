@@ -741,8 +741,11 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
                   {"save to Wishlist"}
                 </Button>
               )}
-              <Button onClick={handleBuyNow} variant="contained">
+              <Button
+                onClick={handleBuyNow}
+                variant="contained"
                 disabled={curStockBag.enum === ProductStockEnum.OUT_OF_STOCK}
+              >
                 {"buy now"}
               </Button>
             </Box>

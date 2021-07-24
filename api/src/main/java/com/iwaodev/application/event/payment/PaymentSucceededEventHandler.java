@@ -96,12 +96,12 @@ public class PaymentSucceededEventHandler implements EventHandler<PaymentSucceed
     try {
       if (!userOption.isPresent()) {
         logger.info("this is guest user");
-        orderEventService.add(order, OrderStatusEnum.ORDERED, "", (User) null);
-        orderEventService.add(order, OrderStatusEnum.PAID, "", (User)null);
+        orderEventService.addByProgram(order, OrderStatusEnum.ORDERED, "", (User) null);
+        orderEventService.addByProgram(order, OrderStatusEnum.PAID, "", (User)null);
       } else {
         logger.info("this is member user (id: " + userOption.get().getUserId().toString());
-        orderEventService.add(order, OrderStatusEnum.ORDERED, "", userOption.get().getUserId());
-        orderEventService.add(order, OrderStatusEnum.PAID, "", userOption.get().getUserId());
+        orderEventService.addByProgram(order, OrderStatusEnum.ORDERED, "", userOption.get());
+        orderEventService.addByProgram(order, OrderStatusEnum.PAID, "", userOption.get());
       }
     } catch (DomainException e) {
       throw new AppException(HttpStatus.BAD_REQUEST, e.getMessage());

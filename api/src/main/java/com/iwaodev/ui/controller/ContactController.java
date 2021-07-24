@@ -13,9 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.MimeType;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class ContactController {
@@ -29,11 +28,14 @@ public class ContactController {
    * submit contact form 
    *
    **/
-  @PostMapping("/contact")
+  @RequestMapping(value = "/contact", method = RequestMethod.POST, consumes = "application/x-www-form-urlencoded")
   public ResponseEntity<BaseResponse> post(
-      @Valid @RequestBody ContactCriteria criteria, 
+      @Valid ContactCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
+
+    logger.info("criteria");
+    logger.info(criteria.getEmail());
 
     if (authUser != null) {
       // member

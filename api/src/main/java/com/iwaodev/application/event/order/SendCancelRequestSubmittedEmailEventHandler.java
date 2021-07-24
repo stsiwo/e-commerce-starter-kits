@@ -53,6 +53,18 @@ public class SendCancelRequestSubmittedEmailEventHandler implements EventHandler
    * include following: - greeting. - a list of items. - total price. (subtotal,
    * shipping cost, tax cost) - estimated delivery.
    **/
+  /**
+   * when use @TransactionalEventListener with CrudRepository to persist data, this event handler must be under a transactional. Otherwise, it won't save it.
+   *
+   * you have two choices:
+   *
+   *  1. TransactionPhase.BEFORE_COMMIT
+   *  2. @Transactional(propagation = Propagation.REQUIRES_NEW)
+   *
+   *  default (e.g., AFTER_COMMIT) won't work since the transaction is done already.
+   *
+   * ref: https://stackoverflow.com/questions/44752567/save-data-in-a-method-of-eventlistener-or-transactionaleventlistener
+   */
   @Async
   @TransactionalEventListener
   public void handleEvent(OrderEventWasAddedByMemberEvent event) throws AppException {
@@ -68,13 +80,13 @@ public class SendCancelRequestSubmittedEmailEventHandler implements EventHandler
     User admin = this.userRepository.getAdmin().orElseThrow(
         () -> new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist"));
 
-    // Sender
+    // Recipient
+    // admin and company email
     Company company = admin.getCompanies().get(0);
     String senderEmail = "no-reply@" + company.getDomain();
     String from = String.format("%s <%s>", company.getCompanyName(), senderEmail);
+    String[] bcc = { admin.getEmail() };
 
-    // Recipient
-    // admin and company email
     boolean isGuest = event.getOrder().getIsGuest();
 
     // order
@@ -98,7 +110,7 @@ public class SendCancelRequestSubmittedEmailEventHandler implements EventHandler
     // send it
     try {
       logger.info(String.format("To: %s, From: %s", admin.getEmail(), senderEmail));
-      this.emailService.send(admin.getEmail(), from,
+      this.emailService.send(admin.getEmail(), from, bcc,
           "A Cancel Request Was Submitted By Customer (Order #: " + order.getOrderNumber() + ")", htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());

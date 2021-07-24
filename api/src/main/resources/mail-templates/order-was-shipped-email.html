@@ -48,9 +48,9 @@
     </style>
   </head>
   <body>
-    <p th:text="${'Hi ' + order.orderFirstName + ' ' + order.orderLastName}"></p><br />
+    <p th:text="${'Hi ' + order.orderFirstName + ' ' + order.orderLastName}"></p>
 
-    <p>Your order items have been shipped today. Please refer to the detail below:</p><br />
+    <p>Your order items have been shipped today. Please refer to the detail below:</p>
     
     <h4>Customer Information</h4>
     <p>Name: <b th:text="${order.orderFirstName + ' ' + order.orderLastName}"></b></p>
@@ -63,7 +63,7 @@
 
     <h4>Items Information</h4>
     <p>Order #: <b th:text="${order.orderNumber}"></b></p>
-    <p th:if="${order.estimatedDeliveryDate != null}">Estimated Delivery Date: <b th:text="${order.estimatedDeliveryDate}">N/A</b></p>
+    <p th:if="${order.estimatedDeliveryDate != null}">Estimated Delivery Date: <b th:text="${order.displayEstimatedDeliveryDate()}">N/A</b></p>
     <table class="styled-table">
      <thead>
          <tr>
@@ -100,12 +100,6 @@
          </tr>
      </tbody>
     </table>
-    <div style="display: flex; justify-content: flex-end;">
-       <p>Subtotal Cost: $<b th:text="${order.getProductCost()}"></b></p>
-       <p>Tax Cost: $<b th:text="${order.taxCost}"></b></p>
-       <p>Shipping Cost: $<b th:text="${order.shippingCost}"></b></p>
-       <h6>Total Cost: $<b th:text="${order.getTotalCost()}"></b></p>
-    </div>
     <p th:if="${order.isGuest}">Please visit <a th:href="@{{link} (link=${link})}">your order managment page</a> for more details.</p>
 
     <h4>Note</h4>

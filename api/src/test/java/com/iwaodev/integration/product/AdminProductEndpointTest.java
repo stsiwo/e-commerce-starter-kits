@@ -706,7 +706,8 @@ public class AdminProductEndpointTest {
     // - category (exist)
     // - product iamges (deleted)
     // - reviews (deleted)
-    // - product variant (deleted) 
+    // - product variant (deleted)
+    // - order_details (exist)
     Boolean isCategoryExist = this.entityManager.getEntityManager().createQuery(
         "select case when (count(c) > 0)  then true else false end from categories c where c.categoryId = :categoryId",
         Boolean.class).setParameter("categoryId", 1L).getSingleResult();
@@ -719,12 +720,17 @@ public class AdminProductEndpointTest {
     Boolean isProductVariantsExist = this.entityManager.getEntityManager().createQuery(
         "select case when (count(pv) > 0)  then true else false end from productVariants pv inner join pv.product p where p.productId = :productId",
         Boolean.class).setParameter("productId", UUID.fromString(dummyProductId)).getSingleResult();
+    Boolean isOrderDetailExist = this.entityManager.getEntityManager().createQuery(
+            "select case when (count(od) > 0)  then true else false end from orderDetails od where od.orderDetailId = :orderDetailId",
+            Boolean.class).setParameter("orderDetailId", 1L).getSingleResult();
+
 
     assertThat(isCategoryExist).isTrue();
     assertThat(isProductImagesExist).isFalse();
     assertThat(isReviewsExist).isFalse();
     assertThat(isProductVariantsExist).isFalse();
-    
+    assertThat(isOrderDetailExist).isTrue();
+
     
   }
 }

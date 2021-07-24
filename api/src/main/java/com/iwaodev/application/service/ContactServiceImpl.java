@@ -13,6 +13,7 @@ import com.iwaodev.application.iservice.EmailService;
 import com.iwaodev.application.iservice.ReCaptchaService;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.exception.AppException;
+import com.iwaodev.infrastructure.model.Company;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.contact.ContactCriteria;
 
@@ -68,6 +69,8 @@ public class ContactServiceImpl implements ContactService {
     }
 
     User adminRecipient = adminRecipientOption.get();
+    Company adminCompany = adminRecipient.getCompanies().get(0);
+    String[] bcc = { adminRecipient.getEmail() };
 
     UserTypeEnum userType;
     User senderUser;
@@ -97,7 +100,7 @@ public class ContactServiceImpl implements ContactService {
     String htmlBody = thymeleafTemplateEngine.process("contact.html", thymeleafContext);
 
     try {
-      this.emailService.send(adminRecipient.getEmail(), criteria.getEmail(), criteria.getTitle(), htmlBody);
+      this.emailService.send(adminCompany.getCompanyEmail(), criteria.getEmail(), bcc, criteria.getTitle(), htmlBody);
     } catch (MessagingException e) {
       logger.info(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "failed to send an email. please try again later.");

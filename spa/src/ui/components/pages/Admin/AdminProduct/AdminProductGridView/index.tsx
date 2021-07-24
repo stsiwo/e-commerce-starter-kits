@@ -1,12 +1,15 @@
+import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import Link from "@material-ui/core/Link";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
@@ -15,36 +18,33 @@ import {
   DataGrid,
   GridCellParams,
   GridColDef,
-  GridPageChangeParams,
   GridRowsProp,
 } from "@material-ui/data-grid";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import EditIcon from "@material-ui/icons/Edit";
 import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
+import Pagination from "@material-ui/lab/Pagination";
+import SearchForm from "components/common/SearchForm";
 import { ProductType } from "domain/product/types";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router";
 import { Link as RRLink } from "react-router-dom";
+import {
+  deleteSingleProductFetchStatusActions,
+  postProductFetchStatusActions,
+  putProductFetchStatusActions,
+} from "reducers/slices/app/fetchStatus/product";
 import {
   deleteSingleProductActionCreator,
   fetchProductActionCreator,
   productPaginationPageActions,
   productQuerySearchQueryActions,
 } from "reducers/slices/domain/product";
+import { FetchStatusEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import AdminProductFormDialog from "../AdminProductFormDialog";
 import AdminProductSearchController from "../ADminProductSearchController";
-import { FetchStatusEnum } from "src/app";
-import Box from "@material-ui/core/Box";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import SearchForm from "components/common/SearchForm";
-import { useLocation } from "react-router";
-import {
-  deleteProductFetchStatusActions,
-  deleteSingleProductFetchStatusActions,
-  putProductFetchStatusActions,
-  postProductFetchStatusActions,
-} from "reducers/slices/app/fetchStatus/product";
 
 declare type AdminProductGridViewPropsType = {};
 
@@ -77,6 +77,18 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     cardContentBox: {
       paddingTop: 0,
+    },
+    highlight: {
+      color: theme.palette.fifth.main,
+    },
+    dataGrid: {
+      // any <a> tag should be this color inside data grid.
+      "& a": {
+        color: theme.palette.fifth.main,
+      },
+    },
+    pageBox: {
+      padding: theme.spacing(2),
     },
   })
 );
@@ -181,6 +193,9 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
 
     const curQueryString = useSelector(mSelector.makeProductQuerySelector());
 
+    console.log("current curProductList");
+    console.log(curProductList);
+
     // fetch product
     React.useEffect(() => {
       dispatch(fetchProductActionCreator());
@@ -193,7 +208,7 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
       if (searchQuery) {
         dispatch(productQuerySearchQueryActions.update(searchQuery));
       }
-    }, []);
+    }, [searchQuery]);
 
     const [curFormOpen, setFormOpen] = React.useState<boolean>(false);
 
@@ -252,13 +267,30 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
       setProduct(targetProduct);
     };
 
-    const handlePageChange = (param: GridPageChangeParams) => {
+    /**
+     * pagination.
+     *
+     * switch built-in pagination of DataGrid to the normal one.
+     *
+     */
+    //const handlePageChange = (param: GridPageChangeParams) => {
+    //  // need to decrement since we incremented when display
+    //  console.log("start handling page change");
+    //  const nextPage = param.page;
+
+    //  console.log("next page: " + nextPage);
+    //  dispatch(productPaginationPageActions.update(nextPage));
+    //};
+
+    const handlePaginationChange = (
+      event: React.ChangeEvent<unknown>,
+      value: number
+    ) => {
       // need to decrement since we incremented when display
-      const nextPage = param.page;
+      const nextPage = value - 1;
 
       dispatch(productPaginationPageActions.update(nextPage));
     };
-
     /**
      * search query stuffs
      **/
@@ -332,15 +364,46 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
             </Box>
           )}
           {curFetchProductStatus === FetchStatusEnum.SUCCESS && (
-            <DataGrid
-              rows={generateRows(curProductList)}
-              columns={generateColumns(handleEditClick, handleDeleteClick)}
-              page={pagination.page} // don't forget to increment when display
-              pageSize={pagination.limit}
-              rowCount={pagination.totalElements}
-              onPageChange={handlePageChange}
-              autoHeight
-            />
+            /**
+             * 2nd page does not show the items even if there are items on state.
+             *
+             * i guees this pagination (e.g., DataGrid) need to have previous data to show the next data.
+             *
+             * for example, 1 page shows the items (1 - 20) and when fetch the next items (21 - 40), you still need the items (1 - 20) to show the next item (21 - 40).
+             * since my implementation does not hold any previous data, so i cannot use this pagination anymore.
+             *
+             * instead, use the pagination (e.g., <Pagination>) component.
+             *
+             */
+            <React.Fragment>
+              <DataGrid
+                rows={generateRows(curProductList)}
+                columns={generateColumns(handleEditClick, handleDeleteClick)}
+                hideFooterPagination
+                //page={pagination.page} // don't forget to increment when display
+                //pageSize={pagination.limit}
+                //rowCount={pagination.totalElements}
+                //onPageChange={handlePageChange}
+                autoHeight
+                className={classes.dataGrid}
+              />
+              <Grid
+                container
+                justify="center"
+                alignItems="center"
+                className={classes.pageBox}
+              >
+                <Pagination
+                  page={pagination.page + 1} // don't forget to increment when display
+                  count={pagination.totalPages}
+                  color="primary"
+                  showFirstButton
+                  showLastButton
+                  size={"medium"}
+                  onChange={handlePaginationChange}
+                />
+              </Grid>
+            </React.Fragment>
           )}
           {curFetchProductStatus === FetchStatusEnum.FAILED && (
             <Box className={classes.loadingBox}>

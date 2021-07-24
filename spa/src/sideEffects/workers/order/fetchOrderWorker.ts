@@ -134,7 +134,7 @@ export function* fetchOrderWorker(action: PayloadAction<{}>) {
       console.log(response.totalPages)
 
       yield all([
-        put(orderPaginationPageActions.update(response.pageNumber)),
+        put(orderPaginationPageActions.update(response.pageable.pageNumber)),
         put(orderPaginationTotalPagesActions.update(response.totalPages)),
         put(orderPaginationTotalElementsActions.update(response.totalElements)),
       ])

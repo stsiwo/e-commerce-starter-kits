@@ -115,6 +115,26 @@ export const categoryQuerySearchQuerySlice = createSlice({
 
 export const categoryQuerySearchQuerySliceReducer = categoryQuerySearchQuerySlice.reducer
 export const categoryQuerySearchQueryActions = categoryQuerySearchQuerySlice.actions
+
+
+const resetPaginationExtraReducerActions = [
+  categoryQuerySearchQueryActions.clear,
+  categoryQuerySearchQueryActions.update,
+]
+
+const resetPaginationExtraReducerGenerator = (builder: any, reducer: (state: any) => any): void => {
+    /**
+     * if filter action is dispatched, need to clear all pagiantion
+     */
+    resetPaginationExtraReducerActions.forEach((action: any) => {
+      builder.addCase(
+        action,
+        reducer, 
+      )
+    })
+
+}
+
 /**
  *
  * domain.categories.pagination.page state Slice (no side effects)
@@ -147,6 +167,9 @@ export const categoryPaginationPageSlice = createSlice({
    * You can respond to other action types besides the types it has generated. 
    *
    **/
+  extraReducers: (builder) => {
+    resetPaginationExtraReducerGenerator(builder, (state: number) => 0)
+  }
 }) 
 
 export const categoryPaginationPageSliceReducer = categoryPaginationPageSlice.reducer
@@ -185,6 +208,9 @@ export const categoryPaginationLimitSlice = createSlice({
    * You can respond to other action types besides the types it has generated. 
    *
    **/
+  extraReducers: (builder) => {
+    resetPaginationExtraReducerGenerator(builder, (state: number) => 20)
+  }
 }) 
 
 export const categoryPaginationLimitSliceReducer = categoryPaginationLimitSlice.reducer
@@ -223,6 +249,9 @@ export const categoryPaginationTotalPagesSlice = createSlice({
    * You can respond to other action types besides the types it has generated. 
    *
    **/
+  extraReducers: (builder) => {
+    resetPaginationExtraReducerGenerator(builder, (state: number) => 1)
+  }
 }) 
 
 export const categoryPaginationTotalPagesSliceReducer = categoryPaginationTotalPagesSlice.reducer
@@ -260,6 +289,9 @@ export const categoryPaginationTotalElementsSlice = createSlice({
    * You can respond to other action types besides the types it has generated. 
    *
    **/
+  extraReducers: (builder) => {
+    resetPaginationExtraReducerGenerator(builder, (state: number) => 0)
+  }
 }) 
 
 export const categoryPaginationTotalElementsSliceReducer = categoryPaginationTotalElementsSlice.reducer

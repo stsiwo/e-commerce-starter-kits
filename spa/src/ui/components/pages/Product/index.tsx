@@ -1,25 +1,26 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import { AxiosError } from 'axios';
-import { api } from 'configs/axiosConfig';
-import { ProductType, NormalizedProductType } from 'domain/product/types';
-import { useSnackbar } from 'notistack';
-import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router';
-import { mSelector } from 'src/selectors/selector';
-import ProductDetail from './ProductDetail';
-import Box from '@material-ui/core/Box';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { normalize } from 'normalizr';
-import { productSchemaArray, productSchemaEntity } from 'states/state';
-import { productActions } from 'reducers/slices/domain/product';
+import Box from "@material-ui/core/Box";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { AxiosError } from "axios";
+import { api } from "configs/axiosConfig";
+import { NormalizedProductType, ProductType } from "domain/product/types";
+import { normalize } from "normalizr";
+import { useSnackbar } from "notistack";
+import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory, useParams } from "react-router";
+import { productActions } from "reducers/slices/domain/product";
+import { FetchStatusEnum } from "src/app";
+import { mSelector } from "src/selectors/selector";
+import { productSchemaEntity } from "states/state";
+import NotFound from "../NotFound";
+import ProductDetail from "./ProductDetail";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     title: {
       textTransform: "uppercase",
-      margin: theme.spacing(6)
+      margin: theme.spacing(6),
     },
     subtitle: {
       fontWeight: theme.typography.fontWeightBold,
@@ -29,7 +30,7 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: theme.spacing(1),
     },
     controllerBox: {
-      textAlign: "center"
+      textAlign: "center",
     },
     loadingBox: {
       height: "80vh",
@@ -38,11 +39,11 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: "center",
       flexDirection: "column",
     },
-  }),
+  })
 );
 
 /**
- * product page 
+ * product page
  *
  *  - steps
  *
@@ -62,10 +63,9 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  **/
 const Product: React.FunctionComponent<{}> = (props) => {
-
   const classes = useStyles();
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   // snackbar notification
   // usage: 'enqueueSnackbar("message", { variant: "error" };
@@ -73,54 +73,68 @@ const Product: React.FunctionComponent<{}> = (props) => {
 
   const { productPath } = useParams();
 
+  const history = useHistory();
+
+  const [curFetchStatus, setFetchStatus] = React.useState<FetchStatusEnum>(
+    FetchStatusEnum.INITIAL
+  );
+
+  const [isNeedFetch, setNeedFetch] = React.useState<boolean>(false);
+
   // fetch product detail by productPath
 
   const [curProduct, setProduct] = React.useState<ProductType>(
     useSelector(mSelector.makeProductByPathSelector(productPath))
-  )
+  );
 
   React.useEffect(() => {
-
     if (!curProduct) {
+      setNeedFetch(true);
+      setFetchStatus(FetchStatusEnum.FETCHING);
+
       // oops, the product does not exist in redux store, so send the request to grab this product by path
+      api
+        .request({
+          method: "GET",
+          url: API1_URL + `/products/public/${productPath}`,
+        })
+        .then((data) => {
+          setFetchStatus(FetchStatusEnum.SUCCESS);
+          const targetProduct: ProductType = data.data;
 
-      api.request({
-        method: 'GET',
-        url: API1_URL + `/products/public/${productPath}`,
-      }).then((data) => {
+          // local state
+          setProduct(targetProduct);
 
-        const targetProduct: ProductType = data.data;
+          // redux store
+          const normalizedData = normalize(data.data, productSchemaEntity);
+          dispatch(
+            productActions.update(
+              normalizedData.entities.products as NormalizedProductType
+            )
+          );
 
-        // local state
-        setProduct(targetProduct)
-
-        // redux store
-        const normalizedData = normalize(data.data, productSchemaEntity)
-        dispatch(
-          productActions.update(normalizedData.entities.products as NormalizedProductType)
-        )
-
-        //enqueueSnackbar("updated successfully.", { variant: "success" })
-      }).catch((error: AxiosError) => {
-        enqueueSnackbar(error.message, { variant: "error" })
-      })
+          //enqueueSnackbar("updated successfully.", { variant: "success" })
+        })
+        .catch((error: AxiosError) => {
+          setFetchStatus(FetchStatusEnum.FAILED);
+          enqueueSnackbar(error.message, { variant: "error" });
+        });
     }
-  }, [])
+  }, []);
+
+  if (isNeedFetch && curFetchStatus === FetchStatusEnum.FAILED) {
+    return <NotFound />;
+  }
 
   if (!curProduct) {
     return (
       <Box className={classes.loadingBox}>
         <CircularProgress />
       </Box>
-    )
+    );
   }
 
-  return (
-    <ProductDetail product={curProduct} />
-  )
-}
+  return <ProductDetail product={curProduct} />;
+};
 
-export default Product
-
-
-
+export default Product;

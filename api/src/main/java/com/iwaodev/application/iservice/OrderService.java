@@ -54,7 +54,7 @@ public interface OrderService {
   /**
    * add an order event to existing order (e.g., session-time, cancel, returned, completed, and so on)
    **/
-  public OrderDTO addOrderEvent(UUID orderId, OrderEventCriteria criteria) throws Exception;
+  public OrderDTO addOrderEventByAdmin(UUID orderId, OrderEventCriteria criteria) throws Exception;
 
   /**
    * add an order event to existing order by member ('request_return' and 'request_cancel')

@@ -532,6 +532,39 @@ export const productQuerySortActions = productQuerySortSlice.actions
 //export const productPaginationSliceReducer = productPaginationSlice.reducer
 //export const productPaginationActions = productPaginationSlice.actions
 
+const resetPaginationExtraReducerActions = [
+     productQuerySearchQueryActions.clear,
+     productQuerySearchQueryActions.update,
+     productQueryCategoryIdActions.clear,
+     productQueryCategoryIdActions.update,
+     productQueryStartDateActions.clear,
+     productQueryStartDateActions.update,
+     productQueryEndDateActions.clear,
+     productQueryEndDateActions.update,
+     productQueryIsDiscountActions.clear,
+     productQueryIsDiscountActions.update,
+     productQueryMaxPriceActions.clear,
+     productQueryMaxPriceActions.update,
+     productQueryMinPriceActions.clear,
+     productQueryMinPriceActions.update,
+     productQueryReviewPointActions.clear,
+     productQueryReviewPointActions.update,
+     productQuerySortActions.clear,
+     productQuerySortActions.update,
+]
+
+const resetPaginationExtraReducerGenerator = (builder: any, reducer: (state: any) => any): void => {
+    /**
+     * if filter action is dispatched, need to clear all pagiantion
+     */
+    resetPaginationExtraReducerActions.forEach((action: any) => {
+      builder.addCase(
+        action,
+        reducer, 
+      )
+    })
+
+}
 
 /**
  *
@@ -565,6 +598,9 @@ export const productPaginationPageSlice = createSlice({
    * You can respond to other action types besides the types it has generated. 
    *
    **/
+  extraReducers: (builder) => {
+    resetPaginationExtraReducerGenerator(builder, (state: number) => 0)
+  }
 }) 
 
 export const productPaginationPageSliceReducer = productPaginationPageSlice.reducer
@@ -603,6 +639,9 @@ export const productPaginationLimitSlice = createSlice({
    * You can respond to other action types besides the types it has generated. 
    *
    **/
+  extraReducers: (builder) => {
+    resetPaginationExtraReducerGenerator(builder, (state: number) => 20)
+  }
 }) 
 
 export const productPaginationLimitSliceReducer = productPaginationLimitSlice.reducer
@@ -641,6 +680,9 @@ export const productPaginationTotalPagesSlice = createSlice({
    * You can respond to other action types besides the types it has generated. 
    *
    **/
+  extraReducers: (builder) => {
+    resetPaginationExtraReducerGenerator(builder, (state: number) => 1)
+  }
 }) 
 
 export const productPaginationTotalPagesSliceReducer = productPaginationTotalPagesSlice.reducer
@@ -679,6 +721,9 @@ export const productPaginationTotalElementsSlice = createSlice({
    * You can respond to other action types besides the types it has generated. 
    *
    **/
+  extraReducers: (builder) => {
+    resetPaginationExtraReducerGenerator(builder, (state: number) => 0)
+  }
 }) 
 
 export const productPaginationTotalElementsSliceReducer = productPaginationTotalElementsSlice.reducer
@@ -717,6 +762,9 @@ export const productCurItemsSlice = createSlice({
    * You can respond to other action types besides the types it has generated. 
    *
    **/
+  extraReducers: (builder) => {
+    resetPaginationExtraReducerGenerator(builder, (state: number) => [])
+  }
 }) 
 
 export const productCurItemsSliceReducer = productCurItemsSlice.reducer

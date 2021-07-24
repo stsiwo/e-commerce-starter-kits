@@ -163,6 +163,7 @@ public class AdminOrderEndpointTest {
     for (OrderDTO orderDTO : responseBody) {
       // assert
       assertThat(orderDTO.getOrderId()).isNotNull();
+      assertThat(orderDTO.getStripePaymentIntentId()).isNotNull();
 
       for (OrderDetailDTO orderDetailDTO : orderDTO.getOrderDetails()) {
         assertThat(orderDetailDTO.getIsReviewable()).isNotNull();
@@ -503,7 +504,7 @@ public class AdminOrderEndpointTest {
 
     // assert
     assertThat(responseBody.getOrderId()).isNotNull();
-    assertThat(responseBody.getOrderEvents().size()).isEqualTo(2);
+    assertThat(responseBody.getOrderEvents().size()).isEqualTo(4);
     assertThat(responseBody.getLatestOrderEvent().getOrderStatus()).isEqualTo(OrderStatusEnum.ERROR);
     assertThat(responseBody.getLatestOrderEvent().getUser().getUserId().toString()).isEqualTo(adminUserId);
     assertThat(responseBody.getLatestOrderEvent().getUndoable()).isEqualTo(true);

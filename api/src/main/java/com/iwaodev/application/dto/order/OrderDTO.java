@@ -60,6 +60,7 @@ public class OrderDTO {
 
   private LocalDateTime estimatedDeliveryDate;
 
+  private String stripePaymentIntentId;
 }
 
 

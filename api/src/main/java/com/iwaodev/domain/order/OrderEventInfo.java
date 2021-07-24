@@ -21,10 +21,13 @@ public class OrderEventInfo {
 
   List<OrderStatusEnum> nextAddableEventsForMember = new ArrayList<>();
 
-  public OrderEventInfo(List<UserTypeEnum> addableBy, List<OrderStatusEnum> nextAddableEventsForAdmin, List<OrderStatusEnum> nextAddableEventsForMember) {
+  Boolean isUndoable;
+
+  public OrderEventInfo(List<UserTypeEnum> addableBy, List<OrderStatusEnum> nextAddableEventsForAdmin, List<OrderStatusEnum> nextAddableEventsForMember, Boolean isUndoable) {
     this.addableBy = addableBy;
     this.nextAddableEventsForAdmin = nextAddableEventsForAdmin;
     this.nextAddableEventsForMember = nextAddableEventsForMember;
+    this.isUndoable = isUndoable;
   }
 
   public String addableByToString() {

@@ -1,5 +1,15 @@
 # front end spa
 server {
+    # hide server version
+    server_tokens off;
+    # since this is default server, any request which comes to nginx ends up here
+    # listen       80 default_server; 
+    listen       80 default_server; 
+    server_name  iwaodev.com;    
+    return 301 https://iwaodev.com$request_uri;
+}
+
+server {
     # since this is default server, any request which comes to nginx ends up here
     # listen       80 default_server; 
     listen       443 ssl; 
@@ -8,9 +18,6 @@ server {
     # ssl
     ssl_certificate /etc/letsencrypt/live/iwaodev.com/fullchain.pem; # managed by Certbot
     ssl_certificate_key /etc/letsencrypt/live/iwaodev.com/privkey.pem; # managed by Certbot
-
-    # DOUBT
-    # include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
 
     # enable gzip compression  
     gzip on;  
@@ -39,11 +46,18 @@ server {
     # disable comporession for Internet Explorer versions 1-6
     gzip_disable "MSIE [1-6]\.";    
     
-    
     access_log  /var/log/nginx/iwaodev.com.access.log  main;
     error_log /var/log/nginx/iwaodev.com.error.log info;
-  
-    # cache control            
+
+    add_header Strict-Transport-Security 'max-age=31536000; includeSubDomains; preload' always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options nosniff always;
+
+    # hide server version
+    server_tokens off;
+
+    # CACHE CONTROL 
     location ~* \.(?:ico|css|js|gif|jpe?g|png|svg)$ {
         root   /var/www;       
   
@@ -53,8 +67,6 @@ server {
     }
 
     location / {           
-      # cors
-      add_header Access-Control-Allow-Origin https://www.youtube.com;
 
       root   /var/www;     
       # this is required because manually write for url cause 404 at react app
@@ -63,6 +75,16 @@ server {
 }
 
 # backend api
+server {
+    # hide server version
+    server_tokens off;
+    # since this is default server, any request which comes to nginx ends up here
+    # listen       80 default_server; 
+    listen       80; 
+    server_name  api.iwaodev.com;    
+    return 301 https://api.iwaodev.com$request_uri;
+}
+
 server {
 
     listen       443 ssl; 
@@ -74,6 +96,9 @@ server {
     
     access_log  /var/log/nginx/api.iwaodev.com.access.log  main;
     error_log /var/log/nginx/api.iwaodev.com.error.log info;
+
+    # hide server version
+    server_tokens off;
   
     location / {           
       proxy_pass http://${API_HOST}:${API_PORT};

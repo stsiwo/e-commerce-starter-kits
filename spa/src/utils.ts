@@ -90,6 +90,10 @@ export function getUuidv4() {
   return uuidv4()
 }
 
+export function convertStringToBase64(value: string) {
+  return window.atob(value)
+}
+
 export function getTimeOneHourAfter() {
   const dt = new Date();
   dt.setHours(dt.getHours() + 1)

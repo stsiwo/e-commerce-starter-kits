@@ -8,8 +8,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.Cookie;
 
@@ -276,6 +278,38 @@ public class AdminReviewEndpointTest {
     }
   }
 
+  // filter: productId
+  @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminFilterReviewBySearchQueryReviewId.sql" })
+  public void shouldAdminFilterReviewBySearchQueryReviewId(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnReview.json") Resource dummyFormJsonFile*/) throws Exception {
+
+    // arrange
+    String dummyQueryStringValue = "23";
+    String dummyQueryString = "?searchQuery=" + dummyQueryStringValue;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyQueryString;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+            MockMvcRequestBuilders
+                    .get(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON)
+    )
+            .andDo(print())
+            .andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ReviewDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ReviewDTO[].class);
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(responseBody.length).isGreaterThan(0);
+    List<ReviewDTO> reviews = Arrays.stream(responseBody).filter(r -> r.getReviewId().toString().equals(dummyQueryStringValue)).collect(Collectors.toList());
+    assertThat(reviews.size()).isEqualTo(1);
+  }
   // filter: reviewPoint
   @Test
   @Sql(scripts = { "classpath:/integration/review/shouldAdminFilterReviewByReviewPoint.sql" })

@@ -16,6 +16,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -45,14 +47,16 @@ public class ReCaptchaServiceImpl implements ReCaptchaService {
   @Override
   public void verify(String recaptchaToken) throws Exception {
 
+    logger.info("recaptcha secret: " + this.recaptchaSecret);
+
     // prep for inputs
-    ObjectNode inputs = this.objectMapper.createObjectNode();
-    inputs.put("secret", this.recaptchaSecret);
-    inputs.put("response", recaptchaToken);
+    MultiValueMap<String, Object> inputs = new LinkedMultiValueMap<>();
+    inputs.add("secret", this.recaptchaSecret);
+    inputs.add("response", recaptchaToken);
 
     HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    HttpEntity<String> entity = new HttpEntity<String>(inputs.toString(), headers);
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+    HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(inputs, headers);
 
     // send request
     String responseString = this.restTemplate.postForObject(this.url, entity, String.class);

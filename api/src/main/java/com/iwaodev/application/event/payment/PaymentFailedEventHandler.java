@@ -89,12 +89,12 @@ public class PaymentFailedEventHandler implements EventHandler<PaymentFailedEven
     try {
       if (!userOption.isPresent()) {
         logger.info("this is guest user");
-        orderEventService.add(order, OrderStatusEnum.ORDERED, "", (User)null);
-        orderEventService.add(order, OrderStatusEnum.PAYMENT_FAILED, "", (User)null);
+        orderEventService.addByProgram(order, OrderStatusEnum.ORDERED, "", (User)null);
+        orderEventService.addByProgram(order, OrderStatusEnum.PAYMENT_FAILED, "", (User)null);
       } else {
         logger.info("this is member user (id: " + userOption.get().getUserId().toString());
-        orderEventService.add(order, OrderStatusEnum.ORDERED, "", userOption.get().getUserId());
-        orderEventService.add(order, OrderStatusEnum.PAYMENT_FAILED, "", userOption.get().getUserId());
+        orderEventService.addByProgram(order, OrderStatusEnum.ORDERED, "", userOption.get());
+        orderEventService.addByProgram(order, OrderStatusEnum.PAYMENT_FAILED, "", userOption.get());
       }
     } catch (DomainException e) {
       throw new AppException(HttpStatus.BAD_REQUEST, e.getMessage());

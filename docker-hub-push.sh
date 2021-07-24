@@ -55,5 +55,5 @@ docker image tag ${i}:${v} stsiwo/${i}:${v}
 docker image tag ${i}:${v} stsiwo/${i}:latest
 
 ## PUSH 
-docker image push stsiwo/${i}
+docker image push stsiwo/${i} --all-tags
 

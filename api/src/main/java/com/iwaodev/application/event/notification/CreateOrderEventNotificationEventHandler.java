@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
@@ -41,11 +42,23 @@ public class CreateOrderEventNotificationEventHandler implements EventHandler<Or
   private NotificationRepository notificationRepository;
 
   @Async
-  @TransactionalEventListener()
+  @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
   public void handleEvent(OrderEventWasAddedEvent event) throws AppException {
     logger.info("start CreateOrderEventNotificationEventHandler");
     logger.info(Thread.currentThread().getName());
 
+    /**
+     * when use @TransactionalEventListener with CrudRepository to persist data, this event handler must be under a transactional. Otherwise, it won't save it.
+     *
+     * you have two choices:
+     *
+     *  1. TransactionPhase.BEFORE_COMMIT
+     *  2. @Transactional(propagation = Propagation.REQUIRES_NEW)
+     *
+     *  default (e.g., AFTER_COMMIT) won't work since the transaction is done already.
+     *
+     * ref: https://stackoverflow.com/questions/44752567/save-data-in-a-method-of-eventlistener-or-transactionaleventlistener
+     */
     User admin = this.userRepository.getAdmin().orElseThrow(
         () -> new AppException(HttpStatus.NOT_FOUND, "admin not found. this should not happen."));
 
@@ -57,7 +70,7 @@ public class CreateOrderEventNotificationEventHandler implements EventHandler<Or
             String.format("Your order (order#: %s) was updated to %s. Please check the link for more detail.",
                 event.getOrder().getOrderNumber(), event.getOrder().retrieveLatestOrderEvent().getOrderStatus()),
             admin, event.getOrder().getUser(),
-            String.format("/order?orderId=%s", event.getOrder().getOrderId().toString()), "");
+            String.format("/orders/%s", event.getOrder().getOrderId().toString()), "");
 
         this.notificationRepository.save(notification);
       } catch (NotFoundException e) {

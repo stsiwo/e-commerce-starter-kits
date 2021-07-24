@@ -52,6 +52,26 @@
 
     - ref: https://github.com/docker/compose/issues/3277 
 
+    @2021/07/20
+
+    - found useful ref: https://github.com/docker/compose/issues/4950
+
+      - it said that if you change 'ports' field at docker-compsoe file, it will solve the problem.
+
+        - i changed "80:80" => "80", but this does not open the port to the docker host so this does not help.
+
+      - it also said that 'down' the docker compose first then 'up' again.
+
+        - this works!!
+
+        - not it not!! still cause the error.
+
+    @2021/07/23
+  
+    - insert "systemctl restart docker" in update script, but this requires you to run the script with 'sudo' so you need to ssh the production server first then run 'sudo ./update-docker...' manually.
+
+    
+
     
 
 

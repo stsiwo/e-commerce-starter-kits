@@ -125,6 +125,6 @@ public class SendNewOrderWasPlacedEmailEventHandlerTest {
      **/
 
     // assert
-    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(recipient.getEmail()), Mockito.anyString(), Mockito.eq("A New Order Was Placed By Customer (Order #: " + dummyOrderNumber + ")"), Mockito.anyString());
+    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.eq(recipient.getEmail()), Mockito.anyString(), Mockito.any(), Mockito.eq("A New Order Was Placed By Customer (Order #: " + dummyOrderNumber + ")"), Mockito.anyString());
   }
 }

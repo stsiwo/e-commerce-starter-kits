@@ -136,7 +136,7 @@ public class CreateOrderEventNotificationEventHandlerTest {
         assertThat(notification.getNotificationTitle()).isEqualTo(notificationTypeEntity.getNotificationTitleTemplate());
         assertThat(notification.getRecipient().getUserId()).isEqualTo(dummyOrder.getUser().getUserId());
         assertThat(notification.getIssuer().getUserId()).isEqualTo(admin.getUserId());
-        assertThat(notification.getLink()).isEqualTo(String.format("/order?orderId=%s", dummyOrder.getOrderId().toString()));
+        assertThat(notification.getLink()).isEqualTo(String.format("/orders/%s", dummyOrder.getOrderId().toString()));
     }
 
 }

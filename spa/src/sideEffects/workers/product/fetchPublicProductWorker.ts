@@ -43,7 +43,7 @@ export function* fetchPublicProductWorker(action: PayloadAction<{}>) {
   const curAuth: AuthType = yield select(rsSelector.app.getAuth)
 
 
-  if (curAuth.userType === UserTypeEnum.GUEST || curAuth.userType === UserTypeEnum.MEMBER) {
+  if (curAuth.userType === UserTypeEnum.GUEST || curAuth.userType === UserTypeEnum.MEMBER || curAuth.userType === UserTypeEnum.ADMIN) {
 
     /**
      * update status for anime data
