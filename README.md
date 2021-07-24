@@ -32,7 +32,7 @@ My goal is to develop a maintainable, testable, and scalable application as much
 ## Developer Features
 
   - Daily Backup: automate daily backup with [this docker image](https://github.com/databacker/mysql-backup)
-  - [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin): admin web interface tool to manage my back-end API.  
+  - [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin): admin web interface tool to monitor my back-end API.  
 
 ## Tech Stack
 
