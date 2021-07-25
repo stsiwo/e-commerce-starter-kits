@@ -31,7 +31,7 @@ My goal is to develop a maintainable, testable, and scalable application as much
 
 ## Developer Features
 
-  - Daily Backup: automate daily backup with [this docker image](https://github.com/databacker/mysql-backup)
+  - __Daily Backup__: automate daily backup with [this docker image](https://github.com/databacker/mysql-backup)
   - [Spring Boot Admin](https://github.com/codecentric/spring-boot-admin): admin web interface tool to monitor my back-end API.  
 
 ## Tech Stack
@@ -81,10 +81,10 @@ My goal is to develop a maintainable, testable, and scalable application as much
 
 I separate each responsibility into different modules:
 
-  - UI Components: display UI to users.
-  - Redux-Saga Workers: handle side effects (e.g., CRUD operation to back-end API).
-  - Redux Store: keep the state.
-  - Selectors: filter, sort, or calculate the state as UI components desire. 
+  - __UI Components__: display UI to users.
+  - __Redux-Saga Workers__: handle side effects (e.g., CRUD operation to back-end API).
+  - __Redux Store__: keep the state.
+  - __Selectors__: filter, sort, or calculate the state as UI components desire. 
 
 ![alt text](https://github.com/stsiwo/e-commerce-starter-kits/blob/main/front-end-architecture.png "Architecture Front End 1")
 
@@ -118,10 +118,10 @@ Here are some important details:
 
 I used Docker Compose to orchestrate the following docker containers:
 
-  - SPA container (based on an Nginx image): this container is responsible for handling incoming requests to my single page application (e.g., domain.com) and the back-end API (e.g., api.domain.com). For the SPA, I put the transpiled source code inside this container. For the back-end API. when receiving a request to the API, I pass the request to the API container.
-  - API container (based on an OpenJDK 11 image): this one takes care of any API request and returns the appropriate response. 
-  - DB container (based on MySQL image): this container is in charge of any database operation that comes from the backend API. 
-  - DB backup container (based on [databack/mysql-backup](https://hub.docker.com/r/databack/mysql-backup)): this container regularly makes a backup for the DB container.  
+  - __SPA container (based on an Nginx image)__: this container is responsible for handling incoming requests to my single page application (e.g., domain.com) and the back-end API (e.g., api.domain.com). For the SPA, I put the transpiled source code inside this container. For the back-end API. when receiving a request to the API, I pass the request to the API container.
+  - __API container (based on an OpenJDK 11 image)__: this one takes care of any API request and returns the appropriate response. 
+  - __DB container (based on MySQL image)__: this container is in charge of any database operation that comes from the backend API. 
+  - __DB backup container (based on [databack/mysql-backup](https://hub.docker.com/r/databack/mysql-backup))__: this container regularly makes a backup for the DB container.  
 
 ## Refs
 
