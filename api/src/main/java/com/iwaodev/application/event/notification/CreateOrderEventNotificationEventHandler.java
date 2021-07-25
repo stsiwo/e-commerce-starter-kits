@@ -44,8 +44,8 @@ public class CreateOrderEventNotificationEventHandler implements EventHandler<Or
   @Async
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
   public void handleEvent(OrderEventWasAddedEvent event) throws AppException {
-    logger.info("start CreateOrderEventNotificationEventHandler");
-    logger.info(Thread.currentThread().getName());
+    logger.debug("start CreateOrderEventNotificationEventHandler");
+    logger.debug(Thread.currentThread().getName());
 
     /**
      * when use @TransactionalEventListener with CrudRepository to persist data, this event handler must be under a transactional. Otherwise, it won't save it.

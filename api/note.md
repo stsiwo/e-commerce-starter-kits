@@ -955,7 +955,6 @@
               public void init(EvenementPliRepository evenementPliRepository) 
               {
                   MyListenerClass.evenementPliRepository = evenementPliRepository;
-                  logger.info("Initializing with dependency ["+ evenementPliRepository +"]"); 
               }
             ```
           * don't use above for any nested autowired beans, it only works on the top level bean.

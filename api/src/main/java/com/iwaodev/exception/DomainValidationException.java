@@ -11,7 +11,7 @@ public class DomainValidationException extends Exception {
 
   public DomainValidationException(String errorMessage) {
     super(errorMessage);
-    logger.info(errorMessage);
+    logger.debug(errorMessage);
   }
 }
 

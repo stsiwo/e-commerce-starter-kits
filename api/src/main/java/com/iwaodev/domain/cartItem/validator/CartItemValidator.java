@@ -30,8 +30,6 @@ public class CartItemValidator implements Validator<CartItem> {
   @Override
   public boolean validateWhenBoth(CartItem domain) throws DomainValidationException {
 
-    logger.info("start CartItemNotNullValidator");
-
     if (domain.getUser() == null) {
       throw new DomainValidationException(String.format("user can not be null for this cart item"));
     }

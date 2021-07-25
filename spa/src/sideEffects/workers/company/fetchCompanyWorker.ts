@@ -5,6 +5,8 @@ import { companyActions, FetchCompanyActionType } from "reducers/slices/domain/c
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -32,7 +34,7 @@ import { rsSelector } from "src/selectors/selector";
  **/
 export function* fetchCompanyWorker(action: PayloadAction<FetchCompanyActionType>) {
 
-  console.log("start fetchCompanyWorker")
+  log("start fetchCompanyWorker")
   /**
    * get cur user type
    *
@@ -51,7 +53,7 @@ export function* fetchCompanyWorker(action: PayloadAction<FetchCompanyActionType
    **/
   const apiUrl = `${API1_URL}/companies/public`
 
-  console.log("target url: " + apiUrl)
+  log("target url: " + apiUrl)
 
   /**
    * fetch data
@@ -79,7 +81,7 @@ export function* fetchCompanyWorker(action: PayloadAction<FetchCompanyActionType
   )
 
   if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
-    console.log(response) // pageable response
+    log(response) // pageable response
     /**
      * update company domain in state
      *
@@ -92,8 +94,8 @@ export function* fetchCompanyWorker(action: PayloadAction<FetchCompanyActionType
     )
 
   } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-    console.log(response.fetchStatus)
-    console.log(response.message)
+    log(response.fetchStatus)
+    log(response.message)
   }
 }
 

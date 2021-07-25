@@ -20,9 +20,6 @@ package com.iwaodev.unit.application.event.order;
 //    String dummyStripeCustomerId = "customer-id";
 //
 //    // act
-//    logger.info("publisher exists");
-//    logger.info("" + this.publisher);
-//
 //    /**
 //     * got exception (NullPointerException).
 //     *

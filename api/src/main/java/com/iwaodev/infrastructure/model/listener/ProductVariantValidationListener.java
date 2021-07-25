@@ -45,7 +45,6 @@ public class ProductVariantValidationListener {
   // @Autowired
   // public void init(ValidatorBag<ProductVariant> validatorBag) {
   // ProductVariantValidationListener.validatorBag = validatorBag;
-  // logger.info("Initializing with dependency [" + validatorBag + "]");
   // }
 
   @Autowired
@@ -53,7 +52,6 @@ public class ProductVariantValidationListener {
 
   @PrePersist
   private void beforeCreate(ProductVariant domain) throws AppException {
-    logger.info("start validating domain for create...");
     Set<ConstraintViolation<ProductVariant>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
@@ -63,13 +61,11 @@ public class ProductVariantValidationListener {
 
   @PreUpdate
   private void beforeUpdate(ProductVariant domain) throws AppException {
-    logger.info("start validating domain for update...");
     Set<ConstraintViolation<ProductVariant>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
       throw new AppException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
     }
-    logger.info("the domain passed all validation:)");
   }
 
 }

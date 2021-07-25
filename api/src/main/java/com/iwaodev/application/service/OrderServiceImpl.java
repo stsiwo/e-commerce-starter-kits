@@ -105,8 +105,6 @@ public class OrderServiceImpl implements OrderService {
                     @Override
                     public OrderDTO apply(Order order) {
 
-                        logger.info("order satoshi");
-                        logger.info(order.getStripePaymentIntentId());
                         /**
                          * calculate next addable order event for each order
                          **/
@@ -124,7 +122,7 @@ public class OrderServiceImpl implements OrderService {
         Optional<User> targetEntityOption = this.userRepository.findById(userId);
 
         if (!targetEntityOption.isPresent()) {
-            logger.info("the given user does not exist");
+            logger.debug("the given user does not exist");
             throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
         }
 
@@ -175,7 +173,7 @@ public class OrderServiceImpl implements OrderService {
         Optional<Order> targetEntityOption = this.orderRepository.findById(orderId);
 
         if (!targetEntityOption.isPresent()) {
-            logger.info("the given order does not exist");
+            logger.debug("the given order does not exist");
             throw new AppException(HttpStatus.NOT_FOUND, "the given order does not exist.");
         }
 
@@ -216,12 +214,10 @@ public class OrderServiceImpl implements OrderService {
 
                 stripeCustomerId = stripeCustomer.getId();
             } catch (StripeException e) {
-                logger.info(e.getMessage());
+                logger.debug(e.getMessage());
                 throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
             }
         }
-
-        logger.info("where is null exception");
 
         // create order details from orderDetailCriteria (mapping is not supported)
         this.assignOrderDetails(criteria, order);
@@ -229,7 +225,6 @@ public class OrderServiceImpl implements OrderService {
         /**
          * get shipping cost by send an api request
          **/
-        logger.info("start save rating info");
         RatingDTO ratingDTO = this.shippingService.getRating(order.getTotalWeight(), order.getShippingAddress().getPostalCode());
         order.setShippingCost(ratingDTO.getEstimatedShippingCost());
         order.setEstimatedDeliveryDate(ratingDTO.getExpectedDeliveryDate());
@@ -251,13 +246,11 @@ public class OrderServiceImpl implements OrderService {
 
         PaymentIntent intent;
 
-        logger.info("where is null exception");
-
         try {
             intent = PaymentIntent.create(createParams);
 
         } catch (StripeException e) {
-            logger.info(e.getMessage());
+            logger.debug(e.getMessage());
             throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
 
@@ -287,7 +280,6 @@ public class OrderServiceImpl implements OrderService {
 
         this.publisher.publishEvent(new OrderFinalConfirmedEvent(this, savedOrder, stripeCustomerId, UserTypeEnum.MEMBER));
 
-        logger.info("done with handling published event.");
         // set any transient property up. DON'T FOREGET TO CALL
         savedOrder.setUpCalculatedProperties();
 
@@ -311,13 +303,9 @@ public class OrderServiceImpl implements OrderService {
         /**
          * get shipping cost by send an api request
          **/
-        logger.info("start save rating info");
         RatingDTO ratingDTO = this.shippingService.getRating(order.getTotalWeight(), order.getShippingAddress().getPostalCode());
         order.setShippingCost(ratingDTO.getEstimatedShippingCost());
         order.setEstimatedDeliveryDate(ratingDTO.getExpectedDeliveryDate());
-
-        logger.info("size of order details");
-        logger.info("" + order.getOrderDetails().size());
 
         // create order events
         try {
@@ -339,7 +327,7 @@ public class OrderServiceImpl implements OrderService {
             intent = PaymentIntent.create(createParams);
 
         } catch (StripeException e) {
-            logger.info(e.getMessage());
+            logger.debug(e.getMessage());
             throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
 
@@ -369,7 +357,6 @@ public class OrderServiceImpl implements OrderService {
 
         this.publisher.publishEvent(new OrderFinalConfirmedEvent(this, savedOrder, null, UserTypeEnum.ANONYMOUS));
 
-        logger.info("done with handling published event.");
         // set any transient property up. DON'T FOREGET TO CALL
         savedOrder.setUpCalculatedProperties();
 
@@ -385,8 +372,7 @@ public class OrderServiceImpl implements OrderService {
         List<UUID> productIds = criteria.getOrderDetails().stream().map(orderDetail -> orderDetail.getProductId())
                 .collect(Collectors.toList());
 
-        logger.info("target product ids: ");
-        logger.info("" + productIds.toString());
+        logger.debug("" + productIds.toString());
 
         Map<UUID, Product> products = this.productRepository.findAllByIds(productIds);
 
@@ -414,8 +400,6 @@ public class OrderServiceImpl implements OrderService {
 
             try {
 
-                logger.info("current price: ");
-                logger.info("" + product.getCurrentPriceOfVariant(orderDetailCriteria.getProductVariantId()));
                 OrderDetail orderDetail = new OrderDetail(orderDetailCriteria.getProductQuantity(),
                         product.getCurrentPriceOfVariant(orderDetailCriteria.getProductVariantId()),
                         product.getColorOfVariant(orderDetailCriteria.getProductVariantId()),
@@ -437,8 +421,6 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = this.orderRepository.findByOrderIdAndOrderNumber(orderId, orderNumber)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given order does not exist."));
-
-        logger.info("order id for session timeout: " + order.getOrderId().toString());
 
         User customer = null;
         if (userId != null) {
@@ -546,8 +528,6 @@ public class OrderServiceImpl implements OrderService {
             throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
         }
 
-        logger.info("what's wrong with this transaction.");
-
         Order savedOrder = this.orderRepository.save(targetOrder);
         /**
          * bug.
@@ -615,7 +595,7 @@ public class OrderServiceImpl implements OrderService {
     //  // LocalDateTime curDateTime = LocalDateTime.now();
     //  // if (!order.isEligibleToRefund(curDateTime, this.orderRule.getEligibleDays()))
     //  // {
-    //  // logger.info("sorry, you are not eligible to refund for this order.");
+    //  // logger.debug("sorry, you are not eligible to refund for this order.");
     //  // throw new AppException(HttpStatus.BAD_REQUEST,
     //  // "sorry, you are not eligible to refund for this order.");
     //  // }
@@ -635,7 +615,7 @@ public class OrderServiceImpl implements OrderService {
     //  try {
     //    this.paymentService.requestRefund(paymentIntentId);
     //  } catch (StripeException e) {
-    //    logger.info(e.getMessage());
+    //    logger.debug(e.getMessage());
     //    throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     //  }
 
@@ -707,7 +687,7 @@ public class OrderServiceImpl implements OrderService {
     //  // LocalDateTime curDateTime = LocalDateTime.now();
     //  // if (!order.isEligibleToRefund(curDateTime, this.orderRule.getEligibleDays()))
     //  // {
-    //  // logger.info("sorry, you are not eligible to refund for this order.");
+    //  // logger.debug("sorry, you are not eligible to refund for this order.");
     //  // throw new AppException(HttpStatus.BAD_REQUEST,
     //  // "sorry, you are not eligible to refund for this order.");
     //  // }
@@ -727,7 +707,7 @@ public class OrderServiceImpl implements OrderService {
     //  try {
     //    this.paymentService.requestRefund(paymentIntentId);
     //  } catch (StripeException e) {
-    //    logger.info(e.getMessage());
+    //    logger.debug(e.getMessage());
     //    throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     //  }
 
@@ -793,7 +773,7 @@ public class OrderServiceImpl implements OrderService {
 
         if (!orderOption.isPresent()) {
             // user not found so return error
-            logger.info("the target order does not exist");
+            logger.debug("the target order does not exist");
             throw new AppException(HttpStatus.NOT_FOUND, "the given order does not exist.");
         }
 
@@ -802,12 +782,12 @@ public class OrderServiceImpl implements OrderService {
         OrderEvent lastOrderEvent = order.retrieveLatestOrderEvent();
 
         if (!orderEventId.equals(lastOrderEvent.getOrderEventId())) {
-            logger.info("only latest order event is deletable");
+            logger.debug("only latest order event is deletable");
             throw new AppException(HttpStatus.BAD_REQUEST, "only latest order event is deletable");
         }
 
         if (!lastOrderEvent.getUndoable()) {
-            logger.info("this event is not deletable.");
+            logger.debug("this event is not deletable.");
             throw new AppException(HttpStatus.BAD_REQUEST, "this event is not deletable.");
         }
 
@@ -851,7 +831,7 @@ public class OrderServiceImpl implements OrderService {
 
         if (!orderOption.isPresent()) {
             // user not found so return error
-            logger.info("the target order does not exist");
+            logger.debug("the target order does not exist");
             throw new AppException(HttpStatus.NOT_FOUND, "the given order does not exist.");
         }
 

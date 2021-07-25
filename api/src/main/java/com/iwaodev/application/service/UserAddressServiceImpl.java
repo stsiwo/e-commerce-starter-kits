@@ -32,12 +32,12 @@ public class UserAddressServiceImpl implements UserAddressService {
   private UserRepository repository;
 
   public List<AddressDTO> getAll(UUID userId) throws Exception {
-    logger.info("start handling a request at UserAddressServiceImpl");
+    logger.debug("start handling a request at UserAddressServiceImpl");
 
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (!targetUserOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
@@ -63,7 +63,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (!targetUserOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
@@ -109,7 +109,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (!targetUserOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
@@ -118,10 +118,8 @@ public class UserAddressServiceImpl implements UserAddressService {
       return address.getAddressId().equals(addressId);
     });
 
-    logger.info("target address exists?: " + isTargetAddrssExist);
-
     if (!isTargetAddrssExist) {
-      logger.info("the given address does not exist");
+      logger.debug("the given address does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given address does not exist.");
     }
     // create updated entity
@@ -153,7 +151,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (!targetUserOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
@@ -181,7 +179,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (!targetUserOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
@@ -209,7 +207,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (!targetUserOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 

@@ -82,8 +82,8 @@ public class SendOrderSucceededEmailEventHandler implements EventHandler<Payment
   @Async
   @TransactionalEventListener
   public void handleEvent(PaymentSucceededEvent event) throws AppException {
-    logger.info("start SendOrderSucceededEmailEventHandler called.");
-    logger.info(Thread.currentThread().getName());
+    logger.debug("start SendOrderSucceededEmailEventHandler called.");
+    logger.debug(Thread.currentThread().getName());
 
     // order
     Order order = this.orderRepository.findByStripePaymentIntentId(event.getPaymentIntentId())
@@ -116,15 +116,15 @@ public class SendOrderSucceededEmailEventHandler implements EventHandler<Payment
     thymeleafContext.setVariables(templateModel);
     String htmlBody = thymeleafTemplateEngine.process("order-completed-email.html", thymeleafContext);
 
-    logger.info(htmlBody);
+    logger.debug(htmlBody);
 
     // send it
     try {
-      logger.info(String.format("To: %s, From: %s", recipientEmail, senderEmail));
+      logger.debug(String.format("To: %s, From: %s", recipientEmail, senderEmail));
       this.emailService.send(recipientEmail, from,
           String.format("Your Order Has Been Confirmed (Order #: %s)", order.getOrderNumber()), htmlBody);
     } catch (MessagingException e) {
-      logger.info(e.getMessage());
+      logger.debug(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 

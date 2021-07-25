@@ -1,16 +1,17 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { OrderType, OrderCriteria } from "domain/order/types";
-import { postOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
-import { orderActions, PostOrderActionType } from "reducers/slices/domain/order";
-import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, UserTypeEnum, MessageTypeEnum } from "src/app";
-import { rsSelector } from "src/selectors/selector";
+import { OrderCriteria } from "domain/order/types";
 import { messageActions } from "reducers/slices/app";
-import { getNanoId } from "src/utils";
-import { stripeClientSecretActions } from "reducers/slices/sensitive";
+import { postOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
 import { checkoutOrderActions } from "reducers/slices/domain/checkout";
+import { PostOrderActionType } from "reducers/slices/domain/order";
+import { stripeClientSecretActions } from "reducers/slices/sensitive";
+import { call, put, select } from "redux-saga/effects";
+import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import { rsSelector } from "src/selectors/selector";
+import { getNanoId } from "src/utils";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -98,9 +99,9 @@ export function* postOrderWorker(action: PayloadAction<PostOrderActionType>) {
        *
        **/
 
-      console.log("order and clientSecret in response")
+      log("order and clientSecret in response")
 
-      console.log(response);
+      log(response);
       
 
 
@@ -132,7 +133,7 @@ export function* postOrderWorker(action: PayloadAction<PostOrderActionType>) {
       )
     }
   } else {
-    console.log("permission denied. you are " + curAuth.userType)
+    log("permission denied. you are " + curAuth.userType)
   }
 }
 

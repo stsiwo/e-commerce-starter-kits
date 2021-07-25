@@ -20,7 +20,7 @@ public class AppException extends Exception {
   public AppException(HttpStatus status, String errorMessage) {
     super(errorMessage);
     this.status = status;
-    logger.info(errorMessage);
+    logger.debug(errorMessage);
   }
 }
 

@@ -127,8 +127,6 @@ public class MemberPaymentFailedEventHandlerTest {
    **/
   @BeforeTransaction
   void verifyInitialDatabaseState() throws Exception {
-    logger.info("start calling setup before - satoshi");
-
     this.baseDatabaseSetup.setup(this.entityManager);
   }
 
@@ -155,7 +153,6 @@ public class MemberPaymentFailedEventHandlerTest {
     // act & assert
     this.handler.handleEvent(new PaymentFailedEvent(this, dummyPaymentIntentId, dummyStripeCustomerId));
 
-    logger.info("after finish the event handler");
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.
      *

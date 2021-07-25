@@ -57,7 +57,7 @@ public class ContactServiceImpl implements ContactService {
 
     // if not, return 404
     if (!adminRecipientOption.isPresent()) {
-      logger.info("the admin user does not exist");
+      logger.debug("the admin user does not exist");
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist");
     }
 
@@ -83,7 +83,7 @@ public class ContactServiceImpl implements ContactService {
 
       // if not, return 404
       if (!senderUserOption.isPresent()) {
-        logger.info("the user does not exist");
+        logger.debug("the user does not exist");
         throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the user does not exist");
       }
       senderUser = senderUserOption.get();
@@ -102,7 +102,7 @@ public class ContactServiceImpl implements ContactService {
     try {
       this.emailService.send(adminCompany.getCompanyEmail(), criteria.getEmail(), bcc, criteria.getTitle(), htmlBody);
     } catch (MessagingException e) {
-      logger.info(e.getMessage());
+      logger.debug(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "failed to send an email. please try again later.");
     }
   }

@@ -1,12 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { getReviewFetchStatusActions } from "reducers/slices/app/fetchStatus/review";
-import { reviewActions, reviewPaginationPageActions, reviewPaginationTotalPagesActions, reviewPaginationTotalElementsActions } from "reducers/slices/domain/review";
-import { call, put, select, all } from "redux-saga/effects";
+import { reviewActions, reviewPaginationPageActions, reviewPaginationTotalElementsActions, reviewPaginationTotalPagesActions } from "reducers/slices/domain/review";
+import { all, call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
-import { rsSelector, mSelector } from "src/selectors/selector";
+import { mSelector, rsSelector } from "src/selectors/selector";
 import { generateQueryString } from "src/utils";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -52,8 +53,8 @@ export function* fetchReviewWorker(action: PayloadAction<{}>) {
      **/
     const curQueryString = yield select(mSelector.makeReviewQueryStringSelector())
 
-    console.log(curQueryString)
-    console.log(generateQueryString(curQueryString));
+    log(curQueryString)
+    log(generateQueryString(curQueryString));
 
     /**
      * grab all domain
@@ -128,10 +129,10 @@ export function* fetchReviewWorker(action: PayloadAction<{}>) {
        **/
 
 
-      console.log(response.pageable)
+      log(response.pageable)
 
-      console.log("total pages")
-      console.log(response.totalPages)
+      log("total pages")
+      log(response.totalPages)
 
       yield all([
         put(reviewPaginationPageActions.update(response.pageable.pageNumber)),
@@ -141,11 +142,11 @@ export function* fetchReviewWorker(action: PayloadAction<{}>) {
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.message)
+      log(response.message)
 
     }
   } else {
-    console.log("permission denied. your review type: " + curAuth.userType)
+    log("permission denied. your review type: " + curAuth.userType)
   }
 }
 

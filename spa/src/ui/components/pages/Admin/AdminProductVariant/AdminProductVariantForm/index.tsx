@@ -13,12 +13,12 @@ import {
 } from "@material-ui/pickers";
 import {
   defaultProductVariantValidationData,
+  generateDefaultProductVariantData,
   ProductVariantDataType,
+  productVariantSizeObj,
   ProductVariantSizeType,
   ProductVariantType,
   ProductVariantValidationDataType,
-  productVariantSizeObj,
-  generateDefaultProductVariantData,
 } from "domain/product/types";
 import { useValidation } from "hooks/validation";
 import { productVariantSchema } from "hooks/validation/rules";
@@ -31,6 +31,8 @@ import {
   putProductVariantActionCreator,
 } from "reducers/slices/domain/product";
 import { mSelector } from "src/selectors/selector";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 interface AdminProductVariantFormPropsType {
   productVariant: ProductVariantType;
@@ -366,14 +368,14 @@ const AdminProductVariantForm = React.forwardRef<
     handleSaveClickEvent: (e: React.MouseEvent<HTMLButtonElement>) => {
       const isValid: boolean = isValidSync(curProductVariantState);
 
-      console.log(isValid);
+      log(isValid);
 
       if (isValid) {
         // pass
-        console.log("passed");
+        log("passed");
 
         if (isNew) {
-          console.log("new product creation");
+          log("new product creation");
           // request
           dispatch(
             postProductVariantActionCreator({
@@ -390,7 +392,7 @@ const AdminProductVariantForm = React.forwardRef<
             })
           );
         } else {
-          console.log("new product creation");
+          log("new product creation");
           // request
           dispatch(
             putProductVariantActionCreator({
@@ -408,7 +410,7 @@ const AdminProductVariantForm = React.forwardRef<
           );
         }
       } else {
-        console.log("failed");
+        log("failed");
         updateAllValidation();
       }
     },

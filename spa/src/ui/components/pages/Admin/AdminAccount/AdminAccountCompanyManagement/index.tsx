@@ -20,6 +20,8 @@ import { putAuthCompanyActionCreator } from "reducers/slices/app";
 import { mSelector } from "src/selectors/selector";
 import { getProvinceList, getCountryList } from "src/utils";
 import MenuItem from "@material-ui/core/MenuItem";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -273,11 +275,11 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
   > = async (e) => {
     const isValid: boolean = isValidSync(curAdminCompanyFormState);
 
-    console.log(isValid);
+    log(isValid);
 
     if (isValid) {
       // pass
-      console.log("passed");
+      log("passed");
 
       dispatch(
         putAuthCompanyActionCreator({

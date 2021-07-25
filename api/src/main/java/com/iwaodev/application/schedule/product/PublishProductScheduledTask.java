@@ -21,9 +21,7 @@ public class PublishProductScheduledTask {
   // every day at A.M. 0:00
   @Scheduled(cron = "0 0 0 ? * *") // check with this: https://www.freeformatter.com/cron-expression-generator-quartz.html
   public void handle() throws Exception {
-
-    logger.info("start schedule: TurnIsDiscountFalseWhenDiscountDoneScheduledTask");
-
+    logger.debug("start schedule: TurnIsDiscountFalseWhenDiscountDoneScheduledTask");
     this.productService.turnPassedDiscountFalseByTime(LocalDateTime.now());
   }
 }

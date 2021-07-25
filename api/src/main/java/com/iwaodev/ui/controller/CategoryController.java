@@ -44,8 +44,6 @@ public class CategoryController {
       @RequestParam(value = "sort", required = false, defaultValue = "ALPHABETIC_ASC") CategorySortEnum sort,
       CategoryQueryStringCriteria criteria) throws Exception {
 
-    logger.info("category controller cur thread name: " + Thread.currentThread().getName());
-
     return new ResponseEntity<>(this.service.getAll(criteria, page, limit, sort), HttpStatus.OK);
   }
 

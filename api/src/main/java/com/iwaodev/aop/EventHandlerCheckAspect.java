@@ -31,9 +31,8 @@ public class EventHandlerCheckAspect {
 	@Around("@annotation(com.iwaodev.annotation.EventHandlerCheck)")
 	public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
 		//Advice
-    logger.info("aspect event handler checker.");
-    String result = this.eventHandlerChecker.check(joinPoint.getClass().getName()); 
-    logger.info(result);
+    String result = this.eventHandlerChecker.check(joinPoint.getClass().getName());
+    logger.debug(result);
     return joinPoint.proceed();
     
 	}

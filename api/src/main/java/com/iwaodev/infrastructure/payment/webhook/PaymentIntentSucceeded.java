@@ -26,9 +26,7 @@ public class PaymentIntentSucceeded implements PaymentWebhookHandler {
 
 	@Override
   @Transactional
-	public void handle(Event event, StripeObject stripeObject) {
-    logger.info("payment intent succeeded handler is called successfully."); 
-
+    public void handle(Event event, StripeObject stripeObject) {
     /**
      * find target order by paymentIntentId and target customer by stripeCustomerId.
      *

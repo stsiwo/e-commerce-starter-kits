@@ -45,7 +45,6 @@ public class ProductImageValidationListener {
   // @Autowired
   // public void init(ValidatorBag<ProductImage> validatorBag) {
   // ProductImageValidationListener.validatorBag = validatorBag;
-  // logger.info("Initializing with dependency [" + validatorBag + "]");
   // }
 
   @Autowired
@@ -53,7 +52,6 @@ public class ProductImageValidationListener {
 
   @PrePersist
   private void beforeCreate(ProductImage domain) throws AppException {
-    logger.info("start validating domain for create...");
     Set<ConstraintViolation<ProductImage>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
@@ -63,13 +61,11 @@ public class ProductImageValidationListener {
 
   @PreUpdate
   private void beforeUpdate(ProductImage domain) throws AppException {
-    logger.info("start validating domain for update...");
     Set<ConstraintViolation<ProductImage>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
       throw new AppException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
     }
-    logger.info("the domain passed all validation:)");
   }
 
 }

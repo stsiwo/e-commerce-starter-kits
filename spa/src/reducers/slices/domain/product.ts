@@ -511,8 +511,6 @@ export const productQuerySortActions = productQuerySortSlice.actions
 //
 //    // use when you want to replace
 //    update: (state: DomainPaginationType, action: ProductPaginationActionType) => {
-//      console.log("inside pagination action");
-//      console.log(action.payload)
 //      return action.payload
 //    },
 //    clear: (state: string) => ({

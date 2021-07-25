@@ -8,6 +8,8 @@ import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -90,8 +92,8 @@ export function* putOrderEventWorker(action: PayloadAction<PutOrderEventActionTy
        *
        **/
 
-      console.log("response from PUT order event update.")
-      console.log(response.data)
+      log("response from PUT order event update.")
+      log(response.data)
 
       yield put(
         orderActions.updateEvent({
@@ -112,7 +114,7 @@ export function* putOrderEventWorker(action: PayloadAction<PutOrderEventActionTy
       )
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.fetchStatus)
+      log(response.fetchStatus)
 
       /**
        * update message

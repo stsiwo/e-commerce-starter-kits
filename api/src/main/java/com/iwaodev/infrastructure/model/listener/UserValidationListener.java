@@ -45,7 +45,6 @@ public class UserValidationListener {
   // @Autowired
   // public void init(ValidatorBag<User> validatorBag) {
   // UserValidationListener.validatorBag = validatorBag;
-  // logger.info("Initializing with dependency [" + validatorBag + "]");
   // }
 
   @Autowired
@@ -53,7 +52,6 @@ public class UserValidationListener {
 
   @PrePersist
   private void beforeCreate(User domain) throws AppException {
-    logger.info("start validating domain for create...");
     Set<ConstraintViolation<User>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
@@ -63,13 +61,11 @@ public class UserValidationListener {
 
   @PreUpdate
   private void beforeUpdate(User domain) throws AppException{
-    logger.info("start validating domain for update...");
     Set<ConstraintViolation<User>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
       throw new AppException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
     }
-    logger.info("the domain passed all validation:)");
   }
 
 }

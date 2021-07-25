@@ -69,8 +69,6 @@ import com.iwaodev.exception.AppException;
 //   **/
 //  @TransactionalEventListener
 //  public void handleAddSoldCountEventHandler(CompletedOrderPaymentEvent event) {
-//    logger.info("start handleAddSoldCountEventHandler");
-//    logger.info(Thread.currentThread().getName());
 //
 //    /**
 //     * make shipment api call (e.g., Canada Post) to create non contract shipment
@@ -85,7 +83,6 @@ import com.iwaodev.exception.AppException;
 //    Optional<User> adminOption = this.userRepository.getAdmin();
 //    if (adminOption.isEmpty()) {
 //      // product not found so return error
-//      logger.info("the admin user does not exist.");
 //      throw new AppException(HttpStatus.NOT_FOUND, "the admin user does not exist.");
 //    }
 //

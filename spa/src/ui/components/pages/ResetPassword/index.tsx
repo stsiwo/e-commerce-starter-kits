@@ -1,42 +1,44 @@
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
-import SentimentSatisfiedOutlinedIcon from '@material-ui/icons/SentimentSatisfiedOutlined';
-import { AxiosError } from 'axios';
-import { api } from 'configs/axiosConfig';
-import { useValidation } from 'hooks/validation';
-import { resetPasswordSchema } from 'hooks/validation/rules';
-import * as React from 'react';
-import { useDispatch } from 'react-redux';
-import { useHistory, useLocation } from 'react-router';
+import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
+import IconButton from "@material-ui/core/IconButton";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
+import SentimentSatisfiedOutlinedIcon from "@material-ui/icons/SentimentSatisfiedOutlined";
+import { AxiosError } from "axios";
+import { api } from "configs/axiosConfig";
+import { useValidation } from "hooks/validation";
+import { resetPasswordSchema } from "hooks/validation/rules";
+import * as React from "react";
+import { useDispatch } from "react-redux";
+import { useHistory, useLocation } from "react-router";
 import { Link as RRLink } from "react-router-dom";
-import { messageActions } from 'reducers/slices/app';
-import { MessageTypeEnum } from 'src/app';
-import { getNanoId } from 'src/utils';
+import { messageActions } from "reducers/slices/app";
+import { MessageTypeEnum } from "src/app";
+import { getNanoId } from "src/utils";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 export declare type ResetPasswordDataType = {
-  confirm: string
-  password: string
-}
+  confirm: string;
+  password: string;
+};
 
 const defaultResetPasswordData: ResetPasswordDataType = {
   confirm: "",
   password: "",
-}
+};
 
 export declare type ResetPasswordValidationDataType = {
-  confirm?: string
-  password?: string
-}
+  confirm?: string;
+  password?: string;
+};
 
 const defaultResetPasswordValidationData: ResetPasswordValidationDataType = {
   confirm: "",
   password: "",
-}
+};
 
 // A custom hook that builds on useLocation to parse
 // the query string for you.
@@ -53,7 +55,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     title: {
       textTransform: "uppercase",
-      margin: theme.spacing(3)
+      margin: theme.spacing(3),
     },
     form: {
       margin: theme.spacing(1),
@@ -73,132 +75,141 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     cursorLink: {
       cursor: "pointer",
-    }
-  }),
+    },
+  })
 );
 
 const ResetPassword: React.FunctionComponent<{}> = (props) => {
-
   const classes = useStyles();
 
-  const query = useQuery()
+  const query = useQuery();
 
-  const history = useHistory()
+  const history = useHistory();
 
   // reset password token (get from forgotten password link
-  const forgotPasswordToken = query.get("forgot-password-token")
+  const forgotPasswordToken = query.get("forgot-password-token");
 
   // dispatch
   const dispatch = useDispatch();
 
   // temp user account state
-  const [curResetPasswordState, setResetPasswordState] = React.useState<ResetPasswordDataType>(defaultResetPasswordData);
+  const [curResetPasswordState, setResetPasswordState] =
+    React.useState<ResetPasswordDataType>(defaultResetPasswordData);
 
   // validation logic (should move to hooks)
-  const [curResetPasswordValidationState, setResetPasswordValidationState] = React.useState<ResetPasswordValidationDataType>(defaultResetPasswordValidationData);
+  const [curResetPasswordValidationState, setResetPasswordValidationState] =
+    React.useState<ResetPasswordValidationDataType>(
+      defaultResetPasswordValidationData
+    );
 
-  const { updateValidationAt, updateAllValidation, updateValidationAtMultiple, isValidSync } = useValidation({
+  const {
+    updateValidationAt,
+    updateAllValidation,
+    updateValidationAtMultiple,
+    isValidSync,
+  } = useValidation({
     curDomain: curResetPasswordState,
     curValidationDomain: curResetPasswordValidationState,
     schema: resetPasswordSchema,
     setValidationDomain: setResetPasswordValidationState,
     defaultValidationDomain: defaultResetPasswordValidationData,
-  })
+  });
 
   // event handlers
-  const handleConfirmInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextConfirm = e.currentTarget.value
+  const handleConfirmInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextConfirm = e.currentTarget.value;
     setResetPasswordState((prev: ResetPasswordDataType) => ({
       ...prev,
-      confirm: nextConfirm
+      confirm: nextConfirm,
     }));
-  }
+  };
 
-  const handlePasswordInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextPassword = e.currentTarget.value
+  const handlePasswordInputChangeEvent: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    const nextPassword = e.currentTarget.value;
     setResetPasswordState((prev: ResetPasswordDataType) => ({
       ...prev,
-      password: nextPassword
+      password: nextPassword,
     }));
-  }
+  };
 
   /**
    * validation for multiple fields together
    **/
-  const isInitial = React.useRef<boolean>(true)
+  const isInitial = React.useRef<boolean>(true);
   React.useEffect(() => {
-
     if (!isInitial.current) {
       updateValidationAtMultiple([
         {
           key: "password",
-          value: curResetPasswordState.password
+          value: curResetPasswordState.password,
         },
         {
           key: "confirm",
-          value: curResetPasswordState.confirm
+          value: curResetPasswordState.confirm,
         },
-      ])
+      ]);
     }
     isInitial.current = false;
-  }, [
-      curResetPasswordState.password,
-      curResetPasswordState.confirm
-    ])
+  }, [curResetPasswordState.password, curResetPasswordState.confirm]);
   // event handler to submit
-  const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
-
-    const isValid: boolean = isValidSync(curResetPasswordState)
+  const handleUserAccountSaveClickEvent: React.EventHandler<
+    React.MouseEvent<HTMLButtonElement>
+  > = async (e) => {
+    const isValid: boolean = isValidSync(curResetPasswordState);
 
     if (isValid) {
-      // pass 
-      console.log("passed")
+      // pass
+      log("passed");
       // request
-      api.request({
-        method: 'POST',
-        url: API1_URL + `/reset-password`,
-        data: {
-          password: curResetPasswordState.password,
-          token: forgotPasswordToken,
-        },
-      }).then((data) => {
+      api
+        .request({
+          method: "POST",
+          url: API1_URL + `/reset-password`,
+          data: {
+            password: curResetPasswordState.password,
+            token: forgotPasswordToken,
+          },
+        })
+        .then((data) => {
+          dispatch(
+            messageActions.update({
+              id: getNanoId(),
+              type: MessageTypeEnum.SUCCESS,
+              message: "password was successfully reset.",
+            })
+          );
 
-        dispatch(
-          messageActions.update({
-            id: getNanoId(),
-            type: MessageTypeEnum.SUCCESS,
-            message: "password was successfully reset.",
-          })
-        )
-
-        history.push("/")
-
-
-      }).catch((error: AxiosError) => {
-        dispatch(
-          messageActions.update({
-            id: getNanoId(),
-            type: MessageTypeEnum.ERROR,
-            message: error.response.data.message,
-          })
-        )
-      })
+          history.push("/");
+        })
+        .catch((error: AxiosError) => {
+          dispatch(
+            messageActions.update({
+              id: getNanoId(),
+              type: MessageTypeEnum.ERROR,
+              message: error.response.data.message,
+            })
+          );
+        });
     } else {
-      updateAllValidation()
+      updateAllValidation();
     }
-  }
+  };
 
   return (
-    <Grid
-      container
-      justify="center"
-      direction="column"
-      className={classes.box}
-    >
+    <Grid container justify="center" direction="column" className={classes.box}>
       <IconButton edge="start" color="inherit" aria-label="login-logo">
         <SentimentSatisfiedOutlinedIcon />
       </IconButton>
-      <Typography variant="h5" component="h5" align="center" className={classes.title} >
+      <Typography
+        variant="h5"
+        component="h5"
+        align="center"
+        className={classes.title}
+      >
         {"Reset Password"}
       </Typography>
       <form className={classes.form} noValidate autoComplete="off">
@@ -232,10 +243,7 @@ const ResetPassword: React.FunctionComponent<{}> = (props) => {
         </Box>
       </form>
     </Grid>
-  )
-}
+  );
+};
 
-export default ResetPassword
-
-
-
+export default ResetPassword;

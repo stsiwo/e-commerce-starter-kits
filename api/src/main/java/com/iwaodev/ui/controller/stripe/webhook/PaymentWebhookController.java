@@ -65,9 +65,6 @@ public class PaymentWebhookController {
       @RequestHeader("Stripe-Signature") String sigHeader
       ) throws Exception {
 
-    logger.info("signature value : " + sigHeader);
-    logger.info("endpoint secret value : " + endpointSecret);
-
     /**
      * validate request body (400 if failed) & verify the signature to check it came
      * from Stripe or not (400 if failed)
@@ -102,8 +99,6 @@ public class PaymentWebhookController {
       throw new AppException(HttpStatus.BAD_REQUEST, "failed to deserialize the stripe object.");
     }
 
-    logger.info("webhook test endpoint: event name = " + event.getType());
-
     /**
      * delegate this task to appropriate webhook handler
      **/
@@ -114,7 +109,7 @@ public class PaymentWebhookController {
       // otherwise, handle the webhook
       handler.handle(event, stripeObject);
     } else {
-      logger.info("no handler is implemeneted for event type: " + event.getType());
+      logger.debug("no handler is implemeneted for event type: " + event.getType());
     }
   }
 

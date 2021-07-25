@@ -86,8 +86,6 @@ public class ProductSpecifications {
        * get cheapest price.
        **/
 
-      logger.info("where is my bug.");
-
       /**
        * base query: 
        *  select min(cheapest_price) 
@@ -221,8 +219,6 @@ public class ProductSpecifications {
   // **/
   // return builder.conjunction();
   // }
-  // logger.info("is this called?");
-  // logger.info("" + isVerifiedReviews);
   // return builder.equal(root.join(Product_.reviews).get(Review_.isVerified),
   // isVerifiedReviews);
   // };

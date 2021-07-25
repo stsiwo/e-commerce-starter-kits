@@ -1,10 +1,11 @@
-import * as React from 'react'
-import { useHistory } from 'react-router';
-import TechnicalError from '../TechnicalError';
+import * as React from "react";
+import TechnicalError from "../TechnicalError";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 type ErrorBoundaryStateType = {
-  hasError: boolean
-}
+  hasError: boolean;
+};
 
 class ErrorBoundary extends React.Component<{}, ErrorBoundaryStateType> {
   constructor(props: {}) {
@@ -16,16 +17,16 @@ class ErrorBoundary extends React.Component<{}, ErrorBoundaryStateType> {
     // Display fallback UI
     this.setState({ hasError: true });
     // You can also log the error to an error reporting service
-    console.log(error);
-    console.log(info.componentStack);
+    log(error);
+    log(info.componentStack);
   }
 
   render() {
     if (this.state.hasError) {
       // You can render any custom fallback UI
-      return <TechnicalError />
+      return <TechnicalError />;
     }
     return this.props.children;
   }
 }
-export default ErrorBoundary
+export default ErrorBoundary;

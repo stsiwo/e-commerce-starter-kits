@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { authActions, messageActions, PostAuthAvatarImageActionType } from "reducers/slices/app";
 import { postAuthAvatarImageFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
@@ -7,7 +6,8 @@ import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 /**
  * a worker (generator)    
  *
@@ -104,7 +104,7 @@ export function* postAuthAvatarImageWorker(action: PayloadAction<PostAuthAvatarI
       )
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.message)
+      log(response.message)
 
       /**
        * update message
@@ -118,7 +118,7 @@ export function* postAuthAvatarImageWorker(action: PayloadAction<PostAuthAvatarI
       )
     }
   } else {
-    console.log("permission defined: you are " + curAuth.userType)
+    log("permission defined: you are " + curAuth.userType)
   }
 }
 

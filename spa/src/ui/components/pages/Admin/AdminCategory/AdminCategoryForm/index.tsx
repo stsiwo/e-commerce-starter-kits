@@ -16,6 +16,8 @@ import {
   putCategoryActionCreator,
 } from "reducers/slices/domain/category";
 import { mSelector } from "src/selectors/selector";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 interface AdminCategoryFormPropsType {
   category: CategoryType;
@@ -152,22 +154,22 @@ const AdminCategoryForm = React.forwardRef<any, AdminCategoryFormPropsType>(
       handleSaveClickEvent: (e: React.MouseEvent<HTMLButtonElement>) => {
         const isValid: boolean = isValidSync(curCategoryState);
 
-        console.log(isValid);
+        log(isValid);
 
         if (isValid) {
           // pass
-          console.log("passed");
+          log("passed");
           if (isNew) {
-            console.log("new category creation");
+            log("new category creation");
             // request
             dispatch(postCategoryActionCreator(curCategoryState));
           } else {
-            console.log("update category");
+            log("update category");
             // request
             dispatch(putCategoryActionCreator(curCategoryState));
           }
         } else {
-          console.log("failed");
+          log("failed");
           updateAllValidation();
         }
       },

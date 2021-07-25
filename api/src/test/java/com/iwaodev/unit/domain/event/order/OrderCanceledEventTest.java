@@ -101,7 +101,6 @@ public class OrderCanceledEventTest {
 
   // //Mockito.doNothing().when(this.refundPaymentEventHandler).handleEvent(event);
   // //Mockito.when(this.eventHandlerChecker.check(Mockito.anyString())).thenReturn("A");
-  // //logger.info("" + this.eventHandlerChecker);
 
   // // act
   // this.publisher.publishEvent(event);
@@ -130,9 +129,6 @@ public class OrderCanceledEventTest {
 
   @Test
   public void shouldAllEventHandlersCalled() throws Exception {
-
-    logger.info("try to find all classes which implement EventHandler");
-
     // arrange
     Set<Class> registeredEventHandlers = new HashSet<>();
 

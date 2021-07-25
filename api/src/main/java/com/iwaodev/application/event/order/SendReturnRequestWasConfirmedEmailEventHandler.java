@@ -83,15 +83,15 @@ public class SendReturnRequestWasConfirmedEmailEventHandler implements EventHand
   @Async
   @TransactionalEventListener
   public void handleEvent(OrderEventWasAddedEvent event) throws AppException {
-    logger.info("start SendReturnRequestWasConfirmedEmailEventHandler called.");
-    logger.info(Thread.currentThread().getName());
+    logger.debug("start SendReturnRequestWasConfirmedEmailEventHandler called.");
+    logger.debug(Thread.currentThread().getName());
 
     if (!event.getOrder().retrieveLatestOrderEvent().getOrderStatus().equals(OrderStatusEnum.RECEIVED_RETURN_REQUEST)) {
-      logger.info("order status is not 'received_return_request' so do nothing.");
+      logger.debug("order status is not 'received_return_request' so do nothing.");
       return;
     }
 
-    logger.info("order status is 'received_return_request' so send an email.");
+    logger.debug("order status is 'received_return_request' so send an email.");
     // BCC
     User admin = this.userRepository.getAdmin().orElseThrow(
         () -> new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist"));
@@ -123,15 +123,15 @@ public class SendReturnRequestWasConfirmedEmailEventHandler implements EventHand
     thymeleafContext.setVariables(templateModel);
     String htmlBody = thymeleafTemplateEngine.process("order-return-request-confirmed-email.html", thymeleafContext);
 
-    logger.info(htmlBody);
+    logger.debug(htmlBody);
 
     // send it
     try {
-      logger.info(String.format("To: %s, From: %s", recipientEmail, senderEmail));
+      logger.debug(String.format("To: %s, From: %s", recipientEmail, senderEmail));
       this.emailService.send(recipientEmail, from,
           String.format("Your Return Request Was Confirmed (Order #: %s)", order.getOrderNumber()), htmlBody);
     } catch (MessagingException e) {
-      logger.info(e.getMessage());
+      logger.debug(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 

@@ -101,8 +101,6 @@ public class CreateNotificationServiceImpl implements CreateNotificationService 
     // get all user of the given user type
     List<User> recipientList = this.userRepository.findAvailableAllByType(recipientType);
 
-    logger.info("number of available user: " + recipientList.size());
-
     // get issuer reference
     User issuer = this.userRepository.findById(issuerId).orElseThrow(() -> new NotFoundException("issuer not found"));
 
@@ -121,8 +119,6 @@ public class CreateNotificationServiceImpl implements CreateNotificationService 
 
     // get all user of the given user type
     List<User> recipientList = this.userRepository.findAvailableAllByType(recipientType);
-
-    logger.info("number of available user: " + recipientList.size());
 
     for (User recipient : recipientList) {
       notificationList.add(this.create(notificationType, description, issuer, recipient, link, note));

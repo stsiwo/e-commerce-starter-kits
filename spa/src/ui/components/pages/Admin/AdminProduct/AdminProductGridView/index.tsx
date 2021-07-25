@@ -45,6 +45,8 @@ import { FetchStatusEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import AdminProductFormDialog from "../AdminProductFormDialog";
 import AdminProductSearchController from "../ADminProductSearchController";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 declare type AdminProductGridViewPropsType = {};
 
@@ -94,7 +96,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const generateRows: (domains: ProductType[]) => GridRowsProp = (domains) => {
-  console.log("generateRows: does not update rows? how come");
+  log("generateRows: does not update rows? how come");
   return domains.map((domain: ProductType) => {
     return {
       id: domain.productId,
@@ -193,8 +195,8 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
 
     const curQueryString = useSelector(mSelector.makeProductQuerySelector());
 
-    console.log("current curProductList");
-    console.log(curProductList);
+    log("current curProductList");
+    log(curProductList);
 
     // fetch product
     React.useEffect(() => {
@@ -275,10 +277,10 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
      */
     //const handlePageChange = (param: GridPageChangeParams) => {
     //  // need to decrement since we incremented when display
-    //  console.log("start handling page change");
+    //  log("start handling page change");
     //  const nextPage = param.page;
 
-    //  console.log("next page: " + nextPage);
+    //  log("next page: " + nextPage);
     //  dispatch(productPaginationPageActions.update(nextPage));
     //};
 

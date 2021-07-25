@@ -45,7 +45,6 @@ public class CartItemValidationListener {
   // @Autowired
   // public void init(ValidatorBag<CartItem> validatorBag) {
   // CartItemValidationListener.validatorBag = validatorBag;
-  // logger.info("Initializing with dependency [" + validatorBag + "]");
   // }
 
   @Autowired
@@ -53,7 +52,6 @@ public class CartItemValidationListener {
 
   @PrePersist
   private void beforeCreate(CartItem domain) throws AppException {
-    logger.info("start validating domain for create...");
     Set<ConstraintViolation<CartItem>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
@@ -63,13 +61,11 @@ public class CartItemValidationListener {
 
   @PreUpdate
   private void beforeUpdate(CartItem domain) throws AppException {
-    logger.info("start validating domain for update...");
     Set<ConstraintViolation<CartItem>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
       throw new AppException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
     }
-    logger.info("the domain passed all validation:)");
   }
 
 }

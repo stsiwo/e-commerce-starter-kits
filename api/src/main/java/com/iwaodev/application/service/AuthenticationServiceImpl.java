@@ -92,9 +92,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      * set jwt to cookie (httponly & secure)
      *
      **/
-    logger.info("api token cookie security info: ");
-    logger.info(apiTokenCookieConfig.toString());
-
     ResponseCookie cookie = this.cookieService.createApiTokenCookie(jwt);
 
     response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());

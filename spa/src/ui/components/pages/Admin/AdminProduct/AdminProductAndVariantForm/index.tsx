@@ -1,4 +1,6 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -7,7 +9,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     subtitle: {
       margin: theme.spacing(1, 0),
-      fontWeight: theme.typography.fontWeightBold
+      fontWeight: theme.typography.fontWeightBold,
     },
     txtFieldBase: {
       width: "80%",
@@ -36,11 +38,9 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: 200,
       minWidth: 200,
     },
-    productDateInput: {
-    },
-    actionBox: {
-    },
-  }),
+    productDateInput: {},
+    actionBox: {},
+  })
 );
 
 /**
@@ -127,7 +127,7 @@ const useStyles = makeStyles((theme: Theme) =>
 //
 //  const handleProductBaseUnitPriceInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
 //    const nextProductBaseUnitPrice = e.currentTarget.value
-//    console.log("product base unit price")
+//    log("product base unit price")
 //    updateValidationAt("productBaseUnitPrice", e.currentTarget.value);
 //    setProductState((prev: ProductDataType) => ({
 //      ...prev,
@@ -252,7 +252,7 @@ const useStyles = makeStyles((theme: Theme) =>
 ////    //updateValidationAt("productBaseDiscountPrice", nextProductVariantColor);
 ////    setProductState((prev: ProductDataType) => ({
 ////      ...prev,
-////      productVariants:[ 
+////      productVariants:[
 ////        {
 ////          ...prev.productVariants[0],
 ////          variantColor: nextProductVariantColor,
@@ -266,13 +266,13 @@ const useStyles = makeStyles((theme: Theme) =>
 //
 //    const isValid: boolean = isValidSync(curProductState)
 //
-//    console.log(isValid);
+//    log(isValid);
 //
 //    if (isValid) {
-//      // pass 
-//      console.log("passed")
+//      // pass
+//      log("passed")
 //    } else {
-//      console.log("failed")
+//      log("failed")
 //      updateAllValidation()
 //    }
 //  }
@@ -400,7 +400,7 @@ const useStyles = makeStyles((theme: Theme) =>
 //        Variant
 //      </Typography>
 //      <Typography variant="body2" component="p" color="textSecondary" align="left" className={classes.subtitle}>
-//        any information only applies to this variant. for example, you can make this varaint discount (but not the other variant) by checking 'Variant Discount'.  you can add as many variants as you want after creating one. 
+//        any information only applies to this variant. for example, you can make this varaint discount (but not the other variant) by checking 'Variant Discount'.  you can add as many variants as you want after creating one.
 //      </Typography>
 //      <FormLabel>
 //        {"Variant Color"}
@@ -503,7 +503,3 @@ const useStyles = makeStyles((theme: Theme) =>
 //}
 //
 //export default AdminProductAndVariantForm
-
-
-
-

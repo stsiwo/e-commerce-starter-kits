@@ -11,6 +11,6 @@ public class NotFoundException extends Exception {
 
   public NotFoundException(String errorMessage) {
     super(errorMessage);
-    logger.info(errorMessage);
+    logger.debug(errorMessage);
   }
 }

@@ -55,7 +55,6 @@ import org.springframework.transaction.annotation.Transactional;
 //
 ////  @BeforeTransaction
 ////  void verifyInitialDatabaseState() {
-////    logger.info("start calling setup before - satoshi");
 ////    this.baseDatabaseSetup.setup(this.entityManager);
 ////  }
 ////

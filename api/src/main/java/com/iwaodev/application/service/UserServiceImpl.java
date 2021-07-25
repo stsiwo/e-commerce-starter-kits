@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
     Optional<User> targetEntityOption = this.repository.findById(id);
 
     if (!targetEntityOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
@@ -110,14 +110,12 @@ public class UserServiceImpl implements UserService {
     // otherwise, this try to create a new User
     criteria.setUserId(id);
 
-    logger.info("target criteria: " + criteria.toString());
-
     // check user exists
     Optional<User> targetEntityOption = this.repository.findById(id);
 
     // if not, return 404
     if (!targetEntityOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
@@ -137,7 +135,6 @@ public class UserServiceImpl implements UserService {
      * if email is updated, we need to set active = temp and requires the user to verify again.
      */
     if (!targetEntity.getEmail().equals(criteria.getEmail())) {
-      logger.info("email is updated so turn active to 'temp' and ask him to verify again.");
       targetEntity.setEmail(criteria.getEmail());
       targetEntity.setActive(UserActiveEnum.TEMP);
     }
@@ -151,8 +148,6 @@ public class UserServiceImpl implements UserService {
     }
 
     User savedEntity = this.repository.save(targetEntity);
-
-    logger.info("password (make sure this never gonna be null): " + savedEntity.getPassword());
 
     // map entity to dto
     return UserMapper.INSTANCE.toUserDTO(savedEntity);
@@ -184,7 +179,7 @@ public class UserServiceImpl implements UserService {
     Optional<User> targetEntityOption = this.repository.findById(id);
 
     if (!targetEntityOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
@@ -220,13 +215,13 @@ public class UserServiceImpl implements UserService {
     Optional<User> targetEntityOption = this.repository.findById(userId);
 
     if (!targetEntityOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     // check the file content type (only image is allowed)
     if (!this.fileService.isImage(file)) {
-      logger.info("only image files are acceptable.");
+      logger.debug("only image files are acceptable.");
       throw new AppException(HttpStatus.BAD_REQUEST, "only image files are acceptable.");
     }
 
@@ -238,16 +233,12 @@ public class UserServiceImpl implements UserService {
     String fileName = updateFileName(newFileName);
     String path = directoryPath + "/" + newFileName;
 
-    logger.info("directory path: " + directoryPath);
-    logger.info("file name: " + newFileName);
-    logger.info("path to this file: " + path);
-
     // try to save teh file
     try {
       //this.fileService.save(path, file);
       this.s3Service.upload(path, file.getBytes());
     } catch (Exception e) {
-      logger.info(e.getMessage());
+      logger.debug(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
@@ -255,8 +246,6 @@ public class UserServiceImpl implements UserService {
     User targetEntity = targetEntityOption.get();
 
     String publicPath = getPublicDirectoryPath(targetEntity.getUserId().toString()) + "/" + newFileName;
-
-    logger.info("public path: " + publicPath);
 
     targetEntity.setAvatarImagePath(publicPath);
 
@@ -272,7 +261,7 @@ public class UserServiceImpl implements UserService {
     Optional<User> targetEntityOption = this.repository.findById(userId);
 
     if (!targetEntityOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
@@ -283,24 +272,18 @@ public class UserServiceImpl implements UserService {
     // if it is empty, we don't have any image to delete.
     if (avatarImagePath != null && !avatarImagePath.isEmpty()) {
 
-      logger.info("public image path: " + avatarImagePath);
-
       String directoryPathWithFile = this.switchToDirectoryPathWithFile(avatarImagePath,
           targetEntity.getUserId().toString());
 
-      logger.info("directory image path: " + directoryPathWithFile);
-
       // remove from the directory
       boolean isSuccess = this.fileService.remove(directoryPathWithFile);
-
-      logger.info("avatar image file succeed? " + isSuccess);
 
       // update user entity to remove avatarImagePath
       targetEntity.setAvatarImagePath(null);
 
       this.repository.save(targetEntity);
     } else {
-      logger.info("image path is empty so we don't have any image to delete.");
+      logger.debug("image path is empty so we don't have any image to delete.");
     }
   }
 
@@ -325,7 +308,7 @@ public class UserServiceImpl implements UserService {
 
     String internalPath = this.userFilePath + "/" + userId.toString() + "/" + imageName;
 
-    logger.info("ineternal path: " + internalPath);
+    logger.debug("ineternal path: " + internalPath);
 
     byte[] content = null;
 
@@ -333,7 +316,7 @@ public class UserServiceImpl implements UserService {
       //content = this.fileService.load(internalPath);
       content = this.s3Service.get(internalPath);
     } catch (Exception e) {
-      logger.info(e.getMessage());
+      logger.debug(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 

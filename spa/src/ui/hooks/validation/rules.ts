@@ -1,5 +1,7 @@
+import { get2AlphaCountryCodeRegex, getProvinceList, isAfterOrEqualDateOf, isBeforeOrEqualDateOf, isValidDate } from 'src/utils';
 import * as yup from 'yup';
-import { get2AlphaCountryCodeRegex, getProvinceList, isBeforeOrEqualDateOf, isValidDate, isAfterOrEqualDateOf } from 'src/utils';
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * note:
@@ -162,14 +164,14 @@ export const productVariantSchema = yup.object().shape({
   .test("start-date-mandatory-if-discount", "please enter valid date.",
     function(value: Date) {
       const isDiscount = this.parent.isDiscount
-      console.log(value)
+      log(value)
       if (isDiscount) {
-        console.log("disocunt is enable so start date cannot be null")
+        log("disocunt is enable so start date cannot be null")
         if (!isValidDate(value)) {
-          console.log("invalid start dte")
+          log("invalid start dte")
           return false
         }
-          console.log("valid start dte")
+          log("valid start dte")
       }
       return true
     })
@@ -190,13 +192,13 @@ export const productVariantSchema = yup.object().shape({
   .test("end-date-mandatory-if-discount", "please enter valid date.",
     function(value: Date) {
       const isDiscount = this.parent.isDiscount
-      console.log(value)
+      log(value)
       if (isDiscount) {
-        console.log("disocunt is enable so end date cannot be null")
+        log("disocunt is enable so end date cannot be null")
         if (!isValidDate(value)) {
           return false
         }
-        console.log("valid end date")
+        log("valid end date")
       }
       return true
     })
@@ -287,10 +289,10 @@ export const productSchema = yup.object().shape({
      * - the first file object exists and not empty object
      **/
     (value) => {
-      console.log("product images")
-      console.log(value)
-      console.log("result")
-      console.log(value[0] != null && Object.keys(value[0]).length === 0 && value[0].constructor === Object)
+      log("product images")
+      log(value)
+      log("result")
+      log(value[0] != null && Object.keys(value[0]).length === 0 && value[0].constructor === Object)
       return value[0].productImagePath != ""
     }
   ),
@@ -426,7 +428,7 @@ export const companySchema = yup.object().shape({
      **/
     (value) => {
       const provinceList = getProvinceList();
-      console.log(value);
+      log(value);
       return provinceList.indexOf(value) !== -1 ? true : false;
     }
   ).required(),

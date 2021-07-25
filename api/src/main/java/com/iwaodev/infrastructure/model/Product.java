@@ -223,7 +223,6 @@ public class Product {
 
   public BigDecimal getCheapestPrice() {
 
-    logger.info("try to get cheapest price");
     /**
      * in order to find min price, need to set the max.
      * currently set $10000.00. 
@@ -237,7 +236,6 @@ public class Product {
       cheapestPrice = this.productBaseUnitPrice;
     }
 
-    logger.info("cur cheapest: " + cheapestPrice);
     // pick cheapest price among all variants
     for (ProductVariant variant : this.variants) {
       // if the variant has its own unit price
@@ -253,10 +251,8 @@ public class Product {
 
   public BigDecimal getHighestPrice() {
 
-    logger.info("try to get highest price");
     BigDecimal highestPrice = this.productBaseUnitPrice;
 
-    logger.info("cur highest: " + highestPrice);
     // pick highest price among all variants
     for (ProductVariant variant : this.variants) {
 
@@ -265,7 +261,6 @@ public class Product {
         highestPrice = highestPrice.max(variant.getVariantUnitPrice());
       }
 
-      logger.info("cur highest price after variant unit price: " + highestPrice);
 
       // if the variant is discount
       if (variant.getIsDiscount() && variant.getVariantDiscountStartDate().isBefore(LocalDateTime.now())
@@ -273,7 +268,6 @@ public class Product {
         highestPrice = highestPrice.max(variant.getVariantDiscountPrice());
       }
 
-      logger.info("cur highest price after variant discount price: " + highestPrice);
     }
 
     return highestPrice;
@@ -516,7 +510,6 @@ public class Product {
   public void turnDiscountFalseByTime(LocalDateTime time) {
     for (ProductVariant variant : this.variants) {
       if (variant.getIsDiscount() && variant.getVariantDiscountEndDate().isBefore(time)) {
-        logger.info("turning discount false of variant id: " + variant.getVariantId());
         variant.setIsDiscount(false);
       }
     }

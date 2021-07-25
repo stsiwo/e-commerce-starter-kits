@@ -53,8 +53,6 @@ public class UserCartItemServiceImpl implements UserCartItemService {
 
     List<CartItem> cartItems = this.cartItemRepository.getAllByUserId(userId);
 
-    logger.info("# of cart items found: " + cartItems.size() + " by user id: " + userId.toString());
-
     return cartItems.stream().map(new Function<CartItem, CartItemDTO>() {
 
       @Override
@@ -111,7 +109,7 @@ public class UserCartItemServiceImpl implements UserCartItemService {
     Optional<User> targetUserOption = this.userRepository.findById(criteria.getUserId());
 
     if (!targetUserOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
@@ -119,7 +117,7 @@ public class UserCartItemServiceImpl implements UserCartItemService {
     Optional<Product> targetProductOption = this.productRepository.findByVariantId(criteria.getVariantId());
 
     if (!targetProductOption.isPresent()) {
-      logger.info("the given product or its variant does not exist");
+      logger.debug("the given product or its variant does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product or its variant does not exist.");
     }
 
@@ -127,7 +125,7 @@ public class UserCartItemServiceImpl implements UserCartItemService {
     Optional<CartItem> option = this.cartItemRepository.findByVariantIdAndUserId(criteria.getVariantId(), criteria.getUserId());
 
     if (option.isPresent()) {
-      logger.info("target cart item already exist");
+      logger.debug("target cart item already exist");
       throw new AppException(HttpStatus.CONFLICT, "target cart item already exist.");
     }
 
@@ -150,14 +148,11 @@ public class UserCartItemServiceImpl implements UserCartItemService {
 
     CartItemDTO cartDTO = CartItemMapper.INSTANCE.toCartItemDTO(savedCartItem);
 
-    logger.info("saved cart item dto");
-    logger.info(cartDTO.toString());
     /**
      * maybe we can use 'custom mapstruct' (e.g., @Named & 'qualifiedName' )
      **/
     // filter target variant and remove other unrelated variant
     List<ProductVariantDTO> targetVariantDTO = cartDTO.getProduct().getVariants().stream().filter(variant -> {
-      logger.info(variant.getVariantId().toString());
       return variant.getVariantId().equals(criteria.getVariantId());
     }).collect(Collectors.toList());
 
@@ -173,7 +168,7 @@ public class UserCartItemServiceImpl implements UserCartItemService {
     Optional<CartItem> targetCartItemOption = this.cartItemRepository.findById(criteria.getCartItemId());
 
     if (!targetCartItemOption.isPresent()) {
-      logger.info("the given cart item does not exist");
+      logger.debug("the given cart item does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given cart item does not exist.");
     }
 
@@ -197,7 +192,6 @@ public class UserCartItemServiceImpl implements UserCartItemService {
      **/
     // filter target variant and remove other unrelated variant
     List<ProductVariantDTO> targetVariantDTO = cartDTO.getProduct().getVariants().stream().filter(variant -> {
-      logger.info(variant.getVariantId().toString());
       return variant.getVariantId().equals(criteria.getVariantId());
     }).collect(Collectors.toList());
 

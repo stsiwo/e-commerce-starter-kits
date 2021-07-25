@@ -11,17 +11,17 @@ import {
   useTheme,
 } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { AxiosError } from "axios";
 import { api } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import { useValidation } from "hooks/validation";
 import { forgotPasswordSchema } from "hooks/validation/rules";
-import { useSnackbar } from "notistack";
 import * as React from "react";
 import { useDispatch } from "react-redux";
 import { messageActions } from "reducers/slices/app";
-import { getNanoId } from "src/utils";
 import { MessageTypeEnum } from "src/app";
+import { getNanoId } from "src/utils";
+const log = logger(import.meta.url);
 
 export declare type ForgotPasswordDataType = {
   email: string;
@@ -136,7 +136,7 @@ const ForgotPasswordDialog: React.FunctionComponent<ForgotPasswordDialogPropsTyp
 
       if (isValid) {
         // pass
-        console.log("passed");
+        log("passed");
         // request
         api
           .request({

@@ -48,7 +48,6 @@ public class NotificationValidationListener {
   // @Autowired
   // public void init(ValidatorBag<CartItem> validatorBag) {
   // CartItemValidationListener.validatorBag = validatorBag;
-  // logger.info("Initializing with dependency [" + validatorBag + "]");
   // }
 
   @Autowired
@@ -56,7 +55,6 @@ public class NotificationValidationListener {
 
   @PrePersist
   private void beforeCreate(Notification domain) throws AppException {
-    logger.info("start validating cartitem domain for create...");
     Set<ConstraintViolation<Notification>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
@@ -66,13 +64,11 @@ public class NotificationValidationListener {
 
   @PreUpdate
   private void beforeUpdate(Notification domain) throws AppException {
-    logger.info("start validating cartitem domain for update...");
     Set<ConstraintViolation<Notification>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
       throw new AppException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
     }
-    logger.info("the cartitem domain passed all validation:)");
   }
 
 }

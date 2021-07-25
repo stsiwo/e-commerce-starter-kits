@@ -6,6 +6,8 @@ import { wishlistItemActions } from "reducers/slices/domain/wishlistItem";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -97,7 +99,7 @@ export function* deleteWishlistItemWorker(action: PayloadAction<WishlistItemType
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.message)
+      log(response.message)
 
     }
 

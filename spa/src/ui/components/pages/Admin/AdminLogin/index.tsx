@@ -21,6 +21,8 @@ import { authActions, messageActions } from "reducers/slices/app";
 import { MessageTypeEnum } from "src/app";
 import { mSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 export declare type AdminLoginDataType = {
   email: string;
@@ -157,7 +159,7 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
 
     if (isValid) {
       // pass
-      console.log("passed");
+      log("passed");
       // request
       api
         .request({

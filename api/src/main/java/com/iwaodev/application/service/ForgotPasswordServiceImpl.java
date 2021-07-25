@@ -43,19 +43,15 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
     // find the user by this email
     Optional<User> targetUserOption = this.userRepository.getByEmail(email);
 
-    logger.info("forgot password user? null?");
-    logger.info("" + targetUserOption.isPresent());
 
     if (targetUserOption.isPresent()) {
-      logger.info("target forgot password user exist");
+      logger.debug("target forgot password user exist");
 
       User targetUser = targetUserOption.get();
 
       targetUser.refreshForgotPasswordToken();
 
       User savedUser = this.userRepository.save(targetUser);
-
-      logger.info("publish forgot password event");
       this.publisher.publishEvent(new GeneratedForgotPasswordTokenEvent(this, savedUser));
     }
   }
@@ -71,7 +67,7 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
        * true message is 'the given user does not exist' but to improve the security, we hide the message and return the below message instead.
        * 
        **/
-      logger.info("the reset password token is not valid.");
+      logger.debug("the reset password token is not valid.");
       throw new AppException(HttpStatus.BAD_REQUEST, "the reset password token is not valid.");
     }
 
@@ -79,7 +75,7 @@ public class ForgotPasswordServiceImpl implements ForgotPasswordService {
 
     // token is expired or invalid
     if (!targetUser.verifyForgotPasswordToken(criteria.getToken())) {
-      logger.info("the reset password token is not valid.");
+      logger.debug("the reset password token is not valid.");
       throw new AppException(HttpStatus.BAD_REQUEST, "the reset password token is not valid.");
     }
 

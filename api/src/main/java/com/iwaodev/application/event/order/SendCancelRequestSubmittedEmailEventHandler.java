@@ -68,15 +68,14 @@ public class SendCancelRequestSubmittedEmailEventHandler implements EventHandler
   @Async
   @TransactionalEventListener
   public void handleEvent(OrderEventWasAddedByMemberEvent event) throws AppException {
-    logger.info("start SendCancelRequestSubmittedEmailEventHandler called.");
-    logger.info(Thread.currentThread().getName());
+    logger.debug("start SendCancelRequestSubmittedEmailEventHandler called.");
+    logger.debug(Thread.currentThread().getName());
 
     if (!event.getOrder().retrieveLatestOrderEvent().getOrderStatus().equals(OrderStatusEnum.CANCEL_REQUEST)) {
-      logger.info("order status is not 'cancel_request' so do nothing.");
+      logger.debug("order status is not 'cancel_request' so do nothing.");
       return;
     }
 
-    logger.info("order status is 'cancel_request' so send an email.");
     User admin = this.userRepository.getAdmin().orElseThrow(
         () -> new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist"));
 
@@ -105,15 +104,15 @@ public class SendCancelRequestSubmittedEmailEventHandler implements EventHandler
     thymeleafContext.setVariables(templateModel);
     String htmlBody = thymeleafTemplateEngine.process("order-cancel-request-submitted-email.html", thymeleafContext);
 
-    logger.info(htmlBody);
+    logger.debug(htmlBody);
 
     // send it
     try {
-      logger.info(String.format("To: %s, From: %s", admin.getEmail(), senderEmail));
+      logger.debug(String.format("To: %s, From: %s", admin.getEmail(), senderEmail));
       this.emailService.send(admin.getEmail(), from, bcc,
           "A Cancel Request Was Submitted By Customer (Order #: " + order.getOrderNumber() + ")", htmlBody);
     } catch (MessagingException e) {
-      logger.info(e.getMessage());
+      logger.debug(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 

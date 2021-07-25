@@ -46,8 +46,6 @@ public class ProductController {
       @RequestParam(value = "sort", required = false, defaultValue = "DATE_DESC") ProductSortEnum sort,
       ProductQueryStringCriteria criteria) throws Exception {
 
-    logger.info("product controller cur thread name: " + Thread.currentThread().getName());
-
     return new ResponseEntity<>(this.service.getAll(criteria, page, limit, sort), HttpStatus.OK);
   }
 
@@ -57,8 +55,6 @@ public class ProductController {
       @RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit,
       @RequestParam(value = "sort", required = false, defaultValue = "DATE_DESC") ProductSortEnum sort,
       ProductQueryStringCriteria criteria) throws Exception {
-
-    logger.info("product controller cur thread name: " + Thread.currentThread().getName());
 
     return new ResponseEntity<>(this.service.getPublicAll(criteria, page, limit, sort), HttpStatus.OK);
   }
@@ -87,7 +83,6 @@ public class ProductController {
       @RequestPart(name = "files", required = false) List<MultipartFile> files,
       @Valid @RequestPart("criteria") ProductCriteria criteria
       ) throws Exception {
-    logger.info("start handling at /products POST");
     return new ResponseEntity<>(this.service.create(criteria, files), HttpStatus.OK);
   }
 
@@ -99,7 +94,6 @@ public class ProductController {
       @Valid @RequestPart("criteria") ProductCriteria criteria,
       @RequestPart(name = "files", required = false) List<MultipartFile> files
       ) throws Exception {
-    logger.info("start handling at /products PUT");
     return new ResponseEntity<>(this.service.update(criteria, id, files), HttpStatus.OK);
   }
 
@@ -109,7 +103,6 @@ public class ProductController {
   public ResponseEntity<BaseResponse> delete(
       @PathVariable(value = "id") UUID id
       ) throws Exception {
-    logger.info("start handling at /products DELETE");
     this.service.delete(id);
     return new ResponseEntity<>(new BaseResponse("successfuly deleted."), HttpStatus.OK);
   }

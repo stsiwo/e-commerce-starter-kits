@@ -1,14 +1,15 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { api } from "configs/axiosConfig";
-import { messageActions, FetchAuthOrderActionType, PostAuthOrderEventActionType } from "reducers/slices/app";
-import { all, call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
-import { mSelector, rsSelector } from "src/selectors/selector";
-import { generateQueryString, getNanoId } from "src/utils";
-import { fetchAuthOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
-import { orderActions, orderPaginationPageActions, orderPaginationTotalPagesActions, orderPaginationTotalElementsActions } from "reducers/slices/domain/order";
-import { postOrderEventFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
 import { OrderEventCriteria } from "domain/order/types";
+import { messageActions, PostAuthOrderEventActionType } from "reducers/slices/app";
+import { postOrderEventFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
+import { orderActions } from "reducers/slices/domain/order";
+import { call, put, select } from "redux-saga/effects";
+import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import { rsSelector } from "src/selectors/selector";
+import { getNanoId } from "src/utils";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -42,7 +43,7 @@ export function* postAuthOrderEventWorker(action: PayloadAction<PostAuthOrderEve
 
   if (curAuth.userType === UserTypeEnum.MEMBER) {
 
-    console.log("start calling post auth order event worker:)")
+    log("start calling post auth order event worker:)")
 
     /**
      * update status for anime data
@@ -88,8 +89,8 @@ export function* postAuthOrderEventWorker(action: PayloadAction<PostAuthOrderEve
        *
        * don't use 'merge' since no cache
        **/
-      console.log("order dto in resposne")
-      console.log(response.data)
+      log("order dto in resposne")
+      log(response.data)
       yield put(
         orderActions.updateOne(response.data)
       )
@@ -107,7 +108,7 @@ export function* postAuthOrderEventWorker(action: PayloadAction<PostAuthOrderEve
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.message)
+      log(response.message)
 
       /**
        * update message

@@ -93,7 +93,7 @@ public class CategoryServiceImpl implements CategoryService {
     Optional<Category> targetEntityOption = this.repository.findById(id);
 
     if (!targetEntityOption.isPresent()) {
-      logger.info("the given address does not exist");
+      logger.debug("the given address does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given address does not exist.");
     }
 

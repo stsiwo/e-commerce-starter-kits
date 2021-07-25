@@ -46,13 +46,11 @@ public class SpringSecurityUserDetailsService implements UserDetailsService {
    *  change from email to userId for username and subject value in jwt.
    *
    *  this is because of the following issues:
-   *    1. security issue. it is not good practice to include sensistive information inside jwt since jwt is decoded outside.
+   *    1. security issue. it is not good practice to include sensistive debugrmation inside jwt since jwt is decoded outside.
    *    2. if a member change the email address, the subject value (e.g., email) is obsolete and make the member impossible to access their protected resource unless we force him to log out and login again.
    **/
   @Override
   public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-
-    logger.info("start load user by user name");
 
     /**
      * find the user with userRepo (hibernate)
@@ -66,12 +64,9 @@ public class SpringSecurityUserDetailsService implements UserDetailsService {
      * if the user is not found
      **/
     if (loginUser == null) {
-      logger.info("target user not found by findActiveOrTempByEmail");
+      logger.debug("target user not found by findActiveOrTempByEmail");
       throw new UsernameNotFoundException("NOT_FOUND");
     }
-
-    logger.info("this user tries to login: " + loginUser.getEmail());
-
     /**
      * prepare granded authority
      **/
@@ -87,16 +82,12 @@ public class SpringSecurityUserDetailsService implements UserDetailsService {
 
     grantList.add(authority);
 
-    logger.info("this user's role: " + role);
-
     /**
      * construct UserDetails for return
      *
      * user userid as username of SpringSecurityUser. be careful.
      **/
     UserDetails userDetails = new SpringSecurityUser(loginUser.getUserId(), loginUser.getUserId().toString(), loginUser.getPassword(), grantList);
-
-    logger.info("start returning this userDetails");
 
     return userDetails;
 

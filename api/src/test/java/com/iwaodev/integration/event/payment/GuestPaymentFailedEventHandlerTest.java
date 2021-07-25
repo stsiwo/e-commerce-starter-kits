@@ -122,8 +122,6 @@ public class GuestPaymentFailedEventHandlerTest {
    **/
   @BeforeTransaction
   void verifyInitialDatabaseState() throws Exception {
-    logger.info("start calling setup before - satoshi");
-
     this.baseDatabaseSetup.setup(this.entityManager);
   }
 
@@ -147,7 +145,6 @@ public class GuestPaymentFailedEventHandlerTest {
     // act & assert
     this.handler.handleEvent(new PaymentFailedEvent(this, dummyPaymentIntentId, null));
 
-    logger.info("after finish the event handler");
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.
      *
@@ -162,8 +159,6 @@ public class GuestPaymentFailedEventHandlerTest {
     assertThat(dummyOrder.getOrderEvents().size()).isEqualTo(3);
     //assertThat(dummyOrder.getLatestOrderEventStatus()).isEqualTo(OrderStatusEnum.PAYMENT_FAILED); // @Formula is not updated, but it is ok since it is not returned to client.
     assertThat(dummyOrder.getLatestOrderEvent().getOrderStatus()).isEqualTo(OrderStatusEnum.PAYMENT_FAILED);
-
-    logger.info("order at assertion: ");
 
     for (int i = 0; i < dummyOrder.getOrderDetails().size(); i++) {
       OrderDetail orderDetail = dummyOrder.getOrderDetails().get(i);

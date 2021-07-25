@@ -44,8 +44,6 @@ public class UserCartItemController {
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
 
-    logger.info("product controller cur thread name: " + Thread.currentThread().getName());
-
     return new ResponseEntity<>(this.service.getAll(userId), HttpStatus.OK);
   }
 
@@ -96,7 +94,6 @@ public class UserCartItemController {
       @PathVariable(value = "cartItemId") @NotNull Long cartItemId,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    logger.info("start handling at /users/{userId}/cartItem/{cartItemId} DELETE");
     this.service.remove(cartItemId);
     return new ResponseEntity<>(new BaseResponse("successfully deleted."), HttpStatus.OK);
   }
@@ -108,7 +105,6 @@ public class UserCartItemController {
       @PathVariable(value = "userId") @NotNull UUID userId,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    logger.info("start handling at /users/{userId}/cartItems/{cartItemId} DELETE");
     this.service.deleteAll(userId);
     return new ResponseEntity<>(new BaseResponse("successfully deleted."), HttpStatus.OK);
   }

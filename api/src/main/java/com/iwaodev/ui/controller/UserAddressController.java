@@ -46,9 +46,6 @@ public class UserAddressController {
       @PathVariable(value = "userId") UUID userId,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    logger.info("start handling a request at UserAddressController#get");
-    logger.info("user id: " + userId);
-
     return new ResponseEntity<>(this.service.getAll(userId), HttpStatus.OK);
   }
 
@@ -61,9 +58,6 @@ public class UserAddressController {
       @AuthenticationPrincipal SpringSecurityUser authUser,
       @Valid @RequestBody UserAddressCriteria criteria
       ) throws Exception {
-    logger.info("start handling a request at UserAddressController#post");
-    logger.info("user id: " + userId);
-    logger.info("criteria" + criteria);
 
     return new ResponseEntity<>(this.service.create(criteria, userId), HttpStatus.OK);
   }
@@ -78,9 +72,6 @@ public class UserAddressController {
       @AuthenticationPrincipal SpringSecurityUser authUser,
       @Valid @RequestBody UserAddressCriteria criteria
       ) throws Exception {
-    logger.info("start handling a request at UserAddressController#post");
-    logger.info("user id: " + userId);
-    logger.info("criteria" + criteria);
 
     return new ResponseEntity<>(this.service.update(criteria, userId, addressId), HttpStatus.OK);
   }
@@ -95,17 +86,13 @@ public class UserAddressController {
       @NotEmpty @RequestBody Map<String, String> body,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    logger.info("start handling a request at UserAddressController#post");
-    logger.info("user id: " + userId);
-
-    logger.info("type: " + body);
 
     if (body.get("type").equals("billing")) {
       return new ResponseEntity<>(this.service.toggleBillingAddress(userId, addressId), HttpStatus.OK);
     } else if (body.get("type").equals("shipping")) {
       return new ResponseEntity<>(this.service.toggleShippingAddress(userId, addressId), HttpStatus.OK);
     } else {
-      logger.info("invalid request body. only allow to specify 'billing' or 'shipping'.");
+      logger.debug("invalid request body. only allow to specify 'billing' or 'shipping'.");
       throw new AppException(HttpStatus.BAD_REQUEST, "invalid request body. only allow to specify 'billing' or 'shipping'.");
     }
 
@@ -121,11 +108,7 @@ public class UserAddressController {
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
 
-    logger.info("user id: " + userId);
-    logger.info("address id: " + addressId);
-
     this.service.delete(userId, addressId);
-
     return new ResponseEntity<>(new BaseResponse("successfuly deleted."), HttpStatus.OK);
   }
 }

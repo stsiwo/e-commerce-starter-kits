@@ -1,26 +1,27 @@
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import { CheckoutStepEnum } from 'components/pages/Checkout';
-import { calcOrderTotalCost } from 'domain/order';
-import { toFullNameString } from 'domain/user';
-import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router';
-import { messageActions } from 'reducers/slices/app';
-import { cartItemActions } from 'reducers/slices/domain/cartItem';
-import { MessageTypeEnum } from 'src/app';
-import { mSelector, rsSelector } from 'src/selectors/selector';
-import { cadCurrencyFormat, getNanoId } from 'src/utils';
-import { checkoutSessionStatusActions } from 'reducers/slices/domain/checkout';
-import { CheckoutSessionStatusEnum } from 'domain/order/types';
+import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { CheckoutStepEnum } from "components/pages/Checkout";
+import { calcOrderTotalCost } from "domain/order";
+import { toFullNameString } from "domain/user";
+import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router";
+import { messageActions } from "reducers/slices/app";
+import { cartItemActions } from "reducers/slices/domain/cartItem";
+import { MessageTypeEnum } from "src/app";
+import { mSelector, rsSelector } from "src/selectors/selector";
+import { cadCurrencyFormat, getNanoId } from "src/utils";
+import { checkoutSessionStatusActions } from "reducers/slices/domain/checkout";
+import { CheckoutSessionStatusEnum } from "domain/order/types";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       textAlign: "center",
-
     },
     cartInputBox: {
       margin: `${theme.spacing(1)}px auto`,
@@ -30,45 +31,48 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: `${theme.spacing(1)}px 0`,
       textAlign: "right",
     },
-    btn: {
-    }
-  }),
+    btn: {},
+  })
 );
 
 declare type StripePaymentFormPropsType = {
-  goToStep: (step: CheckoutStepEnum) => void
-}
+  goToStep: (step: CheckoutStepEnum) => void;
+};
 
 /**
- * checkout: Stripe Payment Form component 
+ * checkout: Stripe Payment Form component
  *
  *  - use Stripe Element to process the payment
  *
  **/
-const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (props) => {
-
+const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
+  props
+) => {
   // mui: makeStyles
   const classes = useStyles();
 
   // dispatch
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   // history
-  const history = useHistory()
+  const history = useHistory();
 
   // cur checkout order
-  const curCheckoutOrder = useSelector(rsSelector.domain.getCheckoutOrder)
+  const curCheckoutOrder = useSelector(rsSelector.domain.getCheckoutOrder);
 
   // client_secret state (redux store)
-  const stripeClientSecret = useSelector(mSelector.makeStipeClientSecretSelector())
+  const stripeClientSecret = useSelector(
+    mSelector.makeStipeClientSecretSelector()
+  );
 
   // stripe stuff
   const stripe = useStripe();
   const elements = useElements();
 
   // event handler on 'make payment' click event
-  const handleMakePaymentClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
-
+  const handleMakePaymentClick: React.EventHandler<
+    React.MouseEvent<HTMLButtonElement>
+  > = async (e) => {
     if (!stripe || !elements) {
       // Stripe.js has not yet loaded.
       // Make sure to disable form submission until Stripe.js has loaded.
@@ -80,7 +84,10 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
       payment_method: {
         card: elements.getElement(CardElement),
         billing_details: {
-          name: toFullNameString(curCheckoutOrder.orderFirstName, curCheckoutOrder.orderLastName),
+          name: toFullNameString(
+            curCheckoutOrder.orderFirstName,
+            curCheckoutOrder.orderLastName
+          ),
           address: {
             line1: curCheckoutOrder.billingAddress.address1,
             line2: curCheckoutOrder.billingAddress.address2,
@@ -92,20 +99,22 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
           email: curCheckoutOrder.orderEmail,
           phone: curCheckoutOrder.orderPhone,
         },
-      }
+      },
     });
 
-    // payment done 
+    // payment done
     dispatch(
-      checkoutSessionStatusActions.update(CheckoutSessionStatusEnum.PAYMENT_ATTEMPTED)
-    )
+      checkoutSessionStatusActions.update(
+        CheckoutSessionStatusEnum.PAYMENT_ATTEMPTED
+      )
+    );
 
     /**
      * Payment Failed
      **/
     if (result.error) {
       // Show error to your customer (e.g., insufficient funds)
-      console.log(result.error.message);
+      log(result.error.message);
 
       /**
        * update message
@@ -114,24 +123,26 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: "sorry, we failed to process your payment. please start over again. (reason: " + result.error.message + ")",
+          message:
+            "sorry, we failed to process your payment. please start over again. (reason: " +
+            result.error.message +
+            ")",
           persist: true,
         })
-      )
+      );
       // reload instead of steping back to the fist section.
       // to reset all state (e.g., session timeout)
       // this does not work since error message does not show since this reloading.
       //window.location.reload();
 
       props.goToStep(CheckoutStepEnum.CUSTOMER_BASIC_INFORMATION);
-
     } else {
       /**
        * Payment Succeeded
        **/
 
       // The payment has been processed!
-      if (result.paymentIntent.status === 'succeeded') {
+      if (result.paymentIntent.status === "succeeded") {
         // Show a success message to your customer
         // There's a risk of the customer closing the window before callback
         // execution. Set up a webhook or plugin to listen for the
@@ -141,36 +152,37 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
           messageActions.update({
             id: getNanoId(),
             type: MessageTypeEnum.SUCCESS,
-            message: "thank you for your purchase. we will send the confirmation email soon.",
+            message:
+              "thank you for your purchase. we will send the confirmation email soon.",
           })
-        )
+        );
       }
 
       // remove purchased product from cart.
-      dispatch(
-        cartItemActions.deleteSelectedItems()
-      )
+      dispatch(cartItemActions.deleteSelectedItems());
 
       history.push("/");
     }
-  }
+  };
 
-  const totalCost = curCheckoutOrder ? cadCurrencyFormat(calcOrderTotalCost(curCheckoutOrder)) : cadCurrencyFormat(0)
+  const totalCost = curCheckoutOrder
+    ? cadCurrencyFormat(calcOrderTotalCost(curCheckoutOrder))
+    : cadCurrencyFormat(0);
 
   return (
     <Box component="div" className={classes.root}>
       <Box className={classes.cartInputBox}>
         {/**
-          * The card element automatically determines your customer’s billing address country based on their card number. 
-          * Using this information, the postal code field validation reflects whether that country uses numeric or alphanumeric-formatted postal codes, or if the country uses postal codes at all. 
-          * For instance, if a U.S. card is entered, the postal code field only accepts a five-digit numeric value. 
-          * If it’s a UK card, an alphanumeric value can be provided instead. 
-          **/}
-        <CardElement 
+         * The card element automatically determines your customer’s billing address country based on their card number.
+         * Using this information, the postal code field validation reflects whether that country uses numeric or alphanumeric-formatted postal codes, or if the country uses postal codes at all.
+         * For instance, if a U.S. card is entered, the postal code field only accepts a five-digit numeric value.
+         * If it’s a UK card, an alphanumeric value can be provided instead.
+         **/}
+        <CardElement
           options={{
             // we already got billing address so don't need this one.
-            hidePostalCode: true,   
-          }} 
+            hidePostalCode: true,
+          }}
         />
       </Box>
       <Box className={classes.btnBox}>
@@ -184,8 +196,7 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
         </Button>
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default StripePaymentForm
-
+export default StripePaymentForm;

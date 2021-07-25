@@ -9,6 +9,8 @@ import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { generateQueryString } from "src/utils";
 import { productSchemaArray } from "states/state";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -57,8 +59,8 @@ export function* fetchProductWorker(action: PayloadAction<{}>) {
      **/
     const curQueryString = yield select(mSelector.makeProductQueryStringSelector())
 
-    console.log(curQueryString)
-    console.log(generateQueryString(curQueryString));
+    log(curQueryString)
+    log(generateQueryString(curQueryString));
 
     /**
      * grab all domain
@@ -94,7 +96,7 @@ export function* fetchProductWorker(action: PayloadAction<{}>) {
        *
        *  - TODO: make sure response structure with remote api
        **/
-      console.log(response) // pageable response
+      log(response) // pageable response
       const normalizedData = normalize(response.content, productSchemaArray)
 
       /**
@@ -145,10 +147,10 @@ export function* fetchProductWorker(action: PayloadAction<{}>) {
        **/
 
 
-      console.log(response.pageable)
+      log(response.pageable)
 
-      console.log("total pages")
-      console.log(response.totalPages)
+      log("total pages")
+      log(response.totalPages)
 
       yield all([
         put(productPaginationPageActions.update(response.pageable.pageNumber)),
@@ -158,10 +160,10 @@ export function* fetchProductWorker(action: PayloadAction<{}>) {
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.fetchStatus)
+      log(response.fetchStatus)
     }
   } else {
-    console.log("permission denied. your product type: " + curAuth.userType)
+    log("permission denied. your product type: " + curAuth.userType)
   }
 }
 

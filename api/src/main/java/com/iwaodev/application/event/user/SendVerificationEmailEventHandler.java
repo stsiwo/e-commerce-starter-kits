@@ -63,14 +63,11 @@ public class SendVerificationEmailEventHandler implements EventHandler<Generated
   @TransactionalEventListener
   public void handleEvent(GeneratedVerificationTokenEvent event) throws AppException {
 
-    logger.info("start handleSendVerificationEmailEventHandler");
-    logger.info(Thread.currentThread().getName());
-
     Optional<User> adminRecipientOption = this.userRepository.getAdmin();
 
     // if not, return 404
     if (!adminRecipientOption.isPresent()) {
-      logger.info("the admin user does not exist");
+      logger.debug("the admin user does not exist");
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist");
     }
 
@@ -92,15 +89,15 @@ public class SendVerificationEmailEventHandler implements EventHandler<Generated
     thymeleafContext.setVariables(templateModel);
     String htmlBody = thymeleafTemplateEngine.process("account-verification.html", thymeleafContext);
 
-    logger.info(htmlBody);
+    logger.debug(htmlBody);
 
     // send it
     try {
-      logger.info(String.format("To: %s, From: %s", recipientUser.getEmail(), senderEmail));
+      logger.debug(String.format("To: %s, From: %s", recipientUser.getEmail(), senderEmail));
       this.emailService.send(recipientUser.getEmail(), from,
           "Verification Email To Activate Your Account.", htmlBody);
     } catch (MessagingException e) {
-      logger.info(e.getMessage());
+      logger.debug(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }

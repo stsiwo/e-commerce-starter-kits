@@ -1,12 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { api } from "configs/axiosConfig";
 import { getNotificationFetchStatusActions } from "reducers/slices/app/fetchStatus/notification";
-import { all, call, put, select } from "redux-saga/effects";
+import { FetchNotificationActionType, notificationActions, notificationPaginationActions } from "reducers/slices/domain/notification";
+import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { generateQueryString } from "src/utils";
-import { FetchNotificationActionType, notificationActions, notificationPaginationActions } from "reducers/slices/domain/notification";
-
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 /**
  * a worker (generator)    
  *
@@ -33,14 +34,14 @@ import { FetchNotificationActionType, notificationActions, notificationPaginatio
  **/
 export function* fetchNotificationWorker(action: PayloadAction<FetchNotificationActionType>) {
 
-  console.log("start fetchNotificationWorker")
+  log("start fetchNotificationWorker")
   /**
    * get cur user type
    *
    **/
   const curAuth: AuthType = yield select(rsSelector.app.getAuth)
 
-  console.log("start auth type: " + curAuth.userType)
+  log("start auth type: " + curAuth.userType)
 
   if (curAuth.userType === UserTypeEnum.ADMIN || curAuth.userType === UserTypeEnum.MEMBER) {
 
@@ -56,15 +57,15 @@ export function* fetchNotificationWorker(action: PayloadAction<FetchNotification
      **/
     const curQueryString = yield select(mSelector.makeNotificationQueryStringSelector())
 
-    console.log(curQueryString)
-    console.log(generateQueryString(curQueryString));
+    log(curQueryString)
+    log(generateQueryString(curQueryString));
 
     /**
      * grab all domain
      **/
     const apiUrl = `${API1_URL}/users/${curAuth.user.userId}/notifications${generateQueryString(curQueryString)}`
 
-    console.log("target url: " + apiUrl)
+    log("target url: " + apiUrl)
 
     /**
      * fetch data
@@ -96,7 +97,7 @@ export function* fetchNotificationWorker(action: PayloadAction<FetchNotification
     )
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
-      console.log(response) // pageable response
+      log(response) // pageable response
       /**
        * update notification domain in state
        *
@@ -153,16 +154,16 @@ export function* fetchNotificationWorker(action: PayloadAction<FetchNotification
        * </PageImpl>
        **/
 
-      console.log(response.pageable)
+      log(response.pageable)
 
-      console.log("total pages")
-      console.log(response.totalPages)
+      log("total pages")
+      log(response.totalPages)
 
-      console.log("is last")
-      console.log(response.last)
+      log("is last")
+      log(response.last)
 
-      console.log("size")
-      console.log(response.pageable.pageSize)
+      log("size")
+      log(response.pageable.pageSize)
 
       yield put(
         notificationPaginationActions.update({
@@ -174,10 +175,10 @@ export function* fetchNotificationWorker(action: PayloadAction<FetchNotification
         })
       )
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-      console.log(response.fetchStatus)
+      log(response.fetchStatus)
     }
   } else {
-    console.log("permission denied. your notification type: " + curAuth.userType)
+    log("permission denied. your notification type: " + curAuth.userType)
   }
 }
 

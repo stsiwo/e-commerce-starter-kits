@@ -32,12 +32,10 @@ public class UserPhoneServiceImpl implements UserPhoneService {
   private UserRepository repository;
 
   public List<PhoneDTO> getAll(UUID userId) throws Exception {
-    logger.info("start handling a request at UserPhoneServiceImpl");
-
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (!targetUserOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
@@ -63,7 +61,7 @@ public class UserPhoneServiceImpl implements UserPhoneService {
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (!targetUserOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
@@ -102,16 +100,11 @@ public class UserPhoneServiceImpl implements UserPhoneService {
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (!targetUserOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
     User targetEntity = targetUserOption.get();
-
-    logger.info("target user's phones before update");
-    for (Phone phone : targetEntity.getPhones()) {
-      logger.info("phoneid: " + phone.getPhoneId() + " and isSelected: " + phone.getIsSelected());
-    }
 
     targetEntity.togglePhoneSelection(phoneId);
 
@@ -123,8 +116,6 @@ public class UserPhoneServiceImpl implements UserPhoneService {
 
       @Override
       public PhoneDTO apply(Phone phone) {
-        logger.info("updated phone:");
-        logger.info("phoneid: " + phone.getPhoneId() + " and isSelected: " + phone.getIsSelected());
         return PhoneMapper.INSTANCE.toPhoneDTO(phone);
       }
     }).collect(Collectors.toList());
@@ -145,7 +136,7 @@ public class UserPhoneServiceImpl implements UserPhoneService {
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (!targetUserOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
@@ -154,10 +145,8 @@ public class UserPhoneServiceImpl implements UserPhoneService {
       return phone.getPhoneId().equals(phoneId);
     });
 
-    logger.info("target phone exists?: " + isTargetAddrssExist);
-
     if (!isTargetAddrssExist) {
-      logger.info("the given phone does not exist");
+      logger.debug("the given phone does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given phone does not exist.");
     }
     // create updated entity
@@ -189,7 +178,7 @@ public class UserPhoneServiceImpl implements UserPhoneService {
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (!targetUserOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 

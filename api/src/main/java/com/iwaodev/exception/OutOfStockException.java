@@ -11,7 +11,7 @@ public class OutOfStockException extends Exception {
 
   public OutOfStockException(String errorMessage) {
     super(errorMessage);
-    logger.info(errorMessage);
+    logger.debug(errorMessage);
   }
 }
 

@@ -51,7 +51,7 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
   public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers,
       HttpStatus status, WebRequest request) {
 
-    logger.info("got MethodArgumentNotValid (input validation error) so convert it to its message & status code to ResponseEntity");
+    logger.debug("got MethodArgumentNotValid (input validation error) so convert it to its message & status code to ResponseEntity");
     /**
      * to match response body to AppException.
      *
@@ -69,8 +69,7 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
   public ResponseEntity<Object> handleConstraintViolationException(AppException ex, WebRequest request) {
     ErrorBaseResponse errorResponse = new ErrorBaseResponse(LocalDateTime.now(), ex.getStatus().value(),
         ex.getStatus().toString(), ex.getMessage(), ((ServletWebRequest) request).getRequest().getRequestURI());
-    logger.info("got AppException so convert it to its message & status code to ResponseEntity");
-
+    logger.debug("got AppException so convert it to its message & status code to ResponseEntity");
     return new ResponseEntity<>(errorResponse, ex.getStatus());
   }
 }

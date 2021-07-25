@@ -1,7 +1,8 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CartItemType } from "domain/cart/types";
-import merge from "lodash/merge";
 import remove from 'lodash/remove';
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * redux-sage actions (side effects)
@@ -69,8 +70,8 @@ export const cartItemSlice = createSlice({
 
     // use when you want to replace the whole array
     update: (state: CartItemType[], action: CartItemActionType) => {
-      console.log("inside cart item reducer")
-      console.log(action.payload)
+      log("inside cart item reducer")
+      log(action.payload)
       return action.payload;
     },
     // use when you want to remove a single entity

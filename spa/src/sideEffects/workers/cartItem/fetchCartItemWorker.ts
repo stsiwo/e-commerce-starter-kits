@@ -5,6 +5,8 @@ import { cartItemActions } from "reducers/slices/domain/cartItem";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -78,8 +80,8 @@ export function* fetchCartItemWorker(action: PayloadAction<{}>) {
        * update cartItem domain in state
        *
        **/
-      console.log("recived cart items from api")
-      console.log(response.data) // no pagination, use response.data.
+      log("recived cart items from api")
+      log(response.data) // no pagination, use response.data.
       yield put(
         cartItemActions.update(response.data)
       )
@@ -87,7 +89,7 @@ export function* fetchCartItemWorker(action: PayloadAction<{}>) {
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.message)
+      log(response.message)
 
     }
   }

@@ -1,13 +1,14 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { api } from "configs/axiosConfig";
-import { messageActions, FetchAuthOrderActionType, FetchSingleAuthOrderActionType } from "reducers/slices/app";
-import { all, call, put, select } from "redux-saga/effects";
+import { FetchSingleAuthOrderActionType, messageActions } from "reducers/slices/app";
+import { fetchSingleAuthOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
+import { orderActions } from "reducers/slices/domain/order";
+import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
-import { mSelector, rsSelector } from "src/selectors/selector";
-import { generateQueryString, getNanoId } from "src/utils";
-import { fetchAuthOrderFetchStatusActions, fetchSingleAuthOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
-import { orderActions, orderPaginationPageActions, orderPaginationTotalPagesActions, orderPaginationTotalElementsActions } from "reducers/slices/domain/order";
-
+import { rsSelector } from "src/selectors/selector";
+import { getNanoId } from "src/utils";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 /**
  * a worker (generator)    
  *
@@ -79,8 +80,8 @@ export function* fetchSingleAuthOrderWorker(action: PayloadAction<FetchSingleAut
        *
        * don't use 'merge' since no cache
        **/
-      console.log("auth order item dto response data")
-      console.log(response.data)
+      log("auth order item dto response data")
+      log(response.data)
       yield put(
         orderActions.update([response.data])
       )
@@ -88,7 +89,7 @@ export function* fetchSingleAuthOrderWorker(action: PayloadAction<FetchSingleAut
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.message)
+      log(response.message)
 
       /**
        * update message

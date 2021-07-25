@@ -51,8 +51,6 @@ public class UserWishlistItemController {
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
 
-    logger.info("product controller cur thread name: " + Thread.currentThread().getName());
-
     criteria.setUserId(userId);
 
     return new ResponseEntity<>(this.service.getAll(criteria, page, limit, sort), HttpStatus.OK);
@@ -66,7 +64,6 @@ public class UserWishlistItemController {
       @Valid @RequestBody WishlistItemCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    logger.info("start handling at /users/{userId}/wishlistItem POST");
     return new ResponseEntity<>(this.service.add(userId, criteria.getVariantId()), HttpStatus.OK);
   }
 
@@ -92,7 +89,6 @@ public class UserWishlistItemController {
       @PathVariable(value = "wishlistItemId") @NotNull Long wishlistItemId,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    logger.info("start handling at /users/{userId}/wishlistItem/{wishlistItemId} DELETE");
     this.service.remove(wishlistItemId);
     return new ResponseEntity<>(new BaseResponse("successfully deleted."), HttpStatus.OK);
   }
@@ -104,7 +100,6 @@ public class UserWishlistItemController {
       @PathVariable(value = "userId") @NotNull UUID userId,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    logger.info("start handling at /users/{userId}/wishlistItem/{wishlistItemId} DELETE");
     this.service.deleteAll(userId);
     return new ResponseEntity<>(new BaseResponse("successfully deleted."), HttpStatus.OK);
   }

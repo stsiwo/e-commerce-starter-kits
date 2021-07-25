@@ -33,12 +33,12 @@ public class CompanyServiceImpl implements CompanyService {
   private UserRepository repository;
 
   public List<CompanyDTO> get(UUID userId) throws Exception {
-    logger.info("start handling a request at UserCompanyServiceImpl");
+    logger.debug("start handling a request at UserCompanyServiceImpl");
 
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (!targetUserOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
@@ -78,7 +78,7 @@ public class CompanyServiceImpl implements CompanyService {
     Optional<User> targetUserOption = this.repository.findById(userId);
 
     if (!targetUserOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
@@ -87,10 +87,8 @@ public class CompanyServiceImpl implements CompanyService {
       return company.getCompanyId().equals(companyId);
     });
 
-    logger.info("target company exists?: " + isTargetCompanyExist);
-
     if (!isTargetCompanyExist) {
-      logger.info("the given company does not exist");
+      logger.debug("the given company does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given company does not exist.");
     }
     // create updated entity

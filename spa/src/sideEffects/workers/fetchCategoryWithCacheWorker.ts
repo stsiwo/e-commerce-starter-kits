@@ -9,7 +9,8 @@ import { call, put } from "redux-saga/effects";
 import { FetchStatusEnum, RequestTrackerBaseType } from "src/app";
 import { categorySchemaArray } from "states/state";
 import { requestUrlCheckWorker } from "./common/requestUrlCheckWorker";
-
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 /**
  * a worker (generator)    
  *
@@ -97,7 +98,7 @@ export function* fetchCategoryWithCacheWorker(action: PayloadAction<{}>) {
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.message)
+      log(response.message)
 
     }
 

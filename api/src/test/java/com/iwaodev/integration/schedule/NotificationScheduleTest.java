@@ -103,8 +103,6 @@ public class NotificationScheduleTest {
    **/
   @BeforeTransaction
   void verifyInitialDatabaseState() throws Exception {
-    logger.info("start calling setup before - satoshi");
-
     this.baseDatabaseSetup.setup(this.entityManager);
   }
 
@@ -143,8 +141,6 @@ public class NotificationScheduleTest {
      * - you need to fetch it with 'this.notificationRepository.findAll()' first.
      **/
     List<Notification> totalNotifications = this.notificationRepository.findAll();
-    logger.info("total notification size: " + totalNotifications.size());
-
     // get list of notifcationTypes
     Map<NotificationTypeEnum, NotificationType> notificationTypeList = this.notificationRepository
         .getListOfNotificationTypes();
@@ -156,7 +152,6 @@ public class NotificationScheduleTest {
     assertThat(users.size()).isEqualTo(3); // including main test member
     for (User user : users) {
       List<Notification> notifications = user.getReceivedNotifications();
-      logger.info("notification size: " + notifications.size());
       List<String> targetNotifications = user.getReceivedNotifications().stream()
           .filter(notification -> notification.getNotificationType().getNotificationType()
               .equals(NotificationTypeEnum.NEW_PRODUCT_NOW_ON_SALE))
@@ -191,7 +186,6 @@ public class NotificationScheduleTest {
     // assert
     List<Notification> notifications = this.notificationRepository.findAll();
     for (Notification notification: notifications) {
-      logger.info("notification id : " +  notification.getNotificationId());
       assertThat(notification.getIsRead()).isFalse();
     }
 

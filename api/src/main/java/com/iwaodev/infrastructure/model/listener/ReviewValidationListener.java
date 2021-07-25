@@ -45,7 +45,6 @@ public class ReviewValidationListener {
   // @Autowired
   // public void init(ValidatorBag<Review> validatorBag) {
   // ReviewValidationListener.validatorBag = validatorBag;
-  // logger.info("Initializing with dependency [" + validatorBag + "]");
   // }
 
   @Autowired
@@ -53,7 +52,6 @@ public class ReviewValidationListener {
 
   @PrePersist
   private void beforeCreate(Review domain) throws AppException {
-    logger.info("start validating domain for create...");
     Set<ConstraintViolation<Review>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
@@ -63,13 +61,11 @@ public class ReviewValidationListener {
 
   @PreUpdate
   private void beforeUpdate(Review domain) throws AppException {
-    logger.info("start validating domain for update...");
     Set<ConstraintViolation<Review>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
       throw new AppException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
     }
-    logger.info("the domain passed all validation:)");
   }
 
 }

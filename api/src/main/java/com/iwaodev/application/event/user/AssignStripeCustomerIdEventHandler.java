@@ -41,8 +41,8 @@ public class AssignStripeCustomerIdEventHandler implements EventHandler<OrderFin
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
   public void handleEvent(OrderFinalConfirmedEvent event) {
 
-    logger.info("start handleOrderFinalConfirmedEventHandler");
-    logger.info(Thread.currentThread().getName());
+    logger.debug("start handleOrderFinalConfirmedEventHandler");
+    logger.debug(Thread.currentThread().getName());
 
     /**
      * assuming this customer is member.
@@ -51,12 +51,12 @@ public class AssignStripeCustomerIdEventHandler implements EventHandler<OrderFin
      *
      **/
     if (event.getUserType().equals(UserTypeEnum.MEMBER)) {
-      logger.info("updating stripe customer id since this is member user.");
+      logger.debug("updating stripe customer id since this is member user.");
       User customer = event.getOrder().getUser();
       customer.setStripeCustomerId(event.getStripeCustomerId());
       this.userRepository.save(customer);
     } else {
-      logger.info("skip updating stripe customer id since this is guest user.");
+      logger.debug("skip updating stripe customer id since this is guest user.");
     }
   }
 }

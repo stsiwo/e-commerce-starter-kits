@@ -82,8 +82,8 @@ public class SendNewOrderWasPlacedEmailEventHandler implements EventHandler<Paym
   @Async
   @TransactionalEventListener
   public void handleEvent(PaymentSucceededEvent event) throws AppException {
-    logger.info("start SendNewOrderWasPlacedEmailEventHandler called.");
-    logger.info(Thread.currentThread().getName());
+    logger.debug("start SendNewOrderWasPlacedEmailEventHandler called.");
+    logger.debug(Thread.currentThread().getName());
 
     // order
     Order order = this.orderRepository.findByStripePaymentIntentId(event.getPaymentIntentId())
@@ -115,15 +115,15 @@ public class SendNewOrderWasPlacedEmailEventHandler implements EventHandler<Paym
     thymeleafContext.setVariables(templateModel);
     String htmlBody = thymeleafTemplateEngine.process("new-order-was-placed-email.html", thymeleafContext);
 
-    logger.info(htmlBody);
+    logger.debug(htmlBody);
 
     // send it
     try {
-      logger.info(String.format("To: %s, From: %s", admin.getEmail(), senderEmail));
+      logger.debug(String.format("To: %s, From: %s", admin.getEmail(), senderEmail));
       this.emailService.send(admin.getEmail(), from, bcc,
           "A New Order Was Placed By Customer (Order #: " + order.getOrderNumber() + ")", htmlBody);
     } catch (MessagingException e) {
-      logger.info(e.getMessage());
+      logger.debug(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 

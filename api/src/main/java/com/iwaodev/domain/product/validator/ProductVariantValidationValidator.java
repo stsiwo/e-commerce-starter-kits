@@ -25,10 +25,6 @@ public class ProductVariantValidationValidator
 
   @Override
   public boolean isValid(ProductVariant domain, ConstraintValidatorContext context) {
-    logger.info("start validating custom product variant logic...");
-
-    logger.info("isDiscount: " + domain.getIsDiscount());
-
     // if isDiscount = true
     if (domain.getIsDiscount()) {
 
@@ -84,8 +80,6 @@ public class ProductVariantValidationValidator
         return false;
       }
     }
-
-    logger.info("done product variant validator");
     // if pass all of them,
     return true;
   }

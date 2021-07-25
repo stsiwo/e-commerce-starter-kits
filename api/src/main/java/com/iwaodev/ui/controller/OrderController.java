@@ -300,8 +300,6 @@ public class OrderController {
   public ResponseEntity<String> testEvent(
       ) throws Exception {
 
-    logger.info("start test event");
-
     this.service.testEvent();
 
 	  return new ResponseEntity<>(

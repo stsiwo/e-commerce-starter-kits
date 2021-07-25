@@ -10,6 +10,8 @@ import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/ap
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
 import { categorySchemaEntity } from "states/state";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -120,7 +122,7 @@ export function* putCategoryWorker(action: PayloadAction<PutCategoryActionType>)
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.message)
+      log(response.message)
 
       /**
        * update message

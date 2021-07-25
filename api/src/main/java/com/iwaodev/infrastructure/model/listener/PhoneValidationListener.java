@@ -45,7 +45,6 @@ public class PhoneValidationListener {
   // @Autowired
   // public void init(ValidatorBag<Phone> validatorBag) {
   // PhoneValidationListener.validatorBag = validatorBag;
-  // logger.info("Initializing with dependency [" + validatorBag + "]");
   // }
 
   @Autowired
@@ -53,7 +52,6 @@ public class PhoneValidationListener {
 
   @PrePersist
   private void beforeCreate(Phone domain) throws AppException {
-    logger.info("start validating domain for create...");
     Set<ConstraintViolation<Phone>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
@@ -63,13 +61,11 @@ public class PhoneValidationListener {
 
   @PreUpdate
   private void beforeUpdate(Phone domain) throws AppException {
-    logger.info("start validating domain for update...");
     Set<ConstraintViolation<Phone>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
       throw new AppException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
     }
-    logger.info("the domain passed all validation:)");
   }
 
 }

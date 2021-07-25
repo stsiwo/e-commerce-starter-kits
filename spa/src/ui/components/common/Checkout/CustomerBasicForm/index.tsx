@@ -19,6 +19,8 @@ import { putAuthActionCreator } from "reducers/slices/app";
 import { putAuthFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
 import { FetchStatusEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -144,11 +146,11 @@ const CustomerBasicForm: React.FunctionComponent<CustomerBasicFormPropsType> = (
     React.MouseEvent<HTMLButtonElement>
   > = async (e) => {
     const isValid: boolean = isValidSync(curUserAccountState);
-    console.log(isValid);
+    log(isValid);
 
     if (isValid) {
       // pass
-      console.log("passed");
+      log("passed");
 
       dispatch(
         putAuthActionCreator({

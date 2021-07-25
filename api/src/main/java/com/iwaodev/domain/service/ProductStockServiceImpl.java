@@ -32,16 +32,10 @@ public class ProductStockServiceImpl implements ProductStockService {
 
     for (OrderDetail orderDetail : orderDetails) {
 
-      logger.info("before product and variantid def");
-
       Product product = orderDetail.getProduct();
       Long variantId = orderDetail.getProductVariant().getVariantId();
 
-      logger.info("before increaseStockOfVariantBack");
-
       product.increaseStockOfVariantBack(orderDetail.getProductQuantity(), variantId);
-
-      logger.info("before products.add");
 
       products.add(product);
     }

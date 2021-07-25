@@ -1,20 +1,22 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { CartItemType } from "domain/cart/types";
-import { ProductType, ProductVariantType, productStockBags, ProductStockEnum } from "domain/product/types";
+import { NotificationType } from "domain/notification/types";
+import { toOrderAddress, toOrderDetailCriteriaList } from "domain/order";
+import { OrderCriteria, OrderDetailType, OrderType } from "domain/order/types";
+import { getVariantStockBack } from "domain/product";
+import { ProductType, ProductVariantType } from "domain/product/types";
+import { toPhoneStringWithoutSpace } from "domain/user";
 import { UserAddressType, UserPhoneType, UserType } from "domain/user/types";
+import { WishlistItemType } from "domain/wishlist/types";
 import merge from 'lodash/merge';
+import orderBy from "lodash/orderBy";
 import { denormalize } from "normalizr";
+import { UserTypeEnum } from "src/app";
+import { getApiUrl } from "src/utils";
 import { categorySchemaArray, productSchemaArray } from "states/state";
 import { StateType } from "states/types";
-import { WishlistItemType } from "domain/wishlist/types";
-import { OrderType, OrderCriteria, OrderDetailType } from "domain/order/types";
-import { toPhoneStringWithoutSpace } from "domain/user";
-import { toOrderAddress, toOrderDetailCriteriaList } from "domain/order";
-import { UserTypeEnum } from "src/app";
-import { NotificationType } from "domain/notification/types";
-import orderBy from "lodash/orderBy";
-import { getApiUrl } from "src/utils";
-import { getVariantStockBack } from "domain/product";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 export const rsSelector = {
   /**
@@ -571,7 +573,7 @@ export const mSelector = {
           }, // entities prop of normalized data (ex, { animes: { "1": { ... }, "2": { ... }, ... }})
         )
 
-        console.log(denormalizedEntities)
+        log(denormalizedEntities)
 
         return denormalizedEntities
       },
@@ -1200,8 +1202,8 @@ export const mSelector = {
       ],
       (order) => {
 
-        console.log("makeOrderSelector is called...")
-        console.log(order)
+        log("makeOrderSelector is called...")
+        log(order)
 
         return order
       },
@@ -1349,7 +1351,7 @@ export const mSelector = {
       ],
       (normalizedProducts, pagination) => {
 
-        console.log("should be called once create a new product")
+        log("should be called once create a new product")
         // need pagination??
 
         /**
@@ -1385,8 +1387,8 @@ export const mSelector = {
             denormalizedEntities[i].productImages = orderBy(denormalizedEntities[i].productImages, ['productImageId']);
           }
         }
-        console.log("denormalized entities (resorted product images)")
-        console.log(denormalizedEntities)
+        log("denormalized entities (resorted product images)")
+        log(denormalizedEntities)
         return denormalizedEntities
       },
     )
@@ -1424,7 +1426,7 @@ export const mSelector = {
           }, // entities prop of normalized data (ex, { animes: { "1": { ... }, "2": { ... }, ... }})
         )
 
-        console.log(denormalizedEntities)
+        log(denormalizedEntities)
 
         return denormalizedEntities
       },
@@ -1461,7 +1463,7 @@ export const mSelector = {
           }, // entities prop of normalized data (ex, { animes: { "1": { ... }, "2": { ... }, ... }})
         )
 
-        console.log(denormalizedEntities)
+        log(denormalizedEntities)
 
         return denormalizedEntities.find((product: ProductType) => product.productPath === path);
       },
@@ -1499,7 +1501,7 @@ export const mSelector = {
           }, // entities prop of normalized data (ex, { animes: { "1": { ... }, "2": { ... }, ... }})
         )
 
-        console.log(denormalizedEntities)
+        log(denormalizedEntities)
 
         return denormalizedEntities[0]
       },
@@ -1513,7 +1515,7 @@ export const mSelector = {
       ],
       (normalizedProducts) => {
 
-        console.log(normalizedProducts)
+        log(normalizedProducts)
 
         const product = normalizedProducts[productId];
 

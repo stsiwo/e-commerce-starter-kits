@@ -61,8 +61,8 @@ public class PaymentFailedEventHandler implements EventHandler<PaymentFailedEven
    **/
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
   public void handleEvent(PaymentFailedEvent event) throws AppException {
-    logger.info("start handling PaymentFailedEventHandler");
-    logger.info(Thread.currentThread().getName());
+    logger.debug("start handling PaymentFailedEventHandler");
+    logger.debug("thread name: " + Thread.currentThread().getName());
 
     // target order from db
     Optional<Order> orderOption = this.orderRepository.findByStripePaymentIntentId(event.getPaymentIntentId());
@@ -70,10 +70,7 @@ public class PaymentFailedEventHandler implements EventHandler<PaymentFailedEven
     if (!orderOption.isPresent()) {
       throw new AppException(HttpStatus.NOT_FOUND, "target order not found by its payment intent id");
     }
-
-    logger.info("before ueserRepo.getAdmin");
-    
-    // get customer 
+    // get customer
     Optional<User> userOption = this.userRepository.findByStipeCustomerId(event.getStripeCustomerId());
 
     Order order = orderOption.get();
@@ -83,16 +80,14 @@ public class PaymentFailedEventHandler implements EventHandler<PaymentFailedEven
         throw new AppException(HttpStatus.BAD_REQUEST, "you cannot update an order for other member.");
       }
     }
-
-    logger.info("before orderEventService.add");
     // add new order event
     try {
       if (!userOption.isPresent()) {
-        logger.info("this is guest user");
+        logger.debug("this is guest user");
         orderEventService.addByProgram(order, OrderStatusEnum.ORDERED, "", (User)null);
         orderEventService.addByProgram(order, OrderStatusEnum.PAYMENT_FAILED, "", (User)null);
       } else {
-        logger.info("this is member user (id: " + userOption.get().getUserId().toString());
+        logger.debug("this is member user (id: " + userOption.get().getUserId().toString());
         orderEventService.addByProgram(order, OrderStatusEnum.ORDERED, "", userOption.get());
         orderEventService.addByProgram(order, OrderStatusEnum.PAYMENT_FAILED, "", userOption.get());
       }
@@ -101,10 +96,6 @@ public class PaymentFailedEventHandler implements EventHandler<PaymentFailedEven
     } catch (NotFoundException e) {
       throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
     }
-
-    logger.info("before save");
-    logger.info("order event size");
-    logger.info("" + order.getOrderEvents().size());
 
     // save
     this.orderRepository.save(order);
@@ -128,8 +119,6 @@ public class PaymentFailedEventHandler implements EventHandler<PaymentFailedEven
      **/
     this.orderRepository.flush();
 
-    logger.info("before productStockService.restore");
-
     /**
      * 2. restore product stock.
      **/
@@ -139,9 +128,6 @@ public class PaymentFailedEventHandler implements EventHandler<PaymentFailedEven
     } catch (NotFoundException e) {
       throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
     }
-
-    logger.info("after save");
   }
-
 }
 

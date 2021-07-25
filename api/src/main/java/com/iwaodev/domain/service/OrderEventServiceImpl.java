@@ -87,7 +87,7 @@ public class OrderEventServiceImpl implements OrderEventService {
     if (orderStatus.equals(OrderStatusEnum.RETURN_REQUEST)) {
       LocalDateTime curDateTime = LocalDateTime.now();
       if (!order.isEligibleToRefund(curDateTime, this.orderRule.getEligibleDays())) {
-        logger.info("sorry. this order is not eligible to return.");
+        logger.debug("sorry. this order is not eligible to return.");
         throw new DomainException("sorry. this order is not eligible to return.");
       }
     }

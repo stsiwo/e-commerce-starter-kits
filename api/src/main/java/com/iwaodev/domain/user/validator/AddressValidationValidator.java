@@ -22,9 +22,6 @@ public class AddressValidationValidator implements ConstraintValidator<AddressVa
   @Override
   public boolean isValid(Address domain, ConstraintValidatorContext context) {
 
-    logger.info("start validating custom address ....");
-    logger.info("size of addresss: " + domain.getUser().getAddresses().size());
-
     // addresss max 3
     if (domain.getUser().getAddresses().size() > 3) {
       //throw new DomainValidationException(String.format("address addresss must be less than or equal to 3."));

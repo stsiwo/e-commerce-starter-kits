@@ -130,8 +130,6 @@ public class MemberAuthenticationEndpointTest {
    **/
   @BeforeTransaction
   void verifyInitialDatabaseState() throws Exception {
-    logger.info("start calling setup before - satoshi");
-
     this.baseDatabaseSetup.setup(this.entityManager);
 
     // send authentication request before testing

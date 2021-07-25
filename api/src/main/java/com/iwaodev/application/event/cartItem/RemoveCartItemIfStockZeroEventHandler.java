@@ -62,8 +62,6 @@ public class RemoveCartItemIfStockZeroEventHandler implements EventHandler<Payme
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
   public void handleEvent(PaymentSucceededEvent event) throws AppException {
 
-    logger.info("start handling RemoveCartItemIfStockZeroEventHandler");
-
     // target order from db
     Optional<Order> orderOption = this.orderRepository.findByStripePaymentIntentId(event.getPaymentIntentId());
 
@@ -85,7 +83,6 @@ public class RemoveCartItemIfStockZeroEventHandler implements EventHandler<Payme
       boolean isOutOfStock = curStock - soldQuantity <= 0;
 
       if (isOutOfStock) {
-        logger.info(String.format("variant (%s) is out of stock so delete all cart items whose variant is this variant", variant.getVariantId()));
         List<CartItem> subCartItems = this.cartItemRepository.getAllByVariantId(variant.getVariantId());
         List<Long> subCartItemIds = subCartItems.stream().map(cartItem -> cartItem.getCartItemId()).collect(Collectors.toList());
         cartItemIds.addAll(subCartItemIds);

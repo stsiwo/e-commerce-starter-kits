@@ -40,10 +40,8 @@ public class UserSignupServiceImpl implements UserSignupService {
 
   public UserDTO signup(UserSignupCriteria criteria) throws Exception {
 
-    logger.info("target criteria user name: " + criteria.toString());
-
     if (this.repository.findByEmail(criteria.getEmail()).isPresent()) {
-      logger.info("the given user already exisxts");
+      logger.debug("the given user already exisxts");
       throw new AppException(HttpStatus.CONFLICT, "the given user already exists.");
     }
 
@@ -62,7 +60,6 @@ public class UserSignupServiceImpl implements UserSignupService {
     // set active to temp'
     targetEntity.setActive(UserActiveEnum.TEMP);
     
-    logger.info("target user name: " + targetEntity.getFirstName());
 
     /**
      * generte a verification token to activate this account
@@ -86,12 +83,12 @@ public class UserSignupServiceImpl implements UserSignupService {
     User targetUser = this.repository.findById(userId).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the user not found (id: " + userId.toString() + ")"));
 
     if (targetUser.isActive()) {
-      logger.info("your account is already verified.");
+      logger.debug("your account is already verified.");
       throw new AppException(HttpStatus.BAD_REQUEST, "your account is already verified.");
     }
 
     if (!targetUser.verifyVerificationToken(verificationToken)) {
-      logger.info("verification token is invalid because of wrong value or expired.");
+      logger.debug("verification token is invalid because of wrong value or expired.");
       throw new AppException(HttpStatus.BAD_REQUEST,
           "verification token is invalid because of wrong value or expired.");
     }
@@ -110,7 +107,7 @@ public class UserSignupServiceImpl implements UserSignupService {
     User targetUser = this.repository.findById(userId).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the user not found (id: " + userId.toString() + ")"));
 
     if (targetUser.isActive()) {
-      logger.info("your account is already verified.");
+      logger.debug("your account is already verified.");
       throw new AppException(HttpStatus.BAD_REQUEST, "your account is already verified.");
     }
 

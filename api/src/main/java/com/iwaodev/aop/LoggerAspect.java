@@ -31,11 +31,10 @@ public class LoggerAspect {
    * TODO: fix this when you have time.
    *
    **/
-
   //@Before("execution(* com.iwaodev.application..*(..)) || execution(* com.iwaodev.ui..*(..)) || execution(* com.iwaodev.infrastructure..*(..)) || execution(* com.iwaodev.domain..*(..))")
   @Before("execution(* com.iwaodev.application..*(..)) || execution(* com.iwaodev.ui..*(..))")
   public void before(JoinPoint joinPoint) {
     // Advice
-    logger.info(String.format("start handling %s", joinPoint.getSignature()));
+    logger.debug(String.format("start handling %s", joinPoint.getSignature()));
   }
 }

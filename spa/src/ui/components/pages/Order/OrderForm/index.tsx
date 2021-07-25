@@ -20,6 +20,8 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import { useHistory } from "react-router";
 import OrderProductHorizontalCard from "./OrderProductHorizontalCard";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 interface OrderFormPropsType {
   order: OrderType;
@@ -82,8 +84,8 @@ const OrderForm: React.FunctionComponent<OrderFormPropsType> = (props) => {
       prev.fill(null);
       prev[index] = target;
 
-      console.log("is open? ");
-      console.log(Boolean(prev[index]));
+      log("is open? ");
+      log(Boolean(prev[index]));
 
       return [...prev];
     });
@@ -104,8 +106,6 @@ const OrderForm: React.FunctionComponent<OrderFormPropsType> = (props) => {
     productId: string,
     userId: string
   ) => {
-    console.log();
-
     history.push(`/review?productId=${productId}&userId=${userId}`);
   };
 

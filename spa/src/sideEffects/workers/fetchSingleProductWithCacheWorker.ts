@@ -87,7 +87,6 @@ import { requestUrlCheckWorker } from "./common/requestUrlCheckWorker";
 //         *
 //         *  - TODO: make sure response structure with remote api
 //         **/
-//        console.log(response)
 //        const normalizedData = normalize(response.data.data, productSchemaArray)
 //
 //        /**
@@ -124,7 +123,6 @@ import { requestUrlCheckWorker } from "./common/requestUrlCheckWorker";
 //
 //      } catch (error) {
 //
-//        console.log(error)
 //
 //        /**
 //         * update fetch status failed
@@ -135,7 +133,6 @@ import { requestUrlCheckWorker } from "./common/requestUrlCheckWorker";
 //      }
 //    }
 //  } else {
-//    console.log("permission denied. your product type: " + curAuth.userType)
 //  }
 //}
 //

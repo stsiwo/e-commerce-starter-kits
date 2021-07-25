@@ -22,6 +22,8 @@ import {
 import { AuthType, UserTypeEnum } from "src/app";
 import { mSelector } from "src/selectors/selector";
 import Typography from "@material-ui/core/Typography";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 interface OrderEventUpdateFormDialogPropsType {
   open: boolean;
@@ -64,8 +66,8 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
     // if props.product exists, it updates, otherwise, new
     const [isNew, setNew] = React.useState<boolean>(false);
 
-    console.log("is props.orderEvent changed?");
-    console.log(props.orderEvent);
+    log("is props.orderEvent changed?");
+    log(props.orderEvent);
 
     // switch update/create
     React.useEffect(() => {
@@ -75,11 +77,11 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
        */
       if (props.open) {
         if (props.orderEvent) {
-          console.log("update order event");
+          log("update order event");
           setNew(false);
           setOrderEventState(props.orderEvent);
         } else {
-          console.log("create order event");
+          log("create order event");
           setNew(true);
           setOrderEventState(generateDefaultOrderEventData());
         }
@@ -99,7 +101,7 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
       if (auth.userType === UserTypeEnum.ADMIN) {
         // admin
         if (isNew) {
-          console.log("new order event creation");
+          log("new order event creation");
           // request
           dispatch(
             postOrderEventActionCreator({
@@ -110,7 +112,7 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
             })
           );
         } else {
-          console.log("update order event");
+          log("update order event");
           // request
           dispatch(
             putOrderEventActionCreator({
@@ -160,12 +162,12 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
     // next addable option based on user type
     const nextOrderEventOptions = React.useMemo(() => {
       if (auth.userType === UserTypeEnum.MEMBER) {
-        console.log("next addable optons: member");
+        log("next addable optons: member");
         // member
         return props.order.nextMemberOrderEventOptions;
       } else {
         // admin
-        console.log("next addable optons: admin");
+        log("next addable optons: admin");
         return props.order.nextAdminOrderEventOptions;
       }
     }, [JSON.stringify(props.order)]);

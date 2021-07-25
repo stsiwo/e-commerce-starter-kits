@@ -151,7 +151,7 @@ public class Order {
   private LocalDateTime authReturnUrl;
 
   // I don't know to how to limit the result with this @JoinFormula...
-  // ref: https://stackoverflow.com/questions/10980337/hibernate-joinformula
+  // ref: https://stackoverflow.com/questions/10980337/hibernate-jodebugrmula
   //
   // possible solution: this might help. you can retrieve the lastest record
   // without using limit.
@@ -337,7 +337,6 @@ public class Order {
   public void calculateProductCost() {
     BigDecimal tempTotalCost = new BigDecimal("0");
     for (OrderDetail orderDetail : this.orderDetails) {
-      logger.info("detail unit price cost: " + orderDetail.getProductUnitPrice());
       tempTotalCost = tempTotalCost
           .add(BigDecimal.valueOf(orderDetail.getProductQuantity()).multiply(orderDetail.getProductUnitPrice()));
     }
@@ -355,17 +354,10 @@ public class Order {
   public BigDecimal getTotalCost() {
 
     this.calculateProductCost();
-
-    logger.info("product cost: " + this.productCost);
-    logger.info("tax cost: " + this.taxCost);
-    logger.info("shipping cost: " + this.shippingCost);
-
     BigDecimal totalCost = new BigDecimal("0");
     totalCost = totalCost.add(this.productCost);
     totalCost = totalCost.add(this.taxCost);
     totalCost = totalCost.add(this.shippingCost);
-
-    logger.info("total cost: " + totalCost);
 
     return totalCost;
   }
@@ -389,8 +381,6 @@ public class Order {
 
   // business behaviors
   public Order raiseTestEvent() {
-    logger.info("raise test event at order class");
-    // this.registerEvent(new OrderFinalConfirmedEvent());
     return this;
   }
 
@@ -413,8 +403,6 @@ public class Order {
   }
 
   public boolean isPassEligibleDaysAfterDelivered(LocalDateTime curDate, int eligibleDays) {
-    logger.info(this.getOrderEventDateHappenedOf(OrderStatusEnum.DELIVERED).toString());
-    logger.info("" + eligibleDays);
     return curDate.isAfter(this.getOrderEventDateHappenedOf(OrderStatusEnum.DELIVERED).plusDays(eligibleDays));
   }
 
@@ -439,10 +427,6 @@ public class Order {
   public OrderEvent retrieveLatestOrderEvent() {
     // assuming that the order of order events is perserved since this is array
     // list.
-    logger.info("try to get latest event");
-    logger.info("total event size: " + this.orderEvents.size());
-    logger.info("total event size: " + this.getOrderEvents().size());
-
     if (this.orderEvents.size() == 0) {
       return null;
     }
@@ -514,18 +498,11 @@ public class Order {
     OrderEvent latestEvent = this.retrieveLatestOrderEvent();
 
     if (latestEvent == null) {
-      logger.info("latest event is null");
+      logger.debug("latest event is null");
     }
-    logger.info("" + latestEvent.getOrderEventId());
-    logger.info("" + latestEvent.getOrderStatus());
-
-    logger.info("before setlatestorderevent");
     this.setLatestOrderEvent(latestEvent);
-    logger.info("before setnextadminorder");
     this.setNextAdminOrderEventOptions(this.orderEventBag.map.get(latestEvent.getOrderStatus()).getNextAddableEventsForAdmin());
-    logger.info("before setnextmemberorder");
     this.setNextMemberOrderEventOptions(this.orderEventBag.map.get(latestEvent.getOrderStatus()).getNextAddableEventsForMember());
-    logger.info("done");
   }
 
   public boolean isAddableAsNextForAdmin(OrderStatusEnum curOrderStatus, OrderStatusEnum latestOrderStatus) {

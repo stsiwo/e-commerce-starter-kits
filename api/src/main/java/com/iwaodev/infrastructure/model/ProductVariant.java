@@ -222,10 +222,10 @@ public class ProductVariant {
   //@PreRemove
   //public void setUp() {
   //  if (this.product != null) {
-  //    logger.info("start setup");
+  //    logger.debug("start setup");
   //    this.product.setCheapestPrice();
   //    this.product.setHighestPrice();
-  //    logger.info("end setup");
+  //    logger.debug("end setup");
   //  }
   //}
 
@@ -281,10 +281,8 @@ public class ProductVariant {
   public boolean isUnitPriceGraterThanDiscountPrice() {
     if (this.isDiscount != null && this.isDiscount) {
       if (this.isHasOwnPrice()) {
-        logger.info("variant does have its price");
         return this.variantDiscountPrice.compareTo(this.variantUnitPrice) < 0;
       } else {
-        logger.info("variant does not have its price");
         return this.variantDiscountPrice.compareTo(this.product.getProductBaseUnitPrice()) < 0;
       }
     }

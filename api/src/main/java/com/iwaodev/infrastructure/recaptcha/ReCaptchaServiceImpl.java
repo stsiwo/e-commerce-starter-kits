@@ -47,8 +47,6 @@ public class ReCaptchaServiceImpl implements ReCaptchaService {
   @Override
   public void verify(String recaptchaToken) throws Exception {
 
-    logger.info("recaptcha secret: " + this.recaptchaSecret);
-
     // prep for inputs
     MultiValueMap<String, Object> inputs = new LinkedMultiValueMap<>();
     inputs.add("secret", this.recaptchaSecret);
@@ -68,7 +66,7 @@ public class ReCaptchaServiceImpl implements ReCaptchaService {
     if (!isSuccess) {
       ArrayNode errors = (ArrayNode) responseObject.get("error-codes");
       if (responseObject.get("error-codes").isArray()) {
-        logger.info("recaptcha error: " + errors.get(0).asText());
+        logger.debug("recaptcha error: " + errors.get(0).asText());
         throw new Exception(errors.get(0).asText());
       }
     }

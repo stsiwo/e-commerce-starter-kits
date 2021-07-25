@@ -44,11 +44,9 @@ package com.iwaodev.config.filter;
 //	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 //			throws ServletException, IOException {
 //
-//      logger.info("start processing jwt request filter");
 //
 //      final String authorizationHeader = request.getHeader("Authorization");
 //
-//      logger.info("extracted authorization header (e.g., jwt token header): " + authorizationHeader);
 //
 //      String userEmail = null;
 //      String jwt = null;
@@ -58,8 +56,6 @@ package com.iwaodev.config.filter;
 //        userEmail = jwtUtil.extractUserEmail(jwt);
 //      }
 //
-//      logger.info("extracted jwt: " + jwt);
-//      logger.info("user email: " + userEmail);
 //
 //
 //      if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {

@@ -32,8 +32,6 @@ public class OrderSpecifications {
          **/
         return builder.conjunction();
       }
-      logger.info("lastest order event status: " + Order_.latestOrderEventStatus);
-      logger.info("query status: " + status);
       return builder.equal(root.get(Order_.latestOrderEventStatus), status);
     };
   }

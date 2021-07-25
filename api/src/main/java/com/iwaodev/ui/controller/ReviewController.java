@@ -62,8 +62,6 @@ public class ReviewController {
       @RequestParam(value = "sort", required = false, defaultValue = "DATE_DESC") ReviewSortEnum sort,
       ReviewQueryStringCriteria criteria) throws Exception {
 
-    logger.info("review controller cur thread name: " + Thread.currentThread().getName());
-
     return new ResponseEntity<>(this.service.getAll(criteria, page, limit, sort), HttpStatus.OK);
   }
 
@@ -80,7 +78,6 @@ public class ReviewController {
       @Valid @RequestBody ReviewCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    logger.info("start handling at /reviews POST");
     return new ResponseEntity<>(this.service.create(criteria), HttpStatus.OK);
   }
 
@@ -92,7 +89,6 @@ public class ReviewController {
       @Valid @RequestBody ReviewCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    logger.info("start handling at /reviews PUT");
     return new ResponseEntity<>(this.service.update(criteria, id), HttpStatus.OK);
   }
 
@@ -111,7 +107,6 @@ public class ReviewController {
       @PathVariable(value = "id") Long id,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    logger.info("start handling at /reviews DELETE");
     this.service.delete(id);
     return new ResponseEntity<>(new BaseResponse("successfuly deleted."), HttpStatus.OK);
   }

@@ -281,13 +281,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-
-    logger.info("cors config:");
-    for (String origin : this.corsConfig.getOrigins()) {
-      logger.info("origin: " + origin);
-    }
-    logger.info("credetials: " + this.corsConfig.getCredentials());
-
     /**
      * don't use wildcard in production:
      *

@@ -41,8 +41,6 @@ public class CurAuthenticationImpl implements CurAuthentication {
 
     List<UserTypeEnum> userTypeList = new ArrayList<>();
 
-    logger.info("size of authorities");
-
     for (GrantedAuthority authority : auth.getAuthorities()) {
       String role = authority.getAuthority().substring(authority.getAuthority().indexOf("_") + 1);
       userTypeList.add(UserTypeEnum.valueOf(role));

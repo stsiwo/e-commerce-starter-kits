@@ -8,6 +8,7 @@ import Grid from "@material-ui/core/Grid";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
+import VerifiedUserIcon from "@material-ui/icons/VerifiedUser";
 import Rating from "@material-ui/lab/Rating";
 import { AxiosError } from "axios";
 import UserCard from "components/common/UserCard";
@@ -32,7 +33,8 @@ import {
 import { MessageTypeEnum } from "src/app";
 import { mSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import VerifiedUserIcon from "@material-ui/icons/VerifiedUser";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 interface ReviewFormPropsType {
   review: ReviewType;
@@ -153,14 +155,14 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
   const handleSaveClickEvent = (e: React.MouseEvent<HTMLButtonElement>) => {
     const isValid: boolean = isValidSync(curReviewState);
 
-    console.log(isValid);
+    log(isValid);
 
     if (isValid) {
       // pass
-      console.log("passed");
+      log("passed");
 
       if (isNew) {
-        console.log("new review");
+        log("new review");
         dispatch(
           postReviewActionCreator({
             isVerified: false, // make sure this (member can't edit this) and every time and every time user edit this, need verfication from the admin to publish
@@ -173,7 +175,7 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
           })
         );
       } else {
-        console.log("update review");
+        log("update review");
         dispatch(
           putReviewActionCreator({
             reviewId: curReviewState.reviewId,
@@ -188,7 +190,7 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
         );
       }
     } else {
-      console.log("failed");
+      log("failed");
       updateAllValidation();
     }
   };

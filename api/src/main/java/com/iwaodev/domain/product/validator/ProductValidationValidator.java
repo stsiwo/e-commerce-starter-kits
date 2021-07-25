@@ -27,8 +27,6 @@ public class ProductValidationValidator implements ConstraintValidator<ProductVa
   @Override
   public boolean isValid(Product domain, ConstraintValidatorContext context) {
 
-    logger.info("start validating custom product logic...");
-
     /**
      * bug?
      *
@@ -43,7 +41,6 @@ public class ProductValidationValidator implements ConstraintValidator<ProductVa
      *  => move this validation to service layer.
      **/
 
-    logger.info("" + domain.getProductImages().size());
 
     // productImages: primary image cannot be null.
     //if (domain.getProductImages().size() == 0) {

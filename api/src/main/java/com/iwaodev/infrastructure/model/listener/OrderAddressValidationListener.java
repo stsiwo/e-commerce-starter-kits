@@ -45,7 +45,6 @@ public class OrderAddressValidationListener {
   // @Autowired
   // public void init(ValidatorBag<OrderAddress> validatorBag) {
   // OrderAddressValidationListener.validatorBag = validatorBag;
-  // logger.info("Initializing with dependency [" + validatorBag + "]");
   // }
 
   @Autowired
@@ -53,7 +52,6 @@ public class OrderAddressValidationListener {
 
   @PrePersist
   private void beforeCreate(OrderAddress domain) throws AppException {
-    logger.info("start validating domain for create...");
     Set<ConstraintViolation<OrderAddress>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
@@ -63,13 +61,11 @@ public class OrderAddressValidationListener {
 
   @PreUpdate
   private void beforeUpdate(OrderAddress domain) throws AppException {
-    logger.info("start validating domain for update...");
     Set<ConstraintViolation<OrderAddress>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
       throw new AppException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
     }
-    logger.info("the domain passed all validation:)");
   }
 
 }

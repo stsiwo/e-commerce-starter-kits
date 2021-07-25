@@ -38,6 +38,8 @@ import { FetchStatusEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { renameFile } from "src/utils";
 import ProductImagesForm from "./ProductImagesForm";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 interface AdminProductFormPropsType {
   product: ProductType;
@@ -234,7 +236,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>(
       React.ChangeEvent<HTMLInputElement>
     > = (e) => {
       const nextProductBaseUnitPrice = e.target.value;
-      console.log("product base unit price");
+      log("product base unit price");
       updateValidationAt("productBaseUnitPrice", nextProductBaseUnitPrice);
       setProductState((prev: ProductDataType) => ({
         ...prev,
@@ -300,7 +302,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>(
       handleSaveClickEvent: (e: React.MouseEvent<HTMLButtonElement>) => {
         const isValid: boolean = isValidSync(curProductState);
 
-        console.log(isValid);
+        log(isValid);
 
         /**
          * product images uploading logic.
@@ -322,9 +324,9 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>(
 
         if (isValid) {
           // pass
-          console.log("passed");
+          log("passed");
           if (isNew) {
-            console.log("new product creation");
+            log("new product creation");
             // request
             dispatch(
               postProductActionCreator({
@@ -341,7 +343,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>(
               })
             );
           } else {
-            console.log("new product creation");
+            log("new product creation");
             // request
             dispatch(
               putProductActionCreator({
@@ -360,7 +362,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>(
             );
           }
         } else {
-          console.log("failed");
+          log("failed");
           updateAllValidation();
         }
       },

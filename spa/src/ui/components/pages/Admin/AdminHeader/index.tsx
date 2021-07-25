@@ -1,25 +1,30 @@
-import * as React from 'react';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import SentimentSatisfiedOutlinedIcon from '@material-ui/icons/SentimentSatisfiedOutlined';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
-import Link from '@material-ui/core/Link';
-import Avatar from '@material-ui/core/Avatar';
-import NotificationsIcon from '@material-ui/icons/Notifications';
+import * as React from "react";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import SentimentSatisfiedOutlinedIcon from "@material-ui/icons/SentimentSatisfiedOutlined";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Grid from "@material-ui/core/Grid";
+import IconButton from "@material-ui/core/IconButton";
+import Link from "@material-ui/core/Link";
+import Avatar from "@material-ui/core/Avatar";
+import NotificationsIcon from "@material-ui/icons/Notifications";
 import { Link as RRLink } from "react-router-dom";
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import { api } from 'configs/axiosConfig';
-import { authActions } from 'reducers/slices/app';
-import { useSnackbar } from 'notistack';
-import { AxiosError } from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router';
-import { mSelector } from 'src/selectors/selector';
-import { fetchNotificationActionCreator, incrementNotificationCurIndexActionCreator } from 'reducers/slices/domain/notification';
-import Badge from '@material-ui/core/Badge';
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import { api } from "configs/axiosConfig";
+import { authActions } from "reducers/slices/app";
+import { useSnackbar } from "notistack";
+import { AxiosError } from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router";
+import { mSelector } from "src/selectors/selector";
+import {
+  fetchNotificationActionCreator,
+  incrementNotificationCurIndexActionCreator,
+} from "reducers/slices/domain/notification";
+import Badge from "@material-ui/core/Badge";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -32,29 +37,27 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: "center",
       alignItems: "center",
 
-      '& > *': {
-      }
+      "& > *": {},
     },
     pointer: {
       cursor: "pointer",
-    }
-  }),
+    },
+  })
 );
 
 const AdminHeader: React.FunctionComponent<{}> = (props) => {
-
   const classes = useStyles();
 
   // auth
   const auth = useSelector(mSelector.makeAuthSelector());
 
   // avatar image
-  const curAvatarImageUrl = useSelector(mSelector.makeAuthAvatarUrlSelector())
+  const curAvatarImageUrl = useSelector(mSelector.makeAuthAvatarUrlSelector());
 
   // cart icon click
   const dispatch = useDispatch();
 
-  // history 
+  // history
   const history = useHistory();
 
   // snackbar notification
@@ -76,70 +79,59 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
 
   // handle logout menu item click
   const handleLogout = (e: React.MouseEvent<HTMLElement>) => {
-
     // request
-    api.request({
-      method: 'post',
-      url: API1_URL + `/logout`,
-      data: null
-    }).then((data) => {
+    api
+      .request({
+        method: "post",
+        url: API1_URL + `/logout`,
+        data: null,
+      })
+      .then((data) => {
+        // fetch again
+        dispatch(authActions.logout());
 
-      // fetch again
-      dispatch(authActions.logout())
+        history.push("/admin/login");
 
-      history.push("/admin/login");
+        enqueueSnackbar("logged out successfully.", { variant: "success" });
+      })
+      .catch((error: AxiosError) => {
+        enqueueSnackbar(error.message, { variant: "error" });
+      });
 
-
-      enqueueSnackbar("logged out successfully.", { variant: "success" })
-    }).catch((error: AxiosError) => {
-      enqueueSnackbar(error.message, { variant: "error" })
-    })
-
-    handleMenuClose()
-  }
+    handleMenuClose();
+  };
 
   /**
    * notification feature.
    **/
-  const curNotificationPagination = useSelector(mSelector.makeNotificationPaginationSelector())
+  const curNotificationPagination = useSelector(
+    mSelector.makeNotificationPaginationSelector()
+  );
 
   // fetch notifcation for this member.
   // - initial fetch (replace)
   // - the next consecutive fetchs (concat)
   const isInitial = React.useRef<boolean>(true);
   React.useEffect(() => {
-    console.log("start fetching notification...")
+    log("start fetching notification...");
     if (isInitial.current) {
-      console.log("initial notification fetch with 'update'")
-      dispatch(
-        fetchNotificationActionCreator({ type: "update" })
-      )
-      isInitial.current = false
+      log("initial notification fetch with 'update'");
+      dispatch(fetchNotificationActionCreator({ type: "update" }));
+      isInitial.current = false;
     } else {
-      console.log("initial notification fetch with 'concat'")
-      dispatch(
-        fetchNotificationActionCreator({ type: "concat" })
-      )
+      log("initial notification fetch with 'concat'");
+      dispatch(fetchNotificationActionCreator({ type: "concat" }));
     }
-  }, [
-      curNotificationPagination.page
-    ])
+  }, [curNotificationPagination.page]);
 
   const handleNotificationClick = (e: React.MouseEvent<HTMLElement>) => {
-    dispatch(
-      incrementNotificationCurIndexActionCreator()
-    )
-  }
-
+    dispatch(incrementNotificationCurIndexActionCreator());
+  };
 
   return (
     <AppBar position="sticky" className={classes.appBar} color="default">
-      <Toolbar >
-        <Grid
-          justify="space-between"
-          alignItems="center"
-          container
-        >
+      <Toolbar>
+        <Grid justify="space-between" alignItems="center" container>
           <Grid item>
             <Link color="inherit" component={RRLink} to="/">
               <IconButton edge="start" color="inherit" aria-label="admin-logo">
@@ -148,13 +140,16 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
             </Link>
           </Grid>
           <Grid item className={classes.gridItemRight}>
-            <IconButton 
-              edge="start" 
-              color="inherit" 
+            <IconButton
+              edge="start"
+              color="inherit"
               aria-label="admin-menu-search"
               onClick={handleNotificationClick}
             >
-              <Badge badgeContent={curNotificationPagination.totalElements} color="error">
+              <Badge
+                badgeContent={curNotificationPagination.totalElements}
+                color="error"
+              >
                 <NotificationsIcon />
               </Badge>
             </IconButton>
@@ -177,9 +172,7 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
         </Grid>
       </Toolbar>
     </AppBar>
-  )
-}
+  );
+};
 
-export default AdminHeader
-
-
+export default AdminHeader;

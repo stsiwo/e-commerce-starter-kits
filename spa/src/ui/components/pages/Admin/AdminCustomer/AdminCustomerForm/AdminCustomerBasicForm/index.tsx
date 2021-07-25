@@ -20,6 +20,8 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -167,11 +169,11 @@ const AdminCustomerBasicForm: React.FunctionComponent<AdminCustomerBasicFormProp
       React.MouseEvent<HTMLButtonElement>
     > = async (e) => {
       const isValid: boolean = isValidSync(curAdminCustomerState);
-      console.log(isValid);
+      log(isValid);
 
       if (isValid) {
         // pass
-        console.log("passed");
+        log("passed");
 
         dispatch(
           putUserActionCreator({

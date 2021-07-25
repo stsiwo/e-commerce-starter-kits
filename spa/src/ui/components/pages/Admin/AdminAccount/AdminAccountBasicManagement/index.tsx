@@ -9,11 +9,12 @@ import {
 } from "domain/user/types";
 import { useValidation } from "hooks/validation";
 import { userAccountSchema } from "hooks/validation/rules";
-import { useSnackbar } from "notistack";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { putAuthActionCreator } from "reducers/slices/app";
 import { mSelector } from "src/selectors/selector";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 export declare type UserAccountDataType = {
   firstName: string;
@@ -194,11 +195,11 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
   > = async (e) => {
     const isValid: boolean = isValidSync(curUserAccountState);
 
-    console.log(isValid);
+    log(isValid);
 
     if (isValid) {
       // pass
-      console.log("passed");
+      log("passed");
 
       dispatch(
         putAuthActionCreator({

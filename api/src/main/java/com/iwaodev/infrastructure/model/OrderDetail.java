@@ -132,7 +132,6 @@ public class OrderDetail {
   public void setProductWeight(Double unitWeight, Integer quantity) {
     BigDecimal totalWeight = new BigDecimal(unitWeight);
     Double result = totalWeight.multiply(new BigDecimal(quantity)).setScale(3, RoundingMode.HALF_UP).doubleValue();
-    logger.info("product weight: " + result);
     this.productWeight = result;
   }
 

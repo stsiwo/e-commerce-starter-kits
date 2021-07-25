@@ -165,8 +165,6 @@ public class MemberUserEndpointTest {
    **/
   @BeforeTransaction
   void verifyInitialDatabaseState() throws Exception {
-    logger.info("start calling setup before - satoshi");
-
     this.baseDatabaseSetup.setup(this.entityManager);
 
     // send authentication request before testing
@@ -769,7 +767,6 @@ public class MemberUserEndpointTest {
     assertThat(responseBody.getLatestOrderEvent().getOrderStatus()).isEqualTo(OrderStatusEnum.PAID);
 
     for (OrderEventDTO orderEventDTO : responseBody.getOrderEvents()) {
-      logger.info(orderEventDTO.toString());
       assertThat(orderEventDTO.getOrderEventId()).isNotNull();
     }
 
@@ -812,7 +809,6 @@ public class MemberUserEndpointTest {
     assertThat(responseBody.getLatestOrderEvent().getUser().getUserId().toString()).isEqualTo(dummyUserIdString);
 
     for (OrderEventDTO orderEventDTO : responseBody.getOrderEvents()) {
-      logger.info(orderEventDTO.toString());
       assertThat(orderEventDTO.getOrderEventId()).isNotNull();
     }
 
@@ -909,7 +905,6 @@ public class MemberUserEndpointTest {
     assertThat(responseBody.getLatestOrderEvent().getUser().getUserId().toString()).isEqualTo(dummyUserIdString);
 
     for (OrderEventDTO orderEventDTO : responseBody.getOrderEvents()) {
-      logger.info(orderEventDTO.toString());
       assertThat(orderEventDTO.getOrderEventId()).isNotNull();
     }
     Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(OrderEventWasAddedByMemberEvent.class));

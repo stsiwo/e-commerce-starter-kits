@@ -33,14 +33,10 @@ public class IssuerValidationValidator implements ConstraintValidator<IssuerVali
     // issuer - not null if issuer is admin/member
     NotificationTypeEnum actualNotificationType = domain.getNotificationType().getNotificationType();
 
-    logger.info("start validating issuer.");
-    logger.info("notificaiton type: " + actualNotificationType.toString());
-
     if (domain.isGuestIssuerByTypeOf(actualNotificationType) && domain.getIssuer() != null) {
       // throw new DomainValidationException(String.format("issuer must be null.
       // (type: %s)", actualNotificationType));
 
-      logger.info("{notification.issuer.null}");
       // https://stackoverflow.com/questions/23702975/building-dynamic-constraintviolation-error-messages
       HibernateConstraintValidatorContext hibernateConstraintValidatorContext = context
           .unwrap(HibernateConstraintValidatorContext.class);
@@ -55,8 +51,6 @@ public class IssuerValidationValidator implements ConstraintValidator<IssuerVali
       // throw new DomainValidationException(String.format("issuer cannot be null.
       // (type: %s)", actualNotificationType));
 
-      logger.info("{notification.issuer.notnull}");
-
       HibernateConstraintValidatorContext hibernateConstraintValidatorContext = context
           .unwrap(HibernateConstraintValidatorContext.class);
       hibernateConstraintValidatorContext.disableDefaultConstraintViolation();
@@ -65,7 +59,6 @@ public class IssuerValidationValidator implements ConstraintValidator<IssuerVali
       return false;
     }
 
-    logger.info("where is my bug?");
 
     // if issuer exist
     if (domain.getIssuer() != null) {
@@ -78,7 +71,6 @@ public class IssuerValidationValidator implements ConstraintValidator<IssuerVali
         // notification type; %s)",
         // expectedIssuerType, actualIssuerType, actualNotificationType));
 
-        logger.info("{notification.issuer.invalidtype}");
         // https://stackoverflow.com/questions/23702975/building-dynamic-constraintviolation-error-messages
         HibernateConstraintValidatorContext hibernateConstraintValidatorContext = context
             .unwrap(HibernateConstraintValidatorContext.class);

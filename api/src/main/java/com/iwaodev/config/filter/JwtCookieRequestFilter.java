@@ -108,15 +108,13 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
 
       try {
         String userIdString = this.jwtUtil.extractUserId(jwt);
-        logger.info("extracted user id: " + userIdString);
         /**
          * this throws java.lang.IllegalArgumentException: Invalid UUID string: invalid if the string is not uuid string
          */
         userId = UUID.fromString(userIdString);
-        logger.info("after convert user id to uuid");
       } catch (Exception e) {
-        logger.info("error during extract user id from jwt in the request");
-        logger.info(e.getMessage());
+        logger.debug("error during extract user id from jwt in the request");
+        logger.debug(e.getMessage());
         // force logout e.g., delete 'api-token' cookie
         this.eraseCookie(request, response);
         // return error response
@@ -159,18 +157,15 @@ public class JwtCookieRequestFilter extends OncePerRequestFilter {
            **/
 
           for (Cookie cookie : request.getCookies()) {
-            logger.info("cookie: " + cookie.getName() + " and " + cookie.getValue());
+            logger.debug("cookie: " + cookie.getName() + " and " + cookie.getValue());
           }
 
           Cookie csrfToken = Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals("csrf-token"))
               .findFirst().orElse(null);
           String csrfTokenFromHeader = request.getHeader("csrf-token");
 
-          logger.info("csrfToken from cookie = " + csrfToken);
-          logger.info("csrfToken from header = " + csrfTokenFromHeader);
-
           if (csrfToken != null && csrfTokenFromHeader != null && csrfTokenFromHeader.equals(csrfToken.getValue())) {
-            logger.info("pass jwt token & csrf token validation. congrats:)");
+            logger.debug("pass jwt token & csrf token validation. congrats:)");
             // if jwt is valid, let this move to next step.
             chain.doFilter(request, response);
           } else {

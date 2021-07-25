@@ -5,6 +5,8 @@ import { classnames } from "@material-ui/data-grid";
 import PlayCircleFilledIcon from "@material-ui/icons/PlayCircleFilled";
 import { useResponsive } from "hooks/responsive";
 import * as React from "react";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 declare type SingleLineListPropsType = {
   renderDomainFunc: () => React.ReactNode;
@@ -127,15 +129,15 @@ const SingleLineList: React.FunctionComponent<SingleLineListPropsType> = (
 
   React.useEffect(() => {
     if (outerBoxRef.current && innerBoxRef.current) {
-      console.log("inner box scroll width: " + innerBoxRef.current.scrollWidth);
-      console.log("inner box client width: " + innerBoxRef.current.clientWidth);
-      console.log("are arrows need?");
+      log("inner box scroll width: " + innerBoxRef.current.scrollWidth);
+      log("inner box client width: " + innerBoxRef.current.clientWidth);
+      log("are arrows need?");
       if (innerBoxRef.current.scrollWidth > innerBoxRef.current.clientWidth) {
-        console.log("yes");
+        log("yes");
         // need to have scroll
         setNeedArrows(true);
       } else {
-        console.log("no");
+        log("no");
         // don't need it
         setNeedArrows(false);
       }

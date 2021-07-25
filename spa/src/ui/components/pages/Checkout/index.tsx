@@ -21,6 +21,8 @@ import { CheckoutSessionStatusEnum } from "domain/order/types";
 import { checkoutSessionStatusActions } from "reducers/slices/domain/checkout";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 export enum CheckoutStepEnum {
   CUSTOMER_BASIC_INFORMATION = 0,
@@ -127,7 +129,7 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
   );
 
   const handleSessionTimeout = () => {
-    console.log("session time out");
+    log("session time out");
     dispatch(
       postSessionTimeoutOrderEventActionCreator({
         orderId: curCheckoutOrder.orderId,
@@ -155,9 +157,9 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
    *
    **/
   React.useEffect(() => {
-    console.log(curCheckoutSessionStatus);
+    log(curCheckoutSessionStatus);
     if (curCheckoutSessionStatus === CheckoutSessionStatusEnum.IN_SESSION) {
-      console.log("session status is in_session so start timer");
+      log("session status is in_session so start timer");
       timer = setTimeout(handleSessionTimeout, sessionTime); // this will change session status to be expired.
 
       /**
@@ -167,7 +169,7 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
         clearTimeout(timer);
       };
     } else {
-      console.log("session status is NOT in_session so clear timer");
+      log("session status is NOT in_session so clear timer");
       clearTimeout(timer);
     }
 
@@ -187,7 +189,7 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
      *
      **/
     //return () => {
-    //  console.log("umount so clear timer")
+    //  log("umount so clear timer")
     //  clearTimeout(timer);
     //}
   }, [curCheckoutSessionStatus]);
@@ -195,7 +197,7 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
   // cleanup - clear timer
   React.useEffect(() => {
     return () => {
-      console.log("umount so reset timer");
+      log("umount so reset timer");
       clearTimeout(timer);
     };
   }, []);
@@ -245,7 +247,7 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
       curCheckoutSessionStatus === CheckoutSessionStatusEnum.EXPIRED ||
       curCheckoutSessionStatus === CheckoutSessionStatusEnum.PAYMENT_ATTEMPTED
     ) {
-      console.log(
+      log(
         "reset checkout status since its status is expired or payment_attempted"
       );
       dispatch(resetCheckoutStateActionCreator());
@@ -265,7 +267,7 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
      **/
     // unmount only
     //return () => {
-    //  console.log("reset checkout since this user leaves the checkout page")
+    //  log("reset checkout since this user leaves the checkout page")
     //  dispatch(
     //    resetCheckoutStateActionCreator()
     //  )
@@ -275,7 +277,7 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
   // only run this clean up when unmount
   React.useEffect(() => {
     return () => {
-      console.log("reset checkout since this user leaves the checkout page");
+      log("reset checkout since this user leaves the checkout page");
       dispatch(resetCheckoutStateActionCreator());
     };
   }, []);

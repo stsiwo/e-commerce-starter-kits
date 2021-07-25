@@ -97,7 +97,7 @@ public class ReviewServiceImpl implements ReviewService {
     Optional<Review> targetEntityOption = this.repository.findById(id);
 
     if (!targetEntityOption.isPresent()) {
-      logger.info("the given review does not exist");
+      logger.debug("the given review does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given review does not exist.");
     }
 
@@ -112,7 +112,7 @@ public class ReviewServiceImpl implements ReviewService {
     // product_id combination)
     if (this.repository.isExist(criteria.getUserId(), criteria.getProductId()).isPresent()) {
       // user not found so return error
-      logger.info("the given review already exist.");
+      logger.debug("the given review already exist.");
       throw new AppException(HttpStatus.CONFLICT, "the given review already exist.");
     }
 
@@ -120,7 +120,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     if (!customerOption.isPresent()) {
       // user not found so return error
-      logger.info("the given customer does not exist");
+      logger.debug("the given customer does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given customer does not exist.");
     }
 
@@ -131,7 +131,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     if (!productOption.isPresent()) {
       // user not found so return error
-      logger.info("the given product does not exist");
+      logger.debug("the given product does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
 
@@ -149,7 +149,6 @@ public class ReviewServiceImpl implements ReviewService {
     Review savedEntity = this.repository.save(newEntity);
 
     // publish event
-    logger.info("start publish review was created event.");
     // I leave this event here for any future reference.
     // actually, this add a notification to teh admin
     this.publisher.publishEvent(new NewReviewWasSubmittedEvent(this, savedEntity));
@@ -166,7 +165,7 @@ public class ReviewServiceImpl implements ReviewService {
     Optional<Review> targetEntityOption = this.repository.findById(id);
 
     if (!targetEntityOption.isPresent()) {
-      logger.info("the given review does not exist");
+      logger.debug("the given review does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given review does not exist.");
     }
 
@@ -211,15 +210,12 @@ public class ReviewServiceImpl implements ReviewService {
   @Override
   public FindReviewDTO findByUserIdAndProductId(UUID userId, UUID productId) throws Exception {
 
-    logger.info("before user find");
-
     User user = this.userRepository.findById(userId)
         .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "user not found."));
 
     Product product = this.productRepository.findById(productId)
         .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "product not found."));
 
-    logger.info("before user find");
     Optional<Review> reviewOption = this.repository.isExist(userId, productId);
 
     FindReviewDTO findReviewDTO = new FindReviewDTO();

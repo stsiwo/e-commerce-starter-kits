@@ -7,6 +7,8 @@ import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -79,8 +81,8 @@ export function* deleteSingleProductVariantWorker(action: PayloadAction<DeleteSi
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
 
-      console.log("puted product")
-      console.log(response.data)
+      log("puted product")
+      log(response.data)
       /**
        * update product domain in state
        *
@@ -104,7 +106,7 @@ export function* deleteSingleProductVariantWorker(action: PayloadAction<DeleteSi
       )
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.message)
+      log(response.message)
 
       /**
        * update fetch status failed

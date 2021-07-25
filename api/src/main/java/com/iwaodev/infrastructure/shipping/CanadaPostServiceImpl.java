@@ -81,8 +81,6 @@ public class CanadaPostServiceImpl implements CanadaPostService {
     MailingScenario mailingScenario = new MailingScenario();
     mailingScenario.setCustomerNumber(this.customerNumber);
 
-    logger.info("customer number (canada post): " + this.customerNumber);
-
     MailingScenario.ParcelCharacteristics parcelCharacteristics = new MailingScenario.ParcelCharacteristics();
     /**
      * prevent the value from overflow the decimal point. use 'setScale'.
@@ -116,7 +114,7 @@ public class CanadaPostServiceImpl implements CanadaPostService {
      **/
     String requestBody = serializeObjectToXmlString(mailingScenario, MailingScenario.class);
 
-    logger.info(requestBody);
+    logger.debug(requestBody);
 
     /**
      * prep for post request
@@ -132,7 +130,7 @@ public class CanadaPostServiceImpl implements CanadaPostService {
      * request
      **/
     ResponseEntity<String> response = this.restTemplate.postForEntity(this.ratingUrl, request, String.class);
-    logger.info(response.getBody());
+    logger.debug(response.getBody());
 
     /**
      * parse response xml to dto object
@@ -146,8 +144,8 @@ public class CanadaPostServiceImpl implements CanadaPostService {
       Messages messageData = deserializeXmlStringToObject(response.getBody(), Messages.class);
       for (Iterator<Messages.Message> iter = messageData.getMessage().iterator(); iter.hasNext();) {
         Messages.Message aMessage = (Messages.Message) iter.next();
-        logger.info("Error Code: " + aMessage.getCode());
-        logger.info("Error Msg: " + aMessage.getDescription());
+        logger.debug("Error Code: " + aMessage.getCode());
+        logger.debug("Error Msg: " + aMessage.getDescription());
       }
       throw new Exception("failed to get rating cost & delivery date");
     }
@@ -158,7 +156,7 @@ public class CanadaPostServiceImpl implements CanadaPostService {
     RatingDTO ratingDTO = new RatingDTO();
     for (PriceQuote quote : quotes.getPriceQuotes()) {
       if (quote.getServiceName().equals("Regular Parcel")) {
-        logger.info("this is regular parcel");
+        logger.debug("this is regular parcel");
         ratingDTO.setEstimatedShippingCost(quote.getPriceDetails().getDue());
         ratingDTO.setExpectedDeliveryDate(quote.getServiceStandard().getExpectedDeliveryDate().toGregorianCalendar()
             .toZonedDateTime().toLocalDateTime());
@@ -203,7 +201,7 @@ public class CanadaPostServiceImpl implements CanadaPostService {
      **/
     String requestBody = serializeObjectToXmlString(shipment, NonContractShipment.class);
 
-    logger.info(requestBody);
+    logger.debug(requestBody);
 
     /**
      * prep for post request
@@ -221,7 +219,7 @@ public class CanadaPostServiceImpl implements CanadaPostService {
     ResponseEntity<String> response = this.restTemplate.postForEntity(this.nonContractShipmentUrl, request,
         String.class);
 
-    logger.info(response.getBody());
+    logger.debug(response.getBody());
 
     /**
      * parse response xml to dto object
@@ -276,7 +274,7 @@ public class CanadaPostServiceImpl implements CanadaPostService {
     ResponseEntity<String> response = this.restTemplate
         .postForEntity(this.nonContractShipmentUrl + "/" + shipmentId + "/receipt", request, String.class);
 
-    logger.info(response.getBody());
+    logger.debug(response.getBody());
 
     /**
      * parse response xml to dto object
@@ -311,7 +309,7 @@ public class CanadaPostServiceImpl implements CanadaPostService {
     String requestBody = serializeObjectToXmlString(nonContractShipmentRefundRequest,
         NonContractShipmentRefundRequest.class);
 
-    logger.info(requestBody);
+    logger.debug(requestBody);
 
     /**
      * prep for post request
@@ -328,7 +326,7 @@ public class CanadaPostServiceImpl implements CanadaPostService {
      **/
     ResponseEntity<String> response = this.restTemplate.postForEntity(requestRefundUrl, request, String.class);
 
-    logger.info(response.getBody());
+    logger.debug(response.getBody());
 
     /**
      * parse response xml to dto object
@@ -360,7 +358,7 @@ public class CanadaPostServiceImpl implements CanadaPostService {
      **/
     String requestBody = serializeObjectToXmlString(authorizedReturn, AuthorizedReturn.class);
 
-    logger.info(requestBody);
+    logger.debug(requestBody);
 
     /**
      * prep for post request
@@ -377,7 +375,7 @@ public class CanadaPostServiceImpl implements CanadaPostService {
      **/
     ResponseEntity<String> response = this.restTemplate.postForEntity(this.authorizedReturnUrl, request, String.class);
 
-    logger.info(response.getBody());
+    logger.debug(response.getBody());
 
     /**
      * parse response xml to dto object

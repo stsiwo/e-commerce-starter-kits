@@ -54,8 +54,6 @@ public class CreateCartItemEventHandler implements EventHandler<MovedWishlistIte
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
   public void handleEvent(MovedWishlistItemToCartItemEvent event) throws AppException {
 
-    logger.info(Thread.currentThread().getName());
-
     // if this variant does not have stock return bad_request.
     if (this.productRepository.isOutOfStock(event.getVariantId())) {
       throw new AppException(HttpStatus.BAD_REQUEST, "the variant does not have any stock.");

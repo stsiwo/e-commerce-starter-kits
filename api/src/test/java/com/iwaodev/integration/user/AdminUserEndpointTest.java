@@ -108,8 +108,6 @@ public class AdminUserEndpointTest {
    **/
   @BeforeTransaction
   void verifyInitialDatabaseState() throws Exception {
-    logger.info("start calling setup before - satoshi");
-
     this.baseDatabaseSetup.setup(this.entityManager);
 
     // send authentication request before testing
@@ -226,7 +224,6 @@ public class AdminUserEndpointTest {
 
     // assert
     assertThat(responseBody.length).isGreaterThan(0);
-    logger.info("abcd size: " + responseBody.length);
     for (UserDTO userDto : responseBody) {
       assertThat(userDto.getCreatedAt().isBefore(LocalDateTime.parse(dummyEndDateString, formatter))).isEqualTo(true);
     }

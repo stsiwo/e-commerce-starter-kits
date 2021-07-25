@@ -7,6 +7,8 @@ import { all, call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { generateQueryString, getNanoId } from "src/utils";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -51,8 +53,8 @@ export function* fetchWishlistItemWorker(action: PayloadAction<{}>) {
      **/
     const curQueryString = yield select(mSelector.makeWishlistItemQueryStringSelector())
 
-    console.log(curQueryString)
-    console.log(generateQueryString(curQueryString));
+    log(curQueryString)
+    log(generateQueryString(curQueryString));
 
     /**
      * grab all domain
@@ -87,8 +89,8 @@ export function* fetchWishlistItemWorker(action: PayloadAction<{}>) {
        *
        * don't use 'merge' since no cache
        **/
-      console.log("wishlist item dto response data")
-      console.log(response.data)
+      log("wishlist item dto response data")
+      log(response.data)
       yield put(
         wishlistItemActions.update(response.content)
       )
@@ -131,10 +133,10 @@ export function* fetchWishlistItemWorker(action: PayloadAction<{}>) {
        **/
 
 
-      console.log(response.pageable)
+      log(response.pageable)
 
-      console.log("total pages")
-      console.log(response.totalPages)
+      log("total pages")
+      log(response.totalPages)
 
       yield all([
         put(wishlistItemPaginationPageActions.update(response.pageable.pageNumber)),
@@ -144,7 +146,7 @@ export function* fetchWishlistItemWorker(action: PayloadAction<{}>) {
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.message)
+      log(response.message)
 
       /**
        * update message

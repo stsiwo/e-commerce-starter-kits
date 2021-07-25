@@ -79,8 +79,6 @@ public class UserController {
       @RequestParam(value = "sort", required = false, defaultValue = "DATE_DESC") UserSortEnum sort,
       UserQueryStringCriteria criteria) throws Exception {
 
-    logger.info("user controller cur thread name: " + Thread.currentThread().getName());
-
     return new ResponseEntity<>(this.service.getAll(criteria, page, limit, sort), HttpStatus.OK);
   }
 
@@ -239,9 +237,6 @@ public class UserController {
       @RequestParam(value = "productId", required = true) UUID productId,
       @AuthenticationPrincipal SpringSecurityUser authUser) throws Exception {
 
-      logger.info("userId " + id.toString());
-      logger.info("productId " + productId.toString());
-
     return new ResponseEntity<>(this.reviewService.findByUserIdAndProductId(id, productId), HttpStatus.OK);
   }
 
@@ -257,7 +252,6 @@ public class UserController {
       @Valid @RequestBody ReviewCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    logger.info("start handling at /reviews POST");
     return new ResponseEntity<>(this.reviewService.create(criteria), HttpStatus.OK);
   }
 
@@ -270,7 +264,6 @@ public class UserController {
       @Valid @RequestBody ReviewCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    logger.info("start handling at /reviews PUT");
     return new ResponseEntity<>(this.reviewService.update(criteria, reviewId), HttpStatus.OK);
   }
 
@@ -282,7 +275,6 @@ public class UserController {
       @PathVariable(value = "reviewId") Long reviewId,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    logger.info("start handling at /reviews DELETE");
     this.reviewService.delete(reviewId);
     return new ResponseEntity<>(new BaseResponse("successfuly deleted."), HttpStatus.OK);
   }

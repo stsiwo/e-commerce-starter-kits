@@ -70,8 +70,8 @@ public class PaymentSucceededEventHandler implements EventHandler<PaymentSucceed
    **/
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
   public void handleEvent(PaymentSucceededEvent event) throws AppException {
-    logger.info("PaymentSucceededEventHandler called.");
-    logger.info(Thread.currentThread().getName());
+    logger.debug("PaymentSucceededEventHandler called.");
+    logger.debug(Thread.currentThread().getName());
 
     // target order from db
     Optional<Order> orderOption = this.orderRepository.findByStripePaymentIntentId(event.getPaymentIntentId());
@@ -95,11 +95,9 @@ public class PaymentSucceededEventHandler implements EventHandler<PaymentSucceed
     // add new order event
     try {
       if (!userOption.isPresent()) {
-        logger.info("this is guest user");
         orderEventService.addByProgram(order, OrderStatusEnum.ORDERED, "", (User) null);
         orderEventService.addByProgram(order, OrderStatusEnum.PAID, "", (User)null);
       } else {
-        logger.info("this is member user (id: " + userOption.get().getUserId().toString());
         orderEventService.addByProgram(order, OrderStatusEnum.ORDERED, "", userOption.get());
         orderEventService.addByProgram(order, OrderStatusEnum.PAID, "", userOption.get());
       }

@@ -141,8 +141,6 @@ public class AdminProductEndpointTest {
    **/
   @BeforeTransaction
   void verifyInitialDatabaseState() throws Exception {
-    logger.info("start calling setup before - satoshi");
-
     this.baseDatabaseSetup.setup(this.entityManager);
 
     // send authentication request before testing
@@ -185,12 +183,9 @@ public class AdminProductEndpointTest {
     ProductDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), ProductDTO[].class);
 
     // assert
-    logger.info("response body length");
-    logger.info("" + responseBody.length);
     assertThat(responseBody.length).isGreaterThan(0);
     for (ProductDTO productDto : responseBody) {
       // check if the dummy string contains either name, or description
-      logger.info(productDto.getProductId().toString());
       assertThat(productDto.getProductName().contains(dummySearchQueryString)
           || productDto.getProductDescription().contains(dummySearchQueryString)).isEqualTo(true);
       assertThat(productDto.getCategory().getCategoryId()).isNotNull();

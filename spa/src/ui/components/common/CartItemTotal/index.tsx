@@ -9,16 +9,17 @@ import {
   calcSubTotalProductNumbers,
   calcTotalWeight,
 } from "domain/cart";
-import { useSnackbar } from "notistack";
+import { RatingCriteria } from "domain/order/types";
 import * as React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { messageActions } from "reducers/slices/app";
+import { getRatingOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
+import { checkoutIsRatingSuccessActions } from "reducers/slices/domain/checkout";
+import { FetchStatusEnum, MessageTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { cadCurrencyFormat, getNanoId, toDateString } from "src/utils";
-import { messageActions } from "reducers/slices/app";
-import { FetchStatusEnum, MessageTypeEnum } from "src/app";
-import { checkoutIsRatingSuccessActions } from "reducers/slices/domain/checkout";
-import { RatingCriteria } from "domain/order/types";
-import { getRatingOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 const useStyles = makeStyles((theme: Theme) => createStyles({}));
 
@@ -61,8 +62,8 @@ const CartItemTotal: React.FunctionComponent<CartItemTotalPropsType> = (
 
   // request to get appropriate shipping cost
   React.useEffect(() => {
-    console.log("total weight: " + calcTotalWeight(selectedCartItems));
-    console.log("postal code: " + curShippingAddress.postalCode);
+    log("total weight: " + calcTotalWeight(selectedCartItems));
+    log("postal code: " + curShippingAddress.postalCode);
 
     // start fetching
     dispatch(getRatingOrderFetchStatusActions.update(FetchStatusEnum.FETCHING));

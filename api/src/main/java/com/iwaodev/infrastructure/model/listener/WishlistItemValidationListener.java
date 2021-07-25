@@ -45,7 +45,6 @@ public class WishlistItemValidationListener {
   // @Autowired
   // public void init(ValidatorBag<WishlistItem> validatorBag) {
   // WishlistItemValidationListener.validatorBag = validatorBag;
-  // logger.info("Initializing with dependency [" + validatorBag + "]");
   // }
 
   @Autowired
@@ -53,7 +52,6 @@ public class WishlistItemValidationListener {
 
   @PrePersist
   private void beforeCreate(WishlistItem domain) throws AppException {
-    logger.info("start validating domain for create...");
     Set<ConstraintViolation<WishlistItem>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
@@ -63,13 +61,11 @@ public class WishlistItemValidationListener {
 
   @PreUpdate
   private void beforeUpdate(WishlistItem domain) throws AppException {
-    logger.info("start validating domain for update...");
     Set<ConstraintViolation<WishlistItem>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
       throw new AppException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
     }
-    logger.info("the domain passed all validation:)");
   }
 
 }

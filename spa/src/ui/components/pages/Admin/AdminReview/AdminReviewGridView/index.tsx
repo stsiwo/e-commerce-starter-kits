@@ -9,6 +9,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
@@ -16,15 +17,22 @@ import {
   DataGrid,
   GridCellParams,
   GridColDef,
-  GridPageChangeParams,
   GridRowsProp,
 } from "@material-ui/data-grid";
 import EditIcon from "@material-ui/icons/Edit";
 import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
+import Pagination from "@material-ui/lab/Pagination";
+import SearchForm from "components/common/SearchForm";
 import { getStatus } from "domain/review";
 import { ReviewType } from "domain/review/type";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router";
+import {
+  deleteSingleReviewFetchStatusActions,
+  postReviewFetchStatusActions,
+  putReviewFetchStatusActions,
+} from "reducers/slices/app/fetchStatus/review";
 import {
   deleteSingleReviewActionCreator,
   fetchReviewActionCreator,
@@ -35,15 +43,8 @@ import { FetchStatusEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import AdminReviewFormDialog from "../AdminReviewFormDialog";
 import AdminReviewSearchController from "../AdminReviewSearchController";
-import SearchForm from "components/common/SearchForm";
-import { useLocation } from "react-router";
-import {
-  postReviewFetchStatusActions,
-  putReviewFetchStatusActions,
-  deleteSingleReviewFetchStatusActions,
-} from "reducers/slices/app/fetchStatus/review";
-import Grid from "@material-ui/core/Grid";
-import Pagination from "@material-ui/lab/Pagination";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 declare type AdminReviewGridViewPropsType = {};
 
@@ -158,7 +159,7 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
 
     // fetch review
     React.useEffect(() => {
-      console.log("this is called?");
+      log("this is called?");
       dispatch(fetchReviewActionCreator());
     }, [JSON.stringify(curQueryString), pagination.page]);
 
@@ -196,7 +197,7 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
     > = (e) => {
       const reviewId = e.currentTarget.getAttribute("data-review-id");
 
-      console.log("target reveiw to be edit: " + reviewId);
+      log("target reveiw to be edit: " + reviewId);
 
       setReviewId(reviewId);
 

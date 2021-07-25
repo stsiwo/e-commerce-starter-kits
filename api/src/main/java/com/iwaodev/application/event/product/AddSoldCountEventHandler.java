@@ -36,8 +36,8 @@ public class AddSoldCountEventHandler implements EventHandler<CompletedOrderPaym
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
   public void handleEvent(CompletedOrderPaymentEvent event) throws AppException {
 
-    logger.info("start handleAddSoldCountEventHandler");
-    logger.info(Thread.currentThread().getName());
+    logger.debug("start handleAddSoldCountEventHandler");
+    logger.debug(Thread.currentThread().getName());
 
     Order order = event.getOrder();
 
@@ -56,8 +56,8 @@ public class AddSoldCountEventHandler implements EventHandler<CompletedOrderPaym
 
       if (!productOption.isPresent()) {
         // product not found so return error
-        logger.info("the given product does not exist (productId: " + productId.toString());
-        throw new AppException(HttpStatus.NOT_FOUND, "the given customer does not exist.");
+        logger.debug("the given product does not exist (productId: " + productId.toString());
+        throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist (productId: " + productId.toString());
       }
       // product found so assign it to this order
       Product product = productOption.get();

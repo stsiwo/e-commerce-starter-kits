@@ -42,20 +42,12 @@ public class BaseDatabaseSetup {
   @Transactional
   public void setup(TestEntityManager entityManager) {
 
-    logger.info("start setup base database test data");
-
     // check base data is already in database
     int count = ((Number) entityManager.getEntityManager().createQuery("SELECT COUNT(u) FROM users u")
         .getSingleResult()).intValue();
 
-    logger.info("test member user email: " + this.testMemberEmail);
-    logger.info("test admin user email: " + this.testAdminEmail);
-
-
     // if count == 1, only admin user is inserted and this means that you need to insert test user record before testing.
     if (count == 1) {
-
-      logger.info("start inserting base test data such as user_types, test user");
 
       Faker faker = new Faker();
 
@@ -93,7 +85,7 @@ public class BaseDatabaseSetup {
         .executeUpdate();
 
     } else {
-      logger.info("base test data is setup already so skip inserting test data");
+      logger.debug("base test data is setup already so skip inserting test data");
     }
   }
 }

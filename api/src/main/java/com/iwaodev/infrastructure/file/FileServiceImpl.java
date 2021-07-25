@@ -41,8 +41,6 @@ public class FileServiceImpl implements FileService {
 
     // save it
     fos.close();
-
-    logger.info("after done with saving");
   }
 
   private File generatePathIfNotExist(String path) throws IOException {
@@ -53,19 +51,15 @@ public class FileServiceImpl implements FileService {
 
     // create any parent directory if it does not exist
     if (!file.getParentFile().exists()) {
-      logger.info("target directory does not exist");
+      logger.debug("target directory does not exist");
       file.getParentFile().mkdirs();
     }
 
     // create the file if does not exist
     if (!file.exists()) {
-      logger.info("target file does not exist");
+      logger.debug("target file does not exist");
       file.createNewFile();
     }
-
-    logger.info("after create directory");
-    logger.info(path);
-
     return file;
   }
 
@@ -90,7 +84,6 @@ public class FileServiceImpl implements FileService {
 
   @Override
   public boolean isImage(MultipartFile file) {
-    logger.info("isImage check");
     return this.imageFileTypeList.contains(file.getContentType());
   }
 

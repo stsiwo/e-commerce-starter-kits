@@ -6,6 +6,8 @@ import { all, call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { generateQueryString } from "src/utils";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -52,8 +54,8 @@ export function* fetchOrderWorker(action: PayloadAction<{}>) {
      **/
     const curQueryString = yield select(mSelector.makeOrderQueryStringSelector())
 
-    console.log(curQueryString)
-    console.log(generateQueryString(curQueryString));
+    log(curQueryString)
+    log(generateQueryString(curQueryString));
 
     /**
      * grab all domain
@@ -128,10 +130,10 @@ export function* fetchOrderWorker(action: PayloadAction<{}>) {
        **/
 
 
-      console.log(response.pageable)
+      log(response.pageable)
 
-      console.log("total pages")
-      console.log(response.totalPages)
+      log("total pages")
+      log(response.totalPages)
 
       yield all([
         put(orderPaginationPageActions.update(response.pageable.pageNumber)),
@@ -141,11 +143,11 @@ export function* fetchOrderWorker(action: PayloadAction<{}>) {
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.message)
+      log(response.message)
 
     }
   } else {
-    console.log("permission denied. your order type: " + curAuth.userType)
+    log("permission denied. your order type: " + curAuth.userType)
   }
 }
 

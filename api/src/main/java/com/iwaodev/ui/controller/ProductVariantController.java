@@ -70,7 +70,7 @@ public class ProductVariantController {
     
     // if criteria.variantId != variantId (path), reject to update.
     if (!variantId.toString().equals(criteria.getVariantId().toString())) {
-      logger.info("variant id in the request body does not match with the one in url.");
+      logger.debug("variant id in the request body does not match with the one in url.");
       throw new AppException(HttpStatus.BAD_REQUEST, "variant id in the request body does not match with the one in url.");
     }
 

@@ -53,8 +53,6 @@ public class AuthenticationController {
   public ResponseEntity<AuthenticationResponse> index(@RequestBody AuthenticationRequestCriteria criteria,
       HttpServletResponse response) throws Exception {
 
-    logger.info("received credentials: " + criteria.getEmail() + " and " + criteria.getPassword());
-
     /**
      * we need to retrieve the user first since UsernamePasswordAuthenticationToken requires userId and password.
      * we use userid as username

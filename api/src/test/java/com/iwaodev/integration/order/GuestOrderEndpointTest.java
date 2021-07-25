@@ -132,8 +132,6 @@ public class GuestOrderEndpointTest {
    **/
   @BeforeTransaction
   void verifyInitialDatabaseState() throws Exception {
-    logger.info("start calling setup before - satoshi");
-
     this.baseDatabaseSetup.setup(this.entityManager);
   }
 
@@ -249,7 +247,6 @@ public class GuestOrderEndpointTest {
     assertThat(responseBody.getLatestOrderEvent().getOrderStatus()).isEqualTo(OrderStatusEnum.SESSION_TIMEOUT);
 
     for (OrderEventDTO orderEventDTO : responseBody.getOrderEvents()) {
-      logger.info(orderEventDTO.toString());
       assertThat(orderEventDTO.getOrderEventId()).isNotNull();
       assertThat(orderEventDTO.getUndoable()).isEqualTo(false);
     }

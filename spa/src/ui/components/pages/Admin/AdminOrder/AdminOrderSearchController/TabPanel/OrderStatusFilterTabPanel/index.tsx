@@ -8,6 +8,8 @@ import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { orderQueryOrderStatusActions } from "reducers/slices/domain/order";
 import { mSelector } from "src/selectors/selector";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 //interface OrderStatusFilterTabPanelPropsType {
 //  curOrderStatusId: string
@@ -52,8 +54,8 @@ const OrderStatusFilterTabPanel: React.FunctionComponent<{}> = ({}) => {
     });
   };
 
-  console.log("cur orderStatus id (query string)");
-  console.log(curOrderStatus);
+  log("cur orderStatus id (query string)");
+  log(curOrderStatus);
 
   /**
    *

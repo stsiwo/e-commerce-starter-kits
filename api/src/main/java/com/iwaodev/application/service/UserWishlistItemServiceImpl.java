@@ -114,7 +114,7 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
     Optional<User> targetUserOption = this.userRepository.findById(userId);
 
     if (!targetUserOption.isPresent()) {
-      logger.info("the given user does not exist");
+      logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
@@ -122,17 +122,15 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
     Optional<Product> targetProductOption = this.productRepository.findByVariantId(variantId);
 
     if (!targetProductOption.isPresent()) {
-      logger.info("the given product or its variant does not exist");
+      logger.debug("the given product or its variant does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product or its variant does not exist.");
     }
-
-    logger.info("check duplication");
 
     // check cart item already exist
     Optional<WishlistItem> option = this.wishlistItemRepository.findByVariantIdAndUserId(variantId, userId);
 
     if (option.isPresent()) {
-      logger.info("target wishlist item already exist");
+      logger.debug("target wishlist item already exist");
       throw new AppException(HttpStatus.CONFLICT, "target wishlist item already exist.");
     }
 
@@ -180,7 +178,7 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
     Optional<WishlistItem> targetWishlistItemOption = this.wishlistItemRepository.findById(wishlistItemId);
 
     if (!targetWishlistItemOption.isPresent()) {
-      logger.info("the target wishlist item does not exist.");
+      logger.debug("the target wishlist item does not exist.");
       throw new AppException(HttpStatus.NOT_FOUND, "the target wishlist item does not exist.");
     }
 

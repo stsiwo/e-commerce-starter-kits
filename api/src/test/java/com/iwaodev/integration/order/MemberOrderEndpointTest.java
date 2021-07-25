@@ -157,8 +157,6 @@ public class MemberOrderEndpointTest {
    **/
   @BeforeTransaction
   void verifyInitialDatabaseState() throws Exception {
-    logger.info("start calling setup before - satoshi");
-
     this.baseDatabaseSetup.setup(this.entityManager);
 
     // send authentication request before testing
@@ -302,7 +300,6 @@ public class MemberOrderEndpointTest {
     assertThat(responseBody.getLatestOrderEvent().getUser().getUserId().toString()).isEqualTo(testUserId);
 
     for (OrderEventDTO orderEventDTO : responseBody.getOrderEvents()) {
-      logger.info(orderEventDTO.toString());
       assertThat(orderEventDTO.getOrderEventId()).isNotNull();
       assertThat(orderEventDTO.getUndoable()).isEqualTo(false);
     }

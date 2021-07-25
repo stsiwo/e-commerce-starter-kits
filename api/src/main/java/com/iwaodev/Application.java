@@ -307,11 +307,6 @@ public class Application {
   @Bean
   public JavaMailSender getJavaMailSender() {
     JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-
-    logger.info("mail service config");
-    logger.info("smtp name: " + this.mailConfig.getHost());
-    logger.info("is starttls enable: " + this.mailConfig.getIsStartTlsEnable());
-
     mailSender.setHost(this.mailConfig.getHost());
     mailSender.setPort(this.mailConfig.getPort());
     mailSender.setUsername(this.mailConfig.getUserName());

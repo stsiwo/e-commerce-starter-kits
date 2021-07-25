@@ -126,8 +126,6 @@ public class AdminOrderEndpointTest {
    **/
   @BeforeTransaction
   void verifyInitialDatabaseState() throws Exception {
-    logger.info("start calling setup before - satoshi");
-
     this.baseDatabaseSetup.setup(this.entityManager);
 
     // send authentication request before testing
@@ -156,8 +154,6 @@ public class AdminOrderEndpointTest {
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
-
-    logger.info("order events in reaponse");
 
     assertThat(responseBody.length).isGreaterThan(0);
     for (OrderDTO orderDTO : responseBody) {
@@ -190,8 +186,6 @@ public class AdminOrderEndpointTest {
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
-
-    logger.info("order events in reaponse");
 
     assertThat(responseBody.length).isGreaterThan(0);
     for (OrderDTO orderDTO : responseBody) {
@@ -233,8 +227,6 @@ public class AdminOrderEndpointTest {
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
 
-    logger.info("order events in reaponse");
-
     assertThat(responseBody.length).isGreaterThan(0);
     for (OrderDTO orderDTO : responseBody) {
       // assert
@@ -265,8 +257,6 @@ public class AdminOrderEndpointTest {
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
 
-    logger.info("order events in reaponse");
-
     assertThat(responseBody.length).isGreaterThan(0);
     for (OrderDTO orderDTO : responseBody) {
       // assert
@@ -296,8 +286,6 @@ public class AdminOrderEndpointTest {
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
-
-    logger.info("order events in reaponse");
 
     assertThat(responseBody.length).isGreaterThan(0);
     for (OrderDTO orderDTO : responseBody) {
@@ -330,8 +318,6 @@ public class AdminOrderEndpointTest {
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
 
-    logger.info("order events in reaponse");
-
     assertThat(responseBody.length).isGreaterThan(0);
     for (OrderDTO orderDTO : responseBody) {
       // assert
@@ -363,8 +349,6 @@ public class AdminOrderEndpointTest {
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
 
-    logger.info("order events in reaponse");
-
     assertThat(responseBody.length).isGreaterThan(0);
     for (OrderDTO orderDTO : responseBody) {
       // assert
@@ -394,8 +378,6 @@ public class AdminOrderEndpointTest {
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
 
-    logger.info("order events in reaponse");
-
     assertThat(responseBody.length).isGreaterThan(0);
     for (OrderDTO orderDTO : responseBody) {
       // assert
@@ -424,8 +406,6 @@ public class AdminOrderEndpointTest {
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
-
-    logger.info("order events in reaponse");
 
     assertThat(responseBody.length).isGreaterThan(0);
     for (int i = 0; i < responseBody.length; i++) {
@@ -457,8 +437,6 @@ public class AdminOrderEndpointTest {
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     OrderDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), OrderDTO[].class);
-
-    logger.info("order events in reaponse");
 
     assertThat(responseBody.length).isGreaterThan(0);
     for (int i = 0; i < responseBody.length; i++) {
@@ -499,8 +477,6 @@ public class AdminOrderEndpointTest {
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     OrderDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, OrderDTO.class);
-
-    logger.info("order events in reaponse");
 
     // assert
     assertThat(responseBody.getOrderId()).isNotNull();
@@ -544,8 +520,6 @@ public class AdminOrderEndpointTest {
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     OrderDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, OrderDTO.class);
 
-    logger.info("order events in reaponse");
-
     // assert
     assertThat(responseBody.getOrderId()).isNotNull();
     assertThat(responseBody.getOrderEvents().size()).isEqualTo(3);
@@ -588,8 +562,6 @@ public class AdminOrderEndpointTest {
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     OrderDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, OrderDTO.class);
-
-    logger.info("order events in reaponse");
 
     // assert
     assertThat(responseBody.getOrderId()).isNotNull();

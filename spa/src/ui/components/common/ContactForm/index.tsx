@@ -18,6 +18,8 @@ import { useDispatch } from "react-redux";
 import { messageActions } from "reducers/slices/app";
 import { MessageTypeEnum } from "src/app";
 import { getNanoId } from "src/utils";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -156,11 +158,11 @@ const ContactForm: React.FunctionComponent<{}> = (props) => {
 
     const isValid: boolean = isValidSync(curContactFormState);
 
-    console.log(isValid);
+    log(isValid);
 
     if (isValid) {
       // pass
-      console.log("passed");
+      log("passed");
 
       //const body = {
       //  ...curContactFormState, // application/json since object
@@ -204,7 +206,7 @@ const ContactForm: React.FunctionComponent<{}> = (props) => {
           );
         });
     } else {
-      console.log("failed");
+      log("failed");
       updateAllValidation();
     }
   };

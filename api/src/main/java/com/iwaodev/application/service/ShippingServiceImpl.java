@@ -38,14 +38,12 @@ public RatingDTO getRating(Double weight, String destinationPostalCode) throws E
     String originalPostalCode = this.userRepository.getPostalCodeOfAdmin();
 
     if (originalPostalCode == null || originalPostalCode.isEmpty()) {
-      logger.info("failed to get admin's postal code. this should not happen.");
+      logger.debug("failed to get admin's postal code. this should not happen.");
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error. please try again later.");
     }
 
     try {
       RatingDTO ratingDTO = this.canadaPostService.getRegularParcelRating(weight, destinationPostalCode, originalPostalCode);
-      logger.info("shipping cost: " + ratingDTO.getEstimatedShippingCost());
-      logger.info("delivery date: " + ratingDTO.getExpectedDeliveryDate());
       return ratingDTO;
     } catch (Exception e) {
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());

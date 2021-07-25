@@ -47,7 +47,6 @@ public class RecipientValidationValidator implements ConstraintValidator<Recipie
 
     }
 
-    logger.info("where is my bug?");
     // recipient - match with recipient type
     UserTypeEnum expectedRecipientType = domain.getNotificationType().getRecipientType().getUserType();
     UserTypeEnum actualRecipientType = domain.getRecipient().getUserType().getUserType();

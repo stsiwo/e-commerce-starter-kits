@@ -8,6 +8,8 @@ import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -88,8 +90,8 @@ export function* postUserPhoneWorker(action: PayloadAction<PostUserPhoneActionTy
        * update this domain in state
        *
        **/
-      console.log("added phone from response")
-      console.log(response.data)
+      log("added phone from response")
+      log(response.data)
       yield put(
         userActions.appendPhone({
           phone: response.data,
@@ -110,7 +112,7 @@ export function* postUserPhoneWorker(action: PayloadAction<PostUserPhoneActionTy
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.message)
+      log(response.message)
 
       /**
        * update message
@@ -124,7 +126,7 @@ export function* postUserPhoneWorker(action: PayloadAction<PostUserPhoneActionTy
       )
     }
   } else {
-    console.log("permission denied: you are " + curAuth.userType)
+    log("permission denied: you are " + curAuth.userType)
   }
 }
 

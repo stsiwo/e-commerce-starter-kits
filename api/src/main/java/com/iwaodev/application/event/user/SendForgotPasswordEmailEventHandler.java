@@ -63,14 +63,14 @@ public class SendForgotPasswordEmailEventHandler implements EventHandler<Generat
   @TransactionalEventListener
   public void handleEvent(GeneratedForgotPasswordTokenEvent event) throws AppException {
 
-    logger.info("start handleSendForgotPasswordEmailEventHandler");
-    logger.info(Thread.currentThread().getName());
+    logger.debug("start handleSendForgotPasswordEmailEventHandler");
+    logger.debug(Thread.currentThread().getName());
 
     Optional<User> adminRecipientOption = this.userRepository.getAdmin();
 
     // if not, return 404
     if (!adminRecipientOption.isPresent()) {
-      logger.info("the admin user does not exist");
+      logger.debug("the admin user does not exist");
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist");
     }
 
@@ -91,17 +91,17 @@ public class SendForgotPasswordEmailEventHandler implements EventHandler<Generat
     thymeleafContext.setVariables(templateModel);
     String htmlBody = thymeleafTemplateEngine.process("forgot-password.html", thymeleafContext);
 
-    logger.info(htmlBody);
+    logger.debug(htmlBody);
 
     // send it
     try {
       // TODO: make sure 'from' email address (check 'Design Issue: Email With Admin
       // Company State')
-      logger.info(String.format("To: %s, From: %s", recipientUser.getEmail(), senderEmail));
+      logger.debug(String.format("To: %s, From: %s", recipientUser.getEmail(), senderEmail));
       this.emailService.send(recipientUser.getEmail(), senderEmail,
           "Forgot Password Email To Reset Your Password.", htmlBody);
     } catch (MessagingException e) {
-      logger.info(e.getMessage());
+      logger.debug(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 

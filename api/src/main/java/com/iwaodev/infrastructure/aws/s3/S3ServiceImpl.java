@@ -55,9 +55,6 @@ public class S3ServiceImpl implements S3Service {
 
   @PostConstruct
   public void init() {
-    logger.info("aws s3 region: " + this.awsRegion);
-    logger.info("aws s3 bucket name: " + this.awsBucketName);
-
     Region region = Region.of(this.awsRegion);
     this.s3Client = S3Client.builder().region(region).build();
   }
@@ -69,9 +66,6 @@ public class S3ServiceImpl implements S3Service {
 
   @Override
   public void upload(String path, byte[] bytes) throws Exception {
-
-    logger.info("start upload image to " + path);
-    logger.info("size: " + bytes.length);
 
     try {
       PutObjectRequest objectRequest = PutObjectRequest.builder().bucket(this.awsBucketName).key(path).build();
@@ -85,7 +79,6 @@ public class S3ServiceImpl implements S3Service {
   @Override
   public byte[] get(String path) throws Exception {
 
-    logger.info("start get image to " + path);
     GetObjectRequest getObjectRequest = GetObjectRequest.builder().bucket(this.awsBucketName).key(path).build();
 
     ResponseBytes<GetObjectResponse> responseBytes;
@@ -103,10 +96,8 @@ public class S3ServiceImpl implements S3Service {
    **/
   @Override
   public void delete(String path) throws Exception {
-    logger.info("start delete image to " + path);
 
     if (path == null || path.isEmpty()) {
-      logger.info("path is empty so skip deleting");
       return;
     }
 

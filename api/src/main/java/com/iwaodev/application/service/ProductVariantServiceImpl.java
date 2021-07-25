@@ -42,7 +42,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     Optional<Product> targetEntityOption = this.repository.findById(productId);
 
     if (!targetEntityOption.isPresent()) {
-      logger.info("the given product does not exist");
+      logger.debug("the given product does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
 
@@ -67,8 +67,6 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
     Product targetEntity = this.repository.findById(productId).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given product does not exist."));
 
-    logger.info("successfully fetch target product.");
-    
     ProductSize productSize = this.repository.findProductSizeById(criteria.getProductSize().getProductSizeId()).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given product size does not exist."));
 
     // map criteria to entity
@@ -86,28 +84,22 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     if (!newEntity.isUnitPriceGraterThanDiscountPrice()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the discount price must be less than the unit price.");
     }
-    logger.info("pass the cheaper discount price validation.");
-
     // recalculate product cheapest & highest price.
     targetEntity.setUp();
 
     // save it
     Product savedEntity = this.repository.save(targetEntity);
-    logger.info("after save");
     /**
      * if this entity use '@Formula' and '@Transient' you need to refresh.
      **/
     this.repository.refresh(savedEntity);
-    logger.info("after refresh");
 
     // find updated entity
     Optional<ProductVariant> targetVariantOption = savedEntity.findVariantByColorAndSize(criteria.getVariantColor(),
         criteria.getProductSize().getProductSizeId());
-    logger.info("after filter");
     // map entity to dto and return it.
     ProductVariantDTO variantDto = ProductVariantMapper.INSTANCE.toProductVariantDTO(targetVariantOption.get());
 
-    logger.info("returning variant dto after service");
     return variantDto;
   }
 
@@ -155,10 +147,6 @@ public class ProductVariantServiceImpl implements ProductVariantService {
      * if this entity use '@Formula' and '@Transient' you need to refresh.
      **/
     this.repository.refresh(savedEntity);
-
-    logger.info("product variant create");
-    //logger.info("product cheapest price " + savedEntity.getCheapestPrice());
-    //logger.info("product highest price " + savedEntity.getHighestPrice());
 
     // find updated entity
     Optional<ProductVariant> targetVariantOption = savedEntity.findVariantByColorAndSize(criteria.getVariantColor(),

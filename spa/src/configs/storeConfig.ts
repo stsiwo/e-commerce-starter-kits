@@ -17,9 +17,9 @@ export const middleware: any[] = [
 ]
 
 /**
- * TODO: disable redux devtool when production.
+ * disable redux devtool when production.
  */
-const composeEnhancers = (<any>window).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const composeEnhancers = (NODE_ENV !== 'production' && (<any>window).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ) || compose;
 export const store = createStore(rootReducer, initialState as StateType, composeEnhancers(
     applyMiddleware(...middleware)
 ));

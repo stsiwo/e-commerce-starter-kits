@@ -37,9 +37,6 @@ public class DecreaseProductStockEventHandler implements EventHandler<OrderFinal
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
   public void handleEvent(OrderFinalConfirmedEvent event) throws AppException {
 
-    logger.info("start handleOrderFinalConfirmedEventHandler");
-    logger.info(Thread.currentThread().getName());
-
     /**
      * decrease the stock number by the quantity of each order details
      **/

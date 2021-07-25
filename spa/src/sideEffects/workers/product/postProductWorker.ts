@@ -11,6 +11,8 @@ import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/ap
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
 import { productSchemaEntity } from "states/state";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -91,8 +93,8 @@ export function* postProductWorker(action: PayloadAction<PostProductActionType>)
     )
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
-      console.log("posted product")
-      console.log(response.data)
+      log("posted product")
+      log(response.data)
       /**
        * normalize response data
        *
@@ -100,8 +102,8 @@ export function* postProductWorker(action: PayloadAction<PostProductActionType>)
        **/
       const normalizedData = normalize(response.data, productSchemaEntity)
 
-      console.log("normalized product")
-      console.log(normalizedData)
+      log("normalized product")
+      log(normalizedData)
 
       /**
        * update product domain in state
@@ -124,7 +126,7 @@ export function* postProductWorker(action: PayloadAction<PostProductActionType>)
       )
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.message)
+      log(response.message)
 
       /**
        * update message

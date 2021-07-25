@@ -1,8 +1,11 @@
 import axios from "axios";
 import { getCookie } from "src/utils";
 import { store } from "./storeConfig";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
+ * 
  * need to be something like below:
  * ref: https://github.com/axios/axios/issues/430
  *
@@ -16,7 +19,7 @@ import { store } from "./storeConfig";
  **/
 axios.defaults.transformResponse = [].concat(
   (data: any) => {
-    console.log("start transforming response at middleware")
+    log("start transforming response at middleware")
     /**
      * if data is empty, it might cause "Unexpected json at the end of line" error
      * so give a condition
@@ -46,8 +49,8 @@ axios.defaults.transformResponse = [].concat(
     const ISORegex1 = /(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/;
     const ISORegex2 = /(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+)|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d)|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d)/;
     if (data) {
-      console.log("raw json string response")
-      console.log(data)
+      log("raw json string response")
+      log(data)
       return JSON.parse(data, (key: string, value: any) => {
         if (typeof value === 'string') {
           const a = ISORegex1.exec(value);
@@ -70,18 +73,18 @@ axios.defaults.transformResponse = [].concat(
  **/
 axios.interceptors.request.use(function (config) {
 
-  console.log("start chekcing csrf-token cookie exists or not")
-  console.log(document.cookie.indexOf("csrf-token") != -1)
-  console.log(document.cookie)
+  log("start chekcing csrf-token cookie exists or not")
+  log(document.cookie.indexOf("csrf-token") != -1)
+  log(document.cookie)
 
   // if cookie is set, attack this token to header as 'csrf-token=xxxx'.
   if (document.cookie.indexOf("csrf-token") != -1) {
-    console.log("csrf-token in cookie does exist")
+    log("csrf-token in cookie does exist")
     const token = getCookie("csrf-token");
-    console.log("token: " + token)
+    log("token: " + token)
     config.headers["csrf-token"] = token;
   } else {
-    console.log("csrf-token in cookie does not exist")
+    log("csrf-token in cookie does not exist")
   }
 
   return config;
@@ -95,16 +98,16 @@ axios.interceptors.request.use(function (config) {
  *
  **/
 axios.interceptors.response.use(function (response) {
-  console.log("checking response status == 401 or not")
-  console.log(response)
+  log("checking response status == 401 or not")
+  log(response)
   if (response.status === 401) {
-    console.log("receive 401 response so clear the user store data.")
+    log("receive 401 response so clear the user store data.")
     store.dispatch({
       type: "root/reset/all",
       payload: null
     })
   } else {
-    console.log("no 401 status code")
+    log("no 401 status code")
   }
   return response
 });

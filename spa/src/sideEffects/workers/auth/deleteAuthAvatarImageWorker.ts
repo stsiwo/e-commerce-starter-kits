@@ -1,13 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
-import { authActions, messageActions, DeleteAuthAvatarImageActionType } from "reducers/slices/app";
+import { authActions, DeleteAuthAvatarImageActionType, messageActions } from "reducers/slices/app";
 import { deleteAuthAvatarImageFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 /**
  * a worker (generator)    
  *
@@ -99,7 +99,7 @@ export function* deleteAuthAvatarImageWorker(action: PayloadAction<DeleteAuthAva
       )
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.message)
+      log(response.message)
 
       /**
        * update message
@@ -113,7 +113,7 @@ export function* deleteAuthAvatarImageWorker(action: PayloadAction<DeleteAuthAva
       )
     }
   } else {
-    console.log("permission defined: you are " + curAuth.userType)
+    log("permission defined: you are " + curAuth.userType)
   }
 }
 

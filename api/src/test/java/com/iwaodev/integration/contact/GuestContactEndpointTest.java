@@ -114,8 +114,6 @@ public class GuestContactEndpointTest {
    **/
   @BeforeTransaction
   void verifyInitialDatabaseState() throws Exception {
-    logger.info("start calling setup before - satoshi");
-
     this.baseDatabaseSetup.setup(this.entityManager);
   }
 
@@ -150,7 +148,13 @@ public class GuestContactEndpointTest {
         .andExpect(status().isOk());
 
     // assert
-    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.anyString(), Mockito.eq(dummyUserSignupForm.get("email").toString()), Mockito.eq(dummyUserSignupForm.get("title").toString()), Mockito.any());
+    Mockito.verify(this.emailService, Mockito.times(1))
+            .send(
+                    Mockito.anyString(),
+                    Mockito.eq(dummyUserSignupForm.get("email").toString()),
+                    Mockito.any(),
+                    Mockito.eq(dummyUserSignupForm.get("title").toString()),
+                    Mockito.any());
     
   }
 
@@ -193,7 +197,7 @@ public class GuestContactEndpointTest {
 
     // arrange
     Mockito.doNothing().when(this.recaptchaService).verify(Mockito.anyString());
-    Mockito.doThrow(MessagingException.class).when(this.emailService).send(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+    Mockito.doThrow(MessagingException.class).when(this.emailService).send(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.anyString(), Mockito.anyString());
 
     String targetUrl = "http://localhost:" + this.port + this.targetPath;
 

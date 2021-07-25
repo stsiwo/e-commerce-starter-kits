@@ -1,5 +1,4 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
 import { api } from "configs/axiosConfig";
 import { UserPhoneCriteria } from "domain/user/types";
 import { authActions, messageActions, PostAuthPhoneActionType } from "reducers/slices/app";
@@ -8,6 +7,8 @@ import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -90,8 +91,8 @@ export function* postAuthPhoneWorker(action: PayloadAction<PostAuthPhoneActionTy
        * update this domain in state
        *
        **/
-      console.log("added phone from response")
-      console.log(response.data)
+      log("added phone from response")
+      log(response.data)
       yield put(
         authActions.appendPhone(response.data)
       )
@@ -109,7 +110,7 @@ export function* postAuthPhoneWorker(action: PayloadAction<PostAuthPhoneActionTy
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.message)
+      log(response.message)
 
       /**
        * update fetch status failed

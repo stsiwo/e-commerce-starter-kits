@@ -29,9 +29,6 @@ public class PhoneValidationValidator implements ConstraintValidator<PhoneValida
   @Override
   public boolean isValid(Phone domain, ConstraintValidatorContext context) {
 
-    logger.info("start validating custom phone ....");
-    logger.info("size of phones: " + domain.getUser().getPhones().size());
-
     // phones max 3
     //if (domain.getUser().getPhones().size() > 3) {
     //  //throw new DomainValidationException(String.format("phone phones must be less than or equal to 3."));
@@ -41,7 +38,6 @@ public class PhoneValidationValidator implements ConstraintValidator<PhoneValida
     //  return false;
     //}
 
-    logger.info("pass all custom domain validation");
     // if pass all of them,
     return true;
   }

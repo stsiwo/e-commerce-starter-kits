@@ -68,15 +68,15 @@ public class SendReturnRequestSubmittedEmailEventHandler implements EventHandler
   @Async
   @TransactionalEventListener
   public void handleEvent(OrderEventWasAddedByMemberEvent event) throws AppException {
-    logger.info("start SendReturnRequestSubmittedEmailEventHandler called.");
-    logger.info(Thread.currentThread().getName());
+    logger.debug("start SendReturnRequestSubmittedEmailEventHandler called.");
+    logger.debug(Thread.currentThread().getName());
 
     if (!event.getOrder().retrieveLatestOrderEvent().getOrderStatus().equals(OrderStatusEnum.RETURN_REQUEST)) {
-      logger.info("order status is not 'return_request' so do nothing.");
+      logger.debug("order status is not 'return_request' so do nothing.");
       return;
     }
 
-    logger.info("order status is 'return_request' so send an email.");
+    logger.debug("order status is 'return_request' so send an email.");
     User admin = this.userRepository.getAdmin().orElseThrow(
         () -> new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist"));
 
@@ -106,15 +106,15 @@ public class SendReturnRequestSubmittedEmailEventHandler implements EventHandler
     thymeleafContext.setVariables(templateModel);
     String htmlBody = thymeleafTemplateEngine.process("order-return-request-submitted-email.html", thymeleafContext);
 
-    logger.info(htmlBody);
+    logger.debug(htmlBody);
 
     // send it
     try {
-      logger.info(String.format("To: %s, From: %s", admin.getEmail(), senderEmail));
+      logger.debug(String.format("To: %s, From: %s", admin.getEmail(), senderEmail));
       this.emailService.send(admin.getEmail(), from, bcc,
           String.format("A Return Request Was Submitted By Customer (Order #: %s)", order.getOrderNumber()), htmlBody);
     } catch (MessagingException e) {
-      logger.info(e.getMessage());
+      logger.debug(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 

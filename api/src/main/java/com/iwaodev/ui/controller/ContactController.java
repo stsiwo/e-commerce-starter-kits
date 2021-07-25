@@ -34,9 +34,6 @@ public class ContactController {
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
 
-    logger.info("criteria");
-    logger.info(criteria.getEmail());
-
     if (authUser != null) {
       // member
       this.service.submit(criteria, authUser.getId());

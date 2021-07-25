@@ -44,8 +44,8 @@ public class CreateReviewNotificationForAdminEventHandler implements EventHandle
   //@Async
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
   public void handleEvent(NewReviewWasSubmittedEvent event) throws AppException {
-    logger.info("start CreateReviewEventNotificationEventHandler");
-    logger.info(Thread.currentThread().getName());
+    logger.debug("start CreateReviewEventNotificationEventHandler");
+    logger.debug(Thread.currentThread().getName());
 
     /**
      * when use @TransactionalEventListener with CrudRepository to persist data, this event handler must be under a transactional. Otherwise, it won't save it.
@@ -76,6 +76,5 @@ public class CreateReviewNotificationForAdminEventHandler implements EventHandle
       throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
     }
     Notification savedEntity = this.notificationRepository.save(notification);
-    logger.info("saved successfully (ntf id: " + notification.getNotificationId() + ")");
   }
 }

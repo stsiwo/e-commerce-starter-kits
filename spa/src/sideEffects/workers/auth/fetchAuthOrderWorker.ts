@@ -7,6 +7,8 @@ import { mSelector, rsSelector } from "src/selectors/selector";
 import { generateQueryString, getNanoId } from "src/utils";
 import { fetchAuthOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
 import { orderActions, orderPaginationPageActions, orderPaginationTotalPagesActions, orderPaginationTotalElementsActions } from "reducers/slices/domain/order";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -51,8 +53,8 @@ export function* fetchAuthOrderWorker(action: PayloadAction<FetchAuthOrderAction
      **/
     const curQueryString = yield select(mSelector.makeOrderQueryStringSelector())
 
-    console.log(curQueryString)
-    console.log(generateQueryString(curQueryString));
+    log(curQueryString)
+    log(generateQueryString(curQueryString));
 
     /**
      * grab all domain
@@ -64,8 +66,8 @@ export function* fetchAuthOrderWorker(action: PayloadAction<FetchAuthOrderAction
      **/
 
     // prep keyword if necessary
-    console.log("before send request order GET")
-    console.log(apiUrl)
+    log("before send request order GET")
+    log(apiUrl)
 
     // start fetching
     const response = yield call(() => api({
@@ -89,8 +91,8 @@ export function* fetchAuthOrderWorker(action: PayloadAction<FetchAuthOrderAction
        *
        * don't use 'merge' since no cache
        **/
-      console.log("auth order item dto response data")
-      console.log(response.data)
+      log("auth order item dto response data")
+      log(response.data)
       yield put(
         orderActions.update(response.content)
       )
@@ -133,10 +135,10 @@ export function* fetchAuthOrderWorker(action: PayloadAction<FetchAuthOrderAction
        **/
 
 
-      console.log(response.pageable)
+      log(response.pageable)
 
-      console.log("total pages")
-      console.log(response.totalPages)
+      log("total pages")
+      log(response.totalPages)
 
       yield all([
         put(orderPaginationPageActions.update(response.pageable.pageNumber)),
@@ -146,7 +148,7 @@ export function* fetchAuthOrderWorker(action: PayloadAction<FetchAuthOrderAction
 
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.message)
+      log(response.message)
 
       /**
        * update message

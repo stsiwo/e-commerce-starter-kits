@@ -140,8 +140,6 @@ public class MemberContactEndpointTest {
    **/
   @BeforeTransaction
   void verifyInitialDatabaseState() throws Exception {
-    logger.info("start calling setup before - satoshi");
-
     this.baseDatabaseSetup.setup(this.entityManager);
 
     // send authentication request before testing
@@ -204,7 +202,13 @@ public class MemberContactEndpointTest {
         .andExpect(status().isOk());
 
     // assert
-    Mockito.verify(this.emailService, Mockito.times(1)).send(Mockito.anyString(), Mockito.eq(dummyUserSignupForm.get("email").toString()), Mockito.eq(dummyUserSignupForm.get("title").toString()), Mockito.any());
+    Mockito.verify(this.emailService, Mockito.times(1))
+            .send(
+                    Mockito.anyString(),
+                    Mockito.eq(dummyUserSignupForm.get("email").toString()),
+                    Mockito.any(),
+                    Mockito.eq(dummyUserSignupForm.get("title").toString()),
+                    Mockito.any());
     
   }
   @Test

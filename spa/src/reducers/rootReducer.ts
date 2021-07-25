@@ -24,6 +24,8 @@ import { getCompanyFetchStatusSliceReducer } from './slices/app/fetchStatus/comp
 import { companySliceReducer } from './slices/domain/company';
 import { StateType } from 'states/types';
 import { PayloadAction } from '@reduxjs/toolkit';
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 // ** REFACTOR to new approach **/
 
@@ -37,12 +39,12 @@ import { PayloadAction } from '@reduxjs/toolkit';
  **/
 export const rootReducer = (state: StateType, action: PayloadAction<any>) => {
 
-  console.log("start root reducers");
+  log("start root reducers");
 
-  console.log("current state");
-  console.log(state)
-  console.log("current action");
-  console.log(action)
+  log("current state");
+  log(state)
+  log("current action");
+  log(action)
 
   if (action.type === "root/reset/all") {
     return mainReducer(undefined, action);

@@ -129,8 +129,6 @@ public class MemberAddressEndpointTest {
    **/
   @BeforeTransaction
   void verifyInitialDatabaseState() throws Exception {
-    logger.info("start calling setup before - satoshi");
-
     this.baseDatabaseSetup.setup(this.entityManager);
 
     // send authentication request before testing
@@ -207,7 +205,6 @@ public class MemberAddressEndpointTest {
 
     // arrange
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString());
-    logger.info("target url: " + targetUrl);
 
     // act & assert
     ResultActions resultActions = mvc.perform(
@@ -223,9 +220,6 @@ public class MemberAddressEndpointTest {
 
     MvcResult result = resultActions.andReturn();
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
-
-    logger.info("body");
-    logger.info(result.getResponse().getContentAsString());
 
     AddressDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode, AddressDTO[].class);
 
@@ -247,7 +241,6 @@ public class MemberAddressEndpointTest {
 
     // arrange
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, "038b6f4c-b100-4b32-9c21-fd17ec52a605");
-    logger.info("target url: " + targetUrl);
 
     // act & assert
     ResultActions resultActions = mvc.perform(

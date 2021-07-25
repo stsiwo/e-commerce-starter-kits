@@ -43,9 +43,6 @@ public class UserPhoneController {
       @PathVariable(value = "userId") UUID userId,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    logger.info("start handling a request at UserPhoneController#get");
-    logger.info("user id: " + userId);
-
     return new ResponseEntity<>(this.service.getAll(userId), HttpStatus.OK);
   }
 
@@ -58,10 +55,6 @@ public class UserPhoneController {
       @AuthenticationPrincipal SpringSecurityUser authUser,
       @Valid @RequestBody UserPhoneCriteria criteria
       ) throws Exception {
-    logger.info("start handling a request at UserPhoneController#post");
-    logger.info("user id: " + userId);
-    logger.info("criteria" + criteria);
-
     return new ResponseEntity<>(this.service.create(criteria, userId), HttpStatus.OK);
   }
 
@@ -75,10 +68,6 @@ public class UserPhoneController {
       @AuthenticationPrincipal SpringSecurityUser authUser,
       @Valid @RequestBody UserPhoneCriteria criteria
       ) throws Exception {
-    logger.info("start handling a request at UserPhoneController#post");
-    logger.info("user id: " + userId);
-    logger.info("criteria" + criteria);
-
     return new ResponseEntity<>(this.service.update(criteria, userId, phoneId), HttpStatus.OK);
   }
   
@@ -91,10 +80,6 @@ public class UserPhoneController {
       @PathVariable(value = "phoneId") Long phoneId,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    logger.info("start handling a request at UserPhoneController#patch");
-    logger.info("user id: " + userId);
-    logger.info("phone id" + phoneId);
-
     return new ResponseEntity<>(this.service.toggleSelection(userId, phoneId), HttpStatus.OK);
   }
 
@@ -107,9 +92,6 @@ public class UserPhoneController {
       @PathVariable(value = "phoneId") Long phoneId,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-
-    logger.info("user id: " + userId);
-    logger.info("phone id: " + phoneId);
 
     this.service.delete(userId, phoneId);
 

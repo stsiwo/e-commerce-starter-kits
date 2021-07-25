@@ -103,7 +103,6 @@ public class AdvanceProductRepositoryImpl implements AdvanceProductRepository {
     root.fetch("variants", JoinType.LEFT).fetch("productSize", JoinType.LEFT);
     root.fetch("category", JoinType.LEFT);
     if (spec != null) {
-      logger.info("inside variants fetching specificaiton");
       cQuery.where(spec.toPredicate(root, cQuery, cBuilder));
     }
     cQuery.orderBy(QueryUtils.toOrders(pageable.getSort(), root, cBuilder));
@@ -112,8 +111,6 @@ public class AdvanceProductRepositoryImpl implements AdvanceProductRepository {
     tQuery.setFirstResult((int) pageable.getOffset());
     tQuery.setMaxResults(pageable.getPageSize());
     products = tQuery.getResultList();
-
-    logger.info("done variants fetching");
 
     /**
      * for reviews fetching
@@ -173,7 +170,6 @@ public class AdvanceProductRepositoryImpl implements AdvanceProductRepository {
     // query.setHint(QueryHints.PASS_DISTINCT_THROUGH, false);
     // products = query.getResultList();
 
-    logger.info("done jpa specification");
     return new PageImpl<Product>(products, pageable, total.size());
   }
 

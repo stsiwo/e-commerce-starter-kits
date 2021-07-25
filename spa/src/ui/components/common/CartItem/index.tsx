@@ -25,6 +25,8 @@ import { mSelector } from "src/selectors/selector";
 import { cadCurrencyFormat, getApiUrl } from "src/utils";
 import ColorCell from "../GridData/ColorCell";
 import SizeCell from "../GridData/SizeCell";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 /**
  * need 'orderDetail' or 'product/variant'
@@ -193,7 +195,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
       isSelected: e.currentTarget.checked,
     });
 
-    console.log("target cart item id: " + value.cartItemId);
+    log("target cart item id: " + value.cartItemId);
 
     if (auth.userType === UserTypeEnum.MEMBER) {
       // put to replace the whole cart item
@@ -214,7 +216,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
         .then((data) => {
           const updatedCartItem = data.data;
 
-          console.log(updatedCartItem);
+          log(updatedCartItem);
 
           // update cart item in redux store
           dispatch(cartItemActions.updateOne(updatedCartItem));

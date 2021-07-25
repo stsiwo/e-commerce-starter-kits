@@ -106,8 +106,6 @@ public class ProductServiceImpl implements ProductService {
 
           @Override
           public ProductDTO apply(Product product) {
-            logger.info("yes");
-
             return ProductMapper.INSTANCE.toProductDTO(product);
           }
         });
@@ -138,7 +136,7 @@ public class ProductServiceImpl implements ProductService {
     Optional<Product> targetEntityOption = this.repository.findById(id);
 
     if (!targetEntityOption.isPresent()) {
-      logger.info("the given product does not exist");
+      logger.debug("the given product does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
 
@@ -154,7 +152,7 @@ public class ProductServiceImpl implements ProductService {
     Optional<Product> targetEntityOption = this.repository.findByPath(path);
 
     if (!targetEntityOption.isPresent()) {
-      logger.info("the given product does not exist");
+      logger.debug("the given product does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
 
@@ -170,7 +168,7 @@ public class ProductServiceImpl implements ProductService {
     Optional<Product> targetEntityOption = this.repository.findByPathOrId(path);
 
     if (!targetEntityOption.isPresent()) {
-      logger.info("the given product does not exist");
+      logger.debug("the given product does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
 
@@ -190,7 +188,7 @@ public class ProductServiceImpl implements ProductService {
     Optional<Product> targetEntityOption = this.repository.findPublicByPathOrId(path);
 
     if (!targetEntityOption.isPresent()) {
-      logger.info("the given product does not exist");
+      logger.debug("the given product does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
 
@@ -223,8 +221,6 @@ public class ProductServiceImpl implements ProductService {
     // assign id
     newEntity.setProductId(UUID.randomUUID());
 
-    logger.info("new product id: " + newEntity.getProductId());
-
     // duplication
     if (this.repository.isOthersHavePath(newEntity.getProductId(), criteria.getProductPath())) {
       throw new AppException(HttpStatus.BAD_REQUEST, "the product path already taken.");
@@ -239,24 +235,12 @@ public class ProductServiceImpl implements ProductService {
     List<ProductImage> productImages = this.createImages(newEntity.getProductId(), files, criteria.getProductImages());
 
     newEntity.setProductImages(productImages);
-
-    logger.info("new product image size");
-    logger.info("" + newEntity.getProductImages().size());
-
-    logger.info("new product name");
-    logger.info("" + newEntity.getProductName());
     // save it
     Product savedEntity = this.repository.save(newEntity);
     /**
      * need this refresh to refresh the @Formular/@Transient fields
      **/
     this.repository.refresh(savedEntity);
-
-    logger.info("is discount available");
-    logger.info("" + savedEntity.getIsDiscountAvailable());
-
-    logger.info("new product image size afer saved");
-    logger.info("" + savedEntity.getProductImages().size());
     // map entity to dto and return it.
     return ProductMapper.INSTANCE.toProductDTO(savedEntity);
   }
@@ -279,42 +263,31 @@ public class ProductServiceImpl implements ProductService {
          * 'getOriginalFilename()': file name 'getName()': key name for multipart form
          * data
          **/
-        logger.info("file.getOriginalFilename(): " + file.getOriginalFilename());
-        logger.info("criteria.getProductImageName(): " + criteria.getProductImageName());
         return file.getOriginalFilename().contains(criteria.getProductImageName());
       }).findFirst();
 
       // if file exists, we need to save it to local directory and save its public
       // path to its product iamge entity
       if (fileOption.isPresent()) {
-
-        logger.info("file exists, so save it.");
-
         MultipartFile file = fileOption.get();
-
         // check the file content type (only image is allowed)
         if (!this.fileService.isImage(file)) {
-          logger.info("only image files are acceptable.");
+          logger.debug("only image files are acceptable.");
           throw new AppException(HttpStatus.BAD_REQUEST, "only image files are acceptable.");
         }
 
         // generate unique (including hash for cache) file name
         String newFileName = this.fileService.generateHashedFileName(file.getOriginalFilename());
 
-        logger.info("create local directory and public path");
-
         // construct path
         String localDirectory = this.getProductLocalDirectory(productId);
         String publicPath = this.getPublicPath(newFileName, productId.toString());
         String localDirectoryWithFile = localDirectory + "/" + newFileName;
-
-        logger.info("local Directory: " + localDirectory + " and public path: " + publicPath);
-
         // try to save teh file
         try {
           this.s3Service.upload(localDirectoryWithFile, file.getBytes());
         } catch (Exception e) {
-          logger.info(e.getMessage());
+          logger.debug(e.getMessage());
           throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
 
@@ -349,7 +322,7 @@ public class ProductServiceImpl implements ProductService {
     Optional<Product> targetEntityOption = this.repository.findById(id);
 
     if (!targetEntityOption.isPresent()) {
-      logger.info("the given product does not exist");
+      logger.debug("the given product does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given product does not exist.");
     }
 
@@ -408,30 +381,20 @@ public class ProductServiceImpl implements ProductService {
   // this includes update/remove product images
   private void updateImages(UUID productId, List<MultipartFile> files, List<ProductImage> oldProductImages,
       List<ProductImage> newProductImages) throws Exception {
-
-    logger.info("start handling update of images");
-
-    logger.info("old product images");
-
     for (ProductImage image: oldProductImages) {
-      logger.info("id: " + image.getProductImageId().toString() + " and product image path " + image.getProductImagePath());
+      logger.debug("id: " + image.getProductImageId().toString() + " and product image path " + image.getProductImagePath());
     }
 
     for (ProductImage image: newProductImages) {
-      logger.info("id: " + image.getProductImageId().toString() + " and product image path " + image.getProductImagePath());
+      logger.debug("id: " + image.getProductImageId().toString() + " and product image path " + image.getProductImagePath());
     }
 
     for (ProductImage newProductImage : newProductImages) {
-
-      logger.info("target product image id: " + newProductImage.getProductImageId());
-
       // only update product images which = isChange: true
       if (!newProductImage.getIsChange()) {
-        logger.info("isChange is false so go next one");
+        logger.debug("isChange is false so go next one");
         continue;
       }
-      logger.info("isChange is true so remove this image first then update if necessary");
-
       // find target product image
       Optional<ProductImage> oldProductImageOption = oldProductImages.stream()
           .filter(productImage -> productImage.getProductImageId().equals(newProductImage.getProductImageId()))
@@ -439,15 +402,11 @@ public class ProductServiceImpl implements ProductService {
 
       // should exist otherwise your logic is wrong.
       if (!oldProductImageOption.isPresent()) {
-        logger.info("the given product image does not exist");
+        logger.debug("the given product image does not exist");
         throw new AppException(HttpStatus.NOT_FOUND, "the given product image does not exist.");
       }
 
       ProductImage oldProductImage = oldProductImageOption.get();
-
-      logger.info("product image id: " + oldProductImage.getProductImageId());
-
-      logger.info("find target file from criteria. if this is empty, we just need to remvoe the image from storage. if this is not empty, first need to remove and then upload this one as a new one.");
 
       /**
        * got null pointer exception at 'files.stream().filter()...' below when there is no updated file in this 'files'
@@ -472,13 +431,11 @@ public class ProductServiceImpl implements ProductService {
        **/
       String oldProductImagePath = oldProductImage.getProductImagePath();
 
-      logger.info("old product image path: " + oldProductImagePath);
-
       // remove it
       try {
         this.s3Service.delete(oldProductImagePath);
       } catch (Exception e) {
-        logger.info(e.getMessage());
+        logger.debug(e.getMessage());
         throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
       }
 
@@ -488,14 +445,12 @@ public class ProductServiceImpl implements ProductService {
       // product image
       if (fileOption.isPresent()) {
 
-        logger.info("need to add new file");
-
         // need to update
         MultipartFile file = fileOption.get();
 
         // check the file content type (only image is allowed)
         if (!this.fileService.isImage(file)) {
-          logger.info("only image files are acceptable.");
+          logger.debug("only image files are acceptable.");
           throw new AppException(HttpStatus.BAD_REQUEST, "only image files are acceptable.");
         }
 
@@ -512,12 +467,10 @@ public class ProductServiceImpl implements ProductService {
           this.s3Service.upload(localDirectoryWithFile, file.getBytes());
 
         } catch (Exception e) {
-          logger.info(e.getMessage());
+          logger.debug(e.getMessage());
           throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
 
-        logger.info("updated public path: " + publicPath);
-        logger.info("updated product image name: " + newProductImage.getProductImageName());
 
         newProductImage.setProductImagePath(publicPath);
 
@@ -553,7 +506,7 @@ public class ProductServiceImpl implements ProductService {
      * #Change:
      *
      * - now you can successfully delete products even if the product is purchased
-     * before since the order store the all necessary info.
+     * before since the order store the all necessary debug.
      *
      **/
 
@@ -562,12 +515,8 @@ public class ProductServiceImpl implements ProductService {
     if (targetEntityOption.isPresent()) {
       Product targetEntity = targetEntityOption.get();
 
-      logger.info("target product id to be deleted: " + targetEntity.getProductId().toString());
       // delete product images at s3
       String productKey = this.productFilePath + "/" + targetEntity.getProductId().toString() + "/";
-
-      logger.info("start delete its images.");
-      logger.info("path: " + productKey);
 
       this.s3Service.deleteFolder(productKey);
 
@@ -582,7 +531,7 @@ public class ProductServiceImpl implements ProductService {
   // Optional<Product> targetEntityOption = this.repository.findById(productId);
 
   // if (targetEntityOption.isEmpty()) {
-  // logger.info("the given product does not exist");
+  // logger.debug("the given product does not exist");
   // throw new AppException(HttpStatus.NOT_FOUND, "the given product
   // does not exist.");
   // }
@@ -596,7 +545,7 @@ public class ProductServiceImpl implements ProductService {
 
   // // check the file content type (only image is allowed)
   // if (!this.fileService.isImage(file)) {
-  // logger.info("only image files are acceptable.");
+  // logger.debug("only image files are acceptable.");
   // throw new AppException(HttpStatus.BAD_REQUEST, "only image files
   // are acceptable.");
   // }
@@ -611,7 +560,7 @@ public class ProductServiceImpl implements ProductService {
   // try {
   // this.fileService.save(path, file);
   // } catch (IOException e) {
-  // logger.info(e.getMessage());
+  // logger.debug(e.getMessage());
   // throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR,
   // e.getMessage());
   // }
@@ -635,7 +584,7 @@ public class ProductServiceImpl implements ProductService {
   // Optional<Product> targetEntityOption = this.repository.findById(productId);
 
   // if (targetEntityOption.isEmpty()) {
-  // logger.info("the given product does not exist");
+  // logger.debug("the given product does not exist");
   // throw new AppException(HttpStatus.NOT_FOUND, "the given product
   // does not exist.");
   // }
@@ -654,7 +603,7 @@ public class ProductServiceImpl implements ProductService {
   // // remove from the directory
   // boolean isSuccess = this.fileService.remove(path);
 
-  // logger.info("product image file succeed (" + path + ")?" + isSuccess);
+  // logger.debug("product image file succeed (" + path + ")?" + isSuccess);
 
   // // update product entity to remove avatarImagePath
   // targetEntity.removeProductImage(productImage);
@@ -674,7 +623,7 @@ public class ProductServiceImpl implements ProductService {
       // content = this.fileService.load(internalPath);
       content = this.s3Service.get(internalPath);
     } catch (Exception e) {
-      logger.info(e.getMessage());
+      logger.debug(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 

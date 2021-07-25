@@ -1,31 +1,36 @@
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Grid from '@material-ui/core/Grid';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import Switch from '@material-ui/core/Switch';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
-import Rating from '@material-ui/lab/Rating';
-import UserCard from 'components/common/UserCard';
-import { defaultReviewValidationData, ReviewDataType, ReviewType, ReviewValidationDataType } from 'domain/review/type';
-import { useValidation } from 'hooks/validation';
-import { reviewSchema } from 'hooks/validation/rules';
-import * as React from 'react';
-import { useDispatch } from 'react-redux';
-import { putReviewActionCreator } from 'reducers/slices/domain/review';
-import ReviewProductHorizontalCard from './ReviewProductHorizontalCard';
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Grid from "@material-ui/core/Grid";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import Switch from "@material-ui/core/Switch";
+import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
+import Rating from "@material-ui/lab/Rating";
+import UserCard from "components/common/UserCard";
+import {
+  defaultReviewValidationData,
+  ReviewDataType,
+  ReviewType,
+  ReviewValidationDataType,
+} from "domain/review/type";
+import { useValidation } from "hooks/validation";
+import { reviewSchema } from "hooks/validation/rules";
+import * as React from "react";
+import { useDispatch } from "react-redux";
+import { putReviewActionCreator } from "reducers/slices/domain/review";
+import ReviewProductHorizontalCard from "./ReviewProductHorizontalCard";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 interface AdminReviewFormPropsType {
-  review: ReviewType
+  review: ReviewType;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    orderDetailBox: {
-
-    },
+    orderDetailBox: {},
     title: {
       textAlign: "center",
-      fontWeight: theme.typography.fontWeightBold
+      fontWeight: theme.typography.fontWeightBold,
     },
     form: {
       margin: theme.spacing(1),
@@ -36,9 +41,8 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: 500,
       margin: theme.spacing(1, 0, 1, 0),
     },
-    actionBox: {
-    }
-  }),
+    actionBox: {},
+  })
 );
 
 /**
@@ -58,205 +62,224 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  *    - 6. display result popup message
  **/
-const AdminReviewForm = React.forwardRef<any, AdminReviewFormPropsType>((props, ref) => {
+const AdminReviewForm = React.forwardRef<any, AdminReviewFormPropsType>(
+  (props, ref) => {
+    // mui: makeStyles
+    const classes = useStyles();
 
-  // mui: makeStyles
-  const classes = useStyles();
+    const dispatch = useDispatch();
 
-  const dispatch = useDispatch()
+    // temp user account state
+    const [curReviewState, setReviewState] = React.useState<ReviewDataType>(
+      props.review
+    );
 
-  // temp user account state
-  const [curReviewState, setReviewState] = React.useState<ReviewDataType>(props.review);
+    // validation logic (should move to hooks)
+    const [curReviewValidationState, setReviewValidationState] =
+      React.useState<ReviewValidationDataType>(defaultReviewValidationData);
 
-  // validation logic (should move to hooks)
-  const [curReviewValidationState, setReviewValidationState] = React.useState<ReviewValidationDataType>(defaultReviewValidationData);
+    const { updateValidationAt, updateAllValidation, isValidSync } =
+      useValidation({
+        curDomain: curReviewState,
+        curValidationDomain: curReviewValidationState,
+        schema: reviewSchema,
+        setValidationDomain: setReviewValidationState,
+        defaultValidationDomain: defaultReviewValidationData,
+      });
 
-  const { updateValidationAt, updateAllValidation, isValidSync } = useValidation({
-    curDomain: curReviewState,
-    curValidationDomain: curReviewValidationState,
-    schema: reviewSchema,
-    setValidationDomain: setReviewValidationState,
-    defaultValidationDomain: defaultReviewValidationData,
-  })
+    // event handlers
+    const handleReviewTitleInputChangeEvent: React.EventHandler<
+      React.ChangeEvent<HTMLInputElement>
+    > = (e) => {
+      const nextReviewTitle = e.currentTarget.value;
+      updateValidationAt("reviewTitle", e.currentTarget.value);
+      setReviewState((prev: ReviewDataType) => ({
+        ...prev,
+        reviewTitle: nextReviewTitle,
+      }));
+    };
 
-  // event handlers
-  const handleReviewTitleInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextReviewTitle = e.currentTarget.value
-    updateValidationAt("reviewTitle", e.currentTarget.value);
-    setReviewState((prev: ReviewDataType) => ({
-      ...prev,
-      reviewTitle: nextReviewTitle
+    const handleReviewDescriptionInputChangeEvent: React.EventHandler<
+      React.ChangeEvent<HTMLInputElement>
+    > = (e) => {
+      const nextReviewDescription = e.currentTarget.value;
+      updateValidationAt("reviewDescription", e.currentTarget.value);
+      setReviewState((prev: ReviewDataType) => ({
+        ...prev,
+        reviewDescription: nextReviewDescription,
+      }));
+    };
+
+    const handleReviewPointInputChangeEvent: React.EventHandler<
+      React.ChangeEvent<HTMLInputElement>
+    > = (e) => {
+      const nextReviewPoint = e.currentTarget.value;
+      updateValidationAt("reviewPoint", e.currentTarget.value);
+      setReviewState((prev: ReviewDataType) => ({
+        ...prev,
+        reviewPoint: parseFloat(nextReviewPoint),
+      }));
+    };
+
+    const handleNoteInputChangeEvent: React.EventHandler<
+      React.ChangeEvent<HTMLInputElement>
+    > = (e) => {
+      const nextNote = e.currentTarget.value;
+      updateValidationAt("note", e.currentTarget.value);
+      setReviewState((prev: ReviewDataType) => ({
+        ...prev,
+        note: nextNote,
+      }));
+    };
+
+    const handleReviewIsVerifiedInputChangeEvent: React.EventHandler<
+      React.ChangeEvent<HTMLInputElement>
+    > = (e) => {
+      const nextReviewIsVerified = e.currentTarget.checked;
+      updateValidationAt("isVerified", e.currentTarget.checked);
+      setReviewState((prev: ReviewDataType) => ({
+        ...prev,
+        isVerified: nextReviewIsVerified,
+      }));
+    };
+
+    /**
+     * call child function from parent
+     *
+     * ref: https://stackoverflow.com/questions/37949981/call-child-method-from-parent
+     *
+     **/
+    React.useImperativeHandle(ref, () => ({
+      // event handler to submit
+      handleSaveClickEvent: (e: React.MouseEvent<HTMLButtonElement>) => {
+        const isValid: boolean = isValidSync(curReviewState);
+
+        log(isValid);
+
+        if (isValid) {
+          // pass
+          log("passed");
+          log("update review");
+
+          dispatch(
+            putReviewActionCreator({
+              reviewId: curReviewState.reviewId,
+              isVerified: curReviewState.isVerified,
+              reviewTitle: curReviewState.reviewTitle,
+              reviewDescription: curReviewState.reviewDescription,
+              note: curReviewState.note,
+              reviewPoint: curReviewState.reviewPoint,
+              productId: curReviewState.product.productId,
+              userId: curReviewState.user.userId,
+            })
+          );
+        } else {
+          log("failed");
+          updateAllValidation();
+        }
+      },
     }));
-  }
 
-  const handleReviewDescriptionInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextReviewDescription = e.currentTarget.value
-    updateValidationAt("reviewDescription", e.currentTarget.value);
-    setReviewState((prev: ReviewDataType) => ({
-      ...prev,
-      reviewDescription: nextReviewDescription
-    }));
-  }
-
-  const handleReviewPointInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextReviewPoint = e.currentTarget.value
-    updateValidationAt("reviewPoint", e.currentTarget.value);
-    setReviewState((prev: ReviewDataType) => ({
-      ...prev,
-      reviewPoint: parseFloat(nextReviewPoint)
-    }));
-  }
-
-  const handleNoteInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextNote = e.currentTarget.value
-    updateValidationAt("note", e.currentTarget.value);
-    setReviewState((prev: ReviewDataType) => ({
-      ...prev,
-      note: nextNote
-    }));
-  }
-
-  const handleReviewIsVerifiedInputChangeEvent: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    const nextReviewIsVerified = e.currentTarget.checked
-    updateValidationAt("isVerified", e.currentTarget.checked);
-    setReviewState((prev: ReviewDataType) => ({
-      ...prev,
-      isVerified: nextReviewIsVerified
-    }));
-  }
-
-  /**
-   * call child function from parent 
-   *
-   * ref: https://stackoverflow.com/questions/37949981/call-child-method-from-parent
-   *
-   **/
-  React.useImperativeHandle(ref, () => ({
-
-    // event handler to submit
-    handleSaveClickEvent: (e: React.MouseEvent<HTMLButtonElement>) => {
-      const isValid: boolean = isValidSync(curReviewState)
-
-      console.log(isValid);
-
-      if (isValid) {
-        // pass 
-        console.log("passed")
-        console.log("update review")
-
-        dispatch(
-          putReviewActionCreator({
-            reviewId: curReviewState.reviewId,
-            isVerified: curReviewState.isVerified,
-            reviewTitle: curReviewState.reviewTitle,
-            reviewDescription: curReviewState.reviewDescription,
-            note: curReviewState.note,
-            reviewPoint: curReviewState.reviewPoint,
-            productId: curReviewState.product.productId,
-            userId: curReviewState.user.userId,
-          })
-        );
-      } else {
-        console.log("failed")
-        updateAllValidation()
-      }
-    }
-  }))
-
-  return (
-    <Grid
-      container
-      justify="center"
-    >
-      <Grid
-        item
-        xs={12}
-      >
-        <Typography variant="subtitle1" component="h6" className={classes.title}>
-          {"Reviewing Customer"}
-        </Typography>
-        <UserCard
-          firstName={curReviewState.user.firstName}
-          lastName={curReviewState.user.lastName}
-          email={curReviewState.user.email}
-          userType={curReviewState.user.userType.userType}
-          avatarImagePath={curReviewState.user.avatarImagePath}
-        />
+    return (
+      <Grid container justify="center">
+        <Grid item xs={12}>
+          <Typography
+            variant="subtitle1"
+            component="h6"
+            className={classes.title}
+          >
+            {"Reviewing Customer"}
+          </Typography>
+          <UserCard
+            firstName={curReviewState.user.firstName}
+            lastName={curReviewState.user.lastName}
+            email={curReviewState.user.email}
+            userType={curReviewState.user.userType.userType}
+            avatarImagePath={curReviewState.user.avatarImagePath}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Typography
+            variant="subtitle1"
+            component="h6"
+            className={classes.title}
+          >
+            {"Reviewed Product"}
+          </Typography>
+          <ReviewProductHorizontalCard product={props.review.product} />
+        </Grid>
+        <Grid item xs={12} className={classes.orderDetailBox}>
+          <Typography
+            variant="subtitle1"
+            component="h6"
+            className={classes.title}
+          >
+            {"Review Form"}
+          </Typography>
+          <form className={classes.form} noValidate autoComplete="off">
+            <Typography component="legend">
+              click/touch stars to rate this product.
+            </Typography>
+            <Rating
+              name="review-point"
+              precision={0.1}
+              value={curReviewState.reviewPoint}
+              onChange={handleReviewPointInputChangeEvent}
+              className={`${classes.txtFieldBase}`}
+              size="large"
+            />
+            <br />
+            <TextField
+              id="review-title"
+              label="Review Title"
+              className={`${classes.txtFieldBase}`}
+              value={curReviewState.reviewTitle}
+              onChange={handleReviewTitleInputChangeEvent}
+              helperText={curReviewValidationState.reviewTitle}
+              error={curReviewValidationState.reviewTitle !== ""}
+            />
+            <br />
+            <TextField
+              id="review-description"
+              label="Review Description"
+              multiline
+              rows={6}
+              className={`${classes.txtFieldBase}`}
+              value={curReviewState.reviewDescription}
+              onChange={handleReviewDescriptionInputChangeEvent}
+              helperText={curReviewValidationState.reviewDescription}
+              error={curReviewValidationState.reviewDescription !== ""}
+            />
+            <br />
+            <TextField
+              id="review-note"
+              label="Review Note (Only Visible Admin)"
+              multiline
+              rows={6}
+              className={`${classes.txtFieldBase}`}
+              value={curReviewState.note}
+              onChange={handleNoteInputChangeEvent}
+              helperText={curReviewValidationState.note}
+              error={curReviewValidationState.note !== ""}
+            />
+            <br />
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={curReviewState.isVerified}
+                  onChange={handleReviewIsVerifiedInputChangeEvent}
+                  name="review-is-verified"
+                />
+              }
+              className={`${classes.txtFieldBase}`}
+              label="Verified"
+            />
+            <br />
+          </form>
+        </Grid>
       </Grid>
-      <Grid
-        item
-        xs={12}
-      >
-        <Typography variant="subtitle1" component="h6" className={classes.title}>
-          {"Reviewed Product"}
-        </Typography>
-        <ReviewProductHorizontalCard product={props.review.product} />
-      </Grid>
-      <Grid
-        item
-        xs={12}
-        className={classes.orderDetailBox}
-      >
-        <Typography variant="subtitle1" component="h6" className={classes.title}>
-          {"Review Form"}
-        </Typography>
-        <form className={classes.form} noValidate autoComplete="off">
-          <Typography component="legend">click/touch stars to rate this product.</Typography>
-          <Rating
-            name="review-point"
-            precision={0.1}
-            value={curReviewState.reviewPoint}
-            onChange={handleReviewPointInputChangeEvent}
-            className={`${classes.txtFieldBase}`}
-            size="large"
-          /><br />
-          <TextField
-            id="review-title"
-            label="Review Title"
-            className={`${classes.txtFieldBase}`}
-            value={curReviewState.reviewTitle}
-            onChange={handleReviewTitleInputChangeEvent}
-            helperText={curReviewValidationState.reviewTitle}
-            error={curReviewValidationState.reviewTitle !== ""}
-          /><br />
-          <TextField
-            id="review-description"
-            label="Review Description"
-            multiline
-            rows={6}
-            className={`${classes.txtFieldBase}`}
-            value={curReviewState.reviewDescription}
-            onChange={handleReviewDescriptionInputChangeEvent}
-            helperText={curReviewValidationState.reviewDescription}
-            error={curReviewValidationState.reviewDescription !== ""}
-          /><br />
-          <TextField
-            id="review-note"
-            label="Review Note (Only Visible Admin)"
-            multiline
-            rows={6}
-            className={`${classes.txtFieldBase}`}
-            value={curReviewState.note}
-            onChange={handleNoteInputChangeEvent}
-            helperText={curReviewValidationState.note}
-            error={curReviewValidationState.note !== ""}
-          /><br />
-          <FormControlLabel
-            control={
-              <Switch
-                checked={curReviewState.isVerified}
-                onChange={handleReviewIsVerifiedInputChangeEvent}
-                name="review-is-verified" />
-            }
-            className={`${classes.txtFieldBase}`}
-            label="Verified"
-          /><br />
-        </form>
-      </Grid>
-    </Grid>
-  )
-})
+    );
+  }
+);
 
-export default AdminReviewForm
-
-
+export default AdminReviewForm;

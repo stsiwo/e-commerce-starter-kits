@@ -78,27 +78,21 @@ public class RefundPaymentEventHandler implements EventHandler<OrderEventWasAdde
    **/
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
   public void handleEvent(OrderEventWasAddedEvent event) throws AppException {
-    logger.info("start RefundPaymentEventHandler called.");
-    logger.info(Thread.currentThread().getName());
-    logger.info("" + this.eventHandlerChecker);
-    logger.info(this.eventHandlerChecker.check(this.getClass().getName()));
+    logger.debug("start RefundPaymentEventHandler called.");
+    logger.debug(Thread.currentThread().getName());
 
     this.orderRepository.findAll();
 
     if (event.getOrder().retrieveLatestOrderEvent() == null) {
-      logger.info("this order does not have any event so do nothing.");
+      logger.debug("this order does not have any event so do nothing.");
       return;
     }
-
-    logger.info("order event name: " + event.getOrder().retrieveLatestOrderEvent().getOrderStatus());
 
     if (!event.getOrder().retrieveLatestOrderEvent().getOrderStatus().equals(OrderStatusEnum.CANCELED)
         && !event.getOrder().retrieveLatestOrderEvent().getOrderStatus().equals(OrderStatusEnum.RETURNED)) {
-      logger.info("order status is not 'canceled'/'returned' so do nothing.");
+      logger.debug("order status is not 'canceled'/'returned' so do nothing.");
       return;
     }
-
-    logger.info("order status is 'canceled'/'returned' so cancel the payment with Stripe.");
     // order
     Order order = event.getOrder();
     /**
@@ -116,9 +110,8 @@ public class RefundPaymentEventHandler implements EventHandler<OrderEventWasAdde
     try {
       this.paymentService.requestRefund(paymentIntentId);
     } catch (StripeException e) {
-      logger.info(e.getMessage());
+      logger.debug(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
-    logger.info("payment was refund successfully:)");
   }
 }

@@ -11,6 +11,8 @@ import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/ap
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
 import { productSchemaEntity } from "states/state";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -118,7 +120,7 @@ export function* putProductWorker(action: PayloadAction<PutProductActionType>) {
       )
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-      console.log(response.message)
+      log(response.message)
 
       /**
        * update fetch status failed

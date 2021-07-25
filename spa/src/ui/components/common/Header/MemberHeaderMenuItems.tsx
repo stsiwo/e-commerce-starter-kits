@@ -28,6 +28,8 @@ import {
 } from "reducers/slices/domain/notification";
 import { cartModalActions } from "reducers/slices/ui";
 import { mSelector } from "src/selectors/selector";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 declare interface MenuItemType {
   url: string;
@@ -150,13 +152,13 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
   // - the next consecutive fetchs (concat)
   const isInitial = React.useRef<boolean>(true);
   React.useEffect(() => {
-    console.log("start fetching notification...");
+    log("start fetching notification...");
     if (isInitial.current) {
-      console.log("initial notification fetch with 'update'");
+      log("initial notification fetch with 'update'");
       dispatch(fetchNotificationActionCreator({ type: "update" }));
       isInitial.current = false;
     } else {
-      console.log("initial notification fetch with 'concat'");
+      log("initial notification fetch with 'concat'");
       dispatch(fetchNotificationActionCreator({ type: "concat" }));
     }
   }, [curNotificationPagination.page]);

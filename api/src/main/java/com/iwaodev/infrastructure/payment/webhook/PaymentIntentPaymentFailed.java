@@ -34,9 +34,6 @@ public class PaymentIntentPaymentFailed implements PaymentWebhookHandler {
   @Override
   @Transactional
   public void handle(Event event, StripeObject stripeObject) {
-    logger.info("Stripe WebHook: " + this.type);
-    logger.info("PaymentIntent has failed the attempt to create a payment method or a payment.");
-
     PaymentIntent paymentIntent = (PaymentIntent) stripeObject;
 
     String paymentIntentId = paymentIntent.getId();

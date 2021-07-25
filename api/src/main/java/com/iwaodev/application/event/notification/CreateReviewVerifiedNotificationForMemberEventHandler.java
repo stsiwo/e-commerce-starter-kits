@@ -50,8 +50,8 @@ public class CreateReviewVerifiedNotificationForMemberEventHandler implements Ev
     @Async
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handleEvent(ReviewWasVerifiedByAdminEvent event) throws AppException {
-        logger.info("start CreateReviewVerifiedNotificationForMemberEventHandler");
-        logger.info(Thread.currentThread().getName());
+        logger.debug("start CreateReviewVerifiedNotificationForMemberEventHandler");
+        logger.debug(Thread.currentThread().getName());
 
         /**
          * when use @TransactionalEventListener with CrudRepository to persist data, this event handler must be under a transactional. Otherwise, it won't save it.

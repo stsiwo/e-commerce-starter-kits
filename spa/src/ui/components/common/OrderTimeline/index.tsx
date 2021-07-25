@@ -35,6 +35,8 @@ import { FetchStatusEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { toDateString } from "src/utils";
 import OrderEventUpdateFormDialog from "../OrderEventUpdateFormDialog";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 /**
  * TODO: review this when test data is available.
@@ -107,14 +109,14 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({
     e: React.MouseEvent<HTMLButtonElement>,
     orderEventId: string
   ) => {
-    console.log("selected order event id: " + orderEventId);
+    log("selected order event id: " + orderEventId);
 
     const targetOrderEvent = order.orderEvents.find(
       (orderEvent: OrderEventType) => orderEvent.orderEventId == orderEventId
     );
 
-    console.log("selected order event:");
-    console.log(targetOrderEvent);
+    log("selected order event:");
+    log(targetOrderEvent);
 
     setOrderEvent(targetOrderEvent);
 
@@ -174,12 +176,12 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({
   // next addable option based on user type
   const nextOrderEventOptions = React.useMemo(() => {
     if (auth.userType === UserTypeEnum.MEMBER) {
-      console.log("next addable optons: member");
+      log("next addable optons: member");
       // member
       return order.nextMemberOrderEventOptions;
     } else {
       // admin
-      console.log("next addable optons: admin");
+      log("next addable optons: admin");
       return order.nextAdminOrderEventOptions;
     }
   }, [JSON.stringify(order)]);

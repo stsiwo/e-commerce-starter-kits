@@ -10,6 +10,8 @@ import {
   productQueryMinPriceActions,
 } from "reducers/slices/domain/product";
 import { mSelector } from "src/selectors/selector";
+import { logger } from "configs/logger";
+const log = logger(import.meta.url);
 
 //interface PriceFilterTabPanelPropsType {
 //  curMinPrice: number
@@ -143,8 +145,8 @@ const PriceFilterTabPanel: React.FunctionComponent<{}> = ({}) => {
       nextMaxPrice = newValue[0];
     }
 
-    console.log("next min price: " + nextMinPrice);
-    console.log("next max price: " + nextMaxPrice);
+    log("next min price: " + nextMinPrice);
+    log("next max price: " + nextMaxPrice);
 
     dispatch(productQueryMinPriceActions.update(nextMinPrice));
     dispatch(productQueryMaxPriceActions.update(nextMaxPrice));

@@ -9,6 +9,8 @@ import { FetchStatusEnum } from "src/app";
 import { mSelector } from "src/selectors/selector";
 import { generateQueryString } from "src/utils";
 import { categorySchemaArray } from "states/state";
+import { logger } from 'configs/logger';
+const log = logger(import.meta.url);
 
 /**
  * a worker (generator)    
@@ -58,8 +60,8 @@ export function* fetchCategoryWorker(action: PayloadAction<{}>) {
    **/
   const curQueryString = yield select(mSelector.makeCategoryQueryStringSelector())
 
-  console.log(curQueryString)
-  console.log(generateQueryString(curQueryString));
+  log(curQueryString)
+  log(generateQueryString(curQueryString));
 
   /**
    * grab all domain
@@ -94,7 +96,7 @@ export function* fetchCategoryWorker(action: PayloadAction<{}>) {
      *
      *  - TODO: make sure response structure with remote api
      **/
-    console.log(response) // pageable response
+    log(response) // pageable response
     const normalizedData = normalize(response.content, categorySchemaArray)
 
     /**
@@ -144,10 +146,10 @@ export function* fetchCategoryWorker(action: PayloadAction<{}>) {
      **/
 
 
-    console.log(response.pageable)
+    log(response.pageable)
 
-    console.log("total pages")
-    console.log(response.totalPages)
+    log("total pages")
+    log(response.totalPages)
 
     yield all([
       put(categoryPaginationPageActions.update(response.pageable.pageNumber)),
@@ -157,7 +159,7 @@ export function* fetchCategoryWorker(action: PayloadAction<{}>) {
 
   } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
 
-    console.log(response.message)
+    log(response.message)
 
   }
 }

@@ -120,8 +120,6 @@ public class GuestPaymentSucceededEventHandlerTest {
    **/
   @BeforeTransaction
   void verifyInitialDatabaseState() throws Exception {
-    logger.info("start calling setup before - satoshi");
-
     this.baseDatabaseSetup.setup(this.entityManager);
   }
 
@@ -142,7 +140,6 @@ public class GuestPaymentSucceededEventHandlerTest {
     // act & assert
     this.handler.handleEvent(new PaymentSucceededEvent(this, dummyPaymentIntentId, null));
 
-    logger.info("after finish the event handler");
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.
      *

@@ -63,8 +63,8 @@ public class SendReviewWasUpdatedEmailEventHandler implements EventHandler<Revie
   @Async
   @TransactionalEventListener
   public void handleEvent(ReviewWasUpdatedByMemberEvent event) throws AppException {
-    logger.info("start SendNewOrderWasPlacedEmailEventHandler called.");
-    logger.info(Thread.currentThread().getName());
+    logger.debug("start SendNewOrderWasPlacedEmailEventHandler called.");
+    logger.debug(Thread.currentThread().getName());
 
     User admin = this.userRepository.getAdmin().orElseThrow(
         () -> new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin user does not exist"));
@@ -83,9 +83,6 @@ public class SendReviewWasUpdatedEmailEventHandler implements EventHandler<Revie
 
     Map<String, Object> templateModel = new HashMap<String, Object>();
 
-    logger.info("review user");
-    logger.info(review.getUser().getFirstName());
-
     // set model variables
     templateModel.put("review", review);
     templateModel.put("admin", admin);
@@ -97,15 +94,13 @@ public class SendReviewWasUpdatedEmailEventHandler implements EventHandler<Revie
     thymeleafContext.setVariables(templateModel);
     String htmlBody = thymeleafTemplateEngine.process("review-was-updated-email.html", thymeleafContext);
 
-    logger.info(htmlBody);
-
     // send it
     try {
-      logger.info(String.format("To: %s, From: %s", admin.getEmail(), senderEmail));
+      logger.debug(String.format("To: %s, From: %s", admin.getEmail(), senderEmail));
       this.emailService.send(admin.getEmail(), from, bcc,
           String.format("A Review Was Updated By Customer (Review #: %s)", review.getReviewId()), htmlBody);
     } catch (MessagingException e) {
-      logger.info(e.getMessage());
+      logger.debug(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 

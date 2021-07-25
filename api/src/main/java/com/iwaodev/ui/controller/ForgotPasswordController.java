@@ -38,7 +38,7 @@ public class ForgotPasswordController {
     String email = body.get("email");
 
     if (email.isEmpty() || email == null) {
-      logger.info("email is missing.");
+      logger.debug("email is missing.");
       throw new AppException(HttpStatus.BAD_REQUEST, "email is missing.");
     }
 

@@ -68,22 +68,18 @@ public class SendPleaseReviewEmailEventHandler implements EventHandler<OrderEven
   @Async
   @TransactionalEventListener
   public void handleEvent(OrderEventWasAddedEvent event) throws AppException {
-    logger.info("start SendPleaseReviewEmailEventHandler called.");
-    logger.info(Thread.currentThread().getName());
+    logger.debug("start SendPleaseReviewEmailEventHandler called.");
+    logger.debug(Thread.currentThread().getName());
 
     if (!event.getOrder().retrieveLatestOrderEvent().getOrderStatus().equals(OrderStatusEnum.DELIVERED)) {
-      logger.info("order status is not 'delivered' so do nothing.");
+      logger.debug("order status is not 'delivered' so do nothing.");
       return;
     }
-
-    logger.info("order status is 'delivered' so send an email.");
 
     if (event.getOrder().getIsGuest()) {
-      logger.info("this order is from guest so we don't send please-review email.");
+      logger.debug("this order is from guest so we don't send please-review email.");
       return;
     }
-
-    logger.info("this order is from member so we send please-review email.");
 
     // assuming customer is member only
 
@@ -101,9 +97,6 @@ public class SendPleaseReviewEmailEventHandler implements EventHandler<OrderEven
     Order order = event.getOrder();
 
     Map<String, Object> templateModel = new HashMap<String, Object>();
-    logger.info("link:");
-    logger.info(this.clientSpaConfig.getUrl() + "/orders/" + event.getOrder().getOrderId().toString());
-
     // set model variables
     templateModel.put("order", order);
     templateModel.put("company", company);
@@ -113,16 +106,14 @@ public class SendPleaseReviewEmailEventHandler implements EventHandler<OrderEven
     Context thymeleafContext = new Context();
     thymeleafContext.setVariables(templateModel);
     String htmlBody = thymeleafTemplateEngine.process("please-review-email.html", thymeleafContext);
-
-    logger.info(htmlBody);
-
+    logger.debug(htmlBody);
     // send it
     try {
-      logger.info(String.format("To: %s, From: %s", recipientEmail, senderEmail));
+      logger.debug(String.format("To: %s, From: %s", recipientEmail, senderEmail));
       this.emailService.send(recipientEmail, from, String.format("Please Write Your Review About The Order (Order #: %s)", order.getOrderNumber()),
           htmlBody + ")");
     } catch (MessagingException e) {
-      logger.info(e.getMessage());
+      logger.debug(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 

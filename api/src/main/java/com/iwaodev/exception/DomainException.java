@@ -11,7 +11,7 @@ public class DomainException extends Exception {
 
   public DomainException(String errorMessage) {
     super(errorMessage);
-    logger.info(errorMessage);
+    logger.debug(errorMessage);
   }
 }
 
