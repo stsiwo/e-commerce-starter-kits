@@ -31,6 +31,8 @@ const DefaultHead: React.FunctionComponent<{}> = (props) => {
        * you can just add 'nonce' in the script tag for reCaptcha and add that nonce in CSP tag.
        * src: https://developers.google.com/recaptcha/docs/faq#im-using-content-security-policy-csp-on-my-website.-how-can-i-configure-it-to-work-with-recaptcha
        * src: https://stackoverflow.com/questions/39853162/recaptcha-with-content-security-policy
+       *
+       * @2021/07/24 - nonce not working so use alternative (e.g., put url in src directly)
        */}
       <script
         src="https://www.google.com/recaptcha/api.js"

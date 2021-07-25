@@ -53,4 +53,4 @@ hs_err_pid*
 
 # production 
 # make repo private so I can put this in my repo
-# prod/
+prod/*
