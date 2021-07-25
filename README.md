@@ -116,6 +116,12 @@ Here are some important details:
 
 ![alt text](https://github.com/stsiwo/e-commerce-starter-kits/blob/main/infrastructure-architecture.png "Architecture Infrastructure 1")
 
+I used Docker Compose to orchestrate the following docker containers:
+
+  - SPA container (based on an Nginx image): this container is responsible for handling incoming requests to my single page application (e.g., domain.com) and the back-end API (e.g., api.domain.com). For the SPA, I put the transpiled source code inside this container. For the back-end API. when receiving a request to the API, I pass the request to the API container.
+  - API container (based on an OpenJDK 11 image): this one takes care of any API request and returns the appropriate response. 
+  - DB container (based on MySQL image): this container is in charge of any database operation that comes from the backend API. 
+  - DB backup container (based on [databack/mysql-backup](https://hub.docker.com/r/databack/mysql-backup)): this container regularly makes a backup for the DB container.  
 
 ## Refs
 
