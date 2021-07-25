@@ -103,6 +103,20 @@ Here is a typical flow of how each component interacts with the other.
 
 ![alt text](https://github.com/stsiwo/e-commerce-starter-kits/blob/main/back-end-architecture.png "Architecture Back End 1")
 
+Here are some important details:
+
+  - [Dependency Rule](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html): the classes in the higher layer can use or have dependencies of interfaces in the lower layer, not vice versa. For instance, a class in the Infrastructure layer can have dependencies of components in the Application layer, but components in the Domain layer cannot have dependencies of the Application layer. Why? there are some benefits:
+    - make your code testable.
+    - avoid circular dependencies 
+    - easier if the components in the higher layer need to be replaced
+
+  - [Event And Event Handlers](https://www.baeldung.com/spring-events): avoid a thick application service by delegating some tasks to this event and event handlers. this makes it easy to write tests in a decoupled way. For example, if a new order was placed by a customer, the app needs to send a notification and an email to the customer and the admin. If you put that logic in a single application service, it makes me hard to write a test for the service. So, I delegate those tasks to event handlers and publish events.  This allows us to write a test separately and easily.
+
+## Infrastructure
+
+![alt text](https://github.com/stsiwo/e-commerce-starter-kits/blob/main/infrastructure-architecture.png "Architecture Infrastructure 1")
+
+
 ## Refs
 
   - rechaptch management console: https://www.google.com/u/2/recaptcha/admin/site/459661075 (need to login as satoshi@iwaodev.com)
