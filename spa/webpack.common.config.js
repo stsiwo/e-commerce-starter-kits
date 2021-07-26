@@ -15,7 +15,7 @@ module.exports = {
     new CleanWebpackPlugin(['dist']),
     // Note: html-webpack-plugin must come before favicons-webpack-plugin in the plugins array.
     new HtmlWebpackPlugin({
-      title: 'ReactJS + Redux-Saga + Reselect (TypeScript) Starter Kits',
+      title: 'stsDev - Ecommerce Web App',
       meta: { viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no' },
       template: 'src/index.html',
       inject: true,

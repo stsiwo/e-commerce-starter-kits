@@ -129,3 +129,23 @@
 
   - don't use "Double" because you cannot define the decimal point (e.g., double value might be 3.699999999999999733546474089962430298328399658203125)
     - use BigDecimal
+
+
+## Security
+
+## git-secrets
+
+Check your git repo contains sensitive data that you specify as pattern.
+
+### Prerequisite
+
+  1. cloen git-secrets repo from https://github.com/awslabs/git-secrets
+  2. run 'make install'
+
+### Steps 
+
+  1. go to the target repo where you want to check.
+  2. add any pattern you want (e.g., if your db password: XXX, then you can run 'git secrets --add XXX')
+  3. run 'git secrets --scan-history'. this check the current files and the history
+  4. if it shows any result, remove it. If it is in the history, you need to use bfg to delete the history.
+  
