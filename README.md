@@ -123,7 +123,4 @@ I used Docker Compose to orchestrate the following docker containers:
   - __DB container (based on MySQL image)__: this container is in charge of any database operation that comes from the backend API. 
   - __DB backup container (based on [databack/mysql-backup](https://hub.docker.com/r/databack/mysql-backup))__: this container regularly makes a backup for the DB container.  
 
-## Refs
-
-  - rechaptch management console: https://www.google.com/u/2/recaptcha/admin/site/459661075 (need to login as satoshi@iwaodev.com)
 
