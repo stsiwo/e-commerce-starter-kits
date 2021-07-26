@@ -138,23 +138,6 @@ const AdminProductVariantForm = React.forwardRef<
   const [curProductVariantState, setProductVariantState] =
     React.useState<ProductVariantDataType>(generateDefaultProductVariantData());
 
-  // switch update/create
-  React.useEffect(() => {
-    /**
-     * need this 'props.open' since if user open 'edit' after the anotehr 'edit', it still previous input exists.
-     * so every time form is open, we need to set target entity state.
-     */
-    if (props.open) {
-      if (props.productVariant) {
-        setNew(false);
-        setProductVariantState(props.productVariant);
-      } else {
-        setNew(true);
-        setProductVariantState(generateDefaultProductVariantData());
-      }
-    }
-  }, [JSON.stringify(props.productVariant), props.open]);
-
   // validation logic (should move to hooks)
   const [curProductVariantValidationState, setProductVariantValidationState] =
     React.useState<ProductVariantValidationDataType>(
@@ -195,6 +178,26 @@ const AdminProductVariantForm = React.forwardRef<
       }));
     }
   };
+
+  // switch update/create
+  React.useEffect(() => {
+    /**
+     * need this 'props.open' since if user open 'edit' after the anotehr 'edit', it still previous input exists.
+     * so every time form is open, we need to set target entity state.
+     */
+    if (props.open) {
+      if (props.productVariant) {
+        setNew(false);
+        setProductVariantState(props.productVariant);
+        if (!props.productVariant.variantUnitPrice) {
+          setUnitPriceDisable(true);
+        }
+      } else {
+        setNew(true);
+        setProductVariantState(generateDefaultProductVariantData());
+      }
+    }
+  }, [JSON.stringify(props.productVariant), props.open]);
 
   // test product variant size list
   // #TODO: replace with real one when you are ready

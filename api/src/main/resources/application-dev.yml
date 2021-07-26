@@ -1,0 +1,51 @@
+# for development
+
+spring: 
+  # database
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa 
+    password: test_password
+  jpa: 
+    database-platform: org.hibernate.dialect.H2Dialect
+
+  flyway:
+    locations: "classpath:db/migration/mysql/common, classpath:db/migration/mysql/integ"
+
+  # email (JavaMailSender)
+  mail: 
+    host: smtp.gmail.com
+    port: 587
+    username: <login user to smtp server>
+    password: <login password to smtp server>
+    properties:
+      mail:
+        smtp.auth: true
+        starttls.enable: true
+
+# cookie
+cookie:
+  api.token:
+    # 30 mins 
+    timeout: 1800
+    secure: false
+    httpOnly: false
+    # capitalize
+    sameSite: "Strict"
+    domain: ""
+    path: "/"
+
+cors:
+  allowed:
+    origins: \*
+    credentials: true 
+
+# client single page application
+spa:
+  # need to escape so wrap with string
+  url: "http://localdev.com:3000"
+
+server:
+  # set rather than localhost because of setting cookie issue
+  host: "localdev.com"

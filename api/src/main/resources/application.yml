@@ -1,0 +1,124 @@
+# for common
+
+## this common (application.yml) is always included at any profile (e.g., unittest, integtest, dev, prod)
+## you cannot override key and value pair at any profile. if you need different value, you need to define it at the profile individually.
+
+## hide sensitive data in applicaiton.yml
+## bg) if uploading this file which includes sensitive data to a public git repo, the data is exposed to public.
+## solution) use 'jasypt' to encrypted the data and put the encrypted data in application.yml to protect the data.
+## currently, this is only used for local and use env vars in product mainly.
+
+## steps to generate encypted data (e.g., ENC(....))
+## 1. add maven package of jasypt and its marven plugins
+## 2. run this command: mvn jasypt:encrypt-value -Djasypt.encryptor.password="<YOUR_PASSWORD>" -Djasypt.plugin.value="<YOUR_VALUE>"
+## note: don't use jasypt online tool since it uses old encyprtion method so does not match with the current method. (ref: https://github.com/ulisesbocchio/jasypt-spring-boot#update-11242019-version-300-release-includes
+## 3. after you got the encrypted code, paste it to appropriated place in here.
+## note: you don't need to wrap values with single quote even if you experienced type conversion error (e.g., '000123412' treat as string but if no single quote, java consider this as float).
+##        - you don't need to wrap with single quote. jasypt handle this.
+
+
+
+# debugging for developers
+logging:
+  level:
+    # root: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate:
+      SQL: DEBUG
+      type.descriptor.sql.BasicBinder: TRACE
+
+# sql logging
+spring:
+  jpa:
+    show-sql: true
+    properties: 
+      hibernate:
+        format_sql: true
+  # uploading file
+  servlet:
+    mutipart:
+      max-file-size: 10MB
+      max-request-size: 10MB 
+  # pagination page starts from 1 (not 0)
+  # this does not working.
+  #data:
+  #  rest:
+  #    pageable:
+  #      page-parameter: page
+  #      size-parameter: limit
+  #      default-page-size: 10 
+  #      one-indexed-parameters: true
+  #    sort:
+  #      sort-parameter: sort
+
+  # email (JavaMailSender)
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ENC(QU44KUp9bjirmJ6uxE6h8A4sC0HLBFXFqoPl+ekJ/VL7mIB/FoRaJHxpSxuc+pl0gutqVTiYltdhojpKRegIkg==)
+    password: ENC(45zzcPrBi7K+mALNeKLOVKtxjoS78N2JCA/fYC9fF6vRcufBOGAMycTfmu6178/a)
+    properties:
+      mail:
+        smtp.auth: true
+        starttls.enable: true
+
+
+# business rules
+business:
+  order:
+    refund:
+      eligible:
+        days: ${BUSINESS_ORDER_REFUND_ELIGIBLE_DAYS:30}
+
+# file (images/pdfs)
+file:
+  order:
+    path: ${FILE_ORDER_PATH:domain/orders}
+    shippingLabelFileName: "shipping-label"
+  user: 
+    path: ${FILE_USER_PATH:domain/users}
+    avatarImageName: "avatar-image"
+  product:
+    path: ${FILE_PRODUCT_PATH:domain/products}
+    # don't use this since the product image name is defined at client sise.
+    #productImageName: "product-image",
+    #
+    # this should match with the path name of ProductController#getProduct. (e.g., products/{productId}/images <- this 'images')
+    productImageParentDirectory: "images"
+
+# stripe (payment system)
+stripe:
+  apiKey: ENC(438tNdv9LInqR10aIvtfaaG7zw/EPQcCHz/WtAGiE6PIl3vbURMXnBKDPP+ou5g1c5Crb+IzTCTrhnYNJXtTQqQl2HHC5OYjvT3LdOgoUkn+IX4rGY5hOvMw27MSJOfv9OD8SV6Sag9BnKtqvaoqU3PaV5MX/Bri2WSxmryD+M1b4TcLWvXmDRkjo5Ge2JRX)
+  webhook:
+    endpoint:
+      secret: ENC(X5pQh+wJRO9o9Vfs4H0MNb2XJ3Rhy3rlzMl1mOSCcVhGJJ6lywn9YNR9Aw3nQesymG/hOK53PVXkwSBNZ3li+BToaavzo84GsMK4fK7uu0M=)
+
+# shipping (Canada Post)
+## ref: https://www.canadapost-postescanada.ca/information/app/drc/registered?execution=e1s1
+shipping:
+  api:
+    username: ENC(uYRJDCVtlLwQHfgl3x6XnsJGB5ZvQ+Iq4NnRSAJEDyaf714dCf/MfN5ATiAET1/MCn5L9B7tu7SjFRqs7XUr+g==)
+    password: ENC(ipd8IAYtUe8VUcugADUZSE6S4/EiTlxeScF0yEyKkuyXBDyISiXxeuV3QYsh3lDaYgiObgWc7LyUzSIGfV7dew==)
+    baseurl: https://ct.soa-gw.canadapost.ca
+    # need to quote otherwise, it becomes float
+    customernumber: ENC(PVFsptAYzeborZaf6ve3XO/9OjnTQ49vXQp9+HEKa7WxEP2vB3kxDyI1jnujpTVF)
+
+# server
+server:
+  error:
+    # show error message when javax.validation (JSR 303)
+    include-message: always
+    include-binding-errors: always
+
+login:
+  limit:
+    maxAttempt: 10
+    lockTime: 30
+
+recaptcha:
+  secret: ${RECAPTCHA_SECRET:recaptch-secret}
+
+jwt:
+  # one day
+  expiration: ${JWT_EXPIRATION:86400000}
+  secret: ${JWT_SECRET:jwt-secert}

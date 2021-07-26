@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Helmet } from "react-helmet";
-import { getUuidv4 } from "src/utils";
+import { getNonce, getUuidv4 } from "src/utils";
 
 /**
  * default <head> content
@@ -10,7 +10,7 @@ import { getUuidv4 } from "src/utils";
  */
 
 const DefaultHead: React.FunctionComponent<{}> = (props) => {
-  const [curNonce, setNonce] = React.useState<string>(getUuidv4());
+  const [curNonce, setNonce] = React.useState<string>(getNonce());
 
   //React.useEffect(() => {
   //  setNounce(getUuidv4());

@@ -1,0 +1,145 @@
+# for production
+
+# database
+spring:
+  jpa: 
+    hibernate.ddl-auto: none
+    properties.hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
+
+    # logging
+    show-sql: true
+    properties: 
+      hibernate:
+        format_sql: true
+
+  datasource:
+    # use default port
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT}/${DB_DATABASE}
+    driver-class-name: com.mysql.jdbc.Driver
+    username: ${DB_USER_NAME}
+    password: ${DB_PASSWORD}
+
+  flyway:
+    locations: "classpath:db/migration/mysql/common, classpath:db/migration/mysql/prod, classpath:db/callback"
+
+  # email (JavaMailSender)
+  mail: 
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USER_NAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp.auth: ${MAIL_SMTP_AUTH}
+        starttls.enable: ${MAIL_STARTTLS_ENABLE}
+
+  # admin client
+  boot:
+    admin:
+      # this is to make a connection with spring boot admin server.
+      client:
+        url: ${ADMIN_URL}
+        username: ${ADMIN_CLIENT_USER_NAME}
+        password: ${ADMIN_CLIENT_PASSWORD}
+        
+        # this is to actuator endpoint to send data to the server with basic auth in header.
+        # When the actuator endpoints are secured using HTTP Basic authentication the SBA Server needs credentials to access them. You can submit the credentials in the metadata when registering the application. The BasicAuthHttpHeaderProvider then uses this metadata to add the Authorization header to access your application’s actuator endpoints. You can provide your own HttpHeadersProvider to alter the behaviour (e.g. add some decryption) or add extra headers.
+        # TODO: should be via HTTPS since HTTPS basic authentication
+        instance:
+          metadata:
+            user.name: ${ADMIN_CLIENT_USER_NAME}
+            user.password: ${ADMIN_CLIENT_PASSWORD}
+          management-base-url: https://api.iwaodev.com
+# admin
+management:
+  endpoints: 
+    web:
+      exposure:
+        include: ${ADMIN_EXPOSURE}
+  endpoint:
+    health:
+      show-details: ${ADMIN_HEALTH_DETAIL}
+
+
+# stripe (payment system)
+stripe:
+  apiKey: ${STRIPE_API_KEY}
+  webhook: 
+    endpoint:
+      secret: ${STRIPE_WEBHOOK_ENDPOINT_SECRET}
+
+# shipping (Canada Post)
+# THIS IS TEST 
+## ref: https://www.canadapost-postescanada.ca/information/app/drc/registered?execution=e1s1
+shipping:
+  api: 
+    username: ${SHIPPING_API_USER_NAME} 
+    password: ${SHIPPING_API_PASSWORD}
+    baseurl: ${SHIPPING_API_BASE_URL}
+    customernumber: ${SHIPPING_API_CUSTOMER_NUMBER} 
+
+# cookie
+cookie:
+  api.token:
+    # 1 day
+    timeout: ${COOKIE_API_TOKEN_TIMEOUT}
+    secure: ${COOKIE_API_TOKEN_SECURE}
+    httpOnly: ${COOKIE_API_TOKEN_HTTPONLY}
+    # capitalize
+    sameSite: ${COOKIE_API_TOKEN_SAMESITE}
+    domain: ${COOKIE_API_TOKEN_DOMAIN}
+    path: ${COOKIE_API_TOKEN_PATH}
+
+cors:
+  allowed:
+    # need to escape
+    origins: ${CORS_ALLOWED_ORIGINS}
+    credentials: ${CORS_ALLOWED_CREDENTIALS}
+
+# client single page application
+spa:
+  # need to escape so wrap with string
+  # change when you are ready
+  url: ${SPA_URL}
+ 
+# server
+server:
+  forward-headers-strategy: NATIVE
+  tomcat:
+    # compression
+    compression: 4096
+    compressableMimeTypes: application/json,application/xml
+
+# logging for spring boot admin
+logging:
+  file:
+    name: ec-iwaodev.log 
+  pattern:
+    file: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID}){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"
+  level:
+    root: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate:
+      SQL: DEBUG
+      type.descriptor.sql.BasicBinder: TRACE
+
+# SSL stuff
+#server: 
+#  port: ${SERVER_PORT}
+#  ssl:
+#    enabled: ${SERVER_SSL_ENABLED} 
+#    # The format used for the keystore. It could be set to JKS in case it is a JKS file
+#    key-store-type: ${SERVER_SSL_KEY_STORE_TYPE} 
+#    # The path to the keystore containing the certificate
+#    key-store: ${SERVER_SSL_KEY_STORE} 
+#    # The password used to generate the certificate
+#    key-store-password: ${SERVER_SSL_KEY_STORE_PASSWORD}
+#    # The alias mapped to the certificate
+#    key-alias: ${SERVER_SSL_KEY_ALIAS}
+#security: 
+#  require-ssl: ${SECURITY_REQUIRE_SSL:false}
+
+aws:
+  s3:
+    region: ${AWS_S3_REGION}
+    bucketName: ${AWS_S3_BUCKETNAME}

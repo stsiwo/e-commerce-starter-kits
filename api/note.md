@@ -1237,6 +1237,10 @@
   - generate jacoco (test coverage) report
     - command) mvn clean jacoco:prepare-agent install jacoco:report 
     - config ref: https://stackoverflow.com/questions/36304793/jacoco-with-maven-missing-execution-data-file/36305148#36305148
+    
+  - generate jasypt code
+    - command) mvn jasypt:encrypt-value -Djasypt.encryptor.password="the password" -Djasypt.plugin.value="theValueYouWantToEncrypt"
+    - you need the plugins (ref: https://github.com/ulisesbocchio/jasypt-spring-boot)
 
   ### General
 

@@ -90,6 +90,13 @@
       <version>${org.springframework.boot.version}</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/com.github.ulisesbocchio/jasypt-spring-boot-starter -->
+    <!-- hide senstive data in application.properties/yml -->
+    <dependency>
+      <groupId>com.github.ulisesbocchio</groupId>
+      <artifactId>jasypt-spring-boot-starter</artifactId>
+      <version>3.0.3</version>
+    </dependency>
     <!-- aspectj -->
     <!-- https://mvnrepository.com/artifact/org.aspectj/aspectjrt -->
     <dependency>
@@ -587,6 +594,12 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>com.github.ulisesbocchio</groupId>
+        <artifactId>jasypt-maven-plugin</artifactId>
+        <version>3.0.3</version>
       </plugin>
       <!--
       <plugin>

@@ -85,6 +85,10 @@ export function getUuidv4() {
   return uuidv4()
 }
 
+export function getNonce() {
+  return window.btoa(uuidv4());
+}
+
 export function convertStringToBase64(value: string) {
   return window.atob(value)
 }

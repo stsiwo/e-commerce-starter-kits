@@ -1,0 +1,104 @@
+# for development
+
+spring: 
+  # database
+  datasource:
+    # integ dev (with spa) use port 3307 and check 'run-dev-db-container.sh' in db/
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3307/ec-schema
+    driver-class-name: com.mysql.jdbc.Driver
+    username: sts
+    password: test_password
+  jpa: 
+    database-platform: org.hibernate.dialect.H2Dialect
+
+    # logging
+    show-sql: true
+    properties: 
+      hibernate:
+        format_sql: true
+
+  flyway:
+    locations: "classpath:db/migration/mysql/common, classpath:db/migration/mysql/integ, classpath:db/callback"
+
+  # pagination page starts from 1 (not 0)
+  #   - this does not working.
+  #data:
+  #  web:
+  #    pageable:
+  #      page-parameter: page
+  #      size-parameter: limit
+  #      default-page-size: 10 
+  #      one-indexed-parameters: true
+  #    sort:
+  #      sort-parameter: sort
+
+  # admin client
+  boot:
+    admin:
+      # this is to make a connection with spring boot admin server.
+      client:
+        url: http://localdev.com:8081
+        username: sts
+        password: test_password 
+        
+        # this is to actuator endpoint to send data to the server with basic auth in header.
+        # When the actuator endpoints are secured using HTTP Basic authentication the SBA Server needs credentials to access them. You can submit the credentials in the metadata when registering the application. The BasicAuthHttpHeaderProvider then uses this metadata to add the Authorization header to access your application’s actuator endpoints. You can provide your own HttpHeadersProvider to alter the behaviour (e.g. add some decryption) or add extra headers.
+        # TODO: should be via HTTPS since HTTPS basic authentication
+        instance.metadata:
+          user.name: sts 
+          user.password: test_password 
+
+# admin
+management:
+  endpoints: 
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS 
+
+# cookie
+cookie:
+  api.token:
+    # 30 mins 
+    timeout: 1800
+    secure: false
+    httpOnly: false
+    # capitalize
+    sameSite: ""
+    domain: "localdev.com"
+    path: "/"
+
+cors:
+  allowed:
+    origins: "http://localdev.com:3000"
+    credentials: true 
+
+# client single page application
+spa:
+  # need to escape so wrap with string
+  url: "http://localdev.com:3000"
+
+
+# logging for spring boot admin
+logging:
+  file:
+    name: sample-boot-application.log 
+  pattern:
+    file: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID}){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"
+  level:
+    # root: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate:
+      SQL: DEBUG
+      #type.descriptor.sql.BasicBinder: TRACE
+
+aws:
+  s3:
+    region: us-west-2 
+    bucketName: bucket.iwaodev.com 
+
+server:
+  # set rather than localhost because of setting cookie issue
+  host: "localdev.com"

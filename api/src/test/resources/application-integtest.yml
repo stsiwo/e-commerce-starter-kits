@@ -1,0 +1,68 @@
+## for integtest 
+
+test:
+  user:
+    admin:
+      id: e95bf632-1518-4bf2-8ba9-cd8b7587530b
+      email: test_admin@test.com
+    member: 
+      id: c7081519-16e5-4f92-ac50-1834001f12b9
+      email: test_member@test.com
+    all: 
+      password: test_PASSWORD
+
+  stripe: 
+    customer:
+      id: cus_JM1bFTjtfxgtPj
+    
+spring: 
+  # database
+  jpa: 
+    hibernate.ddl-auto: none
+    properties.hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/ec-schema
+    driver-class-name: com.mysql.jdbc.Driver
+    username: sts
+    password: test_password
+
+  flyway:
+    locations: "classpath:db/migration/mysql/common, classpath:db/migration/mysql/test, classpath:db/callback"
+
+  # email (JavaMailSender)
+  mail: 
+    host: smtp.gmail.com
+    port: 587
+    username: <login user to smtp server>
+    password: <login password to smtp server>
+    properties:
+      mail:
+        smtp.auth: true
+        starttls.enable: true
+
+# cookie
+cookie:
+  api.token:
+    # 30 mins 
+    timeout: 1800 
+    secure: false
+    httpOnly: false
+    # capitalize
+    sameSite: "Strict"
+    domain: "127.0.0.1"
+    path: "/"
+
+cors:
+  allowed:
+    origins: "*"
+    credentials: true 
+
+# client single page application
+spa:
+  # need to escape so wrap with string
+  url: "http://localhost:3000"
+
+aws:
+  s3:
+    region: us-west-2 
+    bucketName: bucket.iwaodev.com 
