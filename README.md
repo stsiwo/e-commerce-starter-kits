@@ -99,6 +99,8 @@ Here is a typical flow of how each component interacts with the other.
   5. The Redux store receives the updated data and updates the state.
   6. Any UI component, which subscribes to updated data, is updated through its selector where you can filter, sort, or calculate the state if necessary. 
 
+Click [here](https://github.com/stsiwo/e-commerce-starter-kits/blob/main/details.md#reactjs) for more detail.
+
 ## Back End
 
 ![alt text](https://github.com/stsiwo/e-commerce-starter-kits/blob/main/back-end-architecture.png "Architecture Back End 1")
@@ -111,6 +113,8 @@ Here are some important details:
     - easier if the components in the higher layer need to be replaced
 
   - [Event And Event Handlers](https://www.baeldung.com/spring-events): avoid a thick application service by delegating some tasks to this event and event handlers. this makes it easy to write tests in a decoupled way. For example, if a new order was placed by a customer, the app needs to send a notification and an email to the customer and the admin. If you put that logic in a single application service, it makes me hard to write a test for the service. So, I delegate those tasks to event handlers and publish events.  This allows us to write a test separately and easily.
+
+Click [here](https://github.com/stsiwo/e-commerce-starter-kits/blob/main/details.md#back-end) for more detail.
 
 ## Infrastructure
 
