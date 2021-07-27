@@ -104,6 +104,12 @@ follow the architecture.
  
   - __JWT HttpOnly & Secure Cookie and Double Submit Cookie__: JWT is a better approach than HTTP Basic Authentication with password. a client send the credential only once and exchange it a token (a.k.a JWT) with expiry, and use it to access to protected resources. Now, the problem is where to store the JWT in front end. if you store in session or local storage in browsers, it is under the target of XSS since js can access to those storage. the more secure approach is to use httpOnly & Secure Cookie (e.g., js cannot access and sent over TLS only) and put the token in the cookie. However, httpOnly cookie is well known as a target of CSRF. if a malicous attaacker sends a link which requests to the authorized web site, it might result in unwanted result for the victim. that's why I use Double Submit Cookie technique. you need to add an additional token (a.k.a csrf token) and ask auth users to send it with header, and the server verify the csrf token in header and cookie match each other. this mitigates CSRF attacks. 
  
+  - __Security Headers__: don't forget the following security headers in your web servers:
+    * Strict-Transport-Security: tell browsers that it should only be accessed using HTTPS (no HTTP). many website configure redirect from HTTP to HTTPS. this redirect create a security hole such as man-in-hte-middle-attack. Threfore, setting this header prevent the security hole.
+    * X-Frame-Options: prevent the target page from being framed by other website. the difference btw frame-src (CSP) and X-Frame-Options is that frame-src restrict other resources. On the other hand, X-Frame-Options is used to restrict your page to be framed by ohter domains.
+    * X-XSS-Protection: used for only old browsers which don't support CSP, but you still should add this header.
+    * X-Content-Type-Options: to prevent MIME sniffing (e.g., browsers try to correct wrong extension and excute the file). this creates a security hole. for example, if malicious users uploads js file as image file and when other users access the website, the broser execute the js file by sniffing.
+ 
  
  
   
