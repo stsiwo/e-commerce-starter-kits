@@ -86,8 +86,11 @@ follow the architecture.
  
  - __JPA Specification__: use JPA Specification interface to improve handling query strings for filter. the main reason why use this specification is to write code in more OOP way and avoid less maintainable code such as a lot of if statements. Also, it is extensible when you want to add a new query string parameter, you can just add a new class/method and register the specification. you don't need to modify/change the existing code ideally.
  
- - 
-  
+ - __Hibernate EntityListener__: you can register listeners which is called when a specific event happens such as before persist, after loading, and so on). I personally use this listeners for validation before persist entities. Also, if you have any @Transit fields, this is good place to set up the value with @PostLoad annotation.
+
+ - __Flyway__: database versioning control. this makes easy to update existing database and its data in production. 
+ 
+ - __Jacoco__: check the test coverage so you won't miss writing tests.
  
  
  
