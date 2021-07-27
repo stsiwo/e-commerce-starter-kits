@@ -16,6 +16,8 @@
 
 ### ReactJS
 
+#### Hooks, HOCs, Render Props
+
 To organize the code (e.g., avoid any duplication on common logic), use hooks, higher order components, and render props.
 
   - __hooks__: brings local state (e.g., useState) and lifecycle features (e.g., useEffect) in functional components
@@ -26,11 +28,11 @@ To organize the code (e.g., avoid any duplication on common logic), use hooks, h
     * benefits: reusability of components which implements render props.
     * react-router used render props to abstract routing logic in <Route> component
   
-To do lifecycle features:
+#### Lifecycle Features:
   
   - use 'useEffect' hook.
   
-To manage the state:
+#### State Management:
   
   - use Redux for any state needed to be shared by different components. you can still use the local state (e.g., useState) and pass the state as a prop but this make hard to maintains and increase complexity.
     so better to use the redux store. it also scalable.
@@ -38,7 +40,9 @@ To manage the state:
   - use Redux-Saga for side effects (e.g., CRUD operation to APIs). technically, this is optional. you don't need to use this at all. for example, you can implement sending a request in UI components. if your project is relative samll, you can do this, so you can save a lot of time.
     But this is not scalable solution, and too many reponsibility on UI components so I decided to enclose side effect logic into different modules. 
   
-to optimize the performance on any ReactJS project, we can do the following if necessary: 
+#### Performance 
+ 
+To optimize the performance on any ReactJS project, we can do the following if necessary: 
 
   - use 'useMemo' for values and 'useCallback' for functions to avoid re-created every time the component is rendered.
   
@@ -91,6 +95,12 @@ follow the architecture.
  - __Flyway__: database versioning control. this makes easy to update existing database and its data in production. 
  
  - __Jacoco__: check the test coverage so you won't miss writing tests.
+ 
+ #### Performance
+ 
+ - __Algorithm Analysis__: calculate time coplexity and avoid O(n^2), O(2^n), and O(n!) as much as possible.
+ 
+ - __Avoid N+1 Problem With Hibernate__: N+1 problem is well known issue when you deal with Hibernate. When you fetch an aggregate with its associations, the associations are lazily loaded (e.g., not fetched until you actually need it). this requires to run additional SQL statement so this ends up running N+1 SQL statement (i.e., 1 = the 1st SQL statement to fetch N aggregtes and N = the following SQL statement to fetch its lazy-loaded associations). To avoid this problem, use 'fetch join' to fetch its associations eagerly.
  
  ### Security
  
