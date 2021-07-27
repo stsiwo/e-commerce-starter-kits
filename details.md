@@ -92,6 +92,17 @@ follow the architecture.
  
  - __Jacoco__: check the test coverage so you won't miss writing tests.
  
+ ### Security
+ 
+  - __Content Security Policy__: restrict domains that the browser should consider to be valid sources of executable scripts. This mitigates XSS attacks. 
+ 
+  - __CORS__: list domains that the browser should consider to be valid sources to load/request. this prevents one domain from accessing sensitive data on another domain such as CSRF.
+ 
+  - __Sanitize All User Input___: to prevent XSS attack and SQL injection. in front end and back end, don't forget validate input and sanitize it.
+ 
+  - __No Dynamic Query__: to prevent SQL inject. in Hibernate, you always should use parameter binding (e.g., 'setParamter') and don't do like this (e.g., "SELECT x from " + input + "...")
+ 
+  - __JWT HttpOnly & Secure Cookie and Double Submit Cookie__: JWT is a better approach than HTTP Basic Authentication with password. a client send the credential only once and exchange it a token (a.k.a JWT) with expiry, and use it to access to protected resources. Now, the problem is where to store the JWT in front end. if you store in session or local storage in browsers, it is under the target of XSS since js can access to those storage. the more secure approach is to use httpOnly & Secure Cookie (e.g., js cannot access and sent over TLS only) and put the token in the cookie. However, httpOnly cookie is well known as a target of CSRF. if a malicous attaacker sends a link which requests to the authorized web site, it might result in unwanted result for the victim. that's why I use Double Submit Cookie technique. you need to add an additional token (a.k.a csrf token) and ask auth users to send it with header, and the server verify the csrf token in header and cookie match each other. this mitigates CSRF attacks. 
  
  
  
