@@ -99,6 +99,8 @@ Here is a typical flow of how each component interacts with the other.
   5. The Redux store receives the updated data and updates the state.
   6. Any UI component, which subscribes to updated data, is updated through its selector where you can filter, sort, or calculate the state if necessary. 
 
+Click [here](https://github.com/stsiwo/e-commerce-starter-kits/blob/main/details.md#reactjs) for more detail.
+
 ## Back End
 
 ![alt text](https://github.com/stsiwo/e-commerce-starter-kits/blob/main/back-end-architecture.png "Architecture Back End 1")
@@ -112,6 +114,8 @@ Here are some important details:
 
   - [Event And Event Handlers](https://www.baeldung.com/spring-events): avoid a thick application service by delegating some tasks to this event and event handlers. this makes it easy to write tests in a decoupled way. For example, if a new order was placed by a customer, the app needs to send a notification and an email to the customer and the admin. If you put that logic in a single application service, it makes me hard to write a test for the service. So, I delegate those tasks to event handlers and publish events.  This allows us to write a test separately and easily.
 
+Click [here](https://github.com/stsiwo/e-commerce-starter-kits/blob/main/details.md#back-end) for more detail.
+
 ## Infrastructure
 
 ![alt text](https://github.com/stsiwo/e-commerce-starter-kits/blob/main/infrastructure-architecture.png "Architecture Infrastructure 1")
@@ -123,7 +127,4 @@ I used Docker Compose to orchestrate the following docker containers:
   - __DB container (based on MySQL image)__: this container is in charge of any database operation that comes from the backend API. 
   - __DB backup container (based on [databack/mysql-backup](https://hub.docker.com/r/databack/mysql-backup))__: this container regularly makes a backup for the DB container.  
 
-## Refs
-
-  - rechaptch management console: https://www.google.com/u/2/recaptcha/admin/site/459661075 (need to login as satoshi@iwaodev.com)
 
