@@ -26,6 +26,7 @@ import { cadCurrencyFormat, getApiUrl } from "src/utils";
 import ColorCell from "../GridData/ColorCell";
 import SizeCell from "../GridData/SizeCell";
 import { logger } from "configs/logger";
+import { isReachMaxQuantity } from "domain/cart";
 const log = logger(import.meta.url);
 
 /**
@@ -107,6 +108,11 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
   const handleQtyIncrement: React.EventHandler<
     React.MouseEvent<HTMLButtonElement>
   > = (e) => {
+    // max quantity = 10
+    if (isReachMaxQuantity(value.quantity)) {
+      return false;
+    }
+
     if (value.quantity < value.product.variants[0].variantStock) {
       const nextCartItem = merge({}, value, { quantity: value.quantity + 1 });
 

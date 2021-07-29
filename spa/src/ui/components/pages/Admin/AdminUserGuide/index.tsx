@@ -157,9 +157,9 @@ const AdminDashboard: React.FunctionComponent<{}> = (props) => {
                 email.
               </li>
               <li>
-                <b>admin</b>: a member who did suspicious behaviors. this member
-                cannot log in unless the admin changes the status to either
-                temporary or active.
+                <b>blacklist</b>: a member who did suspicious behaviors. this
+                member cannot log in unless the admin changes the status to
+                either temporary or active.
               </li>
               <li>
                 <b>deleted by customer</b>: a member who requests for the
