@@ -1,5 +1,6 @@
 import { ThemeProvider } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import DemoDialog from "components/common/DemoDialog";
 import DefaultHead from "components/head/DefaultHead";
 import Content from "components/pages/Content";
 import { store } from "configs/storeConfig";
@@ -49,6 +50,7 @@ const Index = (props: any) => {
               <Provider store={store}>
                 <ScrollToTop />
                 <DefaultHead />
+                <DemoDialog />
                 <Content />
                 {/**(RoleSwitch &&
                   <RoleSwitch />
