@@ -34,7 +34,7 @@ const DefaultHead: React.FunctionComponent<{}> = (props) => {
     <Helmet>
       <meta
         http-equiv="Content-Security-Policy"
-        content={`default-src 'self'; script-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ www.google-analytics.com www.googletagmanager.com'nonce-${curNonce}'; style-src 'self' 'unsafe-inline' ; img-src 'self' blob: data: api.iwaodev.com www.google-analytics.com www.googletagmanager.com; frame-src https://js.stripe.com https://hooks.stripe.com https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; connect-src 'self' https://api.stripe.com https://api.iwaodev.com`}
+        content={`default-src 'self'; script-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ www.google-analytics.com www.googletagmanager.com 'nonce-${curNonce}'; style-src 'self' 'unsafe-inline' ; img-src 'self' blob: data: api.iwaodev.com www.google-analytics.com www.googletagmanager.com; frame-src https://js.stripe.com https://hooks.stripe.com https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; connect-src 'self' https://api.stripe.com https://api.iwaodev.com www.google-analytics.com`}
       />
       <meta property="csp-nonce" content={curNonce} />
       {/**
