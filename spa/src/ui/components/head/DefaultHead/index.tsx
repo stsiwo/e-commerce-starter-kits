@@ -34,7 +34,7 @@ const DefaultHead: React.FunctionComponent<{}> = (props) => {
     <Helmet>
       <meta
         http-equiv="Content-Security-Policy"
-        content={`default-src 'self'; script-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ 'nonce-${curNonce}'; style-src 'self' 'unsafe-inline' ; img-src 'self' blob: data: api.iwaodev.com; frame-src https://js.stripe.com https://hooks.stripe.com https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; connect-src 'self' https://api.stripe.com https://api.iwaodev.com`}
+        content={`default-src 'self'; script-src 'self' https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ www.google-analytics.com www.googletagmanager.com'nonce-${curNonce}'; style-src 'self' 'unsafe-inline' ; img-src 'self' blob: data: api.iwaodev.com www.google-analytics.com www.googletagmanager.com; frame-src https://js.stripe.com https://hooks.stripe.com https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; connect-src 'self' https://api.stripe.com https://api.iwaodev.com`}
       />
       <meta property="csp-nonce" content={curNonce} />
       {/**
@@ -44,11 +44,12 @@ const DefaultHead: React.FunctionComponent<{}> = (props) => {
        *
        * @2021/07/24 - nonce not working so use alternative (e.g., put url in src directly)
        */}
-      <script
-        src="https://www.google.com/recaptcha/api.js"
-        async
-        defer
-      ></script>
+
+      {/**
+       * putting script tag here sometiems causes CSP violation even if I listed that in CSP.
+       *
+       * so move all script tag to index.html
+       */}
     </Helmet>
   );
 };
