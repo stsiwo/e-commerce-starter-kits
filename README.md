@@ -20,8 +20,11 @@ Visit [here](https://iwaodev.com/).
   - __Wishlist Management__: members can save products for later.
   - __Cart Management__: guests/members can keep products for their checkout.
   - __Checkout & Online Payment__: guests/members can buy products online.
+  ![checkout 1](./samples/checkout-1.png "Checkout 1")
   - __Order History Management__: members can view their orders, and they can update an order event if applicable.
   - __Product Search__: guests/members can search/filter/sort products.
+  - __Product Detail__: guests/members can choose a variant (e.g., different color and size) to purchase
+  ![product detail](./samples/product-detail.png "Product Detail 1")
   - __Account Management__: members/admin can manage their account information (e.g., avatar, basic info, billing/shipping address, phone, and account deletion)
   ![admin account](./samples/admin-account.png "Admin Account")
   - __Product Management__: the admin can CRUD products. 
