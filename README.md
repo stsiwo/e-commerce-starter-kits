@@ -12,6 +12,8 @@ My goal is to develop a maintainable, testable, and scalable application as much
 
 Visit [here](https://iwaodev.com/).
 
+![admin dashboard](./samples/admin-dashboard.png "Admin Dashboard")
+
 ## End-User Features
 
   - __Role Management__: guest, member, and admin roles.
@@ -21,10 +23,15 @@ Visit [here](https://iwaodev.com/).
   - __Order History Management__: members can view their orders, and they can update an order event if applicable.
   - __Product Search__: guests/members can search/filter/sort products.
   - __Account Management__: members/admin can manage their account information (e.g., avatar, basic info, billing/shipping address, phone, and account deletion)
+  ![admin account](./samples/admin-account.png "Admin Account")
   - __Product Management__: the admin can CRUD products. 
+  ![admin product](./samples/admin-product.png "Admin Product")
+  ![admin product form](./samples/admin-product-form.png "Admin Product Form")
   - __Category Management__: the admin can CRUD categories.
   - __Order Management__: the admin can manage all of the orders by customers.
+  ![admin order form](./samples/admin-order-form.png "Admin Order Form")
   - __Review Management__: the admin can manage all of the reviews by customers
+  ![admin review](./samples/admin-review.png "Admin Review")
   - __Customer Management__: the admin can CRUD customers.
   - __Login Attempt Limitation__: prevent brute force attack.
   - __Email Verification__: protect email reputation.
