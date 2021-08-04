@@ -6,7 +6,7 @@ An e-commerce web application integrated with [Stripe](https://stripe.com/en-ca)
 
 ## Goal
 
-My goal is to develop a maintainable, testable, and scalable application as much as possible. I focus on OOP and architecture to achieve this goal. I explain how I implement it in the following sections.
+My goal is to develop a maintainable, testable, and scalable application as much as possible. I focus on OOP and programming architecture to achieve this goal. I explain how I implement it in the following sections.
 
 ## Demo
 
