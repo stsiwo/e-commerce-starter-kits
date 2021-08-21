@@ -6,7 +6,7 @@ An e-commerce web application integrated with [Stripe](https://stripe.com/en-ca)
 
 ## Goal
 
-My goal is to develop a maintainable, testable, and scalable application as much as possible. I focus on OOP and architecture to achieve this goal. I explain how I implement it in the following sections.
+My goal is to develop a maintainable, testable, and scalable application as much as possible. I focus on OOP and programming architecture to achieve this goal. I explain how I implement it in the following sections.
 
 ## Demo
 
@@ -20,8 +20,11 @@ Visit [here](https://iwaodev.com/).
   - __Wishlist Management__: members can save products for later.
   - __Cart Management__: guests/members can keep products for their checkout.
   - __Checkout & Online Payment__: guests/members can buy products online.
+  ![checkout 1](./samples/checkout-1.png "Checkout 1")
   - __Order History Management__: members can view their orders, and they can update an order event if applicable.
   - __Product Search__: guests/members can search/filter/sort products.
+  - __Product Detail__: guests/members can choose a variant (e.g., different color and size) to purchase
+  ![product detail](./samples/product-detail.png "Product Detail 1")
   - __Account Management__: members/admin can manage their account information (e.g., avatar, basic info, billing/shipping address, phone, and account deletion)
   ![admin account](./samples/admin-account.png "Admin Account")
   - __Product Management__: the admin can CRUD products. 
@@ -138,4 +141,45 @@ I used Docker Compose to orchestrate the following docker containers:
   - __DB container (based on MySQL image)__: this container is in charge of any database operation that comes from the backend API. 
   - __DB backup container (based on [databack/mysql-backup](https://hub.docker.com/r/databack/mysql-backup))__: this container regularly makes a backup for the DB container.  
 
+## Security
+
+Click [here](https://github.com/stsiwo/e-commerce-starter-kits/blob/main/details.md#security) for detail.
+
+## Testing
+
+### Back End 
+
+I used Junit, AssertJ, and Spring Testing to do the integration and unit testing.
+
+#### Integration Testing with DB and MockMvc
+
+To test all endpoints from sending a request to persisting the data in DB. 
+
+  - (GET/POST/PUT/PATCH/DELETE) return success status code.
+  - (GET/POST/PUT/PATCH/DELETE) return any error status code (e.g., 400 (BAD_REQUEST), 404 (NOT_FOUND), 500 (INTERNAL_SERVER_ERROR)).
+  - (GET/POST/PUT/PATCH/DELETE) return 403 status code if a request does not have proper authorization (e.g., access control based on the role).
+  - (GET/POST/PUT/PATCH) response DTO contains all of the necessary fields.
+  - (GET) sorting/filtering/pagination test with query string parameters.
+  - (POST) its association is properly created along with the target resource.
+  - (PUT) a target resource is replaced without changing its id.
+  - (PATCH) a target resource is partially updated.
+  - (DELETE) its association is properly handled (e.g., if the association should be deleted along with the target deletion, make sure it is deleted).
+
+#### Event & Event Handler Testing
+  - an event is properly published.
+  - an event is properly handled by all subscribed event handlers.
+  - an event handler properly handles its use case.
+  - any error handling.
+
+#### Domain Unit Testing
+  - each domain behavior with its input and output
+  - any error handling.
+
+#### Scheduled Task & Domain Service Testing
+  - a task/service properly handles its use case.
+  - any error handling.
+
+#### Infrastructure Service (Facade) Testing
+  - a service properly interacts with an external system.
+  - any error handling.
 
