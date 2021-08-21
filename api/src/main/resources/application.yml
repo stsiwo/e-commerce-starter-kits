@@ -19,6 +19,7 @@
 
 
 # debugging for developers
+# really great thing about spring boot is that you can define the log level based on the package.
 logging:
   level:
     # root: DEBUG
@@ -26,6 +27,8 @@ logging:
     org.hibernate:
       SQL: DEBUG
       type.descriptor.sql.BasicBinder: TRACE
+    # my package
+    com.iwaodev: DEBUG
 
 # sql logging
 spring:

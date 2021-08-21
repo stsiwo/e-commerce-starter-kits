@@ -104,7 +104,7 @@ const FinalConfirmForm: React.FunctionComponent<FinalConfirmFormPropsType> = (
     // validate isRatingSuccess (e.g., estimated shipping cost & delivery date)
     if (!isRatingSuccess) {
       message =
-        "Failed to get the estimated shipping cost and delivery date. please try again later.";
+        "Failed to get the estimated shipping cost and delivery date. Make sure your postal code is correct.";
       result = false;
     }
 

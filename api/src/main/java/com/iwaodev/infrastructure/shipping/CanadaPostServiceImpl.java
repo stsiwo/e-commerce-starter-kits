@@ -138,6 +138,11 @@ public class CanadaPostServiceImpl implements CanadaPostService {
     if (response.getStatusCode().is2xxSuccessful()) {
       // 2xx
       PriceQuotes priceQuotes = deserializeXmlStringToObject(response.getBody(), PriceQuotes.class);
+
+      for (PriceQuote priceQuote: priceQuotes.getPriceQuotes()) {
+        logger.debug(priceQuote.getServiceCode());
+      }
+
       return priceQuotes;
     } else {
       // anything else
@@ -149,7 +154,6 @@ public class CanadaPostServiceImpl implements CanadaPostService {
       }
       throw new Exception("failed to get rating cost & delivery date");
     }
-
   }
 
   private RatingDTO extractRegularParcel(PriceQuotes quotes) {

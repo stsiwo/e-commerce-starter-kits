@@ -38,4 +38,31 @@ public class CanadaPostServiceImplTest {
     // assert
     assertThat(priceQuotes).isNotNull(); 
   }
+
+  /**
+   * ?? don't experience any throttle limit when send a request twice in a loop.
+   *
+   * for now, just leave it as it is and if you experience the throttle limit, modify this.
+   * @throws Exception
+   */
+  @Test
+  public void shouldReturnSLMMonitorRejectedResponseDueToThrottleLimit() throws Exception {
+
+    // arrange
+    RatingCriteria criteria = new RatingCriteria();
+    criteria.setParcelWeight(1D);
+    criteria.setDestinationPostalCode("M4W2G8");
+
+    // act
+    //PriceQuotes priceQuotes = this.canadaPostService.getRating(criteria, "V5R 2C2");
+
+    logger.debug("satoshi");
+    PriceQuotes priceQuotes = new PriceQuotes();
+    for (int i = 0; i < 2; i++) {
+      priceQuotes = this.canadaPostService.getRating(criteria.getParcelWeight(), criteria.getDestinationPostalCode(), "V5R 2C2");
+    }
+
+    // assert
+    assertThat(priceQuotes).isNotNull();
+  }
 }
