@@ -8,6 +8,7 @@ import { mSelector } from 'src/selectors/selector';
 import Typography from '@material-ui/core/Typography';
 import CancelIcon from '@material-ui/icons/Cancel';
 import { IconButton } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
 
 /**
  * TODO: enable scrollbar (vertical) on this drawer.
@@ -78,14 +79,17 @@ const CartDrawer: React.FunctionComponent<{}> = (props) => {
         keepMounted: false, // make this false. otherwise, every time when page change, this send an api request to fetch current cart items. (keepMouted: true => Better open performance on mobile).
       }}
     >
-      {/**<div className={classes.toolbar} />**/}
-      <Typography variant="h5" component="h5" align="center" className={classes.title} >
-        {"Cart"}
-      </Typography>
-      <CartBox toggleDrawer={toggleDrawer}/>
-      <IconButton onClick={toggleDrawer(false)} className={classes.closeBtn}>
-        <CancelIcon />
-      </IconButton>
+      {/** need this wrapper to prevent overflow of content inside CartBox **/}
+      <Box>
+        {/**<div className={classes.toolbar} />**/}
+        <Typography variant="h5" component="h5" align="center" className={classes.title} >
+          {"Cart"}
+        </Typography>
+        <CartBox toggleDrawer={toggleDrawer}/>
+        <IconButton onClick={toggleDrawer(false)} className={classes.closeBtn}>
+          <CancelIcon />
+        </IconButton>
+      </Box>
     </Drawer>
   )
 }

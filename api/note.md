@@ -319,6 +319,28 @@
 
     - ref: https://www.baeldung.com/spring-email
 
+## Jasypt (hide sensitive info from application.yml)
+
+hide sensitive data in applicaiton.yml
+ 
+bg) if uploading this file which includes sensitive data to a public git repo, the data is exposed to public.
+ 
+solution) use 'jasypt' to encrypted the data and put the encrypted data in application.yml to protect the data.  currently, this is only used for local and use env vars in product mainly.
+
+steps to generate encypted data (e.g., ENC(....))
+
+ 1. add maven package of jasypt and its marven plugins
+ 2. run this command: mvn jasypt:encrypt-value -Djasypt.encryptor.password="<YOUR_PASSWORD>" -Djasypt.plugin.value="<YOUR_VALUE>"
+ note: don't use jasypt online tool since it uses old encyprtion method so does not match with the current method. (ref: https://github.com/ulisesbocchio/jasypt-spring-boot#update-11242019-version-300-release-includes
+ 3. after you got the encrypted code, paste it to appropriated place in here.
+ note: you don't need to wrap values with single quote even if you experienced type conversion error (e.g., '000123412' treat as string but if no single quote, java consider this as float).
+        - you don't need to wrap with single quote. jasypt handle this.
+ 4. if you use the maven plugin for jasypt, you need to set env variable (e.g., add this to /etc/environment) like below:
+ ```
+    JASYPT_ENCRYPTOR_PASSWORD=<YOUR_PASSWORD>
+ ```
+ your app pick this env when run test/dev. don't store this password to this project directory. it will kill the whole benefit of jasypt.
+
   ## DB Migration (Flyway)
 
     - ref: https://flywaydb.org/documentation/concepts/migrations.html#overview (official docs of Flyway)

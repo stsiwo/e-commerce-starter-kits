@@ -11,7 +11,8 @@ module.exports = merge(common, {
     contentBase: __dirname,
     hot: true,
     historyApiFallback: true,
-    port: 8888
+    port: 3000,
+    disableHostCheck: true,
   },
   output: {
     filename: '[name].bundle.js',
@@ -25,6 +26,7 @@ module.exports = merge(common, {
       OWNER_BUCKET_NAME: JSON.stringify("bactivityhair.com-dev-bucket"),
       CHECKOUT_SESSION_TIMEOUT: JSON.stringify("60000"),
       API1_URL: JSON.stringify("http://localdev.com:8080"),
+      API1_DOMAIN: JSON.stringify("localdev.com:8080"),
       PUBLIC_IMAGE_PATH: JSON.stringify("/images/"),
       RECAPTCHA_SITE_KEY: JSON.stringify("6LcT32UbAAAAAPkBTDRWFyPfYhd6rN-9JhtUQCLg"),
     })

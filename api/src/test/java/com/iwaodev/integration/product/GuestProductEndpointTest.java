@@ -484,7 +484,7 @@ public class GuestProductEndpointTest {
     for (int i = 0; i < responseBody.length; i++) {
       int next = i+1;
       if (next < responseBody.length) {
-        assertThat(responseBody[i].getCreatedAt()).isAfterOrEqualTo(responseBody[next].getCreatedAt());
+        assertThat(responseBody[i].getReleaseDate()).isAfterOrEqualTo(responseBody[next].getReleaseDate());
       }
     }
   }
@@ -517,7 +517,7 @@ public class GuestProductEndpointTest {
     for (int i = 0; i < responseBody.length; i++) {
       int next = i+1;
       if (next < responseBody.length) {
-        assertThat(responseBody[i].getCreatedAt()).isBeforeOrEqualTo(responseBody[next].getCreatedAt());
+        assertThat(responseBody[i].getReleaseDate()).isBeforeOrEqualTo(responseBody[next].getReleaseDate());
       }
     }
   }

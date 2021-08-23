@@ -3,21 +3,6 @@
 ## this common (application.yml) is always included at any profile (e.g., unittest, integtest, dev, prod)
 ## you cannot override key and value pair at any profile. if you need different value, you need to define it at the profile individually.
 
-## hide sensitive data in applicaiton.yml
-## bg) if uploading this file which includes sensitive data to a public git repo, the data is exposed to public.
-## solution) use 'jasypt' to encrypted the data and put the encrypted data in application.yml to protect the data.
-## currently, this is only used for local and use env vars in product mainly.
-
-## steps to generate encypted data (e.g., ENC(....))
-## 1. add maven package of jasypt and its marven plugins
-## 2. run this command: mvn jasypt:encrypt-value -Djasypt.encryptor.password="<YOUR_PASSWORD>" -Djasypt.plugin.value="<YOUR_VALUE>"
-## note: don't use jasypt online tool since it uses old encyprtion method so does not match with the current method. (ref: https://github.com/ulisesbocchio/jasypt-spring-boot#update-11242019-version-300-release-includes
-## 3. after you got the encrypted code, paste it to appropriated place in here.
-## note: you don't need to wrap values with single quote even if you experienced type conversion error (e.g., '000123412' treat as string but if no single quote, java consider this as float).
-##        - you don't need to wrap with single quote. jasypt handle this.
-
-
-
 # debugging for developers
 # really great thing about spring boot is that you can define the log level based on the package.
 logging:

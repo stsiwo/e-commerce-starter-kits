@@ -13,6 +13,7 @@ import javax.servlet.http.Cookie;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwaodev.application.dto.user.UserDTO;
+import com.iwaodev.application.iservice.S3Service;
 import com.iwaodev.auth.AuthenticateTestUser;
 import com.iwaodev.auth.AuthenticationInfo;
 import com.iwaodev.data.BaseDatabaseSetup;
@@ -24,6 +25,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -100,6 +103,8 @@ public class AdminUserEndpointTest {
   private Cookie csrfCookie;
   private AuthenticationInfo authInfo;
 
+  @MockBean
+  private S3Service s3Service;
   /**
    * insert base test data into mysql database
    *
@@ -856,6 +861,7 @@ public class AdminUserEndpointTest {
   @Sql(scripts = { "classpath:/integration/user/shouldAdminUserDeleteOtheruserAccountCompletely.sql" })
   public void shouldAdminUserDeleteOtheruserAccountCompletely() throws Exception {
 
+    Mockito.doNothing().when(this.s3Service).delete(Mockito.any());
     // dummy form json
     // arrange
     String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978";

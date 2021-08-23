@@ -67,7 +67,6 @@ public class AuthenticateTestUser {
         .accept(MediaType.APPLICATION_JSON)
         );
 
-      
      MvcResult result = resultAction.andReturn();
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
