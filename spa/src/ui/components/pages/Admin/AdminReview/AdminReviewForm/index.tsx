@@ -19,7 +19,7 @@ import { useDispatch } from "react-redux";
 import { putReviewActionCreator } from "reducers/slices/domain/review";
 import ReviewProductHorizontalCard from "./ReviewProductHorizontalCard";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 interface AdminReviewFormPropsType {
   review: ReviewType;

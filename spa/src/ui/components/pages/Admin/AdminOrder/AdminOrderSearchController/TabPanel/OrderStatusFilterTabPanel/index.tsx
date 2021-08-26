@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { orderQueryOrderStatusActions } from "reducers/slices/domain/order";
 import { mSelector } from "src/selectors/selector";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 //interface OrderStatusFilterTabPanelPropsType {
 //  curOrderStatusId: string

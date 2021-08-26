@@ -22,7 +22,7 @@ import { checkoutSessionStatusActions } from "reducers/slices/domain/checkout";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 export enum CheckoutStepEnum {
   CUSTOMER_BASIC_INFORMATION = 0,

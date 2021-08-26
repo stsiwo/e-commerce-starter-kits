@@ -44,7 +44,7 @@ import { mSelector, rsSelector } from "src/selectors/selector";
 import AdminReviewFormDialog from "../AdminReviewFormDialog";
 import AdminReviewSearchController from "../AdminReviewSearchController";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 declare type AdminReviewGridViewPropsType = {};
 

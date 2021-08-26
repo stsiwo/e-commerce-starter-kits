@@ -20,7 +20,7 @@ import { putAuthFetchStatusActions } from "reducers/slices/app/fetchStatus/auth"
 import { FetchStatusEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

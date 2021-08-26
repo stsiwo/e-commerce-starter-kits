@@ -10,7 +10,7 @@ import { mSelector } from "src/selectors/selector";
 import { withBasePage } from "ui/hoc/withBasePage";
 import { commonRoutesData, RouteDataType, routesData } from "..";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 const PageRoute: React.FunctionComponent<{}> = (props) => {
   const location = useLocation();

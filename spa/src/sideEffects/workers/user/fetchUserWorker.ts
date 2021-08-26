@@ -1,66 +1,68 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { api } from "configs/axiosConfig";
 import { getUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
-import { userActions, userPaginationPageActions, userPaginationTotalElementsActions, userPaginationTotalPagesActions } from "reducers/slices/domain/user";
+import {
+  userActions,
+  userPaginationPageActions,
+  userPaginationTotalElementsActions,
+  userPaginationTotalPagesActions,
+} from "reducers/slices/domain/user";
 import { all, call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { generateQueryString } from "src/utils";
-import { logger } from 'configs/logger';
-const log = logger(import.meta.url);
+import { logger } from "configs/logger";
+const log = logger(__filename);
 
 /**
- * a worker (generator)    
+ * a worker (generator)
  *
- *  - fetch user items of current user 
+ *  - fetch user items of current user
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
  *  - (UserType)
  *
- *      - (Guest): N/A (permission denied) 
- *      - (Member): N/A (permission denied) 
+ *      - (Guest): N/A (permission denied)
+ *      - (Member): N/A (permission denied)
  *      - (Admin): send fetch request and receive data and save it  to redux store
  *
  *  - steps:
  *
- *      (Admin): 
+ *      (Admin):
  *
  *        a1. send fetch request to api to grab data
  *
  *        a2. receive the response and save it to redux store
- *  
+ *
  **/
 export function* fetchUserWorker(action: PayloadAction<{}>) {
-
   /**
    * get cur user type
    *
    **/
-  const curAuth: AuthType = yield select(rsSelector.app.getAuth)
-
+  const curAuth: AuthType = yield select(rsSelector.app.getAuth);
 
   if (curAuth.userType === UserTypeEnum.ADMIN) {
-
     /**
      * update status for anime data
      **/
-    yield put(
-      getUserFetchStatusActions.update(FetchStatusEnum.FETCHING)
-    )
+    yield put(getUserFetchStatusActions.update(FetchStatusEnum.FETCHING));
 
     /**
      * prep query string
      **/
-    const curQueryString = yield select(mSelector.makeUserQueryStringSelector())
+    const curQueryString = yield select(
+      mSelector.makeUserQueryStringSelector()
+    );
 
-    log(curQueryString)
+    log(curQueryString);
     log(generateQueryString(curQueryString));
 
     /**
      * grab all domain
      **/
-    const apiUrl = `${API1_URL}/users${generateQueryString(curQueryString)}`
+    const apiUrl = `${API1_URL}/users${generateQueryString(curQueryString)}`;
 
     /**
      * fetch data
@@ -69,35 +71,41 @@ export function* fetchUserWorker(action: PayloadAction<{}>) {
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() => api({
-      method: "GET",
-      url: apiUrl,
-    })
-      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, content: response.data.content, pageable: response.data.pageable, totalPages: response.data.totalPages, totalElements: response.data.totalElements }))
-      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
-    )
+    const response = yield call(() =>
+      api({
+        method: "GET",
+        url: apiUrl,
+      })
+        .then((response) => ({
+          fetchStatus: FetchStatusEnum.SUCCESS,
+          content: response.data.content,
+          pageable: response.data.pageable,
+          totalPages: response.data.totalPages,
+          totalElements: response.data.totalElements,
+        }))
+        .catch((e) => ({
+          fetchStatus: FetchStatusEnum.FAILED,
+          message: e.response.data.message,
+        }))
+    );
 
     /**
      * update fetch status sucess
      **/
-    yield put(
-      getUserFetchStatusActions.update(response.fetchStatus)
-    )
+    yield put(getUserFetchStatusActions.update(response.fetchStatus));
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update user domain in state
        *
        **/
-      yield put(
-        userActions.update(response.content)
-      )
+      yield put(userActions.update(response.content));
 
       /**
        * update pagination.
        *
        * sample response data:
-       * 
+       *
        * <PageImpl>
        *  <content>
        *    ... actual content
@@ -130,26 +138,20 @@ export function* fetchUserWorker(action: PayloadAction<{}>) {
        * </PageImpl>
        **/
 
+      log(response.pageable);
 
-      log(response.pageable)
-
-      log("total pages")
-      log(response.totalPages)
+      log("total pages");
+      log(response.totalPages);
 
       yield all([
         put(userPaginationPageActions.update(response.pageable.pageNumber)),
         put(userPaginationTotalPagesActions.update(response.totalPages)),
         put(userPaginationTotalElementsActions.update(response.totalElements)),
-      ])
+      ]);
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-
-      log(response.message)
-
+      log(response.message);
     }
   } else {
-    log("permission denied. your user type: " + curAuth.userType)
+    log("permission denied. your user type: " + curAuth.userType);
   }
 }
-
-
-

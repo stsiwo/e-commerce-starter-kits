@@ -5,17 +5,25 @@ import { NormalizedProductType } from "domain/product/types";
 import { normalize } from "normalizr";
 import { messageActions } from "reducers/slices/app";
 import { postProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
-import { PostProductActionType, productActions } from "reducers/slices/domain/product";
+import {
+  PostProductActionType,
+  productActions,
+} from "reducers/slices/domain/product";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import {
+  AuthType,
+  FetchStatusEnum,
+  MessageTypeEnum,
+  UserTypeEnum,
+} from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
 import { productSchemaEntity } from "states/state";
-import { logger } from 'configs/logger';
-const log = logger(import.meta.url);
+import { logger } from "configs/logger";
+const log = logger(__filename);
 
 /**
- * a worker (generator)    
+ * a worker (generator)
  *
  *  - post this domain to create new
  *
@@ -23,15 +31,15 @@ const log = logger(import.meta.url);
  *
  *  - (UserType)
  *
- *      - (Guest): N/A 
- *      - (Member): N/A 
- *      - (Admin): OK 
+ *      - (Guest): N/A
+ *      - (Member): N/A
+ *      - (Admin): OK
  *
  *  - steps:
  *
- *      (Admin): 
+ *      (Admin):
  *
- *        a1. send post request to api to post a new data 
+ *        a1. send post request to api to post a new data
  *
  *        a2. receive the response and save it to redux store
  *
@@ -40,12 +48,13 @@ const log = logger(import.meta.url);
  *    - this domain does not have its id yet.
  *
  **/
-export function* postProductWorker(action: PayloadAction<PostProductActionType>) {
-
+export function* postProductWorker(
+  action: PayloadAction<PostProductActionType>
+) {
   /**
    * get cur user type
    **/
-  const curAuth: AuthType = yield select(rsSelector.app.getAuth)
+  const curAuth: AuthType = yield select(rsSelector.app.getAuth);
 
   /**
    *
@@ -53,57 +62,58 @@ export function* postProductWorker(action: PayloadAction<PostProductActionType>)
    *
    **/
   if (curAuth.userType === UserTypeEnum.ADMIN) {
-
     /**
      * update status for post product data
      **/
-    yield put(
-      postProductFetchStatusActions.update(FetchStatusEnum.FETCHING)
-    )
+    yield put(postProductFetchStatusActions.update(FetchStatusEnum.FETCHING));
 
     /**
      * grab this domain
      **/
-    const apiUrl = `${API1_URL}/products`
+    const apiUrl = `${API1_URL}/products`;
 
     /**
      * fetch data
      **/
 
     // prep form data
-    const formData = productFormDataGenerator(action.payload)
-
+    const formData = productFormDataGenerator(action.payload);
 
     // start fetching
-    const response = yield call(() => api({
-      method: "POST",
-      url: apiUrl,
-      data: formData,
-      headers: { "Content-Type": "multipart/form-data" },
-    })
-      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
-      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
-    )
+    const response = yield call(() =>
+      api({
+        method: "POST",
+        url: apiUrl,
+        data: formData,
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+        .then((response) => ({
+          fetchStatus: FetchStatusEnum.SUCCESS,
+          data: response.data,
+        }))
+        .catch((e) => ({
+          fetchStatus: FetchStatusEnum.FAILED,
+          message: e.response.data.message,
+        }))
+    );
 
     /**
      * update fetch status sucess
      **/
-    yield put(
-      postProductFetchStatusActions.update(response.fetchStatus)
-    )
+    yield put(postProductFetchStatusActions.update(response.fetchStatus));
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
-      log("posted product")
-      log(response.data)
+      log("posted product");
+      log(response.data);
       /**
        * normalize response data
        *
        *  - TODO: make sure response structure with remote api
        **/
-      const normalizedData = normalize(response.data, productSchemaEntity)
+      const normalizedData = normalize(response.data, productSchemaEntity);
 
-      log("normalized product")
-      log(normalizedData)
+      log("normalized product");
+      log(normalizedData);
 
       /**
        * update product domain in state
@@ -111,8 +121,10 @@ export function* postProductWorker(action: PayloadAction<PostProductActionType>)
        **/
       yield put(
         // be careful when normalized a single object, you need to append its domain name (plural) to 'entities'
-        productActions.unshiftMerge(normalizedData.entities.products as NormalizedProductType)
-      )
+        productActions.unshiftMerge(
+          normalizedData.entities.products as NormalizedProductType
+        )
+      );
 
       /**
        * update message
@@ -123,10 +135,9 @@ export function* postProductWorker(action: PayloadAction<PostProductActionType>)
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
         })
-      )
+      );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-
-      log(response.message)
+      log(response.message);
 
       /**
        * update message
@@ -135,16 +146,9 @@ export function* postProductWorker(action: PayloadAction<PostProductActionType>)
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: response.message
+          message: response.message,
         })
-      )
+      );
     }
   }
 }
-
-
-
-
-
-
-

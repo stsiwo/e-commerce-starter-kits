@@ -3,19 +3,24 @@ import { api } from "configs/axiosConfig";
 import { NormalizedProductType } from "domain/product/types";
 import { normalize } from "normalizr";
 import { getProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
-import { productActions, productPaginationPageActions, productPaginationTotalElementsActions, productPaginationTotalPagesActions } from "reducers/slices/domain/product";
+import {
+  productActions,
+  productPaginationPageActions,
+  productPaginationTotalElementsActions,
+  productPaginationTotalPagesActions,
+} from "reducers/slices/domain/product";
 import { all, call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { generateQueryString } from "src/utils";
 import { productSchemaArray } from "states/state";
-import { logger } from 'configs/logger';
-const log = logger(import.meta.url);
+import { logger } from "configs/logger";
+const log = logger(__filename);
 
 /**
- * a worker (generator)    
+ * a worker (generator)
  *
- *  - fetch all of this domain 
+ *  - fetch all of this domain
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
@@ -23,49 +28,46 @@ const log = logger(import.meta.url);
  *
  *  - (ProductType)
  *
- *      - (Guest): N/A  
- *      - (Member): N/A 
- *      - (Admin): send get request and receive all domain and save it to redux store 
+ *      - (Guest): N/A
+ *      - (Member): N/A
+ *      - (Admin): send get request and receive all domain and save it to redux store
  *
  *  - steps:
  *
- *      (Admin): 
+ *      (Admin):
  *
  *        a1. send fetch request to api to grab data
  *
  *        a2. receive the response and save it to redux store
- *  
+ *
  **/
 export function* fetchProductWorker(action: PayloadAction<{}>) {
-
   /**
    * get cur user type
    *
    **/
-  const curAuth: AuthType = yield select(rsSelector.app.getAuth)
-
+  const curAuth: AuthType = yield select(rsSelector.app.getAuth);
 
   if (curAuth.userType === UserTypeEnum.ADMIN) {
-
     /**
      * update status for anime data
      **/
-    yield put(
-      getProductFetchStatusActions.update(FetchStatusEnum.FETCHING)
-    )
+    yield put(getProductFetchStatusActions.update(FetchStatusEnum.FETCHING));
 
     /**
      * prep query string
      **/
-    const curQueryString = yield select(mSelector.makeProductQueryStringSelector())
+    const curQueryString = yield select(
+      mSelector.makeProductQueryStringSelector()
+    );
 
-    log(curQueryString)
+    log(curQueryString);
     log(generateQueryString(curQueryString));
 
     /**
      * grab all domain
      **/
-    const apiUrl = `${API1_URL}/products${generateQueryString(curQueryString)}`
+    const apiUrl = `${API1_URL}/products${generateQueryString(curQueryString)}`;
 
     /**
      * fetch data
@@ -74,21 +76,28 @@ export function* fetchProductWorker(action: PayloadAction<{}>) {
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() => api({
-      method: "GET",
-      url: apiUrl,
-    })
-      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, content: response.data.content, pageable: response.data.pageable, totalPages: response.data.totalPages, totalElements: response.data.totalElements }))
-      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
-    )
+    const response = yield call(() =>
+      api({
+        method: "GET",
+        url: apiUrl,
+      })
+        .then((response) => ({
+          fetchStatus: FetchStatusEnum.SUCCESS,
+          content: response.data.content,
+          pageable: response.data.pageable,
+          totalPages: response.data.totalPages,
+          totalElements: response.data.totalElements,
+        }))
+        .catch((e) => ({
+          fetchStatus: FetchStatusEnum.FAILED,
+          message: e.response.data.message,
+        }))
+    );
 
     /**
      * update fetch status sucess
      **/
-    yield put(
-      getProductFetchStatusActions.update(response.fetchStatus)
-    )
-
+    yield put(getProductFetchStatusActions.update(response.fetchStatus));
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
@@ -96,8 +105,8 @@ export function* fetchProductWorker(action: PayloadAction<{}>) {
        *
        *  - TODO: make sure response structure with remote api
        **/
-      log(response) // pageable response
-      const normalizedData = normalize(response.content, productSchemaArray)
+      log(response); // pageable response
+      const normalizedData = normalize(response.content, productSchemaArray);
 
       /**
        * update product domain in state
@@ -106,14 +115,16 @@ export function* fetchProductWorker(action: PayloadAction<{}>) {
        *
        **/
       yield put(
-        productActions.update(normalizedData.entities.products as NormalizedProductType)
-      )
+        productActions.update(
+          normalizedData.entities.products as NormalizedProductType
+        )
+      );
 
       /**
        * update pagination.
        *
        * sample response data:
-       * 
+       *
        * <PageImpl>
        *  <content>
        *    ... actual content
@@ -146,28 +157,22 @@ export function* fetchProductWorker(action: PayloadAction<{}>) {
        * </PageImpl>
        **/
 
+      log(response.pageable);
 
-      log(response.pageable)
-
-      log("total pages")
-      log(response.totalPages)
+      log("total pages");
+      log(response.totalPages);
 
       yield all([
         put(productPaginationPageActions.update(response.pageable.pageNumber)),
         put(productPaginationTotalPagesActions.update(response.totalPages)),
-        put(productPaginationTotalElementsActions.update(response.totalElements)),
-      ])
-
+        put(
+          productPaginationTotalElementsActions.update(response.totalElements)
+        ),
+      ]);
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-
-      log(response.fetchStatus)
+      log(response.fetchStatus);
     }
   } else {
-    log("permission denied. your product type: " + curAuth.userType)
+    log("permission denied. your product type: " + curAuth.userType);
   }
 }
-
-
-
-
-

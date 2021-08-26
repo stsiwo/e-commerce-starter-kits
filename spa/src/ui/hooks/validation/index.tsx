@@ -7,7 +7,7 @@ import {
   UseValidationOutputType,
 } from "./types";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 export declare type ValidationKeyValuePiarType = {
   key: string;

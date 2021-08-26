@@ -1,8 +1,12 @@
-import { OrderType, OrderEventType, OrderStatusEnum, OrderDetailType } from "domain/order/types";
+import {
+  OrderDetailType,
+  OrderEventType,
+  OrderStatusEnum,
+  OrderType,
+} from "domain/order/types";
 import faker from "../faker";
-import { testGuestUser } from "../user";
 import { generateProductList } from "../product";
-
+import { testGuestUser } from "../user";
 
 export const testOrderEventListAfterCompleted: OrderEventType[] = [
   {
@@ -41,7 +45,7 @@ export const testOrderEventListAfterCompleted: OrderEventType[] = [
     user: testGuestUser,
     note: "",
   },
-]
+];
 
 export const testOrderEventListAfterOrdered: OrderEventType[] = [
   {
@@ -71,9 +75,11 @@ export const testOrderEventListAfterOrdered: OrderEventType[] = [
     user: testGuestUser,
     note: "",
   },
-]
-export const generateOrderDetailList: (count?: number) => OrderDetailType[] = (count = 1) => {
-  const list = []
+];
+export const generateOrderDetailList: (count?: number) => OrderDetailType[] = (
+  count = 1
+) => {
+  const list = [];
 
   for (let i = 0; i < count; i++) {
     list.push({
@@ -81,18 +87,19 @@ export const generateOrderDetailList: (count?: number) => OrderDetailType[] = (c
       product: generateProductList(1)[0],
       productColor: faker.commerce.color(),
       productName: faker.commerce.productName(),
-      productQuantity: faker.random.number(5),
+      productQuantity: faker.datatype.number(5),
       productSize: "XS",
       productUnitPrice: parseFloat(faker.commerce.price()),
-    } as OrderDetailType)
+    } as OrderDetailType);
   }
 
-  return list
-}
+  return list;
+};
 
-
-export const generateOrderList: (count?: number) => OrderType[] = (count = 1) => {
-  const list = []
+export const generateOrderList: (count?: number) => OrderType[] = (
+  count = 1
+) => {
+  const list = [];
 
   for (let i = 0; i < count; i++) {
     list.push({
@@ -106,8 +113,8 @@ export const generateOrderList: (count?: number) => OrderType[] = (count = 1) =>
       orderEvents: testOrderEventListAfterOrdered,
       orderDetails: generateOrderDetailList(3),
       user: testGuestUser,
-    } as OrderType)
+    } as OrderType);
   }
 
-  return list
-}
+  return list;
+};

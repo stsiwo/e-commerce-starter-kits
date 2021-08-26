@@ -24,7 +24,7 @@ import {
 } from "reducers/slices/domain/notification";
 import Badge from "@material-ui/core/Badge";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

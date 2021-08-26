@@ -2,40 +2,49 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { api } from "configs/axiosConfig";
 import { messageActions } from "reducers/slices/app";
 import { deleteUserPhoneFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
-import { DeleteUserPhoneActionType, userActions } from "reducers/slices/domain/user";
+import {
+  DeleteUserPhoneActionType,
+  userActions,
+} from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import {
+  AuthType,
+  FetchStatusEnum,
+  MessageTypeEnum,
+  UserTypeEnum,
+} from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { logger } from 'configs/logger';
-const log = logger(import.meta.url);
+import { logger } from "configs/logger";
+const log = logger(__filename);
 
 /**
- * a worker (generator)    
+ * a worker (generator)
  *
- *  - delete the other memebr's phone 
+ *  - delete the other memebr's phone
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
  *  - (UserType)
  *
- *      - (Guest): N/A (permission denied) 
+ *      - (Guest): N/A (permission denied)
  *      - (Member): N/A (permission denied)
- *      - (Admin): OK 
+ *      - (Admin): OK
  *
  *  - steps:
  *
  *  - note:
  *
- *    - userId always refers to other member's userid 
+ *    - userId always refers to other member's userid
  *
  **/
-export function* deleteUserPhoneWorker(action: PayloadAction<DeleteUserPhoneActionType>) {
-
+export function* deleteUserPhoneWorker(
+  action: PayloadAction<DeleteUserPhoneActionType>
+) {
   /**
    * get cur user type
    **/
-  const curAuth: AuthType = yield select(rsSelector.app.getAuth)
+  const curAuth: AuthType = yield select(rsSelector.app.getAuth);
 
   /**
    *
@@ -43,18 +52,17 @@ export function* deleteUserPhoneWorker(action: PayloadAction<DeleteUserPhoneActi
    *
    **/
   if (curAuth.userType === UserTypeEnum.ADMIN) {
-
     /**
      * update status for delete user data
      **/
     yield put(
       deleteUserPhoneFetchStatusActions.update(FetchStatusEnum.FETCHING)
-    )
+    );
 
     /**
      * grab this  domain
      **/
-    const apiUrl = `${API1_URL}/users/${action.payload.userId}/phones/${action.payload.phoneId}`
+    const apiUrl = `${API1_URL}/users/${action.payload.userId}/phones/${action.payload.phoneId}`;
 
     /**
      * fetch data
@@ -63,20 +71,25 @@ export function* deleteUserPhoneWorker(action: PayloadAction<DeleteUserPhoneActi
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() => api({
-      method: "DELETE",
-      url: apiUrl,
-    })
-      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
-      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
-    )
+    const response = yield call(() =>
+      api({
+        method: "DELETE",
+        url: apiUrl,
+      })
+        .then((response) => ({
+          fetchStatus: FetchStatusEnum.SUCCESS,
+          data: response.data,
+        }))
+        .catch((e) => ({
+          fetchStatus: FetchStatusEnum.FAILED,
+          message: e.response.data.message,
+        }))
+    );
 
     /**
      * update fetch status sucess
      **/
-    yield put(
-      deleteUserPhoneFetchStatusActions.update(response.fetchStatus)
-    )
+    yield put(deleteUserPhoneFetchStatusActions.update(response.fetchStatus));
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
@@ -86,9 +99,9 @@ export function* deleteUserPhoneWorker(action: PayloadAction<DeleteUserPhoneActi
       yield put(
         userActions.removePhone({
           phoneId: action.payload.phoneId,
-          userId: action.payload.userId
+          userId: action.payload.userId,
         })
-      )
+      );
 
       /**
        * update message
@@ -99,18 +112,16 @@ export function* deleteUserPhoneWorker(action: PayloadAction<DeleteUserPhoneActi
           type: MessageTypeEnum.SUCCESS,
           message: "deleted successfully.",
         })
-      )
-
+      );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-
-      log(response.message)
+      log(response.message);
 
       /**
        * update fetch status failed
        **/
       yield put(
         deleteUserPhoneFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      );
 
       /**
        * update message
@@ -119,17 +130,11 @@ export function* deleteUserPhoneWorker(action: PayloadAction<DeleteUserPhoneActi
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: response.message
+          message: response.message,
         })
-      )
+      );
     }
   } else {
-    log("permission denied: you are " + curAuth.userType)
+    log("permission denied: you are " + curAuth.userType);
   }
 }
-
-
-
-
-
-

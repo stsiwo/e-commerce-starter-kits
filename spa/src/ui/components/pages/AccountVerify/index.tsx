@@ -18,7 +18,7 @@ import { Link as RRLink } from "react-router-dom";
 import { getNanoId } from "src/utils";
 import { MessageTypeEnum } from "src/app";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

@@ -21,7 +21,7 @@ import CustomerContactConfirm from "./CustomerContactConfirm";
 import { checkoutSessionStatusActions } from "reducers/slices/domain/checkout";
 import { CheckoutSessionStatusEnum } from "domain/order/types";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

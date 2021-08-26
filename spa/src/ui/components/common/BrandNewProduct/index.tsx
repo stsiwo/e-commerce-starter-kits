@@ -1,15 +1,14 @@
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { ProductType } from "domain/product/types";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link as RRLink } from "react-router-dom";
+import { fetchPublicProductActionCreator } from "reducers/slices/domain/product";
 import { mSelector } from "src/selectors/selector";
 import ProductCard from "../ProductCard";
-import { fetchPublicProductActionCreator } from "reducers/slices/domain/product";
 import SingleLineList from "../SingleLineList";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -47,7 +46,7 @@ const BrandNewProduct: React.FunctionComponent<{}> = (props) => {
 
   const renderDomains: () => React.ReactNode = () => {
     return curDomains.slice(0, 5).map((product: ProductType) => {
-      return <ProductCard product={product} />;
+      return <ProductCard product={product} key={product.productId} />;
     });
   };
 
@@ -62,11 +61,13 @@ const BrandNewProduct: React.FunctionComponent<{}> = (props) => {
         {"Brand New"}
       </Typography>
       <SingleLineList renderDomainFunc={renderDomains} />
-      <Box component="div" className={classes.moreBtnBox}>
-        <Button component={RRLink} to={`/search`} variant="contained">
-          More Brad New Products
-        </Button>
-      </Box>
+      {curDomains.length > 0 && (
+        <Box component="div" className={classes.moreBtnBox}>
+          <Button component={RRLink} to={`/search`} variant="contained">
+            More Brad New Products
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };

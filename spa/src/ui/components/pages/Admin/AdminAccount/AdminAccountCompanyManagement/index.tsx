@@ -21,7 +21,7 @@ import { mSelector } from "src/selectors/selector";
 import { getProvinceList, getCountryList } from "src/utils";
 import MenuItem from "@material-ui/core/MenuItem";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

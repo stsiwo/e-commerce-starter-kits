@@ -21,7 +21,7 @@ import { useDispatch } from "react-redux";
 import { messageActions } from "reducers/slices/app";
 import { MessageTypeEnum } from "src/app";
 import { getNanoId } from "src/utils";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 export declare type ForgotPasswordDataType = {
   email: string;

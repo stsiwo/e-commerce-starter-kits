@@ -1,7 +1,7 @@
 import * as React from "react";
 import TechnicalError from "../TechnicalError";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 type ErrorBoundaryStateType = {
   hasError: boolean;

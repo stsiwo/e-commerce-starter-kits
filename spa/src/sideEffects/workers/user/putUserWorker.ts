@@ -5,14 +5,19 @@ import { messageActions } from "reducers/slices/app";
 import { putUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 import { PutUserActionType, userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import {
+  AuthType,
+  FetchStatusEnum,
+  MessageTypeEnum,
+  UserTypeEnum,
+} from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { logger } from 'configs/logger';
-const log = logger(import.meta.url);
+import { logger } from "configs/logger";
+const log = logger(__filename);
 
 /**
- * a worker (generator)    
+ * a worker (generator)
  *
  *  - put user item to replace
  *
@@ -20,23 +25,22 @@ const log = logger(import.meta.url);
  *
  *  - (UserType)
  *
- *      - (Guest): N/A (permission denied) 
+ *      - (Guest): N/A (permission denied)
  *      - (Member): N/A (permission denied)
- *      - (Admin): OK 
+ *      - (Admin): OK
  *
  *  - steps:
  *
  *  - note:
  *
- *    - userId must be the other member (not for auth) 
+ *    - userId must be the other member (not for auth)
  *
  **/
 export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
-
   /**
    * get cur user type
    **/
-  const curAuth: AuthType = yield select(rsSelector.app.getAuth)
+  const curAuth: AuthType = yield select(rsSelector.app.getAuth);
 
   /**
    *
@@ -44,18 +48,15 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
    *
    **/
   if (curAuth.userType === UserTypeEnum.ADMIN) {
-
     /**
      * update status for put user data
      **/
-    yield put(
-      putUserFetchStatusActions.update(FetchStatusEnum.FETCHING)
-    )
+    yield put(putUserFetchStatusActions.update(FetchStatusEnum.FETCHING));
 
     /**
      * grab this  domain
      **/
-    const apiUrl = `${API1_URL}/users/${action.payload.userId}`
+    const apiUrl = `${API1_URL}/users/${action.payload.userId}`;
 
     /**
      * fetch data
@@ -64,21 +65,26 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() => api({
-      method: "PUT",
-      url: apiUrl,
-      data: action.payload as UserCriteria
-    })
-      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
-      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
-    )
+    const response = yield call(() =>
+      api({
+        method: "PUT",
+        url: apiUrl,
+        data: action.payload as UserCriteria,
+      })
+        .then((response) => ({
+          fetchStatus: FetchStatusEnum.SUCCESS,
+          data: response.data,
+        }))
+        .catch((e) => ({
+          fetchStatus: FetchStatusEnum.FAILED,
+          message: e.response.data.message,
+        }))
+    );
 
     /**
      * update fetch status sucess
      **/
-    yield put(
-      putUserFetchStatusActions.update(response.fetchStatus)
-    )
+    yield put(putUserFetchStatusActions.update(response.fetchStatus));
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
@@ -88,9 +94,9 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
       yield put(
         userActions.updateUser({
           userId: action.payload.userId,
-          user: response.data
+          user: response.data,
         })
-      )
+      );
 
       /**
        * update message
@@ -101,10 +107,9 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
           type: MessageTypeEnum.SUCCESS,
           message: "updated successfully.",
         })
-      )
+      );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-
-      log(response.message)
+      log(response.message);
 
       /**
        * update message
@@ -113,15 +118,11 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: response.message
+          message: response.message,
         })
-      )
+      );
     }
   } else {
-    log("permission denied: you are " + curAuth.userType)
+    log("permission denied: you are " + curAuth.userType);
   }
 }
-
-
-
-

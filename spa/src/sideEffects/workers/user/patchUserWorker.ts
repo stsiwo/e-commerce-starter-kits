@@ -6,13 +6,13 @@ import { userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { logger } from 'configs/logger';
-const log = logger(import.meta.url);
+import { logger } from "configs/logger";
+const log = logger(__filename);
 
 /**
- * a worker (generator)    
+ * a worker (generator)
  *
- *  - patch (temporarly delete) this domain 
+ *  - patch (temporarly delete) this domain
  *
  *    - only update 'isDeleted' property to true in user table
  *
@@ -20,28 +20,27 @@ const log = logger(import.meta.url);
  *
  *  - (UserType)
  *
- *      - (Guest): N/A (permission denied) 
- *      - (Member): N/A (permission denied) 
- *      - (Admin): OK 
+ *      - (Guest): N/A (permission denied)
+ *      - (Member): N/A (permission denied)
+ *      - (Admin): OK
  *
  *  - steps:
  *
- *      (Admin): 
+ *      (Admin):
  *
- *        a1. send patch request to api to delete it temporary 
+ *        a1. send patch request to api to delete it temporary
  *
- *        a2. receive the response and delete it from redux store 
+ *        a2. receive the response and delete it from redux store
  *
  *  - note:
  *
  *
  **/
 export function* patchUserWorker(action: PayloadAction<UserType>) {
-
   /**
    * get cur user type
    **/
-  const curAuth: AuthType = yield select(rsSelector.app.getAuth)
+  const curAuth: AuthType = yield select(rsSelector.app.getAuth);
 
   /**
    *
@@ -49,18 +48,15 @@ export function* patchUserWorker(action: PayloadAction<UserType>) {
    *
    **/
   if (curAuth.userType === UserTypeEnum.ADMIN) {
-
     /**
      * update status for anime data
      **/
-    yield put(
-      patchUserFetchStatusActions.update(FetchStatusEnum.FETCHING)
-    )
+    yield put(patchUserFetchStatusActions.update(FetchStatusEnum.FETCHING));
 
     /**
      * grab all domain
      **/
-    const apiUrl = `${API1_URL}/users/${action.payload.userId}`
+    const apiUrl = `${API1_URL}/users/${action.payload.userId}`;
 
     /**
      * fetch data
@@ -69,45 +65,39 @@ export function* patchUserWorker(action: PayloadAction<UserType>) {
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() => api({
-      method: "PATCH",
-      url: apiUrl,
-      // TODO: make sure backend
-      data: {
-        isDeleted: true,
-        deletedAccountDate: new Date().toString(),
-      }
-    })
-      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
-      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
-    )
+    const response = yield call(() =>
+      api({
+        method: "PATCH",
+        url: apiUrl,
+        // TODO: make sure backend
+        data: {
+          isDeleted: true,
+          deletedAccountDate: new Date().toString(),
+        },
+      })
+        .then((response) => ({
+          fetchStatus: FetchStatusEnum.SUCCESS,
+          data: response.data,
+        }))
+        .catch((e) => ({
+          fetchStatus: FetchStatusEnum.FAILED,
+          message: e.response.data.message,
+        }))
+    );
 
     /**
      * update fetch status sucess
      **/
-    yield put(
-      patchUserFetchStatusActions.update(response.fetchStatus)
-    )
-
+    yield put(patchUserFetchStatusActions.update(response.fetchStatus));
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update categories domain in state
        *
        **/
-      yield put(
-        userActions.delete(action.payload)
-      )
-
-
+      yield put(userActions.delete(action.payload));
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-
-      log(response.message)
-
+      log(response.message);
     }
   }
 }
-
-
-
-

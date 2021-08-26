@@ -155,10 +155,10 @@ public class AdminUserEndpointTest {
     // act & assert
     ResultActions resultActions = mvc
         .perform(MockMvcRequestBuilders.get(targetUrl)
-            .cookie(this.authCookie)
+          .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
-            .accept(MediaType.APPLICATION_JSON))
+          .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
     MvcResult result = resultActions.andReturn();
 

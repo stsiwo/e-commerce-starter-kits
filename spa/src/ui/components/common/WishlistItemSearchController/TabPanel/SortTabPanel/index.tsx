@@ -11,7 +11,7 @@ import { wishlistItemQuerySortActions } from "reducers/slices/domain/wishlistIte
 import { mSelector } from "src/selectors/selector";
 import { WishlistItemSortEnum } from "domain/wishlist/types";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 //interface SortTabPanelPropsType {
 //

@@ -17,7 +17,7 @@ import {
 } from "reducers/slices/domain/category";
 import { mSelector } from "src/selectors/selector";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 interface AdminCategoryFormPropsType {
   category: CategoryType;

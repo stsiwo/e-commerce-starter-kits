@@ -2,44 +2,53 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { api } from "configs/axiosConfig";
 import { messageActions } from "reducers/slices/app";
 import { deleteSingleCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
-import { categoryActions, DeleteSingleCategoryActionType } from "reducers/slices/domain/category";
+import {
+  categoryActions,
+  DeleteSingleCategoryActionType,
+} from "reducers/slices/domain/category";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import {
+  AuthType,
+  FetchStatusEnum,
+  MessageTypeEnum,
+  UserTypeEnum,
+} from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { logger } from 'configs/logger';
-const log = logger(import.meta.url);
+import { logger } from "configs/logger";
+const log = logger(__filename);
 
 /**
- * a worker (generator)    
+ * a worker (generator)
  *
- *  - delete single category items 
+ *  - delete single category items
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
  *  - (UserType)
  *
- *      - (Guest): N/A (permission denied) 
- *      - (Member): N/A (permission denied) 
+ *      - (Guest): N/A (permission denied)
+ *      - (Member): N/A (permission denied)
  *      - (Admin): OK
  *
  *  - steps:
  *
- *      (Admin): 
+ *      (Admin):
  *
- *        a1. send delete request to api to delete the target entity 
+ *        a1. send delete request to api to delete the target entity
  *
  *        a2. receive the response and delete it from redux store if success
  *
  *  - note:
  *
  **/
-export function* deleteSingleCategoryWorker(action: PayloadAction<DeleteSingleCategoryActionType>) {
-
+export function* deleteSingleCategoryWorker(
+  action: PayloadAction<DeleteSingleCategoryActionType>
+) {
   /**
    * get cur user type
    **/
-  const curAuth: AuthType = yield select(rsSelector.app.getAuth)
+  const curAuth: AuthType = yield select(rsSelector.app.getAuth);
 
   /**
    *
@@ -47,18 +56,17 @@ export function* deleteSingleCategoryWorker(action: PayloadAction<DeleteSingleCa
    *
    **/
   if (curAuth.userType === UserTypeEnum.ADMIN) {
-
     /**
      * update status for anime data
      **/
     yield put(
       deleteSingleCategoryFetchStatusActions.update(FetchStatusEnum.FETCHING)
-    )
+    );
 
     /**
      * grab all domain
      **/
-    const apiUrl = `${API1_URL}/categories/${action.payload.categoryId}`
+    const apiUrl = `${API1_URL}/categories/${action.payload.categoryId}`;
 
     /**
      * fetch data
@@ -67,31 +75,34 @@ export function* deleteSingleCategoryWorker(action: PayloadAction<DeleteSingleCa
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() => api({
-      method: "DELETE",
-      url: apiUrl,
-    })
-      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS }))
-      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
-    )
+    const response = yield call(() =>
+      api({
+        method: "DELETE",
+        url: apiUrl,
+      })
+        .then((response) => ({ fetchStatus: FetchStatusEnum.SUCCESS }))
+        .catch((e) => ({
+          fetchStatus: FetchStatusEnum.FAILED,
+          message: e.response.data.message,
+        }))
+    );
     /**
      * update fetch status sucess
      **/
     yield put(
       deleteSingleCategoryFetchStatusActions.update(response.fetchStatus)
-    )
+    );
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
-
       /**
        * update categories domain in state
        *
        **/
       yield put(
         categoryActions.delete({
-          categoryId: action.payload.categoryId
+          categoryId: action.payload.categoryId,
         })
-      )
+      );
 
       /**
        * update message
@@ -102,11 +113,9 @@ export function* deleteSingleCategoryWorker(action: PayloadAction<DeleteSingleCa
           type: MessageTypeEnum.SUCCESS,
           message: "deleted successfully.",
         })
-      )
-
+      );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-
-      log(response.message)
+      log(response.message);
 
       /**
        * update message
@@ -117,11 +126,7 @@ export function* deleteSingleCategoryWorker(action: PayloadAction<DeleteSingleCa
           type: MessageTypeEnum.ERROR,
           message: response.message,
         })
-      )
+      );
     }
   }
 }
-
-
-
-

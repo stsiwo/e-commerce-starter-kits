@@ -39,7 +39,7 @@ import { mSelector, rsSelector } from "src/selectors/selector";
 import { renameFile } from "src/utils";
 import ProductImagesForm from "./ProductImagesForm";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 interface AdminProductFormPropsType {
   product: ProductType;

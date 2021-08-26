@@ -24,9 +24,9 @@ spring:
         format_sql: true
   # uploading file
   servlet:
-    mutipart:
+    multipart:
       max-file-size: 10MB
-      max-request-size: 10MB 
+      max-request-size: 10MB
   # pagination page starts from 1 (not 0)
   # this does not working.
   #data:
@@ -97,6 +97,10 @@ server:
     # show error message when javax.validation (JSR 303)
     include-message: always
     include-binding-errors: always
+
+  # this is necessary otherwise you cannot handle max-file-size exception since tomcat kill the request by default.
+  tomcat:
+    max-swallow-size: -1
 
 login:
   limit:

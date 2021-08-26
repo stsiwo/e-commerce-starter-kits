@@ -3,26 +3,34 @@ import { api } from "configs/axiosConfig";
 import { UserPhoneCriteria } from "domain/user/types";
 import { messageActions } from "reducers/slices/app";
 import { putUserPhoneFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
-import { PutUserPhoneActionType, userActions } from "reducers/slices/domain/user";
+import {
+  PutUserPhoneActionType,
+  userActions,
+} from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import {
+  AuthType,
+  FetchStatusEnum,
+  MessageTypeEnum,
+  UserTypeEnum,
+} from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { logger } from 'configs/logger';
-const log = logger(import.meta.url);
+import { logger } from "configs/logger";
+const log = logger(__filename);
 
 /**
- * a worker (generator)    
+ * a worker (generator)
  *
- *  - put user's phone of the other member (not for auth) 
+ *  - put user's phone of the other member (not for auth)
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
  *  - (UserType)
  *
- *      - (Guest): N/A (permission denied) 
+ *      - (Guest): N/A (permission denied)
  *      - (Member): N/A (permission denied)
- *      - (Admin): OK 
+ *      - (Admin): OK
  *
  *  - steps:
  *
@@ -31,12 +39,13 @@ const log = logger(import.meta.url);
  *    - userId: the other member
  *
  **/
-export function* putUserPhoneWorker(action: PayloadAction<PutUserPhoneActionType>) {
-
+export function* putUserPhoneWorker(
+  action: PayloadAction<PutUserPhoneActionType>
+) {
   /**
    * get cur user type
    **/
-  const curAuth: AuthType = yield select(rsSelector.app.getAuth)
+  const curAuth: AuthType = yield select(rsSelector.app.getAuth);
 
   /**
    *
@@ -44,18 +53,15 @@ export function* putUserPhoneWorker(action: PayloadAction<PutUserPhoneActionType
    *
    **/
   if (curAuth.userType === UserTypeEnum.ADMIN) {
-
     /**
      * update status for put user data
      **/
-    yield put(
-      putUserPhoneFetchStatusActions.update(FetchStatusEnum.FETCHING)
-    )
+    yield put(putUserPhoneFetchStatusActions.update(FetchStatusEnum.FETCHING));
 
     /**
      * grab this  domain
      **/
-    const apiUrl = `${API1_URL}/users/${action.payload.userId}/phones/${action.payload.phoneId}`
+    const apiUrl = `${API1_URL}/users/${action.payload.userId}/phones/${action.payload.phoneId}`;
 
     /**
      * fetch data
@@ -64,26 +70,31 @@ export function* putUserPhoneWorker(action: PayloadAction<PutUserPhoneActionType
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() => api({
-      method: "PUT",
-      url: apiUrl,
-      data: {
-        phoneNumber: action.payload.phoneNumber,
-        countryCode: action.payload.countryCode,
-        isSelected: action.payload.isSelected,
-        phoneId: action.payload.phoneId
-      } as UserPhoneCriteria
-    })
-      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
-      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
-    )
+    const response = yield call(() =>
+      api({
+        method: "PUT",
+        url: apiUrl,
+        data: {
+          phoneNumber: action.payload.phoneNumber,
+          countryCode: action.payload.countryCode,
+          isSelected: action.payload.isSelected,
+          phoneId: action.payload.phoneId,
+        } as UserPhoneCriteria,
+      })
+        .then((response) => ({
+          fetchStatus: FetchStatusEnum.SUCCESS,
+          data: response.data,
+        }))
+        .catch((e) => ({
+          fetchStatus: FetchStatusEnum.FAILED,
+          message: e.response.data.message,
+        }))
+    );
 
     /**
      * update fetch status sucess
      **/
-    yield put(
-      putUserPhoneFetchStatusActions.update(response.fetchStatus)
-    )
+    yield put(putUserPhoneFetchStatusActions.update(response.fetchStatus));
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
@@ -95,7 +106,7 @@ export function* putUserPhoneWorker(action: PayloadAction<PutUserPhoneActionType
           phone: response.data,
           userId: action.payload.userId,
         })
-      )
+      );
 
       /**
        * update message
@@ -106,18 +117,14 @@ export function* putUserPhoneWorker(action: PayloadAction<PutUserPhoneActionType
           type: MessageTypeEnum.SUCCESS,
           message: "updated successfully.",
         })
-      )
-
+      );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-
-      log(response.message)
+      log(response.message);
 
       /**
        * update fetch status failed
        **/
-      yield put(
-        putUserPhoneFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      yield put(putUserPhoneFetchStatusActions.update(FetchStatusEnum.FAILED));
 
       /**
        * update message
@@ -126,17 +133,11 @@ export function* putUserPhoneWorker(action: PayloadAction<PutUserPhoneActionType
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: response.message
+          message: response.message,
         })
-      )
+      );
     }
   } else {
-    log("permission denied: you are " + curAuth.userType)
+    log("permission denied: you are " + curAuth.userType);
   }
 }
-
-
-
-
-
-

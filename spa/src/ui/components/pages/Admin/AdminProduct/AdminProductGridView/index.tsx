@@ -46,7 +46,7 @@ import { mSelector, rsSelector } from "src/selectors/selector";
 import AdminProductFormDialog from "../AdminProductFormDialog";
 import AdminProductSearchController from "../ADminProductSearchController";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 declare type AdminProductGridViewPropsType = {};
 

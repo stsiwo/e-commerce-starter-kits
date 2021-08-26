@@ -32,7 +32,7 @@ import {
 } from "reducers/slices/domain/product";
 import { mSelector } from "src/selectors/selector";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 interface AdminProductVariantFormPropsType {
   productVariant: ProductVariantType;

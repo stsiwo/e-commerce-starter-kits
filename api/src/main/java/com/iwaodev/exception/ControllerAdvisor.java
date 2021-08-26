@@ -14,7 +14,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @ControllerAdvice
 public class ControllerAdvisor extends ResponseEntityExceptionHandler {
@@ -62,6 +66,18 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
         HttpStatus.BAD_REQUEST.toString(), ex.getBindingResult().getAllErrors().get(0).getDefaultMessage(),
         ((ServletWebRequest) request).getRequest().getRequestURI());
 
+    return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(MaxUploadSizeExceededException.class)
+  public ResponseEntity<Object> handleMaxSizeException(
+          MaxUploadSizeExceededException ex,
+          HttpServletRequest request,
+          HttpServletResponse response) {
+
+    ErrorBaseResponse errorResponse = new ErrorBaseResponse(LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(),
+            HttpStatus.BAD_REQUEST.toString(), ex.getMessage(), ((ServletWebRequest) request).getRequest().getRequestURI());
+    logger.debug(ex.getMessage());
     return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
   }
 

@@ -21,7 +21,7 @@ import { MessageTypeEnum } from "src/app";
 import { mSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 export declare type MemberLoginDataType = {
   email: string;

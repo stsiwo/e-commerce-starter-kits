@@ -24,6 +24,8 @@ public interface FileService {
   public String extractFileNameFromPath(String path);
 
   public String generateHashedFileName(String originalFileName);
+
+  public Boolean isExceedMaxSize(MultipartFile file);
 }
 
 

@@ -27,7 +27,7 @@ import ColorCell from "../GridData/ColorCell";
 import SizeCell from "../GridData/SizeCell";
 import { logger } from "configs/logger";
 import { isReachMaxQuantity } from "domain/cart";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 /**
  * need 'orderDetail' or 'product/variant'

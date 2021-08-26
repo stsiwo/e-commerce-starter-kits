@@ -45,7 +45,7 @@ import {
 import { FetchStatusEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

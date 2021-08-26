@@ -6,11 +6,11 @@ import { orderActions } from "reducers/slices/domain/order";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { logger } from 'configs/logger';
-const log = logger(import.meta.url);
+import { logger } from "configs/logger";
+const log = logger(__filename);
 
 /**
- * a worker (generator)    
+ * a worker (generator)
  *
  *  - put this domain to replace
  *
@@ -18,29 +18,28 @@ const log = logger(import.meta.url);
  *
  *  - (UserType)
  *
- *      - (Guest): N/A (permission denied) 
- *      - (Member): N/A (permission denied) 
- *      - (Admin): OK 
+ *      - (Guest): N/A (permission denied)
+ *      - (Member): N/A (permission denied)
+ *      - (Admin): OK
  *
  *  - steps:
  *
- *      (Admin): 
+ *      (Admin):
  *
- *        a1. send put request to api to put a new data 
+ *        a1. send put request to api to put a new data
  *
  *        a2. receive the response and save it to redux store
  *
  *  - note:
  *
- *    - keep the same id since it is replacement 
+ *    - keep the same id since it is replacement
  *
  **/
 export function* putOrderWorker(action: PayloadAction<OrderType>) {
-
   /**
    * get cur user type
    **/
-  const curAuth: AuthType = yield select(rsSelector.app.getAuth)
+  const curAuth: AuthType = yield select(rsSelector.app.getAuth);
 
   /**
    *
@@ -48,18 +47,15 @@ export function* putOrderWorker(action: PayloadAction<OrderType>) {
    *
    **/
   if (curAuth.userType === UserTypeEnum.ADMIN) {
-
     /**
      * update status for put order data
      **/
-    yield put(
-      putOrderFetchStatusActions.update(FetchStatusEnum.FETCHING)
-    )
+    yield put(putOrderFetchStatusActions.update(FetchStatusEnum.FETCHING));
 
     /**
      * grab this  domain
      **/
-    const apiUrl = `${API1_URL}/orders/${action.payload.orderId}`
+    const apiUrl = `${API1_URL}/orders/${action.payload.orderId}`;
 
     /**
      * fetch data
@@ -68,40 +64,34 @@ export function* putOrderWorker(action: PayloadAction<OrderType>) {
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() => api({
-      method: "PUT",
-      url: apiUrl,
-      data: action.payload
-    })
-      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
-      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
-    )
+    const response = yield call(() =>
+      api({
+        method: "PUT",
+        url: apiUrl,
+        data: action.payload,
+      })
+        .then((response) => ({
+          fetchStatus: FetchStatusEnum.SUCCESS,
+          data: response.data,
+        }))
+        .catch((e) => ({
+          fetchStatus: FetchStatusEnum.FAILED,
+          message: e.response.data.message,
+        }))
+    );
     /**
      * update fetch status sucess
      **/
-    yield put(
-      putOrderFetchStatusActions.update(response.fetchStatus)
-    )
+    yield put(putOrderFetchStatusActions.update(response.fetchStatus));
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update this domain in state
        *
        **/
-      yield put(
-        orderActions.concat(response.data)
-      )
-
-
+      yield put(orderActions.concat(response.data));
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-
-      log(response.message)
-
+      log(response.message);
     }
   }
 }
-
-
-
-
-

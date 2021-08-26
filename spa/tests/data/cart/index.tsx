@@ -1,10 +1,12 @@
 import { CartItemType } from "domain/cart/types";
-import { testGuestUser } from "../user";
 import faker from "../faker";
 import { generateProductList, generateProductVariantList } from "../product";
+import { testGuestUser } from "../user";
 
-export const generateCartItemList: (count?: number) => CartItemType[] = (count = 1) => {
-  const list = []
+export const generateCartItemList: (count?: number) => CartItemType[] = (
+  count = 1
+) => {
+  const list = [];
 
   for (let i = 0; i < count; i++) {
     list.push({
@@ -13,11 +15,11 @@ export const generateCartItemList: (count?: number) => CartItemType[] = (count =
       isSelected: true,
       product: generateProductList(1)[0],
       variant: generateProductVariantList(1)[0],
-      quantity: faker.random.number(4),
+      quantity: faker.datatype.number(4),
       createdAt: new Date(faker.date.past()),
       updatedAt: new Date(faker.date.past()),
-    } as CartItemType)
+    } as CartItemType);
   }
 
-  return list
-}
+  return list;
+};

@@ -6,16 +6,21 @@ import { postSessionTimeoutOrderEventFetchStatusActions } from "reducers/slices/
 import { checkoutOrderActions } from "reducers/slices/domain/checkout";
 import { PostSessionTimeoutOrderEventActionType } from "reducers/slices/domain/order";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import {
+  AuthType,
+  FetchStatusEnum,
+  MessageTypeEnum,
+  UserTypeEnum,
+} from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { logger } from 'configs/logger';
-const log = logger(import.meta.url);
+import { logger } from "configs/logger";
+const log = logger(__filename);
 
 /**
- * a worker (generator)    
+ * a worker (generator)
  *
- *  - delete single order event 
+ *  - delete single order event
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
@@ -23,76 +28,88 @@ const log = logger(import.meta.url);
  *
  *      - (Guest): OK
  *      - (Member): OK
- *      - (Admin): N/A 
+ *      - (Admin): N/A
  *
  *  - steps:
  *
- *      (Admin): 
+ *      (Admin):
  *
- *        a1. send delete request to api to delete the target entity 
+ *        a1. send delete request to api to delete the target entity
  *
  *        a2. receive the response and delete it from redux store if success
  *
  *  - note:
  *
  **/
-export function* postSessionTimeoutOrderEventWorker(action: PayloadAction<PostSessionTimeoutOrderEventActionType>) {
-
+export function* postSessionTimeoutOrderEventWorker(
+  action: PayloadAction<PostSessionTimeoutOrderEventActionType>
+) {
   /**
    * get cur user type
    **/
-  const curAuth: AuthType = yield select(rsSelector.app.getAuth)
+  const curAuth: AuthType = yield select(rsSelector.app.getAuth);
 
   /**
    *
    * Admin User Type
    *
    **/
-  if (curAuth.userType === UserTypeEnum.GUEST || curAuth.userType === UserTypeEnum.MEMBER) {
-
+  if (
+    curAuth.userType === UserTypeEnum.GUEST ||
+    curAuth.userType === UserTypeEnum.MEMBER
+  ) {
     /**
      * update status for put product data
      **/
     yield put(
-      postSessionTimeoutOrderEventFetchStatusActions.update(FetchStatusEnum.FETCHING)
-    )
+      postSessionTimeoutOrderEventFetchStatusActions.update(
+        FetchStatusEnum.FETCHING
+      )
+    );
 
     /**
      * grab this domain
      **/
-    const apiUrl = `${API1_URL}/orders/${action.payload.orderId}/events/session-timeout`
+    const apiUrl = `${API1_URL}/orders/${action.payload.orderId}/events/session-timeout`;
 
     /**
      * fetch data
      **/
 
     // start fetching
-    const response = yield call(() => api({
-      method: "POST",
-      url: apiUrl,
-      data: {
-        orderNumber: action.payload.orderNumber
-      } as SessionTimeoutOrderEventCriteria
-    })
-      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
-      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
-    )
+    const response = yield call(() =>
+      api({
+        method: "POST",
+        url: apiUrl,
+        data: {
+          orderNumber: action.payload.orderNumber,
+        } as SessionTimeoutOrderEventCriteria,
+      })
+        .then((response) => ({
+          fetchStatus: FetchStatusEnum.SUCCESS,
+          data: response.data,
+        }))
+        .catch((e) => ({
+          fetchStatus: FetchStatusEnum.FAILED,
+          message: e.response.data.message,
+        }))
+    );
 
     /**
      * update fetch status sucess
      **/
     yield put(
-      postSessionTimeoutOrderEventFetchStatusActions.update(response.fetchStatus)
-    )
+      postSessionTimeoutOrderEventFetchStatusActions.update(
+        response.fetchStatus
+      )
+    );
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update product domain in state
        *
        **/
-      yield put(
-        checkoutOrderActions.update(response.data)
-      )
+      yield put(checkoutOrderActions.update(response.data));
 
       /**
        * update message
@@ -103,9 +120,8 @@ export function* postSessionTimeoutOrderEventWorker(action: PayloadAction<PostSe
           type: MessageTypeEnum.ERROR,
           message: "sorry, your session is timeout. please start over again.",
         })
-      )
+      );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-
       /**
        * update message
        **/
@@ -113,13 +129,11 @@ export function* postSessionTimeoutOrderEventWorker(action: PayloadAction<PostSe
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: response.message
+          message: response.message,
         })
-      )
+      );
     }
   } else {
-    log("permission denied. you are " + curAuth.userType)
+    log("permission denied. you are " + curAuth.userType);
   }
 }
-
-

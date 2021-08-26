@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { putAuthActionCreator } from "reducers/slices/app";
 import { mSelector } from "src/selectors/selector";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

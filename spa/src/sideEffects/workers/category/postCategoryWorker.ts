@@ -4,47 +4,56 @@ import { CategoryCriteria, NormalizedCategoryType } from "domain/product/types";
 import { normalize } from "normalizr";
 import { messageActions } from "reducers/slices/app";
 import { postCategoryFetchStatusActions } from "reducers/slices/app/fetchStatus/category";
-import { categoryActions, PostCategoryActionType } from "reducers/slices/domain/category";
+import {
+  categoryActions,
+  PostCategoryActionType,
+} from "reducers/slices/domain/category";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import {
+  AuthType,
+  FetchStatusEnum,
+  MessageTypeEnum,
+  UserTypeEnum,
+} from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
 import { categorySchemaEntity } from "states/state";
-import { logger } from 'configs/logger';
-const log = logger(import.meta.url);
+import { logger } from "configs/logger";
+const log = logger(__filename);
 
 /**
- * a worker (generator)    
+ * a worker (generator)
  *
- *  - post category of current user 
+ *  - post category of current user
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
  *  - (UserType)
  *
- *      - (Guest): N/A (permission denied) 
- *      - (Member): N/A (permission denied) 
- *      - (Admin): OK 
+ *      - (Guest): N/A (permission denied)
+ *      - (Member): N/A (permission denied)
+ *      - (Admin): OK
  *
  *  - steps:
  *
- *      (Admin): 
+ *      (Admin):
  *
- *        a1. send post request to api to post a new data 
+ *        a1. send post request to api to post a new data
  *
  *        a2. receive the response and save it to redux store
  *
  *  - note:
  *
  *    - payload (e.g., CategoryType) does not have any id yet.
- *  
+ *
  **/
-export function* postCategoryWorker(action: PayloadAction<PostCategoryActionType>) {
-
+export function* postCategoryWorker(
+  action: PayloadAction<PostCategoryActionType>
+) {
   /**
    * get cur user type
    **/
-  const curAuth: AuthType = yield select(rsSelector.app.getAuth)
+  const curAuth: AuthType = yield select(rsSelector.app.getAuth);
 
   /**
    *
@@ -52,18 +61,15 @@ export function* postCategoryWorker(action: PayloadAction<PostCategoryActionType
    *
    **/
   if (curAuth.userType === UserTypeEnum.ADMIN) {
-
     /**
      * update status for anime data
      **/
-    yield put(
-      postCategoryFetchStatusActions.update(FetchStatusEnum.FETCHING)
-    )
+    yield put(postCategoryFetchStatusActions.update(FetchStatusEnum.FETCHING));
 
     /**
      * grab all domain
      **/
-    const apiUrl = `${API1_URL}/categories`
+    const apiUrl = `${API1_URL}/categories`;
 
     /**
      * fetch data
@@ -72,34 +78,38 @@ export function* postCategoryWorker(action: PayloadAction<PostCategoryActionType
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() => api({
-      method: "POST",
-      url: apiUrl,
-      data: {
-        categoryName: action.payload.categoryName,
-        categoryPath: action.payload.categoryPath,
-        categoryDescription: action.payload.categoryDescription,
-      } as CategoryCriteria
-    })
-      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
-      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
-    )
+    const response = yield call(() =>
+      api({
+        method: "POST",
+        url: apiUrl,
+        data: {
+          categoryName: action.payload.categoryName,
+          categoryPath: action.payload.categoryPath,
+          categoryDescription: action.payload.categoryDescription,
+        } as CategoryCriteria,
+      })
+        .then((response) => ({
+          fetchStatus: FetchStatusEnum.SUCCESS,
+          data: response.data,
+        }))
+        .catch((e) => ({
+          fetchStatus: FetchStatusEnum.FAILED,
+          message: e.response.data.message,
+        }))
+    );
 
     /**
      * update fetch status sucess
      **/
-    yield put(
-      postCategoryFetchStatusActions.update(response.fetchStatus)
-    )
+    yield put(postCategoryFetchStatusActions.update(response.fetchStatus));
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
-
       /**
        * normalize response data
        *
        *  - TODO: make sure response structure with remote api
        **/
-      const normalizedData = normalize(response.data, categorySchemaEntity)
+      const normalizedData = normalize(response.data, categorySchemaEntity);
 
       /**
        * update categories domain in state
@@ -107,8 +117,10 @@ export function* postCategoryWorker(action: PayloadAction<PostCategoryActionType
        **/
       yield put(
         // be careful when normalized a single object, you need to append its domain name (plural) to 'entities'
-        categoryActions.merge(normalizedData.entities.categories as NormalizedCategoryType)
-      )
+        categoryActions.merge(
+          normalizedData.entities.categories as NormalizedCategoryType
+        )
+      );
 
       /**
        * update message
@@ -119,11 +131,9 @@ export function* postCategoryWorker(action: PayloadAction<PostCategoryActionType
           type: MessageTypeEnum.SUCCESS,
           message: "added successfully.",
         })
-      )
-
+      );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-
-      log(response.message)
+      log(response.message);
       /**
        * update message
        **/
@@ -133,9 +143,7 @@ export function* postCategoryWorker(action: PayloadAction<PostCategoryActionType
           type: MessageTypeEnum.ERROR,
           message: response.message,
         })
-      )
+      );
     }
   }
 }
-
-

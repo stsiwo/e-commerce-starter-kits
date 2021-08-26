@@ -4,24 +4,29 @@ import { messageActions } from "reducers/slices/app";
 import { deleteUserAvatarImageFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 import { DeleteUserAvatarImageActionType } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import {
+  AuthType,
+  FetchStatusEnum,
+  MessageTypeEnum,
+  UserTypeEnum,
+} from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { logger } from 'configs/logger';
-const log = logger(import.meta.url);
+import { logger } from "configs/logger";
+const log = logger(__filename);
 
 /**
- * a worker (generator)    
+ * a worker (generator)
  *
- *  - delete user avatar image 
+ *  - delete user avatar image
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
  *  - (UserType)
  *
- *      - (Guest): N/A (permission denied) 
+ *      - (Guest): N/A (permission denied)
  *      - (Member): N/A (permission denied)
- *      - (Admin): OK 
+ *      - (Admin): OK
  *
  *  - steps:
  *
@@ -32,12 +37,13 @@ const log = logger(import.meta.url);
  *
  *
  **/
-export function* deleteUserAvatarImageWorker(action: PayloadAction<DeleteUserAvatarImageActionType>) {
-
+export function* deleteUserAvatarImageWorker(
+  action: PayloadAction<DeleteUserAvatarImageActionType>
+) {
   /**
    * get cur user type
    **/
-  const curAuth: AuthType = yield select(rsSelector.app.getAuth)
+  const curAuth: AuthType = yield select(rsSelector.app.getAuth);
 
   /**
    *
@@ -45,40 +51,45 @@ export function* deleteUserAvatarImageWorker(action: PayloadAction<DeleteUserAva
    *
    **/
   if (curAuth.userType === UserTypeEnum.ADMIN) {
-
     /**
      * update status for put user data
      **/
     yield put(
       deleteUserAvatarImageFetchStatusActions.update(FetchStatusEnum.FETCHING)
-    )
+    );
 
     /**
      * grab this  domain
      **/
-    const apiUrl = `${API1_URL}/users/${action.payload.userId}/avatar-image`
+    const apiUrl = `${API1_URL}/users/${action.payload.userId}/avatar-image`;
 
     /**
      * fetch data
      **/
 
     // start fetching
-    const response = yield call(() => api({
-      method: "DELETE",
-      url: apiUrl,
-    })
-      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
-      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
-    )
+    const response = yield call(() =>
+      api({
+        method: "DELETE",
+        url: apiUrl,
+      })
+        .then((response) => ({
+          fetchStatus: FetchStatusEnum.SUCCESS,
+          data: response.data,
+        }))
+        .catch((e) => ({
+          fetchStatus: FetchStatusEnum.FAILED,
+          message: e.response.data.message,
+        }))
+    );
 
     /**
      * update fetch status sucess
      **/
     yield put(
       deleteUserAvatarImageFetchStatusActions.update(response.fetchStatus)
-    )
+    );
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
-
       /**
        * update this domain in state
        *
@@ -98,17 +109,16 @@ export function* deleteUserAvatarImageWorker(action: PayloadAction<DeleteUserAva
           type: MessageTypeEnum.SUCCESS,
           message: "deleted successfully.",
         })
-      )
+      );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-
-      log(response.message)
+      log(response.message);
 
       /**
        * update fetch status failed
        **/
       yield put(
         deleteUserAvatarImageFetchStatusActions.update(FetchStatusEnum.FAILED)
-      )
+      );
 
       /**
        * update message
@@ -117,16 +127,11 @@ export function* deleteUserAvatarImageWorker(action: PayloadAction<DeleteUserAva
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: response.message
+          message: response.message,
         })
-      )
+      );
     }
   } else {
-    log("permission defined: you are " + curAuth.userType)
+    log("permission defined: you are " + curAuth.userType);
   }
 }
-
-
-
-
-

@@ -113,6 +113,16 @@
 
       - use "Button" instead with Icon.
 
+    - Jest with TypeScript:
+
+      - TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'esnext' or 'system'.
+
+      - background: Jest does not support this (ES2020) yet.
+
+      - workaround: remove this import.meta and don't use this until Jest support this. use "__filename" instead.
+
+      - src: https://github.com/facebook/jest/issues/11167
+
 ### Integration Link (material-ui) with React-Router-Dom Library
 
     - read this: https://material-ui.com/guides/composition/#link

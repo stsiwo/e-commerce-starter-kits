@@ -36,7 +36,7 @@ import { mSelector, rsSelector } from "src/selectors/selector";
 import { toDateString } from "src/utils";
 import OrderEventUpdateFormDialog from "../OrderEventUpdateFormDialog";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 /**
  * TODO: review this when test data is available.

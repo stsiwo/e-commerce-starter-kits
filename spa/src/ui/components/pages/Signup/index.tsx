@@ -21,7 +21,7 @@ import { useHistory } from "react-router";
 import { getNanoId } from "src/utils";
 import { MessageTypeEnum } from "src/app";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 export declare type MemberSignupDataType = {
   firstName: string;

@@ -564,6 +564,52 @@ public class MemberUserEndpointTest {
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
   }
 
+  /**
+   * this does not work since MockMVC not trigger the spring.servlet.multipart.max-size.
+   * see: https://stackoverflow.com/questions/55514396/spring-multipartfile-parameter-not-respecting-configured-maxfilesize
+   *
+   * need to find the workaround.
+   *
+   * @throws Exception
+   */
+  //@Test
+  //// @Sql(scripts = {
+  //// "classpath:/integration/user/shouldMemberUserUploadAvatar.sql" })
+  //public void shouldNotMemberUserUploadAvatarSinceExceedMaxFileSize(
+  //) throws Exception {
+
+  //  Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
+
+  //  // dummy form json
+  //  // JsonNode dummyFormJson =
+  //  // this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+
+  //  // String dummyFormJsonString = dummyFormJson.toString();
+
+  //  // arrange
+  //  String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+  //  String dummyUserPath = "/" + dummyUserIdString;
+  //  String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/avatar-image";
+
+  //  byte[] bytes = new byte[1024 * 1024 * 1000]; // 100 mb
+  //  MockMultipartFile fileAtZeroIndex = new MockMultipartFile("avatarImage", "product-image-0.jpeg", "image/jpeg",
+  //          bytes);
+
+  //  logger.info("satoshi");
+  //  logger.info("" + fileAtZeroIndex.getBytes().length);
+
+  //  // act
+  //  ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.multipart(targetUrl) // create
+  //                  .file(fileAtZeroIndex).contentType(MediaType.MULTIPART_FORM_DATA).cookie(this.authCookie)
+  //                  .cookie(this.csrfCookie).header("csrf-token", this.authInfo.getCsrfToken()).accept(MediaType.APPLICATION_JSON))
+  //          .andDo(print()).andExpect(status().isBadRequest());
+
+  //  MvcResult result = resultActions.andReturn();
+
+  //  // assert
+  //  assertThat(result.getResponse().getErrorMessage()).isEqualTo("file too big.");
+  //}
+
   @Test
   // @Sql(scripts = {
   // "classpath:/integration/user/shouldMemberUserUploadAvatar.sql" })

@@ -23,7 +23,7 @@ import { AuthType, UserTypeEnum } from "src/app";
 import { mSelector } from "src/selectors/selector";
 import Typography from "@material-ui/core/Typography";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 interface OrderEventUpdateFormDialogPropsType {
   open: boolean;

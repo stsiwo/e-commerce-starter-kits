@@ -1,60 +1,67 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { api } from "configs/axiosConfig";
 import { OrderEventCriteria } from "domain/order/types";
-import { messageActions, PostAuthOrderEventActionType } from "reducers/slices/app";
+import {
+  messageActions,
+  PostAuthOrderEventActionType,
+} from "reducers/slices/app";
 import { postOrderEventFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
 import { orderActions } from "reducers/slices/domain/order";
 import { call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import {
+  AuthType,
+  FetchStatusEnum,
+  MessageTypeEnum,
+  UserTypeEnum,
+} from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { logger } from 'configs/logger';
-const log = logger(import.meta.url);
+import { logger } from "configs/logger";
+const log = logger(__filename);
 
 /**
- * a worker (generator)    
+ * a worker (generator)
  *
- *  - fetch wishlist items of current user 
+ *  - fetch wishlist items of current user
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
  *  - (UserType)
  *
- *      - (Guest): N/A 
+ *      - (Guest): N/A
  *      - (Member): send api request to grab data
  *      - (Admin): N/A
  *
  *  - steps:
  *
- *      (Member): 
+ *      (Member):
  *
  *        m1. send fetch request to api to grab data
  *
  *        m2. receive the response and save it to redux store
- *  
+ *
  **/
-export function* postAuthOrderEventWorker(action: PayloadAction<PostAuthOrderEventActionType>) {
-
+export function* postAuthOrderEventWorker(
+  action: PayloadAction<PostAuthOrderEventActionType>
+) {
   /**
    * get cur user type
    **/
-  const curAuth: AuthType = yield select(rsSelector.app.getAuth)
-
+  const curAuth: AuthType = yield select(rsSelector.app.getAuth);
 
   if (curAuth.userType === UserTypeEnum.MEMBER) {
-
-    log("start calling post auth order event worker:)")
+    log("start calling post auth order event worker:)");
 
     /**
      * update status for anime data
      **/
     yield put(
       postOrderEventFetchStatusActions.update(FetchStatusEnum.FETCHING)
-    )
+    );
     /**
      * grab all domain
      **/
-    const apiUrl = `${API1_URL}/users/${action.payload.userId}/orders/${action.payload.orderId}/events`
+    const apiUrl = `${API1_URL}/users/${action.payload.userId}/orders/${action.payload.orderId}/events`;
 
     /**
      * fetch data
@@ -63,25 +70,30 @@ export function* postAuthOrderEventWorker(action: PayloadAction<PostAuthOrderEve
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() => api({
-      method: "POST",
-      url: apiUrl,
-      data: {
-        orderStatus: action.payload.orderStatus,
-        note: action.payload.note,
-        userId: action.payload.userId
-      } as OrderEventCriteria
-    })
-      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
-      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
-    )
+    const response = yield call(() =>
+      api({
+        method: "POST",
+        url: apiUrl,
+        data: {
+          orderStatus: action.payload.orderStatus,
+          note: action.payload.note,
+          userId: action.payload.userId,
+        } as OrderEventCriteria,
+      })
+        .then((response) => ({
+          fetchStatus: FetchStatusEnum.SUCCESS,
+          data: response.data,
+        }))
+        .catch((e) => ({
+          fetchStatus: FetchStatusEnum.FAILED,
+          message: e.response.data.message,
+        }))
+    );
 
     /**
      * update fetch status sucess
      **/
-    yield put(
-      postOrderEventFetchStatusActions.update(response.fetchStatus)
-    )
+    yield put(postOrderEventFetchStatusActions.update(response.fetchStatus));
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
@@ -89,11 +101,9 @@ export function* postAuthOrderEventWorker(action: PayloadAction<PostAuthOrderEve
        *
        * don't use 'merge' since no cache
        **/
-      log("order dto in resposne")
-      log(response.data)
-      yield put(
-        orderActions.updateOne(response.data)
-      )
+      log("order dto in resposne");
+      log(response.data);
+      yield put(orderActions.updateOne(response.data));
 
       /**
        * update message
@@ -102,13 +112,11 @@ export function* postAuthOrderEventWorker(action: PayloadAction<PostAuthOrderEve
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.SUCCESS,
-          message: "we received your request." 
+          message: "we received your request.",
         })
-      )
-
+      );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-
-      log(response.message)
+      log(response.message);
 
       /**
        * update message
@@ -117,11 +125,9 @@ export function* postAuthOrderEventWorker(action: PayloadAction<PostAuthOrderEve
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: response.message
+          message: response.message,
         })
-      )
+      );
     }
   }
 }
-
-

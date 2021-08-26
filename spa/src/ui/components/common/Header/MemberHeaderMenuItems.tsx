@@ -29,7 +29,7 @@ import {
 import { cartModalActions } from "reducers/slices/ui";
 import { mSelector } from "src/selectors/selector";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 declare interface MenuItemType {
   url: string;

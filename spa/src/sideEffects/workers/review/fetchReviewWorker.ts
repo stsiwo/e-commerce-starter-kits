@@ -1,101 +1,109 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { api } from "configs/axiosConfig";
 import { getReviewFetchStatusActions } from "reducers/slices/app/fetchStatus/review";
-import { reviewActions, reviewPaginationPageActions, reviewPaginationTotalElementsActions, reviewPaginationTotalPagesActions } from "reducers/slices/domain/review";
+import {
+  reviewActions,
+  reviewPaginationPageActions,
+  reviewPaginationTotalElementsActions,
+  reviewPaginationTotalPagesActions,
+} from "reducers/slices/domain/review";
 import { all, call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { generateQueryString } from "src/utils";
-import { logger } from 'configs/logger';
-const log = logger(import.meta.url);
+import { logger } from "configs/logger";
+const log = logger(__filename);
 
 /**
- * a worker (generator)    
+ * a worker (generator)
  *
- *  - fetch review items of current review 
+ *  - fetch review items of current review
  *
  *  - NOT gonna use caching since it might be stale soon and the review can update any time.
  *
  *  - (ReviewType)
  *
- *      - (Guest): N/A (permission denied) 
- *      - (Member): N/A (permission denied) 
+ *      - (Guest): N/A (permission denied)
+ *      - (Member): N/A (permission denied)
  *      - (Admin): send fetch request and receive data and save it  to redux store
  *
  *  - steps:
  *
- *      (Admin): 
+ *      (Admin):
  *
  *        a1. send fetch request to api to grab data
  *
  *        a2. receive the response and save it to redux store
- *  
+ *
  **/
 export function* fetchReviewWorker(action: PayloadAction<{}>) {
-
   /**
    * get cur review type
    *
    **/
-  const curAuth: AuthType = yield select(rsSelector.app.getAuth)
-
+  const curAuth: AuthType = yield select(rsSelector.app.getAuth);
 
   if (curAuth.userType === UserTypeEnum.ADMIN) {
-
     /**
      * update status for anime data
      **/
-    yield put(
-      getReviewFetchStatusActions.update(FetchStatusEnum.FETCHING)
-    )
+    yield put(getReviewFetchStatusActions.update(FetchStatusEnum.FETCHING));
     /**
      * prep query string
      **/
-    const curQueryString = yield select(mSelector.makeReviewQueryStringSelector())
+    const curQueryString = yield select(
+      mSelector.makeReviewQueryStringSelector()
+    );
 
-    log(curQueryString)
+    log(curQueryString);
     log(generateQueryString(curQueryString));
 
     /**
      * grab all domain
      **/
-    const apiUrl = `${API1_URL}/reviews${generateQueryString(curQueryString)}`
+    const apiUrl = `${API1_URL}/reviews${generateQueryString(curQueryString)}`;
 
     /**
      * fetch data
      **/
 
-      // prep keyword if necessary
+    // prep keyword if necessary
 
-      // start fetching
-    const response = yield call(() => api({
+    // start fetching
+    const response = yield call(() =>
+      api({
         method: "GET",
         url: apiUrl,
       })
-      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, content: response.data.content, pageable: response.data.pageable, totalPages: response.data.totalPages, totalElements: response.data.totalElements }))
-      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
-    )
-      /**
-       * update fetch status sucess
-       **/
-      yield put(
-        getReviewFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-      )
+        .then((response) => ({
+          fetchStatus: FetchStatusEnum.SUCCESS,
+          content: response.data.content,
+          pageable: response.data.pageable,
+          totalPages: response.data.totalPages,
+          totalElements: response.data.totalElements,
+        }))
+        .catch((e) => ({
+          fetchStatus: FetchStatusEnum.FAILED,
+          message: e.response.data.message,
+        }))
+    );
+    /**
+     * update fetch status sucess
+     **/
+    yield put(getReviewFetchStatusActions.update(FetchStatusEnum.SUCCESS));
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
        * update review domain in state
        *
        **/
-      yield put(
-        reviewActions.update(response.content)
-      )
+      yield put(reviewActions.update(response.content));
 
       /**
        * update pagination.
        *
        * sample response data:
-       * 
+       *
        * <PageImpl>
        *  <content>
        *    ... actual content
@@ -128,28 +136,22 @@ export function* fetchReviewWorker(action: PayloadAction<{}>) {
        * </PageImpl>
        **/
 
+      log(response.pageable);
 
-      log(response.pageable)
-
-      log("total pages")
-      log(response.totalPages)
+      log("total pages");
+      log(response.totalPages);
 
       yield all([
         put(reviewPaginationPageActions.update(response.pageable.pageNumber)),
         put(reviewPaginationTotalPagesActions.update(response.totalPages)),
-        put(reviewPaginationTotalElementsActions.update(response.totalElements)),
-      ])
-
+        put(
+          reviewPaginationTotalElementsActions.update(response.totalElements)
+        ),
+      ]);
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-
-      log(response.message)
-
+      log(response.message);
     }
   } else {
-    log("permission denied. your review type: " + curAuth.userType)
+    log("permission denied. your review type: " + curAuth.userType);
   }
 }
-
-
-
-

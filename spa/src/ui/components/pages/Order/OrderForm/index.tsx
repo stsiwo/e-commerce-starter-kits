@@ -21,7 +21,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { useHistory } from "react-router";
 import OrderProductHorizontalCard from "./OrderProductHorizontalCard";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 interface OrderFormPropsType {
   order: OrderType;

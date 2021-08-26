@@ -6,13 +6,14 @@ import PlayCircleFilledIcon from "@material-ui/icons/PlayCircleFilled";
 import { useResponsive } from "hooks/responsive";
 import * as React from "react";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 declare type SingleLineListPropsType = {
   renderDomainFunc: () => React.ReactNode;
   wrapperClassName?: string;
   outerClassName?: string;
   innerClassName?: string;
+  role?: string;
 };
 
 const useStyles = makeStyles((theme: Theme) =>

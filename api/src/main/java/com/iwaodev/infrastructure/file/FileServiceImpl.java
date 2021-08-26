@@ -15,6 +15,7 @@ import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.iwaodev.application.iservice.FileService;
 
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.slf4j.Logger;
@@ -27,6 +28,7 @@ public class FileServiceImpl implements FileService {
 
   private final List<String> imageFileTypeList = Arrays.asList("image/apng", "image/avif", "image/gif", "image/jpeg",
       "image/png", "image/svg+xml", "image/webp");
+
 
   @Override
   public void save(String targetDirectory, String fileName, InputStream content) throws IOException {
@@ -124,6 +126,11 @@ public class FileServiceImpl implements FileService {
     String hashCode = NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 11);
 
     return fileName + "-" + hashCode + "." + extension;
+  }
+
+  @Override
+  public Boolean isExceedMaxSize(MultipartFile file) {
+    return true;
   }
 
 }

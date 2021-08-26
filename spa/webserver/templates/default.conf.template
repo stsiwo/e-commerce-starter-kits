@@ -78,6 +78,10 @@ server {
 server {
     # hide server version
     server_tokens off;
+
+    # disable the max image upload size
+    client_max_body_size 0;
+
     # since this is default server, any request which comes to nginx ends up here
     # listen       80 default_server; 
     listen       80; 
@@ -96,6 +100,9 @@ server {
     
     access_log  /var/log/nginx/api.iwaodev.com.access.log  main;
     error_log /var/log/nginx/api.iwaodev.com.error.log info;
+
+    # disable the max image upload size
+    client_max_body_size 0;
 
     # hide server version
     server_tokens off;

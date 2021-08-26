@@ -6,27 +6,27 @@ import { userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { logger } from 'configs/logger';
-const log = logger(import.meta.url);
+import { logger } from "configs/logger";
+const log = logger(__filename);
 
 /**
- * a worker (generator)    
+ * a worker (generator)
  *
- *  - delete single user items 
+ *  - delete single user items
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
  *  - (UserType)
  *
- *      - (Guest): N/A (permission denied) 
- *      - (Member): N/A (permission denied) 
+ *      - (Guest): N/A (permission denied)
+ *      - (Member): N/A (permission denied)
  *      - (Admin): OK
  *
  *  - steps:
  *
- *      (Admin): 
+ *      (Admin):
  *
- *        a1. send delete request to api to delete the target entity 
+ *        a1. send delete request to api to delete the target entity
  *
  *        a2. receive the response and delete it from redux store if success
  *
@@ -34,11 +34,10 @@ const log = logger(import.meta.url);
  *
  **/
 export function* deleteSingleUserWorker(action: PayloadAction<UserType>) {
-
   /**
    * get cur user type
    **/
-  const curAuth: AuthType = yield select(rsSelector.app.getAuth)
+  const curAuth: AuthType = yield select(rsSelector.app.getAuth);
 
   /**
    *
@@ -46,18 +45,17 @@ export function* deleteSingleUserWorker(action: PayloadAction<UserType>) {
    *
    **/
   if (curAuth.userType === UserTypeEnum.ADMIN) {
-
     /**
      * update status for anime data
      **/
     yield put(
       deleteSingleUserFetchStatusActions.update(FetchStatusEnum.FETCHING)
-    )
+    );
 
     /**
      * grab all domain
      **/
-    const apiUrl = `${API1_URL}/categories/${action.payload.userId}`
+    const apiUrl = `${API1_URL}/categories/${action.payload.userId}`;
 
     /**
      * fetch data
@@ -66,40 +64,36 @@ export function* deleteSingleUserWorker(action: PayloadAction<UserType>) {
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() => api({
-      method: "DELETE",
-      url: apiUrl,
-    })
-      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, data: response.data }))
-      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
-    )
+    const response = yield call(() =>
+      api({
+        method: "DELETE",
+        url: apiUrl,
+      })
+        .then((response) => ({
+          fetchStatus: FetchStatusEnum.SUCCESS,
+          data: response.data,
+        }))
+        .catch((e) => ({
+          fetchStatus: FetchStatusEnum.FAILED,
+          message: e.response.data.message,
+        }))
+    );
 
     /**
      * update fetch status sucess
      **/
     yield put(
       deleteSingleUserFetchStatusActions.update(FetchStatusEnum.SUCCESS)
-    )
+    );
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
-
       /**
        * update categories domain in state
        *
        **/
-      yield put(
-        userActions.delete(action.payload)
-      )
-
+      yield put(userActions.delete(action.payload));
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-
-      log(response.message)
-
+      log(response.message);
     }
   }
 }
-
-
-
-
-

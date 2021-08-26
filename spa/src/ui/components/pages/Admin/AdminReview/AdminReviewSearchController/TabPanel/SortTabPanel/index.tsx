@@ -11,7 +11,7 @@ import { reviewQuerySortActions } from "reducers/slices/domain/review";
 import { mSelector } from "src/selectors/selector";
 import { ReviewSortEnum } from "domain/review/type";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 //interface SortTabPanelPropsType {
 //

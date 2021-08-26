@@ -44,7 +44,7 @@ import {
   deleteAuthPhoneFetchStatusActions,
 } from "reducers/slices/app/fetchStatus/auth";
 import { logger } from "configs/logger";
-const log = logger(import.meta.url);
+const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

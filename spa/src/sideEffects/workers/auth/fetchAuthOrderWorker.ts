@@ -2,88 +2,109 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { api } from "configs/axiosConfig";
 import { messageActions, FetchAuthOrderActionType } from "reducers/slices/app";
 import { all, call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import {
+  AuthType,
+  FetchStatusEnum,
+  MessageTypeEnum,
+  UserTypeEnum,
+} from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { generateQueryString, getNanoId } from "src/utils";
 import { fetchAuthOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
-import { orderActions, orderPaginationPageActions, orderPaginationTotalPagesActions, orderPaginationTotalElementsActions } from "reducers/slices/domain/order";
-import { logger } from 'configs/logger';
-const log = logger(import.meta.url);
+import {
+  orderActions,
+  orderPaginationPageActions,
+  orderPaginationTotalPagesActions,
+  orderPaginationTotalElementsActions,
+} from "reducers/slices/domain/order";
+import { logger } from "configs/logger";
+const log = logger(__filename);
 
 /**
- * a worker (generator)    
+ * a worker (generator)
  *
- *  - fetch wishlist items of current user 
+ *  - fetch wishlist items of current user
  *
  *  - NOT gonna use caching since it might be stale soon and the user can update any time.
  *
  *  - (UserType)
  *
- *      - (Guest): N/A 
+ *      - (Guest): N/A
  *      - (Member): send api request to grab data
  *      - (Admin): N/A
  *
  *  - steps:
  *
- *      (Member): 
+ *      (Member):
  *
  *        m1. send fetch request to api to grab data
  *
  *        m2. receive the response and save it to redux store
- *  
+ *
  **/
-export function* fetchAuthOrderWorker(action: PayloadAction<FetchAuthOrderActionType>) {
-
+export function* fetchAuthOrderWorker(
+  action: PayloadAction<FetchAuthOrderActionType>
+) {
   /**
    * get cur user type
    **/
-  const curAuth: AuthType = yield select(rsSelector.app.getAuth)
-
+  const curAuth: AuthType = yield select(rsSelector.app.getAuth);
 
   if (curAuth.userType === UserTypeEnum.MEMBER) {
-
     /**
      * update status for anime data
      **/
     yield put(
       fetchAuthOrderFetchStatusActions.update(FetchStatusEnum.FETCHING)
-    )
+    );
     /**
      * prep query string
      **/
-    const curQueryString = yield select(mSelector.makeOrderQueryStringSelector())
+    const curQueryString = yield select(
+      mSelector.makeOrderQueryStringSelector()
+    );
 
-    log(curQueryString)
+    log(curQueryString);
     log(generateQueryString(curQueryString));
 
     /**
      * grab all domain
      **/
-    const apiUrl = `${API1_URL}/users/${curAuth.user.userId}/orders${generateQueryString(curQueryString)}`
+    const apiUrl = `${API1_URL}/users/${
+      curAuth.user.userId
+    }/orders${generateQueryString(curQueryString)}`;
 
     /**
      * fetch data
      **/
 
     // prep keyword if necessary
-    log("before send request order GET")
-    log(apiUrl)
+    log("before send request order GET");
+    log(apiUrl);
 
     // start fetching
-    const response = yield call(() => api({
-      method: "GET",
-      url: apiUrl,
-    })
-      .then(response => ({ fetchStatus: FetchStatusEnum.SUCCESS, content: response.data.content, pageable: response.data.pageable, totalPages: response.data.totalPages, totalElements: response.data.totalElements }))
-      .catch(e => ({ fetchStatus: FetchStatusEnum.FAILED, message: e.response.data.message }))
-    )
+    const response = yield call(() =>
+      api({
+        method: "GET",
+        url: apiUrl,
+      })
+        .then((response) => ({
+          fetchStatus: FetchStatusEnum.SUCCESS,
+          content: response.data.content,
+          pageable: response.data.pageable,
+          totalPages: response.data.totalPages,
+          totalElements: response.data.totalElements,
+        }))
+        .catch((e) => ({
+          fetchStatus: FetchStatusEnum.FAILED,
+          message: e.response.data.message,
+        }))
+    );
 
     /**
      * update fetch status sucess
      **/
-    yield put(
-      fetchAuthOrderFetchStatusActions.update(response.fetchStatus)
-    )
+    yield put(fetchAuthOrderFetchStatusActions.update(response.fetchStatus));
 
     if (response.fetchStatus === FetchStatusEnum.SUCCESS) {
       /**
@@ -91,17 +112,15 @@ export function* fetchAuthOrderWorker(action: PayloadAction<FetchAuthOrderAction
        *
        * don't use 'merge' since no cache
        **/
-      log("auth order item dto response data")
-      log(response.data)
-      yield put(
-        orderActions.update(response.content)
-      )
+      log("auth order item dto response data");
+      log(response.data);
+      yield put(orderActions.update(response.content));
 
       /**
        * update pagination.
        *
        * sample response data:
-       * 
+       *
        * <PageImpl>
        *  <content>
        *    ... actual content
@@ -134,21 +153,18 @@ export function* fetchAuthOrderWorker(action: PayloadAction<FetchAuthOrderAction
        * </PageImpl>
        **/
 
+      log(response.pageable);
 
-      log(response.pageable)
-
-      log("total pages")
-      log(response.totalPages)
+      log("total pages");
+      log(response.totalPages);
 
       yield all([
         put(orderPaginationPageActions.update(response.pageable.pageNumber)),
         put(orderPaginationTotalPagesActions.update(response.totalPages)),
         put(orderPaginationTotalElementsActions.update(response.totalElements)),
-      ])
-
+      ]);
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-
-      log(response.message)
+      log(response.message);
 
       /**
        * update message
@@ -157,11 +173,9 @@ export function* fetchAuthOrderWorker(action: PayloadAction<FetchAuthOrderAction
         messageActions.update({
           id: getNanoId(),
           type: MessageTypeEnum.ERROR,
-          message: response.message
+          message: response.message,
         })
-      )
+      );
     }
   }
 }
-
-
