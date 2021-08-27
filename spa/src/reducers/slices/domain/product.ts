@@ -1,5 +1,12 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { NormalizedProductType, ProductSortEnum, ProductType, ProductVariantType, ProductCriteria, ProductVariantCriteria } from "domain/product/types";
+import {
+  NormalizedProductType,
+  ProductCriteria,
+  ProductSortEnum,
+  ProductType,
+  ProductVariantCriteria,
+  ProductVariantType,
+} from "domain/product/types";
 import merge from "lodash/merge";
 
 /**
@@ -10,72 +17,112 @@ import merge from "lodash/merge";
  **/
 
 // for GET request with cache
-export const fetchProductWithCacheActionCreator = createAction("saga/domain/product/fetch/cache")
-export const fetchProductWithCacheActionTypeName = fetchProductWithCacheActionCreator().type
+export const fetchProductWithCacheActionCreator = createAction(
+  "saga/domain/product/fetch/cache"
+);
+export const fetchProductWithCacheActionTypeName =
+  fetchProductWithCacheActionCreator().type;
 
 // for GET request with cache
-export const fetchSingleProductWithCacheActionCreator = createAction("saga/domain/product/fetchSingle/cache")
-export const fetchSingleProductWithCacheActionTypeName = fetchSingleProductWithCacheActionCreator().type
+export const fetchSingleProductWithCacheActionCreator = createAction(
+  "saga/domain/product/fetchSingle/cache"
+);
+export const fetchSingleProductWithCacheActionTypeName =
+  fetchSingleProductWithCacheActionCreator().type;
 
 // for GET request
-export const fetchProductActionCreator = createAction("saga/domain/product/fetch")
-export const fetchProductActionTypeName = fetchProductActionCreator().type
+export const fetchProductActionCreator = createAction(
+  "saga/domain/product/fetch"
+);
+export const fetchProductActionTypeName = fetchProductActionCreator().type;
 
 // for GET by Id request
-export declare type FetchSingleProductActionType = { productId: string } 
-export const fetchSingleProductActionCreator = createAction<FetchSingleProductActionType>("saga/domain/product/fetchSingle")
-export const fetchSingleProductActionTypeName = fetchSingleProductActionCreator().type
+export declare type FetchSingleProductActionType = { productId: string };
+export const fetchSingleProductActionCreator =
+  createAction<FetchSingleProductActionType>("saga/domain/product/fetchSingle");
+export const fetchSingleProductActionTypeName =
+  fetchSingleProductActionCreator().type;
 
-// for GET request 
-export const fetchPublicProductActionCreator = createAction("saga/domain/product/fetchPublic")
-export const fetchPublicProductActionTypeName = fetchPublicProductActionCreator().type
+// for GET request
+export const fetchPublicProductActionCreator = createAction(
+  "saga/domain/product/fetchPublic"
+);
+export const fetchPublicProductActionTypeName =
+  fetchPublicProductActionCreator().type;
 
 // for POST (add a new cart item) request
-export declare type PostProductActionType = ProductCriteria 
-export const postProductActionCreator = createAction<PostProductActionType>("saga/domain/product/post")
-export const postProductActionTypeName = postProductActionCreator().type
+export declare type PostProductActionType = ProductCriteria;
+export const postProductActionCreator = createAction<PostProductActionType>(
+  "saga/domain/product/post"
+);
+export const postProductActionTypeName = postProductActionCreator().type;
 
 // for PUT (replace) request
-export declare type PutProductActionType = ProductCriteria 
-export const putProductActionCreator = createAction<PutProductActionType>("saga/domain/product/put")
-export const putProductActionTypeName = putProductActionCreator().type
+export declare type PutProductActionType = ProductCriteria;
+export const putProductActionCreator = createAction<PutProductActionType>(
+  "saga/domain/product/put"
+);
+export const putProductActionTypeName = putProductActionCreator().type;
 
 // for DELETE (delete single cart item) request
-export declare type DeleteSingleProductActionType = { productId: string } 
-export const deleteSingleProductActionCreator = createAction<DeleteSingleProductActionType>("saga/domain/product/deleteSingle")
-export const deleteSingleProductActionTypeName = deleteSingleProductActionCreator().type
+export declare type DeleteSingleProductActionType = { productId: string };
+export const deleteSingleProductActionCreator =
+  createAction<DeleteSingleProductActionType>(
+    "saga/domain/product/deleteSingle"
+  );
+export const deleteSingleProductActionTypeName =
+  deleteSingleProductActionCreator().type;
 
 // for DELETE (delete all of cart items) request
-export const deleteProductActionCreator = createAction<ProductType>("saga/domain/product/delete")
-export const deleteProductActionTypeName = deleteProductActionCreator().type
+export const deleteProductActionCreator = createAction<ProductType>(
+  "saga/domain/product/delete"
+);
+export const deleteProductActionTypeName = deleteProductActionCreator().type;
 
 // for POST (add a new cart item) request
-export declare type PostProductVariantActionType = ProductVariantCriteria & { productId: string }
-export const postProductVariantActionCreator = createAction<PostProductVariantActionType>("saga/domain/product/variant/post")
-export const postProductVariantActionTypeName = postProductVariantActionCreator().type
+export declare type PostProductVariantActionType = ProductVariantCriteria & {
+  productId: string;
+};
+export const postProductVariantActionCreator =
+  createAction<PostProductVariantActionType>(
+    "saga/domain/product/variant/post"
+  );
+export const postProductVariantActionTypeName =
+  postProductVariantActionCreator().type;
 
 // for PUT (replace) request
-export declare type PutProductVariantActionType = ProductVariantCriteria & { productId: string }
-export const putProductVariantActionCreator = createAction<PutProductVariantActionType>("saga/domain/product/variant/put")
-export const putProductVariantActionTypeName = putProductVariantActionCreator().type
+export declare type PutProductVariantActionType = ProductVariantCriteria & {
+  productId: string;
+};
+export const putProductVariantActionCreator =
+  createAction<PutProductVariantActionType>("saga/domain/product/variant/put");
+export const putProductVariantActionTypeName =
+  putProductVariantActionCreator().type;
 
 // for DELETE (delete single cart item) request
-export declare type DeleteSingleProductVariantActionType = { variantId: string, productId: string } 
-export const deleteSingleProductVariantActionCreator = createAction<DeleteSingleProductVariantActionType>("saga/domain/product/variant/deleteSingle")
-export const deleteSingleProductVariantActionTypeName = deleteSingleProductVariantActionCreator().type
+export declare type DeleteSingleProductVariantActionType = {
+  variantId: string;
+  productId: string;
+};
+export const deleteSingleProductVariantActionCreator =
+  createAction<DeleteSingleProductVariantActionType>(
+    "saga/domain/product/variant/deleteSingle"
+  );
+export const deleteSingleProductVariantActionTypeName =
+  deleteSingleProductVariantActionCreator().type;
 
 /**
  *
  * domain.products.data state Slice (no side effects)
  *
  **/
-// action type             
-export type ProductActionType = PayloadAction<NormalizedProductType> 
+// action type
+export type ProductActionType = PayloadAction<NormalizedProductType>;
 
-export const productSlice = createSlice({ 
+export const productSlice = createSlice({
   name: "domain/product/data", // a name used in action type
-  initialState: {},        
-  reducers: {              
+  initialState: {},
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -89,44 +136,69 @@ export const productSlice = createSlice({
     /**
      * unshift.
      *
-     * - no duplicate. 
+     * - no duplicate.
      *
      **/
-    unshiftMerge: (state: NormalizedProductType, action: ProductActionType) => merge(action.payload, state),
+    unshiftMerge: (state: NormalizedProductType, action: ProductActionType) =>
+      merge(action.payload, state),
 
     // use when update existing one
     // put 'action.payload' first at 'merge' so that it is displayed on the list.
     // this is wrong. this prevent this product updated at client. make users refresh to get new data, so get it back to (state, action.payload)
     // if display on the top of the list, use 'unshiftMerge'
-    merge: (state: NormalizedProductType, action: ProductActionType) => merge(state, action.payload),
+    merge: (state: NormalizedProductType, action: ProductActionType) =>
+      merge(state, action.payload),
 
     // use when you want to replace
-    update: (state: NormalizedProductType, action: ProductActionType) => action.payload,
+    update: (state: NormalizedProductType, action: ProductActionType) =>
+      action.payload,
 
     // use when you want to remove a single entity
-    delete: (state: NormalizedProductType, action: PayloadAction<{ productId: string }>) =>  {
-      delete state[action.payload.productId]
-      return state
+    delete: (
+      state: NormalizedProductType,
+      action: PayloadAction<{ productId: string }>
+    ) => {
+      delete state[action.payload.productId];
+      return state;
     },
 
-    appendVariant: (state: NormalizedProductType, action: PayloadAction<{ productId: string, variant: ProductVariantType }>) => {
-      state[action.payload.productId].variants.push(action.payload.variant)
-      return state
+    appendVariant: (
+      state: NormalizedProductType,
+      action: PayloadAction<{ productId: string; variant: ProductVariantType }>
+    ) => {
+      state[action.payload.productId].variants.push(action.payload.variant);
+      return state;
     },
 
-    updateVariant: (state: NormalizedProductType, action: PayloadAction<{ productId: string, targetVariant: ProductVariantType }>) => {
-      state[action.payload.productId].variants = state[action.payload.productId].variants.map((variant: ProductVariantType) => {
+    updateVariant: (
+      state: NormalizedProductType,
+      action: PayloadAction<{
+        productId: string;
+        targetVariant: ProductVariantType;
+      }>
+    ) => {
+      state[action.payload.productId].variants = state[
+        action.payload.productId
+      ].variants.map((variant: ProductVariantType) => {
         if (variant.variantId == action.payload.targetVariant.variantId) {
-          return action.payload.targetVariant
+          return action.payload.targetVariant;
         }
-        return variant
-      })
-      return state
+        return variant;
+      });
+      return state;
     },
 
-    deleteVariant: (state: NormalizedProductType, action: PayloadAction<{ productId: string, variantId: string }>) => {
-      state[action.payload.productId].variants = state[action.payload.productId].variants.filter((variant: ProductVariantType) => variant.variantId != action.payload.variantId)
-      return state
+    deleteVariant: (
+      state: NormalizedProductType,
+      action: PayloadAction<{ productId: string; variantId: string }>
+    ) => {
+      state[action.payload.productId].variants = state[
+        action.payload.productId
+      ].variants.filter(
+        (variant: ProductVariantType) =>
+          variant.variantId != action.payload.variantId
+      );
+      return state;
     },
 
     clear: (state: NormalizedProductType) => ({}),
@@ -134,27 +206,26 @@ export const productSlice = createSlice({
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const productSliceReducer = productSlice.reducer
-export const productActions = productSlice.actions
-
+export const productSliceReducer = productSlice.reducer;
+export const productActions = productSlice.actions;
 
 /**
  *
  * domain.products.query.searchQuery state Slice (no side effects)
  *
  **/
-// action type             
-export type ProductQuerySearchQueryActionType = PayloadAction<string> 
+// action type
+export type ProductQuerySearchQueryActionType = PayloadAction<string>;
 
-export const productQuerySearchQuerySlice = createSlice({ 
+export const productQuerySearchQuerySlice = createSlice({
   name: "domain/products/query/searchQuery", // a name used in action type
-  initialState: "",        
-  reducers: {              
+  initialState: "",
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -166,33 +237,35 @@ export const productQuerySearchQuerySlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ProductQuerySearchQueryActionType) => action.payload,
+    update: (state: string, action: ProductQuerySearchQueryActionType) =>
+      action.payload,
     clear: (state: string) => "",
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const productQuerySearchQuerySliceReducer = productQuerySearchQuerySlice.reducer
-export const productQuerySearchQueryActions = productQuerySearchQuerySlice.actions
-
+export const productQuerySearchQuerySliceReducer =
+  productQuerySearchQuerySlice.reducer;
+export const productQuerySearchQueryActions =
+  productQuerySearchQuerySlice.actions;
 
 /**
  *
  * domain.products.query.categoryId state Slice (no side effects)
  *
  **/
-// action type             
-export type ProductQueryCategoryIdActionType = PayloadAction<string> 
+// action type
+export type ProductQueryCategoryIdActionType = PayloadAction<string>;
 
-export const productQueryCategoryIdSlice = createSlice({ 
+export const productQueryCategoryIdSlice = createSlice({
   name: "domain/products/query/categoryId", // a name used in action type
-  initialState: "",        
-  reducers: {              
+  initialState: "0",
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -204,33 +277,35 @@ export const productQueryCategoryIdSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ProductQueryCategoryIdActionType) => action.payload,
+    update: (state: string, action: ProductQueryCategoryIdActionType) =>
+      action.payload,
     clear: (state: string) => "",
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const productQueryCategoryIdSliceReducer = productQueryCategoryIdSlice.reducer
-export const productQueryCategoryIdActions = productQueryCategoryIdSlice.actions
-
+export const productQueryCategoryIdSliceReducer =
+  productQueryCategoryIdSlice.reducer;
+export const productQueryCategoryIdActions =
+  productQueryCategoryIdSlice.actions;
 
 /**
  *
  * domain.products.query.minPrice state Slice (no side effects)
  *
  **/
-// action type             
-export type ProductQueryMinPriceActionType = PayloadAction<number> 
+// action type
+export type ProductQueryMinPriceActionType = PayloadAction<number>;
 
-export const productQueryMinPriceSlice = createSlice({ 
+export const productQueryMinPriceSlice = createSlice({
   name: "domain/products/query/minPrice", // a name used in action type
-  initialState: null,        
-  reducers: {              
+  initialState: null,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -242,33 +317,34 @@ export const productQueryMinPriceSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ProductQueryMinPriceActionType) => action.payload,
+    update: (state: string, action: ProductQueryMinPriceActionType) =>
+      action.payload,
     clear: (state: string) => null,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const productQueryMinPriceSliceReducer = productQueryMinPriceSlice.reducer
-export const productQueryMinPriceActions = productQueryMinPriceSlice.actions
-
+export const productQueryMinPriceSliceReducer =
+  productQueryMinPriceSlice.reducer;
+export const productQueryMinPriceActions = productQueryMinPriceSlice.actions;
 
 /**
  *
  * domain.products.query.maxPrice state Slice (no side effects)
  *
  **/
-// action type             
-export type ProductQueryMaxPriceActionType = PayloadAction<number> 
+// action type
+export type ProductQueryMaxPriceActionType = PayloadAction<number>;
 
-export const productQueryMaxPriceSlice = createSlice({ 
+export const productQueryMaxPriceSlice = createSlice({
   name: "domain/products/query/maxPrice", // a name used in action type
-  initialState: null,        
-  reducers: {              
+  initialState: null,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -280,33 +356,34 @@ export const productQueryMaxPriceSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ProductQueryMaxPriceActionType) => action.payload,
+    update: (state: string, action: ProductQueryMaxPriceActionType) =>
+      action.payload,
     clear: (state: string) => null,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const productQueryMaxPriceSliceReducer = productQueryMaxPriceSlice.reducer
-export const productQueryMaxPriceActions = productQueryMaxPriceSlice.actions
-
+export const productQueryMaxPriceSliceReducer =
+  productQueryMaxPriceSlice.reducer;
+export const productQueryMaxPriceActions = productQueryMaxPriceSlice.actions;
 
 /**
  *
  * domain.products.query.reviewPoint state Slice (no side effects)
  *
  **/
-// action type             
-export type ProductQueryReviewPointActionType = PayloadAction<number> 
+// action type
+export type ProductQueryReviewPointActionType = PayloadAction<number>;
 
-export const productQueryReviewPointSlice = createSlice({ 
+export const productQueryReviewPointSlice = createSlice({
   name: "domain/products/query/reviewPoint", // a name used in action type
-  initialState: null,        
-  reducers: {              
+  initialState: null,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -318,33 +395,35 @@ export const productQueryReviewPointSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ProductQueryReviewPointActionType) => action.payload,
+    update: (state: string, action: ProductQueryReviewPointActionType) =>
+      action.payload,
     clear: (state: string) => null,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const productQueryReviewPointSliceReducer = productQueryReviewPointSlice.reducer
-export const productQueryReviewPointActions = productQueryReviewPointSlice.actions
-
+export const productQueryReviewPointSliceReducer =
+  productQueryReviewPointSlice.reducer;
+export const productQueryReviewPointActions =
+  productQueryReviewPointSlice.actions;
 
 /**
  *
  * domain.products.query.isDiscount state Slice (no side effects)
  *
  **/
-// action type             
-export type ProductQueryIsDiscountActionType = PayloadAction<boolean> 
+// action type
+export type ProductQueryIsDiscountActionType = PayloadAction<boolean>;
 
-export const productQueryIsDiscountSlice = createSlice({ 
+export const productQueryIsDiscountSlice = createSlice({
   name: "domain/products/query/isDiscount", // a name used in action type
-  initialState: null,        
-  reducers: {              
+  initialState: null,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -356,33 +435,35 @@ export const productQueryIsDiscountSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ProductQueryIsDiscountActionType) => action.payload,
+    update: (state: string, action: ProductQueryIsDiscountActionType) =>
+      action.payload,
     clear: (state: string) => null,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const productQueryIsDiscountSliceReducer = productQueryIsDiscountSlice.reducer
-export const productQueryIsDiscountActions = productQueryIsDiscountSlice.actions
-
+export const productQueryIsDiscountSliceReducer =
+  productQueryIsDiscountSlice.reducer;
+export const productQueryIsDiscountActions =
+  productQueryIsDiscountSlice.actions;
 
 /**
  *
  * domain.products.query.startDate state Slice (no side effects)
  *
  **/
-// action type             
-export type ProductQueryStartDateActionType = PayloadAction<Date> 
+// action type
+export type ProductQueryStartDateActionType = PayloadAction<Date>;
 
-export const productQueryStartDateSlice = createSlice({ 
+export const productQueryStartDateSlice = createSlice({
   name: "domain/products/query/startDate", // a name used in action type
-  initialState: null,        
-  reducers: {              
+  initialState: null,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -394,33 +475,34 @@ export const productQueryStartDateSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ProductQueryStartDateActionType) => action.payload,
+    update: (state: string, action: ProductQueryStartDateActionType) =>
+      action.payload,
     clear: (state: string) => null,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const productQueryStartDateSliceReducer = productQueryStartDateSlice.reducer
-export const productQueryStartDateActions = productQueryStartDateSlice.actions
-
+export const productQueryStartDateSliceReducer =
+  productQueryStartDateSlice.reducer;
+export const productQueryStartDateActions = productQueryStartDateSlice.actions;
 
 /**
  *
  * domain.products.query.endDate state Slice (no side effects)
  *
  **/
-// action type             
-export type ProductQueryEndDateActionType = PayloadAction<Date> 
+// action type
+export type ProductQueryEndDateActionType = PayloadAction<Date>;
 
-export const productQueryEndDateSlice = createSlice({ 
+export const productQueryEndDateSlice = createSlice({
   name: "domain/products/query/endDate", // a name used in action type
-  initialState: null,        
-  reducers: {              
+  initialState: null,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -432,33 +514,33 @@ export const productQueryEndDateSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ProductQueryEndDateActionType) => action.payload,
+    update: (state: string, action: ProductQueryEndDateActionType) =>
+      action.payload,
     clear: (state: string) => null,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const productQueryEndDateSliceReducer = productQueryEndDateSlice.reducer
-export const productQueryEndDateActions = productQueryEndDateSlice.actions
-
+export const productQueryEndDateSliceReducer = productQueryEndDateSlice.reducer;
+export const productQueryEndDateActions = productQueryEndDateSlice.actions;
 
 /**
  *
  * domain.products.query.sort state Slice (no side effects)
  *
  **/
-// action type             
-export type ProductQuerySortActionType = PayloadAction<ProductSortEnum> 
+// action type
+export type ProductQuerySortActionType = PayloadAction<ProductSortEnum>;
 
-export const productQuerySortSlice = createSlice({ 
+export const productQuerySortSlice = createSlice({
   name: "domain/products/query/sort", // a name used in action type
-  initialState: null,        
-  reducers: {              
+  initialState: ProductSortEnum.DATE_DESC,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -470,20 +552,20 @@ export const productQuerySortSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ProductQuerySortActionType) => action.payload,
+    update: (state: string, action: ProductQuerySortActionType) =>
+      action.payload,
     clear: (state: string) => ProductSortEnum.DATE_DESC,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const productQuerySortSliceReducer = productQuerySortSlice.reducer
-export const productQuerySortActions = productQuerySortSlice.actions
-
+export const productQuerySortSliceReducer = productQuerySortSlice.reducer;
+export const productQuerySortActions = productQuerySortSlice.actions;
 
 /**
  *
@@ -492,13 +574,13 @@ export const productQuerySortActions = productQuerySortSlice.actions
  * you CANNOT use this since you register reducers for each property (not as whole object)
  *
  **/
-// action type             
-//export type ProductPaginationActionType = PayloadAction<DomainPaginationType> 
+// action type
+//export type ProductPaginationActionType = PayloadAction<DomainPaginationType>
 //
-//export const productPaginationSlice = createSlice({ 
+//export const productPaginationSlice = createSlice({
 //  name: "domain/products/pagination", // a name used in action type
-//  initialState: {},        
-//  reducers: {              
+//  initialState: {},
+//  reducers: {
 //    /**
 //     *
 //     *  a property name gonna be the name of action
@@ -522,60 +604,59 @@ export const productQuerySortActions = productQuerySortSlice.actions
 //  /**
 //   * extraReducers property
 //   *
-//   * You can respond to other action types besides the types it has generated. 
+//   * You can respond to other action types besides the types it has generated.
 //   *
 //   **/
-//}) 
+//})
 //
 //export const productPaginationSliceReducer = productPaginationSlice.reducer
 //export const productPaginationActions = productPaginationSlice.actions
 
 const resetPaginationExtraReducerActions = [
-     productQuerySearchQueryActions.clear,
-     productQuerySearchQueryActions.update,
-     productQueryCategoryIdActions.clear,
-     productQueryCategoryIdActions.update,
-     productQueryStartDateActions.clear,
-     productQueryStartDateActions.update,
-     productQueryEndDateActions.clear,
-     productQueryEndDateActions.update,
-     productQueryIsDiscountActions.clear,
-     productQueryIsDiscountActions.update,
-     productQueryMaxPriceActions.clear,
-     productQueryMaxPriceActions.update,
-     productQueryMinPriceActions.clear,
-     productQueryMinPriceActions.update,
-     productQueryReviewPointActions.clear,
-     productQueryReviewPointActions.update,
-     productQuerySortActions.clear,
-     productQuerySortActions.update,
-]
+  productQuerySearchQueryActions.clear,
+  productQuerySearchQueryActions.update,
+  productQueryCategoryIdActions.clear,
+  productQueryCategoryIdActions.update,
+  productQueryStartDateActions.clear,
+  productQueryStartDateActions.update,
+  productQueryEndDateActions.clear,
+  productQueryEndDateActions.update,
+  productQueryIsDiscountActions.clear,
+  productQueryIsDiscountActions.update,
+  productQueryMaxPriceActions.clear,
+  productQueryMaxPriceActions.update,
+  productQueryMinPriceActions.clear,
+  productQueryMinPriceActions.update,
+  productQueryReviewPointActions.clear,
+  productQueryReviewPointActions.update,
+  productQuerySortActions.clear,
+  productQuerySortActions.update,
+];
 
-const resetPaginationExtraReducerGenerator = (builder: any, reducer: (state: any) => any): void => {
-    /**
-     * if filter action is dispatched, need to clear all pagiantion
-     */
-    resetPaginationExtraReducerActions.forEach((action: any) => {
-      builder.addCase(
-        action,
-        reducer, 
-      )
-    })
-
-}
+const resetPaginationExtraReducerGenerator = (
+  builder: any,
+  reducer: (state: any) => any
+): void => {
+  /**
+   * if filter action is dispatched, need to clear all pagiantion
+   */
+  resetPaginationExtraReducerActions.forEach((action: any) => {
+    builder.addCase(action, reducer);
+  });
+};
 
 /**
  *
  * domain.products.pagination.page state Slice (no side effects)
  *
  **/
-// action type             
-export type ProductPaginationPageActionType = PayloadAction<number> 
+// action type
+export type ProductPaginationPageActionType = PayloadAction<number>;
 
-export const productPaginationPageSlice = createSlice({ 
+export const productPaginationPageSlice = createSlice({
   name: "domain/products/pagination/page", // a name used in action type
-  initialState: 0,        
-  reducers: {              
+  initialState: 0,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -587,36 +668,37 @@ export const productPaginationPageSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: number, action: ProductPaginationPageActionType) => action.payload,
+    update: (state: number, action: ProductPaginationPageActionType) =>
+      action.payload,
     clear: (state: number) => 0, // start from 0, (not 1)
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
   extraReducers: (builder) => {
-    resetPaginationExtraReducerGenerator(builder, (state: number) => 0)
-  }
-}) 
+    resetPaginationExtraReducerGenerator(builder, (state: number) => 0);
+  },
+});
 
-export const productPaginationPageSliceReducer = productPaginationPageSlice.reducer
-export const productPaginationPageActions = productPaginationPageSlice.actions
-
+export const productPaginationPageSliceReducer =
+  productPaginationPageSlice.reducer;
+export const productPaginationPageActions = productPaginationPageSlice.actions;
 
 /**
  *
  * domain.products.pagination.limit state Slice (no side effects)
  *
  **/
-// action type             
-export type ProductPaginationLimitActionType = PayloadAction<number> 
+// action type
+export type ProductPaginationLimitActionType = PayloadAction<number>;
 
-export const productPaginationLimitSlice = createSlice({ 
+export const productPaginationLimitSlice = createSlice({
   name: "domain/products/pagination/limit", // a name used in action type
-  initialState: 20,        
-  reducers: {              
+  initialState: 20,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -628,36 +710,38 @@ export const productPaginationLimitSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: number, action: ProductPaginationLimitActionType) => action.payload,
+    update: (state: number, action: ProductPaginationLimitActionType) =>
+      action.payload,
     clear: (state: number) => 20,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
   extraReducers: (builder) => {
-    resetPaginationExtraReducerGenerator(builder, (state: number) => 20)
-  }
-}) 
+    resetPaginationExtraReducerGenerator(builder, (state: number) => 20);
+  },
+});
 
-export const productPaginationLimitSliceReducer = productPaginationLimitSlice.reducer
-export const productPaginationLimitActions = productPaginationLimitSlice.actions
-
+export const productPaginationLimitSliceReducer =
+  productPaginationLimitSlice.reducer;
+export const productPaginationLimitActions =
+  productPaginationLimitSlice.actions;
 
 /**
  *
  * domain.products.pagination.totalPages state Slice (no side effects)
  *
  **/
-// action type             
-export type ProductPaginationTotalPagesActionType = PayloadAction<number> 
+// action type
+export type ProductPaginationTotalPagesActionType = PayloadAction<number>;
 
-export const productPaginationTotalPagesSlice = createSlice({ 
+export const productPaginationTotalPagesSlice = createSlice({
   name: "domain/products/pagination/totalPages", // a name used in action type
-  initialState: 1,        
-  reducers: {              
+  initialState: 1,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -669,36 +753,38 @@ export const productPaginationTotalPagesSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: number, action: ProductPaginationTotalPagesActionType) => action.payload,
+    update: (state: number, action: ProductPaginationTotalPagesActionType) =>
+      action.payload,
     clear: (state: number) => 1,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
   extraReducers: (builder) => {
-    resetPaginationExtraReducerGenerator(builder, (state: number) => 1)
-  }
-}) 
+    resetPaginationExtraReducerGenerator(builder, (state: number) => 1);
+  },
+});
 
-export const productPaginationTotalPagesSliceReducer = productPaginationTotalPagesSlice.reducer
-export const productPaginationTotalPagesActions = productPaginationTotalPagesSlice.actions
-
+export const productPaginationTotalPagesSliceReducer =
+  productPaginationTotalPagesSlice.reducer;
+export const productPaginationTotalPagesActions =
+  productPaginationTotalPagesSlice.actions;
 
 /**
  *
  * domain.products.pagination.totalElements state Slice (no side effects)
  *
  **/
-// action type             
-export type ProductPaginationTotalElementsActionType = PayloadAction<number> 
+// action type
+export type ProductPaginationTotalElementsActionType = PayloadAction<number>;
 
-export const productPaginationTotalElementsSlice = createSlice({ 
+export const productPaginationTotalElementsSlice = createSlice({
   name: "domain/products/pagination/totalElements", // a name used in action type
-  initialState: 0,        
-  reducers: {              
+  initialState: 0,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -710,36 +796,38 @@ export const productPaginationTotalElementsSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: number, action: ProductPaginationTotalElementsActionType) => action.payload,
+    update: (state: number, action: ProductPaginationTotalElementsActionType) =>
+      action.payload,
     clear: (state: number) => 0,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
   extraReducers: (builder) => {
-    resetPaginationExtraReducerGenerator(builder, (state: number) => 0)
-  }
-}) 
+    resetPaginationExtraReducerGenerator(builder, (state: number) => 0);
+  },
+});
 
-export const productPaginationTotalElementsSliceReducer = productPaginationTotalElementsSlice.reducer
-export const productPaginationTotalElementsActions = productPaginationTotalElementsSlice.actions
-
+export const productPaginationTotalElementsSliceReducer =
+  productPaginationTotalElementsSlice.reducer;
+export const productPaginationTotalElementsActions =
+  productPaginationTotalElementsSlice.actions;
 
 /**
  *
  * domain.products.curItems state Slice (no side effects)
  *
  **/
-// action type             
-export type ProductcurItemsActionType = PayloadAction<string[]> 
+// action type
+export type ProductcurItemsActionType = PayloadAction<string[]>;
 
-export const productCurItemsSlice = createSlice({ 
+export const productCurItemsSlice = createSlice({
   name: "domain/products/curItems", // a name used in action type
-  initialState: [],        
-  reducers: {              
+  initialState: [],
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -751,19 +839,20 @@ export const productCurItemsSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string[], action: ProductcurItemsActionType) => action.payload,
+    update: (state: string[], action: ProductcurItemsActionType) =>
+      action.payload,
     clear: (state: string[]) => [],
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
   extraReducers: (builder) => {
-    resetPaginationExtraReducerGenerator(builder, (state: number) => [])
-  }
-}) 
+    resetPaginationExtraReducerGenerator(builder, (state: number) => []);
+  },
+});
 
-export const productCurItemsSliceReducer = productCurItemsSlice.reducer
-export const productCurItemsActions = productCurItemsSlice.actions
+export const productCurItemsSliceReducer = productCurItemsSlice.reducer;
+export const productCurItemsActions = productCurItemsSlice.actions;

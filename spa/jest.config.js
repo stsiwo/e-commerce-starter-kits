@@ -39,5 +39,9 @@ module.exports = {
     NODE_ENV: "testing",
     API1_URL: "http://api.stsiwo.com",
     PUBLIC_IMAGE_PATH: "/images/",
+    TEST_MEMBER_USER_ID: "c7081519-16e5-4f92-ac50-1834001f12b9",
+    TEST_MEMBER_EMAIL: "test_member@test.com",
+    TEST_ADMIN_USER_ID: "e95bf632-1518-4bf2-8ba9-cd8b7587530b",
+    TEST_ADMIN_EMAIL: "test_admin@test.com",
   },
 };

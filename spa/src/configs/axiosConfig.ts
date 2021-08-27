@@ -1,7 +1,7 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+import { logger } from "configs/logger";
 import { getCookie } from "src/utils";
 import { store } from "./storeConfig";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 /**
@@ -96,20 +96,27 @@ axios.interceptors.request.use(function (config) {
  * re-authentication is required.
  *
  **/
-axios.interceptors.response.use(function (response) {
-  log("checking response status == 401 or not");
-  log(response);
-  if (response.status === 401) {
-    log("receive 401 response so clear the user store data.");
-    store.dispatch({
-      type: "root/reset/all",
-      payload: null,
-    });
-  } else {
-    log("no 401 status code");
+axios.interceptors.response.use(
+  (response) => {
+    // put interceptors for any success response 2xx
+    return response;
+  },
+  (error: AxiosError) => {
+    // put interceptors for any error response outside 2xx
+    log("checking response status == 401 or not");
+    log(error);
+    if (error.response.status === 401) {
+      log("receive 401 response so clear the user store data.");
+      store.dispatch({
+        type: "root/reset/all",
+        payload: null,
+      });
+    } else {
+      log("no 401 status code");
+    }
+    return Promise.reject(error);
   }
-  return response;
-});
+);
 
 // set default 'withCredential'
 axios.defaults.withCredentials = true;

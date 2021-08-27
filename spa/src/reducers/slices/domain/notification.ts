@@ -10,26 +10,36 @@ import { DomainPaginationType } from "states/types";
  **/
 
 // for GET request with cache
-export declare type FetchNotificationActionType = { type: string } // 'replace'/'concat' 
-export const fetchNotificationActionCreator = createAction<FetchNotificationActionType>("saga/domain/notification/fetch")
-export const fetchNotificationActionTypeName = fetchNotificationActionCreator().type
+export declare type FetchNotificationActionType = { type: string }; // 'replace'/'concat'
+export const fetchNotificationActionCreator =
+  createAction<FetchNotificationActionType>("saga/domain/notification/fetch");
+export const fetchNotificationActionTypeName =
+  fetchNotificationActionCreator().type;
 
 // for PUT (add a new cart item) request
-export declare type PatchNotificationActionType = { notificationId: string, userId: string }
-export const patchNotificationActionCreator = createAction<PatchNotificationActionType>("saga/domain/notification/patch")
-export const patchNotificationActionTypeName = patchNotificationActionCreator().type
+export declare type PatchNotificationActionType = {
+  notificationId: string;
+  userId: string;
+};
+export const patchNotificationActionCreator =
+  createAction<PatchNotificationActionType>("saga/domain/notification/patch");
+export const patchNotificationActionTypeName =
+  patchNotificationActionCreator().type;
 
 // validate curIndex increment
-export const incrementNotificationCurIndexActionCreator = createAction("saga/domain/notification/curIndex/increment")
-export const incrementNotificationCurIndexActionTypeName = incrementNotificationCurIndexActionCreator().type
+export const incrementNotificationCurIndexActionCreator = createAction(
+  "saga/domain/notification/curIndex/increment"
+);
+export const incrementNotificationCurIndexActionTypeName =
+  incrementNotificationCurIndexActionCreator().type;
 
 /**
  *
  * domain.notifications.data state Slice (no side effects)
  *
  **/
-// action type             
-export type NotificationActionType = PayloadAction<NotificationType[]>
+// action type
+export type NotificationActionType = PayloadAction<NotificationType[]>;
 
 export const notificationSlice = createSlice({
   name: "domain/notification/data", // a name used in action type
@@ -45,19 +55,24 @@ export const notificationSlice = createSlice({
      *
      **/
 
-    concat: (state: NotificationType[], action: NotificationActionType) => state.concat(action.payload),
+    concat: (state: NotificationType[], action: NotificationActionType) =>
+      state.concat(action.payload),
 
     // replace
-    update: (state: NotificationType[], action: NotificationActionType) => action.payload,
+    update: (state: NotificationType[], action: NotificationActionType) =>
+      action.payload,
 
     // update a single domain
-    updateOne: (state: NotificationType[], action: PayloadAction<NotificationType>) => {
+    updateOne: (
+      state: NotificationType[],
+      action: PayloadAction<NotificationType>
+    ) => {
       return state.map((domain: NotificationType) => {
         if (domain.notificationId === action.payload.notificationId) {
-          return action.payload
+          return action.payload;
         }
-        return domain
-      })
+        return domain;
+      });
     },
 
     clear: (state: NotificationType[]) => [],
@@ -65,14 +80,13 @@ export const notificationSlice = createSlice({
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-})
+});
 
-export const notificationSliceReducer = notificationSlice.reducer
-export const notificationActions = notificationSlice.actions
-
+export const notificationSliceReducer = notificationSlice.reducer;
+export const notificationActions = notificationSlice.actions;
 
 /**
  *
@@ -81,17 +95,19 @@ export const notificationActions = notificationSlice.actions
  * you CANNOT use this since you register reducers for each property (not as whole object)
  *
  **/
-// action type             
-export type NotificationPaginationActionType = PayloadAction<DomainPaginationType>
+// action type
+export type NotificationPaginationActionType =
+  PayloadAction<DomainPaginationType>;
 
 export const notificationPaginationSlice = createSlice({
   name: "domain/notifications/pagination", // a name used in action type
   initialState: {
+    last: true,
     page: 0,
     limit: 5,
     totalPages: 1,
     totalElements: 0,
-  },
+  } as DomainPaginationType,
   reducers: {
     /**
      *
@@ -104,14 +120,18 @@ export const notificationPaginationSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: DomainPaginationType, action: NotificationPaginationActionType) => {
-      return action.payload
+    update: (
+      state: DomainPaginationType,
+      action: NotificationPaginationActionType
+    ) => {
+      return action.payload;
     },
     incrementPage: (state: DomainPaginationType) => {
-      state.page = state.page + 1
-      return state
+      state.page = state.page + 1;
+      return state;
     },
     clear: (state: DomainPaginationType) => ({
+      last: true,
       page: 0,
       limit: 5,
       totalPages: 1,
@@ -121,22 +141,23 @@ export const notificationPaginationSlice = createSlice({
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-})
+});
 
-export const notificationPaginationSliceReducer = notificationPaginationSlice.reducer
-export const notificationPaginationActions = notificationPaginationSlice.actions
-
+export const notificationPaginationSliceReducer =
+  notificationPaginationSlice.reducer;
+export const notificationPaginationActions =
+  notificationPaginationSlice.actions;
 
 /**
  *
  * domain.notifications.curIndex state Slice (no side effects)
  *
  **/
-// action type             
-export type NotificationCurIndexActionType = PayloadAction<number>
+// action type
+export type NotificationCurIndexActionType = PayloadAction<number>;
 
 export const notificationCurIndexSlice = createSlice({
   name: "domain/notifications/curIndex", // a name used in action type
@@ -153,7 +174,8 @@ export const notificationCurIndexSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: number, action: NotificationCurIndexActionType) => action.payload,
+    update: (state: number, action: NotificationCurIndexActionType) =>
+      action.payload,
     increment: (state: number) => state + 1,
     decrement: (state: number) => state - 1,
     clear: (state: number) => -1,
@@ -161,11 +183,11 @@ export const notificationCurIndexSlice = createSlice({
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-})
+});
 
-export const notificationCurIndexSliceReducer = notificationCurIndexSlice.reducer
-export const notificationCurIndexActions = notificationCurIndexSlice.actions
-
+export const notificationCurIndexSliceReducer =
+  notificationCurIndexSlice.reducer;
+export const notificationCurIndexActions = notificationCurIndexSlice.actions;
