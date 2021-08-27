@@ -71,7 +71,7 @@ const Product: React.FunctionComponent<{}> = (props) => {
   // usage: 'enqueueSnackbar("message", { variant: "error" };
   const { enqueueSnackbar } = useSnackbar();
 
-  const { productPath } = useParams();
+  const { productPath } = useParams<{ productPath: string }>();
 
   const history = useHistory();
 

@@ -1,5 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { api } from "configs/axiosConfig";
+import { api, WorkerResponse } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import { NormalizedProductType } from "domain/product/types";
 import { normalize } from "normalizr";
 import { messageActions } from "reducers/slices/app";
@@ -18,7 +19,7 @@ import {
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
 import { productSchemaEntity } from "states/state";
-import { logger } from "configs/logger";
+
 const log = logger(__filename);
 
 /**
@@ -70,7 +71,7 @@ export function* fetchSingleProductWorker(
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() =>
+    const response: WorkerResponse = yield call(() =>
       api({
         method: "GET",
         url: apiUrl,

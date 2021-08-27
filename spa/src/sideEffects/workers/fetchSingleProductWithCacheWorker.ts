@@ -1,20 +1,5 @@
-import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosPromise, AxiosRequestConfig } from 'axios';
-import { api } from "configs/axiosConfig";
-import { NormalizedProductType } from "domain/product/types";
-import { normalize } from "normalizr";
-import { requestTrackerActions } from "reducers/slices/app";
-import { getProductFetchStatusActions, getSingleProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
-import { productActions, productCurItemsActions, productPaginationLimitActions, productPaginationPageActions, productPaginationTotalPagesActions } from "reducers/slices/domain/product";
-import { all, call, put, select } from "redux-saga/effects";
-import { AuthType, FetchStatusEnum, RequestTrackerBaseType, UserTypeEnum } from "src/app";
-import { mSelector, rsSelector } from "src/selectors/selector";
-import { generateQueryString } from "src/utils";
-import { productSchemaArray } from "states/state";
-import { requestUrlCheckWorker } from "./common/requestUrlCheckWorker";
-
 /**
- * a worker (generator)    
+ * a worker (generator)
  *
  *  - fetch single domain with cache
  *
@@ -24,18 +9,18 @@ import { requestUrlCheckWorker } from "./common/requestUrlCheckWorker";
  *
  *      - (Guest): send get request and receive all domain and save it to redux store with cache
  *      - (Member): send get request and receive all domain and save it to redux store with cache
- *      - (Admin): N/A 
+ *      - (Admin): N/A
  *
  *  - steps:
  *
- *      (Guest/Member): 
+ *      (Guest/Member):
  *
  *        a1. check the url is requested before or not
  *
- *        a2. if yes, get data from redux store. 
+ *        a2. if yes, get data from redux store.
  *
- *        a3. if no, send a request and store it in redux store and also update 'requestUrlTracker' 
- *  
+ *        a3. if no, send a request and store it in redux store and also update 'requestUrlTracker'
+ *
  **/
 //export function* fetchProductWithCacheWorker(action: PayloadAction<{ productPath: string}>) {
 //
@@ -77,7 +62,7 @@ import { requestUrlCheckWorker } from "./common/requestUrlCheckWorker";
 //        // prep keyword if necessary
 //
 //        // start fetching
-//        const response = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
+//        const response: WorkerResponse = yield call<(config: AxiosRequestConfig) => AxiosPromise>(api, {
 //          method: "GET",
 //          url: apiUrl,
 //        })

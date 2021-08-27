@@ -1,5 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { api } from "configs/axiosConfig";
+import { api, WorkerResponse } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import { UserAddressCriteria } from "domain/user/types";
 import { messageActions } from "reducers/slices/app";
 import { putUserAddressFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
@@ -16,7 +17,7 @@ import {
 } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { logger } from "configs/logger";
+
 const log = logger(__filename);
 
 /**
@@ -72,7 +73,7 @@ export function* putUserAddressWorker(
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() =>
+    const response: WorkerResponse = yield call(() =>
       api({
         method: "PUT",
         url: apiUrl,

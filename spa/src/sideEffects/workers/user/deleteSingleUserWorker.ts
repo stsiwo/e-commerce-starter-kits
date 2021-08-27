@@ -1,12 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { api } from "configs/axiosConfig";
+import { api, WorkerResponse } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import { UserType } from "domain/user/types";
 import { deleteSingleUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 import { userActions } from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { logger } from "configs/logger";
+
 const log = logger(__filename);
 
 /**
@@ -64,7 +65,7 @@ export function* deleteSingleUserWorker(action: PayloadAction<UserType>) {
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() =>
+    const response: WorkerResponse = yield call(() =>
       api({
         method: "DELETE",
         url: apiUrl,

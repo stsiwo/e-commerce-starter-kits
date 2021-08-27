@@ -1,5 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { api } from "configs/axiosConfig";
+import { api, WorkerResponse } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import { OrderEventCriteria } from "domain/order/types";
 import { messageActions } from "reducers/slices/app";
 import { postOrderEventFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
@@ -16,7 +17,7 @@ import {
 } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { logger } from "configs/logger";
+
 const log = logger(__filename);
 
 /**
@@ -74,7 +75,7 @@ export function* postOrderEventWorker(
      **/
 
     // start fetching
-    const response = yield call(() =>
+    const response: WorkerResponse = yield call(() =>
       api({
         method: "POST",
         url: apiUrl,

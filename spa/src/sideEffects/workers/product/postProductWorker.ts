@@ -1,5 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { api } from "configs/axiosConfig";
+import { api, WorkerResponse } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import { productFormDataGenerator } from "domain/product/formData";
 import { NormalizedProductType } from "domain/product/types";
 import { normalize } from "normalizr";
@@ -19,7 +20,7 @@ import {
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
 import { productSchemaEntity } from "states/state";
-import { logger } from "configs/logger";
+
 const log = logger(__filename);
 
 /**
@@ -80,7 +81,7 @@ export function* postProductWorker(
     const formData = productFormDataGenerator(action.payload);
 
     // start fetching
-    const response = yield call(() =>
+    const response: WorkerResponse = yield call(() =>
       api({
         method: "POST",
         url: apiUrl,

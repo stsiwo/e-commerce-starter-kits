@@ -1,12 +1,13 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { api } from "configs/axiosConfig";
+import { api, WorkerResponse } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import { CartItemType } from "domain/cart/types";
 import { deleteSingleCartItemFetchStatusActions } from "reducers/slices/app/fetchStatus/cartItem";
 import { cartItemActions } from "reducers/slices/domain/cartItem";
 import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { logger } from "configs/logger";
+
 const log = logger(__filename);
 
 /**
@@ -69,7 +70,7 @@ export function* deleteSingleCartItemWorker(
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() =>
+    const response: WorkerResponse = yield call(() =>
       api({
         method: "DELETE",
         url: apiUrl,

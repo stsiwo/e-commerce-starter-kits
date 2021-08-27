@@ -1,5 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { api } from "configs/axiosConfig";
+import { api, WorkerResponse } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import { getNotificationFetchStatusActions } from "reducers/slices/app/fetchStatus/notification";
 import {
   FetchNotificationActionType,
@@ -10,7 +11,8 @@ import { call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { generateQueryString } from "src/utils";
-import { logger } from "configs/logger";
+import { DomainPaginationType } from "states/types";
+
 const log = logger(__filename);
 /**
  * a worker (generator)
@@ -62,7 +64,7 @@ export function* fetchNotificationWorker(
     /**
      * prep query string
      **/
-    const curQueryString = yield select(
+    const curQueryString: DomainPaginationType = yield select(
       mSelector.makeNotificationQueryStringSelector()
     );
 
@@ -85,7 +87,7 @@ export function* fetchNotificationWorker(
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() =>
+    const response: WorkerResponse = yield call(() =>
       api({
         method: "GET",
         url: apiUrl,

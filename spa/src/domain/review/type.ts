@@ -3,29 +3,29 @@ import { UserType } from "domain/user/types";
 
 // type def
 export declare type ReviewType = {
-  reviewId?: string
-  user: UserType
-  product: ProductType
-  reviewPoint: number
-  reviewTitle: string
-  reviewDescription: string
-  isVerified: boolean
-  createdAt: Date
-  updateAt: Date
-  note: string
-}
+  reviewId?: string;
+  user: UserType;
+  product: ProductType;
+  reviewPoint: number;
+  reviewTitle: string;
+  reviewDescription: string;
+  isVerified: boolean;
+  createdAt: Date;
+  updateAt: Date;
+  note: string;
+};
 
 export declare type ReviewValidationType = {
-  reviewId?: string
-  reviewPoint: string
-  reviewTitle: string
-  reviewDescription: string
-  isVerified: string
-  note: string
-}
+  reviewId?: string;
+  reviewPoint: string;
+  reviewTitle: string;
+  reviewDescription: string;
+  isVerified: string;
+  note: string;
+};
 
-export declare type ReviewDataType = ReviewType
-export declare type ReviewValidationDataType = ReviewValidationType
+export declare type ReviewDataType = ReviewType;
+export declare type ReviewValidationDataType = ReviewValidationType;
 
 // form & input state
 export const defaultReviewData: ReviewDataType = {
@@ -35,18 +35,18 @@ export const defaultReviewData: ReviewDataType = {
   reviewTitle: "",
   reviewDescription: "",
   isVerified: false,
-  createdAt: new Date,
-  updateAt: new Date,
-  note: ""
-}
+  createdAt: new Date(),
+  updateAt: new Date(),
+  note: "",
+};
 
 export const defaultReviewValidationData: ReviewValidationDataType = {
   reviewPoint: "",
   reviewTitle: "",
   reviewDescription: "",
   isVerified: "",
-  note: ""
-}
+  note: "",
+};
 
 // sort
 export enum ReviewSortEnum {
@@ -58,12 +58,28 @@ export enum ReviewSortEnum {
 
 // criteria
 export declare type ReviewCriteria = {
-  reviewId?: string
-  userId: string
-  productId: string
-  reviewPoint: number
-  reviewTitle: string
-  reviewDescription: string
-  isVerified: boolean
-  note?: string
-}
+  reviewId?: string;
+  userId: string;
+  productId: string;
+  reviewPoint: number;
+  reviewTitle: string;
+  reviewDescription: string;
+  isVerified: boolean;
+  note?: string;
+};
+
+export declare type ReviewQueryType = {
+  searchQuery: string;
+  reviewPoint: number;
+  isVerified: boolean;
+  startDate: Date;
+  endDate: Date;
+  userId: string;
+  productId: string;
+  sort: ReviewSortEnum;
+};
+
+export declare type ReviewQueryStringType = ReviewQueryType & {
+  page: number;
+  limit: number;
+};

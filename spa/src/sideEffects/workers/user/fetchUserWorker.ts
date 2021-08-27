@@ -1,5 +1,7 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { api } from "configs/axiosConfig";
+import { api, WorkerResponse } from "configs/axiosConfig";
+import { logger } from "configs/logger";
+import { UserQueryStringType } from "domain/user/types";
 import { getUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 import {
   userActions,
@@ -11,7 +13,7 @@ import { all, call, put, select } from "redux-saga/effects";
 import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { generateQueryString } from "src/utils";
-import { logger } from "configs/logger";
+
 const log = logger(__filename);
 
 /**
@@ -52,7 +54,7 @@ export function* fetchUserWorker(action: PayloadAction<{}>) {
     /**
      * prep query string
      **/
-    const curQueryString = yield select(
+    const curQueryString: UserQueryStringType = yield select(
       mSelector.makeUserQueryStringSelector()
     );
 
@@ -71,7 +73,7 @@ export function* fetchUserWorker(action: PayloadAction<{}>) {
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() =>
+    const response: WorkerResponse = yield call(() =>
       api({
         method: "GET",
         url: apiUrl,

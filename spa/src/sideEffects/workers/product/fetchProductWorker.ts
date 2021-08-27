@@ -1,6 +1,10 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { api } from "configs/axiosConfig";
-import { NormalizedProductType } from "domain/product/types";
+import { api, WorkerResponse } from "configs/axiosConfig";
+import { logger } from "configs/logger";
+import {
+  NormalizedProductType,
+  ProductQueryStringType,
+} from "domain/product/types";
 import { normalize } from "normalizr";
 import { getProductFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
 import {
@@ -14,7 +18,7 @@ import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { generateQueryString } from "src/utils";
 import { productSchemaArray } from "states/state";
-import { logger } from "configs/logger";
+
 const log = logger(__filename);
 
 /**
@@ -57,7 +61,7 @@ export function* fetchProductWorker(action: PayloadAction<{}>) {
     /**
      * prep query string
      **/
-    const curQueryString = yield select(
+    const curQueryString: ProductQueryStringType = yield select(
       mSelector.makeProductQueryStringSelector()
     );
 
@@ -76,7 +80,7 @@ export function* fetchProductWorker(action: PayloadAction<{}>) {
     // prep keyword if necessary
 
     // start fetching
-    const response = yield call(() =>
+    const response: WorkerResponse = yield call(() =>
       api({
         method: "GET",
         url: apiUrl,

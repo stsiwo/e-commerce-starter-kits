@@ -1,23 +1,23 @@
-import { UserTypeEnum } from "src/app";
-import { ProductType, ProductVariantType } from "domain/product/types";
-import DraftsIcon from '@material-ui/icons/Drafts';
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
-import PaymentIcon from '@material-ui/icons/Payment';
-import LocalShippingIcon from '@material-ui/icons/LocalShipping';
-import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
-import HomeIcon from '@material-ui/icons/Home';
-import AssignmentReturnIcon from '@material-ui/icons/AssignmentReturn';
-import CancelPresentationIcon from '@material-ui/icons/CancelPresentation';
-import TimerOffIcon from '@material-ui/icons/TimerOff';
-import ErrorIcon from '@material-ui/icons/Error';
-import { theme } from "ui/css/theme";
 import { OverridableComponent } from "@material-ui/core/OverridableComponent";
 import { SvgIconTypeMap } from "@material-ui/core/SvgIcon";
-import { UserType, UserAddressType } from "domain/user/types";
+import AssignmentReturnIcon from "@material-ui/icons/AssignmentReturn";
+import AssignmentTurnedInIcon from "@material-ui/icons/AssignmentTurnedIn";
+import CancelPresentationIcon from "@material-ui/icons/CancelPresentation";
+import DraftsIcon from "@material-ui/icons/Drafts";
+import ErrorIcon from "@material-ui/icons/Error";
+import HomeIcon from "@material-ui/icons/Home";
+import LocalShippingIcon from "@material-ui/icons/LocalShipping";
+import PaymentIcon from "@material-ui/icons/Payment";
+import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
+import TimerOffIcon from "@material-ui/icons/TimerOff";
+import { ProductType, ProductVariantType } from "domain/product/types";
+import { UserAddressType, UserType } from "domain/user/types";
+import { UserTypeEnum } from "src/app";
+import { theme } from "ui/css/theme";
 
 export enum CheckoutSessionStatusEnum {
   INITIAL = "INITIAL",
-  IN_SESSION = "IN_SESSION", 
+  IN_SESSION = "IN_SESSION",
   PAYMENT_ATTEMPTED = "PAYMENT_ATTEMPTED",
   EXPIRED = "EXPIRED",
 }
@@ -40,8 +40,8 @@ export enum OrderStatusEnum {
 }
 
 export declare type OrderStatusLabelListType = {
-  [key in OrderStatusEnum]: string
-}
+  [key in OrderStatusEnum]: string;
+};
 
 export const orderStatusLabelList: OrderStatusLabelListType = {
   [OrderStatusEnum.DRAFT]: "Draft",
@@ -58,7 +58,7 @@ export const orderStatusLabelList: OrderStatusLabelListType = {
   [OrderStatusEnum.RETURNED]: "Returned",
   [OrderStatusEnum.ERROR]: "Error",
   [OrderStatusEnum.SESSION_TIMEOUT]: "Session Timeout",
-}
+};
 
 export enum OrderSortEnum {
   DATE_DESC = "DATE_DESC",
@@ -66,28 +66,27 @@ export enum OrderSortEnum {
 }
 
 export declare type OrderStatusNextOptionType = {
-  [kye in UserTypeEnum]?: OrderStatusEnum[]
-}
+  [kye in UserTypeEnum]?: OrderStatusEnum[];
+};
 
 export declare type OrderStatusBagType = {
-  label: string,
-  defaultNote: string
-  icon: OverridableComponent<SvgIconTypeMap<Record<string, never>, "svg">>,
-  color: string
-  nextOptions?: OrderStatusNextOptionType
-}
-
+  label: string;
+  defaultNote: string;
+  icon: OverridableComponent<SvgIconTypeMap<Record<string, never>, "svg">>;
+  color: string;
+  nextOptions?: OrderStatusNextOptionType;
+};
 
 export declare type OrderStatusBagListType = {
-  [key in OrderStatusEnum]: OrderStatusBagType
-}
+  [key in OrderStatusEnum]: OrderStatusBagType;
+};
 
 export const orderStatusBagList: OrderStatusBagListType = {
   [OrderStatusEnum.DRAFT]: {
     label: "Draft",
     defaultNote: "the order draft received.",
     icon: DraftsIcon,
-    color: theme.palette.success.main
+    color: theme.palette.success.main,
   },
   [OrderStatusEnum.PAYMENT_FAILED]: {
     label: "Failed Payment:(",
@@ -99,7 +98,7 @@ export const orderStatusBagList: OrderStatusBagListType = {
     label: "Paid:)",
     defaultNote: "the customer paid successfuly.",
     icon: PaymentIcon,
-    color: theme.palette.success.main
+    color: theme.palette.success.main,
   },
   [OrderStatusEnum.ORDERED]: {
     label: "Ordered!",
@@ -167,75 +166,80 @@ export const orderStatusBagList: OrderStatusBagListType = {
     icon: ErrorIcon,
     color: theme.palette.error.main,
   },
-}
+};
 
 // helper function
 //// check function
-export const hasNextOrderOptions: (orderStatusBag: OrderStatusBagType, targetUserType: UserTypeEnum) => boolean = (orderStatusBag, targetUserType) => {
-  if (!orderStatusBag) return false
- 
-  return orderStatusBag.nextOptions &&
+export const hasNextOrderOptions: (
+  orderStatusBag: OrderStatusBagType,
+  targetUserType: UserTypeEnum
+) => boolean = (orderStatusBag, targetUserType) => {
+  if (!orderStatusBag) return false;
+
+  return (
+    orderStatusBag.nextOptions &&
     orderStatusBag.nextOptions[targetUserType] &&
     orderStatusBag.nextOptions[targetUserType].length > 0
-}
+  );
+};
 
 // type def
 
 export declare type OrderAddressType = {
-  addressId?: string
-  address1: string
-  address2: string
-  city: string
-  province: string
-  country: string
-  postalCode: string
-}
+  addressId?: string;
+  address1: string;
+  address2: string;
+  city: string;
+  province: string;
+  country: string;
+  postalCode: string;
+};
 
 export declare type OrderEventType = {
-  orderEventId?: string
-  createdAt: Date
-  orderId: string
-  orderStatus: OrderStatusEnum
-  undoable: boolean
-  user: UserType
-  note: string
-}
+  orderEventId?: string;
+  createdAt: Date;
+  orderId: string;
+  orderStatus: OrderStatusEnum;
+  undoable: boolean;
+  user: UserType;
+  note: string;
+};
 
 export declare type OrderDetailType = {
-  orderDetailId: string,
-  productQuantity: number,
-  productUnitPrice: number,
-  productColor: string,
-  productSize: string,
-  productName: string
-  productVariant: ProductVariantType // selected variant
-  product?: ProductType // if still the product exist
-  isReviewable?: boolean
-}
+  orderDetailId: string;
+  productQuantity: number;
+  productUnitPrice: number;
+  productColor: string;
+  productSize: string;
+  productName: string;
+  productVariant: ProductVariantType; // selected variant
+  product?: ProductType; // if still the product exist
+  isReviewable?: boolean;
+};
 
 export declare type OrderType = {
-  orderId: string
-  user: UserType
-  orderNumber: string
-  orderFirstName: string
-  orderLastName: string
-  orderEmail: string
-  orderPhone: string
-  shippingAddress: UserAddressType
-  billingAddress: UserAddressType
-  orderEvents: OrderEventType[]
-  orderDetails: OrderDetailType[]
-  productCost: number
-  taxCost: number
-  shippingCost: number
-  note: string
-  createdAt: Date
-  updatedAt: Date
-  nextAdminOrderEventOptions: OrderStatusEnum[],
-  nextMemberOrderEventOptions: OrderStatusEnum[],
-  latestOrderEvent: OrderEventType,
-  stripePaymentIntentId: string
-}
+  orderId: string;
+  user: UserType;
+  orderNumber: string;
+  orderFirstName: string;
+  orderLastName: string;
+  orderEmail: string;
+  orderPhone: string;
+  shippingAddress: UserAddressType;
+  billingAddress: UserAddressType;
+  orderEvents: OrderEventType[];
+  orderDetails: OrderDetailType[];
+  productCost: number;
+  taxCost: number;
+  shippingCost: number;
+  note: string;
+  createdAt: Date;
+  updatedAt: Date;
+  nextAdminOrderEventOptions: OrderStatusEnum[];
+  nextMemberOrderEventOptions: OrderStatusEnum[];
+  latestOrderEvent: OrderEventType;
+  stripePaymentIntentId: string;
+};
 
 // form & input state
 export const generateDefaultOrderEventData: () => OrderEventType = () => ({
@@ -245,45 +249,58 @@ export const generateDefaultOrderEventData: () => OrderEventType = () => ({
   orderId: "",
   orderStatus: null,
   note: "",
-})
+});
 
 // criteria
 
 export declare type RatingCriteria = {
-  parcelWeight: number
-  destinationPostalCode: string
-}
+  parcelWeight: number;
+  destinationPostalCode: string;
+};
 
 export declare type SessionTimeoutOrderEventCriteria = {
-  orderNumber: string
-}
+  orderNumber: string;
+};
 
 export declare type OrderDetailCriteria = {
-  orderDetailId: string,
-  productQuantity: number,
-  productVariantId: string // selected variant
-  productId: string // if still the product exist
-}
+  orderDetailId: string;
+  productQuantity: number;
+  productVariantId: string; // selected variant
+  productId: string; // if still the product exist
+};
 
 export declare type OrderCriteria = {
-  orderId?: string
-  orderNumber?: string
-  orderFirstName: string
-  orderLastName: string
-  orderEmail: string
-  orderPhone: string
-  shippingAddress: OrderAddressType
-  billingAddress: OrderAddressType
-  note: string
-  userId: string
-  orderDetails: OrderDetailCriteria[]
-  orderEvents?: string[]
-  currency: string
-}
+  orderId?: string;
+  orderNumber?: string;
+  orderFirstName: string;
+  orderLastName: string;
+  orderEmail: string;
+  orderPhone: string;
+  shippingAddress: OrderAddressType;
+  billingAddress: OrderAddressType;
+  note: string;
+  userId: string;
+  orderDetails: OrderDetailCriteria[];
+  orderEvents?: string[];
+  currency: string;
+};
 
 export declare type OrderEventCriteria = {
-  orderEventId?: string
-  orderStatus?: OrderStatusEnum
-  note: string
-  userId: string
-}
+  orderEventId?: string;
+  orderStatus?: OrderStatusEnum;
+  note: string;
+  userId: string;
+};
+
+export declare type OrderQueryType = {
+  searchQuery: string;
+  orderStatus: string;
+  startDate: Date;
+  endDate: Date;
+  sort: OrderSortEnum;
+};
+
+export declare type OrderQueryStringType = OrderQueryType & {
+  page: number;
+  limit: number;
+};

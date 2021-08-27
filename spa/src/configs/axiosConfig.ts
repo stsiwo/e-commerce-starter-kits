@@ -1,7 +1,8 @@
 import axios from "axios";
+import { logger } from "configs/logger";
+import { FetchStatusEnum } from "src/app";
 import { getCookie } from "src/utils";
 import { store } from "./storeConfig";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 /**
@@ -161,4 +162,18 @@ export declare type AppErrorResponse = {
   error: string;
   message: string;
   path: string;
+};
+
+export declare type WorkerResponse = {
+  fetchStatus: FetchStatusEnum;
+  message?: string;
+  data?: any;
+  content?: any;
+  pageable?: any;
+  totalPages?: any;
+  totalElements?: any;
+  last?: any;
+  order?: any;
+  clientSecret?: any;
+  imagePath?: any;
 };

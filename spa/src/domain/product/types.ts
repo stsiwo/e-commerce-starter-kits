@@ -1,5 +1,5 @@
-import { NormalizedDomainType } from "domain/types";
 import { ReviewType } from "domain/review/type";
+import { NormalizedDomainType } from "domain/types";
 
 // variant stock enum
 export enum ProductStockEnum {
@@ -9,13 +9,13 @@ export enum ProductStockEnum {
 }
 
 export declare type ProductStockBagType = {
-  label: string
-  color: string 
-  enum: ProductStockEnum
-}
+  label: string;
+  color: string;
+  enum: ProductStockEnum;
+};
 export declare type ProductStockBagsType = {
-  [key in ProductStockEnum]: ProductStockBagType
-}
+  [key in ProductStockEnum]: ProductStockBagType;
+};
 
 export const productStockBags: ProductStockBagsType = {
   [ProductStockEnum.OUT_OF_STOCK]: {
@@ -33,7 +33,7 @@ export const productStockBags: ProductStockBagsType = {
     color: "#4caf50", // default theme success.main
     enum: ProductStockEnum.ENOUGH_STOCK,
   },
-}
+};
 
 // variant size
 // this must match with the backend 'product_size' table
@@ -63,77 +63,76 @@ export const productVariantSizeObj = {
     productSizeName: "XL",
     productSizeDescription: "",
   },
-}
+};
 export declare type CategoryType = {
-  categoryId: string
-  categoryName: string
-  categoryPath: string
-  categoryDescription: string
-  totalProductCount?: number
-}
+  categoryId: string;
+  categoryName: string;
+  categoryPath: string;
+  categoryDescription: string;
+  totalProductCount?: number;
+};
 
-export declare type NormalizedCategoryType = NormalizedDomainType<CategoryType>
+export declare type NormalizedCategoryType = NormalizedDomainType<CategoryType>;
 
 export declare type ProductImageType = {
-  productImageId?: string
-  productImagePath: string
-  isChange: boolean
-  productImageName: string
-}
+  productImageId?: string;
+  productImagePath: string;
+  isChange: boolean;
+  productImageName: string;
+};
 
 export declare type ProductVariantSizeType = {
-  productSizeId: string
-  productSizeName: string
-  productSizeDescription: string
-}
+  productSizeId: string;
+  productSizeName: string;
+  productSizeDescription: string;
+};
 
 export declare type ProductVariantType = {
-  variantId: string
-  productSize: ProductVariantSizeType
-  variantColor: string
-  variantUnitPrice?: number
-  variantDiscountPrice?: number
-  variantDiscountStartDate?: Date
-  variantDiscountEndDate?: Date
-  variantStock: number
-  isDiscount: boolean
-  soldCount: number
-  note: string
-  createdAt: Date
-  updateAt: Date
-  variantWeight: number
-  variantHeight: number
-  variantWidth: number
-  variantLength: number
-  productId?: string
-  currentPrice?: number
-  isDiscountAvailable: boolean
-  regularPrice: number // either product base unit price / variant uint price
-}
-
+  variantId: string;
+  productSize: ProductVariantSizeType;
+  variantColor: string;
+  variantUnitPrice?: number;
+  variantDiscountPrice?: number;
+  variantDiscountStartDate?: Date;
+  variantDiscountEndDate?: Date;
+  variantStock: number;
+  isDiscount: boolean;
+  soldCount: number;
+  note: string;
+  createdAt: Date;
+  updateAt: Date;
+  variantWeight: number;
+  variantHeight: number;
+  variantWidth: number;
+  variantLength: number;
+  productId?: string;
+  currentPrice?: number;
+  isDiscountAvailable: boolean;
+  regularPrice: number; // either product base unit price / variant uint price
+};
 
 export declare type ProductType = {
-  productId?: string
-  productName: string
-  productDescription: string
-  productPath: string
-  productBaseUnitPrice: number
-  averageReviewPoint: number
-  isPublic: boolean
-  category: CategoryType
-  releaseDate: Date
-  note: string
-  createdAt: Date
-  updatedAt: Date
-  productImageFiles?: File[] // to upload file in product form
-  productImages?: ProductImageType[] // to display teh image at client side (also send this to backend)
-  variants?: ProductVariantType[]
-  isDiscountAvailable?: boolean
-  cheapestPrice?: number
-  reviews?: ReviewType[]
-}
+  productId?: string;
+  productName: string;
+  productDescription: string;
+  productPath: string;
+  productBaseUnitPrice: number;
+  averageReviewPoint: number;
+  isPublic: boolean;
+  category: CategoryType;
+  releaseDate: Date;
+  note: string;
+  createdAt: Date;
+  updatedAt: Date;
+  productImageFiles?: File[]; // to upload file in product form
+  productImages?: ProductImageType[]; // to display teh image at client side (also send this to backend)
+  variants?: ProductVariantType[];
+  isDiscountAvailable?: boolean;
+  cheapestPrice?: number;
+  reviews?: ReviewType[];
+};
 
-export declare type NormalizedProductType = NormalizedDomainType<ProductType>
+export declare type NormalizedProductType = NormalizedDomainType<ProductType>;
 
 export enum ProductSortEnum {
   DATE_DESC = "DATE_DESC",
@@ -146,127 +145,129 @@ export enum ProductSortEnum {
 
 // productCriteria
 export declare type ProductCriteria = {
-  productId?: string
-  productName: string
-  productDescription: string
-  productPath: string
-  productBaseUnitPrice: number
-  isPublic: boolean
-  category: CategoryType
-  releaseDate: Date
-  note: string
-  productImageFiles?: File[] // to upload file in product form
-  productImages?: ProductImageType[] // to display teh image at client side (also send this to backend)
-}
+  productId?: string;
+  productName: string;
+  productDescription: string;
+  productPath: string;
+  productBaseUnitPrice: number;
+  isPublic: boolean;
+  category: CategoryType;
+  releaseDate: Date;
+  note: string;
+  productImageFiles?: File[]; // to upload file in product form
+  productImages?: ProductImageType[]; // to display teh image at client side (also send this to backend)
+};
 
 // product variant criteria
 export declare type ProductVariantCriteria = {
-  variantId?: string 
-  productSize: ProductVariantSizeType
-  variantColor: string
-  variantUnitPrice?: number
-  variantDiscountPrice?: number
-  variantDiscountStartDate?: Date
-  variantDiscountEndDate?: Date
-  variantStock: number
-  isDiscount: boolean
-  note: string
-  variantWeight: number
-  variantHeight: number
-  variantWidth: number
-  variantLength: number
-}
+  variantId?: string;
+  productSize: ProductVariantSizeType;
+  variantColor: string;
+  variantUnitPrice?: number;
+  variantDiscountPrice?: number;
+  variantDiscountStartDate?: Date;
+  variantDiscountEndDate?: Date;
+  variantStock: number;
+  isDiscount: boolean;
+  note: string;
+  variantWeight: number;
+  variantHeight: number;
+  variantWidth: number;
+  variantLength: number;
+};
 
 // category criteria
 export declare type CategoryCriteria = {
-  categoryId?: string
-  categoryName: string
-  categoryDescription: string
-  categoryPath: string
-}
+  categoryId?: string;
+  categoryName: string;
+  categoryDescription: string;
+  categoryPath: string;
+};
 
 // product variant state type for form & input
 export declare type ProductVariantDataType = {
-  variantId?: string 
-  productSize: ProductVariantSizeType
-  variantColor: string
-  variantUnitPrice?: number
-  variantDiscountPrice?: number
-  variantDiscountStartDate?: Date
-  variantDiscountEndDate?: Date
-  variantStock: number
-  isDiscount: boolean
-  note: string
-  variantWeight: number
-  variantHeight: number
-  variantWidth: number
-  variantLength: number
-}
+  variantId?: string;
+  productSize: ProductVariantSizeType;
+  variantColor: string;
+  variantUnitPrice?: number;
+  variantDiscountPrice?: number;
+  variantDiscountStartDate?: Date;
+  variantDiscountEndDate?: Date;
+  variantStock: number;
+  isDiscount: boolean;
+  note: string;
+  variantWeight: number;
+  variantHeight: number;
+  variantWidth: number;
+  variantLength: number;
+};
 
-export const generateDefaultProductVariantData: () => ProductVariantDataType = () => ({
-  productSize: productVariantSizeObj.xs,
-  variantColor: "#fff",
-  variantUnitPrice: 1,
-  variantDiscountPrice: 1,
-  variantDiscountStartDate: new Date(),
-  variantDiscountEndDate: new Date(),
-  variantStock: 0,
-  isDiscount: false,
-  note: "",
-  variantWeight: 1,
-  variantHeight: 1,
-  variantWidth: 1,
-  variantLength: 1,
-})
+export const generateDefaultProductVariantData: () => ProductVariantDataType =
+  () => ({
+    productSize: productVariantSizeObj.xs,
+    variantColor: "#fff",
+    variantUnitPrice: 1,
+    variantDiscountPrice: 1,
+    variantDiscountStartDate: new Date(),
+    variantDiscountEndDate: new Date(),
+    variantStock: 0,
+    isDiscount: false,
+    note: "",
+    variantWeight: 1,
+    variantHeight: 1,
+    variantWidth: 1,
+    variantLength: 1,
+  });
 
 // product variant state type for form & input
 export declare type ProductVariantValidationDataType = {
-  productSize: string, 
-  variantColor: string,
-  variantUnitPrice: string,
-  variantDiscountPrice: string,
-  variantDiscountStartDate: string,
-  variantDiscountEndDate: string,
-  variantStock: string,
-  isDiscount: string,
-  note: string,
-  variantWeight: string,
-  variantHeight: string,
-  variantWidth: string,
-  variantLength: string,
-}
+  productSize: string;
+  variantColor: string;
+  variantUnitPrice: string;
+  variantDiscountPrice: string;
+  variantDiscountStartDate: string;
+  variantDiscountEndDate: string;
+  variantStock: string;
+  isDiscount: string;
+  note: string;
+  variantWeight: string;
+  variantHeight: string;
+  variantWidth: string;
+  variantLength: string;
+};
 
-export const defaultProductVariantValidationData: ProductVariantValidationDataType = {
-  productSize: "", 
-  variantColor: "",
-  variantUnitPrice: "",
-  variantDiscountPrice: "",
-  variantDiscountStartDate: "",
-  variantDiscountEndDate: "",
-  variantStock: "",
-  isDiscount: "",
-  note: "",
-  variantWeight: "",
-  variantHeight: "",
-  variantWidth: "",
-  variantLength: "",
-}
+export const defaultProductVariantValidationData: ProductVariantValidationDataType =
+  {
+    productSize: "",
+    variantColor: "",
+    variantUnitPrice: "",
+    variantDiscountPrice: "",
+    variantDiscountStartDate: "",
+    variantDiscountEndDate: "",
+    variantStock: "",
+    isDiscount: "",
+    note: "",
+    variantWeight: "",
+    variantHeight: "",
+    variantWidth: "",
+    variantLength: "",
+  };
 
 // product state type for form & input
 export declare type ProductDataType = {
-  productId?: string
-  productName: string
-  productDescription: string
-  productPath: string
-  productBaseUnitPrice: number
-  isPublic: boolean
-  category: CategoryType
-  releaseDate: Date
-  note: string
-  productImageFiles?: File[]
-  productImages?: ProductImageType[]
-  productVariants?: ProductVariantDataType[]
-}
+  productId?: string;
+  productName: string;
+  productDescription: string;
+  productPath: string;
+  productBaseUnitPrice: number;
+  isPublic: boolean;
+  category: CategoryType;
+  releaseDate: Date;
+  note: string;
+  productImageFiles?: File[];
+  productImages?: ProductImageType[];
+  productVariants?: ProductVariantDataType[];
+};
 
 export const defaultProductData: ProductDataType = {
   productName: "",
@@ -279,10 +280,8 @@ export const defaultProductData: ProductDataType = {
   category: null,
   releaseDate: new Date(),
   note: "",
-  productVariants: [
-    generateDefaultProductVariantData()
-  ],
-}
+  productVariants: [generateDefaultProductVariantData()],
+};
 
 export const generateDefaultProductOnlyData: () => ProductDataType = () => ({
   productName: "",
@@ -321,63 +320,86 @@ export const generateDefaultProductOnlyData: () => ProductDataType = () => ({
   category: null,
   releaseDate: new Date(),
   note: "",
-})
+});
 
 // product validation state type for form & input
 export declare type ProductValidationDataType = {
-  productId?: string
-  productName: string
-  productDescription: string
-  productPath: string
-  productImages: string 
-  productBaseUnitPrice: string
-  isPublic: string
-  category: string
-  releaseDate: string
-  note: string
-  productVariants: ProductVariantValidationDataType[]
-}
+  productId?: string;
+  productName: string;
+  productDescription: string;
+  productPath: string;
+  productImages: string;
+  productBaseUnitPrice: string;
+  isPublic: string;
+  category: string;
+  releaseDate: string;
+  note: string;
+  productVariants: ProductVariantValidationDataType[];
+};
 
 export const defaultProductValidationData: ProductValidationDataType = {
   productName: "",
   productDescription: "",
   productPath: "",
-  productImages: "", 
+  productImages: "",
   productBaseUnitPrice: "",
   isPublic: "",
   category: "",
   releaseDate: "",
   note: "",
-  productVariants: [
-    defaultProductVariantValidationData
-  ]
-}
+  productVariants: [defaultProductVariantValidationData],
+};
 
 // category state typ for form & input
 export declare type CategoryDataType = {
-  categoryId?: string
-  categoryName: string
-  categoryDescription: string
-  categoryPath: string
-}
+  categoryId?: string;
+  categoryName: string;
+  categoryDescription: string;
+  categoryPath: string;
+};
 
 export const generateDefaultCategoryData: () => CategoryDataType = () => ({
   categoryName: "",
   categoryDescription: "",
-  categoryPath: ""
-})
+  categoryPath: "",
+});
 
 // category validation type for form & input
 export declare type CategoryValidationDataType = {
-  categoryId?: string
-  categoryName: string
-  categoryDescription: string
-  categoryPath: string
-}
+  categoryId?: string;
+  categoryName: string;
+  categoryDescription: string;
+  categoryPath: string;
+};
 
 export const defaultCategoryValidationData: CategoryValidationDataType = {
   categoryName: "",
   categoryDescription: "",
-  categoryPath: ""
-}
+  categoryPath: "",
+};
 
+export declare type ProductQueryType = {
+  searchQuery: string;
+  categoryId: string;
+  minPrice: number;
+  maxPrice: number;
+  reviewPoint: number;
+  isDiscount: boolean;
+  startDate: Date;
+  endDate: Date;
+  sort: ProductSortEnum;
+};
+
+export declare type ProductQueryStringType = ProductQueryType & {
+  page: number;
+  limit: number;
+};
+
+export declare type CategoryQueryType = {
+  searchQuery: string;
+};
+
+export declare type CategoryQueryStringType = CategoryQueryType & {
+  page: number;
+  limit: number;
+};

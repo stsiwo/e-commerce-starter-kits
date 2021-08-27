@@ -1,6 +1,15 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { api } from "configs/axiosConfig";
-import { messageActions, FetchAuthOrderActionType } from "reducers/slices/app";
+import { api, WorkerResponse } from "configs/axiosConfig";
+import { logger } from "configs/logger";
+import { OrderQueryStringType } from "domain/order/types";
+import { FetchAuthOrderActionType, messageActions } from "reducers/slices/app";
+import { fetchAuthOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
+import {
+  orderActions,
+  orderPaginationPageActions,
+  orderPaginationTotalElementsActions,
+  orderPaginationTotalPagesActions,
+} from "reducers/slices/domain/order";
 import { all, call, put, select } from "redux-saga/effects";
 import {
   AuthType,
@@ -10,14 +19,7 @@ import {
 } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { generateQueryString, getNanoId } from "src/utils";
-import { fetchAuthOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
-import {
-  orderActions,
-  orderPaginationPageActions,
-  orderPaginationTotalPagesActions,
-  orderPaginationTotalElementsActions,
-} from "reducers/slices/domain/order";
-import { logger } from "configs/logger";
+
 const log = logger(__filename);
 
 /**
@@ -60,7 +62,7 @@ export function* fetchAuthOrderWorker(
     /**
      * prep query string
      **/
-    const curQueryString = yield select(
+    const curQueryString: OrderQueryStringType = yield select(
       mSelector.makeOrderQueryStringSelector()
     );
 
@@ -83,7 +85,7 @@ export function* fetchAuthOrderWorker(
     log(apiUrl);
 
     // start fetching
-    const response = yield call(() =>
+    const response: WorkerResponse = yield call(() =>
       api({
         method: "GET",
         url: apiUrl,

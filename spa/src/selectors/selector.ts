@@ -1,4 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
+import { logger } from "configs/logger";
 import { CartItemType } from "domain/cart/types";
 import { NotificationType } from "domain/notification/types";
 import { toOrderAddress, toOrderDetailCriteriaList } from "domain/order";
@@ -15,7 +16,6 @@ import { UserTypeEnum } from "src/app";
 import { getApiUrl } from "src/utils";
 import { categorySchemaArray, productSchemaArray } from "states/state";
 import { StateType } from "states/types";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 export const rsSelector = {
@@ -589,10 +589,16 @@ export const mSelector = {
   // domain.categories query string (query + pagination)
   makeCategoryQueryStringSelector: () => {
     return createSelector(
-      [rsSelector.domain.getCategoryPagination],
-      (pagination) => {
+      [
+        rsSelector.domain.getCategoryQuery,
+        rsSelector.domain.getCategoryPagination,
+      ],
+      (query, pagination) => {
         // react state should be immutable so put empty object first
-        return merge({}, { page: pagination.page, limit: pagination.limit });
+        return merge({}, query, {
+          page: pagination.page,
+          limit: pagination.limit,
+        });
       }
     );
   },

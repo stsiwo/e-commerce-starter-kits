@@ -1,5 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { api } from "configs/axiosConfig";
+import { api, WorkerResponse } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import { messageActions } from "reducers/slices/app";
 import { patchNotificationFetchStatusActions } from "reducers/slices/app/fetchStatus/notification";
 import {
@@ -15,7 +16,7 @@ import {
 } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { logger } from "configs/logger";
+
 const log = logger(__filename);
 
 /**
@@ -74,7 +75,7 @@ export function* patchNotificationWorker(
     const apiUrl = `${API1_URL}/users/${action.payload.userId}/notifications/${action.payload.notificationId}`;
 
     // start fetching
-    const response = yield call(() =>
+    const response: WorkerResponse = yield call(() =>
       api({
         method: "PATCH",
         url: apiUrl,

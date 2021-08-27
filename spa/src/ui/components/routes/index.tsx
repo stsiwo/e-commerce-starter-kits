@@ -1,3 +1,4 @@
+import SaleChart from "components/common/Statistics/SaleChart";
 import Account from "components/pages/Account";
 import AccountVerify from "components/pages/AccountVerify";
 import AdminAccount from "components/pages/Admin/AdminAccount";
@@ -178,5 +179,9 @@ export const commonRoutesData: CommonRoutesDataType = [
   {
     url: "/privacy-policy",
     component: withBasePage(PrivacyPolicy),
+  },
+  {
+    url: "/test",
+    component: withBasePage(SaleChart),
   },
 ];
