@@ -103,6 +103,110 @@ export function getTimeOneHourAfter() {
 }
 
 /**
+ * get the last 10 years
+ */
+export function getPastTenYears(): number[] {
+  const curYear = new Date().getFullYear();
+
+  const result: number[] = [];
+
+  for (let i = 0; i < 10; i++) {
+    result.push(curYear - i);
+  }
+
+  return result;
+}
+
+/**
+ * get available months
+ */
+export function getAvailableMonth(year: number): number[] {
+  const curDate = new Date();
+  const curMonth = curDate.getMonth() + 1;
+
+  const result: number[] = [];
+
+  if (curDate.getFullYear() == year) {
+    for (let i = 1; i <= curMonth; i++) {
+      result.push(i);
+    }
+  } else {
+    for (let i = 1; i <= 12; i++) {
+      result.push(i);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * get available months
+ */
+export function getAvailableDate(year: number, month: number): number[] {
+  const curDate = new Date();
+
+  let result: number[] = [];
+
+  if (curDate.getFullYear() == year && curDate.getMonth() == month) {
+    for (let i = 1; i <= curDate.getDate(); i++) {
+      result.push(i);
+    }
+  } else {
+    result = result.concat(getDaysInMonth(year, month));
+  }
+
+  return result;
+}
+
+/**
+ * @param {int} The month number, 0 based
+ * @param {int} The year, not zero based, required to account for leap years
+ * @return {Date[]} List with date objects for each day of the month
+ */
+function getDaysInMonth(year: number, month: number): number[] {
+  const date = new Date(year, month, 1);
+  const days: number[] = [];
+  while (date.getMonth() === month) {
+    days.push(new Date(date).getDate());
+    date.setDate(date.getDate() + 1);
+  }
+  return days;
+}
+
+export function filterEndYear(year: number, endYearList: number[]): number[] {
+  return endYearList.filter((endYear: number) => endYear >= year);
+}
+
+export function filterEndMonth(
+  startYear: number,
+  startMonth: number,
+  endYear: number,
+  endMonth: number,
+  endMonthList: number[]
+): number[] {
+  if (startYear === endYear) {
+    return endMonthList.filter((endMonth: number) => endMonth >= startMonth);
+  }
+  return endMonthList;
+}
+
+export function filterEndDate(
+  startYear: number,
+  startMonth: number,
+  startDate: number,
+  endYear: number,
+  endMonth: number,
+  endDate: number,
+  endDateList: number[]
+): number[] {
+  if (startYear === endYear && startMonth === endMonth) {
+    console.log("same year and month");
+    return endDateList.filter((endDate: number) => endDate >= startDate);
+  }
+  return endDateList;
+}
+
+/**
  * check two object has the same properties (could have different values for the same properties)
  *  - just check two object has same form (properties) or not
  **/

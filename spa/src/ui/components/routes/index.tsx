@@ -1,8 +1,7 @@
-import SaleChart from "components/common/Statistics/SaleChart";
 import Account from "components/pages/Account";
 import AccountVerify from "components/pages/AccountVerify";
 import AdminAccount from "components/pages/Admin/AdminAccount";
-import AdminDashboard from "components/pages/Admin/AdminBashboard";
+import AdminStatisticsDashboard from "components/pages/Admin/AdminBashboard/statistics.index";
 import AdminCategory from "components/pages/Admin/AdminCategory";
 import AdminCustomer from "components/pages/Admin/AdminCustomer";
 import AdminLogin from "components/pages/Admin/AdminLogin";
@@ -113,7 +112,7 @@ export const routesData: RoutesDataType = {
   [UserTypeEnum.ADMIN]: [
     {
       url: "/admin",
-      component: withAdminBasePage(AdminDashboard),
+      component: withAdminBasePage(AdminStatisticsDashboard),
     },
     {
       url: "/admin/account",
@@ -179,9 +178,5 @@ export const commonRoutesData: CommonRoutesDataType = [
   {
     url: "/privacy-policy",
     component: withBasePage(PrivacyPolicy),
-  },
-  {
-    url: "/test",
-    component: withBasePage(SaleChart),
   },
 ];
