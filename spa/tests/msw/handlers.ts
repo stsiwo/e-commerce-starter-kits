@@ -23,3 +23,14 @@ export const handlers = [
     );
   }),
 ];
+
+export const invalidAccessTokenHanders = [
+  rest.get("http://api.stsiwo.com/*", (req, res, ctx) => {
+    return res(
+      ctx.status(401),
+      ctx.json({
+        message: "sample",
+      })
+    );
+  }),
+];

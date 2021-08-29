@@ -1,4 +1,7 @@
+import { PayloadAction } from "@reduxjs/toolkit";
+import { logger } from "configs/logger";
 import { combineReducers } from "redux";
+import { StateType } from "states/types";
 import {
   authSliceReducer,
   messageSliceReducer,
@@ -10,19 +13,19 @@ import {
   deleteAuthAddressFetchStatusSliceReducer,
   deleteAuthAvatarImageFetchStatusSliceReducer,
   deleteAuthPhoneFetchStatusSliceReducer,
+  fetchAuthOrderFetchStatusSliceReducer,
+  fetchSingleAuthOrderFetchStatusSliceReducer,
   getSingleAuthFetchStatusSliceReducer,
   patchAuthAddressFetchStatusSliceReducer,
   patchAuthPhoneFetchStatusSliceReducer,
   postAuthAddressFetchStatusSliceReducer,
   postAuthAvatarImageFetchStatusSliceReducer,
+  postAuthOrderEventFetchStatusSliceReducer,
   postAuthPhoneFetchStatusSliceReducer,
   putAuthAddressFetchStatusSliceReducer,
   putAuthCompanyFetchStatusSliceReducer,
   putAuthFetchStatusSliceReducer,
   putAuthPhoneFetchStatusSliceReducer,
-  fetchAuthOrderFetchStatusSliceReducer,
-  postAuthOrderEventFetchStatusSliceReducer,
-  fetchSingleAuthOrderFetchStatusSliceReducer,
 } from "./slices/app/fetchStatus/auth";
 import {
   deleteCartItemFetchStatusSliceReducer,
@@ -37,17 +40,22 @@ import {
   postCategoryFetchStatusSliceReducer,
   putCategoryFetchStatusSliceReducer,
 } from "./slices/app/fetchStatus/category";
+import { getCompanyFetchStatusSliceReducer } from "./slices/app/fetchStatus/company";
+import {
+  getNotificationFetchStatusSliceReducer,
+  patchNotificationFetchStatusSliceReducer,
+} from "./slices/app/fetchStatus/notification";
 import {
   deleteSingleOrderEventFetchStatusSliceReducer,
   deleteSingleOrderFetchStatusSliceReducer,
   getOrderFetchStatusSliceReducer,
+  getRatingOrderFetchStatusSliceReducer,
   getSingleOrderFetchStatusSliceReducer,
   postOrderEventFetchStatusSliceReducer,
   postOrderFetchStatusSliceReducer,
+  postSessionTimeoutOrderEventFetchStatusSliceReducer,
   putOrderEventFetchStatusSliceReducer,
   putOrderFetchStatusSliceReducer,
-  postSessionTimeoutOrderEventFetchStatusSliceReducer,
-  getRatingOrderFetchStatusSliceReducer,
 } from "./slices/app/fetchStatus/order";
 import {
   deleteSingleProductFetchStatusSliceReducer,
@@ -97,9 +105,20 @@ import {
   categoryPaginationPageSliceReducer,
   categoryPaginationTotalElementsSliceReducer,
   categoryPaginationTotalPagesSliceReducer,
-  categorySliceReducer,
   categoryQuerySearchQuerySliceReducer,
+  categorySliceReducer,
 } from "./slices/domain/category";
+import {
+  checkoutIsRatingSuccessSliceReducer,
+  checkoutOrderSliceReducer,
+  checkoutSessionStatusSliceReducer,
+} from "./slices/domain/checkout";
+import { companySliceReducer } from "./slices/domain/company";
+import {
+  notificationCurIndexSliceReducer,
+  notificationPaginationSliceReducer,
+  notificationSliceReducer,
+} from "./slices/domain/notification";
 import {
   orderPaginationLimitSliceReducer,
   orderPaginationPageSliceReducer,
@@ -149,12 +168,12 @@ import {
   userPaginationPageSliceReducer,
   userPaginationTotalElementsSliceReducer,
   userPaginationTotalPagesSliceReducer,
+  userQueryActiveSliceReducer,
   userQueryEndDateSliceReducer,
   userQuerySearchQuerySliceReducer,
   userQuerySortSliceReducer,
   userQueryStartDateSliceReducer,
   userSliceReducer,
-  userQueryActiveSliceReducer,
 } from "./slices/domain/user";
 import {
   wishlistItemPaginationLimitSliceReducer,
@@ -178,25 +197,6 @@ import {
   rightNavMenuSliceReducer,
   searchModalSliceReducer,
 } from "./slices/ui";
-import {
-  checkoutOrderSliceReducer,
-  checkoutIsRatingSuccessSliceReducer,
-  checkoutSessionStatusSliceReducer,
-} from "./slices/domain/checkout";
-import {
-  getNotificationFetchStatusSliceReducer,
-  patchNotificationFetchStatusSliceReducer,
-} from "./slices/app/fetchStatus/notification";
-import {
-  notificationSliceReducer,
-  notificationPaginationSliceReducer,
-  notificationCurIndexSliceReducer,
-} from "./slices/domain/notification";
-import { getCompanyFetchStatusSliceReducer } from "./slices/app/fetchStatus/company";
-import { companySliceReducer } from "./slices/domain/company";
-import { StateType } from "states/types";
-import { PayloadAction } from "@reduxjs/toolkit";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 // ** REFACTOR to new approach **/
@@ -210,13 +210,6 @@ const log = logger(__filename);
  *
  **/
 export const rootReducer = (state: StateType, action: PayloadAction<any>) => {
-  log("start root reducers");
-
-  log("current state");
-  log(state);
-  log("current action");
-  log(action);
-
   if (action.type === "root/reset/all") {
     return mainReducer(undefined, action);
   }
