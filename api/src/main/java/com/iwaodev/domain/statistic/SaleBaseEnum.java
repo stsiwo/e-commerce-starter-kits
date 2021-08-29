@@ -1,2 +1,7 @@
-package com.iwaodev.domain.statistic;public class SaleBaseEnum {
+package com.iwaodev.domain.statistic;
+
+public enum SaleBaseEnum {
+    HOURLY,
+    DAILY,
+    MONTHLY,
 }
