@@ -1,9 +1,11 @@
 package com.iwaodev.infrastructure.specification;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.iwaodev.domain.user.UserActiveEnum;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.infrastructure.model.Product_;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.infrastructure.model.UserType_;
 import com.iwaodev.infrastructure.model.User_;
@@ -94,7 +96,17 @@ public class UserSpecifications {
          **/
         return builder.conjunction();
       }
-      return builder.like(root.get(User_.userId).as(String.class), "%" + searchQuery + "%");
+      /**
+       * bug?:
+       *  this does not work: return builder.like(root.get(Product_.productId).as(String.class), "%" + searchQuery + "%");
+       *
+       *  also, you need to validate the string is uuid in the case that teh string is anything else rather than uuid (e.g., 'game')
+       */
+      try {
+        return builder.equal(root.get(User_.userId), UUID.fromString(searchQuery));
+      } catch (IllegalArgumentException exception) {
+        return builder.or();
+      }
     };
   }
 

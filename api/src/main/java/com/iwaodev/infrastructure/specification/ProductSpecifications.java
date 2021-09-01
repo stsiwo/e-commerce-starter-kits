@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.UUID;
 
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
@@ -223,6 +224,29 @@ public class ProductSpecifications {
   // isVerifiedReviews);
   // };
   // }
+
+  public static Specification<Product> searchQueryByProductId(String searchQuery) {
+    return (root, query, builder) -> {
+      if (searchQuery == null) {
+        /**
+         * if paramter is null, we still want to chain specificiation so use
+         * 'conjunction()'
+         **/
+        return builder.conjunction();
+      }
+      /**
+       * bug?:
+       *  this does not work: return builder.like(root.get(Product_.productId).as(String.class), "%" + searchQuery + "%");
+       *
+       *  also, you need to validate the string is uuid in the case that teh string is anything else rather than uuid (e.g., 'game')
+       */
+      try {
+        return builder.equal(root.get(Product_.productId), UUID.fromString(searchQuery));
+      } catch (IllegalArgumentException exception) {
+        return builder.or();
+      }
+    };
+  }
 
   public static Specification<Product> searchQueryByProductName(String searchQuery) {
     return (root, query, builder) -> {

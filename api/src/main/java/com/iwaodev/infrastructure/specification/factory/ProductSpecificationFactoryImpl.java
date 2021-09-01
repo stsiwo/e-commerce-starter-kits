@@ -32,6 +32,7 @@ public class ProductSpecificationFactoryImpl implements ProductSpecificationFact
       .and(
           this.specifications.searchQueryByProductName(criteria.getSearchQuery())
             .or(this.specifications.searchQueryByProductDescription(criteria.getSearchQuery()))
+                  .or(this.specifications.searchQueryByProductId(criteria.getSearchQuery()))
           );
 	}
 }

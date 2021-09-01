@@ -61,7 +61,7 @@ import lombok.ToString;
  * https://stackoverflow.com/questions/34972895/lombok-hashcode-issue-with-java-lang-stackoverflowerror-null
  **/
 @EqualsAndHashCode(exclude = { "shippingAddress", "billingAddress" })
-@EntityListeners(value = { OrderValidationListener.class, OrderListener.class })
+@EntityListeners(value = { OrderValidationListener.class })
 @Entity(name = "orders")
 public class Order {
 
@@ -132,6 +132,9 @@ public class Order {
   @Column(name = "stripe_payment_intent_id")
   private String stripePaymentIntentId;
 
+  @Column(name = "transaction_result")
+  private Boolean transactionResult = false;
+
   @Column(name = "shipment_id")
   private String shipmentId;
 
@@ -194,7 +197,6 @@ public class Order {
   @Column(name = "is_guest")
   private Boolean isGuest;
 
-  @NotNull(message = "{order.estimatedDeliveryDate.notnull}")
   @Column(name = "estimated_delivery_date")
   private LocalDateTime estimatedDeliveryDate;
 
@@ -263,6 +265,7 @@ public class Order {
   @Transient
   private List<OrderStatusEnum> nextMemberOrderEventOptions = new ArrayList<>();
 
+  @Getter(value = AccessLevel.NONE)
   @Transient
   private OrderEvent latestOrderEvent;
 
@@ -319,6 +322,49 @@ public class Order {
   public void removeOrderEvent(OrderEvent orderEvent) {
     this.orderEvents.remove(orderEvent);
     orderEvent.setOrder(null);
+  }
+
+  /**
+   * must use when you add a new order event to update transaction_result field.
+   */
+  public void updateTransactionResult() {
+
+    /**
+     * use retrieveLatestOrderEvent rather than getLatestOrderEvent.
+     *
+     * the latter might return null since this is @Transient.
+     */
+    OrderEvent curLatestOrderEvent = this.retrieveLatestOrderEvent();
+
+    // transaction_resuslt
+    /**
+     * if order status is one of the following make it false:
+     *  - 'RETURNED',
+     *  - 'ERROR',
+     *  - 'CANCELED',
+     *  - 'DRAFT',
+     *  - 'PAYMENT_FAILED',
+     *  - 'ORDERED',
+     *  - 'SESSION_TIMEOUT'
+     */
+    if (curLatestOrderEvent.getOrderStatus().equals(OrderStatusEnum.RETURNED) ||
+            curLatestOrderEvent.getOrderStatus().equals(OrderStatusEnum.ERROR) ||
+            curLatestOrderEvent.getOrderStatus().equals(OrderStatusEnum.CANCELED) ||
+            curLatestOrderEvent.getOrderStatus().equals(OrderStatusEnum.DRAFT) ||
+            curLatestOrderEvent.getOrderStatus().equals(OrderStatusEnum.PAYMENT_FAILED) ||
+            curLatestOrderEvent.getOrderStatus().equals(OrderStatusEnum.ORDERED) ||
+            curLatestOrderEvent.getOrderStatus().equals(OrderStatusEnum.SESSION_TIMEOUT)
+    ) {
+      this.setTransactionResult(false);
+    }
+
+    /**
+     * if order status is one of the following make it true:
+     *  PAID
+     */
+    if (curLatestOrderEvent.getOrderStatus().equals(OrderStatusEnum.PAID)) {
+      this.setTransactionResult(true);
+    }
   }
 
   // business behaviors
@@ -422,6 +468,10 @@ public class Order {
     }
 
     return true;
+  }
+
+  public OrderEvent getLatestOrderEvent() {
+    return this.retrieveLatestOrderEvent();
   }
 
   public OrderEvent retrieveLatestOrderEvent() {

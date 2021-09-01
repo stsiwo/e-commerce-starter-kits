@@ -125,14 +125,14 @@ VALUES ('21', '5', 'aqua', '60', 'db600487-5142-4121-8b3f-237c2d883c14', '1.00',
 
 
 -- order 1
-INSERT INTO `orders` (`order_id`, `order_number`, `product_cost`, `tax_cost`, `shipping_cost`, `user_id`, `order_first_name`, `order_last_name`, `order_email`, `order_phone`, `stripe_payment_intent_id`, `is_guest`, `created_at`)
-VALUES ('c8f8591c-bb83-4fd1-a098-3fac8d40e450', 'order_w0vDYZvqy_Y', '123.00', '2.00', '10.00', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'first name', 'last name', 'test_order@email.com', '+12342342345', 'sample_stripe_payment_intent_id', '0', '2021-08-01 01:12:00');
+INSERT INTO `orders` (`order_id`, `order_number`, `product_cost`, `tax_cost`, `shipping_cost`, `user_id`, `order_first_name`, `order_last_name`, `order_email`, `order_phone`, `stripe_payment_intent_id`, `is_guest`, `created_at`, `transaction_result`)
+VALUES ('c8f8591c-bb83-4fd1-a098-3fac8d40e450', 'order_w0vDYZvqy_Y', '123.00', '2.00', '10.00', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'first name', 'last name', 'test_order@email.com', '+12342342345', 'sample_stripe_payment_intent_id', '0', '2021-08-01 01:12:00', '1');
 
 -- order address
 INSERT INTO `order_addresses` (`order_address_id`, `address_1`, `address_2`, `city`, `province`, `country`, `postal_code`, `shipping_order_id`, `billing_order_id`)
-VALUES ('H-RMUEU37S5', 'shipping_address_1', 'shipping_address_2', 'shipping_city', 'shipping_province', 'shipping_country', 'shipping_postal_code', 'c8f8591c-bb83-4fd1-a098-3fac8d40e450', NULL);
+VALUES ('H-RMUEU37S5', 'shipping_address_1', 'shipping_address_2', 'shipping_city', 'shipping_province', 'CA', 'V5R 2C1', 'c8f8591c-bb83-4fd1-a098-3fac8d40e450', NULL);
 INSERT INTO `order_addresses` (`order_address_id`, `address_1`, `address_2`, `city`, `province`, `country`, `postal_code`, `shipping_order_id`, `billing_order_id`)
-VALUES ('KWuZZcLulPn', 'billing_address_1', 'billing_address_2', 'billing_city', 'billing_province', 'billing_country', 'billing_postal_code', NULL, 'c8f8591c-bb83-4fd1-a098-3fac8d40e450');
+VALUES ('KWuZZcLulPn', 'billing_address_1', 'billing_address_2', 'billing_city', 'billing_province', 'CA', 'V5R 2C1', NULL, 'c8f8591c-bb83-4fd1-a098-3fac8d40e450');
 
 
 -- order detail
@@ -153,14 +153,14 @@ VALUES ('3', 'c8f8591c-bb83-4fd1-a098-3fac8d40e450', 'PAID', '0', 'c7081519-16e5
 
 
 -- order 2
-INSERT INTO `orders` (`order_id`, `order_number`, `product_cost`, `tax_cost`, `shipping_cost`, `user_id`, `order_first_name`, `order_last_name`, `order_email`, `order_phone`, `stripe_payment_intent_id`, `is_guest`, `created_at`)
-VALUES ('34c6c314-de67-41d1-9a97-3bdb7aa5f076', 'order_okkfl1Ez7UN', '23.00', '5.00', '3.00', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'first name', 'last name', 'test_order@email.com', '+12342342345', 'sample_stripe_payment_intent_id', '0', '2021-08-01 02:01:00');
+INSERT INTO `orders` (`order_id`, `order_number`, `product_cost`, `tax_cost`, `shipping_cost`, `user_id`, `order_first_name`, `order_last_name`, `order_email`, `order_phone`, `stripe_payment_intent_id`, `is_guest`, `created_at`, `transaction_result`)
+VALUES ('34c6c314-de67-41d1-9a97-3bdb7aa5f076', 'order_okkfl1Ez7UN', '23.00', '5.00', '3.00', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'first name', 'last name', 'test_order@email.com', '+12342342345', 'sample_stripe_payment_intent_id', '0', '2021-08-01 02:01:00', '1');
 
 -- order address
 INSERT INTO `order_addresses` (`order_address_id`, `address_1`, `address_2`, `city`, `province`, `country`, `postal_code`, `shipping_order_id`, `billing_order_id`)
-VALUES ('I8Bj53ER5DI', 'shipping_address_1', 'shipping_address_2', 'shipping_city', 'shipping_province', 'shipping_country', 'shipping_postal_code', '34c6c314-de67-41d1-9a97-3bdb7aa5f076', NULL);
+VALUES ('I8Bj53ER5DI', 'shipping_address_1', 'shipping_address_2', 'shipping_city', 'shipping_province', 'CA', 'V5R 2C1', '34c6c314-de67-41d1-9a97-3bdb7aa5f076', NULL);
 INSERT INTO `order_addresses` (`order_address_id`, `address_1`, `address_2`, `city`, `province`, `country`, `postal_code`, `shipping_order_id`, `billing_order_id`)
-VALUES ('dplUq5zUFPw', 'billing_address_1', 'billing_address_2', 'billing_city', 'billing_province', 'billing_country', 'billing_postal_code', NULL, '34c6c314-de67-41d1-9a97-3bdb7aa5f076');
+VALUES ('dplUq5zUFPw', 'billing_address_1', 'billing_address_2', 'billing_city', 'billing_province', 'CA', 'V5R 2C1', NULL, '34c6c314-de67-41d1-9a97-3bdb7aa5f076');
 
 
 -- order detail
@@ -177,18 +177,18 @@ VALUES ('4', '34c6c314-de67-41d1-9a97-3bdb7aa5f076', 'DRAFT', '0', 'c7081519-16e
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
 VALUES ('5', '34c6c314-de67-41d1-9a97-3bdb7aa5f076', 'ORDERED', '0', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('6', '34c6c314-de67-41d1-9a97-3bdb7aa5f076', 'PAYMENT_FAILED', '0', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+VALUES ('6', '34c6c314-de67-41d1-9a97-3bdb7aa5f076', 'PAID', '0', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
 
 
 -- order 3
-INSERT INTO `orders` (`order_id`, `order_number`, `product_cost`, `tax_cost`, `shipping_cost`, `user_id`, `order_first_name`, `order_last_name`, `order_email`, `order_phone`, `stripe_payment_intent_id`, `is_guest`, `created_at`)
-VALUES ('7923d2aa-5f4b-4344-8773-d810f5505496', 'order_IxaCXIxluYA', '23.00', '5.00', '3.00', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'first name', 'last name', 'test_order@email.com', '+12342342345', 'sample_stripe_payment_intent_id', '0', '2021-08-01 02:23:00');
+INSERT INTO `orders` (`order_id`, `order_number`, `product_cost`, `tax_cost`, `shipping_cost`, `user_id`, `order_first_name`, `order_last_name`, `order_email`, `order_phone`, `stripe_payment_intent_id`, `is_guest`, `created_at`, `transaction_result`)
+VALUES ('7923d2aa-5f4b-4344-8773-d810f5505496', 'order_IxaCXIxluYA', '23.00', '5.00', '3.00', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'first name', 'last name', 'test_order@email.com', '+12342342345', 'sample_stripe_payment_intent_id', '0', '2021-08-01 02:23:00', '1');
 
 -- order address
 INSERT INTO `order_addresses` (`order_address_id`, `address_1`, `address_2`, `city`, `province`, `country`, `postal_code`, `shipping_order_id`, `billing_order_id`)
-VALUES ('mIhj08qNdgK', 'shipping_address_1', 'shipping_address_2', 'shipping_city', 'shipping_province', 'shipping_country', 'shipping_postal_code', '7923d2aa-5f4b-4344-8773-d810f5505496', NULL);
+VALUES ('mIhj08qNdgK', 'shipping_address_1', 'shipping_address_2', 'shipping_city', 'shipping_province', 'CA', 'V5R 2C1', '7923d2aa-5f4b-4344-8773-d810f5505496', NULL);
 INSERT INTO `order_addresses` (`order_address_id`, `address_1`, `address_2`, `city`, `province`, `country`, `postal_code`, `shipping_order_id`, `billing_order_id`)
-VALUES ('OQ8nY-3kOg7', 'billing_address_1', 'billing_address_2', 'billing_city', 'billing_province', 'billing_country', 'billing_postal_code', NULL, '7923d2aa-5f4b-4344-8773-d810f5505496');
+VALUES ('OQ8nY-3kOg7', 'billing_address_1', 'billing_address_2', 'billing_city', 'billing_province', 'CA', 'V5R 2C1', NULL, '7923d2aa-5f4b-4344-8773-d810f5505496');
 
 -- order detail
 INSERT INTO `order_details` (`order_detail_id`, `product_quantity`, `product_unit_price`, `product_color`, `product_size`, `product_name`, `order_id`, `product_variant_id`, `product_id`)
@@ -211,14 +211,14 @@ VALUES ('10', '7923d2aa-5f4b-4344-8773-d810f5505496', 'CANCEL_REQUEST', '0', 'c7
 
 
 -- order 4
-INSERT INTO `orders` (`order_id`, `order_number`, `product_cost`, `tax_cost`, `shipping_cost`, `user_id`, `order_first_name`, `order_last_name`, `order_email`, `order_phone`, `stripe_payment_intent_id`, `is_guest`, `created_at`)
-VALUES ('753f5ac2-f704-4f8b-a52c-51f2338c9e0c', 'order__b5UeIc4ZN4', '23.00', '5.00', '3.00', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'first name', 'last name', 'test_order@email.com', '+12342342345', 'sample_stripe_payment_intent_id', '0', '2021-08-01 12:00:00');
+INSERT INTO `orders` (`order_id`, `order_number`, `product_cost`, `tax_cost`, `shipping_cost`, `user_id`, `order_first_name`, `order_last_name`, `order_email`, `order_phone`, `stripe_payment_intent_id`, `is_guest`, `created_at`, `transaction_result`)
+VALUES ('753f5ac2-f704-4f8b-a52c-51f2338c9e0c', 'order__b5UeIc4ZN4', '23.00', '5.00', '3.00', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'first name', 'last name', 'test_order@email.com', '+12342342345', 'sample_stripe_payment_intent_id', '0', '2021-08-01 12:00:00', '1');
 
 -- order address
 INSERT INTO `order_addresses` (`order_address_id`, `address_1`, `address_2`, `city`, `province`, `country`, `postal_code`, `shipping_order_id`, `billing_order_id`)
-VALUES ('GSKsIBTihIj', 'shipping_address_1', 'shipping_address_2', 'shipping_city', 'shipping_province', 'shipping_country', 'shipping_postal_code', '753f5ac2-f704-4f8b-a52c-51f2338c9e0c', NULL);
+VALUES ('GSKsIBTihIj', 'shipping_address_1', 'shipping_address_2', 'shipping_city', 'shipping_province', 'CA', 'V5R 2C1', '753f5ac2-f704-4f8b-a52c-51f2338c9e0c', NULL);
 INSERT INTO `order_addresses` (`order_address_id`, `address_1`, `address_2`, `city`, `province`, `country`, `postal_code`, `shipping_order_id`, `billing_order_id`)
-VALUES ('i4KRlHo8fZB', 'billing_address_1', 'billing_address_2', 'billing_city', 'billing_province', 'billing_country', 'billing_postal_code', NULL, '753f5ac2-f704-4f8b-a52c-51f2338c9e0c');
+VALUES ('i4KRlHo8fZB', 'billing_address_1', 'billing_address_2', 'billing_city', 'billing_province', 'CA', 'V5R 2C1', NULL, '753f5ac2-f704-4f8b-a52c-51f2338c9e0c');
 
 -- order detail
 INSERT INTO `order_details` (`order_detail_id`, `product_quantity`, `product_unit_price`, `product_color`, `product_size`, `product_name`, `order_id`, `product_variant_id`, `product_id`)
@@ -241,3 +241,32 @@ INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoa
 VALUES ('15', '753f5ac2-f704-4f8b-a52c-51f2338c9e0c', 'RECEIVED_CANCEL_REQUEST', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
 
 
+-- order 5 (transaction_result: failed)
+INSERT INTO `orders` (`order_id`, `order_number`, `product_cost`, `tax_cost`, `shipping_cost`, `user_id`, `order_first_name`, `order_last_name`, `order_email`, `order_phone`, `stripe_payment_intent_id`, `is_guest`, `created_at`, `transaction_result`)
+VALUES ('8cb7d223-5df7-4a94-8b4d-56a2f6ac362d', 'order_BMrM78BLPXU', '23.00', '5.00', '3.00', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'first name', 'last name', 'test_order@email.com', '+12342342345', 'sample_stripe_payment_intent_id', '0', '2021-09-10 12:00:00', '0');
+
+-- order address
+INSERT INTO `order_addresses` (`order_address_id`, `address_1`, `address_2`, `city`, `province`, `country`, `postal_code`, `shipping_order_id`, `billing_order_id`)
+VALUES ('5KQ5N-lpnHk', 'shipping_address_1', 'shipping_address_2', 'shipping_city', 'shipping_province', 'CA', 'V5R 2C1', '8cb7d223-5df7-4a94-8b4d-56a2f6ac362d', NULL);
+INSERT INTO `order_addresses` (`order_address_id`, `address_1`, `address_2`, `city`, `province`, `country`, `postal_code`, `shipping_order_id`, `billing_order_id`)
+VALUES ('uimv1-5HFKN', 'billing_address_1', 'billing_address_2', 'billing_city', 'billing_province', 'CA', 'V5R 2C1', NULL, '8cb7d223-5df7-4a94-8b4d-56a2f6ac362d');
+
+-- order detail
+INSERT INTO `order_details` (`order_detail_id`, `product_quantity`, `product_unit_price`, `product_color`, `product_size`, `product_name`, `order_id`, `product_variant_id`, `product_id`)
+VALUES ('13', '3', '5.00', 'white', 'XS', 'sample product name 1', '8cb7d223-5df7-4a94-8b4d-56a2f6ac362d', '1', '9e3e67ca-d058-41f0-aad5-4f09c956a81f');
+INSERT INTO `order_details` (`order_detail_id`, `product_quantity`, `product_unit_price`, `product_color`, `product_size`, `product_name`, `order_id`, `product_variant_id`, `product_id`)
+VALUES ('14', '1', '10.00', 'purple', 'M', 'sample product name 2', '8cb7d223-5df7-4a94-8b4d-56a2f6ac362d', '9', '773f1fc7-c037-447a-a5b2-f790ea2302e5');
+INSERT INTO `order_details` (`order_detail_id`, `product_quantity`, `product_unit_price`, `product_color`, `product_size`, `product_name`, `order_id`, `product_variant_id`, `product_id`)
+VALUES ('15', '1', '3.00', 'white', 'XS', 'sample product name 3', '8cb7d223-5df7-4a94-8b4d-56a2f6ac362d', '14', 'de7e767d-cd0c-4705-b633-353b2340715b');
+
+-- order event
+INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
+VALUES ('16', '8cb7d223-5df7-4a94-8b4d-56a2f6ac362d', 'DRAFT', '0', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
+VALUES ('17', '8cb7d223-5df7-4a94-8b4d-56a2f6ac362d', 'ORDERED', '0', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
+VALUES ('18', '8cb7d223-5df7-4a94-8b4d-56a2f6ac362d', 'PAID', '0', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
+VALUES ('19', '8cb7d223-5df7-4a94-8b4d-56a2f6ac362d', 'CANCEL_REQUEST', '0', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
+VALUES ('20', '8cb7d223-5df7-4a94-8b4d-56a2f6ac362d', 'RECEIVED_CANCEL_REQUEST', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');

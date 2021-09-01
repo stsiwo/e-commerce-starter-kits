@@ -41,7 +41,7 @@ import lombok.ToString;
  **/
 @EqualsAndHashCode(exclude = {"order"})
 @NoArgsConstructor
-@EntityListeners( value = { OrderEventValidationListener.class, OrderEventListener.class })
+@EntityListeners( value = { OrderEventValidationListener.class })
 @Entity(name = "orderEvents")
 public class OrderEvent {
 

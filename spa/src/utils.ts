@@ -147,13 +147,24 @@ export function getAvailableDate(year: number, month: number): number[] {
 
   let result: number[] = [];
 
+  console.log("available date");
   if (curDate.getFullYear() == year && curDate.getMonth() == month) {
+    console.log("if");
+    console.log(curDate.getDate());
     for (let i = 1; i <= curDate.getDate(); i++) {
+      console.log(i);
+      console.log(curDate.getDate());
+
       result.push(i);
     }
   } else {
-    result = result.concat(getDaysInMonth(year, month));
+    console.log("else");
+    console.log(curDate.getDate());
+    result = result.concat(getDaysInMonth(year, month - 1)); // minus 1 since this month is start from one (not zero)
   }
+
+  console.log("get available date: ");
+  console.log(result);
 
   return result;
 }
@@ -201,7 +212,11 @@ export function filterEndDate(
 ): number[] {
   if (startYear === endYear && startMonth === endMonth) {
     console.log("same year and month");
-    return endDateList.filter((endDate: number) => endDate >= startDate);
+    return endDateList.filter((endDate: number) => {
+      console.log("filter endDate: " + endDate);
+      console.log("filter startDate: " + startDate);
+      return endDate >= startDate;
+    });
   }
   return endDateList;
 }

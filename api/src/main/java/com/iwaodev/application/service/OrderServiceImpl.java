@@ -793,6 +793,11 @@ public class OrderServiceImpl implements OrderService {
 
         order.removeOrderEvent(lastOrderEvent);
 
+        /**
+         * update transaction result after deleting the latest order event
+         */
+        order.updateTransactionResult();
+
         Order savedOrder = this.orderRepository.save(order);
         /**
          * bug.

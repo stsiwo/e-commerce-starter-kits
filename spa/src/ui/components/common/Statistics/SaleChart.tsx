@@ -1,8 +1,19 @@
 import { Box } from "@material-ui/core";
+import Card from "@material-ui/core/Card";
+import CardActions from "@material-ui/core/CardActions";
+import CardContent from "@material-ui/core/CardContent";
+import CardHeader from "@material-ui/core/CardHeader";
 import FormControl from "@material-ui/core/FormControl";
+import FormLabel from "@material-ui/core/FormLabel";
+import Grid from "@material-ui/core/Grid";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import {
+  createStyles,
+  makeStyles,
+  Theme,
+  useTheme,
+} from "@material-ui/core/styles";
 import { AxiosError } from "axios";
 import { api } from "configs/axiosConfig";
 import { logger } from "configs/logger";
@@ -14,7 +25,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis
+  YAxis,
 } from "recharts";
 import {
   filterEndDate,
@@ -22,18 +33,40 @@ import {
   filterEndYear,
   getAvailableDate,
   getAvailableMonth,
-  getPastTenYears
+  getPastTenYears,
 } from "src/utils";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     wrapper: {
-      height: 500,
+      height: 200,
     },
     controllerBox: {},
-    chart: {
-      backgroundColor: "rgba(255, 255, 255, 0.7)",
+    controllerGridItem: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    controllerLabel: {
+      marginRight: theme.spacing(1),
+    },
+    chart: {},
+    card: {
+      display: "flex",
+      flexDirection: "column",
+    },
+    actions: {
+      display: "flex",
+      justifyContent: "flex-end",
+
+      marginTop: "auto",
+    },
+    media: {
+      // aspect ratio: 1:1
+      height: 0,
+      paddingTop: "100%",
+      marginTop: "30",
     },
   })
 );
@@ -51,6 +84,7 @@ export declare type SaleDataType = {
  **/
 const SaleChart: React.FunctionComponent<{}> = (props) => {
   const classes = useStyles();
+  const themes = useTheme();
 
   /**
    * start date time query string
@@ -270,7 +304,7 @@ const SaleChart: React.FunctionComponent<{}> = (props) => {
    */
   const [curData, setData] = React.useState<SaleDataType[]>([]);
   React.useEffect(() => {
-    const queryString = `?startYear=${curStartYear}&startMonth=${curStartMonth}&startDate=${curStartDate}%s&endYear=${curEndYear}%s&endMonth=${curEndMonth}%s&endDate=${curEndDate}`;
+    const queryString = `?startYear=${curStartYear}&startMonth=${curStartMonth}&startDate=${curStartDate}&endYear=${curEndYear}&endMonth=${curEndMonth}&endDate=${curEndDate}`;
 
     api
       .request({
@@ -292,118 +326,145 @@ const SaleChart: React.FunctionComponent<{}> = (props) => {
     curEndDate,
   ]);
 
+  /**
+   * calculate total amount based on the curData
+   */
+  const [curTotalAmount, setTotalAmount] = React.useState<number>(0);
+  React.useEffect(() => {
+    let total = 0;
+
+    curData.forEach((data: SaleDataType) => {
+      total += data.value;
+    });
+
+    setTotalAmount(total);
+  }, [JSON.stringify(curData)]);
+
   return (
-    <Box className={classes.wrapper}>
-      <Box className={""}>
-        <FormControl className={""}>
-          <Select
-            id="sale-chart-start-year-select"
-            value={curStartYear}
-            onChange={handleStartYearSelectChange}
-          >
-            {curStartYearList.map((year: number) => (
-              <MenuItem key={`year=${year}`} value={year}>
-                {year}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl className={""}>
-          <Select
-            id="sale-chart-start-month-select"
-            value={curStartMonth}
-            onChange={handleStartMonthSelectChange}
-          >
-            {curStartMonthList.map((month: number) => (
-              <MenuItem key={`month-${month}`} value={month}>
-                {month === 0 ? "All Months" : month}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl className={""}>
-          <Select
-            id="sale-chart-start-date-select"
-            value={curStartDate}
-            onChange={handleStartDateSelectChange}
-          >
-            {curStartDateList.map((date: number) => (
-              <MenuItem key={`date-${date}`} value={date}>
-                {date === 0 ? "All Dates" : date}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-      <Box className={""}>
-        <FormControl className={""}>
-          <Select
-            id="sale-chart-end-year-select"
-            value={curEndYear}
-            onChange={handleEndYearSelectChange}
-          >
-            {curEndYearList.map((year: number) => (
-              <MenuItem key={`year=${year}`} value={year}>
-                {year}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl className={""}>
-          <Select
-            id="sale-chart-end-month-select"
-            value={curEndMonth}
-            onChange={handleEndMonthSelectChange}
-          >
-            {curEndMonthList.map((month: number) => (
-              <MenuItem key={`month-${month}`} value={month}>
-                {month === 0 ? "All Months" : month}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl className={""}>
-          <Select
-            id="sale-chart-end-date-select"
-            value={curEndDate}
-            onChange={handleEndDateSelectChange}
-          >
-            {curEndDateList.map((date: number) => (
-              <MenuItem key={`date-${date}`} value={date}>
-                {date === 0 ? "All Dates" : date}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart
-          width={730}
-          height={250}
-          data={curData}
-          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-          className={classes.chart}
-        >
-          <defs>
-            <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <XAxis dataKey="name" />
-          <YAxis />
-          <CartesianGrid strokeDasharray="3 3" />
-          <Tooltip />
-          <Area
-            type="monotone"
-            dataKey="value"
-            stroke="#8884d8"
-            fillOpacity={1}
-            fill="url(#colorUv)"
-          />
-        </AreaChart>
-      </ResponsiveContainer>
-    </Box>
+    <Card className={classes.card}>
+      <CardHeader title={curTotalAmount} subheader="Sales" />
+      <CardContent>
+        <Box className={classes.wrapper}>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              width={730}
+              height={250}
+              data={curData}
+              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+              className={classes.chart}
+            >
+              <defs>
+                <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <CartesianGrid strokeDasharray="3 3" />
+              <Tooltip />
+              <Area
+                type="monotone"
+                dataKey="value"
+                stroke={themes.palette.primary.main}
+                fillOpacity={1}
+                fill={themes.palette.primary.main}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </Box>
+      </CardContent>
+      <CardActions disableSpacing>
+        <Grid container spacing={2} justify="space-around">
+          <Grid item xs={12} md={6} className={classes.controllerGridItem}>
+            <FormLabel className={classes.controllerLabel}>
+              Start Date
+            </FormLabel>
+            <FormControl className={""}>
+              <Select
+                id="sale-chart-start-year-select"
+                value={curStartYear}
+                onChange={handleStartYearSelectChange}
+              >
+                {curStartYearList.map((year: number) => (
+                  <MenuItem key={`year=${year}`} value={year}>
+                    {year}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl className={""}>
+              <Select
+                id="sale-chart-start-month-select"
+                value={curStartMonth}
+                onChange={handleStartMonthSelectChange}
+              >
+                {curStartMonthList.map((month: number) => (
+                  <MenuItem key={`month-${month}`} value={month}>
+                    {month === 0 ? "All Months" : month}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl className={""}>
+              <Select
+                id="sale-chart-start-date-select"
+                value={curStartDate}
+                onChange={handleStartDateSelectChange}
+              >
+                {curStartDateList.map((date: number) => (
+                  <MenuItem key={`date-${date}`} value={date}>
+                    {date === 0 ? "All Dates" : date}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} md={6} className={classes.controllerGridItem}>
+            <FormLabel className={classes.controllerLabel}>End Date</FormLabel>
+            <FormControl className={""}>
+              <Select
+                id="sale-chart-end-year-select"
+                value={curEndYear}
+                onChange={handleEndYearSelectChange}
+              >
+                {curEndYearList.map((year: number) => (
+                  <MenuItem key={`year=${year}`} value={year}>
+                    {year}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl className={""}>
+              <Select
+                id="sale-chart-end-month-select"
+                value={curEndMonth}
+                onChange={handleEndMonthSelectChange}
+              >
+                {curEndMonthList.map((month: number) => (
+                  <MenuItem key={`month-${month}`} value={month}>
+                    {month === 0 ? "All Months" : month}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl className={""}>
+              <Select
+                id="sale-chart-end-date-select"
+                value={curEndDate}
+                onChange={handleEndDateSelectChange}
+              >
+                {curEndDateList.map((date: number) => (
+                  <MenuItem key={`date-${date}`} value={date}>
+                    {date === 0 ? "All Dates" : date}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
+      </CardActions>
+    </Card>
   );
 };
 

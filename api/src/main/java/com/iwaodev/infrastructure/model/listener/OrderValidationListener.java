@@ -55,6 +55,7 @@ public class OrderValidationListener {
     Set<ConstraintViolation<Order>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
+      logger.debug("order beforeCreate there is an error");
       throw new AppException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
     }
   }
@@ -64,6 +65,7 @@ public class OrderValidationListener {
     Set<ConstraintViolation<Order>> constraintViolations = this.validator.validate(domain);
 
     if (constraintViolations.size() > 0) {
+      logger.debug("order beforeUpdate there is an error");
       throw new AppException(HttpStatus.BAD_REQUEST, constraintViolations.iterator().next().getMessage());
     }
   }

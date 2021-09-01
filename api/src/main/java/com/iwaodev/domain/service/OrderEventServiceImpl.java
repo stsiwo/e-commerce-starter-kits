@@ -47,6 +47,15 @@ public class OrderEventServiceImpl implements OrderEventService {
      }
   }
 
+  /**
+   * this is a core method that every method in this class uses.
+   * @param order Order
+   * @param orderStatus OrderStatus
+   * @param note String
+   * @param user User
+   * @throws DomainException
+   * @throws NotFoundException
+   */
   private void add(Order order, OrderStatusEnum orderStatus, String note, User user)
       throws DomainException, NotFoundException {
 
@@ -59,8 +68,11 @@ public class OrderEventServiceImpl implements OrderEventService {
       // guest
       orderEvent.setIsGuest(true);
     }
-
     order.addOrderEvent(orderEvent);
+    /**
+     * must be after addOrderEvent since use 'getLastestOrderEvent' internally.
+     */
+    order.updateTransactionResult();
   }
 
   /**

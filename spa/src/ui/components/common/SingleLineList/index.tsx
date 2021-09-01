@@ -3,9 +3,9 @@ import IconButton from "@material-ui/core/IconButton";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { classnames } from "@material-ui/data-grid";
 import PlayCircleFilledIcon from "@material-ui/icons/PlayCircleFilled";
+import { logger } from "configs/logger";
 import { useResponsive } from "hooks/responsive";
 import * as React from "react";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 declare type SingleLineListPropsType = {
@@ -178,10 +178,13 @@ const SingleLineList: React.FunctionComponent<SingleLineListPropsType> = (
   };
 
   return (
-    <div className={classnames(classes.wrapper)}>
-      <div className={classnames(classes.outerBox)} ref={outerBoxRef}>
+    <div className={classnames(classes.wrapper, props.wrapperClassName)}>
+      <div
+        className={classnames(classes.outerBox, props.outerClassName)}
+        ref={outerBoxRef}
+      >
         <div
-          className={classnames(classes.innerBox)}
+          className={classnames(classes.innerBox, props.innerClassName)}
           ref={innerBoxRef}
           onScroll={handleScrollChangeEvent}
         >

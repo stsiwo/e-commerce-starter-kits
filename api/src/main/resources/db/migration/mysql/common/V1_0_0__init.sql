@@ -563,7 +563,7 @@ COMMIT;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `ec-schema`;
-INSERT INTO `ec-schema`.`users` (`user_id`, `first_name`, `last_name`, `email`, `password`, `avatar_image_path`, `user_type_id`, `created_at`, `updated_at`, `stripe_customer_id`, `active`, `verification_token`, `verification_token_expiry_date`, `forgot_password_token`, `forgot_password_token_expiry_date`, `active_note`) VALUES ('e95bf632-1518-4bf2-8ba9-cd8b7587530b', 'Admin First Name', 'Admin Last Name', 'test_admin@test.com', '$2a$10$elqDcxXm.YgyuwRS/TcnfuwI4qO8JMKRDJqc4lJatXJ9LIRRhqzB2', NULL, 1, DEFAULT, NULL, NULL, DEFAULT, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `ec-schema`.`users` (`user_id`, `first_name`, `last_name`, `email`, `password`, `avatar_image_path`, `user_type_id`, `created_at`, `updated_at`, `stripe_customer_id`, `active`, `verification_token`, `verification_token_expiry_date`, `forgot_password_token`, `forgot_password_token_expiry_date`, `active_note`) VALUES ('e95bf632-1518-4bf2-8ba9-cd8b7587530b', 'Admin First Name', 'Admin Last Name', 'test_admin@test.com', '$2a$10$elqDcxXm.YgyuwRS/TcnfuwI4qO8JMKRDJqc4lJatXJ9LIRRhqzB2', NULL, 1, '1999-01-01 00:00:00', NULL, NULL, DEFAULT, NULL, NULL, NULL, NULL, NULL);
 
 COMMIT;
 

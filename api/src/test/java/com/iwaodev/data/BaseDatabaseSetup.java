@@ -1,5 +1,6 @@
 package com.iwaodev.data;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.github.javafaker.Faker;
@@ -74,12 +75,13 @@ public class BaseDatabaseSetup {
 
       // member test user
       entityManager.getEntityManager().createNativeQuery(
-          "INSERT INTO `ec-schema`.`users` (`user_id`, `first_name`, `last_name`, `email`, `password`, `user_type_id`) VALUES ( :user_id, :first_name, :last_name, :email, :password, '2')"
+          "INSERT INTO `ec-schema`.`users` (`user_id`, `first_name`, `last_name`, `email`, `password`, `user_type_id`, `created_at`) VALUES ( :user_id, :first_name, :last_name, :email, :password, '2', :createdAt)"
           ) // user type id = 2 for member
         .setParameter("user_id",  this.testMemberId.toString())
         .setParameter("first_name",  faker.name().firstName())
         .setParameter("last_name",  faker.name().lastName())
         .setParameter("email",  this.testMemberEmail)
+        .setParameter("createdAt", LocalDateTime.of(1999, 01, 01, 0, 0, 0))
         // don't forget encode password
         .setParameter("password",  this.bCryptPasswordEncoder.encode(this.testPassword))
         .executeUpdate();

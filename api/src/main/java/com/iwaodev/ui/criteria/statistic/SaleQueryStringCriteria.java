@@ -16,7 +16,7 @@ public class SaleQueryStringCriteria {
      */
     private Integer startYear = LocalDate.now().getYear();
     private Integer startMonth = LocalDate.now().getMonthValue();
-    private Integer startDate = LocalDate.now().getDayOfMonth(); // start from the previous date
+    private Integer startDate = LocalDate.now().getDayOfMonth();
     private Integer endYear = LocalDate.now().getYear();
     private Integer endMonth = LocalDate.now().getMonthValue();
     private Integer endDate = LocalDate.now().getDayOfMonth();

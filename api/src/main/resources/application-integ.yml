@@ -102,3 +102,9 @@ aws:
 server:
   # set rather than localhost because of setting cookie issue
   host: "localdev.com"
+
+jwt:
+  # 15 mins to make sure 401 repsonse
+  # this is millisec based
+  expiration: ${JWT_EXPIRATION:900000}
+  secret: ${JWT_SECRET:jwt-secert}

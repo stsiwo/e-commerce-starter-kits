@@ -64,7 +64,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional(isolation = Isolation.READ_UNCOMMITTED)
 @ActiveProfiles("integtest")
 @AutoConfigureMockMvc
-public class AdminStatisticEndpointTest {
+public class AdminStatisticSalesEndpointTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AdminAddressEndpointTest.class);
 
@@ -422,6 +422,8 @@ public class AdminStatisticEndpointTest {
         assertThat(responseBody.length).isGreaterThan(10);
         for (SaleDTO saleDTO : responseBody) {
 
+            logger.debug(saleDTO.getName().toString());
+            logger.debug(saleDTO.getValue().toString());
             if (firstDate.isEqual(saleDTO.getName())) {
                 assertThat(totalCostForFirst).isEqualTo(saleDTO.getValue());
             }
@@ -514,4 +516,7 @@ public class AdminStatisticEndpointTest {
             expectedDate = expectedDate.plusMonths(monthIncrement);
         }
     }
+
+
+
 }

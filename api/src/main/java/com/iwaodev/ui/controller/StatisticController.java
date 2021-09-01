@@ -1,13 +1,14 @@
 package com.iwaodev.ui.controller;
 
 import com.iwaodev.application.dto.category.CategoryDTO;
-import com.iwaodev.application.dto.statistic.SaleDTO;
+import com.iwaodev.application.dto.product.ProductDTO;
+import com.iwaodev.application.dto.statistic.*;
 import com.iwaodev.application.iservice.CategoryService;
 import com.iwaodev.application.iservice.StatisticService;
 import com.iwaodev.config.SpringSecurityUser;
 import com.iwaodev.domain.category.CategorySortEnum;
 import com.iwaodev.ui.criteria.category.CategoryQueryStringCriteria;
-import com.iwaodev.ui.criteria.statistic.SaleQueryStringCriteria;
+import com.iwaodev.ui.criteria.statistic.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,18 +39,57 @@ public class StatisticController {
      */
     @GetMapping("/statistics/sales")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<List<SaleDTO>> get(
+    public ResponseEntity<List<SaleDTO>> getSales(
             SaleQueryStringCriteria criteria) throws Exception {
+        List<SaleDTO> data = this.service.getSales(criteria);
+        return new ResponseEntity<>(data, HttpStatus.OK);
+    }
 
-        logger.debug("criteria query params");
-        logger.debug(criteria.toString());
-        List<SaleDTO> data = this.service.getSale(criteria);
+    @GetMapping("/statistics/users")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<List<StatisticUserDTO>> getUsers(
+            StatisticUserQueryStringCriteria criteria) throws Exception {
+        List<StatisticUserDTO> data = this.service.getUsers(criteria);
+        return new ResponseEntity<>(data, HttpStatus.OK);
+    }
 
-        logger.debug("response data");
-        logger.debug(data.toString());
+    @GetMapping("/statistics/total/sales")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<List<StatisticTotalSaleDTO>> getUsers(
+            StatisticTotalSaleQueryStringCriteria criteria) throws Exception {
+        List<StatisticTotalSaleDTO> data = this.service.getTotalSales(criteria);
+        return new ResponseEntity<>(data, HttpStatus.OK);
+    }
 
+    @GetMapping("/statistics/total/users")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<List<StatisticTotalUserDTO>> getUsers(
+            StatisticTotalUserQueryStringCriteria criteria) throws Exception {
+        List<StatisticTotalUserDTO> data = this.service.getTotalUsers(criteria);
+        return new ResponseEntity<>(data, HttpStatus.OK);
+    }
 
+    @GetMapping("/statistics/total/products")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<List<StatisticTotalProductDTO>> getProducts(
+            StatisticTotalProductQueryStringCriteria criteria) throws Exception {
+        List<StatisticTotalProductDTO> data = this.service.getTotalProducts(criteria);
+        return new ResponseEntity<>(data, HttpStatus.OK);
+    }
 
+    @GetMapping("/statistics/top/products")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<List<StatisticTopProductDTO>> getProducts(
+            StatisticTopProductQueryStringCriteria criteria) throws Exception {
+        List<StatisticTopProductDTO> data = this.service.getTopProducts(criteria);
+        return new ResponseEntity<>(data, HttpStatus.OK);
+    }
+
+    @GetMapping("/statistics/top/users")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<List<StatisticTopUserDTO>> getUsers(
+            StatisticTopUserQueryStringCriteria criteria) throws Exception {
+        List<StatisticTopUserDTO> data = this.service.getTopUsers(criteria);
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
 }

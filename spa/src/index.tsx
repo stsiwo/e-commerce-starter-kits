@@ -10,7 +10,6 @@ import * as ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { useLocation } from "react-router";
 import { BrowserRouter as Router } from "react-router-dom";
-
 /**
  * dev env only
  **/
@@ -51,7 +50,7 @@ const Index = (props: any) => {
               <Provider store={store}>
                 <ScrollToTop />
                 <DefaultHead />
-                <DemoDialog />
+                {NODE_ENV === "production" && <DemoDialog />}
                 <Content />
                 {/**(RoleSwitch &&
                   <RoleSwitch />
