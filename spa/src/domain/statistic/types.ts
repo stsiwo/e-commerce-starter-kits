@@ -1,4 +1,10 @@
-export enum SaleBaseEnum {
+export enum StatisticSaleBaseEnum {
+  HOURLY = "HOURLY",
+  DAILY = "DAILY",
+  MONTHLY = "MONTHLY",
+}
+
+export enum StatisticUserBaseEnum {
   HOURLY = "HOURLY",
   DAILY = "DAILY",
   MONTHLY = "MONTHLY",

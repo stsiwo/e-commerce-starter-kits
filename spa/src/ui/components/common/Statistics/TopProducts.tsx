@@ -5,6 +5,7 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import FavoriteIcon from "@material-ui/icons/Favorite";
 import { AxiosError, AxiosResponse } from "axios";
 import { api } from "configs/axiosConfig";
 import { logger } from "configs/logger";
@@ -102,31 +103,47 @@ const TopProducts: React.FunctionComponent<{}> = (props) => {
   }, []);
 
   const renderDomains: () => React.ReactNode = () => {
-    return curData.slice(0, curDataSize).map((product: TopProductType) => {
-      /**
-       * if the product is available (e.g., not null), display teh primary image.
-       **/
-      return (
-        <Card className={classes.horizontalCard} key={product.productId}>
-          <CardHeader
-            className={classes.horizontalCardHeader}
-            avatar={<Avatar alt="" src={product.primaryImagePath} />}
-            title={product.soldCount + " items sold"}
-            subheader={product.productName}
-            action={
-              <Button
-                variant="contained"
-                size={"small"}
-                component={RRLink}
-                to={`/admin/products?searchQuery=${product.productId}`}
-              >
-                Detail
-              </Button>
-            }
-          ></CardHeader>
-        </Card>
-      );
-    });
+    return curData
+      .slice(0, curDataSize)
+      .map((product: TopProductType, index: number) => {
+        /**
+         * if the product is available (e.g., not null), display teh primary image.
+         **/
+        return (
+          <Card className={classes.horizontalCard} key={product.productId}>
+            <CardHeader
+              className={classes.horizontalCardHeader}
+              avatar={
+                <React.Fragment>
+                  {!product.primaryImagePath && (
+                    <Avatar alt={`top-product-${index}`}>
+                      <FavoriteIcon />
+                    </Avatar>
+                  )}
+                  {product.primaryImagePath && (
+                    <Avatar
+                      alt={`top-product-${index}`}
+                      src={product.primaryImagePath}
+                    />
+                  )}
+                </React.Fragment>
+              }
+              title={product.soldCount + " items sold"}
+              subheader={product.productName}
+              action={
+                <Button
+                  variant="contained"
+                  size={"small"}
+                  component={RRLink}
+                  to={`/admin/products?searchQuery=${product.productId}`}
+                >
+                  Detail
+                </Button>
+              }
+            ></CardHeader>
+          </Card>
+        );
+      });
   };
 
   return (

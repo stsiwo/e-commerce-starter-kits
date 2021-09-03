@@ -19,6 +19,7 @@ import {
 } from "domain/statistic/types";
 import * as React from "react";
 import { Pie, PieChart, ResponsiveContainer } from "recharts";
+import { toDateMonthDayString, toHourString } from "src/utils";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -145,6 +146,25 @@ const TotalUsersPieChart: React.FunctionComponent<{}> = (props) => {
     setTotalAmount(total);
   }, [JSON.stringify(curData)]);
 
+  /**
+   * render label for pic chart (you need to do this manually)
+   *
+   * note: rechart bug: https://github.com/recharts/recharts/issues/929
+   *
+   * solution is to use 'useCallback'.
+   */
+  const renderPieLabel: (data: TotalUsersDataType) => string =
+    React.useCallback(
+      (data) => {
+        if (curBase === TotalUsersBaseEnum.TODAY) {
+          return toHourString(data.name);
+        } else {
+          return toDateMonthDayString(data.name);
+        }
+      },
+      [curBase, curData]
+    );
+
   return (
     <Card className={classes.card}>
       <CardHeader
@@ -179,7 +199,8 @@ const TotalUsersPieChart: React.FunctionComponent<{}> = (props) => {
                 innerRadius={10}
                 outerRadius={40}
                 fill={themes.palette.fifth.main}
-                label
+                label={renderPieLabel}
+                labelLine
               />
             </PieChart>
           </ResponsiveContainer>

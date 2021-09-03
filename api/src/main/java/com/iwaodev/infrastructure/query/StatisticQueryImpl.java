@@ -356,9 +356,8 @@ public class StatisticQueryImpl implements StatisticQuery {
                 "u.avatar_image_path, " +
                 "sum(ifnull(o.product_cost + o.shipping_cost + o.tax_cost, 0)) total_spend " +
                 "from users u " +
-                "left join orders o on o.user_id = u.user_id " +
+                "left join orders o on o.user_id = u.user_id and o.transaction_result = 1 " +
                 "where u.user_type_id = 2 " +
-                "and o.transaction_result = 1 " +
                 "group by u.user_id " +
                 "order by total_spend desc " +
                 "limit 20;";

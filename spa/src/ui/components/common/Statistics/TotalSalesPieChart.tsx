@@ -19,7 +19,11 @@ import {
 } from "domain/statistic/types";
 import * as React from "react";
 import { Pie, PieChart, ResponsiveContainer } from "recharts";
-import { cadCurrencyFormat } from "src/utils";
+import {
+  cadCurrencyFormat,
+  toDateMonthDayString,
+  toHourString,
+} from "src/utils";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -61,32 +65,6 @@ export declare type TotalSalesDataType = {
   sales: number;
 };
 
-const data01: TotalSalesDataType[] = [
-  {
-    name: new Date(),
-    sales: 400,
-  },
-  {
-    name: new Date(),
-    sales: 300,
-  },
-  {
-    name: new Date(),
-    sales: 300,
-  },
-  {
-    name: new Date(),
-    sales: 200,
-  },
-  {
-    name: new Date(),
-    sales: 278,
-  },
-  {
-    name: new Date(),
-    sales: 189,
-  },
-];
 /**
  * admin dashboard total sales pie chart component page
  *
@@ -150,6 +128,25 @@ const TotalSalesPieChart: React.FunctionComponent<{}> = (props) => {
     setTotalAmount(total);
   }, [JSON.stringify(curData)]);
 
+  /**
+   * render label for pic chart (you need to do this manually)
+   *
+   * note: rechart bug: https://github.com/recharts/recharts/issues/929
+   *
+   * solution is to use 'useCallback'.
+   */
+  const renderPieLabel: (data: TotalSalesDataType) => string =
+    React.useCallback(
+      (data) => {
+        if (curBase === TotalSalesBaseEnum.TODAY) {
+          return toHourString(data.name);
+        } else {
+          return toDateMonthDayString(data.name);
+        }
+      },
+      [curBase, curData]
+    );
+
   return (
     <Card className={classes.card}>
       <CardHeader
@@ -203,7 +200,7 @@ const TotalSalesPieChart: React.FunctionComponent<{}> = (props) => {
                 innerRadius={10}
                 outerRadius={40}
                 fill={themes.palette.fifth.main}
-                label
+                label={renderPieLabel}
               />
             </PieChart>
           </ResponsiveContainer>

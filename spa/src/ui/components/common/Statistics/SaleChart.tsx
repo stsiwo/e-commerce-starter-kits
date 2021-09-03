@@ -14,9 +14,11 @@ import {
   Theme,
   useTheme,
 } from "@material-ui/core/styles";
-import { AxiosError } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { api } from "configs/axiosConfig";
 import { logger } from "configs/logger";
+import { determineBaseOnSaleAreaChart } from "domain/statistic";
+import { StatisticSaleBaseEnum } from "domain/statistic/types";
 import * as React from "react";
 import {
   Area,
@@ -28,12 +30,14 @@ import {
   YAxis,
 } from "recharts";
 import {
+  cadCurrencyFormat,
   filterEndDate,
   filterEndMonth,
   filterEndYear,
   getAvailableDate,
   getAvailableMonth,
   getPastTenYears,
+  toHourString,
 } from "src/utils";
 const log = logger(__filename);
 
@@ -71,7 +75,12 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export declare type SaleDataType = {
+export declare type StatisticSaleDataType = {
+  name: string;
+  value: number;
+};
+
+export declare type ApiStatisticSaleDataType = {
   name: Date;
   value: number;
 };
@@ -302,7 +311,7 @@ const SaleChart: React.FunctionComponent<{}> = (props) => {
   /**
    * request to my back end api to get sales data
    */
-  const [curData, setData] = React.useState<SaleDataType[]>([]);
+  const [curData, setData] = React.useState<StatisticSaleDataType[]>([]);
   React.useEffect(() => {
     const queryString = `?startYear=${curStartYear}&startMonth=${curStartMonth}&startDate=${curStartDate}&endYear=${curEndYear}&endMonth=${curEndMonth}&endDate=${curEndDate}`;
 
@@ -311,8 +320,32 @@ const SaleChart: React.FunctionComponent<{}> = (props) => {
         method: "GET",
         url: API1_URL + `/statistics/sales${queryString}`,
       })
-      .then((data) => {
-        setData(data.data);
+      .then((data: AxiosResponse<ApiStatisticSaleDataType[]>) => {
+        const result: StatisticSaleDataType[] = data.data.map(
+          (userData: ApiStatisticSaleDataType) => {
+            if (
+              determineBaseOnSaleAreaChart(
+                curStartYear,
+                curStartMonth,
+                curStartDate,
+                curEndYear,
+                curEndMonth,
+                curEndDate
+              ) === StatisticSaleBaseEnum.HOURLY
+            ) {
+              return {
+                name: toHourString(userData.name),
+                value: userData.value,
+              };
+            } else {
+              return {
+                name: userData.name.toLocaleDateString(),
+                value: userData.value,
+              };
+            }
+          }
+        );
+        setData(result);
       })
       .catch((error: AxiosError) => {
         log("failed to load sale data.");
@@ -333,7 +366,7 @@ const SaleChart: React.FunctionComponent<{}> = (props) => {
   React.useEffect(() => {
     let total = 0;
 
-    curData.forEach((data: SaleDataType) => {
+    curData.forEach((data: StatisticSaleDataType) => {
       total += data.value;
     });
 
@@ -342,7 +375,7 @@ const SaleChart: React.FunctionComponent<{}> = (props) => {
 
   return (
     <Card className={classes.card}>
-      <CardHeader title={curTotalAmount} subheader="Sales" />
+      <CardHeader title={cadCurrencyFormat(curTotalAmount)} subheader="Sales" />
       <CardContent>
         <Box className={classes.wrapper}>
           <ResponsiveContainer width="100%" height="100%">

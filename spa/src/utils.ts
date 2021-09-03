@@ -7,10 +7,34 @@ export const getApiUrl = (path: string): string => {
   return API1_URL + "/" + path;
 };
 
+/**
+ * this format does not work.
+ *
+ * for example, it also include unspecified value. even if specifying year, month, and day, it also display hour, minute, day.
+ *
+ * currently, manually construct the desired format (e.g., date.getMonth() + "-" + date.getDay())
+ */
 export const dateFormatOption: Intl.DateTimeFormatOptions = {
   year: "numeric",
   month: "long",
   day: "numeric",
+};
+
+export const dateShortFormatOption: Intl.DateTimeFormatOptions = {
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+};
+
+export const timeFormatOption: Intl.DateTimeFormatOptions = {
+  hour: "numeric",
+  minute: "numeric",
+  second: "numeric",
+};
+
+export const hourMinuteFormatOption: Intl.DateTimeFormatOptions = {
+  hour: "numeric",
+  minute: "numeric",
 };
 
 /**
@@ -263,6 +287,20 @@ export const monthNames = [
   "December",
 ];
 
+export const monthShortNames = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 export function generateQueryString(target: { [key: string]: any }): string {
   const keys = Object.keys(target);
   let queryString = "?";
@@ -289,6 +327,45 @@ export function isDateObject(variable: any): boolean {
 
 export function toStringToDateToString(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("en-US", dateFormatOption);
+}
+
+export function toDateShortString(date: Date): string {
+  if (!date) {
+    return "";
+  }
+  return date.toLocaleDateString("en-US", dateShortFormatOption);
+  //return ` ${date.getDay()}`;
+}
+
+export function toDateMonthDayString(date: Date): string {
+  if (!date) {
+    return "";
+  }
+  //return date.toLocaleDateString("en-US", dateShortFormatOption);
+  return `${monthShortNames[date.getMonth()]} ${date.getDay()}`;
+}
+
+export function toHourMinuteString(date: Date): string {
+  if (!date) {
+    return "";
+  }
+  //return date.toLocaleDateString("en-US", hourMinuteFormatOption);
+  return date.getHours() + ":" + date.getMinutes();
+}
+
+export function toHourString(date: Date): string {
+  if (!date) {
+    return "";
+  }
+  //return date.toLocaleDateString("en-US", hourMinuteFormatOption);
+  return `${date.getHours()}:00`;
+}
+
+export function toTimeString(date: Date): string {
+  if (!date) {
+    return "";
+  }
+  return date.toLocaleDateString("en-US", timeFormatOption);
 }
 
 export function toDateString(date: Date): string {
@@ -647,13 +724,16 @@ export const emptyNestedObject: (
 /**
  * formatter
  **/
+export const formatter = new Intl.NumberFormat("en-CA", {
+  // string must match with spec otherwise won't render dollar sign properly
+  // ?? i have no idea how this works? spell miss?? but now work correctly.
+  style: "currency",
+  currency: "CAD",
+});
 
 // price (currency)
 export const cadCurrencyFormat: (amount: number) => string = (amount) => {
-  return amount.toLocaleString("ca-CA", {
-    style: "currency",
-    currency: "CAD",
-  });
+  return formatter.format(amount);
 };
 
 /**

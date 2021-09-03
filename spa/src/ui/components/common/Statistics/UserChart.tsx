@@ -14,9 +14,11 @@ import {
   Theme,
   useTheme,
 } from "@material-ui/core/styles";
-import { AxiosError } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { api } from "configs/axiosConfig";
 import { logger } from "configs/logger";
+import { determineBaseOnUserAreaChart } from "domain/statistic";
+import { StatisticUserBaseEnum } from "domain/statistic/types";
 import * as React from "react";
 import {
   Area,
@@ -34,6 +36,7 @@ import {
   getAvailableDate,
   getAvailableMonth,
   getPastTenYears,
+  toHourString,
 } from "src/utils";
 const log = logger(__filename);
 
@@ -72,6 +75,11 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export declare type StatisticUserDataType = {
+  name: string;
+  users: number;
+};
+
+export declare type ApiStatisticUserDataType = {
   name: Date;
   users: number;
 };
@@ -314,8 +322,32 @@ const UserChart: React.FunctionComponent<{}> = (props) => {
         method: "GET",
         url: API1_URL + `/statistics/users${queryString}`,
       })
-      .then((data) => {
-        setData(data.data);
+      .then((data: AxiosResponse<ApiStatisticUserDataType[]>) => {
+        const result: StatisticUserDataType[] = data.data.map(
+          (userData: ApiStatisticUserDataType) => {
+            if (
+              determineBaseOnUserAreaChart(
+                curStartYear,
+                curStartMonth,
+                curStartDate,
+                curEndYear,
+                curEndMonth,
+                curEndDate
+              ) === StatisticUserBaseEnum.HOURLY
+            ) {
+              return {
+                name: toHourString(userData.name),
+                users: userData.users,
+              };
+            } else {
+              return {
+                name: userData.name.toLocaleDateString(),
+                users: userData.users,
+              };
+            }
+          }
+        );
+        setData(result);
       })
       .catch((error: AxiosError) => {
         log("failed to load user data.");

@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
+    <!-- Disable index.html caching since this still load old app when deploying the new application -->
+    <meta
+      http-equiv="Cache-control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
     <!-- DON'T FORGET THIS FOR SEO OPTIMIZATION and you DON'T need to specify others unnecessary meta description execpt for title, meta description -->
-    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <title><%= htmlWebpackPlugin.options.title %></title>
-      <script
-        src="https://www.google.com/recaptcha/api.js"
-        async
-        defer
-      ></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script
-        async
-        src="https://www.googletagmanager.com/gtag/js?id=G-BET3ZBJQ4E"
-      ></script>
-      <script src="/inline-google-analytics.js"></script>
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-BET3ZBJQ4E"
+    ></script>
+    <script src="/inline-google-analytics.js"></script>
 
     <!--
       error: Uncaught SyntaxError: Unexpected token '<'
