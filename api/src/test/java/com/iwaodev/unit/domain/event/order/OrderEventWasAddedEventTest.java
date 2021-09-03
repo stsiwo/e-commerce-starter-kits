@@ -13,6 +13,8 @@ import com.iwaodev.application.event.order.SendOrderWasCanceledEmailEventHandler
 import com.iwaodev.application.event.order.SendOrderWasReturnedEmailEventHandler;
 import com.iwaodev.application.event.order.SendOrderWasShippedEmailEventHandler;
 import com.iwaodev.application.event.order.SendReturnRequestWasConfirmedEmailEventHandler;
+import com.iwaodev.application.event.product.GetProductStockBackEventHandler;
+import com.iwaodev.application.event.product.GetSoldCountBackEventHandler;
 import com.iwaodev.application.event.review.SendPleaseReviewEmailEventHandler;
 import com.iwaodev.domain.order.event.OrderEventWasAddedEvent;
 import com.iwaodev.util.TestUtil;
@@ -138,6 +140,8 @@ public class OrderEventWasAddedEventTest {
     registeredEventHandlers.add(SendOrderWasReturnedEmailEventHandler.class);
     registeredEventHandlers.add(SendOrderWasCanceledEmailEventHandler.class);
     registeredEventHandlers.add(SendReturnRequestWasConfirmedEmailEventHandler.class);
+    registeredEventHandlers.add(GetSoldCountBackEventHandler.class);
+    registeredEventHandlers.add(GetProductStockBackEventHandler.class);
 
     Set<Class<? extends EventHandler>> result = this.testUtil.getAllEventHandlerOfEvent(OrderEventWasAddedEvent.class);
 

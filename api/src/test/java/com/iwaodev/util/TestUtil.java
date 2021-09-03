@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.reflections.Reflections;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.stereotype.Component;
 
 
@@ -38,5 +39,12 @@ public class TestUtil {
     }).collect(Collectors.toSet());
 
     return targetEventHandlers;
+  }
+
+  public Set<Class<? extends ApplicationEvent>> getAllEvent() {
+    Reflections ref = new Reflections("com.iwaodev");
+    Set<Class<? extends ApplicationEvent>> allEvents = ref.getSubTypesOf(ApplicationEvent.class);
+
+    return allEvents;
   }
 }

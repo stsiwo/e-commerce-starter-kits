@@ -1,37 +1,5 @@
 package com.iwaodev.application.event.order;
 
-import java.math.BigDecimal;
-import java.util.Optional;
-
-import com.iwaodev.application.irepository.OrderRepository;
-import com.iwaodev.application.irepository.UserRepository;
-import com.iwaodev.application.iservice.PaymentService;
-import com.iwaodev.domain.order.event.CompletedOrderPaymentEvent;
-import com.iwaodev.exception.InvalidUserTypeException;
-import com.iwaodev.exception.NotFoundException;
-import com.iwaodev.infrastructure.model.Address;
-import com.iwaodev.infrastructure.model.Order;
-import com.iwaodev.infrastructure.model.User;
-import com.iwaodev.infrastructure.shipping.schema.ncshipment.DeliverySpecType;
-import com.iwaodev.infrastructure.shipping.schema.ncshipment.DestinationAddressDetailsType;
-import com.iwaodev.infrastructure.shipping.schema.ncshipment.DestinationType;
-import com.iwaodev.infrastructure.shipping.schema.ncshipment.DomesticAddressDetailsType;
-import com.iwaodev.infrastructure.shipping.schema.ncshipment.NonContractShipment;
-import com.iwaodev.infrastructure.shipping.schema.ncshipment.NotificationType;
-import com.iwaodev.infrastructure.shipping.schema.ncshipment.OptionType;
-import com.iwaodev.infrastructure.shipping.schema.ncshipment.ParcelCharacteristicsType;
-import com.iwaodev.infrastructure.shipping.schema.ncshipment.PreferencesType;
-import com.iwaodev.infrastructure.shipping.schema.ncshipment.ReferencesType;
-import com.iwaodev.infrastructure.shipping.schema.ncshipment.SenderType;
-import com.iwaodev.infrastructure.shipping.schema.ncshipment.ParcelCharacteristicsType.Dimensions;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.event.TransactionalEventListener;
-import com.iwaodev.exception.AppException;
 /**
  * shipment integration will be integrated at next version.
  *

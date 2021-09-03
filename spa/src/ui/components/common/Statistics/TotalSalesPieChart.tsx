@@ -115,7 +115,7 @@ const TotalSalesPieChart: React.FunctionComponent<{}> = (props) => {
   /**
    * request to my back end api to get sales data
    */
-  const [curData, setData] = React.useState<TotalSalesDataType[]>(data01);
+  const [curData, setData] = React.useState<TotalSalesDataType[]>([]);
   React.useEffect(() => {
     const queryString = `?base=${curBase}`;
 
@@ -195,7 +195,7 @@ const TotalSalesPieChart: React.FunctionComponent<{}> = (props) => {
           <ResponsiveContainer width="100%" height="100%">
             <PieChart width={730} height={250}>
               <Pie
-                data={data01}
+                data={curData}
                 dataKey="sales"
                 nameKey="name"
                 cx="50%"

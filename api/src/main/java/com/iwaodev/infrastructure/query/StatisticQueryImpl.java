@@ -113,7 +113,7 @@ public class StatisticQueryImpl implements StatisticQuery {
                 "(select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t2,  " +
                 "(select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t3,  " +
                 "(select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t4) v  " +
-                "left join users us on extract(day_hour from us.created_at) = extract(day_hour from name) " +
+                "left join users us on extract(day_hour from us.created_at) = extract(day_hour from name) and year(us.created_at) = year(:startDate)" + // add year condition since sometime this query return data from past years.
                 "where name between :startDate and :endDate " +
                 "group by name;";
 

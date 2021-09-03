@@ -386,6 +386,14 @@ public class Product {
     variant.setSoldCount(nextSoldCount);
   }
 
+  public void decreaseSoldCountForVariant(Integer soldCount, Long variantId) {
+    ProductVariant variant = this.findVariantById(variantId);
+    Integer curSoldCount = variant.getSoldCount();
+    Integer nextSoldCount = curSoldCount.intValue() - soldCount;
+    variant.setSoldCount(nextSoldCount);
+  }
+
+
   public ProductVariant findVariantById(Long variantId) {
     for (ProductVariant variant : variants) {
       if (variant.getVariantId().equals(variantId)) {

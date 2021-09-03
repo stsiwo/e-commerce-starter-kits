@@ -1,23 +1,16 @@
 package com.iwaodev.integration.event;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-// MockMvc stuff
-
 import com.iwaodev.application.event.product.DecreaseProductStockEventHandler;
+import com.iwaodev.application.event.product.GetProductStockBackEventHandler;
 import com.iwaodev.application.irepository.OrderRepository;
 import com.iwaodev.application.irepository.ProductRepository;
 import com.iwaodev.data.BaseDatabaseSetup;
+import com.iwaodev.domain.order.event.OrderEventWasAddedEvent;
 import com.iwaodev.domain.order.event.OrderFinalConfirmedEvent;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.Order;
 import com.iwaodev.infrastructure.model.OrderDetail;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.slf4j.Logger;
@@ -35,10 +28,17 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import com.iwaodev.exception.AppException;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 // this is alias to SpringJUnit4ClassRunner
 ////@RunWith(SpringRunner.class)
+
 /**
  * this allows you to use TestEntityManager instead of EntityManager.
  *
@@ -57,9 +57,9 @@ import com.iwaodev.exception.AppException;
 @Transactional(isolation = Isolation.READ_UNCOMMITTED)
 @ActiveProfiles("integtest")
 @AutoConfigureMockMvc
-public class DecreaseProductStockEventHandlerTest {
+public class GetProductStockBackEventHandlerTest {
 
-  private static final Logger logger = LoggerFactory.getLogger(DecreaseProductStockEventHandlerTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(GetProductStockBackEventHandlerTest.class);
 
   @LocalServerPort
   private int port;
@@ -77,7 +77,7 @@ public class DecreaseProductStockEventHandlerTest {
   private OrderRepository orderRepository;
 
   @Autowired
-  private DecreaseProductStockEventHandler handler;
+  private GetProductStockBackEventHandler handler;
 
   /**
    * insert base test data into mysql database
@@ -91,8 +91,8 @@ public class DecreaseProductStockEventHandlerTest {
   }
 
   @Test
-  @Sql(scripts = { "classpath:/integration/event/shouldDecreaseProductStockSuccessfullyWhenDecreaseStockEventHandlerCalled.sql" })
-  public void shouldDecreaseProductStockSuccessfullyWhenDecreaseStockEventHandlerCalled() throws Exception {
+  @Sql(scripts = { "classpath:/integration/event/shouldGetProductStockBackSuccessfullyWhenGetProductStockBackEventHandlerCalled.sql" })
+  public void shouldGetProductStockBackSuccessfullyWhenGetProductStockBackEventHandlerCalled() throws Exception {
 
     // make sure user_id in the sql match test admin user id
 
@@ -111,7 +111,7 @@ public class DecreaseProductStockEventHandlerTest {
     };
 
     // act & assert
-    this.handler.handleEvent(new OrderFinalConfirmedEvent(this, dummyOrder, dummyCustomerId, UserTypeEnum.MEMBER));
+    this.handler.handleEvent(new OrderEventWasAddedEvent(this, dummyOrder));
 
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.
@@ -125,38 +125,40 @@ public class DecreaseProductStockEventHandlerTest {
     for (int i = 0; i < orderDetails.size(); i++) {
       Integer quantity = orderDetails.get(i).getProductQuantity(); 
       Integer stock = orderDetails.get(i).getProductVariant().getVariantStock();
-      assertThat(originalStocks[i].intValue() - quantity.intValue()).isEqualTo(stock);
+      logger.debug("original stock: " + originalStocks[i].intValue());
+      logger.debug("restored stock: " + stock);
+      assertThat(originalStocks[i].intValue() + quantity.intValue()).isEqualTo(stock);
     }
   }
 
-  @Test
-  @Sql(scripts = { "classpath:/integration/event/shouldThrowOutOfStockWhenDecreaseStockEventHandlerCalled.sql" })
-  public void shouldThrowOutOfStockWhenDecreaseStockEventHandlerCalled() throws Exception {
+  //@Test
+  //@Sql(scripts = { "classpath:/integration/event/shouldDoNothingAboutGetProductStockBackWhenTargetProductDoesNotExist.sql" })
+  //public void shouldDoNothingAboutGetProductStockBackWhenTargetProductDoesNotExist() throws Exception {
 
-    // make sure user_id in the sql match test admin user id
+  //  // make sure user_id in the sql match test admin user id
 
-    // arrange
-    UUID dummyOrderId = UUID.fromString("c8f8591c-bb83-4fd1-a098-3fac8d40e450");
-    Optional<Order> dummyOrderOption = this.orderRepository.findById(dummyOrderId);
-    Order dummyOrder = dummyOrderOption.get();
-    String dummyCustomerId = "dummy-customer-id";
+  //  // arrange
+  //  UUID dummyOrderId = UUID.fromString("c8f8591c-bb83-4fd1-a098-3fac8d40e450");
+  //  Optional<Order> dummyOrderOption = this.orderRepository.findById(dummyOrderId);
+  //  Order dummyOrder = dummyOrderOption.get();
+  //  String dummyCustomerId = "dummy-customer-id";
 
-    // assuming the number of order details: 3
+  //  // assuming the number of order details: 3
 
-    // act & assert
-    assertThatThrownBy(() -> {
-      this.handler.handleEvent(new OrderFinalConfirmedEvent(this, dummyOrder, dummyCustomerId, UserTypeEnum.MEMBER));
-    }).isInstanceOf(AppException.class);
+  //  // act & assert
+  //  assertThatThrownBy(() -> {
+  //    this.handler.handleEvent(new OrderFinalConfirmedEvent(this, dummyOrder, dummyCustomerId, UserTypeEnum.MEMBER));
+  //  }).isInstanceOf(AppException.class);
 
-    /**
-     * NOTE: 'save' inside this handler automatically update/reflect target entity.
-     *
-     * e.g., even if we call the this.orderRepository before this handler is handled, its variant sold count is updated.
-     **/
+  //  /**
+  //   * NOTE: 'save' inside this handler automatically update/reflect target entity.
+  //   *
+  //   * e.g., even if we call the this.orderRepository before this handler is handled, its variant sold count is updated.
+  //   **/
 
-    // assert
-    // use prodictRepository to make sure purchased product has added sold count
-  }
+  //  // assert
+  //  // use prodictRepository to make sure purchased product has added sold count
+  //}
 }
 
 

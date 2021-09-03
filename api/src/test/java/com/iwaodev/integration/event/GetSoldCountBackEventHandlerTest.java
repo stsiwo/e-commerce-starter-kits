@@ -1,17 +1,14 @@
-package com.iwaodev.integration.schedule;
+package com.iwaodev.integration.event;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-
-// MockMvc stuff
-
+import com.iwaodev.application.event.product.AddSoldCountEventHandler;
+import com.iwaodev.application.event.product.GetSoldCountBackEventHandler;
+import com.iwaodev.application.irepository.OrderRepository;
 import com.iwaodev.application.irepository.ProductRepository;
-import com.iwaodev.application.schedule.product.TurnIsDiscountFalseWhenDiscountDoneScheduledTask;
 import com.iwaodev.data.BaseDatabaseSetup;
-import com.iwaodev.infrastructure.model.Product;
-import com.iwaodev.infrastructure.model.ProductVariant;
-
+import com.iwaodev.domain.order.event.OrderEventWasAddedEvent;
+import com.iwaodev.domain.order.event.PaymentSucceededEvent;
+import com.iwaodev.infrastructure.model.Order;
+import com.iwaodev.infrastructure.model.OrderDetail;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.slf4j.Logger;
@@ -30,8 +27,14 @@ import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 // this is alias to SpringJUnit4ClassRunner
-//@RunWith(SpringRunner.class)
+////@RunWith(SpringRunner.class)
+
 /**
  * this allows you to use TestEntityManager instead of EntityManager.
  *
@@ -50,9 +53,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(isolation = Isolation.READ_UNCOMMITTED)
 @ActiveProfiles("integtest")
 @AutoConfigureMockMvc
-public class TurnIsDiscountFalseWhenDiscountDoneScheduledTaskTest {
+public class GetSoldCountBackEventHandlerTest {
 
-  private static final Logger logger = LoggerFactory.getLogger(TurnIsDiscountFalseWhenDiscountDoneScheduledTaskTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(GetSoldCountBackEventHandlerTest.class);
 
   @LocalServerPort
   private int port;
@@ -67,7 +70,10 @@ public class TurnIsDiscountFalseWhenDiscountDoneScheduledTaskTest {
   private ProductRepository productRepository;
 
   @Autowired
-  private TurnIsDiscountFalseWhenDiscountDoneScheduledTask task;
+  private OrderRepository orderRepository;
+
+  @Autowired
+  private GetSoldCountBackEventHandler handler;
 
   /**
    * insert base test data into mysql database
@@ -81,54 +87,38 @@ public class TurnIsDiscountFalseWhenDiscountDoneScheduledTaskTest {
   }
 
   @Test
-  @Sql(scripts = { "classpath:/integration/schedule/shouldTurnDiscountFalseSuccessfully.sql" })
-  public void shouldTurnDiscountFalseSuccessfully(/**@Value("classpath:/integration/schedule/shouldAddSoldCountSuccessfullyWhenAddSoldCountEventHandlerCalled.json") Resource dummyFormJsonFile**/) throws Exception {
+  @Sql(scripts = { "classpath:/integration/event/shouldGetSoldCountBackSuccessfullyWhenGetSoldCountBackEventHandlerCalled.sql" })
+  public void shouldGetSoldCountBackSuccessfullyWhenGetSoldCountBackEventHandlerCalled(/**@Value("classpath:/integration/event/shouldAddSoldCountSuccessfullyWhenAddSoldCountEventHandlerCalled.json") Resource dummyFormJsonFile**/) throws Exception {
+
+    // make sure user_id in the sql match test admin user id
+
+    // this is guest purchase (does not have a user membership account)
 
     // arrange
+    UUID dummyOrderId = UUID.fromString("c8f8591c-bb83-4fd1-a098-3fac8d40e450");
+    Optional<Order> dummyOrderOption = this.orderRepository.findById(dummyOrderId);
+    Order dummyOrder = dummyOrderOption.get();
+    Integer dummyOriginalStock = 100;
+
     // act & assert
+    this.handler.handleEvent(new OrderEventWasAddedEvent(this, dummyOrder));
 
     /**
      * NOTE: 'save' inside this handler automatically update/reflect target entity.
      *
      * e.g., even if we call the this.orderRepository before this handler is handled, its variant sold count is updated.
      **/
-    this.task.handle();
 
     // assert
-    List<Product> products = this.productRepository.findAll();
-
-    for (Product product : products) {
-      if (product.getProductId().toString().equals("9e3e67ca-d058-41f0-aad5-4f09c956a81f")) {
-        for (ProductVariant variant: product.getVariants()) {
-          if (variant.getVariantId().toString().equals("3")) {
-            assertThat(variant.getIsDiscount()).isEqualTo(true);
-          } else {
-            assertThat(variant.getIsDiscount()).isEqualTo(false);
-          }
-        }
-      }
-      if (product.getProductId().toString().equals("773f1fc7-c037-447a-a5b2-f790ea2302e5")) {
-        for (ProductVariant variant: product.getVariants()) {
-          if (variant.getVariantId().toString().equals("9")) {
-            assertThat(variant.getIsDiscount()).isEqualTo(true);
-          } else {
-            assertThat(variant.getIsDiscount()).isEqualTo(false);
-          }
-        }
-      }
-      if (product.getProductId().toString().equals("a362bbc3-5c70-4e82-96d3-5fa1e3103332")) {
-        for (ProductVariant variant: product.getVariants()) {
-          if (variant.getVariantId().toString().equals("11")) {
-            assertThat(variant.getIsDiscount()).isEqualTo(true);
-          } else {
-            assertThat(variant.getIsDiscount()).isEqualTo(false);
-          }
-        }
-      }
+    // use prodictRepository to make sure purchased product has added sold count
+    for (OrderDetail orderDetail: dummyOrder.getOrderDetails()) {
+      Integer quantity = orderDetail.getProductQuantity(); 
+      Integer soldCount = orderDetail.getProductVariant().getSoldCount();
+      logger.debug("" + soldCount);
+      assertThat(soldCount).isEqualTo(dummyOriginalStock - quantity);
     }
   }
 }
-
 
 
 

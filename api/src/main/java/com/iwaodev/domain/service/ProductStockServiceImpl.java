@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.iwaodev.application.irepository.ProductRepository;
 import com.iwaodev.exception.NotFoundException;
+import com.iwaodev.exception.OutOfStockException;
 import com.iwaodev.infrastructure.model.OrderDetail;
 import com.iwaodev.infrastructure.model.Product;
 
@@ -44,7 +45,14 @@ public class ProductStockServiceImpl implements ProductStockService {
   }
 
   @Override
-  public List<Product> take(List<OrderDetail> orderDetails) throws NotFoundException {
+  public List<Product> take(List<OrderDetail> orderDetails) throws NotFoundException, OutOfStockException {
+
+    // find target product and variant by criteria productId & variantId
+    // TODO: make sure pessimistic lock works
+
+    //Product product = this.productRepository.findByIdWithPessimisticLock(productId)
+    //    .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND,
+    //        this.ExceptionMessenger.getNotFoundMessage("product", productId.toString())));
 
     // increase the stock back for each item
     List<Product> products = new ArrayList<>();
@@ -54,7 +62,7 @@ public class ProductStockServiceImpl implements ProductStockService {
       Product product = orderDetail.getProduct();
       Long variantId = orderDetail.getProductVariant().getVariantId();
 
-      product.increaseStockOfVariantBack(orderDetail.getProductQuantity(), variantId);
+      product.decreaseStockOfVariant(orderDetail.getProductQuantity(), variantId);
 
       products.add(product);
     }

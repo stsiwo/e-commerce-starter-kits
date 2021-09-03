@@ -6,35 +6,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.iwaodev.application.event.EventHandler;
-import com.iwaodev.application.event.notification.CreateOrderEventNotificationEventHandler;
-import com.iwaodev.application.event.notification.CreateOrderEventNotificationForMemberEventHandler;
-import com.iwaodev.application.event.order.RefundPaymentEventHandler;
-import com.iwaodev.application.event.order.SendCancelRequestSubmittedEmailEventHandler;
-import com.iwaodev.application.event.order.SendCancelRequestWasConfirmedEmailEventHandler;
-import com.iwaodev.application.event.order.SendOrderWasCanceledEmailEventHandler;
-import com.iwaodev.application.event.order.SendOrderWasReturnedEmailEventHandler;
-import com.iwaodev.application.event.order.SendOrderWasShippedEmailEventHandler;
-import com.iwaodev.application.event.order.SendReturnRequestSubmittedEmailEventHandler;
-import com.iwaodev.application.event.order.SendReturnRequestWasConfirmedEmailEventHandler;
-import com.iwaodev.application.event.product.AddSoldCountEventHandler;
 import com.iwaodev.application.event.product.DecreaseProductStockEventHandler;
-import com.iwaodev.application.event.review.SendPleaseReviewEmailEventHandler;
 import com.iwaodev.application.event.user.AssignStripeCustomerIdEventHandler;
-import com.iwaodev.domain.order.event.CompletedOrderPaymentEvent;
-import com.iwaodev.domain.order.event.OrderCanceledEvent;
-import com.iwaodev.domain.order.event.OrderEventWasAddedByMemberEvent;
-import com.iwaodev.domain.order.event.OrderEventWasAddedEvent;
 import com.iwaodev.domain.order.event.OrderFinalConfirmedEvent;
 import com.iwaodev.util.TestUtil;
 
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * check if registered event handler is called or not.

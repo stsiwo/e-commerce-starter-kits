@@ -2,73 +2,37 @@ package com.iwaodev.integration.event.payment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.persistence.EntityManager;
-import javax.servlet.http.Cookie;
-
 // MockMvc stuff
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iwaodev.application.dto.company.CompanyDTO;
-import com.iwaodev.application.dto.user.AddressDTO;
-import com.iwaodev.application.dto.user.UserDTO;
 import com.iwaodev.application.event.payment.PaymentFailedEventHandler;
-import com.iwaodev.application.event.product.AddSoldCountEventHandler;
 import com.iwaodev.application.irepository.OrderRepository;
 import com.iwaodev.application.irepository.ProductRepository;
-import com.iwaodev.auth.AuthenticateTestUser;
-import com.iwaodev.auth.AuthenticationInfo;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.order.OrderStatusEnum;
-import com.iwaodev.domain.order.event.CompletedOrderPaymentEvent;
 import com.iwaodev.domain.order.event.PaymentFailedEvent;
-import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.infrastructure.model.Order;
 import com.iwaodev.infrastructure.model.OrderDetail;
-import com.iwaodev.infrastructure.model.Product;
-import com.iwaodev.util.ResourceReader;
 
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.transaction.BeforeTransaction;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,6 +1,7 @@
 package com.iwaodev.application.event.order;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import com.iwaodev.application.event.EventHandler;
 import com.iwaodev.application.event.EventHandlerChecker;
 import com.iwaodev.application.irepository.NotificationRepository;
 import com.iwaodev.application.irepository.OrderRepository;
+import com.iwaodev.application.irepository.ProductRepository;
 import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.iservice.EmailService;
 import com.iwaodev.application.iservice.OrderService;
@@ -26,11 +28,7 @@ import com.iwaodev.domain.service.ProductStockService;
 import com.iwaodev.exception.DomainException;
 import com.iwaodev.exception.ExceptionMessenger;
 import com.iwaodev.exception.NotFoundException;
-import com.iwaodev.infrastructure.model.CartItem;
-import com.iwaodev.infrastructure.model.Company;
-import com.iwaodev.infrastructure.model.Notification;
-import com.iwaodev.infrastructure.model.Order;
-import com.iwaodev.infrastructure.model.User;
+import com.iwaodev.infrastructure.model.*;
 import com.iwaodev.ui.criteria.order.OrderEventCriteria;
 import com.stripe.exception.StripeException;
 import com.iwaodev.exception.AppException;
@@ -66,6 +64,11 @@ public class RefundPaymentEventHandler implements EventHandler<OrderEventWasAdde
   @Autowired
   private OrderRepository orderRepository;
 
+  @Autowired
+  private ProductStockService productStockService;
+
+  @Autowired
+  private ProductRepository productRepository;
   /**
    * refund the payment with Stripe .
    *
@@ -75,12 +78,15 @@ public class RefundPaymentEventHandler implements EventHandler<OrderEventWasAdde
    * this event handler is shared by the use cases of 'CANCELED' and 'RETURNED'.
    *
    * this must be sync since if one of the step failed, it cannot be completed.
+   *
+   * only admin can do the actual cancel/refund although customers can request for it.
    **/
   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
   public void handleEvent(OrderEventWasAddedEvent event) throws AppException {
     logger.debug("start RefundPaymentEventHandler called.");
     logger.debug(Thread.currentThread().getName());
 
+    // ? what's this??
     this.orderRepository.findAll();
 
     if (event.getOrder().retrieveLatestOrderEvent() == null) {
@@ -113,5 +119,7 @@ public class RefundPaymentEventHandler implements EventHandler<OrderEventWasAdde
       logger.debug(e.getMessage());
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
+
+    // restore the product stock in another event handler.
   }
 }
