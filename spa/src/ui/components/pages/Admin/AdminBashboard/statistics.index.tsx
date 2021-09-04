@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
     topSectionGridContainer: {},
     topSectionGridItems: {
       margin: theme.spacing(1),
-      flex: "0 0 300px",
+      flex: "0 0 320px",
     },
     secondSectionGridContainer: {},
 

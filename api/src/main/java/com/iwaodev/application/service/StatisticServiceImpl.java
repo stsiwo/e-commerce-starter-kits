@@ -32,6 +32,9 @@ public class StatisticServiceImpl implements StatisticService {
         LocalDateTime startDate = LocalDateTime.of(criteria.getStartYear(), criteria.getStartMonth(), criteria.getStartDate(), 0, 0);
         LocalDateTime endDate = LocalDateTime.of(criteria.getEndYear(), criteria.getEndMonth(), criteria.getEndDate(), LocalDateTime.now().getHour(), LocalDateTime.now().getMinute());
 
+        logger.debug(startDate.toString());
+        logger.debug(endDate.toString());
+
         SaleBaseEnum saleBase = this.determineSaleBase(criteria.getStartYear(), criteria.getStartMonth(), criteria.getStartDate(), criteria.getEndYear(), criteria.getEndMonth(), criteria.getEndDate());
 
         if (saleBase.equals(SaleBaseEnum.HOURLY)) {

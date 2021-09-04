@@ -41,6 +41,9 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       flexDirection: "column",
     },
+    cardContentRoot: {
+      padding: 0,
+    },
     actions: {
       display: "flex",
       justifyContent: "flex-end",
@@ -157,9 +160,9 @@ const TotalUsersPieChart: React.FunctionComponent<{}> = (props) => {
     React.useCallback(
       (data) => {
         if (curBase === TotalUsersBaseEnum.TODAY) {
-          return toHourString(data.name);
+          return `${data.users} (${toHourString(data.name)})`;
         } else {
-          return toDateMonthDayString(data.name);
+          return `${data.users} (${toDateMonthDayString(data.name)})`;
         }
       },
       [curBase, curData]
@@ -186,7 +189,11 @@ const TotalUsersPieChart: React.FunctionComponent<{}> = (props) => {
           </Select>
         }
       />
-      <CardContent>
+      <CardContent
+        classes={{
+          root: classes.cardContentRoot,
+        }}
+      >
         <Box className={classes.wrapper}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart width={730} height={250}>

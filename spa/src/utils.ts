@@ -342,7 +342,7 @@ export function toDateMonthDayString(date: Date): string {
     return "";
   }
   //return date.toLocaleDateString("en-US", dateShortFormatOption);
-  return `${monthShortNames[date.getMonth()]} ${date.getDay()}`;
+  return `${monthShortNames[date.getMonth()]} ${date.getDate()}`;
 }
 
 export function toHourMinuteString(date: Date): string {

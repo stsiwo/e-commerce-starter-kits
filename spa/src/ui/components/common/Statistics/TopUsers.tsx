@@ -10,7 +10,7 @@ import { api } from "configs/axiosConfig";
 import { logger } from "configs/logger";
 import * as React from "react";
 import { Link as RRLink } from "react-router-dom";
-import { cadCurrencyFormat } from "src/utils";
+import { cadCurrencyFormat, getApiUrl } from "src/utils";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -104,31 +104,38 @@ const TopUsers: React.FunctionComponent<{}> = (props) => {
   }, []);
 
   const renderDomains: () => React.ReactNode = () => {
-    return curData.slice(0, curDataSize).map((user: TopUserType) => {
-      /**
-       * if the user is available (e.g., not null), display teh primary image.
-       **/
-      return (
-        <Card className={classes.horizontalCard} key={user.userId}>
-          <CardHeader
-            className={classes.horizontalCardHeader}
-            avatar={<Avatar alt="" src={user.userAvatarImagePath} />}
-            title={cadCurrencyFormat(user.totalSpend) + " spent"}
-            subheader={user.userFirstName + " " + user.userLastName}
-            action={
-              <Button
-                variant="contained"
-                size="small"
-                component={RRLink}
-                to={`/admin/customers?searchQuery=${user.userId}`}
-              >
-                Detail
-              </Button>
-            }
-          ></CardHeader>
-        </Card>
-      );
-    });
+    return curData
+      .slice(0, curDataSize)
+      .map((user: TopUserType, index: number) => {
+        /**
+         * if the user is available (e.g., not null), display teh primary image.
+         **/
+        return (
+          <Card className={classes.horizontalCard} key={user.userId}>
+            <CardHeader
+              className={classes.horizontalCardHeader}
+              avatar={
+                <Avatar
+                  alt={`top-user-no-${index}`}
+                  src={getApiUrl(user.userAvatarImagePath)}
+                />
+              }
+              title={cadCurrencyFormat(user.totalSpend) + " spent"}
+              subheader={user.userFirstName + " " + user.userLastName}
+              action={
+                <Button
+                  variant="contained"
+                  size="small"
+                  component={RRLink}
+                  to={`/admin/customers?searchQuery=${user.userId}`}
+                >
+                  Detail
+                </Button>
+              }
+            ></CardHeader>
+          </Card>
+        );
+      });
   };
 
   return (

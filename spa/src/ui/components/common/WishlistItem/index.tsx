@@ -75,7 +75,7 @@ const WishlistItem: React.FunctionComponent<WishlistItemPropsType> = ({
         className={classes.cardHeader}
         avatar={<Avatar alt="" src={primaryImageUrl} />}
         title={value.product.productName}
-        subheader={`$${cadCurrencyFormat(
+        subheader={`${cadCurrencyFormat(
           value.product.variants[0].currentPrice
         )}`}
       ></CardHeader>

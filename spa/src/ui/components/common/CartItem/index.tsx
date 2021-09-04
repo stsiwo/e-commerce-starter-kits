@@ -14,6 +14,8 @@ import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
 import { AxiosError } from "axios";
 import { api } from "configs/axiosConfig";
+import { logger } from "configs/logger";
+import { isReachMaxQuantity } from "domain/cart";
 import { CartItemCriteria, CartItemType } from "domain/cart/types";
 import merge from "lodash/merge";
 import { useSnackbar } from "notistack";
@@ -25,8 +27,6 @@ import { mSelector } from "src/selectors/selector";
 import { cadCurrencyFormat, getApiUrl } from "src/utils";
 import ColorCell from "../GridData/ColorCell";
 import SizeCell from "../GridData/SizeCell";
-import { logger } from "configs/logger";
-import { isReachMaxQuantity } from "domain/cart";
 const log = logger(__filename);
 
 /**
@@ -280,7 +280,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
         className={classes.cardHeader}
         avatar={<Avatar alt="" src={primaryImageUrl} />}
         title={value.product.productName}
-        subheader={`$${cadCurrencyFormat(
+        subheader={`${cadCurrencyFormat(
           value.product.variants[0].currentPrice
         )}`}
       ></CardHeader>

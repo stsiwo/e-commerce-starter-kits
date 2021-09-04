@@ -1717,3 +1717,6 @@ steps to generate encypted data (e.g., ENC(....))
 
       - ref: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#define_where_cookies_are_sent
 
+# Time Zone
+
+  - you cannot use LocalTimeDate for handling time zone. you need to use another class. see: https://www.baeldung.com/java-set-date-time-zone

@@ -11,6 +11,7 @@ import { api } from "configs/axiosConfig";
 import { logger } from "configs/logger";
 import * as React from "react";
 import { Link as RRLink } from "react-router-dom";
+import { getApiUrl } from "src/utils";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -123,7 +124,7 @@ const TopProducts: React.FunctionComponent<{}> = (props) => {
                   {product.primaryImagePath && (
                     <Avatar
                       alt={`top-product-${index}`}
-                      src={product.primaryImagePath}
+                      src={getApiUrl(product.primaryImagePath)}
                     />
                   )}
                 </React.Fragment>

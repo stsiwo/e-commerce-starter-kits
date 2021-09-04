@@ -1,6 +1,5 @@
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
-import { Link as RRLink } from "react-router-dom";
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import CartItem from 'components/common/CartItem';
@@ -9,6 +8,7 @@ import { CartItemType } from 'domain/cart/types';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
+import { Link as RRLink } from "react-router-dom";
 import { messageActions } from 'reducers/slices/app';
 import { fetchCartItemActionCreator } from 'reducers/slices/domain/cartItem';
 import { MessageTypeEnum, UserTypeEnum } from 'src/app';
@@ -106,7 +106,7 @@ const CartBox: React.FunctionComponent<CartBoxPropsType> = (props) => {
           {renderCartItems()}
           <Box component="div" className={classes.subtotalBox}>
             <Typography variant="subtitle1" component="h3" align="right" >
-               Subtotal (<b>{calcSubTotalProductNumbers(curCartItems)}</b>  items): $<b>{cadCurrencyFormat(calcSubTotalPriceAmount(curCartItems))}</b>
+               Subtotal (<b>{calcSubTotalProductNumbers(curCartItems)}</b>  items): <b>{cadCurrencyFormat(calcSubTotalPriceAmount(curCartItems))}</b>
             </Typography>
           </Box>
           <Box component="div" className={classes.controllerBox}>
