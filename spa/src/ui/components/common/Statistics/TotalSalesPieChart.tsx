@@ -21,6 +21,9 @@ import * as React from "react";
 import { Pie, PieChart, ResponsiveContainer } from "recharts";
 import {
   cadCurrencyFormat,
+  getThisMonthFromBeginning,
+  getThisYearFromBeginning,
+  getTodayFromBeginning,
   toDateMonthDayString,
   toHourString,
 } from "src/utils";
@@ -98,7 +101,20 @@ const TotalSalesPieChart: React.FunctionComponent<{}> = (props) => {
    */
   const [curData, setData] = React.useState<TotalSalesDataType[]>([]);
   React.useEffect(() => {
-    const queryString = `?base=${curBase}`;
+    //const queryString = `?base=${curBase}`;
+    let startDate;
+
+    if (curBase === TotalSalesBaseEnum.TODAY) {
+      startDate = getTodayFromBeginning();
+    } else if (curBase === TotalSalesBaseEnum.THIS_MONTH) {
+      startDate = getThisMonthFromBeginning();
+    } else {
+      startDate = getThisYearFromBeginning();
+    }
+
+    const endDate = new Date();
+
+    const queryString = `?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&base=${curBase}`;
 
     api
       .request({

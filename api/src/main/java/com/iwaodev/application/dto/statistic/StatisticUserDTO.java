@@ -4,18 +4,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @NoArgsConstructor
 @Data
 @ToString
 public class StatisticUserDTO {
-    private LocalDateTime name;
+    private ZonedDateTime name;
 
     private Integer users;
 
-    public StatisticUserDTO(LocalDateTime name, Integer value) {
+    public StatisticUserDTO(ZonedDateTime name, Integer value) {
         this.name = name;
         this.users = value;
     }

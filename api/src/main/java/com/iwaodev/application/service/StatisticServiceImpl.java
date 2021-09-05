@@ -14,7 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.TimeZone;
 
 @Service
 @Transactional
@@ -28,24 +31,17 @@ public class StatisticServiceImpl implements StatisticService {
     public List<SaleDTO> getSales(SaleQueryStringCriteria criteria) throws Exception {
 
         List<SaleDTO> result;
-
-        LocalDateTime startDate = LocalDateTime.of(criteria.getStartYear(), criteria.getStartMonth(), criteria.getStartDate(), 0, 0);
-        LocalDateTime endDate = LocalDateTime.of(criteria.getEndYear(), criteria.getEndMonth(), criteria.getEndDate(), LocalDateTime.now().getHour(), LocalDateTime.now().getMinute());
-
-        logger.debug(startDate.toString());
-        logger.debug(endDate.toString());
-
-        SaleBaseEnum saleBase = this.determineSaleBase(criteria.getStartYear(), criteria.getStartMonth(), criteria.getStartDate(), criteria.getEndYear(), criteria.getEndMonth(), criteria.getEndDate());
+        SaleBaseEnum saleBase = this.determineSaleBase(criteria.getStartDate().getYear(), criteria.getStartDate().getMonthValue(), criteria.getStartDate().getDayOfMonth(), criteria.getEndDate().getYear(), criteria.getEndDate().getMonthValue(), criteria.getEndDate().getDayOfMonth());
 
         if (saleBase.equals(SaleBaseEnum.HOURLY)) {
             logger.debug("hourly based");
-            result = this.statisticQuery.getHourlySale(startDate, endDate);
+            result = this.statisticQuery.getHourlySale(criteria.getStartDate(), criteria.getEndDate());
         } else if (saleBase.equals(SaleBaseEnum.DAILY)) {
             logger.debug("daily based");
-            result = this.statisticQuery.getDailySale(startDate, endDate);
+            result = this.statisticQuery.getDailySale(criteria.getStartDate(), criteria.getEndDate());
         } else {
             logger.debug("monthly based");
-            result = this.statisticQuery.getMonthlySale(startDate, endDate);
+            result = this.statisticQuery.getMonthlySale(criteria.getStartDate(), criteria.getEndDate());
         }
 
         return result;
@@ -55,20 +51,17 @@ public class StatisticServiceImpl implements StatisticService {
     public List<StatisticUserDTO> getUsers(StatisticUserQueryStringCriteria criteria) throws Exception {
         List<StatisticUserDTO> result;
 
-        LocalDateTime startDate = LocalDateTime.of(criteria.getStartYear(), criteria.getStartMonth(), criteria.getStartDate(), 0, 0);
-        LocalDateTime endDate = LocalDateTime.of(criteria.getEndYear(), criteria.getEndMonth(), criteria.getEndDate(), LocalDateTime.now().getHour(), LocalDateTime.now().getMinute());
-
-        UserBaseEnum userBase = this.determineUserBase(criteria.getStartYear(), criteria.getStartMonth(), criteria.getStartDate(), criteria.getEndYear(), criteria.getEndMonth(), criteria.getEndDate());
+        UserBaseEnum userBase = this.determineUserBase(criteria.getStartDate().getYear(), criteria.getStartDate().getMonthValue(), criteria.getStartDate().getDayOfMonth(), criteria.getEndDate().getYear(), criteria.getEndDate().getMonthValue(), criteria.getEndDate().getDayOfMonth());
 
         if (userBase.equals(UserBaseEnum.HOURLY)) {
             logger.debug("hourly based");
-            result = this.statisticQuery.getHourlyUser(startDate, endDate);
+            result = this.statisticQuery.getHourlyUser(criteria.getStartDate(), criteria.getEndDate());
         } else if (userBase.equals(UserBaseEnum.DAILY)) {
             logger.debug("daily based");
-            result = this.statisticQuery.getDailyUser(startDate, endDate);
+            result = this.statisticQuery.getDailyUser(criteria.getStartDate(), criteria.getEndDate());
         } else {
             logger.debug("monthly based");
-            result = this.statisticQuery.getMonthlyUser(startDate, endDate);
+            result = this.statisticQuery.getMonthlyUser(criteria.getStartDate(), criteria.getEndDate());
         }
 
         return result;
@@ -82,13 +75,13 @@ public class StatisticServiceImpl implements StatisticService {
 
         if (base.equals(TotalSaleBaseEnum.TODAY)) {
             logger.debug("today base");
-            result = this.statisticQuery.getTodayTotalSales();
+            result = this.statisticQuery.getTodayTotalSales(criteria.getStartDate(), criteria.getEndDate());
         } else if (base.equals(TotalSaleBaseEnum.THIS_MONTH)) {
             logger.debug("month base");
-            result = this.statisticQuery.getThisMonthTotalSales();
+            result = this.statisticQuery.getThisMonthTotalSales(criteria.getStartDate(), criteria.getEndDate());
         } else {
             logger.debug("year base");
-            result = this.statisticQuery.getThisYearTotalSales();
+            result = this.statisticQuery.getThisYearTotalSales(criteria.getStartDate(), criteria.getEndDate());
         }
 
         return result;
@@ -101,13 +94,13 @@ public class StatisticServiceImpl implements StatisticService {
 
         if (base.equals(TotalUserBaseEnum.TODAY)) {
             logger.debug("today base");
-            result = this.statisticQuery.getTodayTotalUsers();
+            result = this.statisticQuery.getTodayTotalUsers(criteria.getStartDate(), criteria.getEndDate());
         } else if (base.equals(TotalUserBaseEnum.THIS_MONTH)) {
             logger.debug("month base");
-            result = this.statisticQuery.getThisMonthTotalUsers();
+            result = this.statisticQuery.getThisMonthTotalUsers(criteria.getStartDate(), criteria.getEndDate());
         } else {
             logger.debug("year base");
-            result = this.statisticQuery.getThisYearTotalUsers();
+            result = this.statisticQuery.getThisYearTotalUsers(criteria.getStartDate(), criteria.getEndDate());
         }
 
         return result;
@@ -120,13 +113,13 @@ public class StatisticServiceImpl implements StatisticService {
 
         if (base.equals(TotalProductBaseEnum.TODAY)) {
             logger.debug("today base");
-            result = this.statisticQuery.getTodayTotalProducts();
+            result = this.statisticQuery.getTodayTotalProducts(criteria.getStartDate(), criteria.getEndDate());
         } else if (base.equals(TotalProductBaseEnum.THIS_MONTH)) {
             logger.debug("month base");
-            result = this.statisticQuery.getThisMonthTotalProducts();
+            result = this.statisticQuery.getThisMonthTotalProducts(criteria.getStartDate(), criteria.getEndDate());
         } else {
             logger.debug("year base");
-            result = this.statisticQuery.getThisYearTotalProducts();
+            result = this.statisticQuery.getThisYearTotalProducts(criteria.getStartDate(), criteria.getEndDate());
         }
 
         return result;
@@ -153,6 +146,12 @@ public class StatisticServiceImpl implements StatisticService {
      * 4. if start year and end year are different, it is month base.
      */
     private SaleBaseEnum determineSaleBase(Integer startYear, Integer startMonth, Integer startDate, Integer endYear, Integer endMonth, Integer endDate) {
+
+        /**
+         * TODO: fix this logic.
+         *
+         * my idea is take the gap between start date and end date then count the gap, and based on the gap, change the base.
+         */
 
         if (startYear.equals(endYear) && startMonth.equals(endMonth)) {
             return SaleBaseEnum.HOURLY;

@@ -42,6 +42,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.Cookie;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -179,10 +182,10 @@ public class AdminStatisticTotalProductsEndpointTest {
         // assert
         assertThat(result.getResponse().getStatus()).isEqualTo(200);
         assertThat(responseBody.length).isGreaterThanOrEqualTo(0);
-        //for (StatisticTotalProductDTO totalProductDTO : responseBody) {
-        //    assertThat(totalProductDTO.getName()).isEqualTo(expectedDate);
-        //    assertThat(totalProductDTO.getProducts()).isEqualTo(BigDecimal.valueOf(0.00));
-        //}
+        for (StatisticTotalProductDTO totalProductDTO : responseBody) {
+            assertThat(totalProductDTO.getName()).isEqualTo(expectedDate);
+            assertThat(totalProductDTO.getProducts()).isEqualTo(BigDecimal.valueOf(0.00));
+        }
     }
 
     @Test
@@ -246,6 +249,71 @@ public class AdminStatisticTotalProductsEndpointTest {
     }
 
     @Test
+    @Sql(scripts = { "classpath:/integration/statistic/shouldAdminGetTodayBaseTotalProductDataWithTestDataWithAmericaVancouverTimeZone.sql" })
+    public void shouldAdminGetTodayBaseTotalProductDataWithTestDataWithAmericaVancouverTimeZone(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnAddress.json") Resource dummyFormJsonFile*/) throws Exception {
+
+        // make sure user_id in the sql match test admin user id
+
+        // dummy form json
+        //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+        //String dummyFormJsonString = dummyFormJson.toString();
+
+        // arrange
+        // don't forget start from the previous date (minus 1)
+        String targetTimeZone = "America/Vancouver";
+        ZonedDateTime expectedStartDate = ZonedDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), LocalDateTime.now().getDayOfMonth(), 0, 0, 0, 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCStartDate = expectedStartDate.withZoneSameInstant(ZoneOffset.UTC);
+        ZonedDateTime expectedEndDate = ZonedDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), LocalDateTime.now().getDayOfMonth(), LocalDateTime.now().getHour(), LocalDateTime.now().getMinute(), LocalDateTime.now().getSecond(), 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCEndDate = expectedEndDate.withZoneSameInstant(ZoneOffset.UTC);
+        String queryString = String.format("?startDate=%s&endDate=%s&base=%s", expectedUTCStartDate, expectedUTCEndDate, TotalSaleBaseEnum.TODAY);
+        String targetUrl = "http://localhost:" + this.port + this.targetPath + "/total/products" + queryString;
+
+        // act & assert
+        ResultActions resultActions = mvc.perform(
+                        MockMvcRequestBuilders
+                                .get(targetUrl)
+                                .cookie(this.authCookie)
+                                .cookie(this.csrfCookie)
+                                .header("csrf-token", this.authInfo.getCsrfToken())
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        MvcResult result = resultActions.andReturn();
+        JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+        StatisticTotalProductDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode, StatisticTotalProductDTO[].class);
+
+        Integer totalAmountForOrder1 = 5; // check order 1 on sql
+        Integer totalAmountForOrder2 = 5;// check order 2 on sql
+        Integer totalAmountForOrder3 = 5;  // check order 3 on sql
+        Integer totalAmountForOrder4 = 5; // check order 4 on sql
+
+        Integer totalCostForFirst = totalAmountForOrder1;
+        Integer totalCostForSecond = totalAmountForOrder2;
+        Integer totalCostForThird = totalAmountForOrder3 + totalAmountForOrder4;
+
+        LocalDateTime firstDateTime = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 0, 0, 0);
+        LocalDateTime secondDateTime = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 1, 0, 0);
+        LocalDateTime thirdDateTime = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 2, 0, 0);
+
+        // assert
+        assertThat(result.getResponse().getStatus()).isEqualTo(200);
+        assertThat(responseBody.length).isGreaterThanOrEqualTo(3);
+        for (StatisticTotalProductDTO totalProductDTO : responseBody) {
+            if (totalProductDTO.getName().equals(firstDateTime)) {
+                assertThat(totalProductDTO.getProducts()).isEqualTo(totalCostForFirst);
+            }
+            else if (totalProductDTO.getName().equals(secondDateTime)) {
+                assertThat(totalProductDTO.getProducts()).isEqualTo(totalCostForSecond);
+            }
+            else if (totalProductDTO.getName().equals(thirdDateTime)) {
+                assertThat(totalProductDTO.getProducts()).isEqualTo(totalCostForThird);
+            }
+        }
+    }
+
+    @Test
     @Sql(scripts = { "classpath:/integration/statistic/shouldAdminGetThisMonthBaseTotalProductDataWithTestData.sql" })
     public void shouldAdminGetThisMonthBaseTotalProductDataWithTestData(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnAddress.json") Resource dummyFormJsonFile*/) throws Exception {
 
@@ -257,10 +325,12 @@ public class AdminStatisticTotalProductsEndpointTest {
 
         // arrange
         // don't forget start from the previous date (minus 1)
-        LocalDateTime expectedDate = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 0, 0, 0);
-
-        String queryString = String.format("?base=%s", TotalProductBaseEnum.THIS_MONTH);
-
+        String targetTimeZone = "UTC";
+        ZonedDateTime expectedStartDate = ZonedDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), 1, 0, 0, 0, 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCStartDate = expectedStartDate.withZoneSameInstant(ZoneOffset.UTC);
+        ZonedDateTime expectedEndDate = ZonedDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), LocalDateTime.now().getDayOfMonth(), LocalDateTime.now().getHour(), LocalDateTime.now().getMinute(), LocalDateTime.now().getSecond(), 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCEndDate = expectedEndDate.withZoneSameInstant(ZoneOffset.UTC);
+        String queryString = String.format("?startDate=%s&endDate=%s&base=%s", expectedUTCStartDate, expectedUTCEndDate, TotalSaleBaseEnum.THIS_MONTH);
         String targetUrl = "http://localhost:" + this.port + this.targetPath + "/total/products" + queryString;
 
         // act & assert
@@ -320,9 +390,13 @@ public class AdminStatisticTotalProductsEndpointTest {
 
         // arrange
         // don't forget start from the previous date (minus 1)
-        LocalDateTime expectedDate = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 0, 0, 0);
 
-        String queryString = String.format("?base=%s", TotalProductBaseEnum.THIS_YEAR);
+        String targetTimeZone = "UTC";
+        ZonedDateTime expectedStartDate = ZonedDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0, 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCStartDate = expectedStartDate.withZoneSameInstant(ZoneOffset.UTC);
+        ZonedDateTime expectedEndDate = ZonedDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), LocalDateTime.now().getDayOfMonth(), LocalDateTime.now().getHour(), LocalDateTime.now().getMinute(), LocalDateTime.now().getSecond(), 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCEndDate = expectedEndDate.withZoneSameInstant(ZoneOffset.UTC);
+        String queryString = String.format("?startDate=%s&endDate=%s&base=%s", expectedUTCStartDate, expectedUTCEndDate, TotalSaleBaseEnum.THIS_YEAR);
 
         String targetUrl = "http://localhost:" + this.port + this.targetPath + "/total/products" + queryString;
 

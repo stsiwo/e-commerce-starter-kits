@@ -7,17 +7,18 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @NoArgsConstructor
 @Data
 @ToString
 public class StatisticTotalSaleDTO {
 
-    private LocalDateTime name;
+    private ZonedDateTime name;
 
     private BigDecimal sales;
 
-    public StatisticTotalSaleDTO(LocalDateTime name, BigDecimal sales) {
+    public StatisticTotalSaleDTO(ZonedDateTime name, BigDecimal sales) {
         this.name = name;
         this.sales = sales;
     }

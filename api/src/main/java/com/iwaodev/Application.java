@@ -1,7 +1,10 @@
 package com.iwaodev;
 
+import java.util.Date;
 import java.util.Properties;
+import java.util.TimeZone;
 
+import javax.annotation.PostConstruct;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -91,6 +94,17 @@ public class Application {
   public static void main(String[] args) {
     applicationContext = SpringApplication.run(Application.class, args);
     //displayAllBeans();
+  }
+
+  @PostConstruct
+  public void init() {
+    /**
+     * set time zone to utc
+     *
+     * this automatically convert a local time zone from cleint into UTC (+00:00), so you don't need to convert it explicitly.
+     */
+    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+    System.out.println("Date in UTC: " + new Date().toString());
   }
 
   public static void displayAllBeans() {

@@ -39,6 +39,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.Cookie;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -177,10 +180,10 @@ public class AdminStatisticTotalSalesEndpointTest {
         // assert
         assertThat(result.getResponse().getStatus()).isEqualTo(200);
         assertThat(responseBody.length).isGreaterThanOrEqualTo(0);
-        //for (StatisticTotalSaleDTO totalSaleDTO : responseBody) {
-        //    assertThat(totalSaleDTO.getName()).isEqualTo(expectedDate);
-        //    assertThat(totalSaleDTO.getSales()).isEqualTo(BigDecimal.valueOf(0.00));
-        //}
+        for (StatisticTotalSaleDTO totalSaleDTO : responseBody) {
+            assertThat(totalSaleDTO.getName()).isEqualTo(expectedDate);
+            assertThat(totalSaleDTO.getSales()).isEqualTo(BigDecimal.valueOf(0.00));
+        }
     }
 
     @Test
@@ -231,6 +234,8 @@ public class AdminStatisticTotalSalesEndpointTest {
         assertThat(result.getResponse().getStatus()).isEqualTo(200);
         assertThat(responseBody.length).isGreaterThanOrEqualTo(3);
         for (StatisticTotalSaleDTO totalSaleDTO : responseBody) {
+            logger.debug(totalSaleDTO.getName().toString());
+            logger.debug(totalSaleDTO.getSales().toString());
             if (totalSaleDTO.getName().equals(firstDateTime)) {
                 assertThat(totalSaleDTO.getSales()).isEqualTo(totalCostForFirst);
             }
@@ -243,6 +248,72 @@ public class AdminStatisticTotalSalesEndpointTest {
         }
     }
 
+    @Test
+    @Sql(scripts = { "classpath:/integration/statistic/shouldAdminGetTodayBaseTotalSaleDataWithTestDataWithAmericaVancouverTimeZone.sql" })
+    public void shouldAdminGetTodayBaseTotalSaleDataWithTestDataWithAmericaVancouverTimeZone(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnAddress.json") Resource dummyFormJsonFile*/) throws Exception {
+
+        // make sure user_id in the sql match test admin user id
+
+        // dummy form json
+        //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+        //String dummyFormJsonString = dummyFormJson.toString();
+
+        // arrange
+        String targetTimeZone = "America/Vancouver";
+        ZonedDateTime expectedStartDate = ZonedDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), LocalDateTime.now().getDayOfMonth(), 0, 0, 0, 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCStartDate = expectedStartDate.withZoneSameInstant(ZoneOffset.UTC);
+        ZonedDateTime expectedEndDate = ZonedDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), LocalDateTime.now().getDayOfMonth(), LocalDateTime.now().getHour(), LocalDateTime.now().getMinute(), LocalDateTime.now().getSecond(), 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCEndDate = expectedEndDate.withZoneSameInstant(ZoneOffset.UTC);
+        String queryString = String.format("?startDate=%s&endDate=%s&base=%s", expectedUTCStartDate, expectedUTCEndDate, TotalSaleBaseEnum.TODAY);
+        // don't forget start from the previous date (minus 1)
+        String targetUrl = "http://localhost:" + this.port + this.targetPath + "/total/sales" + queryString;
+
+        // act & assert
+        ResultActions resultActions = mvc.perform(
+                        MockMvcRequestBuilders
+                                .get(targetUrl)
+                                .cookie(this.authCookie)
+                                .cookie(this.csrfCookie)
+                                .header("csrf-token", this.authInfo.getCsrfToken())
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        MvcResult result = resultActions.andReturn();
+        JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+        StatisticTotalSaleDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode, StatisticTotalSaleDTO[].class);
+
+        BigDecimal totalCostForOrder1 = BigDecimal.valueOf(123.00 + 2.00 + 10.00); // check order 1 on sql
+        BigDecimal totalCostForOrder2 = BigDecimal.valueOf(23.00 +5.00 + 3.00); // check order 2 on sql
+        BigDecimal totalCostForOrder3 = BigDecimal.valueOf(23.00 + 5.00 + 3.00); // check order 3 on sql
+        BigDecimal totalCostForOrder4 = BigDecimal.valueOf(23.00 + 5.00 + 3.00); // check order 4 on sql
+
+        BigDecimal totalCostForFirst = totalCostForOrder1;
+        BigDecimal totalCostForSecond = totalCostForOrder2;
+        BigDecimal totalCostForThird = totalCostForOrder3.add(totalCostForOrder4);
+
+        LocalDateTime firstDateTime = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 0, 0, 0);
+        LocalDateTime secondDateTime = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 1, 0, 0);
+        LocalDateTime thirdDateTime = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 2, 0, 0);
+
+        // assert
+        assertThat(result.getResponse().getStatus()).isEqualTo(200);
+        assertThat(responseBody.length).isGreaterThanOrEqualTo(3);
+        for (StatisticTotalSaleDTO totalSaleDTO : responseBody) {
+            logger.debug(totalSaleDTO.getName().toString());
+            logger.debug(totalSaleDTO.getSales().toString());
+            if (totalSaleDTO.getName().equals(firstDateTime)) {
+                assertThat(totalSaleDTO.getSales()).isEqualTo(totalCostForFirst);
+            }
+            else if (totalSaleDTO.getName().equals(secondDateTime)) {
+                assertThat(totalSaleDTO.getSales()).isEqualTo(totalCostForSecond);
+            }
+            else if (totalSaleDTO.getName().equals(thirdDateTime)) {
+                assertThat(totalSaleDTO.getSales()).isEqualTo(totalCostForThird);
+            }
+        }
+    }
     @Test
     @Sql(scripts = { "classpath:/integration/statistic/shouldAdminGetThisMonthBaseTotalSaleDataWithTestData.sql" })
     public void shouldAdminGetThisMonthBaseTotalSaleDataWithTestData(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnAddress.json") Resource dummyFormJsonFile*/) throws Exception {
@@ -257,7 +328,12 @@ public class AdminStatisticTotalSalesEndpointTest {
         // don't forget start from the previous date (minus 1)
         LocalDateTime expectedDate = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 0, 0, 0);
 
-        String queryString = String.format("?base=%s", TotalSaleBaseEnum.THIS_MONTH);
+        String targetTimeZone = "UTC";
+        ZonedDateTime expectedStartDate = ZonedDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), 1, 0, 0, 0, 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCStartDate = expectedStartDate.withZoneSameInstant(ZoneOffset.UTC);
+        ZonedDateTime expectedEndDate = ZonedDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), LocalDateTime.now().getDayOfMonth(), LocalDateTime.now().getHour(), LocalDateTime.now().getMinute(), LocalDateTime.now().getSecond(), 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCEndDate = expectedEndDate.withZoneSameInstant(ZoneOffset.UTC);
+        String queryString = String.format("?startDate=%s&endDate=%s&base=%s", expectedUTCStartDate, expectedUTCEndDate, TotalSaleBaseEnum.THIS_MONTH);
 
         String targetUrl = "http://localhost:" + this.port + this.targetPath + "/total/sales" + queryString;
 
@@ -294,6 +370,8 @@ public class AdminStatisticTotalSalesEndpointTest {
         assertThat(result.getResponse().getStatus()).isEqualTo(200);
         assertThat(responseBody.length).isGreaterThanOrEqualTo(3);
         for (StatisticTotalSaleDTO totalSaleDTO : responseBody) {
+            logger.debug(totalSaleDTO.getName().toString());
+            logger.debug(totalSaleDTO.getSales().toString());
             if (totalSaleDTO.getName().equals(firstDateTime)) {
                 assertThat(totalSaleDTO.getSales()).isEqualTo(totalCostForFirst);
             }
@@ -320,7 +398,12 @@ public class AdminStatisticTotalSalesEndpointTest {
         // don't forget start from the previous date (minus 1)
         LocalDateTime expectedDate = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 0, 0, 0);
 
-        String queryString = String.format("?base=%s", TotalSaleBaseEnum.THIS_YEAR);
+        String targetTimeZone = "UTC";
+        ZonedDateTime expectedStartDate = ZonedDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0, 0, 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCStartDate = expectedStartDate.withZoneSameInstant(ZoneOffset.UTC);
+        ZonedDateTime expectedEndDate = ZonedDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), LocalDateTime.now().getDayOfMonth(), LocalDateTime.now().getHour(), LocalDateTime.now().getMinute(), LocalDateTime.now().getSecond(), 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCEndDate = expectedEndDate.withZoneSameInstant(ZoneOffset.UTC);
+        String queryString = String.format("?startDate=%s&endDate=%s&base=%s", expectedUTCStartDate, expectedUTCEndDate, TotalSaleBaseEnum.THIS_YEAR);
 
         String targetUrl = "http://localhost:" + this.port + this.targetPath + "/total/sales" + queryString;
 

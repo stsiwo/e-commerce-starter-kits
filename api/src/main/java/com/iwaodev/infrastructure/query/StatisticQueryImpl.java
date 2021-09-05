@@ -11,8 +11,11 @@ import javax.persistence.PersistenceContext;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -173,117 +176,133 @@ public class StatisticQueryImpl implements StatisticQuery {
     }
 
     @Override
-    public List<StatisticTotalSaleDTO> getTodayTotalSales() {
+    public List<StatisticTotalSaleDTO> getTodayTotalSales(LocalDateTime startDate, LocalDateTime endDate) {
         /**
          * need to wrap with date_format() for o.created_at otherwise, you got cast error (String -> timestamp)
          */
         String query = "select date_format(o.created_at, '%Y-%m-%d %H:%i:%s') as name, sum(ifnull(o.product_cost + o.tax_cost + o.shipping_cost, 0)) as sales " +
                 "from orders o " +
-                "where date(o.created_at) >= curdate() " +
+                "where o.created_at between :startDate and :endDate " +
                 "and o.transaction_result = 1 " +
                 "group by hour(o.created_at), day(o.created_at);";
 
         List<Object[]> result = this.entityManager.createNativeQuery(query)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
                 .getResultList();
 
         return this.convertToTotalSaleDTO(result);
     }
 
     @Override
-    public List<StatisticTotalSaleDTO> getThisMonthTotalSales() {
+    public List<StatisticTotalSaleDTO> getThisMonthTotalSales(LocalDateTime startDate, LocalDateTime endDate) {
         /**
          * need to wrap with date_format() for o.created_at otherwise, you got cast error (String -> timestamp)
          */
         String query = "select date_format(o.created_at, '%Y-%m-%d %H:%i:%s') as name, sum(ifnull(o.product_cost + o.tax_cost + o.shipping_cost, 0)) as sales " +
                 "from orders o " +
-                "where month(date(o.created_at)) >= month(curdate()) " +
+                //"where month(date(o.created_at)) >= month(curdate()) " +
+                "where month(date(o.created_at)) between month(:startDate) and month(:endDate) " +
                 "and o.transaction_result = 1 " +
                 "group by day(o.created_at);";
 
         List<Object[]> result = this.entityManager.createNativeQuery(query)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
                 .getResultList();
 
         return this.convertToTotalSaleDTO(result);
     }
 
     @Override
-    public List<StatisticTotalSaleDTO> getThisYearTotalSales() {
+    public List<StatisticTotalSaleDTO> getThisYearTotalSales(LocalDateTime startDate, LocalDateTime endDate) {
         /**
          * need to wrap with date_format() for o.created_at otherwise, you got cast error (String -> timestamp)
          */
         String query = "select date_format(o.created_at, '%Y-%m-%d %H:%i:%s') as name, sum(ifnull(o.product_cost + o.tax_cost + o.shipping_cost, 0)) as sales " +
                 "from orders o " +
-                "where year(date(o.created_at)) >= year(curdate()) " +
+                //"where year(date(o.created_at)) >= year(curdate()) " +
+                "where year(date(o.created_at)) between year(:startDate) and year(:endDate) " +
                 "and o.transaction_result = 1 " +
                 "group by month(o.created_at);";
 
         List<Object[]> result = this.entityManager.createNativeQuery(query)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
                 .getResultList();
 
         return this.convertToTotalSaleDTO(result);
     }
 
     @Override
-    public List<StatisticTotalUserDTO> getTodayTotalUsers() {
+    public List<StatisticTotalUserDTO> getTodayTotalUsers(LocalDateTime startDate, LocalDateTime endDate) {
         /**
          * need to wrap with date_format() for o.created_at otherwise, you got cast error (String -> timestamp)
          */
         String query = "select date_format(us.created_at, '%Y-%m-%d %H:%i:%s') as name, count(us.user_id) as users " +
                 "from users us " +
-                "where date(us.created_at) >= curdate() " +
+                "where us.created_at between :startDate and :endDate " +
                 "group by hour(us.created_at), day(us.created_at);";
 
         List<Object[]> result = this.entityManager.createNativeQuery(query)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
                 .getResultList();
 
         return this.convertToTotalUserDTO(result);
     }
 
     @Override
-    public List<StatisticTotalUserDTO> getThisMonthTotalUsers() {
+    public List<StatisticTotalUserDTO> getThisMonthTotalUsers(LocalDateTime startDate, LocalDateTime endDate) {
         /**
          * need to wrap with date_format() for o.created_at otherwise, you got cast error (String -> timestamp)
          */
         String query = "select date_format(us.created_at, '%Y-%m-%d %H:%i:%s') as name, count(us.user_id) as users " +
                 "from users us " +
-                "where month(date(us.created_at)) >= month(curdate()) " +
+                "where month(date(us.created_at)) between month(:startDate) and month(:endDate) " +
                 "group by day(us.created_at);";
 
         List<Object[]> result = this.entityManager.createNativeQuery(query)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
                 .getResultList();
 
         return this.convertToTotalUserDTO(result);
     }
 
     @Override
-    public List<StatisticTotalUserDTO> getThisYearTotalUsers() {
+    public List<StatisticTotalUserDTO> getThisYearTotalUsers(LocalDateTime startDate, LocalDateTime endDate) {
         /**
          * need to wrap with date_format() for o.created_at otherwise, you got cast error (String -> timestamp)
          */
         String query = "select date_format(us.created_at, '%Y-%m-%d %H:%i:%s') as name, count(us.user_id) as users " +
                 "from users us " +
-                "where year(date(us.created_at)) >= year(curdate()) " +
+                "where year(date(us.created_at)) between year(:startDate) and year(:endDate) " +
                 "group by month(us.created_at);";
 
         List<Object[]> result = this.entityManager.createNativeQuery(query)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
                 .getResultList();
 
         return this.convertToTotalUserDTO(result);
     }
 
     @Override
-    public List<StatisticTotalProductDTO> getTodayTotalProducts() {
+    public List<StatisticTotalProductDTO> getTodayTotalProducts(LocalDateTime startDate, LocalDateTime endDate) {
         /**
          * need to wrap with date_format() for o.created_at otherwise, you got cast error (String -> timestamp)
          */
         String query = "select date_format(o.created_at, '%Y-%m-%d %H:%i:%s') as name, sum(ifnull(od.product_quantity, 0)) as products " +
                 "from orders o " +
                 "inner join order_details od on od.order_id = o.order_id " +
-                "where date(o.created_at) >= curdate() " +
+                "where o.created_at between :startDate and :endDate  " +
                 "and o.transaction_result = 1 " +
                 "group by hour(o.created_at), day(o.created_at);";
 
         List<Object[]> result = this.entityManager.createNativeQuery(query)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
                 .getResultList();
 
         logger.debug("size of today total products");
@@ -293,36 +312,40 @@ public class StatisticQueryImpl implements StatisticQuery {
     }
 
     @Override
-    public List<StatisticTotalProductDTO> getThisMonthTotalProducts() {
+    public List<StatisticTotalProductDTO> getThisMonthTotalProducts(LocalDateTime startDate, LocalDateTime endDate) {
         /**
          * need to wrap with date_format() for o.created_at otherwise, you got cast error (String -> timestamp)
          */
         String query = "select date_format(o.created_at, '%Y-%m-%d %H:%i:%s') as name, sum(ifnull(od.product_quantity, 0)) as products " +
                 "from orders o " +
                 "inner join order_details od on od.order_id = o.order_id " +
-                "where month(date(o.created_at)) >= month(curdate()) " +
+                "where month(date(o.created_at)) between month(:startDate) and month(:endDate) " +
                 "and o.transaction_result = 1 " +
                 "group by day(o.created_at);";
 
         List<Object[]> result = this.entityManager.createNativeQuery(query)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
                 .getResultList();
 
         return this.convertToTotalProductDTO(result);
     }
 
     @Override
-    public List<StatisticTotalProductDTO> getThisYearTotalProducts() {
+    public List<StatisticTotalProductDTO> getThisYearTotalProducts(LocalDateTime startDate, LocalDateTime endDate) {
         /**
          * need to wrap with date_format() for o.created_at otherwise, you got cast error (String -> timestamp)
          */
         String query = "select date_format(o.created_at, '%Y-%m-%d %H:%i:%s') as name, sum(ifnull(od.product_quantity, 0)) as products " +
                 "from orders o " +
                 "inner join order_details od on od.order_id = o.order_id " +
-                "where year(date(o.created_at)) >= year(curdate()) " +
+                "where year(date(o.created_at)) between year(:startDate) and year(:endDate) " +
                 "and o.transaction_result = 1 " +
                 "group by month(o.created_at);";
 
         List<Object[]> result = this.entityManager.createNativeQuery(query)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate", endDate)
                 .getResultList();
 
         return this.convertToTotalProductDTO(result);
@@ -379,7 +402,7 @@ public class StatisticQueryImpl implements StatisticQuery {
         List<SaleDTO> saleDtoList = target.stream().map(object -> {
             logger.debug("converting to saleDTO");
             return new SaleDTO(
-                    (LocalDateTime) LocalDateTime.parse((String) object[0], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    (ZonedDateTime) LocalDateTime.parse((String) object[0], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).atZone(ZoneId.of("UTC")),
                     (BigDecimal) object[1]
             );
         }).collect(Collectors.toList());
@@ -397,7 +420,7 @@ public class StatisticQueryImpl implements StatisticQuery {
     private List<StatisticUserDTO> convertToUserDTO(List<Object[]> target) {
         List<StatisticUserDTO> saleDtoList = target.stream().map(object -> {
             return new StatisticUserDTO(
-                    (LocalDateTime) LocalDateTime.parse((String) object[0], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    (ZonedDateTime) LocalDateTime.parse((String) object[0], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).atZone(ZoneId.of("UTC")),
                     (Integer) ((BigInteger) object[1]).intValue()
             );
         }).collect(Collectors.toList());
@@ -415,7 +438,7 @@ public class StatisticQueryImpl implements StatisticQuery {
     private List<StatisticTotalSaleDTO> convertToTotalSaleDTO(List<Object[]> target) {
         List<StatisticTotalSaleDTO> totalSaleDtoList = target.stream().map(object -> {
             return new StatisticTotalSaleDTO(
-                    (LocalDateTime) LocalDateTime.parse((String) object[0], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    (ZonedDateTime) LocalDateTime.parse((String) object[0], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).atZone(ZoneId.of("UTC")),
                     (BigDecimal) object[1]
             );
         }).collect(Collectors.toList());
@@ -433,7 +456,7 @@ public class StatisticQueryImpl implements StatisticQuery {
     private List<StatisticTotalUserDTO> convertToTotalUserDTO(List<Object[]> target) {
         List<StatisticTotalUserDTO> totalUserDtoList = target.stream().map(object -> {
             return new StatisticTotalUserDTO(
-                    (LocalDateTime) LocalDateTime.parse((String) object[0], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    (ZonedDateTime) LocalDateTime.parse((String) object[0], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).atZone(ZoneId.of("UTC")),
                     (Integer) ((BigInteger) object[1]).intValue()
             );
         }).collect(Collectors.toList());
@@ -451,7 +474,7 @@ public class StatisticQueryImpl implements StatisticQuery {
     private List<StatisticTotalProductDTO> convertToTotalProductDTO(List<Object[]> target) {
         List<StatisticTotalProductDTO> totalProductDtoList = target.stream().map(object -> {
             return new StatisticTotalProductDTO(
-                    (LocalDateTime) LocalDateTime.parse((String) object[0], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    (ZonedDateTime) LocalDateTime.parse((String) object[0], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).atZone(ZoneId.of("UTC")),
                     /**
                      * this return BigDecimal (not BigInteger)
                      */

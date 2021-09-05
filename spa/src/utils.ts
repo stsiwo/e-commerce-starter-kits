@@ -60,6 +60,35 @@ export function isAfterOrEqualDateOf(one: Date, two: Date) {
 }
 
 /**
+ * get today start from 00:00:00
+ */
+export function getTodayFromBeginning() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
+}
+
+/**
+ * get this month start from 00:00:00
+ */
+export function getThisMonthFromBeginning() {
+  const today = new Date();
+  today.setDate(1);
+  today.setHours(0, 0, 0, 0);
+  return today;
+}
+
+/**
+ * get this month start from 00:00:00
+ */
+export function getThisYearFromBeginning() {
+  const today = new Date();
+  today.setMonth(0);
+  today.setDate(1);
+  today.setHours(0, 0, 0, 0);
+  return today;
+}
+/**
  * check if two dates are same or not.
  *
  * ignore time and only compare year, month and date.

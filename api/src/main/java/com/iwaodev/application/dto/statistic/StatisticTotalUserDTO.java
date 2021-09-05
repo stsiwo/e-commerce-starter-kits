@@ -5,18 +5,18 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @NoArgsConstructor
 @Data
 @ToString
 public class StatisticTotalUserDTO {
 
-    private LocalDateTime name;
+    private ZonedDateTime name;
 
     private Integer users;
 
-    public StatisticTotalUserDTO(LocalDateTime name, Integer users) {
+    public StatisticTotalUserDTO(ZonedDateTime name, Integer users) {
         this.name = name;
         this.users = users;
     }

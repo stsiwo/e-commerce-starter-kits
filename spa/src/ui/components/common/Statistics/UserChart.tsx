@@ -312,7 +312,26 @@ const UserChart: React.FunctionComponent<{}> = (props) => {
    */
   const [curData, setData] = React.useState<StatisticUserDataType[]>([]);
   React.useEffect(() => {
-    const queryString = `?startYear=${curStartYear}&startMonth=${curStartMonth}&startDate=${curStartDate}&endYear=${curEndYear}&endMonth=${curEndMonth}&endDate=${curEndDate}`;
+    //const queryString = `?startYear=${curStartYear}&startMonth=${curStartMonth}&startDate=${curStartDate}&endYear=${curEndYear}&endMonth=${curEndMonth}&endDate=${curEndDate}`;
+
+    const startDate = new Date(
+      curStartYear,
+      curStartMonth,
+      curStartDate,
+      0,
+      0,
+      0
+    );
+    const endDate = new Date(
+      curEndYear,
+      curEndMonth,
+      curEndDate,
+      new Date().getHours(),
+      new Date().getMinutes(),
+      new Date().getSeconds()
+    );
+
+    const queryString = `?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
 
     log("statistic user request url ");
     log(API1_URL + `/statistics/users${queryString}`);

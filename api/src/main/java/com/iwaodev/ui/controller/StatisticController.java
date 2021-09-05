@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.TimeZone;
 
 @RestController
 public class StatisticController {
@@ -92,4 +94,5 @@ public class StatisticController {
         List<StatisticTopUserDTO> data = this.service.getTopUsers(criteria);
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
+
 }

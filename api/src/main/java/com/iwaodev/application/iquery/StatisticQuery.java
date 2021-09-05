@@ -3,6 +3,7 @@ package com.iwaodev.application.iquery;
 import com.iwaodev.application.dto.statistic.*;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
@@ -24,17 +25,17 @@ public interface StatisticQuery {
 
     public List<StatisticUserDTO> getMonthlyUser(LocalDateTime startDate, LocalDateTime endDate);
 
-    public List<StatisticTotalSaleDTO> getTodayTotalSales();
-    public List<StatisticTotalSaleDTO> getThisMonthTotalSales();
-    public List<StatisticTotalSaleDTO> getThisYearTotalSales();
+    public List<StatisticTotalSaleDTO> getTodayTotalSales(LocalDateTime startDate, LocalDateTime endDate);
+    public List<StatisticTotalSaleDTO> getThisMonthTotalSales(LocalDateTime startDate, LocalDateTime endDate);
+    public List<StatisticTotalSaleDTO> getThisYearTotalSales(LocalDateTime startDate, LocalDateTime endDate);
 
-    public List<StatisticTotalUserDTO> getTodayTotalUsers();
-    public List<StatisticTotalUserDTO> getThisMonthTotalUsers();
-    public List<StatisticTotalUserDTO> getThisYearTotalUsers();
+    public List<StatisticTotalUserDTO> getTodayTotalUsers(LocalDateTime startDate, LocalDateTime endDate);
+    public List<StatisticTotalUserDTO> getThisMonthTotalUsers(LocalDateTime startDate, LocalDateTime endDate);
+    public List<StatisticTotalUserDTO> getThisYearTotalUsers(LocalDateTime startDate, LocalDateTime endDate);
 
-    public List<StatisticTotalProductDTO> getTodayTotalProducts();
-    public List<StatisticTotalProductDTO> getThisMonthTotalProducts();
-    public List<StatisticTotalProductDTO> getThisYearTotalProducts();
+    public List<StatisticTotalProductDTO> getTodayTotalProducts(LocalDateTime startDate, LocalDateTime endDate);
+    public List<StatisticTotalProductDTO> getThisMonthTotalProducts(LocalDateTime startDate, LocalDateTime endDate);
+    public List<StatisticTotalProductDTO> getThisYearTotalProducts(LocalDateTime startDate, LocalDateTime endDate);
 
     public List<StatisticTopProductDTO> getTopProducts();
     public List<StatisticTopUserDTO> getTopUsers();

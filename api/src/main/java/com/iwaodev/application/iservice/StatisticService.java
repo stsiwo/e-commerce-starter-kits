@@ -6,6 +6,7 @@ import com.iwaodev.application.dto.statistic.*;
 import com.iwaodev.ui.criteria.category.CategoryCriteria;
 import com.iwaodev.ui.criteria.statistic.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface StatisticService {

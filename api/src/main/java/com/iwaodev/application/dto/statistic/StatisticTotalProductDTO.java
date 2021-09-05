@@ -4,18 +4,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @NoArgsConstructor
 @Data
 @ToString
 public class StatisticTotalProductDTO {
 
-    private LocalDateTime name;
+    private ZonedDateTime name;
 
     private Integer products;
 
-    public StatisticTotalProductDTO(LocalDateTime name, Integer products) {
+    public StatisticTotalProductDTO(ZonedDateTime name, Integer products) {
         this.name = name;
         this.products = products;
     }
