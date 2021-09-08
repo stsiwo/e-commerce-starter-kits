@@ -1088,7 +1088,20 @@ steps to generate encypted data (e.g., ENC(....))
     - issue-bG2CTHHBd6I: ResponseStatusException is overriden by the fallback Exception handler at @ControllerAdvice.
     
         - solution) add ResponseStatusExceptionhandler at @ControlelrAdvice.
+    
+    - issue-UqNd_0_ndj9: AccessDeniedException is overriden by the fallback Exception handler at @ControllerAdvice.
 
+        - solution) add AccessDeniedStatusExceptionhandler at @ControlelrAdvice.
+
+    - issue-xzvLu2R0S1p: AppException is overriden by the fallback Exception even if the handler method is defined. bug??
+
+        - workaround) this is not proper solution. check the original excepiton class is AppException and if so, call the handler method manually.
+
+        - fix if you have time. 
+
+        - attempted)
+
+            - use @Order(Lower_priority) or @Primary but none of them worked. i guess this is a bug snice other AppExceptions are properly caught at the handler method.
   ## Bugs:
 
      - hibernate return the same child entity twice in child list.

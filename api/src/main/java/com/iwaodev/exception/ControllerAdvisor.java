@@ -6,9 +6,13 @@ import java.util.Map;
 
 import com.iwaodev.ui.response.ErrorBaseResponse;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,6 +22,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -83,6 +88,20 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
   }
 
   /**
+   * issue-UqNd_0_ndj9
+   * @param ex
+   * @param request
+   * @return
+   */
+  @ExceptionHandler(AccessDeniedException.class)
+  public final ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
+    logger.debug("got AccessDeniedException so convert it to its message & status code to ResponseEntity");
+    ErrorBaseResponse errorResponse = new ErrorBaseResponse(LocalDateTime.now(), HttpStatus.FORBIDDEN.value(),
+            HttpStatus.FORBIDDEN.toString(), ex.getMessage(), ((ServletWebRequest) request).getRequest().getRequestURI());
+    return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+  }
+
+  /**
    * issue-bG2CTHHBd6I
    * @param ex
    * @param request
@@ -97,8 +116,8 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
   }
 
 
-  @ExceptionHandler(AppException.class)
-  public ResponseEntity<Object> handleConstraintViolationException(AppException ex, WebRequest request) {
+  @ExceptionHandler({ AppException.class })
+  public ResponseEntity<Object> handleAppException(AppException ex, WebRequest request) {
     ErrorBaseResponse errorResponse = new ErrorBaseResponse(LocalDateTime.now(), ex.getStatus().value(),
         ex.getStatus().toString(), ex.getMessage(), ((ServletWebRequest) request).getRequest().getRequestURI());
     logger.debug("got AppException so convert it to its message & status code to ResponseEntity");
@@ -114,11 +133,19 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
    * @return ResponseEntity<Object>
    */
   @ExceptionHandler({ Exception.class })
-  public ResponseEntity<Object> handleAll(final Exception ex, final WebRequest request) {
+  public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
     logger.debug("got Exception so convert it to its message & status code to ResponseEntity");
     logger.debug("original error message for this exception.");
     logger.debug(ex.getMessage());
+    logger.debug("original exception class");
+    logger.debug(ex.getCause());
     logger.debug("abstract this message for clients");
+
+    // issue-xzvLu2R0S1p
+    if (ex.getCause() instanceof AppException) {
+      AppException originalException = (AppException) ex.getCause();
+      return this.handleAppException(originalException, request);
+    }
 
     ErrorBaseResponse errorResponse = new ErrorBaseResponse(LocalDateTime.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
             HttpStatus.INTERNAL_SERVER_ERROR.toString(), "encountered errors. please try again.", ((ServletWebRequest) request).getRequest().getRequestURI());
