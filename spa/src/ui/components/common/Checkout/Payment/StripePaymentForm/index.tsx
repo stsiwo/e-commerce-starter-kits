@@ -3,19 +3,19 @@ import Button from "@material-ui/core/Button";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { CheckoutStepEnum } from "components/pages/Checkout";
+import { logger } from "configs/logger";
 import { calcOrderTotalCost } from "domain/order";
+import { CheckoutSessionStatusEnum } from "domain/order/types";
 import { toFullNameString } from "domain/user";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { messageActions } from "reducers/slices/app";
 import { cartItemActions } from "reducers/slices/domain/cartItem";
+import { checkoutSessionStatusActions } from "reducers/slices/domain/checkout";
 import { MessageTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { cadCurrencyFormat, getNanoId } from "src/utils";
-import { checkoutSessionStatusActions } from "reducers/slices/domain/checkout";
-import { CheckoutSessionStatusEnum } from "domain/order/types";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -192,7 +192,7 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormPropsType> = (
           className={classes.btn}
           variant="contained"
         >
-          Pay (<b>$ {totalCost} </b>)
+          Pay (<b> {totalCost} </b>)
         </Button>
       </Box>
     </Box>

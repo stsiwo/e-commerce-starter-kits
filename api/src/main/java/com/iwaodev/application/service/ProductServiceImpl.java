@@ -288,7 +288,7 @@ public class ProductServiceImpl implements ProductService {
           this.s3Service.upload(localDirectoryWithFile, file.getBytes());
         } catch (Exception e) {
           logger.debug(e.getMessage());
-          throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+          throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during uploading product image to s3. please try again.");
         }
 
         newEntity.setProductImagePath(publicPath);
@@ -436,7 +436,7 @@ public class ProductServiceImpl implements ProductService {
         this.s3Service.delete(oldProductImagePath);
       } catch (Exception e) {
         logger.debug(e.getMessage());
-        throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during deleting product images from s3. please try again.");
       }
 
       /**
@@ -468,7 +468,7 @@ public class ProductServiceImpl implements ProductService {
 
         } catch (Exception e) {
           logger.debug(e.getMessage());
-          throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+          throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during uploading product images. please try again.");
         }
 
 
@@ -624,7 +624,7 @@ public class ProductServiceImpl implements ProductService {
       content = this.s3Service.get(internalPath);
     } catch (Exception e) {
       logger.debug(e.getMessage());
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during retrieving product images. please try again.");
     }
 
     return content;

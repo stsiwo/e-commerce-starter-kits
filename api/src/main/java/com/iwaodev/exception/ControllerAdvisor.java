@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.servlet.http.HttpServletRequest;
@@ -81,11 +82,46 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
   }
 
+  /**
+   * issue-bG2CTHHBd6I
+   * @param ex
+   * @param request
+   * @return
+   */
+  @ExceptionHandler(ResponseStatusException.class)
+  public ResponseEntity<Object> handleresponseStatusException(ResponseStatusException ex, WebRequest request) {
+    logger.debug("got ResponseStatusException so convert it to its message & status code to ResponseEntity");
+    ErrorBaseResponse errorResponse = new ErrorBaseResponse(LocalDateTime.now(), ex.getStatus().value(),
+            ex.getStatus().toString(), ex.getReason(), ((ServletWebRequest) request).getRequest().getRequestURI());
+    return new ResponseEntity<>(errorResponse, ex.getStatus());
+  }
+
+
   @ExceptionHandler(AppException.class)
   public ResponseEntity<Object> handleConstraintViolationException(AppException ex, WebRequest request) {
     ErrorBaseResponse errorResponse = new ErrorBaseResponse(LocalDateTime.now(), ex.getStatus().value(),
         ex.getStatus().toString(), ex.getMessage(), ((ServletWebRequest) request).getRequest().getRequestURI());
     logger.debug("got AppException so convert it to its message & status code to ResponseEntity");
     return new ResponseEntity<>(errorResponse, ex.getStatus());
+  }
+
+  /**
+   * fallback exception handler.
+   *
+   * any expcetion thrown by this app is caught here and return 500 internal server error as a response
+   * @param ex Exception
+   * @param request WebRequest
+   * @return ResponseEntity<Object>
+   */
+  @ExceptionHandler({ Exception.class })
+  public ResponseEntity<Object> handleAll(final Exception ex, final WebRequest request) {
+    logger.debug("got Exception so convert it to its message & status code to ResponseEntity");
+    logger.debug("original error message for this exception.");
+    logger.debug(ex.getMessage());
+    logger.debug("abstract this message for clients");
+
+    ErrorBaseResponse errorResponse = new ErrorBaseResponse(LocalDateTime.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
+            HttpStatus.INTERNAL_SERVER_ERROR.toString(), "encountered errors. please try again.", ((ServletWebRequest) request).getRequest().getRequestURI());
+    return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }

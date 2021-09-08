@@ -47,7 +47,8 @@ public RatingDTO getRating(Double weight, String destinationPostalCode) throws E
         RatingDTO ratingDTO = this.canadaPostService.getRegularParcelRating(weight, destinationPostalCode, originalPostalCode);
         return ratingDTO;
     } catch (Exception e) {
-        throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        logger.debug(e.getMessage());
+        throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during retrieving estimated delivery date and shipping cost. please try again.");
     }
 }
 

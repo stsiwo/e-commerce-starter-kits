@@ -107,7 +107,7 @@ const TotalUsersPieChart: React.FunctionComponent<{}> = (props) => {
   const themes = useTheme();
 
   const [curBase, setBase] = React.useState<TotalUsersBaseEnum>(
-    TotalUsersBaseEnum.TODAY
+    TotalUsersBaseEnum.THIS_MONTH
   );
 
   const handleBaseChange: React.EventHandler<

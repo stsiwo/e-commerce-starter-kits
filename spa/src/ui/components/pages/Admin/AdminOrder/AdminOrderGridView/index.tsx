@@ -4,6 +4,7 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
@@ -11,14 +12,16 @@ import {
   DataGrid,
   GridCellParams,
   GridColDef,
-  GridPageChangeParams,
   GridRowsProp,
 } from "@material-ui/data-grid";
 import EditIcon from "@material-ui/icons/Edit";
+import Pagination from "@material-ui/lab/Pagination";
+import SearchForm from "components/common/SearchForm";
 import { getCurOrderStatus } from "domain/order";
 import { OrderType } from "domain/order/types";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router";
 import {
   fetchOrderActionCreator,
   orderPaginationPageActions,
@@ -26,12 +29,9 @@ import {
 } from "reducers/slices/domain/order";
 import { FetchStatusEnum } from "src/app";
 import { mSelector } from "src/selectors/selector";
+import { cadCurrencyFormat } from "src/utils";
 import AdminOrderFormDrawer from "../AdminOrderFormDrawer";
 import AdminOrderSearchController from "../AdminOrderSearchController";
-import SearchForm from "components/common/SearchForm";
-import { useLocation } from "react-router";
-import Grid from "@material-ui/core/Grid";
-import Pagination from "@material-ui/lab/Pagination";
 
 declare type AdminOrderGridViewPropsType = {};
 
@@ -79,7 +79,7 @@ const generateRows: (domains: OrderType[]) => GridRowsProp = (domains) => {
       id: domain.orderNumber,
       stripeId: domain.stripePaymentIntentId,
       date: domain.createdAt,
-      cost: domain.productCost, // TODO: implement this at the backend
+      cost: cadCurrencyFormat(domain.productCost), // TODO: implement this at the backend
       customerName: domain.orderFirstName + " " + domain.orderLastName,
       customerEmail: domain.orderEmail,
       status: getCurOrderStatus(domain), //domain.orderEvents[domain.orderEvents.length - 1].orderStatus,

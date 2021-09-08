@@ -21,23 +21,23 @@ import EditIcon from "@material-ui/icons/Edit";
 import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
 import ColorCell from "components/common/GridData/ColorCell";
 import SizeCell from "components/common/GridData/SizeCell";
-import { ProductVariantType, ProductType } from "domain/product/types";
+import { ProductType, ProductVariantType } from "domain/product/types";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router";
 import {
+  deleteSingleProductVariantFetchStatusActions,
+  postProductVariantFetchStatusActions,
+  putProductVariantFetchStatusActions,
+} from "reducers/slices/app/fetchStatus/product";
+import {
   deleteSingleProductVariantActionCreator,
   fetchSingleProductActionCreator,
 } from "reducers/slices/domain/product";
-import { mSelector, rsSelector } from "src/selectors/selector";
-import AdminProductVariantFormDialog from "../AdminProductVariantFormDialog";
 import { FetchStatusEnum } from "src/app";
-import {
-  deleteSingleProductFetchStatusActions,
-  putProductVariantFetchStatusActions,
-  postProductVariantFetchStatusActions,
-  deleteSingleProductVariantFetchStatusActions,
-} from "reducers/slices/app/fetchStatus/product";
+import { mSelector, rsSelector } from "src/selectors/selector";
+import { cadCurrencyFormat } from "src/utils";
+import AdminProductVariantFormDialog from "../AdminProductVariantFormDialog";
 
 declare type AdminProductVariantGridViewPropsType = {
   curFormOpen: boolean;
@@ -69,12 +69,12 @@ const generateRows: (
       id: domain.variantId,
       size: domain.productSize.productSizeName,
       color: domain.variantColor,
-      currentPrice: domain.currentPrice,
+      currentPrice: cadCurrencyFormat(domain.currentPrice),
       unitPrice: domain.variantUnitPrice
-        ? domain.variantUnitPrice
-        : product.productBaseUnitPrice,
+        ? cadCurrencyFormat(domain.variantUnitPrice)
+        : cadCurrencyFormat(product.productBaseUnitPrice),
       stock: domain.variantStock,
-      discount: domain.isDiscountAvailable,
+      discount: domain.isDiscountAvailable ? "Yes" : "No",
       soldCount: domain.soldCount,
       weight: domain.variantWeight,
       actions: domain.variantId,

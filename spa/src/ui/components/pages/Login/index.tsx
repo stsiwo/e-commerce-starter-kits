@@ -10,6 +10,7 @@ import SentimentSatisfiedOutlinedIcon from "@material-ui/icons/SentimentSatisfie
 import { AxiosError } from "axios";
 import ForgotPasswordDialog from "components/common/ForgotPasswordDialog";
 import { api } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import { UserType } from "domain/user/types";
 import { useValidation } from "hooks/validation";
 import { memberLoginSchema } from "hooks/validation/rules";
@@ -20,7 +21,6 @@ import { authActions, messageActions } from "reducers/slices/app";
 import { MessageTypeEnum } from "src/app";
 import { mSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 export declare type MemberLoginDataType = {

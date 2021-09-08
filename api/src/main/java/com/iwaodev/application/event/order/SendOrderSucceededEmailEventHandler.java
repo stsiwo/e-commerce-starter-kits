@@ -125,7 +125,7 @@ public class SendOrderSucceededEmailEventHandler implements EventHandler<Payment
           String.format("Your Order Has Been Confirmed (Order #: %s)", order.getOrderNumber()), htmlBody);
     } catch (MessagingException e) {
       logger.debug(e.getMessage());
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during sending order-was-confirmed email. please try again.");
     }
 
   }

@@ -101,7 +101,7 @@ public class SendReviewWasUpdatedEmailEventHandler implements EventHandler<Revie
           String.format("A Review Was Updated By Customer (Review #: %s)", review.getReviewId()), htmlBody);
     } catch (MessagingException e) {
       logger.debug(e.getMessage());
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during sending review-was-updated email. please try again.");
     }
 
   }

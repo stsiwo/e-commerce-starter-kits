@@ -239,7 +239,7 @@ public class UserServiceImpl implements UserService {
       this.s3Service.upload(path, file.getBytes());
     } catch (Exception e) {
       logger.debug(e.getMessage());
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during uploading user avatar images. please try again.");
     }
 
     // update the user
@@ -317,7 +317,7 @@ public class UserServiceImpl implements UserService {
       content = this.s3Service.get(internalPath);
     } catch (Exception e) {
       logger.debug(e.getMessage());
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during retrieving user avatar image from s3. please try again.");
     }
 
     return content;

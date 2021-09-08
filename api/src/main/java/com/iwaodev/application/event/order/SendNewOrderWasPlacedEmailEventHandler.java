@@ -124,7 +124,7 @@ public class SendNewOrderWasPlacedEmailEventHandler implements EventHandler<Paym
           "A New Order Was Placed By Customer (Order #: " + order.getOrderNumber() + ")", htmlBody);
     } catch (MessagingException e) {
       logger.debug(e.getMessage());
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during sending new-order-was-placed email. please try again.");
     }
 
   }

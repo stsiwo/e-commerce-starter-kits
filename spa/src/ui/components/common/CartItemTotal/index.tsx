@@ -4,6 +4,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { AxiosError } from "axios";
 import { api } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import {
   calcSubTotalPriceAmount,
   calcSubTotalProductNumbers,
@@ -18,7 +19,6 @@ import { checkoutIsRatingSuccessActions } from "reducers/slices/domain/checkout"
 import { FetchStatusEnum, MessageTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { cadCurrencyFormat, getNanoId, toDateString } from "src/utils";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) => createStyles({}));
@@ -124,7 +124,7 @@ const CartItemTotal: React.FunctionComponent<CartItemTotalPropsType> = (
           gutterBottom
         >
           Subtotal (<b>{calcSubTotalProductNumbers(selectedCartItems)}</b>{" "}
-          items): $
+          items):
           <b>{cadCurrencyFormat(calcSubTotalPriceAmount(selectedCartItems))}</b>
         </Typography>
         <Typography
@@ -133,7 +133,7 @@ const CartItemTotal: React.FunctionComponent<CartItemTotalPropsType> = (
           align="right"
           gutterBottom
         >
-          Tax: $<b>{cadCurrencyFormat(0)}</b>
+          Tax: <b>{cadCurrencyFormat(0)}</b>
         </Typography>
         <Typography
           variant="subtitle1"
@@ -141,11 +141,11 @@ const CartItemTotal: React.FunctionComponent<CartItemTotalPropsType> = (
           align="right"
           gutterBottom
         >
-          Shipping Cost: $<b>{cadCurrencyFormat(curShippingCost)}</b>
+          Shipping Cost: <b>{cadCurrencyFormat(curShippingCost)}</b>
         </Typography>
         <Divider />
         <Typography variant="h6" component="h3" align="right" gutterBottom>
-          Total: $
+          Total:
           <b>
             {cadCurrencyFormat(
               calcSubTotalPriceAmount(selectedCartItems) + 0 + curShippingCost

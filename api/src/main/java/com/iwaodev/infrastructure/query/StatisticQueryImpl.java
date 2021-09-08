@@ -71,7 +71,7 @@ public class StatisticQueryImpl implements StatisticQuery {
                 "(select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t2,  " +
                 "(select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t3,  " +
                 "(select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t4) v " +
-                "left join orders o on date(o.created_at) = name and o.transaction_result = 1 " + // since this is daily based so only compare year & month & day
+                "left join orders o on date(o.created_at) = date(name) and o.transaction_result = 1 " + // since this is daily based so only compare year & month & day
                 "where name between :startDate and :endDate " +
                 "group by name;";
 
@@ -95,7 +95,7 @@ public class StatisticQueryImpl implements StatisticQuery {
                 "(select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t3,  " +
                 "(select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t4) v " +
                 "left join orders o on extract(year_month from date(o.created_at)) = extract(year_month from name) and o.transaction_result = 1 " + // since this is monthly base so only compare year & month only
-                "where name between :startDate and :endDate " +
+                "where extract(year_month from name) between extract(year_month from :startDate) and extract(year_month from :endDate) " +
                 "group by name;";
 
         List<Object[]> result = this.entityManager.createNativeQuery(query)
@@ -141,7 +141,7 @@ public class StatisticQueryImpl implements StatisticQuery {
                 "(select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t2,  " +
                 "(select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t3,  " +
                 "(select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t4) v " +
-                "left join users us on date(us.created_at) = name " + // since this is daily based so only compare year & month & day
+                "left join users us on date(us.created_at) = date(name) " + // since this is daily based so only compare year & month & day
                 "where name between :startDate and :endDate " +
                 "group by name;";
 
@@ -164,7 +164,7 @@ public class StatisticQueryImpl implements StatisticQuery {
                 "(select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t3,  " +
                 "(select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t4) v " +
                 "left join users us on extract(year_month from date(us.created_at)) = extract(year_month from name) " + // since this is monthly base so only compare year & month only
-                "where name between :startDate and :endDate " +
+                "where extract(year_month from name) between extract(year_month from :startDate) and extract(year_month from :endDate) " +
                 "group by name;";
 
         List<Object[]> result = this.entityManager.createNativeQuery(query)

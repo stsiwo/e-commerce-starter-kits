@@ -114,7 +114,7 @@ public class SendPleaseReviewEmailEventHandler implements EventHandler<OrderEven
           htmlBody + ")");
     } catch (MessagingException e) {
       logger.debug(e.getMessage());
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during sending write-review-request email. please try again.");
     }
 
   }

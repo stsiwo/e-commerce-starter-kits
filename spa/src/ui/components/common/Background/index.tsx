@@ -1,8 +1,8 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import * as React from 'react';
-import { useSpring, animated, config, useTransition, useSprings } from 'react-spring'
-import { useHistory, useLocation } from 'react-router';
-import BaseMorph from './BaseMorph';
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import * as React from "react";
+import { useLocation } from "react-router";
+import { config, useSpring } from "react-spring";
+import BaseMorph from "./BaseMorph";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -27,8 +27,8 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: 10,
       left: 0,
       bottom: 0,
-    }
-  }),
+    },
+  })
 );
 
 /**
@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme: Theme) =>
  *  t: shortcut version of q: dx dy
  *
  *
- * note: 
+ * note:
  *  - when creating similar shape for morphine, don't optimize the svg path, just use original path (e.g., uncheck hide original at svg optimizer web interface). otherwise, shape collapse when morphing.
  *  - you need to keep using the original shape (svg path) for this react-spring interpolation. otherwise you get this error: The arity of each "output" value must be equal.
  *    - you can transform the shape from original one.
@@ -74,12 +74,12 @@ const useStyles = makeStyles((theme: Theme) =>
  **/
 
 export declare type MorphPathDataType = {
-  transform: string
-}
+  transform: string;
+};
 
 export declare type MorphMapType = {
-  [key: string]: MorphPathDataType
-}
+  [key: string]: MorphPathDataType;
+};
 
 /**
  * note:
@@ -90,58 +90,68 @@ export declare type MorphMapType = {
 // big think green shape
 const morphMap: MorphMapType = {
   "/": {
-    transform: "scale(1.3, 1.3) rotate(0deg) translate(10%, -10%) translateZ(0px) skew(0deg, 0deg)",
+    transform:
+      "scale(1.3, 1.3) rotate(0deg) translate(10%, -10%) translateZ(0px) skew(0deg, 0deg)",
   },
   "/login": {
-    transform: "scale(1.5, 1.5) rotate(0deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
+    transform:
+      "scale(1.5, 1.5) rotate(0deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
   },
   "/signup": {
-    transform: "scale(1.5, 1.5) rotate(45deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
+    transform:
+      "scale(1.5, 1.5) rotate(45deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
   },
   "/search": {
-    transform: "scale(3.0, 3.0) rotate(0deg) translate(-10%, -10%) translateZ(0px) skew(0deg, 0deg)",
+    transform:
+      "scale(3.0, 3.0) rotate(0deg) translate(-10%, -10%) translateZ(0px) skew(0deg, 0deg)",
   },
   "/account": {
-    transform: "scale(2.0, 1.0) rotate(0deg) translate(-30%, -20%) translateZ(0px) skew(10deg, 10deg)",
+    transform:
+      "scale(2.0, 1.0) rotate(0deg) translate(-30%, -20%) translateZ(0px) skew(10deg, 10deg)",
   },
   "/wishlist": {
-    transform: "scale(1.0, 1.0) rotate(0deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
+    transform:
+      "scale(1.0, 1.0) rotate(0deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
   },
   "/orders": {
-    transform: "scale(1.0, 1.0) rotate(0deg) translate(0%, 0%) translateZ(-1px) skew(0deg, 0deg)",
+    transform:
+      "scale(1.0, 1.0) rotate(0deg) translate(0%, 0%) translateZ(-1px) skew(0deg, 0deg)",
   },
-}
+};
 
 // small thin green shape
 const morphAltMap: MorphMapType = {
   "/": {
-    transform: "scale(1.5, 1.5) rotate(0deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
+    transform:
+      "scale(1.5, 1.5) rotate(0deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
   },
   "/login": {
-    transform: "scale(1.5, 1.5) rotate(0deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
+    transform:
+      "scale(1.5, 1.5) rotate(0deg) translate(0%, 0%) translateZ(0px) skew(0deg, 0deg)",
   },
   "/signup": {
-    transform: "scale(1.5, 1.5) rotate(10deg) translate(50%, 0%) translateZ(0px) skew(0deg, 0deg)",
+    transform:
+      "scale(1.5, 1.5) rotate(10deg) translate(50%, 0%) translateZ(0px) skew(0deg, 0deg)",
   },
   "/search": {
-    transform: "scale(1.5, 1.5) rotate(45deg) translate(30%, 30%) translateZ(0px) skew(10deg, 10deg)",
+    transform:
+      "scale(1.5, 1.5) rotate(45deg) translate(30%, 30%) translateZ(0px) skew(10deg, 10deg)",
   },
   "/account": {
-    transform: "scale(2.0, 2.0) rotate(45deg) translate(30%, 30%) translateZ(0px) skew(-10deg, -10deg)",
+    transform:
+      "scale(2.0, 2.0) rotate(45deg) translate(30%, 30%) translateZ(0px) skew(-10deg, -10deg)",
   },
   "/wishlist": {
-    transform: "scale(4.0, 4.0) rotate(0deg) translate(25%, 25%) translateZ(0px) skew(0deg, 0deg)",
+    transform:
+      "scale(4.0, 4.0) rotate(0deg) translate(25%, 25%) translateZ(0px) skew(0deg, 0deg)",
   },
   "/orders": {
-    transform: "scale(5.0, 5.0) rotate(0deg) translate(25%, 25%) translateZ(-2px) skew(0deg, 0deg)",
+    transform:
+      "scale(5.0, 5.0) rotate(0deg) translate(25%, 25%) translateZ(-2px) skew(0deg, 0deg)",
   },
-}
-
-
-
+};
 
 const Background: React.FunctionComponent<{}> = (props) => {
-
   const classes = useStyles();
 
   const location = useLocation();
@@ -159,13 +169,13 @@ const Background: React.FunctionComponent<{}> = (props) => {
 
   const spring = useSpring({
     config: config.molasses,
-    to: morphMap[location.pathname]
-  })
+    to: morphMap[location.pathname],
+  });
 
   const springAlt = useSpring({
     config: config.molasses,
-    to: morphAltMap[location.pathname]
-  })
+    to: morphAltMap[location.pathname],
+  });
   return (
     <React.Fragment>
       {/**<div className={classes.backgroundBox}>
@@ -177,17 +187,10 @@ const Background: React.FunctionComponent<{}> = (props) => {
         ))}
       </div>**/}
       <div className={classes.backgroundBox}>
-        <BaseMorph
-          spring={spring}
-          springAlt={springAlt}
-        />
+        <BaseMorph spring={spring} springAlt={springAlt} />
       </div>
     </React.Fragment>
-  )
-}
+  );
+};
 
-export default Background
-
-
-
-
+export default Background;

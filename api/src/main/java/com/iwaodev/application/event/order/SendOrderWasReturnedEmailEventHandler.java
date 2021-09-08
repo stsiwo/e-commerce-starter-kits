@@ -117,7 +117,7 @@ public class SendOrderWasReturnedEmailEventHandler implements EventHandler<Order
           String.format("Your Order Was Returned (Order #: %s)", order.getOrderNumber()), htmlBody);
     } catch (MessagingException e) {
       logger.debug(e.getMessage());
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during sending order-was-returned email. please try again.");
     }
 
   }

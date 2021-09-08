@@ -1,3 +1,4 @@
+import { logger } from "configs/logger";
 import {
   get2AlphaCountryCodeRegex,
   getProvinceList,
@@ -6,7 +7,6 @@ import {
   isValidDate,
 } from "src/utils";
 import * as yup from "yup";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 /**
@@ -27,27 +27,30 @@ const log = logger(__filename);
 export const userAccountSchema = yup.object().shape({
   firstName: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required(),
   lastName: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required(),
   email: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required()
     .email(),
   /**
@@ -65,11 +68,12 @@ export const userAccountSchema = yup.object().shape({
     value
       ? yup
           .string()
-          .test(
-            "len",
-            "must be less than or equal to 100",
-            (val) => val.length <= 100
-          )
+          .test("len", "must be less than or equal to 100", (val) => {
+            if (val) {
+              return val.length <= 100;
+            }
+            return true;
+          })
           .min(8, "password must be at least 8 characters")
           .matches(
             /^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/,
@@ -112,39 +116,44 @@ export const userActiveStatusAccountSchema = yup.object().shape({
   active: yup.string().required(),
   activeNote: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 1000",
-      (val) => val.length <= 1000
-    )
+    .test("len", "must be less than or equal to 1000", (val) => {
+      if (val) {
+        return val.length <= 1000;
+      }
+      return true;
+    })
     .optional(),
 });
 
 export const userAccountAddressSchema = yup.object().shape({
   address1: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
+
     .required(),
   address2: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .optional()
     .nullable(),
   city: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required(),
   province: yup
     .string()
@@ -174,20 +183,22 @@ export const userAccountAddressSchema = yup.object().shape({
 export const adminLoginSchema = yup.object().shape({
   email: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required()
     .email(),
   password: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .min(8, "password must be at least 8 characters")
     .matches(
       /^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/,
@@ -199,36 +210,40 @@ export const adminLoginSchema = yup.object().shape({
 export const memberSignupSchema = yup.object().shape({
   firstName: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required(),
   lastName: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required(),
   email: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required()
     .email(),
   password: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .min(8, "password must be at least 8 characters")
     .matches(
       /^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/,
@@ -237,11 +252,12 @@ export const memberSignupSchema = yup.object().shape({
     .required("password is required"),
   confirm: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required()
     .oneOf([yup.ref("password"), null], "password must match"),
 });
@@ -249,20 +265,22 @@ export const memberSignupSchema = yup.object().shape({
 export const memberLoginSchema = yup.object().shape({
   email: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required()
     .email(),
   password: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .min(8, "password must be at least 8 characters")
     .matches(
       /^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/,
@@ -389,11 +407,12 @@ export const productVariantSchema = yup.object().shape({
   isDiscount: yup.bool().optional().nullable(),
   note: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 10000 chars",
-      (val) => val.length <= 10000
-    )
+    .test("len", "must be less than or equal to 10000 chars", (val) => {
+      if (val) {
+        return val.length <= 10000;
+      }
+      return true;
+    })
     .optional()
     .nullable(),
   variantWeight: yup
@@ -481,19 +500,21 @@ export const productVariantSchema = yup.object().shape({
 export const productSchema = yup.object().shape({
   productName: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 500 chars",
-      (val) => val.length <= 500
-    )
+    .test("len", "must be less than or equal to 500 chars", (val) => {
+      if (val) {
+        return val.length <= 500;
+      }
+      return true;
+    })
     .required(),
   productDescription: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 10000 chars",
-      (val) => val.length <= 10000
-    )
+    .test("len", "must be less than or equal to 10000 chars", (val) => {
+      if (val) {
+        return val.length <= 10000;
+      }
+      return true;
+    })
     .required(),
   productBaseUnitPrice: yup
     .string()
@@ -504,11 +525,12 @@ export const productSchema = yup.object().shape({
     .required(),
   productPath: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .matches(
       /^[a-zA-Z0-9-_]*$/,
       "only alphabetics, numbers, underscore (_) and hyphen (-) are availble."
@@ -598,11 +620,12 @@ export const productSchema = yup.object().shape({
   productVariants: yup.array().of(productVariantSchema),
   note: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 10000 chars",
-      (val) => val.length <= 10000
-    )
+    .test("len", "must be less than or equal to 10000 chars", (val) => {
+      if (val) {
+        return val.length <= 10000;
+      }
+      return true;
+    })
     .optional()
     .nullable(),
 });
@@ -611,19 +634,21 @@ export const productSchema = yup.object().shape({
 export const categorySchema = yup.object().shape({
   categoryName: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required(),
   categoryDescription: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 10000 chars",
-      (val) => val.length <= 10000
-    )
+    .test("len", "must be less than or equal to 10000 chars", (val) => {
+      if (val) {
+        return val.length <= 10000;
+      }
+      return true;
+    })
     .required(),
   categoryPath: yup
     .string()
@@ -639,28 +664,31 @@ export const reviewSchema = yup.object().shape({
   reviewPoint: yup.number().min(0).max(5).required(),
   reviewTitle: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 500 chars",
-      (val) => val.length <= 500
-    )
+    .test("len", "must be less than or equal to 500 chars", (val) => {
+      if (val) {
+        return val.length <= 500;
+      }
+      return true;
+    })
     .required(),
   reviewDescription: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 10000 chars",
-      (val) => val.length <= 10000
-    )
+    .test("len", "must be less than or equal to 10000 chars", (val) => {
+      if (val) {
+        return val.length <= 10000;
+      }
+      return true;
+    })
     .required(),
   isVerified: yup.bool().required(),
   note: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 10000 chars",
-      (val) => val.length <= 10000
-    )
+    .test("len", "must be less than or equal to 10000 chars", (val) => {
+      if (val) {
+        return val.length <= 10000;
+      }
+      return true;
+    })
     .optional()
     .nullable(),
 });
@@ -669,44 +697,49 @@ export const reviewSchema = yup.object().shape({
 export const contactSchema = yup.object().shape({
   firstName: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required(),
   lastName: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required(),
   email: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required()
     .email(),
   title: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 500 chars",
-      (val) => val.length <= 500
-    )
+    .test("len", "must be less than or equal to 500 chars", (val) => {
+      if (val) {
+        return val.length <= 500;
+      }
+      return true;
+    })
     .required(),
   description: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 10000 chars",
-      (val) => val.length <= 10000
-    )
+    .test("len", "must be less than or equal to 10000 chars", (val) => {
+      if (val) {
+        return val.length <= 10000;
+      }
+      return true;
+    })
     .required(),
 });
 
@@ -714,27 +747,30 @@ export const contactSchema = yup.object().shape({
 export const companySchema = yup.object().shape({
   companyName: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required(),
   companyDescription: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 10000 chars",
-      (val) => val.length <= 10000
-    )
+    .test("len", "must be less than or equal to 10000 chars", (val) => {
+      if (val) {
+        return val.length <= 10000;
+      }
+      return true;
+    })
     .required(),
   companyEmail: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required()
     .email(),
   phoneNumber: yup
@@ -753,28 +789,31 @@ export const companySchema = yup.object().shape({
     .required(),
   address1: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required(),
   address2: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .optional()
     .nullable(),
   city: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required(),
   province: yup
     .string()
@@ -808,11 +847,12 @@ export const companySchema = yup.object().shape({
     .required(),
   facebookLink: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .matches(
       /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
       "invalid url."
@@ -820,11 +860,12 @@ export const companySchema = yup.object().shape({
     .optional(),
   instagramLink: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .matches(
       /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
       "invalid url."
@@ -832,11 +873,12 @@ export const companySchema = yup.object().shape({
     .optional(),
   twitterLink: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .matches(
       /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
       "invalid url."
@@ -844,11 +886,12 @@ export const companySchema = yup.object().shape({
     .optional(),
   youtubeLink: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .matches(
       /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
       "invalid url."
@@ -860,11 +903,12 @@ export const companySchema = yup.object().shape({
 export const forgotPasswordSchema = yup.object().shape({
   email: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required()
     .email(),
 });
@@ -873,11 +917,12 @@ export const forgotPasswordSchema = yup.object().shape({
 export const resetPasswordSchema = yup.object().shape({
   password: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .min(8, "password must be at least 8 characters")
     .matches(
       /^(?=.*[A-Z])(?=.*[a-z])(?!=\s+)[A-Za-z\d@$!%*#?&_]{8,}$/,
@@ -886,11 +931,12 @@ export const resetPasswordSchema = yup.object().shape({
     .required("password is required"),
   confirm: yup
     .string()
-    .test(
-      "len",
-      "must be less than or equal to 100 chars",
-      (val) => val.length <= 100
-    )
+    .test("len", "must be less than or equal to 100 chars", (val) => {
+      if (val) {
+        return val.length <= 100;
+      }
+      return true;
+    })
     .required()
     .oneOf([yup.ref("password"), null], "password must match"),
 });

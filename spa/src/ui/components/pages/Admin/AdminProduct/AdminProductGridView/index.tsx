@@ -25,6 +25,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
 import Pagination from "@material-ui/lab/Pagination";
 import SearchForm from "components/common/SearchForm";
+import { logger } from "configs/logger";
 import { ProductType } from "domain/product/types";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -43,9 +44,9 @@ import {
 } from "reducers/slices/domain/product";
 import { FetchStatusEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
+import { cadCurrencyFormat } from "src/utils";
 import AdminProductFormDialog from "../AdminProductFormDialog";
 import AdminProductSearchController from "../ADminProductSearchController";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 declare type AdminProductGridViewPropsType = {};
@@ -103,10 +104,10 @@ const generateRows: (domains: ProductType[]) => GridRowsProp = (domains) => {
       name: domain.productName,
       path: domain.productPath,
       category: domain.category.categoryName,
-      unitPrice: domain.productBaseUnitPrice,
-      discount: domain.isDiscountAvailable,
+      unitPrice: cadCurrencyFormat(domain.productBaseUnitPrice),
+      discount: domain.isDiscountAvailable ? "Yes" : "No",
       releaseDate: domain.releaseDate,
-      publish: domain.isPublic,
+      publish: domain.isPublic ? "Yes" : "No",
       variants: {
         count: domain.variants.length,
         productId: domain.productId,

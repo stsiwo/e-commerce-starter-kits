@@ -101,7 +101,7 @@ const UserChart: React.FunctionComponent<{}> = (props) => {
     new Date().getFullYear()
   );
   const [curStartMonth, setStartMonth] = React.useState<number>(
-    new Date().getMonth() + 1
+    new Date().getMonth() // set 1 month before as initial value
   );
   const [curStartDate, setStartDate] = React.useState<number>(
     new Date().getDate()
@@ -316,7 +316,7 @@ const UserChart: React.FunctionComponent<{}> = (props) => {
 
     const startDate = new Date(
       curStartYear,
-      curStartMonth,
+      curStartMonth - 1,
       curStartDate,
       0,
       0,
@@ -324,7 +324,7 @@ const UserChart: React.FunctionComponent<{}> = (props) => {
     );
     const endDate = new Date(
       curEndYear,
-      curEndMonth,
+      curEndMonth - 1,
       curEndDate,
       new Date().getHours(),
       new Date().getMinutes(),

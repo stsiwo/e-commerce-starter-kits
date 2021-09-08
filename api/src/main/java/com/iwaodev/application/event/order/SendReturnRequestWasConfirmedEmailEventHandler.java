@@ -132,7 +132,7 @@ public class SendReturnRequestWasConfirmedEmailEventHandler implements EventHand
           String.format("Your Return Request Was Confirmed (Order #: %s)", order.getOrderNumber()), htmlBody);
     } catch (MessagingException e) {
       logger.debug(e.getMessage());
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during sending request-was-confirmed email. please try again.");
     }
 
   }

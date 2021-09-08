@@ -36,10 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -196,6 +193,8 @@ public class AdminStatisticUsersEndpointTest {
             assertThat(userDTO.getUsers()).isEqualTo(0);
             expectedDate = expectedDate.plusHours(hourIncrement);
         }
+        // to make sure end date matches
+        assertThat(expectedDate.getHour() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getHour());
     }
 
     @Test
@@ -247,10 +246,12 @@ public class AdminStatisticUsersEndpointTest {
         for (StatisticUserDTO userDTO : responseBody) {
             //logger.debug(saleDTO.getName().toString());
             //logger.debug(expectedDate.toString());
-            assertThat(expectedStartDate).isEqualTo(userDTO.getName());
+            assertThat(expectedUTCStartDate).isEqualTo(userDTO.getName());
             assertThat(0).isEqualTo(userDTO.getUsers());
-            expectedStartDate = expectedStartDate.plusHours(hourIncrement);
+            expectedUTCStartDate = expectedUTCStartDate.plusHours(hourIncrement);
         }
+        // to make sure end date matches
+        assertThat(expectedUTCStartDate.getHour() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getHour());
     }
 
     @Test
@@ -337,11 +338,13 @@ public class AdminStatisticUsersEndpointTest {
                 assertThat(sixthUsers).isEqualTo(userDTO.getUsers());
             }
             else {
-                assertThat(expectedStartDate).isEqualTo(userDTO.getName());
+                assertThat(expectedUTCStartDate).isEqualTo(userDTO.getName());
                 assertThat(0).isEqualTo(userDTO.getUsers());
             }
-            expectedStartDate = expectedStartDate.plusHours(hourIncrement);
+            expectedUTCStartDate = expectedUTCStartDate.plusHours(hourIncrement);
         }
+        // to make sure end date matches
+        assertThat(expectedUTCStartDate.getHour() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getHour());
     }
 
     @Test
@@ -394,10 +397,12 @@ public class AdminStatisticUsersEndpointTest {
         for (StatisticUserDTO userDTO : responseBody) {
             //logger.debug(userDTO.getName().toString());
             //logger.debug(expectedDate.toString());
-            assertThat(expectedStartDate).isEqualTo(userDTO.getName());
+            assertThat(expectedUTCStartDate).isEqualTo(userDTO.getName());
             assertThat(0).isEqualTo(userDTO.getUsers());
-            expectedStartDate = expectedStartDate.plusDays(dayIncrement);
+            expectedUTCStartDate = expectedUTCStartDate.plusDays(dayIncrement);
         }
+        // to make sure end date matches
+        assertThat(expectedUTCStartDate.getDayOfMonth() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getDayOfMonth());
     }
 
     @Test
@@ -458,22 +463,106 @@ public class AdminStatisticUsersEndpointTest {
         assertThat(responseBody.length).isGreaterThan(10);
         for (StatisticUserDTO userDTO : responseBody) {
 
-            if (firstDate.isEqual(userDTO.getName())) {
+            logger.debug(userDTO.getName().toString());
+            logger.debug(userDTO.getUsers().toString());
+            if (MonthDay.from(firstDate).equals(MonthDay.from(userDTO.getName()))) {
+                logger.debug("called first date");
                 assertThat(firstUsers).isEqualTo(userDTO.getUsers());
             }
-            else if (secondDate.isEqual(userDTO.getName())) {
+            else if (MonthDay.from(secondDate).equals(MonthDay.from(userDTO.getName()))) {
                 assertThat(secondUsers).isEqualTo(userDTO.getUsers());
             }
-            else if (thirdDate.isEqual(userDTO.getName())) {
+            else if (MonthDay.from(thirdDate).equals(MonthDay.from(userDTO.getName()))) {
                 assertThat(thirdUsers).isEqualTo(userDTO.getUsers());
             } else {
-                assertThat(expectedStartDate).isEqualTo(userDTO.getName());
+                assertThat(expectedUTCStartDate).isEqualTo(userDTO.getName());
                 assertThat(0).isEqualTo(userDTO.getUsers());
             }
-            expectedStartDate = expectedStartDate.plusDays(dayIncrement);
+            expectedUTCStartDate = expectedUTCStartDate.plusDays(dayIncrement);
         }
+
+        // to make sure end date matches
+        assertThat(expectedUTCStartDate.getDayOfMonth() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getDayOfMonth());
     }
 
+    @Test
+    @Sql(scripts = { "classpath:/integration/statistic/shouldAdminGetDailyBaseUserDataWithTestDataWithAmericaVancouverTimeZone.sql" })
+    public void shouldAdminGetDailyBaseUserDataWithTestDataWithAmericaVancouverTimeZone(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnAddress.json") Resource dummyFormJsonFile*/) throws Exception {
+
+        // make sure user_id in the sql match test admin user id
+
+        // dummy form json
+        //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+        //String dummyFormJsonString = dummyFormJson.toString();
+
+        // arrange
+        int targetYear = 2020;
+        int targetStartMonth = 8;
+        int targetEndMonth = 9;
+        int targetStartDate = 1;
+        int targetEndDate = 21;
+        String targetTimeZone = "UTC";
+        ZonedDateTime expectedStartDate = ZonedDateTime.of(targetYear, targetStartMonth, targetStartDate, 0, 0, 0, 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCStartDate = expectedStartDate.withZoneSameInstant(ZoneOffset.UTC);
+        ZonedDateTime expectedEndDate = ZonedDateTime.of(targetYear, targetEndMonth, targetEndDate, LocalDateTime.now().getHour(), LocalDateTime.now().getMinute(), LocalDateTime.now().getSecond(), 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCEndDate = expectedEndDate.withZoneSameInstant(ZoneOffset.UTC);
+        int dayIncrement = 1;
+        String queryParam = String.format(
+                "?startDate=%s&endDate=%s",
+                expectedUTCStartDate.toString(), expectedUTCEndDate.toString()
+        );
+        String targetUrl = "http://localhost:" + this.port + this.targetPath + "/users" + queryParam;
+
+        // act & assert
+        ResultActions resultActions = mvc.perform(
+                        MockMvcRequestBuilders
+                                .get(targetUrl)
+                                .cookie(this.authCookie)
+                                .cookie(this.csrfCookie)
+                                .header("csrf-token", this.authInfo.getCsrfToken())
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        MvcResult result = resultActions.andReturn();
+        JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+        StatisticUserDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode, StatisticUserDTO[].class);
+
+        // assert
+
+        Integer firstUsers = 5; // check sql
+        Integer secondUsers = 4; // check sql
+        Integer thirdUsers = 1; // check sql
+
+        ZonedDateTime firstDate = ZonedDateTime.parse("2020-08-01T00:00:00.000+00:00[UTC]");
+        ZonedDateTime secondDate = ZonedDateTime.parse("2020-08-23T00:00:00.000+00:00[UTC]");
+        ZonedDateTime thirdDate = ZonedDateTime.parse("2020-09-11T00:00:00.000+00:00[UTC]");
+
+        assertThat(result.getResponse().getStatus()).isEqualTo(200);
+        assertThat(responseBody.length).isGreaterThan(10);
+        for (StatisticUserDTO userDTO : responseBody) {
+
+            logger.debug(userDTO.getName().toString());
+            logger.debug(userDTO.getUsers().toString());
+            if (MonthDay.from(firstDate).equals(MonthDay.from(userDTO.getName()))) {
+                assertThat(firstUsers).isEqualTo(userDTO.getUsers());
+            }
+            else if (MonthDay.from(secondDate).equals(MonthDay.from(userDTO.getName()))) {
+                assertThat(secondUsers).isEqualTo(userDTO.getUsers());
+            }
+            else if (MonthDay.from(thirdDate).equals(MonthDay.from(userDTO.getName()))) {
+                assertThat(thirdUsers).isEqualTo(userDTO.getUsers());
+            } else {
+                assertThat(expectedUTCStartDate).isEqualTo(userDTO.getName());
+                assertThat(0).isEqualTo(userDTO.getUsers());
+            }
+            expectedUTCStartDate = expectedUTCStartDate.plusDays(dayIncrement);
+        }
+
+        // to make sure end date matches
+        assertThat(expectedUTCStartDate.getDayOfMonth() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getDayOfMonth());
+    }
     @Test
     @Sql(scripts = { "classpath:/integration/statistic/shouldAdminGetMonthlyBaseUserDataWithTestData.sql" })
     public void shouldAdminGetMonthlyBaseUserDataWithTestData(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnAddress.json") Resource dummyFormJsonFile*/) throws Exception {
@@ -544,10 +633,91 @@ public class AdminStatisticUsersEndpointTest {
             else if (thirdDate.getYear() == userDTO.getName().getYear() && thirdDate.getMonth() == userDTO.getName().getMonth()) {
                 assertThat(thirdUsers).isEqualTo(userDTO.getUsers());
             } else {
-                assertThat(expectedStartDate).isEqualTo(userDTO.getName());
+                assertThat(expectedUTCStartDate).isEqualTo(userDTO.getName());
                 assertThat(0).isEqualTo(userDTO.getUsers());
             }
-            expectedStartDate = expectedStartDate.plusMonths(monthIncrement);
+            expectedUTCStartDate = expectedUTCStartDate.plusMonths(monthIncrement);
         }
+        // to make sure end date matches
+        assertThat(expectedUTCStartDate.getMonthValue() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getMonthValue());
+    }
+
+    @Test
+    @Sql(scripts = { "classpath:/integration/statistic/shouldAdminGetMonthlyBaseUserDataWithTestDataWithAmericaVancouverTimeZone.sql" })
+    public void shouldAdminGetMonthlyBaseUserDataWithTestDataWithAmericaVancouverTimeZone(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnAddress.json") Resource dummyFormJsonFile*/) throws Exception {
+
+        // make sure user_id in the sql match test admin user id
+
+        // dummy form json
+        //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+        //String dummyFormJsonString = dummyFormJson.toString();
+
+        // arrange
+        int targetStartYear = 2019;
+        int targetEndYear = 2020;
+        int targetStartMonth = 8;
+        int targetEndMonth = 9;
+        int targetStartDate = 1;
+        int targetEndDate = 21;
+        String targetTimeZone = "America/Vancouver";
+        ZonedDateTime expectedStartDate = ZonedDateTime.of(targetStartYear, targetStartMonth, targetStartDate, 0, 0, 0, 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCStartDate = expectedStartDate.withZoneSameInstant(ZoneOffset.UTC);
+        ZonedDateTime expectedEndDate = ZonedDateTime.of(targetEndYear, targetEndMonth, targetEndDate, LocalDateTime.now().getHour(), LocalDateTime.now().getMinute(), LocalDateTime.now().getSecond(), 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCEndDate = expectedEndDate.withZoneSameInstant(ZoneOffset.UTC);
+        int monthIncrement = 1;
+        String queryParam = String.format(
+                "?startDate=%s&endDate=%s",
+                expectedUTCStartDate.toString(), expectedUTCEndDate.toString()
+        );
+        String targetUrl = "http://localhost:" + this.port + this.targetPath + "/users" + queryParam;
+
+        // act & assert
+        ResultActions resultActions = mvc.perform(
+                        MockMvcRequestBuilders
+                                .get(targetUrl)
+                                .cookie(this.authCookie)
+                                .cookie(this.csrfCookie)
+                                .header("csrf-token", this.authInfo.getCsrfToken())
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        MvcResult result = resultActions.andReturn();
+        JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+        StatisticUserDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode, StatisticUserDTO[].class);
+
+        // assert
+
+        Integer firstUsers = 5; // check sql
+        Integer secondUsers = 4; // check sql
+        Integer thirdUsers = 1; // check sql
+
+        ZonedDateTime firstDate = ZonedDateTime.parse("2019-08-01T00:00:00.000+00:00[UTC]");
+        ZonedDateTime secondDate = ZonedDateTime.parse("2019-12-23T00:00:00.000+00:00[UTC]");
+        ZonedDateTime thirdDate = ZonedDateTime.parse("2020-09-21T00:00:00.000+00:00[UTC]");
+
+        assertThat(result.getResponse().getStatus()).isEqualTo(200);
+        assertThat(responseBody.length).isGreaterThan(10);
+        for (StatisticUserDTO userDTO : responseBody) {
+
+            logger.debug(userDTO.getName().toString());
+            logger.debug(expectedUTCStartDate.toString());
+            if (firstDate.getYear() == userDTO.getName().getYear() && firstDate.getMonth() == userDTO.getName().getMonth()) {
+                assertThat(firstUsers).isEqualTo(userDTO.getUsers());
+            }
+            else if (secondDate.getYear() == userDTO.getName().getYear() && secondDate.getMonth() == userDTO.getName().getMonth()) {
+                assertThat(secondUsers).isEqualTo(userDTO.getUsers());
+            }
+            else if (thirdDate.getYear() == userDTO.getName().getYear() && thirdDate.getMonth() == userDTO.getName().getMonth()) {
+                assertThat(thirdUsers).isEqualTo(userDTO.getUsers());
+            } else {
+                assertThat(expectedUTCStartDate).isEqualTo(userDTO.getName());
+                assertThat(0).isEqualTo(userDTO.getUsers());
+            }
+            expectedUTCStartDate = expectedUTCStartDate.plusMonths(monthIncrement);
+        }
+        // to make sure end date matches
+        assertThat(expectedUTCStartDate.getMonthValue() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getMonthValue());
     }
 }

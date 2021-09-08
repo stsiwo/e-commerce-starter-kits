@@ -39,10 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.Cookie;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -192,6 +189,7 @@ public class AdminStatisticSalesEndpointTest {
             assertThat(saleDTO.getValue()).isEqualTo(BigDecimal.valueOf(0.00));
             expectedDate = expectedDate.plusHours(hourIncrement);
         }
+        assertThat(expectedDate.getHour() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getHour());
     }
 
     @Test
@@ -247,6 +245,10 @@ public class AdminStatisticSalesEndpointTest {
             assertThat(BigDecimal.valueOf(0.00)).isEqualTo(saleDTO.getValue());
             expectedUTCStartDate = expectedUTCStartDate.plusHours(hourIncrement);
         }
+
+        // to make sure end date matches
+        assertThat(expectedUTCStartDate.getHour() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getHour());
+
     }
 
     @Test
@@ -325,6 +327,8 @@ public class AdminStatisticSalesEndpointTest {
             }
             expectedUTCStartDate = expectedUTCStartDate.plusHours(hourIncrement);
         }
+        // to make sure end date matches
+        assertThat(expectedUTCStartDate.getHour() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getHour());
     }
 
     @Test
@@ -405,6 +409,8 @@ public class AdminStatisticSalesEndpointTest {
             }
             expectedUTCStartDate = expectedUTCStartDate.plusHours(hourIncrement);
         }
+        // to make sure end date matches
+        assertThat(expectedUTCStartDate.getHour() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getHour());
     }
 
     @Test
@@ -457,10 +463,12 @@ public class AdminStatisticSalesEndpointTest {
         for (SaleDTO saleDTO : responseBody) {
             logger.debug(saleDTO.getName().toString());
             logger.debug(expectedStartDate.toString());
-            assertThat(expectedStartDate).isEqualTo(saleDTO.getName());
+            assertThat(expectedUTCStartDate).isEqualTo(saleDTO.getName());
             assertThat(BigDecimal.valueOf(0.00)).isEqualTo(saleDTO.getValue());
-            expectedStartDate = expectedStartDate.plusDays(dayIncrement);
+            expectedUTCStartDate = expectedUTCStartDate.plusDays(dayIncrement);
         }
+        // to make sure end date matches
+        assertThat(expectedUTCStartDate.getDayOfMonth() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getDayOfMonth());
     }
 
     @Test
@@ -529,20 +537,106 @@ public class AdminStatisticSalesEndpointTest {
 
             logger.debug(saleDTO.getName().toString());
             logger.debug(saleDTO.getValue().toString());
-            if (firstDate.isEqual(saleDTO.getName())) {
+            if (MonthDay.from(firstDate).equals(MonthDay.from(saleDTO.getName()))) {
                 assertThat(totalCostForFirst).isEqualTo(saleDTO.getValue());
             }
-            else if (secondDate.isEqual(saleDTO.getName())) {
+            else if (MonthDay.from(secondDate).equals(MonthDay.from(saleDTO.getName()))) {
                 assertThat(totalCostForSecond).isEqualTo(saleDTO.getValue());
             }
-            else if (thirdDate.isEqual(saleDTO.getName())) {
+            else if (MonthDay.from(thirdDate).equals(MonthDay.from(saleDTO.getName()))) {
                 assertThat(totalCostForThird).isEqualTo(saleDTO.getValue());
             } else {
-                assertThat(expectedStartDate).isEqualTo(saleDTO.getName());
+                assertThat(expectedUTCStartDate).isEqualTo(saleDTO.getName());
                 assertThat(BigDecimal.valueOf(0.00)).isEqualTo(saleDTO.getValue());
             }
-            expectedStartDate = expectedStartDate.plusDays(dayIncrement);
+            expectedUTCStartDate = expectedUTCStartDate.plusDays(dayIncrement);
         }
+        // to make sure end date matches
+        assertThat(expectedUTCStartDate.getDayOfMonth() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getDayOfMonth());
+    }
+
+    @Test
+    @Sql(scripts = { "classpath:/integration/statistic/shouldAdminGetDailyBaseSaleDataWithTestDataWithAmericaVancouverTimeZone.sql" })
+    public void shouldAdminGetDailyBaseSaleDataWithTestDataWithAmericaVancouverTimeZone(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnAddress.json") Resource dummyFormJsonFile*/) throws Exception {
+
+        // make sure user_id in the sql match test admin user id
+
+        // dummy form json
+        //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+        //String dummyFormJsonString = dummyFormJson.toString();
+
+        // arrange
+        int targetYear = 2021;
+        int targetStartMonth = 8;
+        int targetEndMonth = 9;
+        int targetStartDate = 1;
+        int targetEndDate = 21;
+        String targetTimeZone = "America/Vancouver";
+        ZonedDateTime expectedStartDate = ZonedDateTime.of(targetYear, targetStartMonth, targetStartDate, 0, 0, 0, 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCStartDate = expectedStartDate.withZoneSameInstant(ZoneOffset.UTC);
+        ZonedDateTime expectedEndDate = ZonedDateTime.of(targetYear, targetEndMonth, targetEndDate, LocalDateTime.now().getHour(), LocalDateTime.now().getMinute(), LocalDateTime.now().getSecond(), 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCEndDate = expectedEndDate.withZoneSameInstant(ZoneOffset.UTC);
+        int dayIncrement = 1;
+        String queryParam = String.format(
+                "?startDate=%s&endDate=%s",
+                expectedUTCStartDate.toString(), expectedUTCEndDate.toString()
+        );
+        String targetUrl = "http://localhost:" + this.port + this.targetPath + "/sales" + queryParam;
+
+        // act & assert
+        ResultActions resultActions = mvc.perform(
+                        MockMvcRequestBuilders
+                                .get(targetUrl)
+                                .cookie(this.authCookie)
+                                .cookie(this.csrfCookie)
+                                .header("csrf-token", this.authInfo.getCsrfToken())
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        MvcResult result = resultActions.andReturn();
+        JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+        SaleDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode, SaleDTO[].class);
+
+        // assert
+
+        BigDecimal totalCostForOrder1 = BigDecimal.valueOf(123.00 + 2.00 + 10.00); // check order 1 on sql
+        BigDecimal totalCostForOrder2 = BigDecimal.valueOf(23.00 +5.00 + 3.00); // check order 2 on sql
+        BigDecimal totalCostForOrder3 = BigDecimal.valueOf(23.00 + 5.00 + 3.00); // check order 3 on sql
+        BigDecimal totalCostForOrder4 = BigDecimal.valueOf(23.00 + 5.00 + 3.00); // check order 4 on sql
+
+        BigDecimal totalCostForFirst = totalCostForOrder1;
+        BigDecimal totalCostForSecond = totalCostForOrder2.add(totalCostForOrder3);
+        BigDecimal totalCostForThird = totalCostForOrder4;
+
+        ZonedDateTime firstDate = ZonedDateTime.parse("2021-08-01T00:00:00.000+00:00[UTC]");
+        ZonedDateTime secondDate = ZonedDateTime.parse("2021-08-23T00:00:00.000+00:00[UTC]");
+        ZonedDateTime thirdDate = ZonedDateTime.parse("2021-09-10T00:00:00.000+00:00[UTC]");
+
+
+        assertThat(result.getResponse().getStatus()).isEqualTo(200);
+        assertThat(responseBody.length).isGreaterThan(10);
+        for (SaleDTO saleDTO : responseBody) {
+
+            logger.debug(saleDTO.getName().toString());
+            logger.debug(saleDTO.getValue().toString());
+            if (MonthDay.from(firstDate).equals(MonthDay.from(saleDTO.getName()))) {
+                assertThat(totalCostForFirst).isEqualTo(saleDTO.getValue());
+            }
+            else if (MonthDay.from(secondDate).equals(MonthDay.from(saleDTO.getName()))) {
+                assertThat(totalCostForSecond).isEqualTo(saleDTO.getValue());
+            }
+            else if (MonthDay.from(thirdDate).equals(MonthDay.from(saleDTO.getName()))) {
+                assertThat(totalCostForThird).isEqualTo(saleDTO.getValue());
+            } else {
+                assertThat(expectedUTCStartDate).isEqualTo(saleDTO.getName());
+                assertThat(BigDecimal.valueOf(0.00)).isEqualTo(saleDTO.getValue());
+            }
+            expectedUTCStartDate = expectedUTCStartDate.plusDays(dayIncrement);
+        }
+        // to make sure end date matches
+        assertThat(expectedUTCStartDate.getDayOfMonth() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getDayOfMonth());
     }
     @Test
     @Sql(scripts = { "classpath:/integration/statistic/shouldAdminGetMonthlyBaseSaleDataWithTestData.sql" })
@@ -609,8 +703,8 @@ public class AdminStatisticSalesEndpointTest {
         assertThat(responseBody.length).isGreaterThan(10);
         for (SaleDTO saleDTO : responseBody) {
 
-            //logger.debug(saleDTO.getName().toString());
-            //logger.debug(expectedDate.toString());
+            logger.debug(saleDTO.getName().toString());
+            logger.debug(expectedUTCStartDate.toString());
             if (firstDate.getYear() == saleDTO.getName().getYear() && firstDate.getMonth() == saleDTO.getName().getMonth()) {
                 assertThat(totalCostForFirst).isEqualTo(saleDTO.getValue());
             }
@@ -620,13 +714,97 @@ public class AdminStatisticSalesEndpointTest {
             else if (thirdDate.getYear() == saleDTO.getName().getYear() && thirdDate.getMonth() == saleDTO.getName().getMonth()) {
                 assertThat(totalCostForThird).isEqualTo(saleDTO.getValue());
             } else {
-                assertThat(expectedStartDate).isEqualTo(saleDTO.getName());
+                assertThat(expectedUTCStartDate).isEqualTo(saleDTO.getName());
                 assertThat(BigDecimal.valueOf(0.00)).isEqualTo(saleDTO.getValue());
             }
-            expectedStartDate = expectedStartDate.plusMonths(monthIncrement);
+            expectedUTCStartDate = expectedUTCStartDate.plusMonths(monthIncrement);
         }
+        // to make sure end date matches
+        assertThat(expectedUTCStartDate.getMonthValue() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getMonthValue());
     }
 
+    @Test
+    @Sql(scripts = { "classpath:/integration/statistic/shouldAdminGetMonthlyBaseSaleDataWithTestDataWithAmericaVancouverTimeZone.sql" })
+    public void shouldAdminGetMonthlyBaseSaleDataWithTestDataWithAmericaVancouverTimeZone(/*@Value("classpath:/integration/user/shouldAdminGetAllOfItsOwnAddress.json") Resource dummyFormJsonFile*/) throws Exception {
+
+        // make sure user_id in the sql match test admin user id
+
+        // dummy form json
+        //JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+        //String dummyFormJsonString = dummyFormJson.toString();
+
+        // arrange
+        int targetStartYear = 2020;
+        int targetEndYear = 2021;
+        int targetStartMonth = 8;
+        int targetEndMonth = 9;
+        int targetStartDate = 1;
+        int targetEndDate = 21;
+        String targetTimeZone = "America/Vancouver";
+        ZonedDateTime expectedStartDate = ZonedDateTime.of(targetStartYear, targetStartMonth, targetStartDate, 0, 0, 0, 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCStartDate = expectedStartDate.withZoneSameInstant(ZoneOffset.UTC);
+        ZonedDateTime expectedEndDate = ZonedDateTime.of(targetEndYear, targetEndMonth, targetEndDate, 0, 0, 0, 0, ZoneId.of(targetTimeZone));
+        ZonedDateTime expectedUTCEndDate = expectedEndDate.withZoneSameInstant(ZoneOffset.UTC);
+        int monthIncrement = 1;
+        String queryParam = String.format(
+                "?startDate=%s&endDate=%s",
+                expectedUTCStartDate.toString(), expectedUTCEndDate.toString()
+        );
+        String targetUrl = "http://localhost:" + this.port + this.targetPath + "/sales" + queryParam;
+
+        // act & assert
+        ResultActions resultActions = mvc.perform(
+                        MockMvcRequestBuilders
+                                .get(targetUrl)
+                                .cookie(this.authCookie)
+                                .cookie(this.csrfCookie)
+                                .header("csrf-token", this.authInfo.getCsrfToken())
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        MvcResult result = resultActions.andReturn();
+        JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+        SaleDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode, SaleDTO[].class);
+
+        // assert
+
+        BigDecimal totalCostForOrder1 = BigDecimal.valueOf(123.00 + 2.00 + 10.00); // check order 1 on sql
+        BigDecimal totalCostForOrder2 = BigDecimal.valueOf(23.00 +5.00 + 3.00); // check order 2 on sql
+        BigDecimal totalCostForOrder3 = BigDecimal.valueOf(23.00 + 5.00 + 3.00); // check order 3 on sql
+        BigDecimal totalCostForOrder4 = BigDecimal.valueOf(23.00 + 5.00 + 3.00); // check order 4 on sql
+
+        BigDecimal totalCostForFirst = totalCostForOrder1;
+        BigDecimal totalCostForSecond = totalCostForOrder2.add(totalCostForOrder3);
+        BigDecimal totalCostForThird = totalCostForOrder4;
+
+        ZonedDateTime firstDate = ZonedDateTime.parse("2020-08-01T00:00:00.000+00:00[UTC]");
+        ZonedDateTime secondDate = ZonedDateTime.parse("2020-12-23T00:00:00.000+00:00[UTC]");
+        ZonedDateTime thirdDate = ZonedDateTime.parse("2021-09-21T00:00:00.000+00:00[UTC]");
 
 
+        assertThat(result.getResponse().getStatus()).isEqualTo(200);
+        assertThat(responseBody.length).isGreaterThan(10);
+        for (SaleDTO saleDTO : responseBody) {
+
+            logger.debug(saleDTO.getName().toString());
+            logger.debug(expectedUTCStartDate.toString());
+            if (firstDate.getYear() == saleDTO.getName().getYear() && firstDate.getMonth() == saleDTO.getName().getMonth()) {
+                assertThat(totalCostForFirst).isEqualTo(saleDTO.getValue());
+            }
+            else if (secondDate.getYear() == saleDTO.getName().getYear() && secondDate.getMonth() == saleDTO.getName().getMonth()) {
+                assertThat(totalCostForSecond).isEqualTo(saleDTO.getValue());
+            }
+            else if (thirdDate.getYear() == saleDTO.getName().getYear() && thirdDate.getMonth() == saleDTO.getName().getMonth()) {
+                assertThat(totalCostForThird).isEqualTo(saleDTO.getValue());
+            } else {
+                assertThat(expectedUTCStartDate).isEqualTo(saleDTO.getName());
+                assertThat(BigDecimal.valueOf(0.00)).isEqualTo(saleDTO.getValue());
+            }
+            expectedUTCStartDate = expectedUTCStartDate.plusMonths(monthIncrement);
+        }
+        // to make sure end date matches
+        assertThat(expectedUTCStartDate.getMonthValue() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getMonthValue());
+    }
 }

@@ -102,7 +102,7 @@ public class SendForgotPasswordEmailEventHandler implements EventHandler<Generat
           "Forgot Password Email To Reset Your Password.", htmlBody);
     } catch (MessagingException e) {
       logger.debug(e.getMessage());
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during sending forgot-password email. please try again.");
     }
 
   }

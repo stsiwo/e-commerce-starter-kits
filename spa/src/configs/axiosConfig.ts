@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { logger } from "configs/logger";
-import { FetchStatusEnum } from "src/app";
+import { FetchStatusEnum, UserTypeEnum } from "src/app";
 import { getCookie } from "src/utils";
 import { store } from "./storeConfig";
 const log = logger(__filename);
@@ -87,6 +87,22 @@ axios.interceptors.request.use(function (config) {
     log("csrf-token in cookie does not exist");
   }
 
+  // issue:d_4Mxk3XkNd
+  // this token cookie does not exist
+  if (document.cookie.indexOf("csrf-token") == -1) {
+    const auth = store.getState().app.auth;
+    if (
+      auth.userType === UserTypeEnum.MEMBER ||
+      auth.userType === UserTypeEnum.ADMIN
+    ) {
+      log("detect authed user with expired token");
+      store.dispatch({
+        type: "root/reset/all",
+        payload: null,
+      });
+    }
+  }
+
   return config;
 });
 
@@ -106,6 +122,9 @@ axios.interceptors.response.use(
     // put interceptors for any error response outside 2xx
     log("checking response status == 401 or not");
     log(error);
+    /**
+     * 401
+     */
     if (error.response.status === 401) {
       log("receive 401 response so clear the user store data.");
       store.dispatch({
@@ -115,6 +134,7 @@ axios.interceptors.response.use(
     } else {
       log("no 401 status code");
     }
+
     return Promise.reject(error);
   }
 );

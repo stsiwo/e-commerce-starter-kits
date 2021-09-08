@@ -178,6 +178,12 @@
 
         => don't rely on ServletResponse.ErrorMessage at client side. always use the body.
 
+    - @ControllerAdvice: a central place to handle all exception so you don't need to setup exception handling for each controller.
+
+        - you can create a fallback method to handle all uncaught exception: https://www.baeldung.com/global-error-handler-in-a-spring-rest-api#default
+
+        - also, you can handle your own custom handler.
+
 # Spring Security
 
   - WebSecurityConfigurerAdapter class
@@ -1078,6 +1084,10 @@ steps to generate encypted data (e.g., ENC(....))
 
         - you can handle fetching its association (e.g., phones and addresses when fetching user entity) by 
         
+
+    - issue-bG2CTHHBd6I: ResponseStatusException is overriden by the fallback Exception handler at @ControllerAdvice.
+    
+        - solution) add ResponseStatusExceptionhandler at @ControlelrAdvice.
 
   ## Bugs:
 

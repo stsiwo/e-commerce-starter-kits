@@ -215,7 +215,7 @@ public class OrderServiceImpl implements OrderService {
                 stripeCustomerId = stripeCustomer.getId();
             } catch (StripeException e) {
                 logger.debug(e.getMessage());
-                throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+                throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during creating stripe customer. please try again.");
             }
         }
 
@@ -251,7 +251,7 @@ public class OrderServiceImpl implements OrderService {
 
         } catch (StripeException e) {
             logger.debug(e.getMessage());
-            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during creating stripe payment intent. please try again.");
         }
 
         // assign payment intent id to this order
@@ -328,7 +328,7 @@ public class OrderServiceImpl implements OrderService {
 
         } catch (StripeException e) {
             logger.debug(e.getMessage());
-            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during creating stripe payment intent. please try again.");
         }
 
         // assign payment intent id to this order

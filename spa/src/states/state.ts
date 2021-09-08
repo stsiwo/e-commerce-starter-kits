@@ -1,12 +1,12 @@
-import { StateType } from "./types";
-import { UserTypeEnum, FetchStatusEnum, MessageTypeEnum } from "src/app";
-import { defaultUser, UserSortEnum } from "domain/user/types";
-import { normalize, schema } from 'normalizr';
+import { CheckoutSessionStatusEnum, OrderSortEnum } from "domain/order/types";
 import { ProductSortEnum } from "domain/product/types";
-import { getNanoId } from "src/utils";
-import { WishlistItemSortEnum } from "domain/wishlist/types";
-import { OrderSortEnum, CheckoutSessionStatusEnum } from "domain/order/types";
 import { ReviewSortEnum } from "domain/review/type";
+import { defaultUser, UserSortEnum } from "domain/user/types";
+import { WishlistItemSortEnum } from "domain/wishlist/types";
+import { schema } from "normalizr";
+import { FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import { getNanoId } from "src/utils";
+import { StateType } from "./types";
 
 /**
  *
@@ -21,7 +21,7 @@ export const categorySchemaEntity = new schema.Entity(
   {
     idAttribute: "categoryId",
   }
-)
+);
 
 export const categorySchemaArray = new schema.Array(categorySchemaEntity);
 
@@ -32,13 +32,13 @@ export const productSchemaEntity = new schema.Entity(
   {
     idAttribute: "productId",
   }
-)
+);
 
 export const productSchemaArray = new schema.Array(productSchemaEntity);
 
 //export const tagSchemaArray = new schema.Array(tagSchemaEntity)
 
-// anime 
+// anime
 //const animeSchemaEntity = new schema.Entity(
 //  "animes",
 //)
@@ -73,16 +73,19 @@ export const initialState: StateType = {
   },
   app: {
     // if "auth" exists in localStorage, retrieve as initial state, otherwise, get default Guest auth.
-    auth: localStorage.getItem("auth") != null ? JSON.parse(localStorage.getItem("auth")) : {
-      isLoggedIn: false,
-      userType: UserTypeEnum.GUEST,
-      user: defaultUser,
-    },
+    auth:
+      localStorage.getItem("auth") != null
+        ? JSON.parse(localStorage.getItem("auth"))
+        : {
+            isLoggedIn: false,
+            userType: UserTypeEnum.GUEST,
+            user: defaultUser,
+          },
     previousUrl: "",
     message: {
       id: getNanoId(),
       type: MessageTypeEnum.INITIAL,
-      message: ""
+      message: "",
     },
     searchKeyword: "",
     requestTracker: {},
@@ -178,7 +181,7 @@ export const initialState: StateType = {
       },
       company: {
         get: FetchStatusEnum.INITIAL,
-      }
+      },
     },
   },
   domain: {
@@ -194,7 +197,10 @@ export const initialState: StateType = {
         totalElements: 0,
       },
     },
-    cartItems: localStorage.getItem("cartItems") != null ? JSON.parse(localStorage.getItem("cartItems")) : [],
+    cartItems:
+      localStorage.getItem("cartItems") != null
+        ? JSON.parse(localStorage.getItem("cartItems"))
+        : [],
     wishlistItems: {
       data: [],
       pagination: {
@@ -289,7 +295,7 @@ export const initialState: StateType = {
     checkout: {
       sessionStatus: CheckoutSessionStatusEnum.INITIAL,
       order: null,
-      isRatingSuccess: false
+      isRatingSuccess: false,
     },
     notifications: {
       data: [],
@@ -303,11 +309,11 @@ export const initialState: StateType = {
       curIndex: -1,
     },
     company: {
-      data: null
-    }
+      data: null,
+    },
   },
   // never persist
   sensitive: {
-    stripeClientSecret: ""
-  }
-}
+    stripeClientSecret: "",
+  },
+};

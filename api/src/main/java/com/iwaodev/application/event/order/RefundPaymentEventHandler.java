@@ -117,7 +117,7 @@ public class RefundPaymentEventHandler implements EventHandler<OrderEventWasAdde
       this.paymentService.requestRefund(paymentIntentId);
     } catch (StripeException e) {
       logger.debug(e.getMessage());
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "");
     }
 
     // restore the product stock in another event handler.

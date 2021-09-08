@@ -168,6 +168,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.GET, "/companies/public").permitAll() //
         .antMatchers(HttpMethod.POST, "/contact").permitAll() //
 
+        .antMatchers(HttpMethod.GET, "/statistics/error").permitAll() //
         // shipping
         .antMatchers(HttpMethod.POST, "/shipping/rating").permitAll() //
 

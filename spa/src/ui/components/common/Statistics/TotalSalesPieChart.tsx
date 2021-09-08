@@ -82,7 +82,7 @@ const TotalSalesPieChart: React.FunctionComponent<{}> = (props) => {
   const themes = useTheme();
 
   const [curBase, setBase] = React.useState<TotalSalesBaseEnum>(
-    TotalSalesBaseEnum.TODAY
+    TotalSalesBaseEnum.THIS_MONTH
   );
 
   const handleBaseChange: React.EventHandler<

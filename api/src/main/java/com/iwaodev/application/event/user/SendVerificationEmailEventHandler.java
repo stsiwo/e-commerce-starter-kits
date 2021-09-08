@@ -98,7 +98,7 @@ public class SendVerificationEmailEventHandler implements EventHandler<Generated
           "Verification Email To Activate Your Account.", htmlBody);
     } catch (MessagingException e) {
       logger.debug(e.getMessage());
-      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during sending verification email. please try again.");
     }
   }
 }
