@@ -25,6 +25,7 @@ import {
   getThisYearFromBeginning,
   getTodayFromBeginning,
   toDateMonthDayString,
+  toDateMonthString,
   toHourString,
 } from "src/utils";
 const log = logger(__filename);
@@ -161,8 +162,12 @@ const TotalSalesPieChart: React.FunctionComponent<{}> = (props) => {
           return `${cadCurrencyFormat(data.sales)} (${toHourString(
             data.name
           )})`;
-        } else {
+        } else if (curBase === TotalSalesBaseEnum.THIS_MONTH) {
           return `${cadCurrencyFormat(data.sales)} (${toDateMonthDayString(
+            data.name
+          )})`;
+        } else {
+          return `${cadCurrencyFormat(data.sales)} (${toDateMonthString(
             data.name
           )})`;
         }

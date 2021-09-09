@@ -214,7 +214,7 @@ const AdminOrderGridView: React.FunctionComponent<AdminOrderGridViewPropsType> =
           subheaderTypographyProps={{
             variant: "body1",
           }}
-          title="List"
+          title="Order List"
         />
         <CardContent className={classes.cardContentBox}>
           <Box className={classes.searchBox}>

@@ -7,7 +7,7 @@ import Typography from "@material-ui/core/Typography";
 import Rating from "@material-ui/lab/Rating/Rating";
 import { ReviewType } from "domain/review/type";
 import * as React from "react";
-import { getApiUrl } from "src/utils";
+import { getApiUrl, toDateString } from "src/utils";
 
 declare type SingleLineListPropsType = {
   review: ReviewType;
@@ -44,7 +44,14 @@ const ReviewCard: React.FunctionComponent<SingleLineListPropsType> = ({
           />
         }
         title={review.reviewTitle}
-        subheader={review.user.firstName + " " + review.user.lastName}
+        subheader={
+          review.user.firstName +
+          " " +
+          review.user.lastName +
+          " (" +
+          toDateString(review.createdAt) +
+          ")"
+        }
       />
       <CardContent>
         <Rating name="review-point" value={review.reviewPoint} readOnly />

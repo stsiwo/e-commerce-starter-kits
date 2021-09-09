@@ -374,6 +374,14 @@ export function toDateMonthDayString(date: Date): string {
   return `${monthShortNames[date.getMonth()]} ${date.getDate()}`;
 }
 
+export function toDateMonthString(date: Date): string {
+  if (!date) {
+    return "";
+  }
+  //return date.toLocaleDateString("en-US", dateShortFormatOption);
+  return `${monthShortNames[date.getMonth()]}`;
+}
+
 export function toHourMinuteString(date: Date): string {
   if (!date) {
     return "";

@@ -597,7 +597,7 @@ export const productSchema = yup.object().shape({
           const releaseDate = this.parent.releaseDate;
           const curDate = new Date();
           return (
-            curDate.getDate() >= (releaseDate as unknown as Date).getDate()
+            curDate.getTime() >= (releaseDate as unknown as Date).getTime()
           );
         }
         return true;

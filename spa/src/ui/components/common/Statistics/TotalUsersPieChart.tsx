@@ -24,6 +24,7 @@ import {
   getThisYearFromBeginning,
   getTodayFromBeginning,
   toDateMonthDayString,
+  toDateMonthString,
   toHourString,
 } from "src/utils";
 const log = logger(__filename);
@@ -180,8 +181,10 @@ const TotalUsersPieChart: React.FunctionComponent<{}> = (props) => {
       (data) => {
         if (curBase === TotalUsersBaseEnum.TODAY) {
           return `${data.users} (${toHourString(data.name)})`;
-        } else {
+        } else if (curBase === TotalUsersBaseEnum.THIS_MONTH) {
           return `${data.users} (${toDateMonthDayString(data.name)})`;
+        } else {
+          return `${data.users} (${toDateMonthString(data.name)})`;
         }
       },
       [curBase, curData]

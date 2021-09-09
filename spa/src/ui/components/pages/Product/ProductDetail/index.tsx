@@ -4,7 +4,6 @@ import ButtonGroup from "@material-ui/core/ButtonGroup";
 import FormControl from "@material-ui/core/FormControl";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
 import MenuItem from "@material-ui/core/MenuItem";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import Select from "@material-ui/core/Select";
@@ -13,42 +12,37 @@ import Typography from "@material-ui/core/Typography";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
 import Rating from "@material-ui/lab/Rating/Rating";
+import { AxiosError } from "axios";
 import Carousel from "components/common/Carousel";
 import ColorRadio from "components/common/ColorRadio";
+import ReviewCard from "components/common/ReviewCard";
+import SingleLineList from "components/common/SingleLineList";
+import { api } from "configs/axiosConfig";
+import { isReachMaxQuantity, isReachMinQuantity } from "domain/cart";
 import {
+  filterSingleVariant,
   filterUniqueVariantColors,
   filterUniqueVariantSizes,
-  isExceedStock,
-  filterSingleVariant,
   getVariantStockBack,
+  isExceedStock,
 } from "domain/product";
 import {
+  ProductStockEnum,
   ProductType,
   ProductVariantSizeType,
   ProductVariantType,
-  ProductStockEnum,
 } from "domain/product/types";
+import { ReviewType } from "domain/review/type";
+import uniqBy from "lodash/uniqBy";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { mSelector } from "src/selectors/selector";
-import { UserTypeEnum, MessageTypeEnum } from "src/app";
-import { cartItemActions } from "reducers/slices/domain/cartItem";
-import { api } from "configs/axiosConfig";
-import { AxiosError } from "axios";
-import {
-  getNanoId,
-  cadCurrencyFormat,
-  toDateString,
-  getApiUrl,
-} from "src/utils";
-import { postWishlistItemActionCreator } from "reducers/slices/domain/wishlistItem";
 import { messageActions } from "reducers/slices/app";
+import { cartItemActions } from "reducers/slices/domain/cartItem";
+import { postWishlistItemActionCreator } from "reducers/slices/domain/wishlistItem";
 import { cartModalActions } from "reducers/slices/ui";
-import uniqBy from "lodash/uniqBy";
-import { ReviewType } from "domain/review/type";
-import SingleLineList from "components/common/SingleLineList";
-import ReviewCard from "components/common/ReviewCard";
-import { isReachMaxQuantity, isReachMinQuantity } from "domain/cart";
+import { MessageTypeEnum, UserTypeEnum } from "src/app";
+import { mSelector } from "src/selectors/selector";
+import { cadCurrencyFormat, getNanoId, toDateString } from "src/utils";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -683,7 +677,10 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
           <Box component="div" className={classes.controllerBox}>
             <Button
               onClick={handleAddCart}
-              disabled={curStockBag.enum === ProductStockEnum.OUT_OF_STOCK}
+              disabled={
+                curStockBag.enum === ProductStockEnum.OUT_OF_STOCK ||
+                auth.userType === UserTypeEnum.ADMIN
+              }
               variant="contained"
             >
               {"Add to Cart"}
@@ -695,7 +692,10 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
             )}
             <Button
               onClick={handleBuyNow}
-              disabled={curStockBag.enum === ProductStockEnum.OUT_OF_STOCK}
+              disabled={
+                curStockBag.enum === ProductStockEnum.OUT_OF_STOCK ||
+                auth.userType === UserTypeEnum.ADMIN
+              }
               variant="contained"
             >
               {"buy now"}
@@ -730,7 +730,10 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
             </Typography>
             <Box component="div" className={classes.controllerBox}>
               <Button
-                disabled={curStockBag.enum === ProductStockEnum.OUT_OF_STOCK}
+                disabled={
+                  curStockBag.enum === ProductStockEnum.OUT_OF_STOCK ||
+                  auth.userType === UserTypeEnum.ADMIN
+                }
                 onClick={handleAddCart}
                 variant="contained"
               >
@@ -744,7 +747,10 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
               <Button
                 onClick={handleBuyNow}
                 variant="contained"
-                disabled={curStockBag.enum === ProductStockEnum.OUT_OF_STOCK}
+                disabled={
+                  curStockBag.enum === ProductStockEnum.OUT_OF_STOCK ||
+                  auth.userType === UserTypeEnum.ADMIN
+                }
               >
                 {"buy now"}
               </Button>

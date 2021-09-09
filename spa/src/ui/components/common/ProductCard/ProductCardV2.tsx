@@ -1,3 +1,4 @@
+import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
@@ -7,10 +8,9 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { ProductType } from "domain/product/types";
 import * as React from "react";
+import { Link as RRLink } from "react-router-dom";
 import { cadCurrencyFormat, getApiUrl } from "src/utils";
 import CornerRibbon from "../CornerRibbon";
-import Box from "@material-ui/core/Box";
-import { Link as RRLink } from "react-router-dom";
 
 declare type ProductCardV2PropsType = {
   product: ProductType;
@@ -85,7 +85,7 @@ const ProductCardV2: React.FunctionComponent<ProductCardV2PropsType> = ({
             {product.productName}
           </Typography>
           <Typography variant="body2" component="p" className={classes.price}>
-            <b>${cadCurrencyFormat(product.cheapestPrice)} ~</b>
+            <b>{cadCurrencyFormat(product.cheapestPrice)} ~</b>
           </Typography>
         </CardContent>
         <CardActions className={classes.actions}>
