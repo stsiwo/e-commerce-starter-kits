@@ -736,6 +736,8 @@ steps to generate encypted data (e.g., ENC(....))
 
           - good ref: https://stackoverflow.com/questions/11043712/what-is-the-difference-between-non-repeatable-read-and-phantom-read
 
+     - ref: https://stackoverflow.com/questions/129329/optimistic-vs-pessimistic-locking
+      
   ## Pattern
 
     - entitymanager-per-peration (ANTIPATTERN): open and close entity manager every single operation (crud) in a single thread.
