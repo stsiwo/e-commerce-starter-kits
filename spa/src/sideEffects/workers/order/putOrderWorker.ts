@@ -69,6 +69,7 @@ export function* putOrderWorker(action: PayloadAction<OrderType>) {
       api({
         method: "PUT",
         url: apiUrl,
+        headers: { "If-Match": `"${action.payload.version}"` },
         data: action.payload,
       })
         .then((response) => ({

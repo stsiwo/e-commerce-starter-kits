@@ -1,0 +1,56 @@
+ALTER TABLE addresses
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE cart_items
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE categories
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE companies
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE notification_types
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE notifications
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE order_addresses
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE order_details
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE order_events
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE orders
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE phones
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE product_images
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE product_sizes
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE product_variants
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE products
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE reviews
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE user_types
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE users
+ADD version BIGINT  NOT NULL DEFAULT 0;
+
+ALTER TABLE wishlist_items
+ADD version BIGINT  NOT NULL DEFAULT 0;

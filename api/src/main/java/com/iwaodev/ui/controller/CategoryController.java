@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 public class CategoryController {
 
@@ -44,7 +46,8 @@ public class CategoryController {
       @RequestParam(value = "sort", required = false, defaultValue = "ALPHABETIC_ASC") CategorySortEnum sort,
       CategoryQueryStringCriteria criteria) throws Exception {
 
-    return new ResponseEntity<>(this.service.getAll(criteria, page, limit, sort), HttpStatus.OK);
+      Page<CategoryDTO> results = this.service.getAll(criteria, page, limit, sort);
+    return new ResponseEntity<>(results, HttpStatus.OK);
   }
 
   // this might not be needed
@@ -63,7 +66,11 @@ public class CategoryController {
   @PreAuthorize("hasRole('ROLE_ADMIN')") // admin only
   public ResponseEntity<CategoryDTO> post(@Valid @RequestBody CategoryCriteria criteria) throws Exception {
 
-    return new ResponseEntity<>(this.service.create(criteria), HttpStatus.OK);
+    CategoryDTO results = this.service.create(criteria);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   // update/replace a new category
@@ -72,7 +79,12 @@ public class CategoryController {
   public ResponseEntity<CategoryDTO> update(@PathVariable(value = "id") Long id,
       @Valid @RequestBody CategoryCriteria criteria) throws Exception {
 
-    return new ResponseEntity<>(this.service.update(criteria, id), HttpStatus.OK);
+    CategoryDTO results = this.service.update(criteria, id);
+
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   @DeleteMapping("/categories/{id}")
@@ -81,5 +93,4 @@ public class CategoryController {
     this.service.delete(id);
     return new ResponseEntity<>(new BaseResponse("successfuly deleted."), HttpStatus.OK);
   }
-
 }

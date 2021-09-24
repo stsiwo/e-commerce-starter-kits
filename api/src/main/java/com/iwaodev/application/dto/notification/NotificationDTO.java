@@ -25,6 +25,8 @@ public class NotificationDTO {
   private NotificationTypeEnum notificationType;
   private LocalDateTime createdAt;
   private LocalDateTime readAt;
+
+  private Long version;
 }
 
 

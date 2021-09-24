@@ -75,6 +75,13 @@ export const notificationSlice = createSlice({
       });
     },
 
+    removeOne: (state: NotificationType[], action: PayloadAction<string>) => {
+      return state.filter(
+        (notification: NotificationType) =>
+          notification.notificationId != action.payload
+      );
+    },
+
     clear: (state: NotificationType[]) => [],
   },
   /**
@@ -157,11 +164,11 @@ export const notificationPaginationActions =
  *
  **/
 // action type
-export type NotificationCurIndexActionType = PayloadAction<number>;
+export type NotificationCurIdActionType = PayloadAction<string>;
 
-export const notificationCurIndexSlice = createSlice({
-  name: "domain/notifications/curIndex", // a name used in action type
-  initialState: -1,
+export const notificationCurIdSlice = createSlice({
+  name: "domain/notifications/curId", // a name used in action type
+  initialState: null,
   reducers: {
     /**
      *
@@ -174,11 +181,9 @@ export const notificationCurIndexSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: number, action: NotificationCurIndexActionType) =>
+    update: (state: string, action: NotificationCurIdActionType) =>
       action.payload,
-    increment: (state: number) => state + 1,
-    decrement: (state: number) => state - 1,
-    clear: (state: number) => -1,
+    clear: (state: string) => -1,
   },
   /**
    * extraReducers property
@@ -188,6 +193,46 @@ export const notificationCurIndexSlice = createSlice({
    **/
 });
 
-export const notificationCurIndexSliceReducer =
-  notificationCurIndexSlice.reducer;
-export const notificationCurIndexActions = notificationCurIndexSlice.actions;
+export const notificationCurIdSliceReducer = notificationCurIdSlice.reducer;
+export const notificationCurIdActions = notificationCurIdSlice.actions;
+
+/**
+ *
+ * domain.notifications.curIndex state Slice (no side effects)
+ *
+ **/
+// action type
+export type NotificationCurNotificationActionType =
+  PayloadAction<NotificationType>;
+
+export const notificationCurNotificationSlice = createSlice({
+  name: "domain/notifications/curNotification", // a name used in action type
+  initialState: null,
+  reducers: {
+    /**
+     *
+     *  a property name gonna be the name of action
+     *  its value is the reduce
+     *
+     *  If you need to define the param of the action, use PayloadAction<X> to define its type.
+     *  In this use case, I need to an string param, so I define 'payloadAction<string' like below
+     *
+     **/
+
+    // use when you want to replace
+    update: (state: string, action: NotificationCurNotificationActionType) =>
+      action.payload,
+    clear: (state: string) => null,
+  },
+  /**
+   * extraReducers property
+   *
+   * You can respond to other action types besides the types it has generated.
+   *
+   **/
+});
+
+export const notificationCurNotificationSliceReducer =
+  notificationCurNotificationSlice.reducer;
+export const notificationCurNotificationActions =
+  notificationCurNotificationSlice.actions;

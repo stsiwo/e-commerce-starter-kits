@@ -179,6 +179,7 @@ const AdminProductVariantGridView: React.FunctionComponent<AdminProductVariantGr
     const handleNewProductVariantFormToggleBtnClickEvent: React.EventHandler<
       React.MouseEvent<HTMLButtonElement>
     > = async (e) => {
+      setProductVariant(null);
       props.setFormOpen(!props.curFormOpen);
     };
 
@@ -199,6 +200,7 @@ const AdminProductVariantGridView: React.FunctionComponent<AdminProductVariantGr
           deleteSingleProductVariantActionCreator({
             productId: targetProductId,
             variantId: curProductVariant.variantId,
+            version: curProductVariant.version,
           })
         );
       };

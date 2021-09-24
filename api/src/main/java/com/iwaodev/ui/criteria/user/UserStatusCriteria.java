@@ -28,5 +28,8 @@ public class UserStatusCriteria {
 
   @Size(max = 1000, message = "{user.activeNote.max1000}")
   private String activeNote;
+
+
+  private Long version;
 }
 

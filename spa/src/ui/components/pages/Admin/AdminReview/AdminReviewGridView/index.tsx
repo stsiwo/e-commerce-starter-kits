@@ -23,6 +23,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
 import Pagination from "@material-ui/lab/Pagination";
 import SearchForm from "components/common/SearchForm";
+import { logger } from "configs/logger";
 import { getStatus } from "domain/review";
 import { ReviewType } from "domain/review/type";
 import * as React from "react";
@@ -43,7 +44,6 @@ import { FetchStatusEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import AdminReviewFormDialog from "../AdminReviewFormDialog";
 import AdminReviewSearchController from "../AdminReviewSearchController";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 declare type AdminReviewGridViewPropsType = {};
@@ -188,7 +188,14 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
     const handleDeletionOk: React.EventHandler<React.MouseEvent<HTMLElement>> =
       (e) => {
         // request
-        dispatch(deleteSingleReviewActionCreator({ reviewId: curReviewId }));
+        dispatch(
+          deleteSingleReviewActionCreator({
+            reviewId: curReviewId,
+            version: curReviewList.find(
+              (review: ReviewType) => review.reviewId == curReviewId
+            ).version,
+          })
+        );
       };
 
     // grid event handler stuff

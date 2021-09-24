@@ -1,52 +1,54 @@
-import PageRoute from 'components/routes/PageRoute';
-import * as React from 'react';
-import { useSnackbar } from 'notistack';
-import { useSelector } from 'react-redux';
-import { mSelector, rsSelector } from 'src/selectors/selector';
-import { MessageTypeEnum } from 'src/app';
-import HighlightOffIcon from '@material-ui/icons/HighlightOff';
-import IconButton from '@material-ui/core/IconButton';
-import Notification from 'components/common/Notification';
-import { NotificationType } from 'domain/notification/types';
-import Background from 'components/common/Background';
-import ErrorBoundary from 'components/common/ErrorBoundary';
+import IconButton from "@material-ui/core/IconButton";
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import Background from "components/common/Background";
+import ErrorBoundary from "components/common/ErrorBoundary";
+import Notification from "components/common/Notification";
+import PageRoute from "components/routes/PageRoute";
+import { NotificationType } from "domain/notification/types";
+import { useSnackbar } from "notistack";
+import * as React from "react";
+import { useSelector } from "react-redux";
+import { MessageTypeEnum } from "src/app";
+import { mSelector, rsSelector } from "src/selectors/selector";
 
 const Content: React.FunctionComponent<{}> = (props) => {
-
   // snackbar notification
   // usage: 'enqueueSnackbar("message", { variant: "error" };
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-  const curMessage = useSelector(mSelector.makeMessageSelector())
+  const curMessage = useSelector(mSelector.makeMessageSelector());
   React.useEffect(() => {
     if (curMessage.type !== MessageTypeEnum.INITIAL) {
-      enqueueSnackbar(
-        curMessage.message,
-        {
-          variant: curMessage.type,
-          persist: curMessage.persist,
-          action: (key: any) => (
-            <IconButton onClick={() => { closeSnackbar(key) }}>
-              <HighlightOffIcon />
-            </IconButton>
-          )
-        });
+      enqueueSnackbar(curMessage.message, {
+        variant: curMessage.type,
+        persist: curMessage.persist,
+        action: (key: any) => (
+          <IconButton
+            onClick={() => {
+              closeSnackbar(key);
+            }}
+          >
+            <HighlightOffIcon />
+          </IconButton>
+        ),
+      });
     }
-  }, [curMessage.id])
+  }, [curMessage.id]);
 
-  const curNotification = useSelector(mSelector.makeNotificationByCurIndexSelector())
-  const curNotificationIndex = useSelector(rsSelector.domain.getNotificationCurIndex)
+  const curNotification: NotificationType = useSelector(
+    rsSelector.domain.getNotificationCurNotification
+  );
   React.useEffect(() => {
+    console.log("notifiation snackbar called");
+    console.log(curNotification);
     if (curNotification) {
-      enqueueSnackbar(
-        curNotification,
-        {
-          variant: "info",
-          content: (key, message: NotificationType) => (
-            <Notification id={key} message={message} />
-          )
-        });
+      enqueueSnackbar(curNotification, {
+        variant: "info",
+        content: (key, message: NotificationType) => (
+          <Notification id={key} message={message} />
+        ),
+      });
     }
-  }, [curNotificationIndex])
+  }, [JSON.stringify(curNotification)]);
 
   return (
     <React.Fragment>
@@ -55,7 +57,7 @@ const Content: React.FunctionComponent<{}> = (props) => {
         <PageRoute />
       </ErrorBoundary>
     </React.Fragment>
-  )
-}
+  );
+};
 
-export default Content
+export default Content;

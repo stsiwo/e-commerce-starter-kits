@@ -1,16 +1,9 @@
 package com.iwaodev.infrastructure.model;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import com.iwaodev.domain.user.validator.AddressValidation;
@@ -86,6 +79,10 @@ public class Address {
   @Column(name="updated_at")
   private LocalDateTime updatedAt;
 
+  @Version
+  @Column(name = "version")
+  private Long version = 0L;
+
   @ManyToOne
 	@JoinColumn(
     name = "user_id", 
@@ -94,6 +91,17 @@ public class Address {
     updatable = false
     )
   private User user;
+
+  public void update(String address1, String address2, String city, String province, String country, String postalCode, Boolean isBillingAddress, Boolean isShippingAddress) {
+    this.address1 = address1;
+    this.address2 = address2;
+    this.city = city;
+    this.province = province;
+    this.country = country;
+    this.postalCode = postalCode;
+    this.isBillingAddress = isBillingAddress;
+    this.isShippingAddress = isShippingAddress;
+  }
 }
 
 

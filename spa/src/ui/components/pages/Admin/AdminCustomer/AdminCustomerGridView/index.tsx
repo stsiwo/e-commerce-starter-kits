@@ -1,12 +1,16 @@
+import Avatar from "@material-ui/core/Avatar";
+import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
@@ -14,34 +18,29 @@ import {
   DataGrid,
   GridCellParams,
   GridColDef,
-  GridPageChangeParams,
   GridRowsProp,
 } from "@material-ui/data-grid";
 import EditIcon from "@material-ui/icons/Edit";
 import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
+import Pagination from "@material-ui/lab/Pagination";
 import { AxiosError } from "axios";
+import SearchForm from "components/common/SearchForm";
 import { api } from "configs/axiosConfig";
-import { UserType, userActiveLabelList } from "domain/user/types";
+import { userActiveLabelList, UserType } from "domain/user/types";
 import { useSnackbar } from "notistack";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router";
 import {
   fetchUserActionCreator,
   userPaginationPageActions,
   userQuerySearchQueryActions,
 } from "reducers/slices/domain/user";
+import { FetchStatusEnum } from "src/app";
 import { mSelector } from "src/selectors/selector";
+import { getApiUrl } from "src/utils";
 import AdminCustomerFormDrawer from "../AdminCustomerFormDrawer";
 import AdminUserSearchController from "../AdminCustomerSearchController";
-import Avatar from "@material-ui/core/Avatar";
-import { FetchStatusEnum } from "src/app";
-import Box from "@material-ui/core/Box";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import SearchForm from "components/common/SearchForm";
-import { useLocation } from "react-router";
-import { getApiUrl } from "src/utils";
-import Grid from "@material-ui/core/Grid";
-import Pagination from "@material-ui/lab/Pagination";
 
 declare type AdminCustomerGridViewPropsType = {};
 
@@ -204,10 +203,16 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
 
     const handleDeletionOk: React.EventHandler<React.MouseEvent<HTMLElement>> =
       (e) => {
-        // request (permenently)
+        // request (permenently)o
+
+        const targetUser = curUserList.find(
+          (user: UserType) => user.userId == curUserId
+        );
+
         api
           .request({
             method: "DELETE",
+            headers: { "If-Match": `"${targetUser.version}"` },
             url: API1_URL + `/users/${curUserId}`,
           })
           .then((data) => {

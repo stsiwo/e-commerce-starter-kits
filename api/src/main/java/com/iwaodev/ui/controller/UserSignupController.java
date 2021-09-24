@@ -78,6 +78,10 @@ public class UserSignupController {
       @AuthenticationPrincipal SpringSecurityUser authUser) throws Exception { // use @Valid instead of @Validated
 
     /**
+     * don't need to handle concurrency since this is supposed to be used by this user only (not admin or other users)
+     */
+
+    /**
      * redirect after signup to authenticate to create api-token cookie
      *
      **/
@@ -88,16 +92,19 @@ public class UserSignupController {
 
   @PostMapping("/users/{id}/reissue-account-verify")
   @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
-  public ResponseEntity<BaseResponse> reissueAccountVerify(
+  public ResponseEntity<UserDTO> reissueAccountVerify(
       @PathVariable(value = "id") UUID id,
       @AuthenticationPrincipal SpringSecurityUser authUser) throws Exception { // use @Valid instead of @Validated
 
+    /**
+     * don't need to handle concurrency since this is supposed to be used by this user only (not admin or other users)
+     */
     /**
      * redirect after signup to authenticate to create api-token cookie
      *
      **/
     UserDTO user = this.service.reissueVerification(authUser.getId());
 
-    return new ResponseEntity<>(new BaseResponse("re-issued the verification email successfully."), HttpStatus.OK);
+    return new ResponseEntity<>(user, HttpStatus.OK);
   }
 }

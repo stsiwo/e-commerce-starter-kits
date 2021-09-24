@@ -3,24 +3,23 @@ import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import Link from "@material-ui/core/Link";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import SentimentSatisfiedOutlinedIcon from "@material-ui/icons/SentimentSatisfiedOutlined";
-import * as React from "react";
-import { Link as RRLink } from "react-router-dom";
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
+import { api } from "configs/axiosConfig";
+import { logger } from "configs/logger";
+import { UserType } from "domain/user/types";
 import { useValidation } from "hooks/validation";
 import { memberSignupSchema } from "hooks/validation/rules";
-import { api } from "configs/axiosConfig";
-import { useDispatch } from "react-redux";
-import { UserType } from "domain/user/types";
-import { authActions, messageActions } from "reducers/slices/app";
-import { AxiosError } from "axios";
 import omit from "lodash/omit";
+import * as React from "react";
+import { useDispatch } from "react-redux";
 import { useHistory } from "react-router";
-import { getNanoId } from "src/utils";
+import { Link as RRLink } from "react-router-dom";
+import { authActions, messageActions } from "reducers/slices/app";
 import { MessageTypeEnum } from "src/app";
-import { logger } from "configs/logger";
+import { getNanoId } from "src/utils";
 const log = logger(__filename);
 
 export declare type MemberSignupDataType = {
@@ -224,18 +223,6 @@ const Signup: React.FunctionComponent<{}> = (props) => {
 
           // move to email verification page
           history.push("/email-verification");
-        })
-        .catch((error: AxiosError) => {
-          /**
-           * update message
-           **/
-          dispatch(
-            messageActions.update({
-              id: getNanoId(),
-              type: MessageTypeEnum.ERROR,
-              message: error.response.data.message,
-            })
-          );
         });
     } else {
       updateAllValidation();

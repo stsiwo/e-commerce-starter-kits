@@ -27,6 +27,7 @@ export declare type UserPhoneType = {
   phoneNumber: string;
   countryCode: string;
   isSelected: boolean;
+  version: number;
 };
 
 export declare type UserAddressType = {
@@ -39,6 +40,7 @@ export declare type UserAddressType = {
   postalCode: string;
   isBillingAddress: boolean;
   isShippingAddress: boolean;
+  version: number;
 };
 
 export declare type AdminCompanyType = {
@@ -58,6 +60,7 @@ export declare type AdminCompanyType = {
   instagramLink: string;
   twitterLink: string;
   youtubeLink: string;
+  version: number;
 };
 
 export declare type UserTypeType = {
@@ -84,6 +87,7 @@ export declare type UserType = {
   orders: OrderType[];
   cartItems: CartItemType[];
   companies?: AdminCompanyType[];
+  version: number;
 };
 
 // criteira
@@ -93,6 +97,7 @@ export declare type UserCriteria = {
   lastName: string;
   email: string;
   password?: string;
+  version: number;
 };
 
 export declare type UserPhoneCriteria = {
@@ -100,6 +105,7 @@ export declare type UserPhoneCriteria = {
   isSelected: boolean;
   phoneNumber: string;
   countryCode: string;
+  version: number;
 };
 
 export declare type UserAddressCriteria = {
@@ -112,6 +118,7 @@ export declare type UserAddressCriteria = {
   postalCode: string;
   isBillingAddress: boolean;
   isShippingAddress: boolean;
+  version: number;
 };
 
 export declare type UserCompanyCriteria = {
@@ -131,6 +138,7 @@ export declare type UserCompanyCriteria = {
   instagramLink: string;
   twitterLink: string;
   youtubeLink: string;
+  version: number;
 };
 
 // empty
@@ -149,6 +157,7 @@ export const defaultUser: UserType = {
   orders: [],
   cartItems: [],
   userType: guestUserType,
+  version: null,
 };
 
 // form & input
@@ -158,6 +167,7 @@ export declare type UserBasicAccountDataType = {
   email: string;
   password: string;
   confirm: string;
+  version: number;
 };
 
 export declare type UserBasicAccountValidationDataType = {
@@ -168,21 +178,23 @@ export declare type UserBasicAccountValidationDataType = {
   confirm?: string;
 };
 
-export const defaultUserBasicAccountData = {
+export const defaultUserBasicAccountData: UserBasicAccountDataType = {
   firstName: "",
   lastName: "",
   email: "",
   password: "",
   confirm: "",
+  version: null,
 };
 
-export const defaultUserBasicAccountValidationData = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  password: "",
-  confirm: "",
-};
+export const defaultUserBasicAccountValidationData: UserBasicAccountValidationDataType =
+  {
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirm: "",
+  };
 
 // customer status
 export declare type UserStatusAccountDataType = {
@@ -217,6 +229,7 @@ export declare type CustomerPhonesFormDataType = {
   phoneNumber: string;
   countryCode: string;
   isSelected: boolean;
+  version: number;
 };
 
 export const generateDefaultCustomerPhonesFormData: () => CustomerPhonesFormDataType =
@@ -226,6 +239,7 @@ export const generateDefaultCustomerPhonesFormData: () => CustomerPhonesFormData
       phoneNumber: "",
       countryCode: "+1",
       isSelected: false,
+      version: null,
     };
   };
 
@@ -255,6 +269,7 @@ export declare type CustomerAddressesFormDataType = {
   postalCode: string;
   isBillingAddress: boolean;
   isShippingAddress: boolean;
+  version: number;
 };
 
 export const generateDefaultCustomerAddressesFormData: () => CustomerAddressesFormDataType =
@@ -269,6 +284,7 @@ export const generateDefaultCustomerAddressesFormData: () => CustomerAddressesFo
       postalCode: "",
       isBillingAddress: false,
       isShippingAddress: false,
+      version: null,
     };
   };
 
@@ -345,6 +361,7 @@ export declare type AdminCompanyFormDataType = {
   instagramLink: string;
   twitterLink: string;
   youtubeLink: string;
+  version: number;
 };
 
 export const generateDefaultAdminCompanyFormData: () => AdminCompanyFormDataType =
@@ -366,6 +383,7 @@ export const generateDefaultAdminCompanyFormData: () => AdminCompanyFormDataType
       instagramLink: "",
       twitterLink: "",
       youtubeLink: "",
+      version: null,
     };
   };
 

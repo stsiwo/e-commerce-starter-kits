@@ -5,6 +5,7 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { AxiosError } from "axios";
 import { api } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import { defaultReviewData, ReviewType } from "domain/review/type";
 import merge from "lodash/merge";
 import * as React from "react";
@@ -13,7 +14,6 @@ import { useLocation } from "react-router";
 import { Link as RRLink } from "react-router-dom";
 import { mSelector } from "src/selectors/selector";
 import ReviewForm from "./ReviewForm";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>

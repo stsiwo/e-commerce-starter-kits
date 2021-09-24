@@ -54,13 +54,19 @@ export const putAuthPhoneActionCreator = createAction<PutAuthPhoneActionType>(
 export const putAuthPhoneActionTypeName = putAuthPhoneActionCreator().type;
 
 // for PATCH (replace a phone) request
-export declare type PatchAuthPhoneActionType = { phoneId: string };
+export declare type PatchAuthPhoneActionType = {
+  phoneId: string;
+  version: number;
+};
 export const patchAuthPhoneActionCreator =
   createAction<PatchAuthPhoneActionType>("saga/domain/auth/phone/patch");
 export const patchAuthPhoneActionTypeName = patchAuthPhoneActionCreator().type;
 
 // for DELETE (delete a phone) request
-export declare type DeleteAuthPhoneActionType = { phoneId: string };
+export declare type DeleteAuthPhoneActionType = {
+  phoneId: string;
+  version: number;
+};
 export const deleteAuthPhoneActionCreator =
   createAction<DeleteAuthPhoneActionType>("saga/domain/auth/phone/delete");
 export const deleteAuthPhoneActionTypeName =
@@ -83,6 +89,7 @@ export const putAuthAddressActionTypeName = putAuthAddressActionCreator().type;
 export declare type PatchAuthAddressActionType = {
   addressId: string;
   type: string;
+  version: number;
 }; // 'billing'/'shipping'
 export const patchAuthAddressActionCreator =
   createAction<PatchAuthAddressActionType>("saga/domain/auth/address/patch");
@@ -90,7 +97,10 @@ export const patchAuthAddressActionTypeName =
   patchAuthAddressActionCreator().type;
 
 // for DELETE (delete a address) request
-export declare type DeleteAuthAddressActionType = { addressId: string };
+export declare type DeleteAuthAddressActionType = {
+  addressId: string;
+  version: number;
+};
 export const deleteAuthAddressActionCreator =
   createAction<DeleteAuthAddressActionType>("saga/domain/auth/address/delete");
 export const deleteAuthAddressActionTypeName =
@@ -100,6 +110,7 @@ export const deleteAuthAddressActionTypeName =
 export declare type PostAuthAvatarImageActionType = {
   avatarImage: File;
   userId: string;
+  version: number;
 };
 export const postAuthAvatarImageActionCreator =
   createAction<PostAuthAvatarImageActionType>(
@@ -109,7 +120,11 @@ export const postAuthAvatarImageActionTypeName =
   postAuthAvatarImageActionCreator().type;
 
 // for DELETE (avatar-image) request
-export declare type DeleteAuthAvatarImageActionType = { userId: string };
+export declare type DeleteAuthAvatarImageActionType = {
+  userId: string;
+  version: number;
+};
+
 export const deleteAuthAvatarImageActionCreator =
   createAction<DeleteAuthAvatarImageActionType>(
     "saga/domain/auth/avatar-image/delete"
@@ -144,6 +159,7 @@ export const fetchSingleAuthOrderActionTypeName =
 // for POST (post auth order event) request
 export declare type PostAuthOrderEventActionType = OrderEventCriteria & {
   orderId: string;
+  orderVersion: number;
 };
 export const postAuthOrderEventActionCreator =
   createAction<PostAuthOrderEventActionType>(
@@ -181,6 +197,10 @@ export const authSlice = createSlice({
         userType: action.payload.userType.userType,
         user: action.payload,
       };
+    },
+    updateUser: (state: AuthType, action: PayloadAction<UserType>) => {
+      state.user = action.payload;
+      return state;
     },
     update: (state: AuthType, action: authUpdateActionType) => action.payload,
     logout: (state: AuthType) => {

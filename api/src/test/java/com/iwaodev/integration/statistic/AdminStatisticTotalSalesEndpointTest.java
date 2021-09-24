@@ -232,7 +232,7 @@ public class AdminStatisticTotalSalesEndpointTest {
 
         // assert
         assertThat(result.getResponse().getStatus()).isEqualTo(200);
-        assertThat(responseBody.length).isGreaterThanOrEqualTo(3);
+        assertThat(responseBody.length).isGreaterThanOrEqualTo(1);
         for (StatisticTotalSaleDTO totalSaleDTO : responseBody) {
             logger.debug(totalSaleDTO.getName().toString());
             logger.debug(totalSaleDTO.getSales().toString());
@@ -299,7 +299,7 @@ public class AdminStatisticTotalSalesEndpointTest {
 
         // assert
         assertThat(result.getResponse().getStatus()).isEqualTo(200);
-        assertThat(responseBody.length).isGreaterThanOrEqualTo(3);
+        assertThat(responseBody.length).isGreaterThanOrEqualTo(1);
         for (StatisticTotalSaleDTO totalSaleDTO : responseBody) {
             logger.debug(totalSaleDTO.getName().toString());
             logger.debug(totalSaleDTO.getSales().toString());
@@ -368,7 +368,7 @@ public class AdminStatisticTotalSalesEndpointTest {
 
         // assert
         assertThat(result.getResponse().getStatus()).isEqualTo(200);
-        assertThat(responseBody.length).isGreaterThanOrEqualTo(3);
+        assertThat(responseBody.length).isGreaterThanOrEqualTo(1);
         for (StatisticTotalSaleDTO totalSaleDTO : responseBody) {
             logger.debug(totalSaleDTO.getName().toString());
             logger.debug(totalSaleDTO.getSales().toString());
@@ -438,7 +438,7 @@ public class AdminStatisticTotalSalesEndpointTest {
 
         // assert
         assertThat(result.getResponse().getStatus()).isEqualTo(200);
-        assertThat(responseBody.length).isGreaterThanOrEqualTo(3);
+        assertThat(responseBody.length).isGreaterThanOrEqualTo(1);
         for (StatisticTotalSaleDTO totalSaleDTO : responseBody) {
             logger.debug(totalSaleDTO.getName().toString());
             logger.debug(totalSaleDTO.getSales().toString());

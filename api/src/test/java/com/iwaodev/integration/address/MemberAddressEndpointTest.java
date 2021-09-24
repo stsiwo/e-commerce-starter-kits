@@ -369,6 +369,7 @@ public class MemberAddressEndpointTest {
 
     // arrange
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyFormJson.get("addressId").asText();
+    String dummyVersion = "\"0\"";
 
     // act & assert
     ResultActions resultActions = mvc.perform(
@@ -378,7 +379,8 @@ public class MemberAddressEndpointTest {
           .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
+                .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -441,6 +443,7 @@ public class MemberAddressEndpointTest {
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyNewSelectedAddressId;
     JSONObject dummyFormJson = new JSONObject();
     dummyFormJson.put("type", "billing");
+    String dummyVersion = "\"0\"";
 
     // act & assert
     ResultActions resultActions = mvc.perform(
@@ -451,7 +454,8 @@ public class MemberAddressEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
-          .accept(MediaType.APPLICATION_JSON)
+                .header("If-Match", dummyVersion)
+                .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
       .andExpect(status().isOk());
@@ -486,6 +490,7 @@ public class MemberAddressEndpointTest {
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyNewSelectedAddressId;
     JSONObject dummyFormJson = new JSONObject();
     dummyFormJson.put("type", "shipping");
+    String dummyVersion = "\"0\"";
 
     // act & assert
     ResultActions resultActions = mvc.perform(
@@ -496,7 +501,8 @@ public class MemberAddressEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
-          .accept(MediaType.APPLICATION_JSON)
+                .header("If-Match", dummyVersion)
+                .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
       .andExpect(status().isOk());
@@ -524,6 +530,7 @@ public class MemberAddressEndpointTest {
 
     // arrange
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/100"; // check the sql to match address id (e.g., 100)
+    String dummyVersion = "\"0\"";
 
     // act & assert
     ResultActions resultActions = mvc.perform(
@@ -531,7 +538,8 @@ public class MemberAddressEndpointTest {
           .delete(targetUrl) // remove
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
+                .header("csrf-token", this.authInfo.getCsrfToken())
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())

@@ -1,5 +1,6 @@
 package com.iwaodev.infrastructure.model;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,18 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import com.iwaodev.domain.user.UserActiveEnum;
@@ -182,6 +172,10 @@ public class User {
   @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Notification> receivedNotifications = new ArrayList<>();
 
+  @Version
+  @Column(name = "version")
+  private Long version = 0L;
+
   // constructor
   public User(String firstName, String lastName, String email, String password) {
     this.firstName = firstName;
@@ -224,6 +218,10 @@ public class User {
     phone.setUser(null);
   }
 
+  public void updatePhone(Long phoneId, String phoneNumber, String countryCode, Boolean isSelected) {
+    Phone curPhone = this.findPhone(phoneId);
+    curPhone.update(phoneNumber, countryCode, isSelected);
+  }
   public void removePhoneById(Long phoneId) {
 
     Phone targetPhone = this.findPhone(phoneId);
@@ -244,6 +242,11 @@ public class User {
   public void removeAddress(Address address) {
     this.addresses.remove(address);
     address.setUser(null);
+  }
+
+  public void updateAddress(Long addressId, String address1, String address2, String city, String province, String country, String postalCode, Boolean isBillingAddress, Boolean isShippingAddress) {
+    Address curAddress = this.findAddress(addressId);
+    curAddress.update(address1, address2, city, province, country, postalCode, isBillingAddress, isShippingAddress);
   }
 
   public void removeAddressById(Long addressId) {
@@ -306,8 +309,8 @@ public class User {
    *
    **/
   public void updateCompany(Long companyId, Company nextCompany) {
-    this.removeCompanyById(companyId);
-    this.addCompany(nextCompany);
+    Company targetCompany = this.findCompany(companyId);
+    targetCompany.update(nextCompany);
   }
 
   public void setReviews(List<Review> reviews) {

@@ -15,6 +15,7 @@ import {
   KeyboardDatePicker,
   MuiPickersUtilsProvider,
 } from "@material-ui/pickers";
+import { logger } from "configs/logger";
 import {
   CategoryType,
   defaultProductValidationData,
@@ -38,7 +39,6 @@ import { FetchStatusEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { renameFile } from "src/utils";
 import ProductImagesForm from "./ProductImagesForm";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 interface AdminProductFormPropsType {
@@ -340,6 +340,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>(
                 note: curProductState.note,
                 productImageFiles: curProductState.productImageFiles,
                 productImages: curProductState.productImages,
+                version: curProductState.version,
               })
             );
           } else {
@@ -358,6 +359,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>(
                 note: curProductState.note,
                 productImageFiles: curProductState.productImageFiles,
                 productImages: curProductState.productImages,
+                version: curProductState.version,
               })
             );
           }

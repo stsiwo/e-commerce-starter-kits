@@ -13,12 +13,11 @@ import {
 import { RatingCriteria } from "domain/order/types";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { messageActions } from "reducers/slices/app";
 import { getRatingOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
 import { checkoutIsRatingSuccessActions } from "reducers/slices/domain/checkout";
-import { FetchStatusEnum, MessageTypeEnum } from "src/app";
+import { FetchStatusEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
-import { cadCurrencyFormat, getNanoId, toDateString } from "src/utils";
+import { cadCurrencyFormat, toDateString } from "src/utils";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) => createStyles({}));
@@ -92,15 +91,6 @@ const CartItemTotal: React.FunctionComponent<CartItemTotalPropsType> = (
         // success fetching
         dispatch(
           getRatingOrderFetchStatusActions.update(FetchStatusEnum.FAILED)
-        );
-        // use error.response.data.message from api
-        dispatch(
-          messageActions.update({
-            id: getNanoId(),
-            type: MessageTypeEnum.ERROR,
-            message:
-              "failed to get estimated shipping cost and delivery date. please try again later.",
-          })
         );
       });
   }, []);

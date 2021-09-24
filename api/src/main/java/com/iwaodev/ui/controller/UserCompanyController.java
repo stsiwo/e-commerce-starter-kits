@@ -7,6 +7,7 @@ import javax.validation.Valid;
 
 import com.iwaodev.application.dto.company.CompanyDTO;
 import com.iwaodev.application.dto.company.PublicCompanyDTO;
+import com.iwaodev.application.dto.user.PhoneDTO;
 import com.iwaodev.application.iservice.CompanyService;
 import com.iwaodev.config.SpringSecurityUser;
 import com.iwaodev.ui.criteria.user.UserCompanyCriteria;
@@ -66,7 +67,12 @@ public class UserCompanyController {
       @AuthenticationPrincipal SpringSecurityUser authUser,
       @Valid @RequestBody UserCompanyCriteria criteria
       ) throws Exception {
-    return new ResponseEntity<>(this.service.update(criteria, userId, companyId), HttpStatus.OK);
+
+    CompanyDTO results = this.service.update(criteria, userId, companyId);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 }
 

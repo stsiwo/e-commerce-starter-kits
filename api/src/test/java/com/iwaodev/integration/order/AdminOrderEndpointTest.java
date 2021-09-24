@@ -20,6 +20,7 @@ import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.order.OrderStatusEnum;
 import com.iwaodev.domain.order.event.OrderEventWasAddedEvent;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.ui.response.ErrorBaseResponse;
 import com.iwaodev.util.ResourceReader;
 
 import org.junit.jupiter.api.Test;
@@ -462,6 +463,7 @@ public class AdminOrderEndpointTest {
     String adminUserId = "e95bf632-1518-4bf2-8ba9-cd8b7587530b";
 
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events";
+    String dummyVersion = "\"0\"";
 
     // act
     ResultActions resultActions = mvc
@@ -470,16 +472,19 @@ public class AdminOrderEndpointTest {
             .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     OrderDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, OrderDTO.class);
 
     // assert
     assertThat(responseBody.getOrderId()).isNotNull();
+    assertThat(etag).isEqualTo("\"1\"");
     assertThat(responseBody.getOrderEvents().size()).isEqualTo(4);
     assertThat(responseBody.getLatestOrderEvent().getOrderStatus()).isEqualTo(OrderStatusEnum.ERROR);
     assertThat(responseBody.getLatestOrderEvent().getUser().getUserId().toString()).isEqualTo(adminUserId);
@@ -488,6 +493,73 @@ public class AdminOrderEndpointTest {
     Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(OrderEventWasAddedEvent.class));
   }
 
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldAdminCreateOrderEventSuccessfully.sql" })
+  public void shouldAdminNotCreateOrderEventSinceNoIfMatch(
+          @Value("classpath:/integration/order/shouldAdminCreateOrderEventSuccessfully.json") Resource dummyFormJsonFile)
+          throws Exception {
+
+    // dummy order id must match with sql.
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
+    String adminUserId = "e95bf632-1518-4bf2-8ba9-cd8b7587530b";
+
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events";
+    String dummyVersion = "\"0\"";
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.post(targetUrl).content(dummyFormJsonString)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+  }
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldAdminCreateOrderEventSuccessfully.sql" })
+  public void shouldAdminNotCreateOrderEventSinceVersionMismatch(
+          @Value("classpath:/integration/order/shouldAdminCreateOrderEventSuccessfully.json") Resource dummyFormJsonFile)
+          throws Exception {
+
+    // dummy order id must match with sql.
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
+    String adminUserId = "e95bf632-1518-4bf2-8ba9-cd8b7587530b";
+
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events";
+    String dummyVersion = "\"3\"";
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.post(targetUrl).content(dummyFormJsonString)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isPreconditionFailed());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
+  }
   @Test
   @Sql(scripts = {
       "classpath:/integration/order/shouldAdminGetIsReviewableTrueWhenCreateOrderEventOfDeliveredSuccessfully.sql" })
@@ -502,6 +574,7 @@ public class AdminOrderEndpointTest {
     String dummyFormJsonString = dummyFormJson.toString();
     String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
     String adminUserId = "e95bf632-1518-4bf2-8ba9-cd8b7587530b";
+    String dummyVersion = "\"0\"";
 
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events";
 
@@ -512,17 +585,19 @@ public class AdminOrderEndpointTest {
             .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
-
+    String etag = result.getResponse().getHeader("ETag");
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     OrderDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, OrderDTO.class);
 
     // assert
     assertThat(responseBody.getOrderId()).isNotNull();
     assertThat(responseBody.getOrderEvents().size()).isEqualTo(3);
+    assertThat(etag).isEqualTo("\"1\"");
 
     for (OrderDetailDTO orderDetailDto : responseBody.getOrderDetails()) {
       assertThat(orderDetailDto.getIsReviewable()).isEqualTo(true);
@@ -545,6 +620,7 @@ public class AdminOrderEndpointTest {
     String dummyFormJsonString = dummyFormJson.toString();
     String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
     String adminUserId = "e95bf632-1518-4bf2-8ba9-cd8b7587530b";
+    String dummyVersion = "\"0\"";
 
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events";
 
@@ -555,6 +631,7 @@ public class AdminOrderEndpointTest {
             .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
@@ -587,6 +664,7 @@ public class AdminOrderEndpointTest {
     String dummyFormJsonString = dummyFormJson.toString();
     String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
     String adminUserId = "e95bf632-1518-4bf2-8ba9-cd8b7587530b";
+    String dummyVersion = "\"0\"";
 
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events";
 
@@ -597,6 +675,7 @@ public class AdminOrderEndpointTest {
             .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
@@ -617,6 +696,7 @@ public class AdminOrderEndpointTest {
     String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
     String adminUserId = "e95bf632-1518-4bf2-8ba9-cd8b7587530b";
     String dummyOrderEventId = "56";
+    String dummyVersion = "\"0\"";
 
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events/"
         + dummyOrderEventId;
@@ -628,19 +708,100 @@ public class AdminOrderEndpointTest {
             .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
-    OrderEventDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, OrderEventDTO.class);
+    OrderDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, OrderDTO.class);
+    String etag = result.getResponse().getHeader("ETag");
 
     // assert
-    assertThat(responseBody.getOrderEventId().toString()).isEqualTo(dummyOrderEventId);
-    assertThat(responseBody.getOrderStatus()).isEqualTo(OrderStatusEnum.DRAFT);
-    assertThat(responseBody.getUndoable()).isEqualTo(false);
-    assertThat(responseBody.getNote()).isEqualTo(dummyFormJson.get("note").asText());
+    assertThat(etag).isEqualTo("\"1\"");
+    for (OrderEventDTO orderEventDTO: responseBody.getOrderEvents()) {
+      if (orderEventDTO.getOrderEventId().equals(Long.parseLong(dummyOrderEventId))) {
+        assertThat(orderEventDTO.getOrderEventId().toString()).isEqualTo(dummyOrderEventId);
+        assertThat(orderEventDTO.getOrderStatus()).isEqualTo(OrderStatusEnum.DRAFT);
+        assertThat(orderEventDTO.getUndoable()).isEqualTo(false);
+        assertThat(orderEventDTO.getNote()).isEqualTo(dummyFormJson.get("note").asText());
+      }
+    }
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldAdminUpdateOrderEventSuccessfully.sql" })
+  public void shouldNotAdminUpdateOrderEventSuccessfullySinceNoIfMatch(
+          @Value("classpath:/integration/order/shouldAdminUpdateOrderEventSuccessfully.json") Resource dummyFormJsonFile)
+          throws Exception {
+
+    // dummy order id and order event id must match with sql.
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
+    String adminUserId = "e95bf632-1518-4bf2-8ba9-cd8b7587530b";
+    String dummyOrderEventId = "56";
+    String dummyVersion = "\"0\"";
+
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events/"
+            + dummyOrderEventId;
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyFormJsonString)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldAdminUpdateOrderEventSuccessfully.sql" })
+  public void shouldNotAdminUpdateOrderEventSuccessfullySinceVersionMismatch(
+          @Value("classpath:/integration/order/shouldAdminUpdateOrderEventSuccessfully.json") Resource dummyFormJsonFile)
+          throws Exception {
+
+    // dummy order id and order event id must match with sql.
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
+    String adminUserId = "e95bf632-1518-4bf2-8ba9-cd8b7587530b";
+    String dummyOrderEventId = "56";
+    String dummyVersion = "\"3\""; // this is order version not order event version
+
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events/"
+            + dummyOrderEventId;
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyFormJsonString)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isPreconditionFailed());
+
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
   }
 
   @Test
@@ -657,6 +818,7 @@ public class AdminOrderEndpointTest {
     String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
     String adminUserId = "e95bf632-1518-4bf2-8ba9-cd8b7587530b";
     String dummyOrderEventId = "58";
+    String dummyVersion = "\"0\"";
 
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events/"
         + dummyOrderEventId;
@@ -664,10 +826,11 @@ public class AdminOrderEndpointTest {
     // act
     ResultActions resultActions = mvc
         .perform(MockMvcRequestBuilders.delete(targetUrl)
-            .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-            .accept(MediaType.APPLICATION_JSON))
+        .cookie(this.authCookie)
+        .cookie(this.csrfCookie)
+        .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
+        .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -686,6 +849,76 @@ public class AdminOrderEndpointTest {
   }
 
   @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldAdminDeleteOrderEventSuccessfully.sql" })
+  public void shouldNotAdminDeleteOrderEventSuccessfullySinceNoIfMatchHeader(
+          @Value("classpath:/integration/order/shouldAdminDeleteOrderEventSuccessfully.json") Resource dummyFormJsonFile)
+          throws Exception {
+
+    // dummy order id and order event id must match with sql.
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
+    String adminUserId = "e95bf632-1518-4bf2-8ba9-cd8b7587530b";
+    String dummyOrderEventId = "58";
+    String dummyVersion = "\"0\"";
+
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events/"
+            + dummyOrderEventId;
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.delete(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+  }
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldAdminDeleteOrderEventSuccessfully.sql" })
+  public void shouldNotAdminDeleteOrderEventSuccessfullySinceVersionMismatch(
+          @Value("classpath:/integration/order/shouldAdminDeleteOrderEventSuccessfully.json") Resource dummyFormJsonFile)
+          throws Exception {
+
+    // dummy order id and order event id must match with sql.
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
+    String adminUserId = "e95bf632-1518-4bf2-8ba9-cd8b7587530b";
+    String dummyOrderEventId = "58";
+    String dummyVersion = "\"3\"";
+
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events/"
+            + dummyOrderEventId;
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.delete(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isPreconditionFailed());
+
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
+  }
+  @Test
   @Sql(scripts = { "classpath:/integration/order/shouldNotAdminDeleteOrderEventSinceNotLatestOrderEvent.sql" })
   public void shouldNotAdminDeleteOrderEventSinceNotLatestOrderEvent(
       @Value("classpath:/integration/order/shouldNotAdminDeleteOrderEventSinceNotLatestOrderEvent.json") Resource dummyFormJsonFile)
@@ -699,6 +932,7 @@ public class AdminOrderEndpointTest {
     String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
     String adminUserId = "e95bf632-1518-4bf2-8ba9-cd8b7587530b";
     String dummyOrderEventId = "57";
+    String dummyVersion = "\"0\"";
 
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events/"
         + dummyOrderEventId;
@@ -709,9 +943,15 @@ public class AdminOrderEndpointTest {
             .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("only latest order event is deletable");
   }
 
   @Test
@@ -728,6 +968,7 @@ public class AdminOrderEndpointTest {
     String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
     String adminUserId = "e95bf632-1518-4bf2-8ba9-cd8b7587530b";
     String dummyOrderEventId = "58";
+    String dummyVersion = "\"0\"";
 
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events/"
         + dummyOrderEventId;
@@ -738,8 +979,14 @@ public class AdminOrderEndpointTest {
             .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("this event is not deletable.");
   }
 }

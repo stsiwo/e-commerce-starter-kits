@@ -82,6 +82,7 @@ export function* putAuthAddressWorker(
       api({
         method: "PUT",
         url: apiUrl,
+        headers: { "If-Match": `"${action.payload.version}"` },
         data: {
           addressId: action.payload.addressId,
           address1: action.payload.address1,
@@ -134,17 +135,6 @@ export function* putAuthAddressWorker(
        **/
       yield put(
         putAuthAddressFetchStatusActions.update(FetchStatusEnum.FAILED)
-      );
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
       );
     }
   } else if (curAuth.userType === UserTypeEnum.GUEST) {

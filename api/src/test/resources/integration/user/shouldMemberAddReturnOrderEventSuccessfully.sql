@@ -113,7 +113,7 @@ INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoa
 VALUES ('58', 'c8f8591c-bb83-4fd1-a098-3fac8d40e450', 'PAID', '0', NULL, '1');
 
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('59', 'c8f8591c-bb83-4fd1-a098-3fac8d40e450', 'SHIPPED', '1', NULL, '1');
+VALUES ('59', 'c8f8591c-bb83-4fd1-a098-3fac8d40e450', 'SHIPPED', '1', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '0');
 
 
 

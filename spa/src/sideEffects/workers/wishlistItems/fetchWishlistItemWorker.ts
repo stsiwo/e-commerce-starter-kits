@@ -2,7 +2,6 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { api, WorkerResponse } from "configs/axiosConfig";
 import { logger } from "configs/logger";
 import { WishlistItemQueryStringType } from "domain/wishlist/types";
-import { messageActions } from "reducers/slices/app";
 import { getWishlistItemFetchStatusActions } from "reducers/slices/app/fetchStatus/wishlistItem";
 import {
   wishlistItemActions,
@@ -11,14 +10,9 @@ import {
   wishlistItemPaginationTotalPagesActions,
 } from "reducers/slices/domain/wishlistItem";
 import { all, call, put, select } from "redux-saga/effects";
-import {
-  AuthType,
-  FetchStatusEnum,
-  MessageTypeEnum,
-  UserTypeEnum,
-} from "src/app";
+import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
-import { generateQueryString, getNanoId } from "src/utils";
+import { generateQueryString } from "src/utils";
 
 const log = logger(__filename);
 
@@ -171,17 +165,6 @@ export function* fetchWishlistItemWorker(action: PayloadAction<{}>) {
       ]);
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       log(response.message);
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
     }
   }
 }

@@ -12,13 +12,11 @@ import Switch from "@material-ui/core/Switch";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
-import { AxiosError } from "axios";
 import { api } from "configs/axiosConfig";
 import { logger } from "configs/logger";
 import { isReachMaxQuantity } from "domain/cart";
 import { CartItemCriteria, CartItemType } from "domain/cart/types";
 import merge from "lodash/merge";
-import { useSnackbar } from "notistack";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { cartItemActions } from "reducers/slices/domain/cartItem";
@@ -100,10 +98,6 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
   const dispatch = useDispatch();
   // event handlers
 
-  // snackbar notification
-  // usage: 'enqueueSnackbar("message", { variant: "error" };
-  const { enqueueSnackbar } = useSnackbar();
-
   /// qty change
   const handleQtyIncrement: React.EventHandler<
     React.MouseEvent<HTMLButtonElement>
@@ -121,6 +115,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
         api
           .request({
             method: "PUT",
+            headers: { "If-Match": `"${nextCartItem.version}"` },
             url:
               API1_URL +
               `/users/${auth.user.userId}/cartItems/${value.cartItemId}`,
@@ -137,11 +132,6 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
 
             // update cart item in redux store
             dispatch(cartItemActions.updateOne(updatedCartItem));
-
-            enqueueSnackbar("updated successfully.", { variant: "success" });
-          })
-          .catch((error: AxiosError) => {
-            enqueueSnackbar(error.message, { variant: "error" });
           });
       } else {
         // update cart item in redux store
@@ -161,6 +151,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
         api
           .request({
             method: "PUT",
+            headers: { "If-Match": `"${value.version}"` },
             url:
               API1_URL +
               `/users/${auth.user.userId}/cartItems/${value.cartItemId}`,
@@ -177,11 +168,6 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
 
             // update cart item in redux store
             dispatch(cartItemActions.updateOne(updatedCartItem));
-
-            enqueueSnackbar("updated successfully.", { variant: "success" });
-          })
-          .catch((error: AxiosError) => {
-            enqueueSnackbar(error.message, { variant: "error" });
           });
       } else {
         // update cart item in redux store
@@ -208,6 +194,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
       api
         .request({
           method: "PUT",
+          headers: { "If-Match": `"${value.version}"` },
           url:
             API1_URL +
             `/users/${auth.user.userId}/cartItems/${value.cartItemId}`,
@@ -226,11 +213,6 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
 
           // update cart item in redux store
           dispatch(cartItemActions.updateOne(updatedCartItem));
-
-          enqueueSnackbar("updated successfully.", { variant: "success" });
-        })
-        .catch((error: AxiosError) => {
-          enqueueSnackbar(error.message, { variant: "error" });
         });
     } else {
       // update cart item in redux store
@@ -250,6 +232,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
       api
         .request({
           method: "DELETE",
+          headers: { "If-Match": `"${value.version}"` },
           url:
             API1_URL +
             `/users/${auth.user.userId}/cartItems/${value.cartItemId}`,
@@ -257,11 +240,6 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
         .then((data) => {
           // update cart item in redux store
           dispatch(cartItemActions.delete(value));
-
-          enqueueSnackbar("updated successfully.", { variant: "success" });
-        })
-        .catch((error: AxiosError) => {
-          enqueueSnackbar(error.message, { variant: "error" });
         });
     } else {
       // update cart item in redux store

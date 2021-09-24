@@ -27,6 +27,8 @@ public class PublicCompanyDTO {
   private String twitterLink;
 
   private String youtubeLink;
+
+  private Long version;
 }
 
 

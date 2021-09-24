@@ -80,6 +80,7 @@ export function* putAuthPhoneWorker(
       api({
         method: "PUT",
         url: apiUrl,
+        headers: { "If-Match": `"${action.payload.version}"` },
         data: {
           phoneId: action.payload.phoneId,
           phoneNumber: action.payload.phoneNumber,
@@ -121,17 +122,6 @@ export function* putAuthPhoneWorker(
       );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       log(response.message);
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
     }
   } else if (curAuth.userType === UserTypeEnum.GUEST) {
     /**

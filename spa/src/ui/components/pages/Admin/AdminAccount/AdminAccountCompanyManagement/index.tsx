@@ -4,9 +4,11 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import CardHeader from "@material-ui/core/CardHeader";
 import Grid from "@material-ui/core/Grid";
+import MenuItem from "@material-ui/core/MenuItem";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
+import { logger } from "configs/logger";
 import {
   AdminCompanyFormDataType,
   AdminCompanyFormValidationDataType,
@@ -18,9 +20,7 @@ import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { putAuthCompanyActionCreator } from "reducers/slices/app";
 import { mSelector } from "src/selectors/selector";
-import { getProvinceList, getCountryList } from "src/utils";
-import MenuItem from "@material-ui/core/MenuItem";
-import { logger } from "configs/logger";
+import { getCountryList, getProvinceList } from "src/utils";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -299,6 +299,7 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
           instagramLink: curAdminCompanyFormState.instagramLink,
           twitterLink: curAdminCompanyFormState.twitterLink,
           youtubeLink: curAdminCompanyFormState.youtubeLink,
+          version: auth.user.companies[0].version,
         })
       );
     } else {

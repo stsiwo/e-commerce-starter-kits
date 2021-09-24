@@ -27,5 +27,6 @@ public class OrderAddressDTO {
 
   private LocalDateTime updatedAt;
 
+  private Long version;
 }
 

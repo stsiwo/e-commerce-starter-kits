@@ -2,16 +2,10 @@ package com.iwaodev.infrastructure.model;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import com.iwaodev.infrastructure.model.listener.OrderDetailValidationListener;
@@ -100,6 +94,10 @@ public class OrderDetail {
   @CreationTimestamp
   @Column(name = "created_at")
   private LocalDateTime createdAt;
+
+  @Version
+  @Column(name = "version")
+  private Long version = 0L;
 
   // use SQL (not HQL/JPQL) everything is sql even if ref id
   @Formula("(select case when (count(*) > 0) then true else false end from orders o inner join order_details od on od.order_id = o.order_id inner join order_events oe on oe.order_id = o.order_id where oe.order_status = 'DELIVERED' and od.product_id is not null and od.order_detail_id = order_detail_id)")

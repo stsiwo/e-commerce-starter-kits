@@ -1,20 +1,14 @@
 package com.iwaodev.infrastructure.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 import com.iwaodev.domain.notification.NotificationTypeEnum;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.sql.Timestamp;
 
 @Data
 @ToString
@@ -33,6 +27,10 @@ public class NotificationType {
 
   @Column(name="notification_title_template")
   private String notificationTitleTemplate;
+
+  @Version
+  @Column(name = "version")
+  private Long version = 0L;
 
   @ManyToOne
   @JoinColumn(name = "issuer_type_id", insertable = true, updatable = true)

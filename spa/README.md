@@ -230,3 +230,9 @@ to detect authed user with expired token, use the following method:
 to check httponly cookie exists, you need to do a little trick like here: https://stackoverflow.com/questions/9353630/check-if-httponly-cookie-exists-in-javascript
 
 - create the same expiry and lifespan non-cookie (in my app, 'csrf-token') and check it exists.
+
+## issue:same-image-is-not-displayed-second-time
+
+see: https://stackoverflow.com/questions/53594250/cant-upload-the-same-image-in-the-second-time-when-remove-it-in-the-first
+
+need to set 'input.value = null'

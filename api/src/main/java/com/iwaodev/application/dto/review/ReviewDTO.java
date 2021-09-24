@@ -30,6 +30,8 @@ public class ReviewDTO {
   private UserDTO user;
 
   private ProductDTO product;
+
+  private Long version;
 }
 
 

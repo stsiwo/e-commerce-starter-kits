@@ -6,6 +6,8 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import MenuItem from "@material-ui/core/MenuItem";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
+import { logger } from "configs/logger";
 import {
   generateDefaultOrderEventData,
   OrderEventType,
@@ -21,8 +23,6 @@ import {
 } from "reducers/slices/domain/order";
 import { AuthType, UserTypeEnum } from "src/app";
 import { mSelector } from "src/selectors/selector";
-import Typography from "@material-ui/core/Typography";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 interface OrderEventUpdateFormDialogPropsType {
@@ -109,6 +109,7 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
               orderId: props.order.orderId,
               note: curOrderEventState.note,
               userId: auth.user.userId,
+              orderVersion: props.order.version,
             })
           );
         } else {
@@ -120,6 +121,7 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
               orderId: props.order.orderId,
               note: curOrderEventState.note,
               userId: auth.user.userId,
+              orderVersion: props.order.version,
             })
           );
         }
@@ -133,6 +135,7 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
               orderId: props.order.orderId,
               note: curOrderEventState.note,
               userId: auth.user.userId,
+              orderVersion: props.order.version,
             })
           );
         }

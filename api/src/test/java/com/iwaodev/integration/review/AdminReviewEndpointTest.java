@@ -29,6 +29,7 @@ import com.iwaodev.domain.review.event.NewReviewWasSubmittedEvent;
 import com.iwaodev.domain.review.event.ReviewWasUpdatedByMemberEvent;
 import com.iwaodev.domain.review.event.ReviewWasVerifiedByAdminEvent;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.ui.response.ErrorBaseResponse;
 import com.iwaodev.util.ResourceReader;
 
 import org.mockito.Mockito;
@@ -719,11 +720,13 @@ public class AdminReviewEndpointTest {
       .andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     ReviewDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ReviewDTO.class);
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(etag).isEqualTo("\"0\"");
     assertThat(responseBody.getReviewId().toString()).isNotNull();
     assertThat(responseBody.getUser().getUserId().toString()).isEqualTo(dummyUserId);
     assertThat(responseBody.getProduct().getProductId().toString()).isEqualTo(dummyProductId);
@@ -782,6 +785,7 @@ public class AdminReviewEndpointTest {
     String dummyReviewId = dummyFormJson.get("reviewId").asText();
     String dummyProductId = dummyFormJson.get("productId").asText();
     String dummyUserId = dummyFormJson.get("userId").asText();
+    String dummyVersion = "\"0\"";
 
     // arrange
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyReviewId; 
@@ -795,17 +799,20 @@ public class AdminReviewEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
-          .accept(MediaType.APPLICATION_JSON)
+                .header("If-Match", dummyVersion)
+                .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
       .andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     ReviewDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ReviewDTO.class);
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(etag).isEqualTo("\"1\"");
     assertThat(responseBody.getReviewId().toString()).isEqualTo(dummyReviewId);
     assertThat(responseBody.getIsVerified()).isEqualTo(true);
     assertThat(responseBody.getUser().getUserId().toString()).isEqualTo(dummyUserId);
@@ -816,6 +823,89 @@ public class AdminReviewEndpointTest {
   }
 
   @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminUpdateReview.sql" })
+  public void shouldNotAdminUpdateReviewSinceNoIfMatch(@Value("classpath:/integration/review/shouldAdminUpdateReview.json") Resource dummyFormJsonFile) throws Exception {
+
+    // product id & user id must be corresponding to sql & json file and here.
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    String dummyReviewId = dummyFormJson.get("reviewId").asText();
+    String dummyProductId = dummyFormJson.get("productId").asText();
+    String dummyUserId = dummyFormJson.get("userId").asText();
+    String dummyVersion = "\"0\"";
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyReviewId;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .put(targetUrl)
+                            .content(dummyFormJsonString)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+
+    // event
+    Mockito.verify(this.publisher, Mockito.never()).publishEvent(Mockito.any(ReviewWasVerifiedByAdminEvent.class));
+  }
+  @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminUpdateReview.sql" })
+  public void shouldNotAdminUpdateReviewSinceVersionMismatch(@Value("classpath:/integration/review/shouldAdminUpdateReview.json") Resource dummyFormJsonFile) throws Exception {
+
+    // product id & user id must be corresponding to sql & json file and here.
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    String dummyReviewId = dummyFormJson.get("reviewId").asText();
+    String dummyProductId = dummyFormJson.get("productId").asText();
+    String dummyUserId = dummyFormJson.get("userId").asText();
+    String dummyVersion = "\"2\"";
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyReviewId;
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .put(targetUrl)
+                            .content(dummyFormJsonString)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .header("If-Match", dummyVersion)
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isPreconditionFailed());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
+
+    // event
+    Mockito.verify(this.publisher, Mockito.never()).publishEvent(Mockito.any(ReviewWasVerifiedByAdminEvent.class));
+  }
+  @Test
   @Sql(scripts = { "classpath:/integration/review/shouldAdminDeleteReview.sql" })
   public void shouldAdminDeleteReview(/**@Value("classpath:/integration/review/shouldAdminDeleteReview.json") Resource dummyFormJsonFile**/) throws Exception {
 
@@ -824,7 +914,8 @@ public class AdminReviewEndpointTest {
     String dummyReviewId = "100"; 
 
     // arrange
-    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyReviewId; 
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyReviewId;
+    String dummyVersion = "\"0\"";
 
     // act & assert
     ResultActions resultActions = mvc.perform(
@@ -833,7 +924,8 @@ public class AdminReviewEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
-          .accept(MediaType.APPLICATION_JSON)
+                .header("If-Match", dummyVersion)
+                .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
       .andExpect(status().isOk());
@@ -855,6 +947,68 @@ public class AdminReviewEndpointTest {
 
     assertThat(isProductExist).isTrue();
     assertThat(isUserExist).isTrue();
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminDeleteReview.sql" })
+  public void shouldAdminDeleteReviewSinceNoIfMatch(/**@Value("classpath:/integration/review/shouldAdminDeleteReview.json") Resource dummyFormJsonFile**/) throws Exception {
+
+    // product id & user id must be corresponding to sql & json file and here.
+
+    String dummyReviewId = "100";
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyReviewId;
+    String dummyVersion = "\"0\"";
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .delete(targetUrl)
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+  }
+  @Test
+  @Sql(scripts = { "classpath:/integration/review/shouldAdminDeleteReview.sql" })
+  public void shouldAdminDeleteReviewSinceVersionMismatch(/**@Value("classpath:/integration/review/shouldAdminDeleteReview.json") Resource dummyFormJsonFile**/) throws Exception {
+
+    // product id & user id must be corresponding to sql & json file and here.
+
+    String dummyReviewId = "100";
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyReviewId;
+    String dummyVersion = "\"3\"";
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .delete(targetUrl)
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .header("If-Match", dummyVersion)
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isPreconditionFailed());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
   }
 }
 

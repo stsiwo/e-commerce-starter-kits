@@ -1,26 +1,14 @@
 package com.iwaodev.infrastructure.model;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.ForeignKey;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.PostLoad;
-import javax.persistence.PrePersist;
-import javax.persistence.PreRemove;
-import javax.persistence.PreUpdate;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import com.iwaodev.domain.product.validator.ProductValidation;
@@ -161,6 +149,10 @@ public class Product {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
+  @Version
+  @Column(name = "version")
+  private Long version = 0L;
+
   /**
    * the value of mappedBy is variable name of the other one
    * 
@@ -271,6 +263,16 @@ public class Product {
     }
 
     return highestPrice;
+  }
+
+  public void update(Product newProduct) {
+    this.productName = newProduct.getProductName();
+    this.productDescription = newProduct.getProductDescription();
+    this.productPath = newProduct.getProductPath();
+    this.productBaseUnitPrice = newProduct.getProductBaseUnitPrice();
+    this.isPublic = newProduct.getIsPublic();
+    this.releaseDate = newProduct.getReleaseDate();
+    this.note = newProduct.getNote();
   }
 
   /**
@@ -490,8 +492,7 @@ public class Product {
    **/
   public void updateVariant(Long variantId, ProductVariant nextVariant) {
     ProductVariant variant = this.findVariantById(variantId);
-    this.removeVariant(variant);
-    this.addVariant(nextVariant);
+    variant.update(nextVariant);
   }
 
   public void removeVariant(ProductVariant variant) {

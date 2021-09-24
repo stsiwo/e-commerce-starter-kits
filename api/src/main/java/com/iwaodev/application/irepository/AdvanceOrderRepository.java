@@ -9,4 +9,6 @@ import org.springframework.data.jpa.domain.Specification;
 public interface AdvanceOrderRepository {
 
   public Page<Order> findAllToAvoidNPlusOne(Specification<Order> spec, Pageable pageable);
+
+  public Order persist(Order order);
 }

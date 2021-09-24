@@ -23,4 +23,14 @@ public class Util {
   public static String formatPostalCode(String postalCode) {
     return postalCode.replaceAll("\\s+","");
   }
+
+  /**
+   *
+   * @param curVersion: a version in db
+   * @param receivedVersion: a version you received from client
+   * @return true if match, otherwise false
+   */
+  public static boolean checkETagVersion(Long curVersion, String receivedVersion) {
+    return receivedVersion.equals("\"" + curVersion + "\"");
+  }
 }

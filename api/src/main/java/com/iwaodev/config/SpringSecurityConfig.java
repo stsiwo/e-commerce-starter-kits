@@ -292,7 +292,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     configuration.setAllowedMethods(Arrays.asList(new String[] { "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS" }));
     configuration.setAllowedHeaders(Arrays.asList(new String[] { "Authorization", "Accept", "Origin", "DNT",
         "X-Chisel-Proxied-Url", "Keep-Alive", "User-Agent", "X-Requested-With", "If-Modified-Since", "Cache-Control",
-        "Content-Type", "Content-Range", "Range", "csrf-token" })); // don't forget add this custo 'csrf-token'.
+        "Content-Type", "Content-Range", "Range", "csrf-token", "If-Match" })); // don't forget add this custo 'csrf-token'.
     configuration.setAllowCredentials(this.corsConfig.getCredentials());
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);

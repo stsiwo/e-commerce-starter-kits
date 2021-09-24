@@ -23,6 +23,7 @@ import com.iwaodev.auth.AuthenticateTestUser;
 import com.iwaodev.auth.AuthenticationInfo;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.ui.response.ErrorBaseResponse;
 import com.iwaodev.util.ResourceReader;
 
 import org.json.JSONObject;
@@ -210,10 +211,12 @@ public class AdminCompanyEndpointTest {
     MvcResult result = resultActions.andReturn();
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     CompanyDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode, CompanyDTO[].class);
+    String etag = result.getResponse().getHeader("ETag");
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
     assertThat(responseBody.length).isGreaterThan(0);
+    assertThat(etag).isNotNull();
     for (CompanyDTO company : responseBody) {
       assertThat(company.getUserId().toString()).isEqualTo(this.authInfo.getAuthUser().getUserId().toString());
     }
@@ -258,6 +261,7 @@ public class AdminCompanyEndpointTest {
     // dummy form json 
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
+    String dummyVersion = "\"0\"";
 
     // arrange
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyFormJson.get("companyId").asText();
@@ -271,6 +275,7 @@ public class AdminCompanyEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -287,6 +292,76 @@ public class AdminCompanyEndpointTest {
     assertThat(responseBody.getCompanyName()).isEqualTo(dummyFormJson.get("companyName").asText());
   }
 
+  @Test
+  //@Sql(scripts = { "classpath:/integration/company/shouldAdminUpdateCompany.sql" })
+  public void shouldNotAdminUpdateCompanySinceNoIfMatch(@Value("classpath:/integration/company/shouldAdminUpdateCompany.json") Resource dummyFormJsonFile) throws Exception {
+
+    // make sure company_id match with sql and json
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyVersion = "\"0\"";
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyFormJson.get("companyId").asText();
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .put(targetUrl) // update
+                            .content(dummyFormJsonString)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+  }
+
+  @Test
+  //@Sql(scripts = { "classpath:/integration/company/shouldAdminUpdateCompany.sql" })
+  public void shouldNotAdminUpdateCompanySinceVersionMismatch(@Value("classpath:/integration/company/shouldAdminUpdateCompany.json") Resource dummyFormJsonFile) throws Exception {
+
+    // make sure company_id match with sql and json
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyVersion = "\"3\"";
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyFormJson.get("companyId").asText();
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .put(targetUrl) // update
+                            .content(dummyFormJsonString)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .header("If-Match", dummyVersion)
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isPreconditionFailed());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
+  }
 }
 
 

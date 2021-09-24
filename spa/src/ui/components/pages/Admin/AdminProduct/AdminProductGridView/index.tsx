@@ -237,7 +237,10 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
       (e) => {
         // request
         dispatch(
-          deleteSingleProductActionCreator({ productId: curProduct.productId })
+          deleteSingleProductActionCreator({
+            productId: curProduct.productId,
+            version: curProduct.version,
+          })
         );
       };
 

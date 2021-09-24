@@ -13,12 +13,14 @@ import javax.servlet.http.Cookie;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwaodev.application.dto.user.UserDTO;
+import com.iwaodev.application.irepository.UserRepository;
 import com.iwaodev.application.iservice.S3Service;
 import com.iwaodev.auth.AuthenticateTestUser;
 import com.iwaodev.auth.AuthenticationInfo;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.user.UserActiveEnum;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.ui.response.ErrorBaseResponse;
 import com.iwaodev.util.ResourceReader;
 
 import org.json.JSONObject;
@@ -40,6 +42,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -97,6 +100,9 @@ public class AdminUserEndpointTest {
 
   @Autowired
   private ResourceReader resourceReader;
+
+  @Autowired
+  private UserRepository userRepository;
 
   private Cookie authCookie;
 
@@ -161,12 +167,14 @@ public class AdminUserEndpointTest {
           .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
     MvcResult result = resultActions.andReturn();
+    String eTag = result.getResponse().getHeader("ETag");
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     UserDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), UserDTO[].class);
 
     // assert
     assertThat(responseBody.length).isGreaterThan(0);
+    assertThat(eTag).isNotNull();
     for (UserDTO userDto : responseBody) {
       assertThat(userDto.getUserId()).isNotNull();
     }
@@ -518,12 +526,14 @@ public class AdminUserEndpointTest {
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     UserDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, UserDTO.class);
 
     // assert
     assertThat(responseBody.getUserId().toString()).isEqualTo(dummyUserIdString);
+    assertThat(etag).isEqualTo("\"0\"");
   }
 
   @Test
@@ -568,6 +578,56 @@ public class AdminUserEndpointTest {
     String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
+    Long curVersion = this.userRepository.getAdmin().get().getVersion();
+    String dummyVersion = "\"" + curVersion + "\"";
+
+    JSONObject dummyUserSignupForm = new JSONObject();
+    dummyUserSignupForm.put("userId", dummyUserIdString);
+    dummyUserSignupForm.put("firstName", "updated first name");
+    dummyUserSignupForm.put("lastName", "updated last name");
+    dummyUserSignupForm.put("email", "update_email@test.com");
+    //dummyUserSignupForm.put("password", "test_PASSWORD");
+    // act
+    ResultActions resultActions = mvc
+        .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyUserSignupForm.toString())
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+                .header("If-Match", dummyVersion)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON))
+        .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    UserDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, UserDTO.class);
+    String etag = result.getResponse().getHeader("ETag");
+
+    // assert
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(etag).isEqualTo("\""+ (curVersion + 2L) + "\""); // be careful this is bumped up twice. issue-YPnuFX8S01a
+    assertThat(responseBody.getUserId().toString()).isEqualTo(this.authInfo.getAuthUser().getUserId().toString());
+    assertThat(responseBody.getLastName()).isEqualTo(dummyUserSignupForm.get("lastName"));
+  }
+
+  @Test
+  public void shouldNotAdminUserUpdateItsOwnDataSinceNoIfMatchHeader(/**
+                                               * @Value("classpath:/integration/user/shouldAdminUserUpdateItsOwnData.json")
+   * Resource dummyFormJsonFile
+                                               **/
+  ) throws Exception {
+
+    // dummy form json
+    // JsonNode dummyFormJson =
+    // this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    // String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
+    String dummyVersion = "\"1\""; // be careful. this should be 1.
 
     JSONObject dummyUserSignupForm = new JSONObject();
     dummyUserSignupForm.put("userId", dummyUserIdString);
@@ -577,26 +637,66 @@ public class AdminUserEndpointTest {
     dummyUserSignupForm.put("password", "test_PASSWORD");
     // act
     ResultActions resultActions = mvc
-        .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyUserSignupForm.toString())
-            .contentType(MediaType.APPLICATION_JSON)
-            .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-            .accept(MediaType.APPLICATION_JSON))
-        .andDo(print()).andExpect(status().isOk());
+            .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyUserSignupForm.toString())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isBadRequest());
+
 
     MvcResult result = resultActions.andReturn();
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
-    UserDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, UserDTO.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
 
-    // assert
-    assertThat(result.getResponse().getStatus()).isEqualTo(200);
-
-    assertThat(responseBody.getUserId().toString()).isEqualTo(this.authInfo.getAuthUser().getUserId().toString());
-    assertThat(responseBody.getLastName()).isEqualTo(dummyUserSignupForm.get("lastName"));
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
   }
 
+  @Test
+  public void shouldNotAdminUserUpdateItsOwnDataSinceVersionMismatch(/**
+                                                                      * @Value("classpath:/integration/user/shouldAdminUserUpdateItsOwnData.json")
+   * Resource dummyFormJsonFile
+                                                                      **/
+  ) throws Exception {
+
+    // dummy form json
+    // JsonNode dummyFormJson =
+    // this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    // String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
+    String dummyVersion = "\"100\"";
+
+    JSONObject dummyUserSignupForm = new JSONObject();
+    dummyUserSignupForm.put("userId", dummyUserIdString);
+    dummyUserSignupForm.put("firstName", "updated first name");
+    dummyUserSignupForm.put("lastName", "updated last name");
+    dummyUserSignupForm.put("email", "update_email@test.com");
+    dummyUserSignupForm.put("password", "test_PASSWORD");
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyUserSignupForm.toString())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isPreconditionFailed());
+
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
+  }
   @Test
   @Sql(scripts = { "classpath:/integration/user/shouldAdminUserUpdateOtherOwnData.sql" })
   public void shouldAdminUserUpdateOtherOwnData(
@@ -614,6 +714,7 @@ public class AdminUserEndpointTest {
     String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978";
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
+    String dummyVersion = "\"0\""; // be careful. this should be 0 since other user.
 
     JSONObject dummyUserSignupForm = new JSONObject();
     dummyUserSignupForm.put("userId", dummyUserIdString);
@@ -627,6 +728,7 @@ public class AdminUserEndpointTest {
             .contentType(MediaType.APPLICATION_JSON)
             .cookie(this.authCookie)
           .cookie(this.csrfCookie)
+                .header("If-Match", dummyVersion)
           .header("csrf-token", this.authInfo.getCsrfToken())
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
@@ -635,13 +737,13 @@ public class AdminUserEndpointTest {
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     UserDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, UserDTO.class);
+    String etag = result.getResponse().getHeader("ETag");
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
-
+    assertThat(etag).isEqualTo("\"2\""); // be careful this is bumped up twice. issue-YPnuFX8S01a
     assertThat(responseBody.getUserId().toString()).isEqualTo("29c845ad-54b1-430a-8a71-5caba98d5978");
     assertThat(responseBody.getLastName()).isEqualTo(dummyUserSignupForm.get("lastName"));
-
   }
 
   @Test
@@ -658,6 +760,7 @@ public class AdminUserEndpointTest {
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
 
+
     JSONObject dummyUserSignupForm = new JSONObject();
     dummyUserSignupForm.put("userId", dummyUserIdString);
     dummyUserSignupForm.put("firstName", "updated first name");
@@ -676,8 +779,10 @@ public class AdminUserEndpointTest {
 
     MvcResult result = resultActions.andReturn();
 
-    // assert
-    assertThat(result.getResponse().getStatus()).isEqualTo(404);
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the given user does not exist.");
   }
 
   @Test
@@ -692,6 +797,7 @@ public class AdminUserEndpointTest {
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
 
     String dummyFormJsonString = dummyFormJson.toString();
+    String dummyVersion = "\"0\""; // be careful. this should be 1.
 
     // arrange
     String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978";
@@ -703,10 +809,18 @@ public class AdminUserEndpointTest {
         .perform(MockMvcRequestBuilders.put(targetUrl).content(dummyFormJsonString)
             .contentType(MediaType.APPLICATION_JSON)
             .cookie(this.authCookie)
+                .header("If-Match", dummyVersion)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("this email already taken.");
   }
 
   @Test
@@ -721,6 +835,7 @@ public class AdminUserEndpointTest {
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
 
     String dummyFormJsonString = dummyFormJson.toString();
+    String dummyVersion = "\"0\"";
 
     // arrange
     String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978";
@@ -734,6 +849,7 @@ public class AdminUserEndpointTest {
             .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
@@ -741,10 +857,11 @@ public class AdminUserEndpointTest {
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     UserDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, UserDTO.class);
+    String etag = result.getResponse().getHeader("ETag");
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
-
+    assertThat(etag).isEqualTo("\"1\"");
     assertThat(responseBody.getUserId().toString()).isEqualTo("29c845ad-54b1-430a-8a71-5caba98d5978");
     assertThat(responseBody.getActive().toString()).isEqualTo(dummyFormJson.get("active").asText());
     assertThat(responseBody.getActiveNote()).isEqualTo(dummyFormJson.get("activeNote").asText());
@@ -761,6 +878,8 @@ public class AdminUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
     JSONObject dummyFormJson = new JSONObject();
     dummyFormJson.put("activeNote", "");
+    Long curVersion = this.userRepository.getAdmin().get().getVersion();
+    String dummyVersion = "\"" + curVersion + "\"";
 
     // act
     ResultActions resultActions = mvc
@@ -769,10 +888,12 @@ public class AdminUserEndpointTest {
             .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
@@ -789,6 +910,7 @@ public class AdminUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
     JSONObject dummyFormJson = new JSONObject();
     dummyFormJson.put("activeNote", "");
+    String dummyVersion = "\"0\"";
 
     // act
     ResultActions resultActions = mvc
@@ -797,6 +919,7 @@ public class AdminUserEndpointTest {
             .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
@@ -806,6 +929,68 @@ public class AdminUserEndpointTest {
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
   }
 
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldAdminUserTempDeleteOtherUserAccount.sql" })
+  public void shouldNotAdminUserTempDeleteOtherUserAccountSinceNoIfMatchHeader() throws Exception {
+
+    // dummy form json
+    // arrange
+    String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978";
+    String dummyUserPath = "/" + dummyUserIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
+    JSONObject dummyFormJson = new JSONObject();
+    dummyFormJson.put("activeNote", "");
+    String dummyVersion = "\"0\"";
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.patch(targetUrl).content(dummyFormJson.toString())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldAdminUserTempDeleteOtherUserAccount.sql" })
+  public void shouldNotAdminUserTempDeleteOtherUserAccountSinceVersionMismatch() throws Exception {
+
+    // dummy form json
+    // arrange
+    String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978";
+    String dummyUserPath = "/" + dummyUserIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
+    JSONObject dummyFormJson = new JSONObject();
+    dummyFormJson.put("activeNote", "");
+    String dummyVersion = "\"2\"";
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.patch(targetUrl).content(dummyFormJson.toString())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isPreconditionFailed());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
+  }
   @Test
   public void shouldNotAdminUserTempDeleteSinceNoTargetUser() throws Exception {
 
@@ -816,6 +1001,7 @@ public class AdminUserEndpointTest {
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
     JSONObject dummyFormJson = new JSONObject();
     dummyFormJson.put("activeNote", "");
+    String dummyVersion = "\"1\""; // be careful. this should be 1.
 
     // act
     ResultActions resultActions = mvc
@@ -824,6 +1010,7 @@ public class AdminUserEndpointTest {
             .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isNotFound());
 
@@ -831,6 +1018,12 @@ public class AdminUserEndpointTest {
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(404);
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the given user does not exist.");
+
   }
 
   @Test
@@ -841,6 +1034,8 @@ public class AdminUserEndpointTest {
     String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
+    Long curVersion = this.userRepository.getAdmin().get().getVersion();
+    String dummyVersion = "\"" + curVersion + "\"";
 
     // act
     ResultActions resultActions = mvc
@@ -848,6 +1043,7 @@ public class AdminUserEndpointTest {
             .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
@@ -858,6 +1054,60 @@ public class AdminUserEndpointTest {
   }
 
   @Test
+  public void shouldAdminUserDeleteItsOwnAccountCompletelySinceNoIfMatch() throws Exception {
+
+    // dummy form json
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
+    String dummyVersion = "\"3\""; // be careful. this should be 1.
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.delete(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+  }
+
+  @Test
+  public void shouldAdminUserDeleteItsOwnAccountCompletelySinceVersionMismatch() throws Exception {
+
+    // dummy form json
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
+    String dummyVersion = "\"100\"";
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders.delete(targetUrl)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isPreconditionFailed());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
+  }
+  @Test
   @Sql(scripts = { "classpath:/integration/user/shouldAdminUserDeleteOtheruserAccountCompletely.sql" })
   public void shouldAdminUserDeleteOtheruserAccountCompletely() throws Exception {
 
@@ -867,14 +1117,16 @@ public class AdminUserEndpointTest {
     String dummyUserIdString = "29c845ad-54b1-430a-8a71-5caba98d5978";
     String dummyUserPath = "/" + dummyUserIdString;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath;
+    String dummyVersion = "\"0\""; // be careful. this should be 1.
 
     // act
     ResultActions resultActions = mvc
         .perform(MockMvcRequestBuilders.delete(targetUrl)
-            .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-            .accept(MediaType.APPLICATION_JSON))
+        .cookie(this.authCookie)
+        .cookie(this.csrfCookie)
+        .header("csrf-token", this.authInfo.getCsrfToken())
+        .header("If-Match", dummyVersion)
+        .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
@@ -937,4 +1189,147 @@ public class AdminUserEndpointTest {
     assertThat(isRecipientNotificationsExist).isFalse();
   }
 
+  @Test
+  public void shouldNotAdminUserUploadAvatarImageSinceNoIfMatchHeader() throws Exception {
+
+    Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
+    Mockito.doNothing().when(this.s3Service).delete(Mockito.any());
+
+    // dummy form json
+    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("avatarImage", "product-image-0.jpeg", "image/jpeg",
+            "some jpg".getBytes());
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/avatar-image";
+    String dummyVersion = "\"3\""; // be careful. this should be 1.
+
+    // act
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.multipart(targetUrl) // create
+                    .file(fileAtZeroIndex)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+  }
+
+  @Test
+  public void shouldNotAdminUserUploadAvatarImageSinceVersionMismatch() throws Exception {
+
+    Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
+    Mockito.doNothing().when(this.s3Service).delete(Mockito.any());
+
+    // dummy form json
+    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("avatarImage", "product-image-0.jpeg", "image/jpeg",
+            "some jpg".getBytes());
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/avatar-image";
+    String dummyVersion = "\"100\"";
+
+    // act
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.multipart(targetUrl) // create
+                    .file(fileAtZeroIndex)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isPreconditionFailed());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
+  }
+
+  @Test
+  public void shouldAdminUserUploadAvatarImage() throws Exception {
+
+    Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
+    Mockito.doNothing().when(this.s3Service).delete(Mockito.any());
+
+    // dummy form json
+    String dummyAvatarImageName = "product-image-0";
+    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("avatarImage", dummyAvatarImageName + ".jpeg", "image/jpeg",
+            "some jpg".getBytes());
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/avatar-image";
+    Long curVersion = this.userRepository.getAdmin().get().getVersion();
+    String dummyVersion = "\"" + curVersion + "\"";
+
+    // act
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.multipart(targetUrl) // create
+                    .file(fileAtZeroIndex)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    UserDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, UserDTO.class);
+    assertThat(etag).isEqualTo("\""+ (curVersion + 1L) + "\"");
+    assertThat(responseBody.getAvatarImagePath()).contains(dummyAvatarImageName);
+
+    Mockito.verify(this.s3Service, Mockito.times(1)).upload(Mockito.any(), Mockito.any());
+    Mockito.verify(this.s3Service, Mockito.never()).delete(Mockito.any());
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/user/shouldAdminUserUploadAvatarImageAfterRemovingPreviousImage.sql" })
+  public void shouldAdminUserUploadAvatarImageAfterRemovingPreviousImage() throws Exception {
+
+    Mockito.doNothing().when(this.s3Service).upload(Mockito.any(), Mockito.any());
+    Mockito.doNothing().when(this.s3Service).delete(Mockito.any());
+
+    // dummy form json
+    String dummyAvatarImageName = "product-image-0";
+    MockMultipartFile fileAtZeroIndex = new MockMultipartFile("avatarImage", dummyAvatarImageName + ".jpeg", "image/jpeg",
+            "some jpg".getBytes());
+    // arrange
+    String dummyUserIdString = this.authInfo.getAuthUser().getUserId().toString();
+    String dummyUserPath = "/" + dummyUserIdString;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + dummyUserPath + "/avatar-image";
+    Long curVersion = this.userRepository.getAdmin().get().getVersion();
+    String dummyVersion = "\"" + curVersion + "\"";
+
+    // act
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.multipart(targetUrl) // create
+                    .file(fileAtZeroIndex)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    UserDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, UserDTO.class);
+    assertThat(etag).isEqualTo("\""+ (curVersion + 1L) + "\"");
+    assertThat(responseBody.getAvatarImagePath()).contains(dummyAvatarImageName);
+
+    Mockito.verify(this.s3Service, Mockito.times(1)).upload(Mockito.any(), Mockito.any());
+    Mockito.verify(this.s3Service, Mockito.times(1)).delete(Mockito.any());
+  }
 }

@@ -78,9 +78,13 @@ export function* deleteAuthAvatarImageWorker(
     const response: WorkerResponse = yield call(() =>
       api({
         method: "DELETE",
+        headers: { "If-Match": `"${action.payload.version}"` },
         url: apiUrl,
       })
-        .then((response) => ({ fetchStatus: FetchStatusEnum.SUCCESS }))
+        .then((response) => ({
+          fetchStatus: FetchStatusEnum.SUCCESS,
+          data: response.data,
+        }))
         .catch((e) => ({
           fetchStatus: FetchStatusEnum.FAILED,
           message: e.response.data.message,
@@ -99,7 +103,7 @@ export function* deleteAuthAvatarImageWorker(
        * update this domain in state
        *
        **/
-      yield put(authActions.updateAvatarImagePath(""));
+      yield put(authActions.updateUser(response.data));
 
       /**
        * update message
@@ -113,17 +117,6 @@ export function* deleteAuthAvatarImageWorker(
       );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       log(response.message);
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
     }
   } else {
     log("permission defined: you are " + curAuth.userType);

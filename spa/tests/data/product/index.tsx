@@ -109,6 +109,7 @@ export const generateProductList: (count?: number) => ProductType[] = (
       isPublic: true,
       note: faker.commerce.productDescription(),
       category: generateCategoryList()[0],
+      version: null,
     } as ProductType);
   }
 

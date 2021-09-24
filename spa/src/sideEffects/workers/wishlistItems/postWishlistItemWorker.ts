@@ -96,6 +96,7 @@ export function* postWishlistItemWorker(
       api({
         method: "POST",
         url: apiUrl,
+        headers: { "If-Match": `"${action.payload.version}"` },
         data: {
           variantId: action.payload.variantId,
           userId: action.payload.userId,
@@ -142,17 +143,6 @@ export function* postWishlistItemWorker(
        **/
       yield put(
         postWishlistItemFetchStatusActions.update(FetchStatusEnum.FAILED)
-      );
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
       );
     }
   } else if (curAuth.userType === UserTypeEnum.GUEST) {

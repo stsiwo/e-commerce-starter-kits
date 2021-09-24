@@ -51,5 +51,7 @@ public class OrderAddressCriteria {
   @Pattern( regexp = "^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9]$", message = "{address.postalCode.invalidformat}")
   @Size(max = 20, message = "{address.postalCode.max20}")
   private String postalCode;
+
+  private Long version;
 }
 

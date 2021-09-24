@@ -409,6 +409,10 @@ steps to generate encypted data (e.g., ENC(....))
 
       - sync the saved state into db
 
+      - immediate execute sql statement in cache (where sql statement until 'save' are saved) to empty the cache regardless of transaction.
+
+        - ref: https://stackoverflow.com/questions/4275111/correct-use-of-flush-in-jpa-hibernate
+
   ## Don't use * (wildcard) with createQuery (JPA)
 
   ## JPA
@@ -670,6 +674,8 @@ steps to generate encypted data (e.g., ENC(....))
 
           - scallable since more than one users can access and do whatever they want, but only the user who update first wins and other got rejected. 
 
+            - if you have an issue that parent entity's version does not dump up see this: https://thorben-janssen.com/hibernate-tips-increase-version-parent-entity-updating-child-entity/
+
         2. pessimistic Locking: dominate the target row/record until you finish update. (you need to use this syntax to get pessimistic lock: SELECT ... FOR UPDATE)
 
           - the other user cannot access the target row until the dominant user release the lock.
@@ -814,6 +820,10 @@ steps to generate encypted data (e.g., ENC(....))
     - usually, you can use a column (created_at: TIMESTAMP(6) - this keeps unto millisecond) so that you can keep the order.
 
   ## Associatioin
+
+    - owning-side: a entity that own a foreign key.
+
+    - owned-side: a entity that does not own a foreign key.
 
     - it is important to consider which is client and parent side.
 
@@ -1102,6 +1112,86 @@ steps to generate encypted data (e.g., ENC(....))
         - attempted)
 
             - use @Order(Lower_priority) or @Primary but none of them worked. i guess this is a bug snice other AppExceptions are properly caught at the handler method.
+
+    - issue-k0rdIGEQ91U: don't use mapping when updating an existing entity. also, 
+
+        - manually assign each field. don't rely on MapStruct and remove the existing one and add it as existing one.
+        - this causes optimistic locking failed; nested exception is org.hibernate.StaleObjectStateException: Row was updated or deleted by another transaction (or unsaved-value mapping was incorrect) 
+        - esp when handling Concurrency with Database.
+
+    - issue-3zWfeAAxZb1 : don't assign an association (new but existing one in db e.g., categories) from criteria to your parent entity (alway retrieve from repositiies)
+
+        - when updating an existing product, I used to get the new categories with MapStruct and assign it as the next category but this causes this error: Not-null property references a transient value - transient instance must be saved before current operation
+        - be sure you always use repository to retrieve an existing entity. don't create it as new or MapStruct
+
+    - issue-j845jixIPCn: to increment version property for an entity, you need to flush otherwise, you get the same version number.
+
+        - use 'saveAndFlush()'
+
+    - issue-QqMbfkO9pcU: saveAndFlush() might cause insert/update sql statement twice.
+
+        - i don't knwo why??
+
+    - issue-v07rKsa0SO2: when version number is incremented esp with relationship.
+
+        - def) The version attribute is updated by the persistence provider runtime when the object is written to the database. All non-relationship fields and properties and all relationships owned by the entity are included in version checks.
+
+        - ex) product (parent: owning) vs category (child: owned-side)
+
+            - when update product, category version is not updated
+
+        - ex) user (parent: owned) vs address (child: owning)
+
+            - when update user with diff property, address version is not udpate.
+
+            - when address is udpated, user version is not udpated 
+
+        - currently, I don't want to update a version number of associated entities. e.g., when update product, i don't want to bump up the version of category.
+        - ref: https://thorben-janssen.com/hibernate-tips-increase-version-parent-entity-updating-child-entity/
+
+    - issue-qPl7MheYUdW: object references an unsaved transient instance - save the transient instance before flushing
+
+        - don't need to use 'flush' when create a new entity
+
+        - use to flush version number when update an existing entity.
+
+    - issue-d8VmQM3FMFY: entity sent to EntityListeners has null associations.
+
+        - when creating a new order and try to persist, it is sent to EntityListeners to validate teh state. Strangly, its association such as shippingAddress, billingAddress, orderEvents are null.
+
+        - see: https://stackoverflow.com/questions/34318369/why-are-some-fields-of-my-entity-null-when-the-entity-listener-is-called
+
+        - i guees hibernate call 'merge()' internally (not 'persist') that's why this happens. i don't know why this.
+
+        - solution) create custom persist method of your repository (e.g., advanceRepository) and use it.
+
+    - issue-XVJzi6CftR: 
+
+         bug.
+
+         hibernate return the same child entity twice in child list. e.g, orderEvents:
+         [ { 101 } , { 102 }, { 102 } ] <- 102 is duplicate.
+
+         workaround: use 'flush'.
+
+         otherwise, you might got an error 'object references an unsaved transient
+         instance – save the transient instance beforeQuery flushing'.
+
+         - this is because hibernate recognize that the entity change its state again
+         by calling 'parent.getChildren().size()' wihtout flushing, so be careful!!!!
+
+         ref:
+         https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
+            
+    - issue-YPnuFX8S01a: flush() causes update statement twice? i don't know why.
+        
+        esp userServiceimpl#update
+
+        it bumps up version twice.
+            
+    
+
+
   ## Bugs:
 
      - hibernate return the same child entity twice in child list.

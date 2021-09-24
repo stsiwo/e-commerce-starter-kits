@@ -77,6 +77,7 @@ export function* putOrderEventWorker(
       api({
         method: "PUT",
         url: apiUrl,
+        headers: { "If-Match": `"${action.payload.orderVersion}"` },
         data: {
           orderEventId: action.payload.orderEventId,
           note: action.payload.note,
@@ -107,12 +108,7 @@ export function* putOrderEventWorker(
       log("response from PUT order event update.");
       log(response.data);
 
-      yield put(
-        orderActions.updateEvent({
-          orderId: action.payload.orderId,
-          event: response.data,
-        })
-      );
+      yield put(orderActions.updateOne(response.data));
 
       /**
        * update message
@@ -126,17 +122,6 @@ export function* putOrderEventWorker(
       );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       log(response.fetchStatus);
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.fetchStatus,
-        })
-      );
     }
   }
 }

@@ -54,5 +54,6 @@ public class OrderProductDTO {
 
   private List<ProductImageDTO> productImages;
 
+  private Long version;
 }
 

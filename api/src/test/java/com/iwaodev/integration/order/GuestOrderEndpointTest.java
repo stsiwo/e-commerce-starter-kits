@@ -11,6 +11,7 @@ import com.iwaodev.config.MyTestConfiguration;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.order.OrderStatusEnum;
 import com.iwaodev.domain.order.event.OrderFinalConfirmedEvent;
+import com.iwaodev.ui.response.ErrorBaseResponse;
 import com.iwaodev.ui.response.PaymentIntentResponse;
 import com.iwaodev.util.ResourceReader;
 
@@ -167,7 +168,7 @@ public class GuestOrderEndpointTest {
         .andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
-
+    String etag = result.getResponse().getHeader("ETag");
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     PaymentIntentResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, PaymentIntentResponse.class);
 
@@ -176,6 +177,7 @@ public class GuestOrderEndpointTest {
 
     OrderDTO order = responseBody.getOrder();
     assertThat(order.getOrderId()).isNotNull();
+    assertThat(etag).isEqualTo("\"1\""); // since draft order event is added to this order so version incremented
     assertThat(order.getOrderNumber()).isNotNull();
     assertThat(order.getShippingAddress().getOrderAddressId()).isNotNull();
     assertThat(order.getShippingAddress().getPostalCode()).isEqualTo(dummyFormJson.get("shippingAddress").get("postalCode").asText());
@@ -223,6 +225,7 @@ public class GuestOrderEndpointTest {
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
     String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
+    String dummyVersion = "\"0\"";
 
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events/session-timeout";
 
@@ -232,17 +235,19 @@ public class GuestOrderEndpointTest {
             .post(targetUrl)
             .content(dummyFormJsonString)
             .contentType(MediaType.APPLICATION_JSON)
+                .header("If-Match", dummyVersion)
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
-
+    String etag = result.getResponse().getHeader("ETag");
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     OrderDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, OrderDTO.class);
 
     // assert
     assertThat(responseBody.getOrderId()).isNotNull();
+    assertThat(etag).isEqualTo("\"1\"");
     assertThat(responseBody.getOrderEvents().size()).isEqualTo(2);
     assertThat(responseBody.getLatestOrderEvent().getOrderStatus()).isEqualTo(OrderStatusEnum.SESSION_TIMEOUT);
 
@@ -251,6 +256,74 @@ public class GuestOrderEndpointTest {
       assertThat(orderEventDTO.getUndoable()).isEqualTo(false);
     }
 
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldGuestCreateSessionTimeoutOrderEventSuccessfully.sql" })
+  public void shouldNotGuestCreateSessionTimeoutOrderEventSuccessfullySinceNoIfMatchHeader(
+          @Value("classpath:/integration/order/shouldGuestCreateSessionTimeoutOrderEventSuccessfully.json") Resource dummyFormJsonFile)
+          throws Exception {
+
+    // dummy order id must match with sql.
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
+    String dummyVersion = "\"0\"";
+
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events/session-timeout";
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders
+                    .post(targetUrl)
+                    .content(dummyFormJsonString)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldGuestCreateSessionTimeoutOrderEventSuccessfully.sql" })
+  public void shouldNotGuestCreateSessionTimeoutOrderEventSuccessfullySinceVersionMismatch(
+          @Value("classpath:/integration/order/shouldGuestCreateSessionTimeoutOrderEventSuccessfully.json") Resource dummyFormJsonFile)
+          throws Exception {
+
+    // dummy order id must match with sql.
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
+    String dummyVersion = "\"3\"";
+
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events/session-timeout";
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders
+                    .post(targetUrl)
+                    .content(dummyFormJsonString)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("If-Match", dummyVersion)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isPreconditionFailed());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
   }
 }
 

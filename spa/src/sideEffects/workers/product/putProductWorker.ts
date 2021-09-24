@@ -84,7 +84,10 @@ export function* putProductWorker(action: PayloadAction<PutProductActionType>) {
         method: "PUT",
         url: apiUrl,
         data: formData,
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "If-Match": `"${action.payload.version}"`,
+          "Content-Type": "multipart/form-data",
+        },
       })
         .then((response) => ({
           fetchStatus: FetchStatusEnum.SUCCESS,
@@ -137,17 +140,6 @@ export function* putProductWorker(action: PayloadAction<PutProductActionType>) {
        * update fetch status failed
        **/
       yield put(putProductFetchStatusActions.update(FetchStatusEnum.FAILED));
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
     }
   }
 }

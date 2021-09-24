@@ -22,4 +22,6 @@ public class CategoryDTO {
   private String categoryPath;
 
   private Integer totalProductCount;
+
+  private Long version;
 }

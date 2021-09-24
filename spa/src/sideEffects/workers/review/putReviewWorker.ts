@@ -78,6 +78,7 @@ export function* putReviewWorker(action: PayloadAction<PutReviewActionType>) {
       api({
         method: "PUT",
         url: apiUrl,
+        headers: { "If-Match": `"${action.payload.version}"` },
         data: {
           reviewId: action.payload.reviewId,
           reviewTitle: action.payload.reviewTitle,
@@ -87,6 +88,7 @@ export function* putReviewWorker(action: PayloadAction<PutReviewActionType>) {
           reviewPoint: action.payload.reviewPoint,
           productId: action.payload.productId,
           userId: action.payload.userId,
+          version: action.payload.version,
         } as ReviewCriteria,
       })
         .then((response) => ({
@@ -123,17 +125,6 @@ export function* putReviewWorker(action: PayloadAction<PutReviewActionType>) {
       );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       log(response.message);
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
     }
   } else {
     log("permission denied. your review type: " + curAuth.userType);

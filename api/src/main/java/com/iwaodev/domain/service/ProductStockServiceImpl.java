@@ -58,12 +58,9 @@ public class ProductStockServiceImpl implements ProductStockService {
     List<Product> products = new ArrayList<>();
 
     for (OrderDetail orderDetail : orderDetails) {
-
       Product product = orderDetail.getProduct();
       Long variantId = orderDetail.getProductVariant().getVariantId();
-
       product.decreaseStockOfVariant(orderDetail.getProductQuantity(), variantId);
-
       products.add(product);
     }
 

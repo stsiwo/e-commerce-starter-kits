@@ -20,6 +20,9 @@ public class ProductSizeCriteria {
   private String productSizeName;
 
   private String productSizeDescription;
+
+
+  private Long version;
 }
 
 

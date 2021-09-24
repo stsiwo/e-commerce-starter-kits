@@ -9,8 +9,11 @@ public class ImagePathResponse {
 
   private String imagePath;
 
-  public ImagePathResponse(String imagePath) {
+  private Long version;
+
+  public ImagePathResponse(String imagePath, Long version) {
     this.imagePath = imagePath;
+    this.version = version;
   }
 }
 

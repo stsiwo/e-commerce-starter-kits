@@ -19,7 +19,8 @@ import EditIcon from "@material-ui/icons/Edit";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import PhoneIphoneIcon from "@material-ui/icons/PhoneIphone";
-import { getPrimaryPhoneId } from "domain/user";
+import { logger } from "configs/logger";
+import { findPhone, getPrimaryPhoneId } from "domain/user";
 import {
   CustomerPhonesFormDataType,
   CustomerPhonesFormValidationDataType,
@@ -44,7 +45,6 @@ import {
 } from "reducers/slices/domain/user";
 import { FetchStatusEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -199,6 +199,7 @@ const AdminCustomerPhoneForm: React.FunctionComponent<AdminCustomerPhoneFormProp
               phoneNumber: curAdminCustomerPhoneState.phoneNumber,
               countryCode: curAdminCustomerPhoneState.countryCode,
               isSelected: curAdminCustomerPhoneState.isSelected,
+              version: curAdminCustomerPhoneState.version,
             })
           );
         } else {
@@ -210,6 +211,7 @@ const AdminCustomerPhoneForm: React.FunctionComponent<AdminCustomerPhoneFormProp
               phoneNumber: curAdminCustomerPhoneState.phoneNumber,
               countryCode: curAdminCustomerPhoneState.countryCode,
               isSelected: curAdminCustomerPhoneState.isSelected,
+              version: curAdminCustomerPhoneState.version,
             })
           );
         }
@@ -264,6 +266,7 @@ const AdminCustomerPhoneForm: React.FunctionComponent<AdminCustomerPhoneFormProp
         deleteUserPhoneActionCreator({
           userId: userId,
           phoneId: phoneId,
+          version: findPhone(phones, phoneId).version,
         })
       );
     };
@@ -300,6 +303,7 @@ const AdminCustomerPhoneForm: React.FunctionComponent<AdminCustomerPhoneFormProp
         patchUserPhoneActionCreator({
           phoneId: nextPrimePhoneId,
           userId: userId,
+          version: findPhone(phones, nextPrimePhoneId).version,
         })
       );
     };

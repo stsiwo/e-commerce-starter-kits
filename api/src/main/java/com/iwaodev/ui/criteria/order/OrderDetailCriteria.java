@@ -40,6 +40,7 @@ public class OrderDetailCriteria {
   @NotNull(message = "{orderDetail.productVariant.notnull}", groups = OnCreate.class)
   private Long productVariantId;
 
+  private Long version;
 }
 
 

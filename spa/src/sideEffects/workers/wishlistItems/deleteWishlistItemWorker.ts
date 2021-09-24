@@ -74,6 +74,7 @@ export function* deleteWishlistItemWorker(
     const response: WorkerResponse = yield call(() =>
       api({
         method: "DELETE",
+        headers: { "If-Match": `"${action.payload.version}"` },
         url: apiUrl,
       })
         .then((response) => ({

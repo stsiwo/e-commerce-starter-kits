@@ -20,6 +20,8 @@ public class FindReviewDTO {
   private UserDTO user;
 
   private ProductDTO product;
+
+  private Long version;
 }
 
 

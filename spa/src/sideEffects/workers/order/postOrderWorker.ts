@@ -2,20 +2,13 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { api, WorkerResponse } from "configs/axiosConfig";
 import { logger } from "configs/logger";
 import { OrderCriteria } from "domain/order/types";
-import { messageActions } from "reducers/slices/app";
 import { postOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/order";
 import { checkoutOrderActions } from "reducers/slices/domain/checkout";
 import { PostOrderActionType } from "reducers/slices/domain/order";
 import { stripeClientSecretActions } from "reducers/slices/sensitive";
 import { call, put, select } from "redux-saga/effects";
-import {
-  AuthType,
-  FetchStatusEnum,
-  MessageTypeEnum,
-  UserTypeEnum,
-} from "src/app";
+import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { getNanoId } from "src/utils";
 
 const log = logger(__filename);
 
@@ -83,6 +76,7 @@ export function* postOrderWorker(action: PayloadAction<PostOrderActionType>) {
       api({
         method: "POST",
         url: apiUrl,
+        headers: { "If-Match": `"${action.payload.version}"` },
         data: action.payload as OrderCriteria,
       })
         .then((response) => ({
@@ -122,16 +116,7 @@ export function* postOrderWorker(action: PayloadAction<PostOrderActionType>) {
        **/
       yield put(postOrderFetchStatusActions.update(FetchStatusEnum.SUCCESS));
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
+      log(response.message);
     }
   } else {
     log("permission denied. you are " + curAuth.userType);

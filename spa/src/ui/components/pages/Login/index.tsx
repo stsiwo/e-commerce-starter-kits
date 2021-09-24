@@ -7,7 +7,6 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import SentimentSatisfiedOutlinedIcon from "@material-ui/icons/SentimentSatisfiedOutlined";
-import { AxiosError } from "axios";
 import ForgotPasswordDialog from "components/common/ForgotPasswordDialog";
 import { api } from "configs/axiosConfig";
 import { logger } from "configs/logger";
@@ -37,7 +36,10 @@ if (NODE_ENV !== "production") {
   defaultMemberLoginData.email = "test_member1@test.com";
   defaultMemberLoginData.password = "test_PASSWORD";
 }
-
+if (NODE_ENV === "production") {
+  defaultMemberLoginData.email = "stsiwo@aol.com";
+  defaultMemberLoginData.password = "test_PASSWORD";
+}
 export declare type MemberLoginValidationDataType = {
   email?: string;
   password?: string;
@@ -194,15 +196,6 @@ const Login: React.FunctionComponent<{}> = (props) => {
               id: getNanoId(),
               type: MessageTypeEnum.SUCCESS,
               message: "logged in successfully.",
-            })
-          );
-        })
-        .catch((error: AxiosError) => {
-          dispatch(
-            messageActions.update({
-              id: getNanoId(),
-              type: MessageTypeEnum.ERROR,
-              message: error.response.data.message,
             })
           );
         });

@@ -25,6 +25,8 @@ public class SessionTimeoutOrderEventCriteria {
    **/
   @NotEmpty(message = "order number can not be null.")
   private String orderNumber;
+
+  private Long version;
 }
 
 

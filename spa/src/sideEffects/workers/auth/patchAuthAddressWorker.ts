@@ -81,6 +81,7 @@ export function* patchAuthAddressWorker(
       api({
         method: "PATCH",
         url: apiUrl,
+        headers: { "If-Match": `"${action.payload.version}"` },
         data: { type: action.payload.type },
       })
         .then((response) => ({
@@ -117,17 +118,6 @@ export function* patchAuthAddressWorker(
       );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       log(response.message);
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
     }
   } else if (curAuth.userType === UserTypeEnum.GUEST) {
     if (action.payload.type === "shipping") {

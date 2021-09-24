@@ -35,5 +35,15 @@ public class CompanyDTO {
   private String postalCode;
 
   private UUID userId;
+
+  private String facebookLink;
+
+  private String instagramLink;
+
+  private String twitterLink;
+
+  private String youtubeLink;
+
+  private Long version;
 }
 

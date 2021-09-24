@@ -31,6 +31,8 @@ public class ProductImageCriteria {
 
   @NotEmpty(message = "{productImage.productImageName.notempty}")
   private String productImageName;
+
+  private Long version;
 }
 
 

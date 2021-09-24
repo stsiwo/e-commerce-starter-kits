@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import javax.validation.Valid;
 
+import com.iwaodev.application.dto.user.AddressDTO;
 import com.iwaodev.application.dto.user.PhoneDTO;
 import com.iwaodev.application.iservice.UserPhoneService;
 import com.iwaodev.config.SpringSecurityUser;
@@ -55,7 +56,12 @@ public class UserPhoneController {
       @AuthenticationPrincipal SpringSecurityUser authUser,
       @Valid @RequestBody UserPhoneCriteria criteria
       ) throws Exception {
-    return new ResponseEntity<>(this.service.create(criteria, userId), HttpStatus.OK);
+
+    PhoneDTO results = this.service.create(criteria, userId);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   // replace an existing phone of a given user
@@ -68,7 +74,12 @@ public class UserPhoneController {
       @AuthenticationPrincipal SpringSecurityUser authUser,
       @Valid @RequestBody UserPhoneCriteria criteria
       ) throws Exception {
-    return new ResponseEntity<>(this.service.update(criteria, userId, phoneId), HttpStatus.OK);
+
+    PhoneDTO results = this.service.update(criteria, userId, phoneId);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
   
   // toggle isSelected on target phone 
@@ -80,6 +91,7 @@ public class UserPhoneController {
       @PathVariable(value = "phoneId") Long phoneId,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
+    // don't return Etag since this is collection and each domain include version field
     return new ResponseEntity<>(this.service.toggleSelection(userId, phoneId), HttpStatus.OK);
   }
 

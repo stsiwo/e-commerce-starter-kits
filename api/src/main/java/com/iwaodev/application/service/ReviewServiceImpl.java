@@ -19,22 +19,27 @@ import com.iwaodev.domain.review.event.ReviewWasUpdatedByMemberEvent;
 import com.iwaodev.domain.review.event.ReviewWasVerifiedByAdminEvent;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.exception.AppException;
+import com.iwaodev.infrastructure.model.Phone;
 import com.iwaodev.infrastructure.model.Product;
 import com.iwaodev.infrastructure.model.Review;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.review.ReviewCriteria;
 import com.iwaodev.ui.criteria.review.ReviewQueryStringCriteria;
 
+import com.iwaodev.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Service
 @Transactional
@@ -59,6 +64,9 @@ public class ReviewServiceImpl implements ReviewService {
 
   @Autowired
   private CurAuthentication curAuthentication;
+
+  @Autowired
+  private HttpServletRequest httpServletRequest;
 
   public Page<ReviewDTO> getAll(ReviewQueryStringCriteria criteria, Integer page, Integer limit, ReviewSortEnum sort) {
 
@@ -171,6 +179,15 @@ public class ReviewServiceImpl implements ReviewService {
 
     Review oldEntity = targetEntityOption.get();
 
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(oldEntity.getVersion(), receivedVersion)) {
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
+
     oldEntity.setReviewTitle(criteria.getReviewTitle());
     oldEntity.setReviewDescription(criteria.getReviewDescription());
     oldEntity.setReviewPoint(criteria.getReviewPoint());
@@ -181,7 +198,13 @@ public class ReviewServiceImpl implements ReviewService {
       oldEntity.setIsVerified(criteria.getIsVerified());
     }
 
-    Review updatedEntity = this.repository.save(oldEntity);
+    Review updatedEntity;
+    try {
+      // don't forget flush otherwise version number is updated.
+      updatedEntity = this.repository.saveAndFlush(oldEntity);
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
 
     if (updatedEntity.getIsVerified()) {
       this.publisher.publishEvent(new ReviewWasVerifiedByAdminEvent(this, updatedEntity));
@@ -203,7 +226,20 @@ public class ReviewServiceImpl implements ReviewService {
 
     if (targetEntityOption.isPresent()) {
       Review targetEntity = targetEntityOption.get();
-      this.repository.delete(targetEntity);
+      // version check for concurrency update
+      String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+      if (receivedVersion == null || receivedVersion.isEmpty()) {
+        throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+      }
+      if (!Util.checkETagVersion(targetEntity.getVersion(), receivedVersion)) {
+        throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+      };
+
+      try {
+        this.repository.delete(targetEntity);
+      } catch (OptimisticLockingFailureException ex) {
+        throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+      }
     }
   }
 
@@ -223,6 +259,8 @@ public class ReviewServiceImpl implements ReviewService {
     if (reviewOption.isPresent()) {
       findReviewDTO.setIsExist(true);
       findReviewDTO.setReview(ReviewMapper.INSTANCE.toReviewDTO(reviewOption.get()));
+      // set review.version to findReviewDTO.version just in case
+      findReviewDTO.setVersion(reviewOption.get().getVersion());
     } else {
       findReviewDTO.setIsExist(false);
     }

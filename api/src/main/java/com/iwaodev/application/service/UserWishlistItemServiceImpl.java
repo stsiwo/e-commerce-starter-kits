@@ -19,22 +19,24 @@ import com.iwaodev.application.specification.factory.WishlistItemSpecificationFa
 import com.iwaodev.domain.product.ProductSortEnum;
 import com.iwaodev.domain.wishlistItem.event.MovedWishlistItemToCartItemEvent;
 import com.iwaodev.exception.AppException;
-import com.iwaodev.infrastructure.model.Product;
-import com.iwaodev.infrastructure.model.ProductVariant;
-import com.iwaodev.infrastructure.model.User;
-import com.iwaodev.infrastructure.model.WishlistItem;
+import com.iwaodev.infrastructure.model.*;
 import com.iwaodev.ui.criteria.wishlistItem.WishlistItemQueryStringCriteria;
 
+import com.iwaodev.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
+
 @Service
 @Transactional
 public class UserWishlistItemServiceImpl implements UserWishlistItemService {
@@ -55,6 +57,9 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
 
   @Autowired
   private ApplicationEventPublisher publisher;
+
+  @Autowired
+  private HttpServletRequest httpServletRequest;
 
   public Page<WishlistItemDTO> getAll(WishlistItemQueryStringCriteria criteria, Integer page, Integer limit,
       ProductSortEnum sort) throws Exception {
@@ -139,7 +144,7 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
     newWishlistItem.setVariant(targetProductOption.get().findVariantById(variantId));
 
     // save
-    WishlistItem savedWishlistItem = this.wishlistItemRepository.save(newWishlistItem);
+    WishlistItem savedWishlistItem = this.wishlistItemRepository.saveAndFlush(newWishlistItem);
 
     // prep dto
     ProductDTO productDTO = ProductMapper.INSTANCE.toProductDTO(targetProductOption.get());
@@ -189,9 +194,22 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
       throw new AppException(HttpStatus.BAD_REQUEST, "the variant does not have any stock.");
     }
 
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(wishlistItem.getVersion(), receivedVersion)) {
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
+
     Long variantId = wishlistItem.getVariant().getVariantId();
 
-    this.remove(wishlistItemId);
+    try {
+      this.remove(wishlistItemId);
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
     this.publisher.publishEvent(new MovedWishlistItemToCartItemEvent(this, userId, variantId));
 
   }
@@ -203,7 +221,23 @@ public class UserWishlistItemServiceImpl implements UserWishlistItemService {
     Optional<WishlistItem> targetWishlistItemOption = this.wishlistItemRepository.findById(wishlistItemItemId);
 
     if (targetWishlistItemOption.isPresent()) {
-      this.wishlistItemRepository.delete(targetWishlistItemOption.get());
+
+      WishlistItem targetEntity = targetWishlistItemOption.get();
+
+      // version check for concurrency update
+      String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+      if (receivedVersion == null || receivedVersion.isEmpty()) {
+        throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+      }
+      if (!Util.checkETagVersion(targetEntity.getVersion(), receivedVersion)) {
+        throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+      };
+
+      try {
+        this.wishlistItemRepository.delete(targetWishlistItemOption.get());
+      } catch (OptimisticLockingFailureException ex) {
+        throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+      }
 
       // #TODO: might be better to return the rest of wishlistItem items of this user
       // (after remvoed this paticular item)

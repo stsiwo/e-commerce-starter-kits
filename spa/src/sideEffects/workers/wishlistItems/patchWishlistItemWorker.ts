@@ -95,6 +95,7 @@ export function* patchWishlistItemWorker(
     const response: WorkerResponse = yield call(() =>
       api({
         method: "PATCH",
+        headers: { "If-Match": `"${action.payload.version}"` },
         url: apiUrl,
       })
         .then((response) => ({
@@ -139,17 +140,6 @@ export function* patchWishlistItemWorker(
        **/
       yield put(
         patchWishlistItemFetchStatusActions.update(FetchStatusEnum.FAILED)
-      );
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
       );
     }
   } else if (curAuth.userType === UserTypeEnum.GUEST) {

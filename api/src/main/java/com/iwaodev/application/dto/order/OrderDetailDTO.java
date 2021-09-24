@@ -39,6 +39,8 @@ public class OrderDetailDTO {
   private Boolean isReviewable;
 
   private Double productWeight;
+
+  private Long version;
 }
 
 

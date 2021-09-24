@@ -18,6 +18,7 @@ import TimelineDot from "@material-ui/lab/TimelineDot";
 import TimelineItem from "@material-ui/lab/TimelineItem";
 import TimelineOppositeContent from "@material-ui/lab/TimelineOppositeContent";
 import TimelineSeparator from "@material-ui/lab/TimelineSeparator";
+import { logger } from "configs/logger";
 import {
   OrderEventType,
   orderStatusBagList,
@@ -35,7 +36,6 @@ import { FetchStatusEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { toDateString } from "src/utils";
 import OrderEventUpdateFormDialog from "../OrderEventUpdateFormDialog";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 /**
@@ -163,6 +163,7 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({
       deleteSingleOrderEventActionCreator({
         orderEventId: curOrderEvent.orderEventId,
         orderId: order.orderId,
+        orderVersion: order.version,
       })
     );
   };

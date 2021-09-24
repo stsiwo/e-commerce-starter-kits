@@ -70,6 +70,7 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
       api({
         method: "PUT",
         url: apiUrl,
+        headers: { "If-Match": `"${action.payload.version}"` },
         data: action.payload as UserCriteria,
       })
         .then((response) => ({
@@ -111,17 +112,6 @@ export function* putUserWorker(action: PayloadAction<PutUserActionType>) {
       );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       log(response.message);
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
     }
   } else {
     log("permission denied: you are " + curAuth.userType);

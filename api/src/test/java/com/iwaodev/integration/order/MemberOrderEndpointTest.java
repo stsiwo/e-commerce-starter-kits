@@ -21,6 +21,7 @@ import com.iwaodev.domain.order.OrderStatusEnum;
 import com.iwaodev.domain.order.event.OrderFinalConfirmedEvent;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.infrastructure.model.User;
+import com.iwaodev.ui.response.ErrorBaseResponse;
 import com.iwaodev.ui.response.PaymentIntentResponse;
 import com.iwaodev.util.ResourceReader;
 
@@ -214,7 +215,7 @@ public class MemberOrderEndpointTest {
         .andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
-
+    String etag = result.getResponse().getHeader("ETag");
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     PaymentIntentResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, PaymentIntentResponse.class);
 
@@ -222,6 +223,7 @@ public class MemberOrderEndpointTest {
     assertThat(responseBody.getClientSecret()).isNotNull();
 
     OrderDTO order = responseBody.getOrder();
+    assertThat(etag).isEqualTo("\"1\"");
     assertThat(order.getOrderId()).isNotNull();
     assertThat(order.getOrderNumber()).isNotNull();
     assertThat(order.getShippingAddress().getOrderAddressId()).isNotNull();
@@ -273,6 +275,7 @@ public class MemberOrderEndpointTest {
     String testUserId = "c7081519-16e5-4f92-ac50-1834001f12b9";
 
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events/session-timeout";
+    String dummyVersion = "\"0\"";
 
     // act
     ResultActions resultActions = mvc
@@ -283,6 +286,7 @@ public class MemberOrderEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
             .accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk());
@@ -304,6 +308,82 @@ public class MemberOrderEndpointTest {
       assertThat(orderEventDTO.getUndoable()).isEqualTo(false);
     }
 
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldMemberCreateSessionTimeoutOrderEventSuccessfully.sql" })
+  public void shouldMemberCreateSessionTimeoutOrderEventSuccessfullySinceNoIfMatch(
+          @Value("classpath:/integration/order/shouldMemberCreateSessionTimeoutOrderEventSuccessfully.json") Resource dummyFormJsonFile)
+          throws Exception {
+
+    // dummy order id must match with sql.
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
+    String testUserId = "c7081519-16e5-4f92-ac50-1834001f12b9";
+
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events/session-timeout";
+    String dummyVersion = "\"0\"";
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders
+                    .post(targetUrl)
+                    .content(dummyFormJsonString)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/order/shouldMemberCreateSessionTimeoutOrderEventSuccessfully.sql" })
+  public void shouldMemberCreateSessionTimeoutOrderEventSuccessfullySinceVersionMismatch(
+          @Value("classpath:/integration/order/shouldMemberCreateSessionTimeoutOrderEventSuccessfully.json") Resource dummyFormJsonFile)
+          throws Exception {
+
+    // dummy order id must match with sql.
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyOrderId = "c8f8591c-bb83-4fd1-a098-3fac8d40e450";
+    String testUserId = "c7081519-16e5-4f92-ac50-1834001f12b9";
+
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyOrderId + "/events/session-timeout";
+    String dummyVersion = "\"3\"";
+
+    // act
+    ResultActions resultActions = mvc
+            .perform(MockMvcRequestBuilders
+                    .post(targetUrl)
+                    .content(dummyFormJsonString)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("If-Match", dummyVersion)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isPreconditionFailed());
+
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
   }
 }
 

@@ -1,7 +1,11 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { api, WorkerResponse } from "configs/axiosConfig";
 import { logger } from "configs/logger";
-import { ProductVariantCriteria } from "domain/product/types";
+import {
+  NormalizedProductType,
+  ProductVariantCriteria,
+} from "domain/product/types";
+import { normalize } from "normalizr";
 import { messageActions } from "reducers/slices/app";
 import { postProductVariantFetchStatusActions } from "reducers/slices/app/fetchStatus/product";
 import {
@@ -17,6 +21,7 @@ import {
 } from "src/app";
 import { rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
+import { productSchemaEntity } from "states/state";
 
 const log = logger(__filename);
 
@@ -81,6 +86,7 @@ export function* postProductVariantWorker(
       api({
         method: "POST",
         url: apiUrl,
+        headers: { "If-Match": `"${action.payload.version}"` },
         data: {
           variantColor: action.payload.variantColor,
           productSize: action.payload.productSize,
@@ -96,6 +102,7 @@ export function* postProductVariantWorker(
           note: action.payload.note,
           variantStock: action.payload.variantStock,
           productId: action.payload.productId,
+          version: action.payload.version,
         } as ProductVariantCriteria,
       })
         .then((response) => ({
@@ -118,14 +125,24 @@ export function* postProductVariantWorker(
       log("posted product");
       log(response.data);
       /**
+       * normalize response data
+       *
+       *  - TODO: make sure response structure with remote api
+       **/
+      const normalizedData = normalize(response.data, productSchemaEntity);
+
+      log("normalized product");
+      log(normalizedData);
+
+      /**
        * update product domain in state
        *
        **/
       yield put(
-        productActions.appendVariant({
-          productId: action.payload.productId,
-          variant: response.data,
-        })
+        // be careful when normalized a single object, you need to append its domain name (plural) to 'entities'
+        productActions.merge(
+          normalizedData.entities.products as NormalizedProductType
+        )
       );
 
       /**
@@ -140,17 +157,6 @@ export function* postProductVariantWorker(
       );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       log(response.message);
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
     }
   }
 }

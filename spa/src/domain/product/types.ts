@@ -70,6 +70,7 @@ export declare type CategoryType = {
   categoryPath: string;
   categoryDescription: string;
   totalProductCount?: number;
+  version: number;
 };
 
 export declare type NormalizedCategoryType = NormalizedDomainType<CategoryType>;
@@ -109,6 +110,7 @@ export declare type ProductVariantType = {
   currentPrice?: number;
   isDiscountAvailable: boolean;
   regularPrice: number; // either product base unit price / variant uint price
+  version: number;
 };
 
 export declare type ProductType = {
@@ -130,6 +132,7 @@ export declare type ProductType = {
   isDiscountAvailable?: boolean;
   cheapestPrice?: number;
   reviews?: ReviewType[];
+  version: number;
 };
 
 export declare type NormalizedProductType = NormalizedDomainType<ProductType>;
@@ -156,6 +159,7 @@ export declare type ProductCriteria = {
   note: string;
   productImageFiles?: File[]; // to upload file in product form
   productImages?: ProductImageType[]; // to display teh image at client side (also send this to backend)
+  version: number;
 };
 
 // product variant criteria
@@ -174,6 +178,7 @@ export declare type ProductVariantCriteria = {
   variantHeight: number;
   variantWidth: number;
   variantLength: number;
+  version: number;
 };
 
 // category criteria
@@ -182,6 +187,7 @@ export declare type CategoryCriteria = {
   categoryName: string;
   categoryDescription: string;
   categoryPath: string;
+  version: number;
 };
 
 // product variant state type for form & input
@@ -200,6 +206,7 @@ export declare type ProductVariantDataType = {
   variantHeight: number;
   variantWidth: number;
   variantLength: number;
+  version: number;
 };
 
 export const generateDefaultProductVariantData: () => ProductVariantDataType =
@@ -217,6 +224,7 @@ export const generateDefaultProductVariantData: () => ProductVariantDataType =
     variantHeight: 1,
     variantWidth: 1,
     variantLength: 1,
+    version: null,
   });
 
 // product variant state type for form & input
@@ -267,6 +275,7 @@ export declare type ProductDataType = {
   productImageFiles?: File[];
   productImages?: ProductImageType[];
   productVariants?: ProductVariantDataType[];
+  version: number;
 };
 
 export const defaultProductData: ProductDataType = {
@@ -281,6 +290,7 @@ export const defaultProductData: ProductDataType = {
   releaseDate: new Date(),
   note: "",
   productVariants: [generateDefaultProductVariantData()],
+  version: null,
 };
 
 export const generateDefaultProductOnlyData: () => ProductDataType = () => ({
@@ -320,6 +330,7 @@ export const generateDefaultProductOnlyData: () => ProductDataType = () => ({
   category: null,
   releaseDate: new Date(),
   note: "",
+  version: null,
 });
 
 // product validation state type for form & input
@@ -356,12 +367,14 @@ export declare type CategoryDataType = {
   categoryName: string;
   categoryDescription: string;
   categoryPath: string;
+  version: number;
 };
 
 export const generateDefaultCategoryData: () => CategoryDataType = () => ({
   categoryName: "",
   categoryDescription: "",
   categoryPath: "",
+  version: null,
 });
 
 // category validation type for form & input

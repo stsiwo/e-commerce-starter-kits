@@ -28,6 +28,8 @@ public class UserDTO {
   private UserTypeDTO userType;
 
   private UserActiveEnum active;
+
+  private Long version;
 }
 
 

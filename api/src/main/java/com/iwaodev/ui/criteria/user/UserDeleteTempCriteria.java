@@ -13,5 +13,6 @@ import lombok.ToString;
 public class UserDeleteTempCriteria {
 
   private String activeNote;
-  
+
+  private Long version;
 }

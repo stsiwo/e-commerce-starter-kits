@@ -1,14 +1,6 @@
 package com.iwaodev.infrastructure.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import com.iwaodev.infrastructure.model.listener.CompanyValidationListener;
@@ -18,6 +10,8 @@ import com.iwaodev.infrastructure.model.validator.OnUpdate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.sql.Timestamp;
 
 @Data
 @ToString
@@ -110,6 +104,10 @@ public class Company {
   @Column(name="youtube_link")
   private String youtubeLink;
 
+  @Version
+  @Column(name = "version")
+  private Long version = 0L;
+
   @NotNull(message = "{company.user.notnull}")
   @ManyToOne
 	@JoinColumn(
@@ -125,5 +123,23 @@ public class Company {
    **/
   public String getDomain() {
     return this.companyEmail.substring(this.companyEmail.indexOf("@") + 1);
+  }
+
+  public void update(Company newCompany) {
+    this.companyName = newCompany.getCompanyName();
+    this.companyDescription = newCompany.getCompanyDescription();
+    this.companyEmail = newCompany.getCompanyEmail();
+    this.phoneNumber = newCompany.getPhoneNumber();
+    this.countryCode = newCompany.getCountryCode();
+    this.address1 = newCompany.getAddress1();
+    this.address2 = newCompany.getAddress2();
+    this.city = newCompany.getCity();
+    this.province = newCompany.getProvince();
+    this.country = newCompany.getCountry();
+    this.postalCode = newCompany.getPostalCode();
+    this.facebookLink = newCompany.getFacebookLink();
+    this.instagramLink = newCompany.getInstagramLink();
+    this.twitterLink = newCompany.getTwitterLink();
+    this.youtubeLink = newCompany.getYoutubeLink();
   }
 }

@@ -13,15 +13,20 @@ import com.iwaodev.application.iservice.CompanyService;
 import com.iwaodev.application.mapper.CompanyMapper;
 import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.Company;
+import com.iwaodev.infrastructure.model.Phone;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.user.UserCompanyCriteria;
 
+import com.iwaodev.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Service
 @Transactional
@@ -31,6 +36,9 @@ public class CompanyServiceImpl implements CompanyService {
 
   @Autowired
   private UserRepository repository;
+
+  @Autowired
+  private HttpServletRequest httpServletRequest;
 
   public List<CompanyDTO> get(UUID userId) throws Exception {
     logger.debug("start handling a request at UserCompanyServiceImpl");
@@ -91,18 +99,35 @@ public class CompanyServiceImpl implements CompanyService {
       logger.debug("the given company does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given company does not exist.");
     }
-    // create updated entity
-    Company updateCompany = CompanyMapper.INSTANCE.toCompanyEntityFromCompanyCriteria(criteria);
 
+    Company targetCompany = targetUserOption.get().findCompany(companyId);
+
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(targetCompany.getVersion(), receivedVersion)) {
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
+
+    // create updated entity
+    // issue-k0rdIGEQ91U
+    Company updateCompany = CompanyMapper.INSTANCE.toCompanyEntityFromCompanyCriteria(criteria);
     targetUserOption.get().updateCompany(companyId, updateCompany);
 
     // save it
-    this.repository.save(targetUserOption.get());
+    User targetUser;
+    try {
+      // don't forget flush otherwise version number is updated.
+      targetUser = this.repository.saveAndFlush(targetUserOption.get());
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
 
-    // find updated entity
-    Company targetCompany = targetUserOption.get().findCompany(companyId);
+    logger.debug("after saved: " + targetUser.getVersion());
 
-    return CompanyMapper.INSTANCE.toCompanyDTO(targetCompany);
+    return CompanyMapper.INSTANCE.toCompanyDTO(targetUser.findCompany(companyId));
   }
 
   @Override

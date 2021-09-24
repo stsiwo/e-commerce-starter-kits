@@ -240,8 +240,11 @@ export const rsSelector = {
     getNotification: (state: StateType) => state.domain.notifications.data,
     getNotificationPagination: (state: StateType) =>
       state.domain.notifications.pagination,
-    getNotificationCurIndex: (state: StateType) =>
-      state.domain.notifications.curIndex,
+    getNotificationCurId: (state: StateType) =>
+      state.domain.notifications.curId,
+
+    getNotificationCurNotification: (state: StateType) =>
+      state.domain.notifications.curNotification,
 
     getCompany: (state: StateType) => state.domain.company.data,
   },
@@ -1609,6 +1612,26 @@ export const mSelector = {
     );
   },
 
+  makeNotificationReadSizeSelector: () => {
+    return createSelector(
+      [rsSelector.domain.getNotification],
+      (notifications) => {
+        return notifications.filter(
+          (notification: NotificationType) => notification.isRead
+        ).length;
+      }
+    );
+  },
+
+  makeFirstNotificationSelector: () => {
+    return createSelector(
+      [rsSelector.domain.getNotification],
+      (notifications) => {
+        return notifications[0];
+      }
+    );
+  },
+
   // domain.notifications.pagination
   makeNotificationPaginationSelector: () => {
     return createSelector(
@@ -1630,13 +1653,10 @@ export const mSelector = {
   },
 
   // domain.notifications.curIndex
-  makeNotificationCurIndexSelector: () => {
-    return createSelector(
-      [rsSelector.domain.getNotificationCurIndex],
-      (curIndex) => {
-        return curIndex;
-      }
-    );
+  makeNotificationCurIdSelector: () => {
+    return createSelector([rsSelector.domain.getNotificationCurId], (curId) => {
+      return curId;
+    });
   },
 
   // domain.notifications.curIndex
@@ -1650,24 +1670,33 @@ export const mSelector = {
   },
 
   // domain.notifications.curIndex
-  makeNotificationByCurIndexSelector: () => {
+  makeNotificationByCurIdSelector: () => {
     return createSelector(
       [
         rsSelector.domain.getNotification,
-        rsSelector.domain.getNotificationCurIndex,
+        rsSelector.domain.getNotificationCurId,
       ],
       (notification, curIndex) => {
-        return notification[curIndex];
+        return notification.find(
+          (notification: NotificationType) =>
+            notification.notificationId == curIndex
+        );
       }
     );
   },
 
   // domain.notifications.curIndex
-  makeNotificationByIndexSelector: (index: number) => {
+  makeNotificationByIdSelector: (id: string) => {
     return createSelector(
       [rsSelector.domain.getNotification],
       (notifications) => {
-        return notifications[index];
+        console.log(id);
+        console.log(notifications.length);
+
+        return notifications.find((notification: NotificationType) => {
+          console.log();
+          return notification.notificationId == id;
+        });
       }
     );
   },

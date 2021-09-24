@@ -69,6 +69,17 @@ public class OrderEventServiceImpl implements OrderEventService {
       orderEvent.setIsGuest(true);
     }
     order.addOrderEvent(orderEvent);
+
+    logger.debug("inside");
+
+    /**
+     * explicitly increment order version since
+     */
+    logger.debug("version: " + order.getVersion());
+    order.bumpUpVersion();
+
+    logger.debug("after bumpupversion");
+
     /**
      * must be after addOrderEvent since use 'getLastestOrderEvent' internally.
      */

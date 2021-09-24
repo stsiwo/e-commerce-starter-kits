@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import com.iwaodev.application.dto.order.OrderDTO;
+import com.iwaodev.application.dto.product.ProductDTO;
 import com.iwaodev.application.dto.review.FindReviewDTO;
 import com.iwaodev.application.dto.review.ReviewDTO;
 import com.iwaodev.application.dto.user.UserDTO;
@@ -88,7 +89,12 @@ public class UserController {
   public ResponseEntity<UserDTO> getWithId(@PathVariable(value = "id") UUID id,
       @AuthenticationPrincipal SpringSecurityUser authUser) throws Exception {
 
-    return new ResponseEntity<>(this.service.getById(id), HttpStatus.OK);
+    UserDTO results = this.service.getById(id);
+
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   // not post since /signup
@@ -99,7 +105,12 @@ public class UserController {
   public ResponseEntity<UserDTO> updateWithId(@PathVariable(value = "id") UUID id,
       @AuthenticationPrincipal User authUser, @Valid @RequestBody UserCriteria criteria) throws Exception {
 
-    return new ResponseEntity<>(this.service.update(criteria, id), HttpStatus.OK);
+    UserDTO results = this.service.update(criteria, id);
+
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   @PatchMapping("/users/{id}/status")
@@ -107,9 +118,13 @@ public class UserController {
                                                                      // user's data
   public ResponseEntity<UserDTO> patchStatus(@PathVariable(value = "id") UUID id,
       @AuthenticationPrincipal User authUser, @Valid @RequestBody UserStatusCriteria criteria) throws Exception {
-    return new ResponseEntity<>(
-        this.service.updateStatus(criteria),
-        HttpStatus.OK);
+
+    UserDTO results = this.service.updateStatus(criteria);
+
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   @PatchMapping("/users/{id}")
@@ -147,20 +162,28 @@ public class UserController {
   // user avatar image
   @RequestMapping(value = "/users/{id}/avatar-image", method = RequestMethod.POST, consumes = {"multipart/form-data"})
   @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
-  public ResponseEntity<ImagePathResponse> uploadAvatarImage(@PathVariable(value = "id") UUID id,
+  public ResponseEntity<UserDTO> uploadAvatarImage(@PathVariable(value = "id") UUID id,
       @AuthenticationPrincipal SpringSecurityUser authUser, @RequestParam("avatarImage") MultipartFile file) throws Exception {
-    return new ResponseEntity<>(new ImagePathResponse(this.service.uploadAvatarImage(id, file)), HttpStatus.OK);
+
+    UserDTO results = this.service.uploadAvatarImage(id, file);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   // delete user avatar image
   @DeleteMapping("/users/{id}/avatar-image")
   @PreAuthorize("hasRole('ROLE_ADMIN') or #authUser.getId() == #id") // to prevent a member from accessing another
                                                                      // user's data
-  public ResponseEntity<BaseResponse> deleteAvatarImage(@PathVariable(value = "id") UUID id,
+  public ResponseEntity<UserDTO> deleteAvatarImage(@PathVariable(value = "id") UUID id,
       @AuthenticationPrincipal SpringSecurityUser authUser) throws Exception {
-    this.service.removeAvatarImage(id);
+    UserDTO results = this.service.removeAvatarImage(id);
 
-    return new ResponseEntity<>(new BaseResponse("avatar image deleted successfully."), HttpStatus.OK);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   // get user avatar image
@@ -220,7 +243,12 @@ public class UserController {
       @PathVariable(value = "orderId") UUID orderId, @Valid @RequestBody OrderEventCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser) throws Exception {
 
-    return new ResponseEntity<>(this.orderService.addOrderEventByMember(orderId, criteria), HttpStatus.OK);
+    OrderDTO results = this.orderService.addOrderEventByMember(orderId, criteria);
+
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   /**
@@ -237,7 +265,20 @@ public class UserController {
       @RequestParam(value = "productId", required = true) UUID productId,
       @AuthenticationPrincipal SpringSecurityUser authUser) throws Exception {
 
-    return new ResponseEntity<>(this.reviewService.findByUserIdAndProductId(id, productId), HttpStatus.OK);
+    FindReviewDTO results = this.reviewService.findByUserIdAndProductId(id, productId);
+
+    // if review exists (whose version is assigned to findReviewDTO.version), return response with eTag
+    if (results.getVersion() == null) {
+      return ResponseEntity
+              .ok()
+              .body(results);
+    } else {
+      return ResponseEntity
+              .ok()
+              .eTag("\"" + results.getVersion() + "\"")
+              .body(results);
+    }
+
   }
 
   /**
@@ -252,7 +293,13 @@ public class UserController {
       @Valid @RequestBody ReviewCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    return new ResponseEntity<>(this.reviewService.create(criteria), HttpStatus.OK);
+
+    ReviewDTO results = this.reviewService.create(criteria);
+
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   // update/replace a new review
@@ -264,7 +311,13 @@ public class UserController {
       @Valid @RequestBody ReviewCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    return new ResponseEntity<>(this.reviewService.update(criteria, reviewId), HttpStatus.OK);
+
+    ReviewDTO results = this.reviewService.update(criteria, reviewId);
+
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   // delete a new review

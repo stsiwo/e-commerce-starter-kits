@@ -38,6 +38,8 @@ public class CartItemCriteria {
   @Min(value = 1, message = "{cartItem.quantity.min1}")
   @Max(value = 10, message = "{cartItem.quantity.max10}")
   private Integer quantity;
+
+  private Long version;
 }
 
 

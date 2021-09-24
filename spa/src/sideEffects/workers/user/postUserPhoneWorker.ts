@@ -75,6 +75,7 @@ export function* postUserPhoneWorker(
     const response: WorkerResponse = yield call(() =>
       api({
         method: "POST",
+        headers: { "If-Match": `"${action.payload.version}"` },
         url: apiUrl,
         data: {
           phoneNumber: action.payload.phoneNumber,
@@ -122,17 +123,6 @@ export function* postUserPhoneWorker(
       );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       log(response.message);
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
     }
   } else {
     log("permission denied: you are " + curAuth.userType);

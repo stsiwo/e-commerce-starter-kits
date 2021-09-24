@@ -26,6 +26,8 @@ public class OrderEventDTO {
   private LocalDateTime updatedAt;
 
   private OrderUserDTO user;
+
+  private Long version;
 }
 
 

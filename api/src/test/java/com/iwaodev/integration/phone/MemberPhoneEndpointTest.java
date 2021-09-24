@@ -369,6 +369,7 @@ public class MemberPhoneEndpointTest {
 
     // arrange
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyFormJson.get("phoneId").asText();
+    String dummyVersion = "\"0\"";
 
     // act & assert
     ResultActions resultActions = mvc.perform(
@@ -379,7 +380,8 @@ public class MemberPhoneEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
-          .accept(MediaType.APPLICATION_JSON)
+                .header("If-Match", dummyVersion)
+                .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
       .andExpect(status().isOk());
@@ -439,6 +441,7 @@ public class MemberPhoneEndpointTest {
 
     // arrange
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyNewSelectedPhoneId;
+    String dummyVersion = "\"0\"";
 
     // act & assert
     ResultActions resultActions = mvc.perform(
@@ -447,7 +450,8 @@ public class MemberPhoneEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
-          .accept(MediaType.APPLICATION_JSON)
+                .header("If-Match", dummyVersion)
+                .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
       .andExpect(status().isOk());
@@ -475,6 +479,7 @@ public class MemberPhoneEndpointTest {
 
     // arrange
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/100"; // check the sql to match phone id (e.g., 100)
+    String dummyVersion = "\"0\"";
 
     // act & assert
     ResultActions resultActions = mvc.perform(
@@ -483,7 +488,8 @@ public class MemberPhoneEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
-          .accept(MediaType.APPLICATION_JSON)
+                .header("If-Match", dummyVersion)
+                .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
       .andExpect(status().isOk());

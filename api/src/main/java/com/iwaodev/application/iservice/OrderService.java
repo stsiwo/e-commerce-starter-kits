@@ -3,9 +3,7 @@ package com.iwaodev.application.iservice;
 import java.util.UUID;
 
 import com.iwaodev.application.dto.order.OrderDTO;
-import com.iwaodev.application.dto.order.OrderEventDTO;
 import com.iwaodev.domain.order.OrderSortEnum;
-import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.Order;
 import com.iwaodev.ui.criteria.order.OrderCriteria;
 import com.iwaodev.ui.criteria.order.OrderEventCriteria;
@@ -63,8 +61,9 @@ public interface OrderService {
 
   /**
    * update an existing order event 
-   **/
-  public OrderEventDTO updateOrderEvent(UUID orderId, Long orderEventId, OrderEventCriteria criteria) throws Exception;
+   *
+   * @return*/
+  public OrderDTO updateOrderEvent(UUID orderId, Long orderEventId, OrderEventCriteria criteria) throws Exception;
 
   /**
    * delete an existing order event 

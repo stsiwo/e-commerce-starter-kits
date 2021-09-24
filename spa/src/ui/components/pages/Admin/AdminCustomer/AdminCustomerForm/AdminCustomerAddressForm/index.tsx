@@ -19,7 +19,9 @@ import EditIcon from "@material-ui/icons/Edit";
 import HomeIcon from "@material-ui/icons/Home";
 import LocalShippingIcon from "@material-ui/icons/LocalShipping";
 import PaymentIcon from "@material-ui/icons/Payment";
+import { logger } from "configs/logger";
 import {
+  findAddress,
   getBillingAddressId,
   getShippingAddressId,
   toAddressString,
@@ -34,15 +36,21 @@ import {
 import { useValidation } from "hooks/validation";
 import { userAccountAddressSchema } from "hooks/validation/rules";
 import * as React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deleteUserAddressFetchStatusActions,
+  postUserAddressFetchStatusActions,
+  putUserAddressFetchStatusActions,
+} from "reducers/slices/app/fetchStatus/user";
 import {
   deleteUserAddressActionCreator,
   patchUserAddressActionCreator,
   postUserAddressActionCreator,
   putUserAddressActionCreator,
 } from "reducers/slices/domain/user";
+import { FetchStatusEnum } from "src/app";
+import { rsSelector } from "src/selectors/selector";
 import { getCountryList, getProvinceList } from "src/utils";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -264,6 +272,7 @@ const AdminCustomerAddressForm: React.FunctionComponent<AdminCustomerAddressForm
               postalCode: curAdminCustomerAddressState.postalCode,
               isBillingAddress: false,
               isShippingAddress: false,
+              version: null,
             })
           );
         } else {
@@ -280,6 +289,7 @@ const AdminCustomerAddressForm: React.FunctionComponent<AdminCustomerAddressForm
               postalCode: curAdminCustomerAddressState.postalCode,
               isBillingAddress: curAdminCustomerAddressState.isBillingAddress,
               isShippingAddress: curAdminCustomerAddressState.isShippingAddress,
+              version: curAdminCustomerAddressState.version,
             })
           );
         }
@@ -314,6 +324,7 @@ const AdminCustomerAddressForm: React.FunctionComponent<AdminCustomerAddressForm
         deleteUserAddressActionCreator({
           userId: userId,
           addressId: addressId,
+          version: findAddress(addresses, addressId).version,
         })
       );
       // request
@@ -356,6 +367,7 @@ const AdminCustomerAddressForm: React.FunctionComponent<AdminCustomerAddressForm
           userId: userId,
           addressId: addressId,
           type: "billing",
+          version: findAddress(addresses, addressId).version,
         })
       );
     };
@@ -371,9 +383,35 @@ const AdminCustomerAddressForm: React.FunctionComponent<AdminCustomerAddressForm
           userId: userId,
           addressId: addressId,
           type: "shipping",
+          version: findAddress(addresses, addressId).version,
         })
       );
     };
+
+    // close form dialog only when success for post/put/delete
+    const curPostFetchStatus = useSelector(
+      rsSelector.app.getPostUserAddressFetchStatus
+    );
+    const curPutFetchStatus = useSelector(
+      rsSelector.app.getPutUserAddressFetchStatus
+    );
+    const curDeleteSingleFetchStatus = useSelector(
+      rsSelector.app.getDeleteUserAddressFetchStatus
+    );
+    React.useEffect(() => {
+      if (
+        curPostFetchStatus === FetchStatusEnum.SUCCESS ||
+        curPutFetchStatus === FetchStatusEnum.SUCCESS ||
+        curDeleteSingleFetchStatus === FetchStatusEnum.SUCCESS
+      ) {
+        setModalOpen(false);
+
+        dispatch(postUserAddressFetchStatusActions.clear());
+        dispatch(putUserAddressFetchStatusActions.clear());
+        dispatch(deleteUserAddressFetchStatusActions.clear());
+      }
+    });
+
     // render functions
 
     // display current address number list

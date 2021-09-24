@@ -41,6 +41,7 @@ public class CustomerCriteria {
   @Size(max = 100, message = "{user.email.max100}")
   private String email;
 
+  private Long version;
 }
 
 

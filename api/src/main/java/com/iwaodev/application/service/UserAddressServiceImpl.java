@@ -15,18 +15,25 @@ import com.iwaodev.infrastructure.model.Address;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.user.UserAddressCriteria;
 
+import com.iwaodev.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Service
 @Transactional
 public class UserAddressServiceImpl implements UserAddressService {
 
   private static final Logger logger = LoggerFactory.getLogger(UserAddressServiceImpl.class);
+
+  @Autowired
+  private HttpServletRequest httpServletRequest;
 
   @Autowired
   private UserRepository repository;
@@ -80,7 +87,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     user.addAddress(newEntity);
 
     // save
-    User savedUser = this.repository.save(user);
+    User savedUser = this.repository.saveAndFlush(user);
 
     /**
      * TODO: how to find the newly saved address with savedUser?
@@ -122,26 +129,46 @@ public class UserAddressServiceImpl implements UserAddressService {
       logger.debug("the given address does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given address does not exist.");
     }
-    // create updated entity
-    Address updateAddress = AddressMapper.INSTANCE.toAddressEntityFromAddressCriteria(criteria);
 
-    /**
-     * @TODO; I don't know this is correct way to update child collection - there
-     * must be better way to do this.
-     *
-     * - or do i need to use AddressRepository?
-     **/
-    targetUserOption.get().removeAddressById(addressId);
-
-    targetUserOption.get().addAddress(updateAddress);
-
-    // save it
-    this.repository.save(targetUserOption.get());
-
-    // find updated entity
     Address targetAddress = targetUserOption.get().findAddress(addressId);
 
-    return AddressMapper.INSTANCE.toAddressDTO(targetAddress);
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(targetAddress.getVersion(), receivedVersion)) {
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
+
+    /**
+     * issue-k0rdIGEQ91U
+     **/
+    targetUserOption.get().updateAddress(
+            addressId,
+            criteria.getAddress1(),
+            criteria.getAddress2(),
+            criteria.getCity(),
+            criteria.getProvince(),
+            criteria.getCountry(),
+            criteria.getPostalCode(),
+            criteria.getIsBillingAddress(),
+            criteria.getIsShippingAddress()
+    );
+
+    // save it
+    User updatedUser;
+    try {
+      // don't forget flush otherwise version number is updated.
+      updatedUser = this.repository.saveAndFlush(targetUserOption.get());
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
+
+    // issue-v07rKsa0SO2
+    logger.debug("after saved: " + updatedUser.getVersion());
+
+    return AddressMapper.INSTANCE.toAddressDTO(updatedUser.findAddress(addressId));
   }
 
   @Override
@@ -157,9 +184,26 @@ public class UserAddressServiceImpl implements UserAddressService {
 
     User targetEntity = targetUserOption.get();
 
+    Address targetAddress = targetUserOption.get().findAddress(addressId);
+
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(targetAddress.getVersion(), receivedVersion)) {
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
+
     targetEntity.toggleBillingAddress(addressId);
 
-    User updatedTargetEntity = this.repository.save(targetEntity);
+    User updatedTargetEntity;
+    try {
+      // don't forget flush otherwise version number is updated.
+      updatedTargetEntity = this.repository.saveAndFlush(targetEntity);
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
 
     // use this rather than the list method since @Mapping for the list does not
     // work.
@@ -185,9 +229,26 @@ public class UserAddressServiceImpl implements UserAddressService {
 
     User targetEntity = targetUserOption.get();
 
+    Address targetAddress = targetUserOption.get().findAddress(addressId);
+
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(targetAddress.getVersion(), receivedVersion)) {
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
+
     targetEntity.toggleShippingAddress(addressId);
 
-    User updatedTargetEntity = this.repository.save(targetEntity);
+    User updatedTargetEntity;
+    try {
+      // don't forget flush otherwise version number is updated.
+      updatedTargetEntity = this.repository.saveAndFlush(targetEntity);
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
 
     // use this rather than the list method since @Mapping for the list does not
     // work.
@@ -211,10 +272,24 @@ public class UserAddressServiceImpl implements UserAddressService {
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
+    Address targetAddress = targetUserOption.get().findAddress(addressId);
+
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(targetAddress.getVersion(), receivedVersion)) {
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
+
     targetUserOption.get().removeAddressById(addressId);
 
-    this.repository.save(targetUserOption.get());
-
+    try {
+      this.repository.save(targetUserOption.get());
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
   }
 
 }

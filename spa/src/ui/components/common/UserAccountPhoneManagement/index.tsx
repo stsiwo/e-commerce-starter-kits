@@ -19,6 +19,8 @@ import EditIcon from "@material-ui/icons/Edit";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import PhoneIphoneIcon from "@material-ui/icons/PhoneIphone";
+import { logger } from "configs/logger";
+import { findPhone } from "domain/user";
 import {
   CustomerPhonesFormDataType,
   CustomerPhonesFormValidationDataType,
@@ -36,14 +38,13 @@ import {
   postAuthPhoneActionCreator,
   putAuthPhoneActionCreator,
 } from "reducers/slices/app";
-import { mSelector, rsSelector } from "src/selectors/selector";
-import { FetchStatusEnum } from "src/app";
 import {
+  deleteAuthPhoneFetchStatusActions,
   postAuthPhoneFetchStatusActions,
   putAuthPhoneFetchStatusActions,
-  deleteAuthPhoneFetchStatusActions,
 } from "reducers/slices/app/fetchStatus/auth";
-import { logger } from "configs/logger";
+import { FetchStatusEnum } from "src/app";
+import { mSelector, rsSelector } from "src/selectors/selector";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -203,6 +204,7 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
               phoneNumber: curUserAccountPhoneState.phoneNumber,
               countryCode: curUserAccountPhoneState.countryCode,
               isSelected: curUserAccountPhoneState.isSelected,
+              version: curUserAccountPhoneState.version,
             })
           );
         } else {
@@ -213,6 +215,7 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
               phoneNumber: curUserAccountPhoneState.phoneNumber,
               countryCode: curUserAccountPhoneState.countryCode,
               isSelected: curUserAccountPhoneState.isSelected,
+              version: curUserAccountPhoneState.version,
             })
           );
         }
@@ -264,6 +267,7 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
       dispatch(
         deleteAuthPhoneActionCreator({
           phoneId: phoneId,
+          version: findPhone(phones, phoneId).version,
         })
       );
     };
@@ -294,7 +298,12 @@ const UserAccountPhoneManagement: React.FunctionComponent<UserAccountPhoneManage
     > = (e) => {
       const nextPrimePhoneId = e.currentTarget.value;
 
-      dispatch(patchAuthPhoneActionCreator({ phoneId: nextPrimePhoneId }));
+      dispatch(
+        patchAuthPhoneActionCreator({
+          phoneId: nextPrimePhoneId,
+          version: findPhone(phones, nextPrimePhoneId).version,
+        })
+      );
     };
 
     // close form dialog only when success for post/put/delete

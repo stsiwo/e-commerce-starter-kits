@@ -19,6 +19,7 @@ import com.iwaodev.auth.AuthenticationInfo;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.infrastructure.model.Product;
+import com.iwaodev.ui.response.ErrorBaseResponse;
 import com.iwaodev.util.ResourceReader;
 
 import org.junit.jupiter.api.Test;
@@ -48,6 +49,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
 
 // this is alias to SpringJUnit4ClassRunner
 //@RunWith(SpringRunner.class)
@@ -171,17 +173,22 @@ public class AdminProductVariantEndpointTest {
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
-    ProductVariantDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductVariantDTO.class);
+    ProductDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductDTO.class);
 
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
-    assertThat(responseBody.getVariantId()).isNotNull();
-    assertThat(responseBody.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
-    // regular price = 10.00 (make sure match with sql & json)
-    assertThat(responseBody.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
-    assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(true);
-    assertThat(responseBody.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantDiscountPrice").asText());
+    assertThat(etag).isEqualTo("\"0\"");
+    for (com.iwaodev.application.dto.product.ProductVariantDTO productVariantDTO: responseBody.getVariants()) {
+      assertThat(productVariantDTO.getVariantId()).isNotNull();
+      assertThat(productVariantDTO.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
+      // regular price = 10.00 (make sure match with sql & json)
+      assertThat(productVariantDTO.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
+      assertThat(productVariantDTO.getIsDiscountAvailable()).isEqualTo(true);
+      assertThat(productVariantDTO.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantDiscountPrice").asText());
+    }
+
     /**
      * need to check product.cheapestPrice/highestPrice but thsi variant endpoint just return the updated variant so need to refatcor
      **/
@@ -212,17 +219,21 @@ public class AdminProductVariantEndpointTest {
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
-    ProductVariantDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductVariantDTO.class);
+    ProductDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductDTO.class);
 
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
-    assertThat(responseBody.getVariantId()).isNotNull();
-    assertThat(responseBody.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
-    // regular price = 10.00 (make sure match with sql & json)
-    //assertThat(responseBody.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
-    assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(false);
-    assertThat(responseBody.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
+    assertThat(etag).isEqualTo("\"0\"");
+    for (com.iwaodev.application.dto.product.ProductVariantDTO productVariantDTO: responseBody.getVariants()) {
+      assertThat(productVariantDTO.getVariantId()).isNotNull();
+      assertThat(productVariantDTO.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
+      // regular price = 10.00 (make sure match with sql & json)
+      //assertThat(responseBody.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
+      assertThat(productVariantDTO.getIsDiscountAvailable()).isEqualTo(false);
+      assertThat(productVariantDTO.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
+    }
   }
 
   @Test
@@ -237,6 +248,7 @@ public class AdminProductVariantEndpointTest {
     // arrange
     String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId);
+    String dummyVersion = "\"0\""; // be careful. this should be 1.
 
     // act & assert
     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
@@ -250,17 +262,23 @@ public class AdminProductVariantEndpointTest {
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
-    ProductVariantDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductVariantDTO.class);
+    ProductDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductDTO.class);
+
 
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
-    assertThat(responseBody.getVariantId()).isNotNull();
-    assertThat(responseBody.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
-    // regular price = 10.00 (make sure match with sql & json)
-    //assertThat(responseBody.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
-    assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(true);
-    assertThat(responseBody.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantDiscountPrice").asText());
+    assertThat(etag).isEqualTo("\"0\"");
+    for (com.iwaodev.application.dto.product.ProductVariantDTO productVariantDTO: responseBody.getVariants()) {
+
+      assertThat(productVariantDTO.getVariantId()).isNotNull();
+      assertThat(productVariantDTO.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
+      // regular price = 10.00 (make sure match with sql & json)
+      //assertThat(responseBody.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
+      assertThat(productVariantDTO.getIsDiscountAvailable()).isEqualTo(true);
+      assertThat(productVariantDTO.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantDiscountPrice").asText());
+    }
   }
 
   /**
@@ -302,17 +320,23 @@ public class AdminProductVariantEndpointTest {
             .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
-    ProductVariantDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductVariantDTO.class);
+    ProductDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductDTO.class);
 
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
-    assertThat(responseBody.getVariantId()).isNotNull();
-    assertThat(responseBody.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
-    // regular price = 10.00 (make sure match with sql & json)
-    //assertThat(responseBody.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
-    assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(true);
-    assertThat(responseBody.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantDiscountPrice").asText());
+    assertThat(etag).isEqualTo("\"0\"");
+
+
+    for (com.iwaodev.application.dto.product.ProductVariantDTO productVariantDTO: responseBody.getVariants()) {
+      assertThat(productVariantDTO.getVariantId()).isNotNull();
+      assertThat(productVariantDTO.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
+      // regular price = 10.00 (make sure match with sql & json)
+      //assertThat(responseBody.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
+      assertThat(productVariantDTO.getIsDiscountAvailable()).isEqualTo(true);
+      assertThat(productVariantDTO.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantDiscountPrice").asText());
+    }
   }
   @Test
   @Sql(scripts = { "classpath:/integration/productVariant/shouldAdminUserCreateNewProductVariantWithProductBaseUnitPrice.sql" })
@@ -339,17 +363,23 @@ public class AdminProductVariantEndpointTest {
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
-    ProductVariantDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductVariantDTO.class);
+    ProductDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductDTO.class);
+
 
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
-    assertThat(responseBody.getVariantId()).isNotNull();
-    assertThat(responseBody.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
-    // regular price = 10.00 (make sure match with sql & json)
-    assertThat(responseBody.getRegularPrice().toString()).isEqualTo("12.21");
-    assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(false);
-    assertThat(responseBody.getCurrentPrice().toString()).isEqualTo("12.21");
+    assertThat(etag).isEqualTo("\"0\"");
+    for (com.iwaodev.application.dto.product.ProductVariantDTO productVariantDTO: responseBody.getVariants()) {
+      assertThat(productVariantDTO.getVariantId()).isNotNull();
+      assertThat(productVariantDTO.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
+      // regular price = 10.00 (make sure match with sql & json)
+      assertThat(productVariantDTO.getRegularPrice().toString()).isEqualTo("12.21");
+      assertThat(productVariantDTO.getIsDiscountAvailable()).isEqualTo(false);
+      assertThat(productVariantDTO.getCurrentPrice().toString()).isEqualTo("12.21");
+
+    }
   }
 
   // 400 bad request (bad input) testing
@@ -377,6 +407,11 @@ public class AdminProductVariantEndpointTest {
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("variant discount start date must be before the end date.");
   }
 
   @Test
@@ -403,6 +438,11 @@ public class AdminProductVariantEndpointTest {
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the discount price must be less than the unit price.");
   }
 
   @Test
@@ -429,6 +469,11 @@ public class AdminProductVariantEndpointTest {
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the discount price must be less than the unit price.");
   }
 
   @Test
@@ -439,6 +484,7 @@ public class AdminProductVariantEndpointTest {
 
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
+    String dummyVersion = "\"0\"";
 
     // arrange
     String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
@@ -452,26 +498,100 @@ public class AdminProductVariantEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
-    ProductVariantDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductVariantDTO.class);
+    ProductDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductDTO.class);
 
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
-    assertThat(responseBody.getVariantId()).isNotNull();
-    assertThat(responseBody.getVariantId().toString()).isEqualTo(dummyFormJson.get("variantId").toString());
-    assertThat(responseBody.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
 
-    assertThat(responseBody.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
-    assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(true);
-    assertThat(responseBody.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantDiscountPrice").asText());
+    boolean isIdExist = false;
+    for (com.iwaodev.application.dto.product.ProductVariantDTO productVariantDTO: responseBody.getVariants()) {
+      if (productVariantDTO.getVariantId().toString().equals(dummyFormJson.get("variantId").asText())) {
+        assertThat(productVariantDTO.getVariantId().toString()).isEqualTo(dummyFormJson.get("variantId").toString());
+        assertThat(productVariantDTO.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
+        assertThat(productVariantDTO.getRegularPrice().toString()).isEqualTo(dummyFormJson.get("variantUnitPrice").asText());
+        assertThat(productVariantDTO.getIsDiscountAvailable()).isEqualTo(true);
+        assertThat(productVariantDTO.getCurrentPrice().toString()).isEqualTo(dummyFormJson.get("variantDiscountPrice").asText());
+        isIdExist = true;
+      }
+    }
+    if (!isIdExist) {
+      assertThat(1).isEqualTo(0);
+    }
 
     /**
      * need to check product.cheapestPrice/highestPrice but thsi variant endpoint just return the updated variant so need to refatcor
      **/
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/productVariant/shouldAdminUserUpdateProductVariant.sql" })
+  public void shouldNotAdminUserUpdateProductVariantSinceNoIfMatchHeader(
+          @Value("classpath:/integration/productVariant/shouldAdminUserUpdateProductVariant.json") Resource dummyFormJsonFile)
+          throws Exception {
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyVersion = "\"0\"";
+
+    // arrange
+    String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId) + "/" + dummyFormJson.get("variantId").asText();
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+                    .put(targetUrl) // update/replace
+                    .content(dummyFormJsonString)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/productVariant/shouldAdminUserUpdateProductVariant.sql" })
+  public void shouldNotAdminUserUpdateProductVariantSinceVersionMismatch(
+          @Value("classpath:/integration/productVariant/shouldAdminUserUpdateProductVariant.json") Resource dummyFormJsonFile)
+          throws Exception {
+
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyVersion = "\"3\"";
+
+    // arrange
+    String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId) + "/" + dummyFormJson.get("variantId").asText();
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+                    .put(targetUrl) // update/replace
+                    .content(dummyFormJsonString)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isPreconditionFailed());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
   }
 
   @Test
@@ -482,6 +602,7 @@ public class AdminProductVariantEndpointTest {
 
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
+    String dummyVersion = "\"0\"";
 
     // arrange
     String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
@@ -494,6 +615,7 @@ public class AdminProductVariantEndpointTest {
         .contentType(MediaType.APPLICATION_JSON)
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
+                    .header("If-Match", dummyVersion)
           .header("csrf-token", this.authInfo.getCsrfToken())
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
@@ -501,16 +623,25 @@ public class AdminProductVariantEndpointTest {
     MvcResult result = resultActions.andReturn();
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
-    ProductVariantDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductVariantDTO.class);
+    ProductDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ProductDTO.class);
 
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
-    assertThat(responseBody.getVariantId()).isNotNull();
-    assertThat(responseBody.getVariantId().toString()).isEqualTo(dummyFormJson.get("variantId").toString());
-    assertThat(responseBody.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
 
-    assertThat(responseBody.getRegularPrice().toString()).isEqualTo("12.21");
-    assertThat(responseBody.getIsDiscountAvailable()).isEqualTo(false);
-    assertThat(responseBody.getCurrentPrice().toString()).isEqualTo("12.21");
+    boolean isIdExist = false;
+    for (com.iwaodev.application.dto.product.ProductVariantDTO productVariantDTO: responseBody.getVariants()) {
+      if (productVariantDTO.getVariantId().toString().equals(dummyFormJson.get("variantId").asText())) {
+        assertThat(productVariantDTO.getVariantId().toString()).isEqualTo(dummyFormJson.get("variantId").toString());
+        assertThat(productVariantDTO.getProductSize().getProductSizeName()).isEqualTo(dummyFormJson.get("productSize").get("productSizeName").asText());
+        assertThat(productVariantDTO.getRegularPrice().toString()).isEqualTo("12.21");
+        assertThat(productVariantDTO.getIsDiscountAvailable()).isEqualTo(false);
+        assertThat(productVariantDTO.getCurrentPrice().toString()).isEqualTo("12.21");
+        isIdExist = true;
+      }
+    }
+    if (!isIdExist) {
+      assertThat(1).isEqualTo(0);
+    }
+
   }
 
   @Test
@@ -525,6 +656,7 @@ public class AdminProductVariantEndpointTest {
     // arrange
     String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId) + "/" + dummyFormJson.get("variantId").asText();
+    String dummyVersion = "\"0\"";
 
     // act & assert
     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
@@ -534,6 +666,7 @@ public class AdminProductVariantEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
@@ -547,7 +680,7 @@ public class AdminProductVariantEndpointTest {
 
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
-
+    String dummyVersion = "\"0\"";
     // arrange
     String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId) + "/" + dummyFormJson.get("variantId").asText();
@@ -560,6 +693,7 @@ public class AdminProductVariantEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isBadRequest());
 
@@ -572,6 +706,7 @@ public class AdminProductVariantEndpointTest {
     String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
     String dummyProductVariantId = "1";
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId) + "/" + dummyProductVariantId;
+    String dummyVersion = "\"0\"";
 
     // act & assert
     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
@@ -579,6 +714,7 @@ public class AdminProductVariantEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
         .accept(MediaType.APPLICATION_JSON))
         .andDo(print()).andExpect(status().isOk());
 
@@ -618,6 +754,59 @@ public class AdminProductVariantEndpointTest {
   }
 
   @Test
+  @Sql(scripts = { "classpath:/integration/productVariant/shouldAdminUserDeleteProductVariant.sql" })
+  public void shouldNotAdminUserDeleteProductVariantSinceNoIfMatchHeader() throws Exception {
+
+    // arrange
+    String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String dummyProductVariantId = "1";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId) + "/" + dummyProductVariantId;
+    String dummyVersion = "\"0\"";
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+                    .delete(targetUrl) // delete
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/productVariant/shouldAdminUserDeleteProductVariant.sql" })
+  public void shouldNotAdminUserDeleteProductVariantSinceVersionMismatch() throws Exception {
+
+    // arrange
+    String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
+    String dummyProductVariantId = "1";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId) + "/" + dummyProductVariantId;
+    String dummyVersion = "\"3\"";
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
+                    .delete(targetUrl) // delete
+                    .cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isPreconditionFailed());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
+  }
+
+  @Test
   @Sql(scripts = { "classpath:/integration/productVariant/shouldAdminUserDeleteProductVariantAndMakeIsPublicFalseSinceNoVariantAnyMore.sql" })
   public void shouldAdminUserDeleteProductVariantAndMakeIsPublicFalseSinceNoVariantAnyMore() throws Exception {
 
@@ -625,6 +814,7 @@ public class AdminProductVariantEndpointTest {
     String dummyProductId = "9e3e67ca-d058-41f0-aad5-4f09c956a81f";
     String dummyProductVariantId = "1";
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyProductId) + "/" + dummyProductVariantId;
+    String dummyVersion = "\"0\""; // be careful. this should be 1.
 
     // act & assert
     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
@@ -632,6 +822,7 @@ public class AdminProductVariantEndpointTest {
             .cookie(this.authCookie)
             .cookie(this.csrfCookie)
             .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
             .accept(MediaType.APPLICATION_JSON))
             .andDo(print()).andExpect(status().isOk());
 

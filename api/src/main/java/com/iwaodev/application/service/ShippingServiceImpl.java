@@ -48,7 +48,7 @@ public RatingDTO getRating(Double weight, String destinationPostalCode) throws E
         return ratingDTO;
     } catch (Exception e) {
         logger.debug(e.getMessage());
-        throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during retrieving estimated delivery date and shipping cost. please try again.");
+        throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during retrieving estimated delivery date and shipping cost. please make sure your postal code of shipping address.");
     }
 }
 

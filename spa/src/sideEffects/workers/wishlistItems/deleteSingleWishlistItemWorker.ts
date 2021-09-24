@@ -85,6 +85,7 @@ export function* deleteSingleWishlistItemWorker(
     const response: WorkerResponse = yield call(() =>
       api({
         method: "DELETE",
+        headers: { "If-Match": `"${action.payload.version}"` },
         url: apiUrl,
       })
         .then((response) => ({
@@ -125,17 +126,6 @@ export function* deleteSingleWishlistItemWorker(
       );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       log(response.message);
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
     }
   } else if (curAuth.userType === UserTypeEnum.GUEST) {
     /**

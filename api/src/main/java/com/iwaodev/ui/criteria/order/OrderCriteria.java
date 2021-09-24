@@ -76,6 +76,7 @@ public class OrderCriteria {
 
   private String currency;
 
+  private Long version;
 }
 
 

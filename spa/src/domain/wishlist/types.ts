@@ -10,6 +10,7 @@ export declare type WishlistItemType = {
   product: ProductType;
   createdAt?: Date;
   updatedAt?: Date;
+  version: number;
 };
 
 // criteria

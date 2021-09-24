@@ -3,7 +3,10 @@ import { api, WorkerResponse } from "configs/axiosConfig";
 import { logger } from "configs/logger";
 import { messageActions } from "reducers/slices/app";
 import { postUserAvatarImageFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
-import { PostUserAvatarImageActionType } from "reducers/slices/domain/user";
+import {
+  PostUserAvatarImageActionType,
+  userActions,
+} from "reducers/slices/domain/user";
 import { call, put, select } from "redux-saga/effects";
 import {
   AuthType,
@@ -75,9 +78,12 @@ export function* postUserAvatarImageWorker(
     const response: WorkerResponse = yield call(() =>
       api({
         method: "POST",
+        headers: {
+          "If-Match": `"${action.payload.version}"`,
+          "Content-Type": "multipart/form-data",
+        },
         url: apiUrl,
         data: formData,
-        headers: { "Content-Type": "multipart/form-data" },
       })
         .then((response) => ({
           fetchStatus: FetchStatusEnum.SUCCESS,
@@ -101,10 +107,12 @@ export function* postUserAvatarImageWorker(
        *
        **/
 
-      // TODO: fix this at admin customer
-      //yield put(
-      //  userActions.update(response.data.imagePath)
-      //)
+      yield put(
+        userActions.updateUser({
+          userId: response.data.userId,
+          user: response.data,
+        })
+      );
 
       /**
        * update message
@@ -124,17 +132,6 @@ export function* postUserAvatarImageWorker(
        **/
       yield put(
         postUserAvatarImageFetchStatusActions.update(FetchStatusEnum.FAILED)
-      );
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
       );
     }
   } else {

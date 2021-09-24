@@ -1,26 +1,12 @@
 package com.iwaodev.infrastructure.model;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.PostLoad;
-import javax.persistence.PrePersist;
-import javax.persistence.PreRemove;
-import javax.persistence.PreUpdate;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import com.iwaodev.domain.product.validator.ProductVariantValidation;
@@ -140,8 +126,12 @@ public class ProductVariant {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
+  @Version
+  @Column(name = "version")
+  private Long version = 0L;
+
   @NotNull(message = "{productVariant.product.notnull}")
-  @ManyToOne
+  @ManyToOne()
   @JoinColumn(name = "product_id", foreignKey = @ForeignKey(name = "FK_product_variants__products"), insertable = true, updatable = true) // insert & update when parent try to update this child entity
   private Product product;
 
@@ -287,6 +277,21 @@ public class ProductVariant {
       }
     }
     return true;
+  }
+
+  public void update(ProductVariant newVariant) {
+    this.variantColor = newVariant.getVariantColor();
+    this.variantUnitPrice = newVariant.getVariantUnitPrice();
+    this.variantDiscountPrice = newVariant.getVariantDiscountPrice();
+    this.variantDiscountStartDate = newVariant.getVariantDiscountStartDate();
+    this.variantDiscountEndDate = newVariant.getVariantDiscountEndDate();
+    this.variantStock = newVariant.getVariantStock();
+    this.isDiscount = newVariant.getIsDiscount();
+    this.note = newVariant.getNote();
+    this.variantWeight = newVariant.getVariantWeight();
+    this.variantHeight = newVariant.getVariantHeight();
+    this.variantWidth = newVariant.getVariantWidth();
+    this.variantLength = newVariant.getVariantLength();
   }
 
   public void setCartItems(List<CartItem> cartItems) {

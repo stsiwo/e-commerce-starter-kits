@@ -1,29 +1,28 @@
-import * as React from "react";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import SentimentSatisfiedOutlinedIcon from "@material-ui/icons/SentimentSatisfiedOutlined";
 import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
+import Avatar from "@material-ui/core/Avatar";
+import Badge from "@material-ui/core/Badge";
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import Link from "@material-ui/core/Link";
-import Avatar from "@material-ui/core/Avatar";
-import NotificationsIcon from "@material-ui/icons/Notifications";
-import { Link as RRLink } from "react-router-dom";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import Toolbar from "@material-ui/core/Toolbar";
+import NotificationsIcon from "@material-ui/icons/Notifications";
+import SentimentSatisfiedOutlinedIcon from "@material-ui/icons/SentimentSatisfiedOutlined";
 import { api } from "configs/axiosConfig";
-import { authActions } from "reducers/slices/app";
+import { logger } from "configs/logger";
 import { useSnackbar } from "notistack";
-import { AxiosError } from "axios";
+import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
-import { mSelector } from "src/selectors/selector";
+import { Link as RRLink } from "react-router-dom";
+import { authActions } from "reducers/slices/app";
 import {
   fetchNotificationActionCreator,
   incrementNotificationCurIndexActionCreator,
 } from "reducers/slices/domain/notification";
-import Badge from "@material-ui/core/Badge";
-import { logger } from "configs/logger";
+import { mSelector } from "src/selectors/selector";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -93,9 +92,31 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
         history.push("/admin/login");
 
         enqueueSnackbar("logged out successfully.", { variant: "success" });
+      });
+
+    handleMenuClose();
+  };
+
+  const handleSwitchToTestMember = (e: React.MouseEvent<HTMLElement>) => {
+    // request
+    api
+      .request({
+        method: "post",
+        url: API1_URL + `/logout`,
+        data: null,
       })
-      .catch((error: AxiosError) => {
-        enqueueSnackbar(error.message, { variant: "error" });
+      .then((data) => {
+        // fetch again
+        dispatch(authActions.logout());
+
+        history.push("/login");
+
+        enqueueSnackbar(
+          "please use this test credential to login as test member.",
+          {
+            variant: "success",
+          }
+        );
       });
 
     handleMenuClose();
@@ -107,6 +128,12 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
   const curNotificationPagination = useSelector(
     mSelector.makeNotificationPaginationSelector()
   );
+
+  /**
+   * counter to decrement from total ntf size
+   * since we fetch the rest of notification from api, it is difficult to count without this.
+   */
+  const [curCounter, setCounter] = React.useState<number>(0);
 
   // fetch notifcation for this member.
   // - initial fetch (replace)
@@ -126,6 +153,11 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
 
   const handleNotificationClick = (e: React.MouseEvent<HTMLElement>) => {
     dispatch(incrementNotificationCurIndexActionCreator());
+
+    // incremnt count until reaching the total ntf
+    if (curCounter < curNotificationPagination.totalElements) {
+      setCounter((prev: number) => ++prev);
+    }
   };
 
   return (
@@ -147,7 +179,9 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
               onClick={handleNotificationClick}
             >
               <Badge
-                badgeContent={curNotificationPagination.totalElements}
+                badgeContent={
+                  curNotificationPagination.totalElements - curCounter
+                }
                 color="error"
               >
                 <NotificationsIcon />
@@ -167,6 +201,9 @@ const AdminHeader: React.FunctionComponent<{}> = (props) => {
               onClose={handleMenuClose}
             >
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              <MenuItem onClick={handleSwitchToTestMember}>
+                Switch to Test Member
+              </MenuItem>
             </Menu>
           </Grid>
         </Grid>

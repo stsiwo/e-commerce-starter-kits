@@ -70,6 +70,7 @@ export function* patchUserWorker(action: PayloadAction<UserType>) {
       api({
         method: "PATCH",
         url: apiUrl,
+        headers: { "If-Match": `"${action.payload.version}"` },
         // TODO: make sure backend
         data: {
           isDeleted: true,

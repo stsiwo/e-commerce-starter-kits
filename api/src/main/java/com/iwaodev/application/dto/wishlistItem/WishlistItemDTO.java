@@ -20,6 +20,8 @@ public class WishlistItemDTO {
   private ProductDTO product;
 
   private LocalDateTime createdAt;
+
+  private Long version;
 }
 
 

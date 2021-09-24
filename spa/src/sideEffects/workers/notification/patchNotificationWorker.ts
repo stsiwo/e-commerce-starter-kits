@@ -1,21 +1,14 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { api, WorkerResponse } from "configs/axiosConfig";
 import { logger } from "configs/logger";
-import { messageActions } from "reducers/slices/app";
 import { patchNotificationFetchStatusActions } from "reducers/slices/app/fetchStatus/notification";
 import {
   notificationActions,
   PatchNotificationActionType,
 } from "reducers/slices/domain/notification";
 import { call, put, select } from "redux-saga/effects";
-import {
-  AuthType,
-  FetchStatusEnum,
-  MessageTypeEnum,
-  UserTypeEnum,
-} from "src/app";
+import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { rsSelector } from "src/selectors/selector";
-import { getNanoId } from "src/utils";
 
 const log = logger(__filename);
 
@@ -123,17 +116,6 @@ export function* patchNotificationWorker(
        **/
       yield put(
         patchNotificationFetchStatusActions.update(FetchStatusEnum.FAILED)
-      );
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
       );
     }
   }

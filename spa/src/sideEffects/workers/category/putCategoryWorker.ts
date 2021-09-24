@@ -82,6 +82,7 @@ export function* putCategoryWorker(
     const response: WorkerResponse = yield call(() =>
       api({
         method: "PUT",
+        headers: { "If-Match": `"${action.payload.version}"` },
         url: apiUrl,
         data: {
           categoryId: action.payload.categoryId,
@@ -134,17 +135,6 @@ export function* putCategoryWorker(
       );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       log(response.message);
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
     }
   }
 }

@@ -11,4 +11,6 @@ public class ProductSizeDTO {
   private Long productSizeId;
   private String productSizeName;
   private String productSizeDescription;
+
+  private Long version;
 }

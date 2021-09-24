@@ -79,6 +79,7 @@ export function* postAuthPhoneWorker(
     const response: WorkerResponse = yield call(() =>
       api({
         method: "POST",
+        headers: { "If-Match": `"${action.payload.version}"` },
         url: apiUrl,
         data: {
           // don't send phoneId when post
@@ -127,17 +128,6 @@ export function* postAuthPhoneWorker(
        * update fetch status failed
        **/
       yield put(postAuthPhoneFetchStatusActions.update(FetchStatusEnum.FAILED));
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
     }
   } else if (curAuth.userType === UserTypeEnum.GUEST) {
     yield put(authActions.appendPhone(action.payload));

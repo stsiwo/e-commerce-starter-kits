@@ -17,15 +17,14 @@ import com.iwaodev.application.iservice.UserCartItemService;
 import com.iwaodev.application.mapper.CartItemMapper;
 import com.iwaodev.application.mapper.ProductMapper;
 import com.iwaodev.domain.product.ProductSortEnum;
-import com.iwaodev.infrastructure.model.CartItem;
-import com.iwaodev.infrastructure.model.Product;
-import com.iwaodev.infrastructure.model.ProductVariant;
-import com.iwaodev.infrastructure.model.User;
+import com.iwaodev.infrastructure.model.*;
 import com.iwaodev.ui.criteria.cartItem.CartItemCriteria;
 
+import com.iwaodev.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -34,11 +33,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.iwaodev.exception.AppException;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Service
 @Transactional
 public class UserCartItemServiceImpl implements UserCartItemService {
 
   private static final Logger logger = LoggerFactory.getLogger(UserCartItemServiceImpl.class);
+
+  @Autowired
+  private HttpServletRequest httpServletRequest;
 
   @Autowired
   private CartItemRepository cartItemRepository;
@@ -143,7 +147,12 @@ public class UserCartItemServiceImpl implements UserCartItemService {
     }
 
     // save
-    CartItem savedCartItem = this.cartItemRepository.save(newCartItem);
+    CartItem savedCartItem;
+    try {
+      savedCartItem = this.cartItemRepository.saveAndFlush(newCartItem);
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
 
 
     CartItemDTO cartDTO = CartItemMapper.INSTANCE.toCartItemDTO(savedCartItem);
@@ -172,8 +181,16 @@ public class UserCartItemServiceImpl implements UserCartItemService {
       throw new AppException(HttpStatus.NOT_FOUND, "the given cart item does not exist.");
     }
 
-
     CartItem targetEntity = targetCartItemOption.get();
+
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(targetEntity.getVersion(), receivedVersion)) {
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
 
     if (criteria.getIsSelected() != null) {
       targetEntity.setIsSelected(criteria.getIsSelected());
@@ -183,7 +200,12 @@ public class UserCartItemServiceImpl implements UserCartItemService {
       targetEntity.setQuantity(criteria.getQuantity());
     }
 
-    this.cartItemRepository.save(targetEntity);
+    try {
+      // don't forget flush otherwise version number is updated.
+      this.cartItemRepository.saveAndFlush(targetEntity);
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
 
     CartItemDTO cartDTO = CartItemMapper.INSTANCE.toCartItemDTO(targetEntity);
 
@@ -207,7 +229,23 @@ public class UserCartItemServiceImpl implements UserCartItemService {
     Optional<CartItem> targetCartItemOption = this.cartItemRepository.findById(cartItemId);
 
     if (targetCartItemOption.isPresent()) {
-      this.cartItemRepository.delete(targetCartItemOption.get());
+
+      CartItem targetEntity = targetCartItemOption.get();
+
+      // version check for concurrency update
+      String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+      if (receivedVersion == null || receivedVersion.isEmpty()) {
+        throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+      }
+      if (!Util.checkETagVersion(targetEntity.getVersion(), receivedVersion)) {
+        throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+      };
+
+      try {
+        this.cartItemRepository.delete(targetEntity);
+      } catch (OptimisticLockingFailureException ex) {
+        throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+      }
 
       // #TODO: might be better to return the rest of cartItem items of this user
       // (after remvoed this paticular item)
@@ -219,6 +257,8 @@ public class UserCartItemServiceImpl implements UserCartItemService {
   public void deleteAll(UUID userId) throws Exception {
 
     // #TODO: N + 1 problem
+
+    // #TODO: how to deal with version and bulk delete.
 
     // check user exists
     List<CartItem> targetCartItemOption = this.cartItemRepository.getAllByUserId(userId);

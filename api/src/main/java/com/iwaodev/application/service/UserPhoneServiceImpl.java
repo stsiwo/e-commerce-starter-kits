@@ -15,12 +15,16 @@ import com.iwaodev.infrastructure.model.Phone;
 import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.user.UserPhoneCriteria;
 
+import com.iwaodev.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Service
 @Transactional
@@ -30,6 +34,9 @@ public class UserPhoneServiceImpl implements UserPhoneService {
 
   @Autowired
   private UserRepository repository;
+
+  @Autowired
+  private HttpServletRequest httpServletRequest;
 
   public List<PhoneDTO> getAll(UUID userId) throws Exception {
     Optional<User> targetUserOption = this.repository.findById(userId);
@@ -79,7 +86,7 @@ public class UserPhoneServiceImpl implements UserPhoneService {
     user.addPhone(newEntity);
 
     // save
-    User savedUser = this.repository.save(user);
+    User savedUser = this.repository.saveAndFlush(user);
 
     /**
      * TODO: how to find the newly saved address with savedUser?
@@ -106,9 +113,25 @@ public class UserPhoneServiceImpl implements UserPhoneService {
 
     User targetEntity = targetUserOption.get();
 
+    Phone targetPhone = targetEntity.findPhone(phoneId);
+
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(targetPhone.getVersion(), receivedVersion)) {
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
+
     targetEntity.togglePhoneSelection(phoneId);
 
-    User updatedTargetEntity = this.repository.save(targetEntity);
+    User updatedTargetEntity;
+    try {
+      updatedTargetEntity = this.repository.saveAndFlush(targetEntity);
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
 
     // use this rather than the list method since @Mapping for the list does not
     // work.
@@ -149,26 +172,32 @@ public class UserPhoneServiceImpl implements UserPhoneService {
       logger.debug("the given phone does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given phone does not exist.");
     }
-    // create updated entity
-    Phone updatePhone = PhoneMapper.INSTANCE.toPhoneEntityFromPhoneCriteria(criteria);
 
-    /**
-     * @TODO; I don't know this is correct way to update child collection - there
-     * must be better way to do this.
-     *
-     * - or do i need to use PhoneRepository?
-     **/
-    targetUserOption.get().removePhoneById(phoneId);
-
-    targetUserOption.get().addPhone(updatePhone);
-
-    // save it
-    this.repository.save(targetUserOption.get());
-
-    // find updated entity
     Phone targetPhone = targetUserOption.get().findPhone(phoneId);
 
-    return PhoneMapper.INSTANCE.toPhoneDTO(targetPhone);
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(targetPhone.getVersion(), receivedVersion)) {
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
+
+    /**
+     * issue-k0rdIGEQ91U
+     **/
+    targetUserOption.get().updatePhone(phoneId, criteria.getPhoneNumber(), criteria.getCountryCode(), criteria.getIsSelected());
+    // save it
+    User updatedUser;
+    try {
+      // don't forget flush otherwise version number is updated.
+      updatedUser = this.repository.saveAndFlush(targetUserOption.get());
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
+
+    return PhoneMapper.INSTANCE.toPhoneDTO(updatedUser.findPhone(phoneId));
   }
 
   @Override
@@ -182,9 +211,24 @@ public class UserPhoneServiceImpl implements UserPhoneService {
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
 
+    Phone targetPhone = targetUserOption.get().findPhone(phoneId);
+
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(targetPhone.getVersion(), receivedVersion)) {
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
+
     targetUserOption.get().removePhoneById(phoneId);
 
-    this.repository.save(targetUserOption.get());
+    try {
+      this.repository.save(targetUserOption.get());
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
 
   }
 

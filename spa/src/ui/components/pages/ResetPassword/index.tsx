@@ -6,8 +6,8 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import SentimentSatisfiedOutlinedIcon from "@material-ui/icons/SentimentSatisfiedOutlined";
-import { AxiosError } from "axios";
 import { api } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import { useValidation } from "hooks/validation";
 import { resetPasswordSchema } from "hooks/validation/rules";
 import * as React from "react";
@@ -17,7 +17,6 @@ import { Link as RRLink } from "react-router-dom";
 import { messageActions } from "reducers/slices/app";
 import { MessageTypeEnum } from "src/app";
 import { getNanoId } from "src/utils";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 export declare type ResetPasswordDataType = {
@@ -184,15 +183,6 @@ const ResetPassword: React.FunctionComponent<{}> = (props) => {
           );
 
           history.push("/");
-        })
-        .catch((error: AxiosError) => {
-          dispatch(
-            messageActions.update({
-              id: getNanoId(),
-              type: MessageTypeEnum.ERROR,
-              message: error.response.data.message,
-            })
-          );
         });
     } else {
       updateAllValidation();

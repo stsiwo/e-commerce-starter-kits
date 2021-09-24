@@ -18,6 +18,7 @@ export const generateCartItemList: (count?: number) => CartItemType[] = (
       quantity: faker.datatype.number(4),
       createdAt: new Date(faker.date.past()),
       updatedAt: new Date(faker.date.past()),
+      version: null,
     } as CartItemType);
   }
 

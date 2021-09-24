@@ -9,6 +9,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
@@ -16,16 +17,22 @@ import {
   DataGrid,
   GridCellParams,
   GridColDef,
-  GridPageChangeParams,
   GridRowsProp,
 } from "@material-ui/data-grid";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import EditIcon from "@material-ui/icons/Edit";
 import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
+import Pagination from "@material-ui/lab/Pagination";
 import SearchForm from "components/common/SearchForm";
 import { CategoryType } from "domain/product/types";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router";
+import {
+  deleteSingleCategoryFetchStatusActions,
+  postCategoryFetchStatusActions,
+  putCategoryFetchStatusActions,
+} from "reducers/slices/app/fetchStatus/category";
 import {
   categoryPaginationPageActions,
   categoryQuerySearchQueryActions,
@@ -35,14 +42,6 @@ import {
 import { FetchStatusEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import AdminCategoryFormDialog from "../AdminCategoryFormDialog";
-import { useLocation } from "react-router";
-import {
-  postCategoryFetchStatusActions,
-  putCategoryFetchStatusActions,
-  deleteSingleCategoryFetchStatusActions,
-} from "reducers/slices/app/fetchStatus/category";
-import Grid from "@material-ui/core/Grid";
-import Pagination from "@material-ui/lab/Pagination";
 
 declare type AdminCategoryGridViewPropsType = {};
 
@@ -192,6 +191,7 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
         dispatch(
           deleteSingleCategoryActionCreator({
             categoryId: curCategory.categoryId,
+            version: curCategory.version,
           })
         );
       };

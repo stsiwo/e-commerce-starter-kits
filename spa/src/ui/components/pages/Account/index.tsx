@@ -1,23 +1,24 @@
-import * as React from "react";
+import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
+import Alert from "@material-ui/lab/Alert";
+import AlertTitle from "@material-ui/lab/AlertTitle";
+import UserAccountAddressManagement from "components/common/UserAccountAddressManagement";
+import UserAccountAvatarManagement from "components/common/UserAccountAvatarManagement";
 import UserAccountBasicManagement from "components/common/UserAccountBasicManagement";
 import UserAccountPhoneManagement from "components/common/UserAccountPhoneManagement";
-import UserAccountAddressManagement from "components/common/UserAccountAddressManagement";
-import Grid from "@material-ui/core/Grid";
-import UserAccountAvatarManagement from "components/common/UserAccountAvatarManagement";
-import { useDispatch, useSelector } from "react-redux";
-import { mSelector } from "src/selectors/selector";
 import UserAccountRemovalManagement from "components/common/UserAccountRemovalManagement";
-import AlertTitle from "@material-ui/lab/AlertTitle";
-import Alert from "@material-ui/lab/Alert";
-import Button from "@material-ui/core/Button";
 import { api } from "configs/axiosConfig";
-import { messageActions } from "reducers/slices/app";
-import { getNanoId } from "src/utils";
+import { logger } from "configs/logger";
+import { UserActiveEnum, UserType } from "domain/user/types";
+import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { authActions, messageActions } from "reducers/slices/app";
 import { MessageTypeEnum } from "src/app";
-import { AxiosError } from "axios";
-import { UserActiveEnum } from "domain/user/types";
+import { mSelector } from "src/selectors/selector";
+import { getNanoId } from "src/utils";
+const log = logger(__filename);
 
 /**
  * TODO: if you have maxWidth at any parent element, Grid xs,md,..  does not work!!
@@ -45,6 +46,24 @@ const Account: React.FunctionComponent<{}> = (props) => {
 
   const auth = useSelector(mSelector.makeAuthSelector());
 
+  // fetch auth from api
+  React.useEffect(() => {
+    api
+      .request({
+        method: "GET",
+        url: API1_URL + `/users/${auth.user.userId}`,
+      })
+      .then((data) => {
+        /**
+         *  add new phone
+         **/
+        const loggedInUser: UserType = data.data;
+        log("user data: ");
+        log(loggedInUser);
+        dispatch(authActions.updateUser(loggedInUser));
+      });
+  }, [JSON.stringify(auth.user)]);
+
   // reissue verification token event handler
   const handleReissueToken = (e: React.MouseEvent<HTMLButtonElement>) => {
     api
@@ -53,6 +72,10 @@ const Account: React.FunctionComponent<{}> = (props) => {
         url: API1_URL + `/users/${auth.user.userId}/reissue-account-verify`,
       })
       .then((data) => {
+        const loggedInUser: UserType = data.data;
+        log("user data: ");
+        log(loggedInUser);
+        dispatch(authActions.updateUser(loggedInUser));
         /**
          * update message
          **/
@@ -62,19 +85,6 @@ const Account: React.FunctionComponent<{}> = (props) => {
             type: MessageTypeEnum.SUCCESS,
             message:
               "we sent the verification email successfuly. please check your email box.",
-          })
-        );
-      })
-      .catch((error: AxiosError) => {
-        /**
-         * update message
-         **/
-        dispatch(
-          messageActions.update({
-            id: getNanoId(),
-            type: MessageTypeEnum.SUCCESS,
-            message:
-              "sorry, we failed to send the verification email. please try again.",
           })
         );
       });

@@ -1,22 +1,26 @@
 import Avatar from "@material-ui/core/Avatar";
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import List from "@material-ui/core/List";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardHeader from "@material-ui/core/CardHeader";
-import Tooltip from "@material-ui/core/Tooltip";
-import FavoriteIcon from "@material-ui/icons/Favorite";
-import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import IconButton from "@material-ui/core/IconButton";
+import List from "@material-ui/core/List";
 import Modal from "@material-ui/core/Modal";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
+import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import DeleteIcon from "@material-ui/icons/Delete";
+import EditIcon from "@material-ui/icons/Edit";
+import FavoriteIcon from "@material-ui/icons/Favorite";
+import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import PhoneIphoneIcon from "@material-ui/icons/PhoneIphone";
+import { logger } from "configs/logger";
+import { findPhone } from "domain/user";
 import {
   CustomerPhonesFormDataType,
   CustomerPhonesFormValidationDataType,
@@ -26,7 +30,6 @@ import {
 } from "domain/user/types";
 import { useValidation } from "hooks/validation";
 import { userAccountPhoneSchema } from "hooks/validation/rules";
-import EditIcon from "@material-ui/icons/Edit";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -35,15 +38,13 @@ import {
   postAuthPhoneActionCreator,
   putAuthPhoneActionCreator,
 } from "reducers/slices/app";
-import { mSelector, rsSelector } from "src/selectors/selector";
-import IconButton from "@material-ui/core/IconButton";
-import { FetchStatusEnum } from "src/app";
 import {
+  deleteAuthPhoneFetchStatusActions,
   postAuthPhoneFetchStatusActions,
   putAuthPhoneFetchStatusActions,
-  deleteAuthPhoneFetchStatusActions,
 } from "reducers/slices/app/fetchStatus/auth";
-import { logger } from "configs/logger";
+import { FetchStatusEnum } from "src/app";
+import { mSelector, rsSelector } from "src/selectors/selector";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -247,6 +248,7 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
       dispatch(
         deleteAuthPhoneActionCreator({
           phoneId: phoneId,
+          version: findPhone(props.phones, phoneId).version,
         })
       );
     };
@@ -278,6 +280,7 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
       dispatch(
         patchAuthPhoneActionCreator({
           phoneId: targetPhoneId,
+          version: findPhone(props.phones, targetPhoneId).version,
         })
       );
     };

@@ -31,4 +31,5 @@ public class ProductVariantDTO {
   private BigDecimal currentPrice;
   private Boolean isDiscountAvailable;
   private BigDecimal regularPrice;
+  private Long version;
 }

@@ -1,26 +1,26 @@
-import Avatar from '@material-ui/core/Avatar';
-import Box from '@material-ui/core/Box';
-import IconButton from '@material-ui/core/IconButton';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import BackupIcon from '@material-ui/icons/Backup';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import ImageIcon from '@material-ui/icons/Image';
-import { AxiosError } from 'axios';
-import { api } from 'configs/axiosConfig';
-import merge from 'lodash/merge';
-import { useSnackbar } from 'notistack';
-import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { authActions, postAuthAvatarImageActionCreator, deleteAuthAvatarImageActionCreator } from 'reducers/slices/app';
-import { mSelector } from 'src/selectors/selector';
-import { MessageTypeEnum } from 'src/app';
-
+import Avatar from "@material-ui/core/Avatar";
+import Box from "@material-ui/core/Box";
+import IconButton from "@material-ui/core/IconButton";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import BackupIcon from "@material-ui/icons/Backup";
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+import ImageIcon from "@material-ui/icons/Image";
+import { logger } from "configs/logger";
+import { useSnackbar } from "notistack";
+import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deleteAuthAvatarImageActionCreator,
+  postAuthAvatarImageActionCreator,
+} from "reducers/slices/app";
+import { mSelector } from "src/selectors/selector";
+const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     title: {
       textTransform: "uppercase",
-      margin: theme.spacing(2)
+      margin: theme.spacing(2),
     },
     avatarBox: {
       display: "flex",
@@ -40,8 +40,8 @@ const useStyles = makeStyles((theme: Theme) =>
     media: {
       // aspect ratio: 1:1
       height: 0,
-      paddingTop: '100%',
-      marginTop: '30',
+      paddingTop: "100%",
+      marginTop: "30",
     },
     form: {
       margin: theme.spacing(1),
@@ -53,12 +53,11 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: 400,
       width: "80%",
       margin: "5px auto",
-
     },
     actionBox: {
-      textAlign: "center"
+      textAlign: "center",
     },
-  }),
+  })
 );
 
 /**
@@ -79,17 +78,16 @@ const useStyles = makeStyles((theme: Theme) =>
  *    - 6. display result popup message
  **/
 const AdminAccountAvatarManagement: React.FunctionComponent<{}> = (props) => {
-
   // mui: makeStyles
   const classes = useStyles();
-  
+
   // auth
-  const auth = useSelector(mSelector.makeAuthSelector())
+  const auth = useSelector(mSelector.makeAuthSelector());
 
   // avatar image
-  const curAvatarImageUrl = useSelector(mSelector.makeAuthAvatarUrlSelector())
+  const curAvatarImageUrl = useSelector(mSelector.makeAuthAvatarUrlSelector());
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   // snackbar notification
   // usage: 'enqueueSnackbar("message", { variant: "error" };
@@ -102,39 +100,55 @@ const AdminAccountAvatarManagement: React.FunctionComponent<{}> = (props) => {
   const [curFilePath, setFilePath] = React.useState<string>(curAvatarImageUrl);
   const imageInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleTriggerClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+  const handleTriggerClick: React.EventHandler<
+    React.MouseEvent<HTMLButtonElement>
+  > = (e) => {
     if (imageInputRef.current) {
       imageInputRef.current.click();
     }
-  }
+  };
 
-  const handleFileChange: React.EventHandler<React.ChangeEvent<HTMLInputElement>> = (e) => {
-    setFile(e.currentTarget.files[0])
-    const path = URL.createObjectURL(e.currentTarget.files[0])
+  const handleFileChange: React.EventHandler<
+    React.ChangeEvent<HTMLInputElement>
+  > = (e) => {
+    setFile(e.currentTarget.files[0]);
+    const path = URL.createObjectURL(e.currentTarget.files[0]);
     setFilePath(path);
-  }
+  };
 
-
-  const handleUploadClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
+  const handleUploadClick: React.EventHandler<
+    React.MouseEvent<HTMLButtonElement>
+  > = (e) => {
     if (!curFile) {
-      enqueueSnackbar("Please choose an image before uploading.", { variant: "error" });
+      enqueueSnackbar("Please choose an image before uploading.", {
+        variant: "error",
+      });
       return false;
     }
 
     dispatch(
-      postAuthAvatarImageActionCreator({ avatarImage: curFile, userId: auth.user.userId })
-    )
-  }
+      postAuthAvatarImageActionCreator({
+        avatarImage: curFile,
+        userId: auth.user.userId,
+        version: auth.user.version,
+      })
+    );
+  };
 
-
-  const handleDeleteClick: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = (e) => {
-
+  const handleDeleteClick: React.EventHandler<
+    React.MouseEvent<HTMLButtonElement>
+  > = (e) => {
     dispatch(
-      deleteAuthAvatarImageActionCreator({ userId: auth.user.userId })
-    )
+      deleteAuthAvatarImageActionCreator({
+        userId: auth.user.userId,
+        version: auth.user.version,
+      })
+    );
 
-    setFilePath("");
-  }
+    // issue:same-image-is-not-displayed-second-time
+    imageInputRef.current.value = "";
+    setFilePath(null);
+  };
 
   return (
     <React.Fragment>
@@ -170,11 +184,7 @@ const AdminAccountAvatarManagement: React.FunctionComponent<{}> = (props) => {
         </IconButton>
       </Box>
     </React.Fragment>
-  )
-}
+  );
+};
 
-export default AdminAccountAvatarManagement
-
-
-
-
+export default AdminAccountAvatarManagement;

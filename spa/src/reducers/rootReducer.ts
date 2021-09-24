@@ -115,7 +115,8 @@ import {
 } from "./slices/domain/checkout";
 import { companySliceReducer } from "./slices/domain/company";
 import {
-  notificationCurIndexSliceReducer,
+  notificationCurIdSliceReducer,
+  notificationCurNotificationSliceReducer,
   notificationPaginationSliceReducer,
   notificationSliceReducer,
 } from "./slices/domain/notification";
@@ -439,7 +440,8 @@ const mainReducer = combineReducers({
     notifications: combineReducers({
       data: notificationSliceReducer,
       pagination: notificationPaginationSliceReducer,
-      curIndex: notificationCurIndexSliceReducer,
+      curId: notificationCurIdSliceReducer,
+      curNotification: notificationCurNotificationSliceReducer,
     }),
     company: combineReducers({
       data: companySliceReducer,

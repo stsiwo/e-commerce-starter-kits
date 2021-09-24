@@ -75,6 +75,7 @@ export function* deleteUserAddressWorker(
     const response: WorkerResponse = yield call(() =>
       api({
         method: "DELETE",
+        headers: { "If-Match": `"${action.payload.version}"` },
         url: apiUrl,
       })
         .then((response) => ({
@@ -122,17 +123,6 @@ export function* deleteUserAddressWorker(
        **/
       yield put(
         deleteUserAddressFetchStatusActions.update(FetchStatusEnum.FAILED)
-      );
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
       );
     }
   } else {

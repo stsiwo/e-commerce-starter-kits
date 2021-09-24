@@ -19,7 +19,9 @@ import EditIcon from "@material-ui/icons/Edit";
 import HomeIcon from "@material-ui/icons/Home";
 import LocalShippingIcon from "@material-ui/icons/LocalShipping";
 import PaymentIcon from "@material-ui/icons/Payment";
+import { logger } from "configs/logger";
 import {
+  findAddress,
   getBillingAddressId,
   getShippingAddressId,
   toAddressString,
@@ -49,7 +51,6 @@ import {
 import { FetchStatusEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
 import { getCountryList, getProvinceList } from "src/utils";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -273,6 +274,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
               postalCode: curUserAccountAddressState.postalCode,
               isBillingAddress: false,
               isShippingAddress: false,
+              version: null,
             })
           );
         } else {
@@ -288,6 +290,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
               postalCode: curUserAccountAddressState.postalCode,
               isBillingAddress: curUserAccountAddressState.isBillingAddress,
               isShippingAddress: curUserAccountAddressState.isShippingAddress,
+              version: curUserAccountAddressState.version,
             })
           );
         }
@@ -321,6 +324,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
       dispatch(
         deleteAuthAddressActionCreator({
           addressId: addressId,
+          version: findAddress(addresses, addressId).version,
         })
       );
       // request
@@ -332,11 +336,9 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
     > = (e) => {
       const targetAddressId: string =
         e.currentTarget.getAttribute("data-address-id");
-      const targetAddress = auth.user.addresses.find(
-        (address: UserAddressType) => {
-          return address.addressId == targetAddressId;
-        }
-      );
+      const targetAddress = addresses.find((address: UserAddressType) => {
+        return address.addressId == targetAddressId;
+      });
 
       setUserAccountAddressState(targetAddress);
       setUserAccountAddressValidationState(
@@ -361,7 +363,11 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
       setBillingId(addressId);
 
       dispatch(
-        patchAuthAddressActionCreator({ addressId: addressId, type: "billing" })
+        patchAuthAddressActionCreator({
+          addressId: addressId,
+          type: "billing",
+          version: findAddress(addresses, addressId).version,
+        })
       );
     };
 
@@ -375,6 +381,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
         patchAuthAddressActionCreator({
           addressId: addressId,
           type: "shipping",
+          version: findAddress(addresses, addressId).version,
         })
       );
     };

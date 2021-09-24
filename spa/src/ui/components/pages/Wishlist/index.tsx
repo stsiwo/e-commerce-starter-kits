@@ -113,7 +113,10 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
     }
 
     dispatch(
-      patchWishlistItemActionCreator({ wishlistItemId: wishlistItemId })
+      patchWishlistItemActionCreator({
+        wishlistItemId: wishlistItemId,
+        version: targetWishlistItem.version,
+      })
     );
   };
 
@@ -121,8 +124,15 @@ const Wishlist: React.FunctionComponent<{}> = (props) => {
     React.MouseEvent<HTMLButtonElement>
   > = (e) => {
     const wishlistItemId = e.currentTarget.getAttribute("data-wishlist-id");
+    const targetWishlistItem = curWishlistItems.find(
+      (wishlistItem: WishlistItemType) =>
+        wishlistItem.wishlistItemId == wishlistItemId
+    );
     dispatch(
-      deleteSingleWishlistItemActionCreator({ wishlistItemId: wishlistItemId })
+      deleteSingleWishlistItemActionCreator({
+        wishlistItemId: wishlistItemId,
+        version: targetWishlistItem.version,
+      })
     );
   };
 

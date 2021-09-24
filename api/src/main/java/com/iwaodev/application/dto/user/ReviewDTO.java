@@ -23,6 +23,6 @@ public class ReviewDTO {
 
   private LocalDateTime updatedAt;
 
-
+  private Long version;
   // #TODO: need to include product
 }

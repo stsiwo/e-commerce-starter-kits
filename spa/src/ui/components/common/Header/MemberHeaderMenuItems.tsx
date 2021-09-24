@@ -14,12 +14,12 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import MenuIcon from "@material-ui/icons/Menu";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
-import { AxiosError } from "axios";
 import { api } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import { useSnackbar } from "notistack";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import { Link as RRLink } from "react-router-dom";
 import { authActions } from "reducers/slices/app";
 import {
@@ -28,13 +28,13 @@ import {
 } from "reducers/slices/domain/notification";
 import { cartModalActions } from "reducers/slices/ui";
 import { mSelector } from "src/selectors/selector";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 declare interface MenuItemType {
   url: string;
   label: string;
   isLogout: boolean;
+  switchTestAdmin?: boolean;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -54,6 +54,12 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
   // data
   const menuItemList: MenuItemType[] = React.useMemo(
     () => [
+      {
+        url: "/admin/login",
+        label: "Switch to Test Admin",
+        isLogout: false,
+        switchTestAdmin: true,
+      },
       {
         url: "/account",
         label: "Accounts",
@@ -91,6 +97,7 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
     mSelector.makeNumberOfCartItemSelector()
   );
 
+  const history = useHistory();
   // responsive
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
@@ -134,11 +141,33 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
           dispatch(authActions.logout());
 
           enqueueSnackbar("logged out successfully.", { variant: "success" });
-        })
-        .catch((error: AxiosError) => {
-          enqueueSnackbar(error.message, { variant: "error" });
         });
     };
+
+  const handleSwitchToTestAdmin: React.EventHandler<
+    React.MouseEvent<HTMLAnchorElement>
+  > = (e) => {
+    e.preventDefault();
+
+    // request
+    api
+      .request({
+        method: "post",
+        url: API1_URL + `/logout`,
+        data: null,
+      })
+      .then((data) => {
+        // fetch again
+        dispatch(authActions.logout());
+
+        enqueueSnackbar(
+          "please use this test credential to login as test admin.",
+          { variant: "success" }
+        );
+
+        history.push("/admin/login");
+      });
+  };
 
   /**
    * notification feature.
@@ -146,6 +175,11 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
   const curNotificationPagination = useSelector(
     mSelector.makeNotificationPaginationSelector()
   );
+  /**
+   * counter to decrement from total ntf size
+   * since we fetch the rest of notification from api, it is difficult to count without this.
+   */
+  const [curCounter, setCounter] = React.useState<number>(0);
 
   // fetch notifcation for this member.
   // - initial fetch (replace)
@@ -153,6 +187,7 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
   const isInitial = React.useRef<boolean>(true);
   React.useEffect(() => {
     log("start fetching notification...");
+    log("current page: " + curNotificationPagination.page);
     if (isInitial.current) {
       log("initial notification fetch with 'update'");
       dispatch(fetchNotificationActionCreator({ type: "update" }));
@@ -165,6 +200,10 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
 
   const handleNotificationClick = (e: React.MouseEvent<HTMLElement>) => {
     dispatch(incrementNotificationCurIndexActionCreator());
+    // incremnt count until reaching the total ntf
+    if (curCounter < curNotificationPagination.totalElements) {
+      setCounter((prev: number) => ++prev);
+    }
   };
 
   // rendering stuff
@@ -181,9 +220,13 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
           key={menuItem.url}
           color="inherit"
           {...linkProps}
-          onClick={(e: React.MouseEvent<HTMLAnchorElement>) =>
-            menuItem.isLogout ? handleLogout(e) : null
-          }
+          onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+            if (menuItem.switchTestAdmin) {
+              handleSwitchToTestAdmin(e);
+            } else if (menuItem.isLogout) {
+              handleLogout(e);
+            }
+          }}
         >
           {menuItem.label}
         </Link>
@@ -203,9 +246,13 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
             className={classes.menuItem}
             component={RRLink}
             to={menuItem.url}
-            onClick={(e: React.MouseEvent<HTMLAnchorElement>) =>
-              menuItem.isLogout ? handleLogout(e) : null
-            }
+            onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+              if (menuItem.switchTestAdmin) {
+                handleSwitchToTestAdmin(e);
+              } else if (menuItem.isLogout) {
+                handleLogout(e);
+              }
+            }}
           >
             {menuItem.label}
           </Link>
@@ -229,7 +276,7 @@ const MemberHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
       <IconButton onClick={handleNotificationClick}>
         {/** use totalElements to display total number of notifications **/}
         <Badge
-          badgeContent={curNotificationPagination.totalElements}
+          badgeContent={curNotificationPagination.totalElements - curCounter}
           color="error"
         >
           <NotificationsIcon />

@@ -79,6 +79,8 @@ public class ProductVariantCriteria {
 
   @NotNull(message = "{productVariant.productId.notnull}")
   private UUID productId;
+
+  private Long version;
 }
 
 

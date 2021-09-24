@@ -47,6 +47,7 @@ import org.springframework.validation.beanvalidation.MethodValidationPostProcess
 import org.springframework.validation.beanvalidation.SpringConstraintValidatorFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.ForwardedHeaderFilter;
+import org.springframework.web.filter.ShallowEtagHeaderFilter;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
@@ -354,5 +355,14 @@ public class Application {
     LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
     bean.setValidationMessageSource(messageSource());
     return bean;
+  }
+
+  /**
+   * to enable eTag used for Optimistic Locking mechanism to handle concurrency issue.
+   * @return
+   */
+  @Bean
+  public ShallowEtagHeaderFilter shallowEtagHeaderFilter() {
+    return new ShallowEtagHeaderFilter();
   }
 }

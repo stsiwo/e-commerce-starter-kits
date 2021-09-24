@@ -8,6 +8,7 @@ import javax.validation.Valid;
 
 import com.iwaodev.application.dto.product.ProductDTO;
 import com.iwaodev.application.dto.productVariant.ProductVariantDTO;
+import com.iwaodev.application.dto.user.PhoneDTO;
 import com.iwaodev.application.iservice.ProductService;
 import com.iwaodev.application.iservice.ProductVariantService;
 import com.iwaodev.domain.product.ProductSortEnum;
@@ -52,17 +53,21 @@ public class ProductVariantController {
 
   // create a new variant of given product
   @PostMapping("/products/{productId}/variants")
-  public ResponseEntity<ProductVariantDTO> post(
+  public ResponseEntity<ProductDTO> post(
       @PathVariable(value = "productId") UUID productId,
       @Valid @RequestBody ProductVariantCriteria criteria
       ) throws Exception {
-    return new ResponseEntity<>(this.service.create(productId, criteria), HttpStatus.OK);
+    ProductDTO results = this.service.create(productId, criteria);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   // update/replace a new product
   @PutMapping("/products/{productId}/variants/{variantId}")
   @PreAuthorize("hasRole('ROLE_ADMIN')") // admin only
-  public ResponseEntity<ProductVariantDTO> put(
+  public ResponseEntity<ProductDTO> put(
       @PathVariable(value = "productId") UUID productId,
       @PathVariable(value = "variantId") Long variantId,
       @Valid @RequestBody ProductVariantCriteria criteria
@@ -74,7 +79,11 @@ public class ProductVariantController {
       throw new AppException(HttpStatus.BAD_REQUEST, "variant id in the request body does not match with the one in url.");
     }
 
-    return new ResponseEntity<>(this.service.replace(productId, variantId, criteria), HttpStatus.OK);
+    ProductDTO results = this.service.replace(productId, variantId, criteria);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   // delete a new product

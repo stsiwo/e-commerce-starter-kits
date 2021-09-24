@@ -1,17 +1,11 @@
 package com.iwaodev.infrastructure.model;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import com.iwaodev.infrastructure.model.listener.CategoryValidationListener;
@@ -65,6 +59,10 @@ public class Category {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
+  @Version
+  @Column(name = "version")
+  private Long version = 0L;
+
   /**
    * the value of mappedBy is variable name of the other one
    * 
@@ -80,4 +78,9 @@ public class Category {
   @OneToMany(mappedBy = "category", cascade = {}, orphanRemoval = false)
   private List<Product> products = new ArrayList<>();
 
+  public void update(Category newCategory) {
+    this.categoryName = newCategory.getCategoryName();
+    this.categoryDescription = newCategory.getCategoryDescription();
+    this.categoryPath = newCategory.getCategoryPath();
+  }
 }

@@ -8,12 +8,13 @@ import Grid from "@material-ui/core/Grid";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
+import { classnames } from "@material-ui/data-grid";
 import VerifiedUserIcon from "@material-ui/icons/VerifiedUser";
 import Rating from "@material-ui/lab/Rating";
-import { AxiosError } from "axios";
 import UserCard from "components/common/UserCard";
 import ReviewProductHorizontalCard from "components/pages/Admin/AdminReview/AdminReviewForm/ReviewProductHorizontalCard";
 import { api } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import {
   defaultReviewValidationData,
   ReviewDataType,
@@ -27,13 +28,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { messageActions } from "reducers/slices/app";
 import {
+  postReviewFetchStatusActions,
+  putReviewFetchStatusActions,
+} from "reducers/slices/app/fetchStatus/review";
+import {
   postReviewActionCreator,
   putReviewActionCreator,
 } from "reducers/slices/domain/review";
-import { MessageTypeEnum } from "src/app";
-import { mSelector } from "src/selectors/selector";
+import { FetchStatusEnum, MessageTypeEnum } from "src/app";
+import { mSelector, rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 interface ReviewFormPropsType {
@@ -64,6 +68,13 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: "center",
       alignItems: "center",
     },
+    reviewVerified: {
+      color: theme.palette.success.main,
+    },
+    reviewPending: {
+      color: theme.palette.fifth.main,
+    },
+    rating: {},
   })
 );
 
@@ -172,6 +183,7 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
             reviewPoint: curReviewState.reviewPoint,
             productId: curReviewState.product.productId, // assign explicitly in teh case of new
             userId: curReviewState.user.userId,
+            version: curReviewState.version,
           })
         );
       } else {
@@ -186,6 +198,7 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
             reviewPoint: curReviewState.reviewPoint,
             productId: curReviewState.product.productId, // assign explicitly in teh case of new
             userId: curReviewState.user.userId,
+            version: curReviewState.version,
           })
         );
       }
@@ -223,6 +236,7 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
     api
       .request({
         method: "DELETE",
+        headers: { "If-Match": `"${curReviewState.version}"` },
         url:
           API1_URL +
           `/users/${curReviewState.user.userId}/reviews/${curReviewState.reviewId}`,
@@ -235,19 +249,26 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
             message: data.data.message,
           })
         );
-
         history.push("/orders");
-      })
-      .catch((error: AxiosError) => {
-        dispatch(
-          messageActions.update({
-            id: getNanoId(),
-            type: MessageTypeEnum.ERROR,
-            message: error.response.data.message,
-          })
-        );
       });
   };
+
+  // close form dialog only when success for post/put/delete
+  const curPostFetchStatus = useSelector(
+    rsSelector.app.getPostReviewFetchStatus
+  );
+  const curPutFetchStatus = useSelector(rsSelector.app.getPutReviewFetchStatus);
+  React.useEffect(() => {
+    if (
+      curPostFetchStatus === FetchStatusEnum.SUCCESS ||
+      curPutFetchStatus === FetchStatusEnum.SUCCESS
+    ) {
+      history.push("/orders");
+
+      dispatch(postReviewFetchStatusActions.clear());
+      dispatch(putReviewFetchStatusActions.clear());
+    }
+  });
 
   return (
     <Grid container justify="center">
@@ -289,7 +310,11 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
           <VerifiedUserIcon
             color={curReviewState.isVerified ? "primary" : "disabled"}
           />
-          <Typography variant="body2" component="p" className={classes.title}>
+          <Typography
+            variant="body2"
+            component="p"
+            className={classnames(classes.title)}
+          >
             {curReviewState.isVerified ? "Approved" : "Pending"}
           </Typography>
         </Box>
@@ -311,7 +336,7 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
             precision={0.1}
             value={curReviewState.reviewPoint}
             onChange={handleReviewPointInputChangeEvent}
-            className={`${classes.txtFieldBase}`}
+            className={`${classes.txtFieldBase} ${classes.rating}`}
             size="large"
           />
           <br />

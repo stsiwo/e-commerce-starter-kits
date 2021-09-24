@@ -1,8 +1,13 @@
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import InputAdornment from "@material-ui/core/InputAdornment";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
+import Visibility from "@material-ui/icons/Visibility";
+import VisibilityOff from "@material-ui/icons/VisibilityOff";
+import { logger } from "configs/logger";
 import {
   defaultUserBasicAccountData,
   defaultUserBasicAccountValidationData,
@@ -16,11 +21,6 @@ import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { putUserActionCreator } from "reducers/slices/domain/user";
 import { mSelector } from "src/selectors/selector";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import IconButton from "@material-ui/core/IconButton";
-import Visibility from "@material-ui/icons/Visibility";
-import VisibilityOff from "@material-ui/icons/VisibilityOff";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -184,8 +184,17 @@ const AdminCustomerBasicForm: React.FunctionComponent<AdminCustomerBasicFormProp
             ...(curAdminCustomerState.password
               ? { password: curAdminCustomerState.password }
               : {}),
+            version: props.user.version,
           })
         );
+
+        setAdminCustomerState((prev: UserBasicAccountDataType) => {
+          return {
+            ...prev,
+            password: "",
+            confirm: "",
+          };
+        });
       } else {
         updateAllValidation();
       }

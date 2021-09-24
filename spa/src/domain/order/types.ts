@@ -239,6 +239,7 @@ export declare type OrderType = {
   nextMemberOrderEventOptions: OrderStatusEnum[];
   latestOrderEvent: OrderEventType;
   stripePaymentIntentId: string;
+  version: number;
 };
 
 // form & input state
@@ -260,6 +261,7 @@ export declare type RatingCriteria = {
 
 export declare type SessionTimeoutOrderEventCriteria = {
   orderNumber: string;
+  orderVersion: number;
 };
 
 export declare type OrderDetailCriteria = {
@@ -283,6 +285,7 @@ export declare type OrderCriteria = {
   orderDetails: OrderDetailCriteria[];
   orderEvents?: string[];
   currency: string;
+  version: number;
 };
 
 export declare type OrderEventCriteria = {

@@ -6,6 +6,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import com.iwaodev.application.dto.product.ProductDTO;
+import com.iwaodev.application.dto.user.PhoneDTO;
 import com.iwaodev.application.dto.wishlistItem.WishlistItemDTO;
 import com.iwaodev.application.iservice.UserWishlistItemService;
 import com.iwaodev.config.SpringSecurityUser;
@@ -64,7 +65,11 @@ public class UserWishlistItemController {
       @Valid @RequestBody WishlistItemCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    return new ResponseEntity<>(this.service.add(userId, criteria.getVariantId()), HttpStatus.OK);
+    WishlistItemDTO results = this.service.add(userId, criteria.getVariantId());
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   // move to cart method (PATCH)

@@ -100,6 +100,12 @@ public class AdvanceOrderRepositoryImpl implements AdvanceOrderRepository {
     return new PageImpl<Order>(orders, pageable, total.size());
   }
 
+  @Override
+  public Order persist(Order order) {
+    this.entityManager.persist(order);
+    return order;
+  }
+
   public Long getTotalCount() {
     return this.entityManager.createQuery("SELECT COUNT(*) FROM categories c", Long.class)
       .getSingleResult();

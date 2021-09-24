@@ -1,16 +1,9 @@
 package com.iwaodev.infrastructure.model;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import com.iwaodev.infrastructure.model.listener.ReviewValidationListener;
@@ -81,6 +74,10 @@ public class Review {
   @UpdateTimestamp
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
+
+  @Version
+  @Column(name = "version")
+  private Long version = 0L;
 
   @NotNull(message = "{review.user.notnull}")
   @ManyToOne

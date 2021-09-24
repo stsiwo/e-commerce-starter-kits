@@ -13,4 +13,5 @@ export declare type NotificationType = {
   notificationType: string;
   createdAt: Date;
   readAt: Date;
+  version: number;
 };

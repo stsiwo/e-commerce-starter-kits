@@ -32,4 +32,6 @@ public class OrderUserDTO {
   private LocalDateTime createdAt;
 
   private LocalDateTime updatedAt;
+
+  private Long version;
 }

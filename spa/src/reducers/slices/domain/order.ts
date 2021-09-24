@@ -56,6 +56,7 @@ export const deleteOrderActionTypeName = deleteOrderActionCreator().type;
 // for POST (add a new order event) request
 export declare type PostOrderEventActionType = OrderEventCriteria & {
   orderId: string;
+  orderVersion: number;
 };
 export const postOrderEventActionCreator =
   createAction<PostOrderEventActionType>("saga/domain/order/event/post");
@@ -64,6 +65,7 @@ export const postOrderEventActionTypeName = postOrderEventActionCreator().type;
 // for PUT (replace a order event) request
 export declare type PutOrderEventActionType = OrderEventCriteria & {
   orderId: string;
+  orderVersion: number;
 };
 export const putOrderEventActionCreator = createAction<PutOrderEventActionType>(
   "saga/domain/order/event/put"
@@ -74,6 +76,7 @@ export const putOrderEventActionTypeName = putOrderEventActionCreator().type;
 export declare type DeleteSingleOrderEventActionType = {
   orderEventId: string;
   orderId: string;
+  orderVersion: number;
 };
 export const deleteSingleOrderEventActionCreator =
   createAction<DeleteSingleOrderEventActionType>(

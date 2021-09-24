@@ -38,5 +38,6 @@ public class CategoryCriteria {
   @Size(max = 100, message = "{category.path.max100}")
   private String categoryPath;
 
+  private Long version;
 }
 

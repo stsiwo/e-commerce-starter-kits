@@ -8,8 +8,10 @@ import javax.validation.constraints.NotNull;
 
 import com.iwaodev.application.dto.cartItem.CartItemDTO;
 import com.iwaodev.application.dto.product.ProductDTO;
+import com.iwaodev.application.dto.user.AddressDTO;
 import com.iwaodev.application.iservice.UserCartItemService;
 import com.iwaodev.config.SpringSecurityUser;
+import com.iwaodev.infrastructure.model.CartItem;
 import com.iwaodev.ui.criteria.cartItem.CartItemCriteria;
 import com.iwaodev.ui.response.BaseResponse;
 
@@ -66,7 +68,12 @@ public class UserCartItemController {
       @Valid @RequestBody CartItemCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    return new ResponseEntity<>(this.service.add(criteria), HttpStatus.OK);
+
+    CartItemDTO results = this.service.add(criteria);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   // update/replace existing cartItem item with a new one 
@@ -83,7 +90,11 @@ public class UserCartItemController {
       criteria.setCartItemId(cartItemId);
     }
 
-    return new ResponseEntity<>(this.service.update(criteria), HttpStatus.OK);
+    CartItemDTO results = this.service.update(criteria);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   // remove a given item from the cartItem 

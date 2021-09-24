@@ -1,15 +1,10 @@
 package com.iwaodev.infrastructure.model;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +26,10 @@ public class ProductSize {
 
   @Column(name = "product_size_description")
   private String productSizeDescription;
+
+  @Version
+  @Column(name = "version")
+  private Long version = 0L;
 
   // any change of this entity should not affect to its children
   @OneToMany(mappedBy = "productSize", cascade = {}, orphanRemoval = false)

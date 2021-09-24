@@ -4,8 +4,8 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
-import { AxiosError } from "axios";
 import { api } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import {
   defaultUserStatusAccountData,
   defaultUserStatusAccountValidationData,
@@ -13,8 +13,8 @@ import {
   userActiveLabelList,
   UserStatusAccountDataType,
   UserStatusAccountValidationDataType,
-  UserType,
   UserStatusCriteria,
+  UserType,
 } from "domain/user/types";
 import { useValidation } from "hooks/validation";
 import { userActiveStatusAccountSchema } from "hooks/validation/rules";
@@ -25,7 +25,6 @@ import { userActions } from "reducers/slices/domain/user";
 import { MessageTypeEnum } from "src/app";
 import { mSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -135,7 +134,8 @@ const AdminCustomerStatusForm: React.FunctionComponent<AdminCustomerStatusFormPr
         // request
         api
           .request({
-            method: "patch",
+            method: "PATCH",
+            headers: { "If-Match": `"${props.user.version}"` },
             url: API1_URL + `/users/${props.user.userId}/status`,
             data: {
               active: curAdminCustomerState.active,
@@ -157,15 +157,6 @@ const AdminCustomerStatusForm: React.FunctionComponent<AdminCustomerStatusFormPr
                 id: getNanoId(),
                 type: MessageTypeEnum.SUCCESS,
                 message: "updated successfully.",
-              })
-            );
-          })
-          .catch((error: AxiosError) => {
-            dispatch(
-              messageActions.update({
-                id: getNanoId(),
-                type: MessageTypeEnum.ERROR,
-                message: "failed to update.",
               })
             );
           });

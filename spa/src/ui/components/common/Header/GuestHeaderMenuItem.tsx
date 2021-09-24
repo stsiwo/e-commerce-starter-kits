@@ -13,9 +13,10 @@ import {
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import MenuIcon from "@material-ui/icons/Menu";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
+import { useSnackbar } from "notistack";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import { Link as RRLink } from "react-router-dom";
 import { cartModalActions } from "reducers/slices/ui";
 import { mSelector } from "src/selectors/selector";
@@ -24,6 +25,7 @@ declare interface MenuItemType {
   url: string;
   label: string;
   isLogout: boolean;
+  asTestAdmin?: boolean;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -40,12 +42,22 @@ const GuestHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
 
   const dispatch = useDispatch();
 
+  const history = useHistory();
+  // snackbar notification
+  // usage: 'enqueueSnackbar("message", { variant: "error" };
+  const { enqueueSnackbar } = useSnackbar();
   // responsive
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
   // data
   const menuItemList: MenuItemType[] = React.useMemo(
     () => [
+      {
+        url: "",
+        label: "Login as Test Admin",
+        isLogout: false,
+        asTestAdmin: true,
+      },
       {
         url: "/search",
         label: "Search",
@@ -88,6 +100,15 @@ const GuestHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
     setAnchorEl(null);
   };
 
+  const handleLoginAsTestAdmin = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+
+    enqueueSnackbar("please use this test credential to login as test admin.", {
+      variant: "success",
+    });
+    history.push("/admin/login");
+  };
+
   // rendering stuff
   const renderMenuItemListForLargeScreen: () => React.ReactNode = () => {
     return menuItemList.map((menuItem: MenuItemType) => {
@@ -98,7 +119,16 @@ const GuestHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
       };
 
       return (
-        <Link key={menuItem.url} color="inherit" {...linkProps}>
+        <Link
+          key={menuItem.url}
+          color="inherit"
+          {...linkProps}
+          onClick={(e) => {
+            if (menuItem.asTestAdmin) {
+              handleLoginAsTestAdmin(e);
+            }
+          }}
+        >
           {menuItem.label}
         </Link>
       );
@@ -117,6 +147,11 @@ const GuestHeaderMenuItems: React.FunctionComponent<{}> = (props) => {
             className={classes.menuItem}
             component={RRLink}
             to={menuItem.url}
+            onClick={(e) => {
+              if (menuItem.asTestAdmin) {
+                handleLoginAsTestAdmin(e);
+              }
+            }}
           >
             {menuItem.label}
           </Link>

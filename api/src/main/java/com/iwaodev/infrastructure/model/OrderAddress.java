@@ -1,13 +1,9 @@
 package com.iwaodev.infrastructure.model;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
@@ -73,6 +69,10 @@ public class OrderAddress {
   @UpdateTimestamp
   @Column(name="updated_at")
   private LocalDateTime updatedAt;
+
+  @Version
+  @Column(name = "version")
+  private Long version = 0L;
 
   public OrderAddress() {
     // explicitly assign id and stop using auto generated id because of order-orderaddress association (its reserverd).

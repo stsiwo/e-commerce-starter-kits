@@ -1,6 +1,11 @@
-import { UserAddressType, UserPhoneType, UserType, guestUserType, UserActiveEnum } from "domain/user/types";
+import {
+  guestUserType,
+  UserActiveEnum,
+  UserAddressType,
+  UserPhoneType,
+  UserType,
+} from "domain/user/types";
 import { UserTypeEnum } from "src/app";
-
 
 export const testPhoneList: UserPhoneType[] = [
   {
@@ -8,20 +13,23 @@ export const testPhoneList: UserPhoneType[] = [
     phoneNumber: "102938402938",
     countryCode: "+1",
     isSelected: false,
+    version: null,
   },
   {
     phoneId: "2",
     phoneNumber: "198374928338",
     countryCode: "+18",
     isSelected: false,
+    version: null,
   },
   {
     phoneId: "3",
     phoneNumber: "809842093480",
     countryCode: "+22",
     isSelected: false,
-  }
-]
+    version: null,
+  },
+];
 
 export const testAddressList: UserAddressType[] = [
   {
@@ -34,6 +42,7 @@ export const testAddressList: UserAddressType[] = [
     postalCode: "v5r 2c2",
     isBillingAddress: false,
     isShippingAddress: false,
+    version: null,
   },
   {
     addressId: "2",
@@ -45,6 +54,7 @@ export const testAddressList: UserAddressType[] = [
     postalCode: "v5r 2c2",
     isBillingAddress: false,
     isShippingAddress: false,
+    version: null,
   },
   {
     addressId: "3",
@@ -56,8 +66,9 @@ export const testAddressList: UserAddressType[] = [
     postalCode: "v5r 2c2",
     isBillingAddress: false,
     isShippingAddress: false,
+    version: null,
   },
-]
+];
 
 export const testGuestUser: UserType = {
   firstName: "Satoshi",
@@ -65,20 +76,21 @@ export const testGuestUser: UserType = {
   avatarImagePath: "",
   active: UserActiveEnum.TEMP,
   email: "",
-  userType: guestUserType, 
+  userType: guestUserType,
   addresses: [],
   orders: [],
   reviews: [],
   phones: [],
-  cartItems: []
-}
+  cartItems: [],
+  version: null,
+};
 
 export const testMemberUser: UserType = {
   userId: TEST_MEMBER_USER_ID,
   firstName: "Satoshi",
   lastName: "Iwao",
   avatarImagePath: "",
-  email: TEST_MEMBER_EMAIL , 
+  email: TEST_MEMBER_EMAIL,
   active: UserActiveEnum.TEMP,
   userType: {
     userTypeId: "2",
@@ -88,8 +100,9 @@ export const testMemberUser: UserType = {
   phones: testPhoneList,
   orders: [],
   reviews: [],
-  cartItems: []
-}
+  cartItems: [],
+  version: null,
+};
 
 export const testAdminUser: UserType = {
   userId: TEST_ADMIN_USER_ID,
@@ -106,7 +119,6 @@ export const testAdminUser: UserType = {
   phones: [],
   orders: [],
   reviews: [],
-  cartItems: []
-}
-
-
+  cartItems: [],
+  version: null,
+};

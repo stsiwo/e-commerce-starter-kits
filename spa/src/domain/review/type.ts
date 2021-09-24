@@ -13,6 +13,7 @@ export declare type ReviewType = {
   createdAt: Date;
   updateAt: Date;
   note: string;
+  version: number;
 };
 
 export declare type ReviewValidationType = {
@@ -38,6 +39,7 @@ export const defaultReviewData: ReviewDataType = {
   createdAt: new Date(),
   updateAt: new Date(),
   note: "",
+  version: null,
 };
 
 export const defaultReviewValidationData: ReviewValidationDataType = {
@@ -66,6 +68,7 @@ export declare type ReviewCriteria = {
   reviewDescription: string;
   isVerified: boolean;
   note?: string;
+  version: number;
 };
 
 export declare type ReviewQueryType = {

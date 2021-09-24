@@ -69,5 +69,7 @@ public class ProductCriteria {
 
   @Valid
   private List<ProductVariantCriteria> variants = new ArrayList<>();
+
+  private Long version;
 }
 

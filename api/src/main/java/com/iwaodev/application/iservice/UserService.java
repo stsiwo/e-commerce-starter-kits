@@ -4,13 +4,13 @@ import java.util.UUID;
 
 import com.iwaodev.application.dto.user.UserDTO;
 import com.iwaodev.domain.user.UserSortEnum;
+import com.iwaodev.infrastructure.model.User;
 import com.iwaodev.ui.criteria.user.UserCriteria;
 import com.iwaodev.ui.criteria.user.UserDeleteTempCriteria;
 import com.iwaodev.ui.criteria.user.UserQueryStringCriteria;
 import com.iwaodev.ui.criteria.user.UserStatusCriteria;
 
 import org.springframework.data.domain.Page;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
@@ -27,9 +27,9 @@ public interface UserService {
 
   public void tempDelete(UserDeleteTempCriteria criteria, UUID id) throws Exception;
 
-  public String uploadAvatarImage(UUID userId, MultipartFile file) throws Exception;
+  public UserDTO uploadAvatarImage(UUID userId, MultipartFile file) throws Exception;
 
-  public void removeAvatarImage(UUID userId) throws Exception;
+  public UserDTO removeAvatarImage(UUID userId) throws Exception;
 
   public byte[] getAvatarImage(UUID userId, String imageName) throws Exception;
 

@@ -1,6 +1,7 @@
 package com.iwaodev.infrastructure.model;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -9,21 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.OrderBy;
-import javax.persistence.PostLoad;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -220,6 +207,10 @@ public class Order {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
+  @Version
+  @Column(name = "version")
+  private Long version;// = 0L; // assign initial value is not work here.
+
   @ManyToOne
   @JoinColumn(name = "user_id")
   private User user;
@@ -272,6 +263,7 @@ public class Order {
   public Order() {
     this.orderNumber = "order_"
         + NanoIdUtils.randomNanoId(NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 11);
+    //this.version = 0L;  // this one also not working.
   }
 
   public String getFullName() {
@@ -492,6 +484,16 @@ public class Order {
       // only update note
       event.setNote(criteria.getNote());
     }
+
+  }
+
+  public void bumpUpVersion() {
+
+    // if this is for creating a new order
+    if (this.getVersion() == null) {
+      this.setVersion(0L);
+    }
+    this.setVersion(this.getVersion() + 1L);
   }
 
   public Optional<OrderEvent> findOrderEventById(Long orderEventId) {

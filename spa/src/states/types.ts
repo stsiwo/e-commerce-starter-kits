@@ -188,7 +188,8 @@ export declare type DomainStateType = {
   notifications: {
     data: NotificationType[];
     pagination: DomainPaginationType;
-    curIndex: number;
+    curId: string;
+    curNotification: NotificationType;
   };
   company: {
     data: AdminCompanyType;

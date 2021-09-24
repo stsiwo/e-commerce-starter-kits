@@ -1,18 +1,18 @@
+import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
 import {
   createStyles,
   makeStyles,
   Theme,
   useTheme,
 } from "@material-ui/core/styles";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { ProductVariantType } from "domain/product/types";
 import * as React from "react";
 import AdminProductVariantForm from "../AdminProductVariantForm";
-import { ProductVariantType } from "domain/product/types";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import Button from "@material-ui/core/Button";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 declare type AdminProductVariantFormDialogPropsType = {
   curFormOpen: boolean;

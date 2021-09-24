@@ -3,6 +3,7 @@ import Button from "@material-ui/core/Button";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import { CheckoutStepComponentPropsType } from "components/pages/Checkout/checkoutSteps";
+import { logger } from "configs/logger";
 import {
   defaultUserBasicAccountData,
   defaultUserBasicAccountValidationData,
@@ -19,7 +20,6 @@ import { putAuthActionCreator } from "reducers/slices/app";
 import { putAuthFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
 import { FetchStatusEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -158,6 +158,7 @@ const CustomerBasicForm: React.FunctionComponent<CustomerBasicFormPropsType> = (
           firstName: curUserAccountState.firstName,
           lastName: curUserAccountState.lastName,
           email: curUserAccountState.email,
+          version: auth.user.version,
         })
       );
 

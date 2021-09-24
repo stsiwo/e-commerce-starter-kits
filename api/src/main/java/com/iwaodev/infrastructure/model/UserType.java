@@ -1,17 +1,10 @@
 package com.iwaodev.infrastructure.model;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.iwaodev.domain.user.UserTypeEnum;
@@ -50,6 +43,10 @@ public class UserType {
   @Setter( value = AccessLevel.NONE)
   @OneToMany(mappedBy = "userType", cascade = CascadeType.ALL, orphanRemoval = false)
   private List<User> users = new ArrayList<>();
+
+  @Version
+  @Column(name = "version")
+  private Long version = 0L;
 
   public void setUsers(List<User> users) {
     this.users = users;

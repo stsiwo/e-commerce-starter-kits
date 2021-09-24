@@ -1,7 +1,7 @@
 import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ReviewCriteria, ReviewSortEnum, ReviewType } from "domain/review/type";
 import merge from "lodash/merge";
-import { ReviewType, ReviewSortEnum, ReviewCriteria } from "domain/review/type";
-import remove from 'lodash/remove';
+import remove from "lodash/remove";
 
 /**
  * redux-sage actions (side effects)
@@ -11,43 +11,59 @@ import remove from 'lodash/remove';
  **/
 
 // for GET request with cache
-export const fetchReviewWithCacheActionCreator = createAction("saga/domain/review/fetch/cache")
-export const fetchReviewWithCacheActionTypeName = fetchReviewWithCacheActionCreator().type
+export const fetchReviewWithCacheActionCreator = createAction(
+  "saga/domain/review/fetch/cache"
+);
+export const fetchReviewWithCacheActionTypeName =
+  fetchReviewWithCacheActionCreator().type;
 
 // for GET request
-export const fetchReviewActionCreator = createAction("saga/domain/review/fetch")
-export const fetchReviewActionTypeName = fetchReviewActionCreator().type
+export const fetchReviewActionCreator = createAction(
+  "saga/domain/review/fetch"
+);
+export const fetchReviewActionTypeName = fetchReviewActionCreator().type;
 
 // for POST (add a new review item) request
-export declare type PostReviewActionType = ReviewCriteria
-export const postReviewActionCreator = createAction<PostReviewActionType>("saga/domain/review/post")
-export const postReviewActionTypeName = postReviewActionCreator().type
+export declare type PostReviewActionType = ReviewCriteria;
+export const postReviewActionCreator = createAction<PostReviewActionType>(
+  "saga/domain/review/post"
+);
+export const postReviewActionTypeName = postReviewActionCreator().type;
 
 // for PUT (replace) request
-export declare type PutReviewActionType = ReviewCriteria
-export const putReviewActionCreator = createAction<PutReviewActionType>("saga/domain/review/put")
-export const putReviewActionTypeName = putReviewActionCreator().type
+export declare type PutReviewActionType = ReviewCriteria;
+export const putReviewActionCreator = createAction<PutReviewActionType>(
+  "saga/domain/review/put"
+);
+export const putReviewActionTypeName = putReviewActionCreator().type;
 
 // for DELETE (delete single review item) request
-export declare type DeleteSingleReviewActionType = { reviewId: string }
-export const deleteSingleReviewActionCreator = createAction<DeleteSingleReviewActionType>("saga/domain/review/deleteSingle")
-export const deleteSingleReviewActionTypeName = deleteSingleReviewActionCreator().type
+export declare type DeleteSingleReviewActionType = {
+  reviewId: string;
+  version: number;
+};
+export const deleteSingleReviewActionCreator =
+  createAction<DeleteSingleReviewActionType>("saga/domain/review/deleteSingle");
+export const deleteSingleReviewActionTypeName =
+  deleteSingleReviewActionCreator().type;
 
 // for DELETE (delete all of review items) request
-export const deleteReviewActionCreator = createAction<ReviewType>("saga/domain/review/delete")
-export const deleteReviewActionTypeName = deleteReviewActionCreator().type
+export const deleteReviewActionCreator = createAction<ReviewType>(
+  "saga/domain/review/delete"
+);
+export const deleteReviewActionTypeName = deleteReviewActionCreator().type;
 
 /**
  * domain.reviews state Slice (no side effect)
  *
  **/
-// action type             
-export type ReviewActionType = PayloadAction<ReviewType[]> 
+// action type
+export type ReviewActionType = PayloadAction<ReviewType[]>;
 
-export const reviewSlice = createSlice({ 
+export const reviewSlice = createSlice({
   name: "domain/reviews", // a name used in action type
-  initialState: [],        
-  reducers: {              
+  initialState: [],
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -65,34 +81,41 @@ export const reviewSlice = createSlice({
      *
      **/
     concat: (state: ReviewType[], action: ReviewActionType) => {
-      return state.concat(action.payload); 
+      return state.concat(action.payload);
     },
 
     // use when update existing one (only apply for array: don't use for object)
     updateOne: (state: ReviewType[], action: PayloadAction<ReviewType>) => {
       return state.map((domain: ReviewType) => {
         if (domain.reviewId === action.payload.reviewId) {
-          return action.payload
+          return action.payload;
         }
-        return domain
-      })
+        return domain;
+      });
     },
 
-    append: (state: ReviewType[], action: PayloadAction<ReviewType>) => merge(state, [action.payload]),
+    append: (state: ReviewType[], action: PayloadAction<ReviewType>) =>
+      merge(state, [action.payload]),
 
     // use when you want to replace the whole array
     update: (state: ReviewType[], action: ReviewActionType) => {
       return action.payload;
     },
     // use when you want to remove a single entity
-    delete: (state: ReviewType[], action: PayloadAction<{ reviewId: string }>) => {
+    delete: (
+      state: ReviewType[],
+      action: PayloadAction<{ reviewId: string }>
+    ) => {
       /**
        * mutable.
        * original one: the rest of elements
        * return one: the removed elements
        **/
-      remove(state, (review: ReviewType) => review.reviewId == action.payload.reviewId)
-      return state
+      remove(
+        state,
+        (review: ReviewType) => review.reviewId == action.payload.reviewId
+      );
+      return state;
     },
 
     clear: (state: ReviewType[]) => [],
@@ -100,26 +123,26 @@ export const reviewSlice = createSlice({
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const reviewSliceReducer = reviewSlice.reducer
-export const reviewActions = reviewSlice.actions
+export const reviewSliceReducer = reviewSlice.reducer;
+export const reviewActions = reviewSlice.actions;
 
 /**
  *
  * domain.reviews.query.searchQuery state Slice (no side effects)
  *
  **/
-// action type             
-export type ReviewQuerySearchQueryActionType = PayloadAction<string> 
+// action type
+export type ReviewQuerySearchQueryActionType = PayloadAction<string>;
 
-export const reviewQuerySearchQuerySlice = createSlice({ 
+export const reviewQuerySearchQuerySlice = createSlice({
   name: "domain/reviews/query/searchQuery", // a name used in action type
-  initialState: "",        
-  reducers: {              
+  initialState: "",
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -131,34 +154,35 @@ export const reviewQuerySearchQuerySlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ReviewQuerySearchQueryActionType) => action.payload,
+    update: (state: string, action: ReviewQuerySearchQueryActionType) =>
+      action.payload,
     clear: (state: string) => "",
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const reviewQuerySearchQuerySliceReducer = reviewQuerySearchQuerySlice.reducer
-export const reviewQuerySearchQueryActions = reviewQuerySearchQuerySlice.actions
-
-
+export const reviewQuerySearchQuerySliceReducer =
+  reviewQuerySearchQuerySlice.reducer;
+export const reviewQuerySearchQueryActions =
+  reviewQuerySearchQuerySlice.actions;
 
 /**
  *
  * domain.reviews.query.reviewPoint state Slice (no side effects)
  *
  **/
-// action type             
-export type ReviewQueryReviewPointActionType = PayloadAction<number> 
+// action type
+export type ReviewQueryReviewPointActionType = PayloadAction<number>;
 
-export const reviewQueryReviewPointSlice = createSlice({ 
+export const reviewQueryReviewPointSlice = createSlice({
   name: "domain/reviews/query/reviewPoint", // a name used in action type
-  initialState: null,        
-  reducers: {              
+  initialState: null,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -170,33 +194,35 @@ export const reviewQueryReviewPointSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ReviewQueryReviewPointActionType) => action.payload,
+    update: (state: string, action: ReviewQueryReviewPointActionType) =>
+      action.payload,
     clear: (state: string) => null,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const reviewQueryReviewPointSliceReducer = reviewQueryReviewPointSlice.reducer
-export const reviewQueryReviewPointActions = reviewQueryReviewPointSlice.actions
-
+export const reviewQueryReviewPointSliceReducer =
+  reviewQueryReviewPointSlice.reducer;
+export const reviewQueryReviewPointActions =
+  reviewQueryReviewPointSlice.actions;
 
 /**
  *
  * domain.reviews.query.isVerified state Slice (no side effects)
  *
  **/
-// action type             
-export type ReviewQueryIsVerifiedActionType = PayloadAction<boolean> 
+// action type
+export type ReviewQueryIsVerifiedActionType = PayloadAction<boolean>;
 
-export const reviewQueryIsVerifiedSlice = createSlice({ 
+export const reviewQueryIsVerifiedSlice = createSlice({
   name: "domain/reviews/query/isVerified", // a name used in action type
-  initialState: null,        
-  reducers: {              
+  initialState: null,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -208,33 +234,34 @@ export const reviewQueryIsVerifiedSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ReviewQueryIsVerifiedActionType) => action.payload,
+    update: (state: string, action: ReviewQueryIsVerifiedActionType) =>
+      action.payload,
     clear: (state: string) => null,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const reviewQueryIsVerifiedSliceReducer = reviewQueryIsVerifiedSlice.reducer
-export const reviewQueryIsVerifiedActions = reviewQueryIsVerifiedSlice.actions
-
+export const reviewQueryIsVerifiedSliceReducer =
+  reviewQueryIsVerifiedSlice.reducer;
+export const reviewQueryIsVerifiedActions = reviewQueryIsVerifiedSlice.actions;
 
 /**
  *
  * domain.reviews.query.startDate state Slice (no side effects)
  *
  **/
-// action type             
-export type ReviewQueryStartDateActionType = PayloadAction<Date> 
+// action type
+export type ReviewQueryStartDateActionType = PayloadAction<Date>;
 
-export const reviewQueryStartDateSlice = createSlice({ 
+export const reviewQueryStartDateSlice = createSlice({
   name: "domain/reviews/query/startDate", // a name used in action type
-  initialState: null,        
-  reducers: {              
+  initialState: null,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -246,33 +273,34 @@ export const reviewQueryStartDateSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ReviewQueryStartDateActionType) => action.payload,
+    update: (state: string, action: ReviewQueryStartDateActionType) =>
+      action.payload,
     clear: (state: string) => null,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const reviewQueryStartDateSliceReducer = reviewQueryStartDateSlice.reducer
-export const reviewQueryStartDateActions = reviewQueryStartDateSlice.actions
-
+export const reviewQueryStartDateSliceReducer =
+  reviewQueryStartDateSlice.reducer;
+export const reviewQueryStartDateActions = reviewQueryStartDateSlice.actions;
 
 /**
  *
  * domain.reviews.query.endDate state Slice (no side effects)
  *
  **/
-// action type             
-export type ReviewQueryEndDateActionType = PayloadAction<Date> 
+// action type
+export type ReviewQueryEndDateActionType = PayloadAction<Date>;
 
-export const reviewQueryEndDateSlice = createSlice({ 
+export const reviewQueryEndDateSlice = createSlice({
   name: "domain/reviews/query/endDate", // a name used in action type
-  initialState: null,        
-  reducers: {              
+  initialState: null,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -284,33 +312,33 @@ export const reviewQueryEndDateSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ReviewQueryEndDateActionType) => action.payload,
+    update: (state: string, action: ReviewQueryEndDateActionType) =>
+      action.payload,
     clear: (state: string) => null,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const reviewQueryEndDateSliceReducer = reviewQueryEndDateSlice.reducer
-export const reviewQueryEndDateActions = reviewQueryEndDateSlice.actions
-
+export const reviewQueryEndDateSliceReducer = reviewQueryEndDateSlice.reducer;
+export const reviewQueryEndDateActions = reviewQueryEndDateSlice.actions;
 
 /**
  *
  * domain.reviews.query.productId state Slice (no side effects)
  *
  **/
-// action type             
-export type ReviewQueryProductIdActionType = PayloadAction<string> 
+// action type
+export type ReviewQueryProductIdActionType = PayloadAction<string>;
 
-export const reviewQueryProductIdSlice = createSlice({ 
+export const reviewQueryProductIdSlice = createSlice({
   name: "domain/reviews/query/productId", // a name used in action type
-  initialState: "",        
-  reducers: {              
+  initialState: "",
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -322,34 +350,34 @@ export const reviewQueryProductIdSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ReviewQueryProductIdActionType) => action.payload,
+    update: (state: string, action: ReviewQueryProductIdActionType) =>
+      action.payload,
     clear: (state: string) => "",
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const reviewQueryProductIdSliceReducer = reviewQueryProductIdSlice.reducer
-export const reviewQueryProductIdActions = reviewQueryProductIdSlice.actions
-
-
+export const reviewQueryProductIdSliceReducer =
+  reviewQueryProductIdSlice.reducer;
+export const reviewQueryProductIdActions = reviewQueryProductIdSlice.actions;
 
 /**
  *
  * domain.reviews.query.userId state Slice (no side effects)
  *
  **/
-// action type             
-export type ReviewQueryUserIdActionType = PayloadAction<string> 
+// action type
+export type ReviewQueryUserIdActionType = PayloadAction<string>;
 
-export const reviewQueryUserIdSlice = createSlice({ 
+export const reviewQueryUserIdSlice = createSlice({
   name: "domain/reviews/query/userId", // a name used in action type
-  initialState: "",        
-  reducers: {              
+  initialState: "",
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -361,35 +389,33 @@ export const reviewQueryUserIdSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ReviewQueryUserIdActionType) => action.payload,
+    update: (state: string, action: ReviewQueryUserIdActionType) =>
+      action.payload,
     clear: (state: string) => "",
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const reviewQueryUserIdSliceReducer = reviewQueryUserIdSlice.reducer
-export const reviewQueryUserIdActions = reviewQueryUserIdSlice.actions
-
-
-
+export const reviewQueryUserIdSliceReducer = reviewQueryUserIdSlice.reducer;
+export const reviewQueryUserIdActions = reviewQueryUserIdSlice.actions;
 
 /**
  *
  * domain.reviews.query.sort state Slice (no side effects)
  *
  **/
-// action type             
-export type ReviewQuerySortActionType = PayloadAction<ReviewSortEnum> 
+// action type
+export type ReviewQuerySortActionType = PayloadAction<ReviewSortEnum>;
 
-export const reviewQuerySortSlice = createSlice({ 
+export const reviewQuerySortSlice = createSlice({
   name: "domain/reviews/query/sort", // a name used in action type
-  initialState: ReviewSortEnum.DATE_DESC,        
-  reducers: {              
+  initialState: ReviewSortEnum.DATE_DESC,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -401,21 +427,20 @@ export const reviewQuerySortSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: string, action: ReviewQuerySortActionType) => action.payload,
+    update: (state: string, action: ReviewQuerySortActionType) =>
+      action.payload,
     clear: (state: string) => ReviewSortEnum.DATE_DESC,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
-}) 
+});
 
-export const reviewQuerySortSliceReducer = reviewQuerySortSlice.reducer
-export const reviewQuerySortActions = reviewQuerySortSlice.actions
-
-
+export const reviewQuerySortSliceReducer = reviewQuerySortSlice.reducer;
+export const reviewQuerySortActions = reviewQuerySortSlice.actions;
 
 const resetPaginationExtraReducerActions = [
   reviewQueryEndDateActions.clear,
@@ -434,32 +459,31 @@ const resetPaginationExtraReducerActions = [
   reviewQueryUserIdActions.update,
   reviewQueryReviewPointActions.clear,
   reviewQueryReviewPointActions.update,
-]
+];
 
-const resetPaginationExtraReducerGenerator = (builder: any, reducer: (state: any) => any): void => {
-    /**
-     * if filter action is dispatched, need to clear all pagiantion
-     */
-    resetPaginationExtraReducerActions.forEach((action: any) => {
-      builder.addCase(
-        action,
-        reducer, 
-      )
-    })
-
-}
+const resetPaginationExtraReducerGenerator = (
+  builder: any,
+  reducer: (state: any) => any
+): void => {
+  /**
+   * if filter action is dispatched, need to clear all pagiantion
+   */
+  resetPaginationExtraReducerActions.forEach((action: any) => {
+    builder.addCase(action, reducer);
+  });
+};
 /**
  *
  * domain.reviews.pagination.page state Slice (no side effects)
  *
  **/
-// action type             
-export type ReviewPaginationPageActionType = PayloadAction<number> 
+// action type
+export type ReviewPaginationPageActionType = PayloadAction<number>;
 
-export const reviewPaginationPageSlice = createSlice({ 
+export const reviewPaginationPageSlice = createSlice({
   name: "domain/reviews/pagination/page", // a name used in action type
-  initialState: 0,        
-  reducers: {              
+  initialState: 0,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -471,36 +495,37 @@ export const reviewPaginationPageSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: number, action: ReviewPaginationPageActionType) => action.payload,
+    update: (state: number, action: ReviewPaginationPageActionType) =>
+      action.payload,
     clear: (state: number) => 0, // start from 0, (not 1)
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
   extraReducers: (builder) => {
-    resetPaginationExtraReducerGenerator(builder, (state: number) => 0)
-  }
-}) 
+    resetPaginationExtraReducerGenerator(builder, (state: number) => 0);
+  },
+});
 
-export const reviewPaginationPageSliceReducer = reviewPaginationPageSlice.reducer
-export const reviewPaginationPageActions = reviewPaginationPageSlice.actions
-
+export const reviewPaginationPageSliceReducer =
+  reviewPaginationPageSlice.reducer;
+export const reviewPaginationPageActions = reviewPaginationPageSlice.actions;
 
 /**
  *
  * domain.reviews.pagination.limit state Slice (no side effects)
  *
  **/
-// action type             
-export type ReviewPaginationLimitActionType = PayloadAction<number> 
+// action type
+export type ReviewPaginationLimitActionType = PayloadAction<number>;
 
-export const reviewPaginationLimitSlice = createSlice({ 
+export const reviewPaginationLimitSlice = createSlice({
   name: "domain/reviews/pagination/limit", // a name used in action type
-  initialState: 20,        
-  reducers: {              
+  initialState: 20,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -512,36 +537,37 @@ export const reviewPaginationLimitSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: number, action: ReviewPaginationLimitActionType) => action.payload,
+    update: (state: number, action: ReviewPaginationLimitActionType) =>
+      action.payload,
     clear: (state: number) => 20,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
   extraReducers: (builder) => {
-    resetPaginationExtraReducerGenerator(builder, (state: number) => 20)
-  }
-}) 
+    resetPaginationExtraReducerGenerator(builder, (state: number) => 20);
+  },
+});
 
-export const reviewPaginationLimitSliceReducer = reviewPaginationLimitSlice.reducer
-export const reviewPaginationLimitActions = reviewPaginationLimitSlice.actions
-
+export const reviewPaginationLimitSliceReducer =
+  reviewPaginationLimitSlice.reducer;
+export const reviewPaginationLimitActions = reviewPaginationLimitSlice.actions;
 
 /**
  *
  * domain.reviews.pagination.totalPages state Slice (no side effects)
  *
  **/
-// action type             
-export type ReviewPaginationTotalPagesActionType = PayloadAction<number> 
+// action type
+export type ReviewPaginationTotalPagesActionType = PayloadAction<number>;
 
-export const reviewPaginationTotalPagesSlice = createSlice({ 
+export const reviewPaginationTotalPagesSlice = createSlice({
   name: "domain/reviews/pagination/totalPages", // a name used in action type
-  initialState: 1,        
-  reducers: {              
+  initialState: 1,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -553,35 +579,38 @@ export const reviewPaginationTotalPagesSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: number, action: ReviewPaginationTotalPagesActionType) => action.payload,
+    update: (state: number, action: ReviewPaginationTotalPagesActionType) =>
+      action.payload,
     clear: (state: number) => 1,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
   extraReducers: (builder) => {
-    resetPaginationExtraReducerGenerator(builder, (state: number) => 1)
-  }
-}) 
+    resetPaginationExtraReducerGenerator(builder, (state: number) => 1);
+  },
+});
 
-export const reviewPaginationTotalPagesSliceReducer = reviewPaginationTotalPagesSlice.reducer
-export const reviewPaginationTotalPagesActions = reviewPaginationTotalPagesSlice.actions
+export const reviewPaginationTotalPagesSliceReducer =
+  reviewPaginationTotalPagesSlice.reducer;
+export const reviewPaginationTotalPagesActions =
+  reviewPaginationTotalPagesSlice.actions;
 
 /**
  *
  * domain.reviews.pagination.totalElements state Slice (no side effects)
  *
  **/
-// action type             
-export type ReviewPaginationTotalElementsActionType = PayloadAction<number> 
+// action type
+export type ReviewPaginationTotalElementsActionType = PayloadAction<number>;
 
-export const reviewPaginationTotalElementsSlice = createSlice({ 
+export const reviewPaginationTotalElementsSlice = createSlice({
   name: "domain/reviews/pagination/totalElements", // a name used in action type
-  initialState: 0,        
-  reducers: {              
+  initialState: 0,
+  reducers: {
     /**
      *
      *  a property name gonna be the name of action
@@ -593,20 +622,22 @@ export const reviewPaginationTotalElementsSlice = createSlice({
      **/
 
     // use when you want to replace
-    update: (state: number, action: ReviewPaginationTotalElementsActionType) => action.payload,
+    update: (state: number, action: ReviewPaginationTotalElementsActionType) =>
+      action.payload,
     clear: (state: number) => 0,
   },
   /**
    * extraReducers property
    *
-   * You can respond to other action types besides the types it has generated. 
+   * You can respond to other action types besides the types it has generated.
    *
    **/
   extraReducers: (builder) => {
-    resetPaginationExtraReducerGenerator(builder, (state: number) => 0)
-  }
-}) 
+    resetPaginationExtraReducerGenerator(builder, (state: number) => 0);
+  },
+});
 
-export const reviewPaginationTotalElementsSliceReducer = reviewPaginationTotalElementsSlice.reducer
-export const reviewPaginationTotalElementsActions = reviewPaginationTotalElementsSlice.actions
-
+export const reviewPaginationTotalElementsSliceReducer =
+  reviewPaginationTotalElementsSlice.reducer;
+export const reviewPaginationTotalElementsActions =
+  reviewPaginationTotalElementsSlice.actions;

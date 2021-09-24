@@ -1,26 +1,30 @@
 import Avatar from "@material-ui/core/Avatar";
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import IconButton from "@material-ui/core/IconButton";
-import List from "@material-ui/core/List";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardHeader from "@material-ui/core/CardHeader";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import IconButton from "@material-ui/core/IconButton";
+import List from "@material-ui/core/List";
+import MenuItem from "@material-ui/core/MenuItem";
 import Modal from "@material-ui/core/Modal";
 import Radio from "@material-ui/core/Radio";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
+import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
+import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import HomeIcon from "@material-ui/icons/Home";
-import Tooltip from "@material-ui/core/Tooltip";
 import LocalShippingIcon from "@material-ui/icons/LocalShipping";
 import PaymentIcon from "@material-ui/icons/Payment";
+import { logger } from "configs/logger";
 import {
-  toAddressString,
-  getShippingAddressId,
+  findAddress,
   getBillingAddressId,
+  getShippingAddressId,
+  toAddressString,
 } from "domain/user";
 import {
   CustomerAddressesFormDataType,
@@ -39,17 +43,14 @@ import {
   postAuthAddressActionCreator,
   putAuthAddressActionCreator,
 } from "reducers/slices/app";
-import { mSelector, rsSelector } from "src/selectors/selector";
-import { getCountryList, getProvinceList } from "src/utils";
-import MenuItem from "@material-ui/core/MenuItem";
-import DeleteIcon from "@material-ui/icons/Delete";
-import { FetchStatusEnum } from "src/app";
 import {
+  deleteAuthAddressFetchStatusActions,
   postAuthAddressFetchStatusActions,
   putAuthAddressFetchStatusActions,
-  deleteAuthAddressFetchStatusActions,
 } from "reducers/slices/app/fetchStatus/auth";
-import { logger } from "configs/logger";
+import { FetchStatusEnum } from "src/app";
+import { mSelector, rsSelector } from "src/selectors/selector";
+import { getCountryList, getProvinceList } from "src/utils";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -306,6 +307,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
       dispatch(
         deleteAuthAddressActionCreator({
           addressId: addressId,
+          version: findAddress(props.addresses, addressId).version,
         })
       );
     };
@@ -335,7 +337,11 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
       setBillingId(addressId);
 
       dispatch(
-        patchAuthAddressActionCreator({ addressId: addressId, type: "billing" })
+        patchAuthAddressActionCreator({
+          addressId: addressId,
+          type: "billing",
+          version: findAddress(props.addresses, addressId).version,
+        })
       );
     };
 
@@ -349,6 +355,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
         patchAuthAddressActionCreator({
           addressId: addressId,
           type: "shipping",
+          version: findAddress(props.addresses, addressId).version,
         })
       );
     };

@@ -7,7 +7,6 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import SentimentSatisfiedOutlinedIcon from "@material-ui/icons/SentimentSatisfiedOutlined";
-import { AxiosError } from "axios";
 import ForgotPasswordDialog from "components/common/ForgotPasswordDialog";
 import { api } from "configs/axiosConfig";
 import { logger } from "configs/logger";
@@ -36,6 +35,11 @@ const defaultAdminLoginData: AdminLoginDataType = {
 
 if (NODE_ENV !== "production") {
   defaultAdminLoginData.email = "test_admin@test.com";
+  defaultAdminLoginData.password = "test_PASSWORD";
+}
+
+if (NODE_ENV === "production") {
+  defaultAdminLoginData.email = "stsiwo@yahoo.com";
   defaultAdminLoginData.password = "test_PASSWORD";
 }
 
@@ -201,15 +205,6 @@ const AdminLogin: React.FunctionComponent<{}> = (props) => {
               id: getNanoId(),
               type: MessageTypeEnum.SUCCESS,
               message: "logged in successfully.",
-            })
-          );
-        })
-        .catch((error: AxiosError) => {
-          dispatch(
-            messageActions.update({
-              id: getNanoId(),
-              type: MessageTypeEnum.ERROR,
-              message: error.response.data.message,
             })
           );
         });

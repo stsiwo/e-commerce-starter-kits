@@ -1,17 +1,15 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import * as React from 'react';
-import Box from '@material-ui/core/Box';
-import SearchIcon from '@material-ui/icons/Search';
-import IconButton from '@material-ui/core/IconButton';
-import Paper from '@material-ui/core/Paper';
+import IconButton from "@material-ui/core/IconButton";
+import Paper from "@material-ui/core/Paper";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import SearchIcon from "@material-ui/icons/Search";
+import * as React from "react";
 
 interface SearchFormPropsType {
-  searchQuery: string,
-  onChange: (searchQuery: string) => void,
-  onClick?: () => void,
-  label: string
+  searchQuery: string;
+  onChange: (searchQuery: string) => void;
+  onClick?: () => void;
+  label: string;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -31,19 +29,18 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     btnBox: {
       flexBasis: "20%",
-    }
-  }),
+    },
+  })
 );
 
 /**
  * member or admin account management component
  **/
 const SearchForm: React.FunctionComponent<SearchFormPropsType> = (props) => {
-
   // mui: makeStyles
   const classes = useStyles();
 
-  // sample autocomplete list 
+  // sample autocomplete list
   //const testItemList = [
   //  "aaa",
   //  "bbb",
@@ -57,27 +54,28 @@ const SearchForm: React.FunctionComponent<SearchFormPropsType> = (props) => {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     props.onChange(e.target.value);
-  }
+  };
 
   const handleSearchClick = (e: React.MouseEvent<HTMLElement>) => {
-    if (props.onClick)
-      props.onClick();
-  }
+    if (props.onClick) props.onClick();
+  };
 
   const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key === "Enter") {
-      if (props.onClick)
-        props.onClick();
+      if (props.onClick) props.onClick();
+      // prevent reloading when click enter.
+      e.preventDefault();
     }
-  }
+  };
 
   return (
     <Paper
       component="form"
       className={classes.root}
       classes={{
-        root: classes.root
-      }}>
+        root: classes.root,
+      }}
+    >
       {/**
       <Autocomplete
         color={"secondary"}
@@ -109,10 +107,7 @@ const SearchForm: React.FunctionComponent<SearchFormPropsType> = (props) => {
         <SearchIcon fontSize={"default"} />
       </IconButton>
     </Paper>
-  )
-}
+  );
+};
 
-export default SearchForm
-
-
-
+export default SearchForm;

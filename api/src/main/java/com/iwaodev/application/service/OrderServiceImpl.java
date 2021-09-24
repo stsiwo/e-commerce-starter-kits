@@ -1,6 +1,5 @@
 package com.iwaodev.application.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -9,12 +8,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.iwaodev.application.dto.order.OrderDTO;
-import com.iwaodev.application.dto.order.OrderEventDTO;
 import com.iwaodev.application.dto.shipping.RatingDTO;
 import com.iwaodev.application.irepository.OrderRepository;
 import com.iwaodev.application.irepository.ProductRepository;
 import com.iwaodev.application.irepository.UserRepository;
-import com.iwaodev.application.iservice.CanadaPostService;
 import com.iwaodev.application.iservice.OrderService;
 import com.iwaodev.application.iservice.PaymentService;
 import com.iwaodev.application.iservice.ShippingService;
@@ -23,27 +20,22 @@ import com.iwaodev.application.specification.factory.OrderSpecificationFactory;
 import com.iwaodev.domain.order.OrderRule;
 import com.iwaodev.domain.order.OrderSortEnum;
 import com.iwaodev.domain.order.OrderStatusEnum;
-import com.iwaodev.domain.order.event.OrderCanceledEvent;
 import com.iwaodev.domain.order.event.OrderEventWasAddedByMemberEvent;
 import com.iwaodev.domain.order.event.OrderEventWasAddedEvent;
 import com.iwaodev.domain.order.event.OrderFinalConfirmedEvent;
-import com.iwaodev.domain.order.event.OrderReturnedEvent;
 import com.iwaodev.domain.service.OrderEventService;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.exception.AppException;
 import com.iwaodev.exception.DomainException;
 import com.iwaodev.exception.ExceptionMessenger;
 import com.iwaodev.exception.NotFoundException;
-import com.iwaodev.infrastructure.model.Order;
-import com.iwaodev.infrastructure.model.OrderDetail;
-import com.iwaodev.infrastructure.model.OrderEvent;
-import com.iwaodev.infrastructure.model.Product;
-import com.iwaodev.infrastructure.model.User;
+import com.iwaodev.infrastructure.model.*;
 import com.iwaodev.ui.criteria.order.OrderCriteria;
 import com.iwaodev.ui.criteria.order.OrderDetailCriteria;
 import com.iwaodev.ui.criteria.order.OrderEventCriteria;
 import com.iwaodev.ui.criteria.order.OrderQueryStringCriteria;
 import com.iwaodev.ui.response.PaymentIntentResponse;
+import com.iwaodev.util.Util;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.PaymentIntent;
@@ -53,12 +45,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Service
 @Transactional
@@ -95,6 +90,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private ShippingService shippingService;
+
+    @Autowired
+    private HttpServletRequest httpServletRequest;
 
     @Override
     public Page<OrderDTO> getAll(OrderQueryStringCriteria criteria, Integer page, Integer limit, OrderSortEnum sort) throws Exception {
@@ -192,6 +190,9 @@ public class OrderServiceImpl implements OrderService {
         // prep input for the requst for stripe
         Order order = OrderMapper.INSTANCE.toOrderEntityFromOrderCriteria(criteria);
 
+        // issue-
+
+
         // find user
         User customer = this.userRepository.findById(authUserId)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND,
@@ -257,26 +258,15 @@ public class OrderServiceImpl implements OrderService {
         // assign payment intent id to this order
         order.setStripePaymentIntentId(intent.getId());
 
-        Order savedOrder = this.orderRepository.save(order);
-        /**
-         * bug.
-         *
-         * hibernate return the same child entity twice in child list. e.g, orderEvents:
-         * [ { 101 } , { 102 }, { 102 } ] <- 102 is duplicate.
-         *
-         * workaround: use 'flush'.
-         *
-         * otherwise, you might got an error 'object references an unsaved transient
-         * instance – save the transient instance beforeQuery flushing'.
-         *
-         * - this is because hibernate recognize that the entity change its state again
-         * by calling 'parent.getChildren().size()' wihtout flushing, so be careful!!!!
-         *
-         * ref:
-         * https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
-         *
-         **/
-        this.orderRepository.flush();
+        Order savedOrder;
+        try {
+            //issue-d8VmQM3FMFY
+            //issue-XVJzi6CftR
+            savedOrder = this.orderRepository.persist(order);
+            this.orderRepository.flush();
+        } catch (OptimisticLockingFailureException ex) {
+            throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+        }
 
         this.publisher.publishEvent(new OrderFinalConfirmedEvent(this, savedOrder, stripeCustomerId, UserTypeEnum.MEMBER));
 
@@ -334,26 +324,15 @@ public class OrderServiceImpl implements OrderService {
         // assign payment intent id to this order
         order.setStripePaymentIntentId(intent.getId());
 
-        Order savedOrder = this.orderRepository.save(order);
-        /**
-         * bug.
-         *
-         * hibernate return the same child entity twice in child list. e.g, orderEvents:
-         * [ { 101 } , { 102 }, { 102 } ] <- 102 is duplicate.
-         *
-         * workaround: use 'flush'.
-         *
-         * otherwise, you might got an error 'object references an unsaved transient
-         * instance – save the transient instance beforeQuery flushing'.
-         *
-         * - this is because hibernate recognize that the entity change its state again
-         * by calling 'parent.getChildren().size()' wihtout flushing, so be careful!!!!
-         *
-         * ref:
-         * https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
-         *
-         **/
-        this.orderRepository.flush();
+        Order savedOrder;
+        try {
+            // issue-d8VmQM3FMFY
+            // issue-XVJzi6CftR
+            savedOrder = this.orderRepository.persist(order);
+            this.orderRepository.flush();
+        } catch (OptimisticLockingFailureException ex) {
+            throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+        }
 
         this.publisher.publishEvent(new OrderFinalConfirmedEvent(this, savedOrder, null, UserTypeEnum.ANONYMOUS));
 
@@ -422,6 +401,15 @@ public class OrderServiceImpl implements OrderService {
         Order order = this.orderRepository.findByOrderIdAndOrderNumber(orderId, orderNumber)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given order does not exist."));
 
+        // version check for concurrency update
+        String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+        if (receivedVersion == null || receivedVersion.isEmpty()) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+        }
+        if (!Util.checkETagVersion(order.getVersion(), receivedVersion)) {
+            throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+        };
+
         User customer = null;
         if (userId != null) {
             customer = this.userRepository.findById(userId).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given user does not exist."));
@@ -435,26 +423,14 @@ public class OrderServiceImpl implements OrderService {
             new AppException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
 
-        Order savedOrder = this.orderRepository.save(order);
-        /**
-         * bug.
-         *
-         * hibernate return the same child entity twice in child list. e.g, orderEvents:
-         * [ { 101 } , { 102 }, { 102 } ] <- 102 is duplicate.
-         *
-         * workaround: use 'flush'.
-         *
-         * otherwise, you might got an error 'object references an unsaved transient
-         * instance – save the transient instance beforeQuery flushing'.
-         *
-         * - this is because hibernate recognize that the entity change its state again
-         * by calling 'parent.getChildren().size()' wihtout flushing, so be careful!!!!
-         *
-         * ref:
-         * https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
-         *
-         **/
-        this.orderRepository.flush();
+        Order savedOrder;
+        try {
+            // issue-XVJzi6CftR
+            // don't forget flush otherwise version number is updated.
+            savedOrder = this.orderRepository.saveAndFlush(order);
+        } catch (OptimisticLockingFailureException ex) {
+            throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+        }
 
         savedOrder.setUpCalculatedProperties();
         return OrderMapper.INSTANCE.toOrderDTO(savedOrder);
@@ -469,6 +445,15 @@ public class OrderServiceImpl implements OrderService {
         Order order = this.orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given order does not exist."));
 
+        // version check for concurrency update
+        String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+        if (receivedVersion == null || receivedVersion.isEmpty()) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+        }
+        if (!Util.checkETagVersion(order.getVersion(), receivedVersion)) {
+            throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+        };
+
         User admin = this.userRepository.getAdmin().orElseThrow(() -> new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "the admin not found. this should not happen."));
 
         try {
@@ -479,26 +464,13 @@ public class OrderServiceImpl implements OrderService {
             throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
         }
 
-        Order savedOrder = this.orderRepository.save(order);
-        /**
-         * bug.
-         *
-         * hibernate return the same child entity twice in child list. e.g, orderEvents:
-         * [ { 101 } , { 102 }, { 102 } ] <- 102 is duplicate.
-         *
-         * workaround: use 'flush'.
-         *
-         * otherwise, you might got an error 'object references an unsaved transient
-         * instance – save the transient instance beforeQuery flushing'.
-         *
-         * - this is because hibernate recognize that the entity change its state again
-         * by calling 'parent.getChildren().size()' wihtout flushing, so be careful!!!!
-         *
-         * ref:
-         * https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
-         *
-         **/
-        this.orderRepository.flush();
+        Order savedOrder;
+        try {
+            // issue-XVJzi6CftR
+            savedOrder = this.orderRepository.saveAndFlush(order);
+        } catch (OptimisticLockingFailureException ex) {
+            throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+        }
 
         // set any transient property up. DON'T FOREGET TO CALL
         savedOrder.setUpCalculatedProperties();
@@ -514,6 +486,15 @@ public class OrderServiceImpl implements OrderService {
         Order targetOrder = this.orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given order does not exist."));
 
+        // version check for concurrency update
+        String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+        if (receivedVersion == null || receivedVersion.isEmpty()) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+        }
+        if (!Util.checkETagVersion(targetOrder.getVersion(), receivedVersion)) {
+            throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+        };
+
         User member = this.userRepository.findById(criteria.getUserId()).orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, "the given user does not exist."));
 
         /**
@@ -527,28 +508,14 @@ public class OrderServiceImpl implements OrderService {
         } catch (NotFoundException e) {
             throw new AppException(HttpStatus.NOT_FOUND, e.getMessage());
         }
-
-        Order savedOrder = this.orderRepository.save(targetOrder);
-        /**
-         * bug.
-         *
-         * hibernate return the same child entity twice in child list. e.g, orderEvents:
-         * [ { 101 } , { 102 }, { 102 } ] <- 102 is duplicate.
-         *
-         * workaround: use 'flush'.
-         *
-         * otherwise, you might got an error 'object references an unsaved transient
-         * instance – save the transient instance beforeQuery flushing'.
-         *
-         * - this is because hibernate recognize that the entity change its state again
-         * by calling 'parent.getChildren().size()' wihtout flushing, so be careful!!!!
-         *
-         * ref:
-         * https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
-         *
-         **/
-        this.orderRepository.flush();
-
+        Order savedOrder;
+        try {
+            // issue-XVJzi6CftR
+            savedOrder = this.orderRepository.save(targetOrder);
+            this.orderRepository.flush();
+        } catch (OptimisticLockingFailureException ex) {
+            throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+        }
         // set any transient property up. DON'T FOREGET TO CALL
         savedOrder.setUpCalculatedProperties();
         // publish event.
@@ -779,6 +746,15 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = orderOption.get();
 
+        // version check for concurrency update
+        String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+        if (receivedVersion == null || receivedVersion.isEmpty()) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+        }
+        if (!Util.checkETagVersion(order.getVersion(), receivedVersion)) {
+            throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+        };
+
         OrderEvent lastOrderEvent = order.retrieveLatestOrderEvent();
 
         if (!orderEventId.equals(lastOrderEvent.getOrderEventId())) {
@@ -798,26 +774,13 @@ public class OrderServiceImpl implements OrderService {
          */
         order.updateTransactionResult();
 
-        Order savedOrder = this.orderRepository.save(order);
-        /**
-         * bug.
-         *
-         * hibernate return the same child entity twice in child list. e.g, orderEvents:
-         * [ { 101 } , { 102 }, { 102 } ] <- 102 is duplicate.
-         *
-         * workaround: use 'flush'.
-         *
-         * otherwise, you might got an error 'object references an unsaved transient
-         * instance – save the transient instance beforeQuery flushing'.
-         *
-         * - this is because hibernate recognize that the entity change its state again
-         * by calling 'parent.getChildren().size()' wihtout flushing, so be careful!!!!
-         *
-         * ref:
-         * https://stackoverflow.com/questions/7903800/hibernate-inserts-duplicates-into-a-onetomany-collection
-         *
-         **/
-        this.orderRepository.flush();
+        Order savedOrder;
+        try {
+            savedOrder = this.orderRepository.save(order);
+            this.orderRepository.flush();
+        } catch (OptimisticLockingFailureException ex) {
+            throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+        }
         // set any transient property up.
         savedOrder.setUpCalculatedProperties();
 
@@ -826,7 +789,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderEventDTO updateOrderEvent(UUID orderId, Long orderEventId, OrderEventCriteria criteria) throws Exception {
+    public OrderDTO updateOrderEvent(UUID orderId, Long orderEventId, OrderEventCriteria criteria) throws Exception {
 
         /**
          * get target order
@@ -842,14 +805,33 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = orderOption.get();
 
+        // version check for concurrency update
+        String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+
+        logger.debug("cur version: " + order.getVersion());
+        logger.debug("rec version: " + receivedVersion);
+
+        if (receivedVersion == null || receivedVersion.isEmpty()) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+        }
+        logger.debug("" + Util.checkETagVersion(order.getVersion(), receivedVersion));
+        if (!Util.checkETagVersion(order.getVersion(), receivedVersion)) {
+            throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+        };
+
+        logger.debug("after version check");
+
         order.updateOrderEvent(orderEventId, criteria);
+        order.bumpUpVersion();
+        Order savedOrder;
+        try {
+            // issue-XVJzi6CftR
+            // don't forget flush otherwise version number is updated.
+            savedOrder = this.orderRepository.saveAndFlush(order);
+        } catch (OptimisticLockingFailureException ex) {
+            throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+        }
 
-        Order savedOrder = this.orderRepository.save(order);
-
-        Optional<OrderEvent> updatedOrderEventOption = savedOrder.findOrderEventById(orderEventId);
-
-        return OrderMapper.INSTANCE.toOrderEventDTO(updatedOrderEventOption.get());
-
+        return OrderMapper.INSTANCE.toOrderDTO(savedOrder);
     }
-
 }

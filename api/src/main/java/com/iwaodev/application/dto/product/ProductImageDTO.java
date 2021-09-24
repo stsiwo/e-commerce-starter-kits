@@ -13,5 +13,7 @@ public class ProductImageDTO {
   private String productImagePath;
   private Boolean isChange;
   private String productImageName;
+
+  private Long version;
 }
 

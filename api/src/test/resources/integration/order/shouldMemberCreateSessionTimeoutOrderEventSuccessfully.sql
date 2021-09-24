@@ -86,7 +86,7 @@ VALUES ('13', '4', 'aqua', '6', 'a362bbc3-5c70-4e82-96d3-5fa1e3103332', '1.00', 
 
 -- target order
 INSERT INTO `orders` (`order_id`, `order_number`, `product_cost`, `tax_cost`, `shipping_cost`, `order_first_name`, `order_last_name`, `order_email`, `order_phone`, `stripe_payment_intent_id`, `user_id`, `is_guest`)
-VALUES ('c8f8591c-bb83-4fd1-a098-3fac8d40e450', 'order_w0vDYZvqy_Y', '123.00', '2.00', '10.00', 'first name', 'last name', 'test_order@email.com', '+12342342345', 'sample_stripe_payment_intent_id', 'c7081519-16e5-4f92-ac50-1834001f12b9', '1'); -- add test main user id.
+VALUES ('c8f8591c-bb83-4fd1-a098-3fac8d40e450', 'order_w0vDYZvqy_Y', '123.00', '2.00', '10.00', 'first name', 'last name', 'test_order@email.com', '+12342342345', 'sample_stripe_payment_intent_id', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0'); -- add test main user id.
 
 -- order address
 INSERT INTO `order_addresses` (`order_address_id`, `address_1`, `address_2`, `city`, `province`, `country`, `postal_code`, `shipping_order_id`, `billing_order_id`)

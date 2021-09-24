@@ -1,3 +1,6 @@
+import Backdrop from "@material-ui/core/Backdrop";
+import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Step from "@material-ui/core/Step";
 import StepContent from "@material-ui/core/StepContent";
 import StepLabel from "@material-ui/core/StepLabel";
@@ -6,22 +9,19 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import CustomerBasicForm from "components/common/Checkout/CustomerBasicForm";
 import CustomerContactForm from "components/common/Checkout/CustomerContactForm";
+import FinalConfirmForm from "components/common/Checkout/FinalConfirmForm";
+import OrderItemForm from "components/common/Checkout/OrderItemForm";
 import Payment from "components/common/Checkout/Payment";
+import { logger } from "configs/logger";
+import { CheckoutSessionStatusEnum } from "domain/order/types";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { mSelector, rsSelector } from "src/selectors/selector";
-import FinalConfirmForm from "components/common/Checkout/FinalConfirmForm";
-import Button from "@material-ui/core/Button";
-import OrderItemForm from "components/common/Checkout/OrderItemForm";
+import { putAuthFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
+import { resetCheckoutStateActionCreator } from "reducers/slices/common";
+import { checkoutSessionStatusActions } from "reducers/slices/domain/checkout";
 import { postSessionTimeoutOrderEventActionCreator } from "reducers/slices/domain/order";
 import { FetchStatusEnum } from "src/app";
-import { resetCheckoutStateActionCreator } from "reducers/slices/common";
-import { putAuthFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
-import { CheckoutSessionStatusEnum } from "domain/order/types";
-import { checkoutSessionStatusActions } from "reducers/slices/domain/checkout";
-import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import { logger } from "configs/logger";
+import { mSelector, rsSelector } from "src/selectors/selector";
 const log = logger(__filename);
 
 export enum CheckoutStepEnum {
@@ -134,6 +134,7 @@ const Checkout: React.FunctionComponent<{}> = (props) => {
       postSessionTimeoutOrderEventActionCreator({
         orderId: curCheckoutOrder.orderId,
         orderNumber: curCheckoutOrder.orderNumber,
+        orderVersion: curCheckoutOrder.version,
       })
     );
 

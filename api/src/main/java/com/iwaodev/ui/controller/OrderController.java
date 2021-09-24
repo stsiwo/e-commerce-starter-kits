@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import com.iwaodev.application.dto.order.OrderDTO;
 import com.iwaodev.application.dto.order.OrderEventDTO;
+import com.iwaodev.application.dto.user.PhoneDTO;
 import com.iwaodev.application.iservice.OrderService;
 import com.iwaodev.config.SpringSecurityUser;
 import com.iwaodev.domain.order.OrderSortEnum;
@@ -67,7 +68,11 @@ public class OrderController {
   @GetMapping("/orders/{id}")
   @PreAuthorize("hasRole('ROLE_ADMIN')") 
   public ResponseEntity<OrderDTO> getWithId(@PathVariable(value = "id") UUID id) throws Exception {
-    return new ResponseEntity<>(this.service.getById(id), HttpStatus.OK);
+    OrderDTO results = this.service.getById(id);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   /**
@@ -94,10 +99,11 @@ public class OrderController {
       response  = this.service.createForGuest(criteria);
     }
 
-	  return new ResponseEntity<>(
-        response, 
-        HttpStatus.OK
-        );
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + response.getOrder().getVersion() + "\"")
+            .body(response);
+
   }
 
   /**
@@ -125,10 +131,11 @@ public class OrderController {
       orderDTO = this.service.addSessionTimeoutOrderEvent(orderId, criteria.getOrderNumber(), null);
     }
 
-	  return new ResponseEntity<>(
-        orderDTO, 
-        HttpStatus.OK
-        );
+
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + orderDTO.getVersion() + "\"")
+            .body(orderDTO);
   }
 
   /**
@@ -148,10 +155,11 @@ public class OrderController {
     // make sure criteria and authUser has the same id
     criteria.setUserId(authUser.getId());
 
-	  return new ResponseEntity<>(
-        this.service.addOrderEventByAdmin(orderId, criteria),
-        HttpStatus.OK
-        );
+    OrderDTO results = this.service.addOrderEventByAdmin(orderId, criteria);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   /**
@@ -162,7 +170,7 @@ public class OrderController {
    **/
   @PutMapping("/orders/{orderId}/events/{orderEventId}")
   @PreAuthorize("hasRole('ROLE_ADMIN')") 
-  public ResponseEntity<OrderEventDTO> updateOrderEvent(
+  public ResponseEntity<OrderDTO> updateOrderEvent(
       @PathVariable(value = "orderId") UUID orderId,
       @PathVariable(value = "orderEventId") Long orderEventId,
       @Valid @RequestBody OrderEventCriteria criteria, 
@@ -172,10 +180,13 @@ public class OrderController {
       // make sure criteria and authUser has the same id
       criteria.setUserId(authUser.getId());
 
-	  return new ResponseEntity<>(
-        this.service.updateOrderEvent(orderId, orderEventId, criteria),
-        HttpStatus.OK
-        );
+
+    OrderDTO results = this.service.updateOrderEvent(orderId, orderEventId, criteria);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
+
   }
   /**
    * delete an order event (condition apply)

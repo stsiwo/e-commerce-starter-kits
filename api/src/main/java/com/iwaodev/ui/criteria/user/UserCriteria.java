@@ -49,4 +49,7 @@ public class UserCriteria {
   @Password(message = "{user.password.invalidformat}")
   @Size(max = 100, message = "{user.password.max100}")
   private String password;
+
+
+  private Long version;
 }

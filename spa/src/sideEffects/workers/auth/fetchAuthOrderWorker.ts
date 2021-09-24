@@ -2,7 +2,7 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { api, WorkerResponse } from "configs/axiosConfig";
 import { logger } from "configs/logger";
 import { OrderQueryStringType } from "domain/order/types";
-import { FetchAuthOrderActionType, messageActions } from "reducers/slices/app";
+import { FetchAuthOrderActionType } from "reducers/slices/app";
 import { fetchAuthOrderFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
 import {
   orderActions,
@@ -11,14 +11,9 @@ import {
   orderPaginationTotalPagesActions,
 } from "reducers/slices/domain/order";
 import { all, call, put, select } from "redux-saga/effects";
-import {
-  AuthType,
-  FetchStatusEnum,
-  MessageTypeEnum,
-  UserTypeEnum,
-} from "src/app";
+import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
 import { mSelector, rsSelector } from "src/selectors/selector";
-import { generateQueryString, getNanoId } from "src/utils";
+import { generateQueryString } from "src/utils";
 
 const log = logger(__filename);
 
@@ -167,17 +162,6 @@ export function* fetchAuthOrderWorker(
       ]);
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       log(response.message);
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
     }
   }
 }

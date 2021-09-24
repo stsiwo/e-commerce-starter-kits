@@ -11,5 +11,7 @@ import lombok.ToString;
 public class ProductImageDTO {
   private Long productImageId;
   private String productImagePath;
+
+  private Long version;
 }
 

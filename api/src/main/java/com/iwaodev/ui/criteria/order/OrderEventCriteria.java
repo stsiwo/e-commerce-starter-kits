@@ -48,6 +48,7 @@ public class OrderEventCriteria {
   @Size(max = 1000, message = "{orderEvent.note.max1000}")
   private String note;
 
+  private Long version;
 }
 
 

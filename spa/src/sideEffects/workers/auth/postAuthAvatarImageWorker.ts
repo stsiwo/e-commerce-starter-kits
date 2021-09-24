@@ -83,12 +83,15 @@ export function* postAuthAvatarImageWorker(
       api({
         method: "POST",
         url: apiUrl,
+        headers: {
+          "If-Match": `"${action.payload.version}"`,
+          "Content-Type": "multipart/form-data",
+        },
         data: formData,
-        headers: { "Content-Type": "multipart/form-data" },
       })
         .then((response) => ({
           fetchStatus: FetchStatusEnum.SUCCESS,
-          imagePath: response.data.imagePath,
+          user: response.data,
         }))
         .catch((e) => ({
           fetchStatus: FetchStatusEnum.FAILED,
@@ -107,7 +110,11 @@ export function* postAuthAvatarImageWorker(
        * update this domain in state
        *
        **/
-      yield put(authActions.updateAvatarImagePath(response.imagePath));
+      yield put(authActions.updateUser(response.user));
+
+      /**
+       * udpate version for this user otherwise, consecutive request return version mismatch error.
+       */
 
       /**
        * update message
@@ -121,17 +128,6 @@ export function* postAuthAvatarImageWorker(
       );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       log(response.message);
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
     }
   } else {
     log("permission defined: you are " + curAuth.userType);

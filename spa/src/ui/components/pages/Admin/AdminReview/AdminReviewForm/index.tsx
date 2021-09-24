@@ -6,6 +6,7 @@ import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import Rating from "@material-ui/lab/Rating";
 import UserCard from "components/common/UserCard";
+import { logger } from "configs/logger";
 import {
   defaultReviewValidationData,
   ReviewDataType,
@@ -18,7 +19,6 @@ import * as React from "react";
 import { useDispatch } from "react-redux";
 import { putReviewActionCreator } from "reducers/slices/domain/review";
 import ReviewProductHorizontalCard from "./ReviewProductHorizontalCard";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 interface AdminReviewFormPropsType {
@@ -171,6 +171,7 @@ const AdminReviewForm = React.forwardRef<any, AdminReviewFormPropsType>(
               reviewPoint: curReviewState.reviewPoint,
               productId: curReviewState.product.productId,
               userId: curReviewState.user.userId,
+              version: curReviewState.version,
             })
           );
         } else {

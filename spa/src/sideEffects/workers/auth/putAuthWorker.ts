@@ -77,6 +77,7 @@ export function* putAuthWorker(action: PayloadAction<PutAuthActionType>) {
     const response: WorkerResponse = yield call(() =>
       api({
         method: "PUT",
+        headers: { "If-Match": `"${action.payload.version}"` },
         url: apiUrl,
         data: action.payload as UserCriteria,
       })
@@ -118,17 +119,6 @@ export function* putAuthWorker(action: PayloadAction<PutAuthActionType>) {
       );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       log(response.message);
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
     }
   } else if (curAuth.userType === UserTypeEnum.GUEST) {
     yield put(

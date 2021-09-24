@@ -15,6 +15,7 @@ import com.iwaodev.auth.AuthenticateTestUser;
 import com.iwaodev.auth.AuthenticationInfo;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.ui.response.BaseResponse;
 import com.iwaodev.ui.response.ErrorBaseResponse;
 import com.iwaodev.util.ResourceReader;
 
@@ -169,10 +170,42 @@ public class AdminCategoryEndpointTest {
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     CategoryDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), CategoryDTO[].class);
 
+    String eTag = result.getResponse().getHeader("ETag");
     assertThat(responseBody.length).isGreaterThan(0);
+    assertThat(eTag).isNotNull();
     for (CategoryDTO categoryDto : responseBody) {
       assertThat(categoryDto.getCategoryId()).isNotNull();
     }
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/category/shouldAdminGetCacheOfAllCategoriesBecauseOfETag.sql" })
+  public void shouldAdminGetCacheOfAllCategoriesBecauseOfETag() throws Exception {
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath;
+
+    // act & assert
+    // 1st request
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    // extract etag from the response
+    String eTag = result.getResponse().getHeader("ETag");
+
+    // 2st request
+    ResultActions result1Actions = mvc.perform(MockMvcRequestBuilders.get(targetUrl).cookie(this.authCookie)
+                    .cookie(this.csrfCookie)
+                    .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-None-Match", eTag)
+                    .accept(MediaType.APPLICATION_JSON))
+            // make sure 304
+            .andDo(print()).andExpect(status().isNotModified());
   }
 
   @Test
@@ -289,11 +322,16 @@ public class AdminCategoryEndpointTest {
 
     MvcResult result = resultActions.andReturn();
 
+    // etag
+    String etag = result.getResponse().getHeader("ETag");
+
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     CategoryDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, CategoryDTO.class);
 
+
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
     assertThat(responseBody.getCategoryId()).isGreaterThan(0);
+    assertThat(etag).isEqualTo("\"0\"");
     assertThat(responseBody.getCategoryName()).isEqualTo(dummyFormJson.get("categoryName").asText());
   }
 
@@ -391,6 +429,7 @@ public class AdminCategoryEndpointTest {
     // dummy form json
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
+    String dummyVersion = "\"0\"";
 
     // arrange
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/"
@@ -402,14 +441,19 @@ public class AdminCategoryEndpointTest {
         .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+          .header("If-Match", dummyVersion)
         .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
+
+    // etag
+    String etag = result.getResponse().getHeader("ETag");
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     CategoryDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, CategoryDTO.class);
 
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(etag).isEqualTo("\"1\"");
     assertThat(responseBody.getCategoryId().toString()).isEqualTo(dummyFormJson.get("categoryId").asText());
     assertThat(responseBody.getCategoryName()).isEqualTo(dummyFormJson.get("categoryName").asText());
     assertThat(responseBody.getCategoryDescription()).isEqualTo(dummyFormJson.get("categoryDescription").asText());
@@ -419,8 +463,91 @@ public class AdminCategoryEndpointTest {
   }
 
   @Test
+  @Sql(scripts = { "classpath:/integration/category/shouldNotAdminUpdateCategorySinceNoIfMatchHeader.sql" })
+  public void shouldNotAdminUpdateCategorySinceNoIfMatchHeader(
+          @Value("classpath:/integration/category/shouldNotAdminUpdateCategorySinceNoIfMatchHeader.json") Resource dummyFormJsonFile)
+          throws Exception {
+
+    // make sure categoryId match the one in sql and json
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/"
+            + dummyFormJson.get("categoryId").asText();
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.put(targetUrl) // update/replace
+            .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+            .cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/category/shouldNotAdminUpdateCategorySinceNoIfMatchHeader.sql" })
+  public void shouldNotAdminUpdateCategorySinceVersionMismatch(
+          @Value("classpath:/integration/category/shouldNotAdminUpdateCategorySinceNoIfMatchHeader.json") Resource dummyFormJsonFile)
+          throws Exception {
+
+    // make sure categoryId match the one in sql and json
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyVersion = "\"3\"";
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/"
+            + dummyFormJson.get("categoryId").asText();
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.put(targetUrl) // update/replace
+            .content(dummyFormJsonString).contentType(MediaType.APPLICATION_JSON)
+            .cookie(this.authCookie)
+            .cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken())
+            .header("If-Match", dummyVersion)
+            .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isPreconditionFailed());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
+  }
+  @Test
   @Sql(scripts = { "classpath:/integration/category/shouldAdminDeleteCategory.sql" })
   public void shouldAdminDeleteCategory() throws Exception {
+
+    // make sure category id match the one in sql
+
+    // arrange
+    Long dummyCategoryId = 100L;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyCategoryId.toString();
+    String dummyVersion = "\"0\"";
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.delete(targetUrl) // delete
+        .cookie(this.authCookie)
+          .cookie(this.csrfCookie)
+          .header("csrf-token", this.authInfo.getCsrfToken())
+            .header("If-Match", dummyVersion)
+        .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
+
+    MvcResult result = resultActions.andReturn();
+
+    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/category/shouldAdminDeleteCategory.sql" })
+  public void shouldNotAdminDeleteCategorySinceNoIfMatch() throws Exception {
 
     // make sure category id match the one in sql
 
@@ -430,15 +557,44 @@ public class AdminCategoryEndpointTest {
 
     // act & assert
     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.delete(targetUrl) // delete
-        .cookie(this.authCookie)
-          .cookie(this.csrfCookie)
-          .header("csrf-token", this.authInfo.getCsrfToken())
-        .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
+            .cookie(this.authCookie)
+            .cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken())
+            .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
 
     MvcResult result = resultActions.andReturn();
 
-    assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
 
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/category/shouldAdminDeleteCategory.sql" })
+  public void shouldNotAdminDeleteCategorySinceVersionMismatch() throws Exception {
+
+    // make sure category id match the one in sql
+
+    // arrange
+    Long dummyCategoryId = 100L;
+    String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyCategoryId.toString();
+    String dummyVersion = "\"100\"";
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.delete(targetUrl) // delete
+            .cookie(this.authCookie)
+            .cookie(this.csrfCookie)
+            .header("csrf-token", this.authInfo.getCsrfToken())
+            .header("If-Match", dummyVersion)
+            .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isPreconditionFailed());
+
+    MvcResult result = resultActions.andReturn();
+
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
   }
 
   @Test
@@ -450,14 +606,20 @@ public class AdminCategoryEndpointTest {
     // arrange
     Long dummyCategoryId = 100L;
     String targetUrl = "http://localhost:" + this.port + this.targetPath + "/" + dummyCategoryId.toString();
+    String dummyVersion = "\"0\"";
 
     // act & assert
     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.delete(targetUrl) // delete
         .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+            .header("If-Match", dummyVersion)
         .accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
 
     MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("cannot delete this category since it has products.");
   }
 }

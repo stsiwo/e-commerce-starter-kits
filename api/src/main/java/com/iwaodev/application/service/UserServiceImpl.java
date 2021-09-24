@@ -24,11 +24,13 @@ import com.iwaodev.ui.criteria.user.UserDeleteTempCriteria;
 import com.iwaodev.ui.criteria.user.UserQueryStringCriteria;
 import com.iwaodev.ui.criteria.user.UserStatusCriteria;
 
+import com.iwaodev.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -37,6 +39,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Service
 @Transactional
@@ -64,6 +68,9 @@ public class UserServiceImpl implements UserService {
 
   @Autowired
   private ApplicationEventPublisher publisher;
+
+  @Autowired
+  private HttpServletRequest httpServletRequest;
 
   @Autowired
   private S3Service s3Service;
@@ -121,6 +128,17 @@ public class UserServiceImpl implements UserService {
 
     User targetEntity = targetEntityOption.get();
 
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(targetEntity.getVersion(), receivedVersion)) {
+      logger.debug("current version: " + targetEntity.getVersion());
+      logger.debug("received version: " + receivedVersion);
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
+
     targetEntity.setFirstName(criteria.getFirstName());
     targetEntity.setLastName(criteria.getLastName());
 
@@ -146,8 +164,19 @@ public class UserServiceImpl implements UserService {
     if (criteria.getPassword() != null && !criteria.getPassword().isEmpty()) {
       targetEntity.setPassword(this.passwordEncoder.encode(criteria.getPassword()));
     }
+    User savedEntity;
 
-    User savedEntity = this.repository.save(targetEntity);
+    logger.debug("version before update: " + targetEntity.getVersion());
+
+    try {
+      // issue-QqMbfkO9pcU
+      // issue-YPnuFX8S01a (run 'update' twice because of flush, but need this in production)
+      savedEntity = this.repository.saveAndFlush(targetEntity);
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
+
+    logger.debug("user version after saved: " + savedEntity.getVersion());
 
     // map entity to dto
     return UserMapper.INSTANCE.toUserDTO(savedEntity);
@@ -161,12 +190,33 @@ public class UserServiceImpl implements UserService {
         .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND,
             "user not found (id: " + criteria.getUserId().toString() + ")"));
 
+
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+
+
+    logger.debug("curVersion" + user.getVersion());
+    logger.debug("recVersion" + receivedVersion);
+
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(user.getVersion(), receivedVersion)) {
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
+
     user.setActive(criteria.getActive());
     if (criteria.getActiveNote() != null && !criteria.getActiveNote().isEmpty()) {
       user.setActiveNote(criteria.getActiveNote());
     }
-
-    User savedEntity = this.repository.save(user);
+    User savedEntity;
+    try {
+      // issue-j845jixIPCn
+      // don't forget flush otherwise version number is updated.
+      savedEntity = this.repository.saveAndFlush(user);
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
 
     // map entity to dto
     return UserMapper.INSTANCE.toUserDTO(savedEntity);
@@ -185,12 +235,25 @@ public class UserServiceImpl implements UserService {
 
     User targetEntity = targetEntityOption.get();
 
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(targetEntity.getVersion(), receivedVersion)) {
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
+
     // update related properties
     targetEntity.setActive(UserActiveEnum.CUSTOMER_DELETED);
     targetEntity.setActiveNote("the customer requested for the deletion of the account ("
         + LocalDateTime.now().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)) + ")");
 
-    this.repository.save(targetEntity);
+    try {
+      this.repository.save(targetEntity);
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
 
   }
 
@@ -201,15 +264,32 @@ public class UserServiceImpl implements UserService {
 
     if (targetEntityOption.isPresent()) {
       User targetEntity = targetEntityOption.get();
+
+      logger.debug("curVersion" + targetEntity.getVersion());
+
+      // version check for concurrency update
+      String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+      if (receivedVersion == null || receivedVersion.isEmpty()) {
+        throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+      }
+      if (!Util.checkETagVersion(targetEntity.getVersion(), receivedVersion)) {
+        throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+      };
+
       // delete s3 directory of this user also.
       String userDirectoryKey = this.userFilePath + "/" + targetEntity.getUserId().toString();
       this.s3Service.delete(userDirectoryKey);
-      this.repository.delete(targetEntity);
+
+      try {
+        this.repository.delete(targetEntity);
+      } catch (OptimisticLockingFailureException ex) {
+        throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+      }
     }
   }
 
   @Override
-  public String uploadAvatarImage(UUID userId, MultipartFile file) throws Exception {
+  public UserDTO uploadAvatarImage(UUID userId, MultipartFile file) throws Exception {
 
     // find the user
     Optional<User> targetEntityOption = this.repository.findById(userId);
@@ -218,6 +298,18 @@ public class UserServiceImpl implements UserService {
       logger.debug("the given user does not exist");
       throw new AppException(HttpStatus.NOT_FOUND, "the given user does not exist.");
     }
+
+    // update the user
+    User targetEntity = targetEntityOption.get();
+
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(targetEntity.getVersion(), receivedVersion)) {
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
 
     // check the file content type (only image is allowed)
     if (!this.fileService.isImage(file)) {
@@ -230,11 +322,16 @@ public class UserServiceImpl implements UserService {
 
     // construct path
     String directoryPath = getDirectoryPath(userId.toString());
-    String fileName = updateFileName(newFileName);
     String path = directoryPath + "/" + newFileName;
 
     // try to save teh file
     try {
+      // if the previous image exists, remove from s3
+      if (targetEntity.getAvatarImagePath() != null && !targetEntity.getAvatarImagePath().isEmpty()) {
+        String oldPath = this.switchToDirectoryPathWithFile(targetEntity.getAvatarImagePath(), userId.toString());
+        logger.debug("old image path to s3: " + oldPath);
+        this.s3Service.delete(oldPath);
+      }
       //this.fileService.save(path, file);
       this.s3Service.upload(path, file.getBytes());
     } catch (Exception e) {
@@ -242,20 +339,25 @@ public class UserServiceImpl implements UserService {
       throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, "encountered errors during uploading user avatar images. please try again.");
     }
 
-    // update the user
-    User targetEntity = targetEntityOption.get();
 
     String publicPath = getPublicDirectoryPath(targetEntity.getUserId().toString()) + "/" + newFileName;
 
     targetEntity.setAvatarImagePath(publicPath);
 
-    User savedEntity = this.repository.save(targetEntity);
+    User savedEntity;
+    try {
+      // don't forget flush otherwise version number is updated.
+      savedEntity = this.repository.saveAndFlush(targetEntity);
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
 
-    return savedEntity.getAvatarImagePath();
+    // map entity to dto
+    return UserMapper.INSTANCE.toUserDTO(savedEntity);
   }
 
   @Override
-  public void removeAvatarImage(UUID userId) throws Exception {
+  public UserDTO removeAvatarImage(UUID userId) throws Exception {
 
     // find the user
     Optional<User> targetEntityOption = this.repository.findById(userId);
@@ -267,7 +369,19 @@ public class UserServiceImpl implements UserService {
 
     // get avatarImagePath from db
     User targetEntity = targetEntityOption.get();
+
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(targetEntity.getVersion(), receivedVersion)) {
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
+
     String avatarImagePath = targetEntity.getAvatarImagePath();
+
+    User savedEntity = targetEntity;
 
     // if it is empty, we don't have any image to delete.
     if (avatarImagePath != null && !avatarImagePath.isEmpty()) {
@@ -276,15 +390,21 @@ public class UserServiceImpl implements UserService {
           targetEntity.getUserId().toString());
 
       // remove from the directory
-      boolean isSuccess = this.fileService.remove(directoryPathWithFile);
+      this.s3Service.delete(directoryPathWithFile);
 
       // update user entity to remove avatarImagePath
       targetEntity.setAvatarImagePath(null);
 
-      this.repository.save(targetEntity);
+      try {
+        savedEntity = this.repository.saveAndFlush(targetEntity);
+      } catch (OptimisticLockingFailureException ex) {
+        throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+      }
     } else {
       logger.debug("image path is empty so we don't have any image to delete.");
     }
+
+    return UserMapper.INSTANCE.toUserDTO(savedEntity);
   }
 
   private String getDirectoryPath(String userIdString) {

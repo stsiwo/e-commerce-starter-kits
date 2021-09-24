@@ -1020,7 +1020,7 @@ VALUES ('23', '84c6354e-3e59-41f3-8c66-726e1a608649', 'ORDERED', '0', 'c7081519-
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
 VALUES ('24', '84c6354e-3e59-41f3-8c66-726e1a608649', 'PAID', '0', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('25', '84c6354e-3e59-41f3-8c66-726e1a608649', 'SHIPPED', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+VALUES ('25', '84c6354e-3e59-41f3-8c66-726e1a608649', 'SHIPPED', '1', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '0');
 
 
 
@@ -1050,9 +1050,9 @@ VALUES ('27', 'cdfc8e21-0ac0-45c8-8a7e-644798166fd8', 'ORDERED', '0', 'c7081519-
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
 VALUES ('28', 'cdfc8e21-0ac0-45c8-8a7e-644798166fd8', 'PAID', '0', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('29', 'cdfc8e21-0ac0-45c8-8a7e-644798166fd8', 'SHIPPED', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+VALUES ('29', 'cdfc8e21-0ac0-45c8-8a7e-644798166fd8', 'SHIPPED', '1', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('30', 'cdfc8e21-0ac0-45c8-8a7e-644798166fd8', 'DELIVERED', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+VALUES ('30', 'cdfc8e21-0ac0-45c8-8a7e-644798166fd8', 'DELIVERED', '1', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '0');
 
 
 
@@ -1083,9 +1083,9 @@ VALUES ('32', '5e5b3163-acba-4c18-90f7-310e0f104786', 'ORDERED', '0', 'c7081519-
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
 VALUES ('33', '5e5b3163-acba-4c18-90f7-310e0f104786', 'PAID', '0', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('34', '5e5b3163-acba-4c18-90f7-310e0f104786', 'SHIPPED', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+VALUES ('34', '5e5b3163-acba-4c18-90f7-310e0f104786', 'SHIPPED', '1', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('35', '5e5b3163-acba-4c18-90f7-310e0f104786', 'DELIVERED', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+VALUES ('35', '5e5b3163-acba-4c18-90f7-310e0f104786', 'DELIVERED', '1', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
 VALUES ('36', '5e5b3163-acba-4c18-90f7-310e0f104786', 'RETURN_REQUEST', '0', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
 
@@ -1117,13 +1117,13 @@ VALUES ('38', '6511c283-5405-4335-b227-5ee3d6d9ed74', 'ORDERED', '0', 'c7081519-
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
 VALUES ('39', '6511c283-5405-4335-b227-5ee3d6d9ed74', 'PAID', '0', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('41', '6511c283-5405-4335-b227-5ee3d6d9ed74', 'SHIPPED', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+VALUES ('41', '6511c283-5405-4335-b227-5ee3d6d9ed74', 'SHIPPED', '1', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('42', '6511c283-5405-4335-b227-5ee3d6d9ed74', 'DELIVERED', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+VALUES ('42', '6511c283-5405-4335-b227-5ee3d6d9ed74', 'DELIVERED', '1', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
 VALUES ('43', '6511c283-5405-4335-b227-5ee3d6d9ed74', 'RETURN_REQUEST', '0', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('44', '6511c283-5405-4335-b227-5ee3d6d9ed74', 'RECEIVED_RETURN_REQUEST', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+VALUES ('44', '6511c283-5405-4335-b227-5ee3d6d9ed74', 'RECEIVED_RETURN_REQUEST', '1', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '0');
 
 
 
@@ -1154,15 +1154,15 @@ VALUES ('46', '8fa1e551-d192-4203-badb-a4bb85df3f11', 'ORDERED', '0', 'c7081519-
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
 VALUES ('47', '8fa1e551-d192-4203-badb-a4bb85df3f11', 'PAID', '0', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('48', '8fa1e551-d192-4203-badb-a4bb85df3f11', 'SHIPPED', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+VALUES ('48', '8fa1e551-d192-4203-badb-a4bb85df3f11', 'SHIPPED', '1', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('49', '8fa1e551-d192-4203-badb-a4bb85df3f11', 'DELIVERED', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+VALUES ('49', '8fa1e551-d192-4203-badb-a4bb85df3f11', 'DELIVERED', '1', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
 VALUES ('50', '8fa1e551-d192-4203-badb-a4bb85df3f11', 'RETURN_REQUEST', '0', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('51', '8fa1e551-d192-4203-badb-a4bb85df3f11', 'RECEIVED_RETURN_REQUEST', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+VALUES ('51', '8fa1e551-d192-4203-badb-a4bb85df3f11', 'RECEIVED_RETURN_REQUEST', '1', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('52', '8fa1e551-d192-4203-badb-a4bb85df3f11', 'RETURNED', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+VALUES ('52', '8fa1e551-d192-4203-badb-a4bb85df3f11', 'RETURNED', '1', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '0');
 
 
 
@@ -1221,9 +1221,9 @@ VALUES ('57', '4558b985-1675-49e1-994f-0d08bc881486', 'ORDERED', '0', 'c7081519-
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
 VALUES ('58', '4558b985-1675-49e1-994f-0d08bc881486', 'PAID', '0', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('59', '4558b985-1675-49e1-994f-0d08bc881486', 'SHIPPED', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+VALUES ('59', '4558b985-1675-49e1-994f-0d08bc881486', 'SHIPPED', '1', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('60', '4558b985-1675-49e1-994f-0d08bc881486', 'DELIVERED', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+VALUES ('60', '4558b985-1675-49e1-994f-0d08bc881486', 'DELIVERED', '1', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '0');
 
 
 
@@ -1254,9 +1254,9 @@ VALUES ('62', 'e3da531d-eca6-420c-8446-ea70b1824f11', 'ORDERED', '0', 'c7081519-
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
 VALUES ('63', 'e3da531d-eca6-420c-8446-ea70b1824f11', 'PAID', '0', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('64', 'e3da531d-eca6-420c-8446-ea70b1824f11', 'SHIPPED', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+VALUES ('64', 'e3da531d-eca6-420c-8446-ea70b1824f11', 'SHIPPED', '1', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '0');
 INSERT INTO `order_events` (`order_event_id`, `order_id`, `order_status`, `undoable`, `user_id`, `is_guest`)
-VALUES ('65', 'e3da531d-eca6-420c-8446-ea70b1824f11', 'DELIVERED', '1', 'c7081519-16e5-4f92-ac50-1834001f12b9', '0');
+VALUES ('65', 'e3da531d-eca6-420c-8446-ea70b1824f11', 'DELIVERED', '1', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '0');
 
 
 -- reviews
@@ -1332,8 +1332,149 @@ VALUES ('ntf_OIDbKusAQ8M', 'sample title', 'sample descripton', 'c7081519-16e5-4
 INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
 VALUES ('ntf_NJxfyoN63ZR', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '1');
 
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_s4d_PkM_og1', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_Xe70edCofio', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_UwjkClnNEWc', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_59G_s5y8jss', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_YLe6Ta9TX1y', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_zVk_FkpjLIw', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_OTuqAg2dRUl', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_Q1qYpzjTkeF', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_qeaDtmzF6Rh', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_EjQWcUvWiHA', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_46gfiZSdwFU', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_wg1QA19zx7A', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_jmNutIaZVSy', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_TwnG4tcs-1u', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_mxioocRTCIH', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_gnc7lISo-dZ', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_yr6QjG4DJXP', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_WVqRguwOr70', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_AIvEXsYPA0M', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_4PkzI_3lGJ8', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_FRKyEYy3Epk', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_runSHQvPHUg', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_MKwJw9baIVj', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_qjEArhX_Uw4', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_pNfI3oW16Mk', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf__DqjE2EIIuM', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_N1pj-xSdn83', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_s56PDZhi8Kk', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_hvm3jYZCv72', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_QJW3815Kb8x', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_pD4Z_u8ww0U', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_j5Ux22IzpkA', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_bl6i4_MLh0t', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_ufkkHZOvAIC', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_FQbn8oA8jfI', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_dH0tUghnhuG', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '1', '0');
 
 
 
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_o4fXMLVhSyE', 'sample title', 'sample descripton', 'c7081519-16e5-4f92-ac50-1834001f12b9', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', '2', '0');
 
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_8mM47DcMqs8', 'sample title', 'sample descripton', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', 'c7081519-16e5-4f92-ac50-1834001f12b9', '2', '0');
 
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_9kCJUWHcvXb', 'sample title', 'sample descripton', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', 'c7081519-16e5-4f92-ac50-1834001f12b9', '2', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_oy7-y1GrSGM', 'sample title', 'sample descripton', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', 'c7081519-16e5-4f92-ac50-1834001f12b9',  '2', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_mXWlO9pXALu', 'sample title', 'sample descripton', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', 'c7081519-16e5-4f92-ac50-1834001f12b9', '2', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_MI4OhCGoCmy', 'sample title', 'sample descripton', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', 'c7081519-16e5-4f92-ac50-1834001f12b9', '2', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_WAUdlzqdyQA', 'sample title', 'sample descripton', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', 'c7081519-16e5-4f92-ac50-1834001f12b9', '2', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_tx8cMXR4-Tt', 'sample title', 'sample descripton', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', 'c7081519-16e5-4f92-ac50-1834001f12b9', '2', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_Zd51-ngq59F', 'sample title', 'sample descripton', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', 'c7081519-16e5-4f92-ac50-1834001f12b9', '2', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_y3pecCBB9hB', 'sample title', 'sample descripton', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', 'c7081519-16e5-4f92-ac50-1834001f12b9', '2', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_n2t7jvcl357', 'sample title', 'sample descripton', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', 'c7081519-16e5-4f92-ac50-1834001f12b9', '2', '0');
+
+INSERT INTO `notifications` (`notification_id`, `notification_title`, `notification_description`, `issuer_id`, `recipient_id`, `notification_type_id`, `is_read`)
+VALUES ('ntf_lKs0_M5Pb2V', 'sample title', 'sample descripton', 'e95bf632-1518-4bf2-8ba9-cd8b7587530b', 'c7081519-16e5-4f92-ac50-1834001f12b9', '2', '0');

@@ -6,9 +6,11 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.iwaodev.application.dto.product.ProductDTO;
 import com.iwaodev.application.dto.productVariant.ProductVariantDTO;
 import com.iwaodev.application.irepository.ProductRepository;
 import com.iwaodev.application.iservice.ProductVariantService;
+import com.iwaodev.application.mapper.ProductMapper;
 import com.iwaodev.application.mapper.ProductVariantMapper;
 import com.iwaodev.exception.AppException;
 import com.iwaodev.infrastructure.model.Product;
@@ -16,13 +18,17 @@ import com.iwaodev.infrastructure.model.ProductSize;
 import com.iwaodev.infrastructure.model.ProductVariant;
 import com.iwaodev.ui.criteria.product.ProductVariantCriteria;
 
+import com.iwaodev.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Service
 @Transactional
@@ -36,6 +42,9 @@ public class ProductVariantServiceImpl implements ProductVariantService {
   public ProductVariantServiceImpl(ProductRepository repository) {
     this.repository = repository;
   }
+
+  @Autowired
+  private HttpServletRequest httpServletRequest;
 
   public List<ProductVariantDTO> getAll(UUID productId) throws Exception {
 
@@ -58,7 +67,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
   }
 
   @Override
-  public ProductVariantDTO create(UUID productId, ProductVariantCriteria criteria) throws Exception {
+  public ProductDTO create(UUID productId, ProductVariantCriteria criteria) throws Exception {
 
     // duplication
     if (this.repository.findVariantByColorAndSize(productId, criteria.getVariantColor(), criteria.getProductSize().getProductSizeName()).isPresent()) {
@@ -89,22 +98,19 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
     // save it
     Product savedEntity = this.repository.save(targetEntity);
+
+    // issue-qPl7MheYUdW
+    //this.repository.flush();
     /**
      * if this entity use '@Formula' and '@Transient' you need to refresh.
      **/
     this.repository.refresh(savedEntity);
 
-    // find updated entity
-    Optional<ProductVariant> targetVariantOption = savedEntity.findVariantByColorAndSize(criteria.getVariantColor(),
-        criteria.getProductSize().getProductSizeId());
-    // map entity to dto and return it.
-    ProductVariantDTO variantDto = ProductVariantMapper.INSTANCE.toProductVariantDTO(targetVariantOption.get());
-
-    return variantDto;
+    return ProductMapper.INSTANCE.toProductDTO(savedEntity);
   }
 
   @Override
-  public ProductVariantDTO replace(UUID productId, Long variantId, ProductVariantCriteria criteria) throws Exception {
+  public ProductDTO replace(UUID productId, Long variantId, ProductVariantCriteria criteria) throws Exception {
 
     // duplication
     if (this.repository.isOthersHaveColorAndSize(productId, variantId, criteria.getVariantColor(), criteria.getProductSize().getProductSizeName())) {
@@ -112,23 +118,31 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     }
 
     Product targetEntity = this.repository.findById(productId).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given product does not exist."));
-
+    ProductVariant targetVariant = targetEntity.findVariantById(criteria.getVariantId());
     ProductSize productSize = this.repository.findProductSizeById(criteria.getProductSize().getProductSizeId()).orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "the given product size does not exist."));
+
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(targetVariant.getVersion(), receivedVersion)) {
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
 
     // map criteria to entity
     ProductVariant updateEntity = ProductVariantMapper.INSTANCE
         .toProductVariantEntityFromProductVariantCriteria(criteria);
 
-    updateEntity.setProductSize(productSize);
-
+    // issue-k0rdIGEQ91U
     targetEntity.updateVariant(variantId, updateEntity);
 
+    targetVariant.setProductSize(productSize);
     /**
      * bug: when throw AppEception instead of ResponseStatusException, it causes 'detached entity passed to persist: com.iwaodev.infrastructure.model.ProductVariant' in response message.
-     *
      **/
     // must be cheaper than the unit price validaiton
-    if (!updateEntity.isUnitPriceGraterThanDiscountPrice()) {
+    if (!targetVariant.isUnitPriceGraterThanDiscountPrice()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "the discount price must be less than the unit price.");
     }
 
@@ -136,7 +150,16 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     targetEntity.setUp();
 
     // save it
-    Product savedEntity = this.repository.save(targetEntity);
+
+    Product savedEntity;
+    try {
+      // don't forget flush otherwise version number is updated.
+      savedEntity = this.repository.saveAndFlush(targetEntity);
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
+
+    logger.debug("saved product version: " + savedEntity.getVersion());
 
     /**
      * you need to flush otherwise, update statement is never executed (esp testing).
@@ -148,12 +171,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
      **/
     this.repository.refresh(savedEntity);
 
-    // find updated entity
-    Optional<ProductVariant> targetVariantOption = savedEntity.findVariantByColorAndSize(criteria.getVariantColor(),
-        criteria.getProductSize().getProductSizeId());
-
-    // map entity to dto and return it.
-    return ProductVariantMapper.INSTANCE.toProductVariantDTO(targetVariantOption.get());
+    return ProductMapper.INSTANCE.toProductDTO(savedEntity);
   }
 
   @Override
@@ -164,6 +182,16 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     if (targetEntityOption.isPresent()) {
 
       Product targetEntity = targetEntityOption.get();
+      ProductVariant targetVariant = targetEntity.findVariantById(variantId);
+
+      // version check for concurrency update
+      String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+      if (receivedVersion == null || receivedVersion.isEmpty()) {
+        throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+      }
+      if (!Util.checkETagVersion(targetVariant.getVersion(), receivedVersion)) {
+        throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+      };
 
       targetEntity.removeVariantById(variantId);
 
@@ -176,7 +204,11 @@ public class ProductVariantServiceImpl implements ProductVariantService {
       }
 
       // save it
-      this.repository.save(targetEntity);
+      try {
+        this.repository.save(targetEntity);
+      } catch (OptimisticLockingFailureException ex) {
+        throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+      }
     }
   }
 }

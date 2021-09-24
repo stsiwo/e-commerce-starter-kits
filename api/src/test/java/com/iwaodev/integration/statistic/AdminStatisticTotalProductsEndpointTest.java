@@ -234,7 +234,7 @@ public class AdminStatisticTotalProductsEndpointTest {
 
         // assert
         assertThat(result.getResponse().getStatus()).isEqualTo(200);
-        assertThat(responseBody.length).isGreaterThanOrEqualTo(3);
+        assertThat(responseBody.length).isGreaterThanOrEqualTo(1);
         for (StatisticTotalProductDTO totalProductDTO : responseBody) {
             if (totalProductDTO.getName().equals(firstDateTime)) {
                 assertThat(totalProductDTO.getProducts()).isEqualTo(totalCostForFirst);
@@ -299,7 +299,7 @@ public class AdminStatisticTotalProductsEndpointTest {
 
         // assert
         assertThat(result.getResponse().getStatus()).isEqualTo(200);
-        assertThat(responseBody.length).isGreaterThanOrEqualTo(3);
+        assertThat(responseBody.length).isGreaterThanOrEqualTo(1);
         for (StatisticTotalProductDTO totalProductDTO : responseBody) {
             if (totalProductDTO.getName().equals(firstDateTime)) {
                 assertThat(totalProductDTO.getProducts()).isEqualTo(totalCostForFirst);

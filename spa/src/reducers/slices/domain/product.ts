@@ -65,7 +65,10 @@ export const putProductActionCreator = createAction<PutProductActionType>(
 export const putProductActionTypeName = putProductActionCreator().type;
 
 // for DELETE (delete single cart item) request
-export declare type DeleteSingleProductActionType = { productId: string };
+export declare type DeleteSingleProductActionType = {
+  productId: string;
+  version: number;
+};
 export const deleteSingleProductActionCreator =
   createAction<DeleteSingleProductActionType>(
     "saga/domain/product/deleteSingle"
@@ -103,6 +106,7 @@ export const putProductVariantActionTypeName =
 export declare type DeleteSingleProductVariantActionType = {
   variantId: string;
   productId: string;
+  version: number;
 };
 export const deleteSingleProductVariantActionCreator =
   createAction<DeleteSingleProductVariantActionType>(

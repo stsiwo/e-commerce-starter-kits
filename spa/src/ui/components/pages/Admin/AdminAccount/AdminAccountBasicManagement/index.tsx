@@ -1,6 +1,7 @@
 import Button from "@material-ui/core/Button";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
+import { logger } from "configs/logger";
 import {
   defaultUserBasicAccountData,
   defaultUserBasicAccountValidationData,
@@ -13,7 +14,6 @@ import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { putAuthActionCreator } from "reducers/slices/app";
 import { mSelector } from "src/selectors/selector";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 export declare type UserAccountDataType = {
@@ -22,6 +22,7 @@ export declare type UserAccountDataType = {
   email: string;
   password: string;
   confirm: string;
+  version: number;
 };
 
 export declare type UserAccountValidationDataType = {
@@ -92,9 +93,10 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
         firstName: auth.user.firstName,
         lastName: auth.user.lastName,
         email: auth.user.email,
+        version: auth.user.version,
       }));
     }
-  }, []);
+  }, [JSON.stringify(auth.user)]);
 
   // validation logic (should move to hooks)
   const [curUserAccountValidationState, setUserAccountValidationState] =
@@ -210,8 +212,16 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
           ...(curUserAccountState.password
             ? { password: curUserAccountState.password }
             : {}),
+          version: curUserAccountState.version,
         })
       );
+      setUserAccountState((prev: UserBasicAccountDataType) => {
+        return {
+          ...prev,
+          password: "",
+          confirm: "",
+        };
+      });
     } else {
       updateAllValidation();
     }

@@ -21,4 +21,6 @@ public class PhoneDTO {
 
   private UUID userId;
 
+  private Long version;
+
 }

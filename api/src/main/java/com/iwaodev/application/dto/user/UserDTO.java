@@ -52,4 +52,7 @@ public class UserDTO {
   private LocalDateTime verificationTokenExpiryDate;
 
   private LocalDateTime forgotPasswordTokenExpiryDate;
+
+  private Long version;
+
 }

@@ -227,7 +227,7 @@ public class AdminStatisticTotalUsersEndpointTest {
 
         // assert
         assertThat(result.getResponse().getStatus()).isEqualTo(200);
-        assertThat(responseBody.length).isGreaterThanOrEqualTo(3);
+        assertThat(responseBody.length).isGreaterThanOrEqualTo(1);
         for (StatisticTotalUserDTO totalUserDTO : responseBody) {
             logger.debug(totalUserDTO.getName().toString());
             logger.debug(totalUserDTO.getUsers().toString());
@@ -289,7 +289,7 @@ public class AdminStatisticTotalUsersEndpointTest {
 
         // assert
         assertThat(result.getResponse().getStatus()).isEqualTo(200);
-        assertThat(responseBody.length).isGreaterThanOrEqualTo(3);
+        assertThat(responseBody.length).isGreaterThanOrEqualTo(1);
         for (StatisticTotalUserDTO totalUserDTO : responseBody) {
             logger.debug(totalUserDTO.getName().toString());
             logger.debug(totalUserDTO.getUsers().toString());
@@ -352,7 +352,7 @@ public class AdminStatisticTotalUsersEndpointTest {
 
         // assert
         assertThat(result.getResponse().getStatus()).isEqualTo(200);
-        assertThat(responseBody.length).isGreaterThanOrEqualTo(3);
+        assertThat(responseBody.length).isGreaterThanOrEqualTo(1);
         for (StatisticTotalUserDTO totalUserDTO : responseBody) {
             if (totalUserDTO.getName().equals(firstDateTime)) {
                 assertThat(totalUserDTO.getUsers()).isEqualTo(totalUsersForFirst);
@@ -414,7 +414,7 @@ public class AdminStatisticTotalUsersEndpointTest {
 
         // assert
         assertThat(result.getResponse().getStatus()).isEqualTo(200);
-        assertThat(responseBody.length).isGreaterThanOrEqualTo(3);
+        assertThat(responseBody.length).isGreaterThanOrEqualTo(1);
         for (StatisticTotalUserDTO totalUserDTO : responseBody) {
             logger.debug(totalUserDTO.getName().toString());
             logger.debug(totalUserDTO.getUsers().toString());

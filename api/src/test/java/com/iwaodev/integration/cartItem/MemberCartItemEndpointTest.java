@@ -15,6 +15,7 @@ import com.iwaodev.auth.AuthenticationInfo;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.infrastructure.model.User;
+import com.iwaodev.ui.response.ErrorBaseResponse;
 import com.iwaodev.util.ResourceReader;
 
 // MockMvc stuff
@@ -194,14 +195,14 @@ public class MemberCartItemEndpointTest {
         .andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
-
+    String etag = result.getResponse().getHeader("ETag");
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     CartItemDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode, CartItemDTO[].class);
 
     // assert
     assertThat(responseBody.length).isGreaterThan(0);
     assertThat(responseBody.length).isEqualTo(3);
-
+    assertThat(etag).isNotNull();
     for (CartItemDTO cartItemDTO : responseBody) {
       assertThat(cartItemDTO.getProduct().getVariants().size()).isEqualTo(1);
     }
@@ -237,12 +238,13 @@ public class MemberCartItemEndpointTest {
         .andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
-
+    String etag = result.getResponse().getHeader("ETag");
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     CartItemDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, CartItemDTO.class);
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(etag).isEqualTo("\"0\"");
     assertThat(responseBody.getProduct().getProductId().toString()).isEqualTo(dummyProductId);
     assertThat(responseBody.getProduct().getVariants().size()).isEqualTo(1);
     assertThat(responseBody.getProduct().getVariants().get(0).getVariantId().toString()).isEqualTo(dummyVariantId);
@@ -314,6 +316,11 @@ public class MemberCartItemEndpointTest {
         .andDo(print())
         .andExpect(status().isBadRequest());
 
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("cart items reaches max size (5 items).");
   }
 
   @Test
@@ -327,6 +334,7 @@ public class MemberCartItemEndpointTest {
     String dummyVariantId = "9";
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyCartItemId;
     JSONObject dummyFormJson = new JSONObject();
+    String dummyVersion = "\"0\"";
     dummyFormJson.put("cartItemId", dummyCartItemId);
     dummyFormJson.put("variantId", dummyVariantId);
     dummyFormJson.put("userId", this.authInfo.getAuthUser().getUserId().toString());
@@ -342,12 +350,14 @@ public class MemberCartItemEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
         .andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
 
     // assert
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
@@ -355,6 +365,7 @@ public class MemberCartItemEndpointTest {
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(etag).isEqualTo("\"1\"");
     assertThat(responseBody.getCartItemId().toString()).isEqualTo(dummyCartItemId);
     assertThat(responseBody.getQuantity()).isEqualTo(9);
     assertThat(responseBody.getIsSelected()).isEqualTo(true);
@@ -362,6 +373,88 @@ public class MemberCartItemEndpointTest {
     assertThat(responseBody.getProduct().getVariants().get(0).getVariantId().toString()).isEqualTo(dummyVariantId);
   }
 
+  @Test
+  @Sql(scripts = { "classpath:/integration/cartItem/shouldMemberUserPutSingleProductInCart.sql" })
+  public void shouldNotMemberUserPutSingleProductInCartSinceNoIfMatch() throws Exception {
+
+    // make sure product, variant, user id match with sql script
+
+    // arrange
+    String dummyCartItemId = "12";
+    String dummyVariantId = "9";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyCartItemId;
+    JSONObject dummyFormJson = new JSONObject();
+    String dummyVersion = "\"0\"";
+    dummyFormJson.put("cartItemId", dummyCartItemId);
+    dummyFormJson.put("variantId", dummyVariantId);
+    dummyFormJson.put("userId", this.authInfo.getAuthUser().getUserId().toString());
+    dummyFormJson.put("quantity", 9);
+    dummyFormJson.put("isSelected", true);
+
+    // act
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .put(targetUrl) // put single cart item
+                            .content(dummyFormJson.toString())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest());
+
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/cartItem/shouldMemberUserPutSingleProductInCart.sql" })
+  public void shouldNotMemberUserPutSingleProductInCartSinceVersionMismatch() throws Exception {
+
+    // make sure product, variant, user id match with sql script
+
+    // arrange
+    String dummyCartItemId = "12";
+    String dummyVariantId = "9";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyCartItemId;
+    JSONObject dummyFormJson = new JSONObject();
+    String dummyVersion = "\"2\"";
+    dummyFormJson.put("cartItemId", dummyCartItemId);
+    dummyFormJson.put("variantId", dummyVariantId);
+    dummyFormJson.put("userId", this.authInfo.getAuthUser().getUserId().toString());
+    dummyFormJson.put("quantity", 9);
+    dummyFormJson.put("isSelected", true);
+
+    // act
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .put(targetUrl) // put single cart item
+                            .content(dummyFormJson.toString())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .header("If-Match", dummyVersion)
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isPreconditionFailed());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
+
+
+  }
   @Test
   @Sql(scripts = { "classpath:/integration/cartItem/shouldNotMemberUserPutSingleProductInCartSinceTooManyQuantity.sql" })
   public void shouldNotMemberUserPutSingleProductInCartSinceTooManyQuantity() throws Exception {
@@ -373,6 +466,7 @@ public class MemberCartItemEndpointTest {
     String dummyVariantId = "9";
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyCartItemId;
     JSONObject dummyFormJson = new JSONObject();
+    String dummyVersion = "\"0\""; // be careful. this should be 1.
     dummyFormJson.put("cartItemId", dummyCartItemId);
     dummyFormJson.put("variantId", dummyVariantId);
     dummyFormJson.put("userId", this.authInfo.getAuthUser().getUserId().toString());
@@ -388,11 +482,17 @@ public class MemberCartItemEndpointTest {
                     .cookie(this.authCookie)
                     .cookie(this.csrfCookie)
                     .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
                     .accept(MediaType.APPLICATION_JSON)
     )
             .andDo(print())
             .andExpect(status().isBadRequest());
 
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("cart item quantity must be less than or equal 10.");
   }
   @Test
   @Sql(scripts = { "classpath:/integration/cartItem/shouldMemberUserDeleteSingleProductInCart.sql" })
@@ -403,6 +503,7 @@ public class MemberCartItemEndpointTest {
     // arrange
     String dummyCartItemId = "12";
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyCartItemId;
+    String dummyVersion = "\"0\"";
 
     // act
     ResultActions resultActions = mvc.perform(
@@ -411,6 +512,7 @@ public class MemberCartItemEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -434,7 +536,69 @@ public class MemberCartItemEndpointTest {
     assertThat(isUserExist).isTrue();
     assertThat(isProductVariantsExist).isTrue();
   }
-  
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/cartItem/shouldMemberUserDeleteSingleProductInCart.sql" })
+  public void shouldNotMemberUserDeleteSingleProductInCartSinceNoIfMatch() throws Exception {
+
+    // make sure product, variant, user id match with sql script
+
+    // arrange
+    String dummyCartItemId = "12";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyCartItemId;
+    String dummyVersion = "\"0\"";
+
+    // act
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .delete(targetUrl) // remove single cart item
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest());
+
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/cartItem/shouldMemberUserDeleteSingleProductInCart.sql" })
+  public void shouldNotMemberUserDeleteSingleProductInCartSinceVersionMismatch() throws Exception {
+
+    // make sure product, variant, user id match with sql script
+
+    // arrange
+    String dummyCartItemId = "12";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyCartItemId;
+    String dummyVersion = "\"2\"";
+
+    // act
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .delete(targetUrl) // remove single cart item
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .header("If-Match", dummyVersion)
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isPreconditionFailed());
+
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
+  }
   @Test
   @Sql(scripts = { "classpath:/integration/cartItem/shouldMemberUserDeleteAllProductInCart.sql" })
   public void shouldMemberUserDeleteAllProductInCart() throws Exception {

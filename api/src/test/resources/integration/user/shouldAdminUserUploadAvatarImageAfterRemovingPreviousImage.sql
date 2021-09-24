@@ -1,0 +1,1 @@
+UPDATE users SET avatar_image_path = 'previous-image-path' WHERE user_id = 'e95bf632-1518-4bf2-8ba9-cd8b7587530b';

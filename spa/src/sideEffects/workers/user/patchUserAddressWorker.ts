@@ -76,6 +76,7 @@ export function* patchUserAddressWorker(
       api({
         method: "PATCH",
         url: apiUrl,
+        headers: { "If-Match": `"${action.payload.version}"` },
         data: { type: action.payload.type },
       })
         .then((response) => ({
@@ -122,17 +123,6 @@ export function* patchUserAddressWorker(
        **/
       yield put(
         patchUserAddressFetchStatusActions.update(FetchStatusEnum.FAILED)
-      );
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
       );
     }
   } else {

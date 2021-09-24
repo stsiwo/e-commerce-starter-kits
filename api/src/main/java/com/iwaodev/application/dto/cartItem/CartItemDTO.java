@@ -20,5 +20,7 @@ public class CartItemDTO {
   private Boolean isSelected;
 
   private Integer quantity;
+
+  private Long version;
 }
 

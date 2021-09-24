@@ -306,7 +306,8 @@ export const initialState: StateType = {
         totalElements: 0,
         last: true,
       },
-      curIndex: -1,
+      curId: null,
+      curNotification: null,
     },
     company: {
       data: null,

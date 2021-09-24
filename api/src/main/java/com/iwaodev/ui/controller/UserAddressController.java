@@ -7,6 +7,7 @@ import java.util.UUID;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
+import com.iwaodev.application.dto.category.CategoryDTO;
 import com.iwaodev.application.dto.user.AddressDTO;
 import com.iwaodev.application.iservice.UserAddressService;
 import com.iwaodev.config.SpringSecurityUser;
@@ -59,7 +60,11 @@ public class UserAddressController {
       @Valid @RequestBody UserAddressCriteria criteria
       ) throws Exception {
 
-    return new ResponseEntity<>(this.service.create(criteria, userId), HttpStatus.OK);
+    AddressDTO results = this.service.create(criteria, userId);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   // replace an existing address of a given user
@@ -73,7 +78,11 @@ public class UserAddressController {
       @Valid @RequestBody UserAddressCriteria criteria
       ) throws Exception {
 
-    return new ResponseEntity<>(this.service.update(criteria, userId, addressId), HttpStatus.OK);
+    AddressDTO results = this.service.update(criteria, userId, addressId);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
   
   // update isBillingAddress/isShippingAddress 
@@ -88,8 +97,10 @@ public class UserAddressController {
       ) throws Exception {
 
     if (body.get("type").equals("billing")) {
+      // don't return ETag since collection and also each domain entity include version field
       return new ResponseEntity<>(this.service.toggleBillingAddress(userId, addressId), HttpStatus.OK);
     } else if (body.get("type").equals("shipping")) {
+      // don't return ETag since collection and also each domain entity include version field
       return new ResponseEntity<>(this.service.toggleShippingAddress(userId, addressId), HttpStatus.OK);
     } else {
       logger.debug("invalid request body. only allow to specify 'billing' or 'shipping'.");

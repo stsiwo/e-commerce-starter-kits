@@ -46,6 +46,8 @@ public class ReviewCriteria {
 
   @NotNull(message = "{review.user.notnull}")
   private UUID userId;
+
+  private Long version;
 }
 
 

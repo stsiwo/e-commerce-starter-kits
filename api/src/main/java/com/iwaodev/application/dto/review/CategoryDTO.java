@@ -20,4 +20,6 @@ public class CategoryDTO {
   private String categoryDescription;
 
   private String categoryPath;
+
+  private Long version;
 }

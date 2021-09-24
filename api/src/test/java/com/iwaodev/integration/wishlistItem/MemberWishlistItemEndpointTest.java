@@ -18,6 +18,7 @@ import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.user.UserTypeEnum;
 import com.iwaodev.domain.wishlistItem.event.MovedWishlistItemToCartItemEvent;
 import com.iwaodev.infrastructure.model.User;
+import com.iwaodev.ui.response.ErrorBaseResponse;
 import com.iwaodev.util.ResourceReader;
 
 // MockMvc stuff
@@ -207,12 +208,14 @@ public class MemberWishlistItemEndpointTest {
         .andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     WishlistItemDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode.get("content"), WishlistItemDTO[].class);
 
     // assert
     assertThat(responseBody.length).isGreaterThan(0);
+    assertThat(etag).isNotNull();
     assertThat(responseBody.length).isEqualTo(3);
 
     for (WishlistItemDTO wishlistItemDTO : responseBody) {
@@ -710,8 +713,10 @@ public class MemberWishlistItemEndpointTest {
         .andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
 
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    assertThat(etag).isEqualTo("\"0\"");
     WishlistItemDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, WishlistItemDTO.class);
 
     // assert
@@ -765,6 +770,7 @@ public class MemberWishlistItemEndpointTest {
     String dummyWishlistItemId = "10";
     Long dummyVariantId = 2L;
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyWishlistItemId;
+    String dummyVersion = "\"0\"";
 
     // act
     ResultActions resultActions = mvc.perform(
@@ -773,6 +779,7 @@ public class MemberWishlistItemEndpointTest {
         .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -791,6 +798,73 @@ public class MemberWishlistItemEndpointTest {
   }
 
   @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserMoveWishlistItemToCartItem.sql" })
+  public void shouldNotMemberUserMoveWishlistItemToCartItemSinceNoIfMatch() throws Exception {
+
+    // make sure product, variant, user id match with sql script
+
+    // arrange
+    String dummyWishlistItemId = "10";
+    Long dummyVariantId = 2L;
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyWishlistItemId;
+    String dummyVersion = "\"0\"";
+
+    // act
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .patch(targetUrl)
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+
+    Mockito.verify(this.publisher, Mockito.never()).publishEvent(Mockito.any(MovedWishlistItemToCartItemEvent.class));
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserMoveWishlistItemToCartItem.sql" })
+  public void shouldNotMemberUserMoveWishlistItemToCartItemSinceVersionMismatch() throws Exception {
+
+    // make sure product, variant, user id match with sql script
+
+    // arrange
+    String dummyWishlistItemId = "10";
+    Long dummyVariantId = 2L;
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyWishlistItemId;
+    String dummyVersion = "\"3\"";
+
+    // act
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .patch(targetUrl)
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .header("If-Match", dummyVersion)
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isPreconditionFailed());
+
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
+
+    Mockito.verify(this.publisher, Mockito.never()).publishEvent(Mockito.any(MovedWishlistItemToCartItemEvent.class));
+  }
+  @Test
   @Sql(scripts = { "classpath:/integration/wishlistItem/shouldNotMemberUserMoveWishlistItemToCartItemSinceOutOfStock.sql" })
   public void shouldNotMemberUserMoveWishlistItemToCartItemSinceOutOfStock() throws Exception {
 
@@ -800,6 +874,7 @@ public class MemberWishlistItemEndpointTest {
     String dummyWishlistItemId = "10";
     Long dummyVariantId = 2L;
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyWishlistItemId;
+    String dummyVersion = "\"0\""; // be careful. this should be 1.
 
     // act
     ResultActions resultActions = mvc.perform(
@@ -808,6 +883,7 @@ public class MemberWishlistItemEndpointTest {
                     .cookie(this.authCookie)
                     .cookie(this.csrfCookie)
                     .header("csrf-token", this.authInfo.getCsrfToken())
+                    .header("If-Match", dummyVersion)
                     .accept(MediaType.APPLICATION_JSON)
     )
             .andDo(print())
@@ -826,7 +902,7 @@ public class MemberWishlistItemEndpointTest {
     // arrange
     String dummyCartItemId = "12";
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyCartItemId;
-
+    String dummyVersion = "\"0\"";
     // act
     ResultActions resultActions = mvc.perform(
         MockMvcRequestBuilders
@@ -834,6 +910,7 @@ public class MemberWishlistItemEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
         .accept(MediaType.APPLICATION_JSON)
         )
         .andDo(print())
@@ -857,7 +934,66 @@ public class MemberWishlistItemEndpointTest {
     assertThat(isUserExist).isTrue();
     assertThat(isProductVariantsExist).isTrue();
   }
-  
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserDeleteSingleProductInWishlistItem.sql" })
+  public void shouldNotMemberUserDeleteSingleProductInWishlistItemSinceNoIfMatchHeader() throws Exception {
+
+    // make sure product, variant, user id match with sql script
+
+    // arrange
+    String dummyCartItemId = "12";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyCartItemId;
+    String dummyVersion = "\"0\"";
+    // act
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .delete(targetUrl) // remove single cart item
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserDeleteSingleProductInWishlistItem.sql" })
+  public void shouldNotMemberUserDeleteSingleProductInWishlistItemSinceVersionMismatch() throws Exception {
+
+    // make sure product, variant, user id match with sql script
+
+    // arrange
+    String dummyCartItemId = "12";
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyCartItemId;
+    String dummyVersion = "\"2\"";
+    // act
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .delete(targetUrl) // remove single cart item
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .header("If-Match", dummyVersion)
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isPreconditionFailed());
+
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
+  }
   @Test
   @Sql(scripts = { "classpath:/integration/wishlistItem/shouldMemberUserDeleteAllProductInWishlistItem.sql" })
   public void shouldMemberUserDeleteAllProductInWishlistItem() throws Exception {

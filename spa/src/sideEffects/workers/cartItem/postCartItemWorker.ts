@@ -82,6 +82,7 @@ export function* postCartItemWorker(action: PayloadAction<CartItemType>) {
       api({
         method: "POST",
         url: apiUrl,
+        headers: { "If-Match": `"${action.payload.version}"` },
         data: action.payload,
       })
         .then((response) => ({

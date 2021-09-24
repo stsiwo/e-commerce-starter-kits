@@ -34,4 +34,5 @@ public class AddressDTO {
 
   private LocalDateTime updatedAt;
 
+  private Long version;
 }

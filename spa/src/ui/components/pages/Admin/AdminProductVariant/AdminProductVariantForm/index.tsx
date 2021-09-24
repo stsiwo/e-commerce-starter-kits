@@ -9,8 +9,9 @@ import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import {
   KeyboardDatePicker,
-  MuiPickersUtilsProvider,
+  MuiPickersUtilsProvider
 } from "@material-ui/pickers";
+import { logger } from "configs/logger";
 import {
   defaultProductVariantValidationData,
   generateDefaultProductVariantData,
@@ -18,7 +19,7 @@ import {
   productVariantSizeObj,
   ProductVariantSizeType,
   ProductVariantType,
-  ProductVariantValidationDataType,
+  ProductVariantValidationDataType
 } from "domain/product/types";
 import { useValidation } from "hooks/validation";
 import { productVariantSchema } from "hooks/validation/rules";
@@ -28,10 +29,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router";
 import {
   postProductVariantActionCreator,
-  putProductVariantActionCreator,
+  putProductVariantActionCreator
 } from "reducers/slices/domain/product";
 import { mSelector } from "src/selectors/selector";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 interface AdminProductVariantFormPropsType {
@@ -392,6 +392,7 @@ const AdminProductVariantForm = React.forwardRef<
                 ? curProductVariantState.variantDiscountPrice
                 : null,
               productId: targetProductId,
+              version: curProductVariantState.version
             })
           );
         } else {
@@ -409,6 +410,7 @@ const AdminProductVariantForm = React.forwardRef<
                 ? curProductVariantState.variantDiscountPrice
                 : null,
               productId: targetProductId,
+              version: curProductVariantState.version
             })
           );
         }

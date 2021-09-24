@@ -36,5 +36,8 @@ public class UserPhoneCriteria {
   private String countryCode;
 
   private Boolean isSelected;
+
+
+  private Long version;
 }
 

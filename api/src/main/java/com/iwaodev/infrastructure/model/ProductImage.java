@@ -1,14 +1,6 @@
 package com.iwaodev.infrastructure.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
@@ -20,6 +12,8 @@ import com.iwaodev.infrastructure.model.validator.OnUpdate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.sql.Timestamp;
 
 @Data
 @ToString
@@ -45,6 +39,10 @@ public class ProductImage {
   @NotEmpty(message = "{productImage.productImageName.notempty}")
   @Column(name = "product_image_name")
   private String productImageName;
+
+  @Version
+  @Column(name = "version")
+  private Long version = 0L;
 
   @NotNull(message = "{productImage.product.notnull}")
   @ManyToOne

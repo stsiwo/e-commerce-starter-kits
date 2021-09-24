@@ -10,8 +10,10 @@ import java.util.function.Function;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.servlet.http.HttpServletRequest;
 
 import com.iwaodev.application.dto.product.ProductDTO;
+import com.iwaodev.application.irepository.CategoryRepository;
 import com.iwaodev.application.irepository.ProductRepository;
 import com.iwaodev.application.iservice.FileService;
 import com.iwaodev.application.iservice.ProductService;
@@ -20,6 +22,7 @@ import com.iwaodev.application.mapper.ProductMapper;
 import com.iwaodev.application.specification.factory.ProductSpecificationFactory;
 import com.iwaodev.domain.product.ProductSortEnum;
 import com.iwaodev.exception.AppException;
+import com.iwaodev.infrastructure.model.Category;
 import com.iwaodev.infrastructure.model.Product;
 import com.iwaodev.infrastructure.model.ProductImage;
 import com.iwaodev.infrastructure.model.Review;
@@ -27,11 +30,13 @@ import com.iwaodev.ui.criteria.product.ProductCriteria;
 import com.iwaodev.ui.criteria.product.ProductImageCriteria;
 import com.iwaodev.ui.criteria.product.ProductQueryStringCriteria;
 
+import com.iwaodev.util.Util;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -52,6 +57,9 @@ public class ProductServiceImpl implements ProductService {
   private ProductRepository repository;
 
   @Autowired
+  private CategoryRepository categoryRepository;
+
+  @Autowired
   private ProductSpecificationFactory specificationFactory;
 
   @Autowired
@@ -65,6 +73,9 @@ public class ProductServiceImpl implements ProductService {
 
   @Value("${file.product.productImageParentDirectory}")
   private String productImageParentDirectory;
+
+  @Autowired
+  private HttpServletRequest httpServletRequest;
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -233,8 +244,16 @@ public class ProductServiceImpl implements ProductService {
     // discout price must be less then unit price
 
     List<ProductImage> productImages = this.createImages(newEntity.getProductId(), files, criteria.getProductImages());
-
     newEntity.setProductImages(productImages);
+
+    // issue-3zWfeAAxZb1
+    // update category
+    Category newCategory = this.categoryRepository
+            .findById(criteria.getCategory().getCategoryId())
+            .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, "the category does not exists."));
+
+    newEntity.setCategory(newCategory);
+
     // save it
     Product savedEntity = this.repository.save(newEntity);
     /**
@@ -327,6 +346,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     Product oldEntity = targetEntityOption.get();
+
+    // version check for concurrency update
+    String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+    if (receivedVersion == null || receivedVersion.isEmpty()) {
+      throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+    }
+    if (!Util.checkETagVersion(oldEntity.getVersion(), receivedVersion)) {
+      throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+    };
+
     // make sure criteria has product id
     criteria.setProductId(id);
 
@@ -345,35 +374,44 @@ public class ProductServiceImpl implements ProductService {
     // update product images
     this.updateImages(id, files, oldEntity.getProductImages(), newEntity.getProductImages());
 
-    /**
-     * any nested association must be explicitly set otherwise, it does not return the associations.
-     * so be careful.
-     *
-     * i guess i need to find more better way to update this entity.
-     */
-    // transfer variants from old to new too
-    newEntity.setVariants(oldEntity.getVariants());
-    newEntity.setReviews(oldEntity.getReviews());
+    // issue-3zWfeAAxZb1
+    // update category
+    Category newCategory = this.categoryRepository
+            .findById(criteria.getCategory().getCategoryId())
+            .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, "the category does not exists."));
+
+    oldEntity.setCategory(newCategory);
+
+    oldEntity.update(newEntity);
 
     // unit price must be greater than the discount price at any variant if it does
     // not has its own unit price validaiton
-    if (!newEntity.isBaseUnitPriceGreaterThanDiscountPriceAtAnyVariant()) {
+    if (!oldEntity.isBaseUnitPriceGreaterThanDiscountPriceAtAnyVariant()) {
       throw new AppException(HttpStatus.BAD_REQUEST,
           "the base unit price is less than the discount price of one of variants of this product.");
     }
 
     // hopely, remove old one included nested entity and replace with new one
     // 'save' return updated entity so return this one
-    Product updatedEntity = this.repository.save(newEntity);
-    /**
-     * when updating you need to call this flush otherwise update statement does not
-     * executed. i don't know why.
-     **/
-    this.repository.flush();
+    Product updatedEntity;
+    try {
+      // don't forget flush otherwise version number is updated.
+      updatedEntity = this.repository.save(oldEntity);
+      /**
+       * when updating you need to call this flush otherwise update statement does not
+       * executed. i don't know why.
+       **/
+      this.repository.flush();
+    } catch (OptimisticLockingFailureException ex) {
+      throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+    }
     /**
      * need this refresh to refresh the @Formular/@Transient fields
      **/
     this.repository.refresh(updatedEntity);
+
+    //issue-v07rKsa0SO2
+    logger.debug("category version: " + updatedEntity.getCategory().getVersion());
 
     return ProductMapper.INSTANCE.toProductDTO(updatedEntity);
   }
@@ -407,6 +445,9 @@ public class ProductServiceImpl implements ProductService {
       }
 
       ProductImage oldProductImage = oldProductImageOption.get();
+
+      logger.debug("old image path: " + oldProductImage.getProductImagePath());
+      logger.debug("new image path: " + newProductImage.getProductImagePath());
 
       /**
        * got null pointer exception at 'files.stream().filter()...' below when there is no updated file in this 'files'
@@ -472,14 +513,17 @@ public class ProductServiceImpl implements ProductService {
         }
 
 
-        newProductImage.setProductImagePath(publicPath);
+        //newProductImage.setProductImagePath(publicPath);
+        oldProductImage.setProductImagePath(publicPath);
 
       } else {
         // when removing
-        newProductImage.setProductImagePath("");
+        //newProductImage.setProductImagePath("");
+        oldProductImage.setProductImagePath("");
       }
 
-      newProductImage.setIsChange(false);
+      //newProductImage.setIsChange(false);
+      oldProductImage.setIsChange(false);
     }
   }
 
@@ -515,12 +559,26 @@ public class ProductServiceImpl implements ProductService {
     if (targetEntityOption.isPresent()) {
       Product targetEntity = targetEntityOption.get();
 
+      // version check for concurrency update
+      String receivedVersion = this.httpServletRequest.getHeader("If-Match");
+      if (receivedVersion == null || receivedVersion.isEmpty()) {
+        throw new AppException(HttpStatus.BAD_REQUEST, "you are missing version (If-Match) header.");
+      }
+      if (!Util.checkETagVersion(targetEntity.getVersion(), receivedVersion)) {
+        throw new AppException(HttpStatus.PRECONDITION_FAILED, "the data was updated by others. please refresh.");
+      };
+
       // delete product images at s3
       String productKey = this.productFilePath + "/" + targetEntity.getProductId().toString() + "/";
 
       this.s3Service.deleteFolder(productKey);
 
-      this.repository.delete(targetEntity);
+      try {
+        this.repository.delete(targetEntity);
+      } catch (OptimisticLockingFailureException ex) {
+        throw new AppException(HttpStatus.CONFLICT, "the data was updated by others. please refresh.");
+      }
+
     }
   }
 

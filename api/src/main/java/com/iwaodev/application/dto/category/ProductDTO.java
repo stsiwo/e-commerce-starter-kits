@@ -49,5 +49,7 @@ public class ProductDTO {
   private List<ProductVariantDTO> variants;
 
   private List<ProductImageDTO> productImages;
+
+  private Long version;
 }
 

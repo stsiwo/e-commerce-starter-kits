@@ -12,4 +12,6 @@ public class UserTypeDTO {
   private Long userTypeId;
 
   private String userType;
+
+  private Long version;
 }

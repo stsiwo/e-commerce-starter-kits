@@ -30,6 +30,7 @@ public class WishlistItemCriteria {
   @NotNull(message = "{wishlistItem.variant.notnull}")
   private Long variantId;
 
+  private Long version;
 }
 
 

@@ -189,7 +189,7 @@ public class AdminStatisticSalesEndpointTest {
             assertThat(saleDTO.getValue()).isEqualTo(BigDecimal.valueOf(0.00));
             expectedDate = expectedDate.plusHours(hourIncrement);
         }
-        assertThat(expectedDate.getHour() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getHour());
+        assertThat(expectedDate.minusHours(1)).isEqualTo(responseBody[responseBody.length - 1].getName());
     }
 
     @Test
@@ -247,7 +247,7 @@ public class AdminStatisticSalesEndpointTest {
         }
 
         // to make sure end date matches
-        assertThat(expectedUTCStartDate.getHour() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getHour());
+        assertThat(expectedUTCStartDate.minusHours(1)).isEqualTo(responseBody[responseBody.length - 1].getName());
 
     }
 
@@ -328,7 +328,7 @@ public class AdminStatisticSalesEndpointTest {
             expectedUTCStartDate = expectedUTCStartDate.plusHours(hourIncrement);
         }
         // to make sure end date matches
-        assertThat(expectedUTCStartDate.getHour() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getHour());
+        assertThat(expectedUTCStartDate.minusHours(1)).isEqualTo(responseBody[responseBody.length - 1].getName());
     }
 
     @Test
@@ -410,7 +410,7 @@ public class AdminStatisticSalesEndpointTest {
             expectedUTCStartDate = expectedUTCStartDate.plusHours(hourIncrement);
         }
         // to make sure end date matches
-        assertThat(expectedUTCStartDate.getHour() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getHour());
+        assertThat(expectedUTCStartDate.minusHours(1)).isEqualTo(responseBody[responseBody.length - 1].getName());
     }
 
     @Test
@@ -468,7 +468,7 @@ public class AdminStatisticSalesEndpointTest {
             expectedUTCStartDate = expectedUTCStartDate.plusDays(dayIncrement);
         }
         // to make sure end date matches
-        assertThat(expectedUTCStartDate.getDayOfMonth() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getDayOfMonth());
+        assertThat(expectedUTCStartDate.minusDays(1)).isEqualTo(responseBody[responseBody.length - 1].getName());
     }
 
     @Test
@@ -552,7 +552,7 @@ public class AdminStatisticSalesEndpointTest {
             expectedUTCStartDate = expectedUTCStartDate.plusDays(dayIncrement);
         }
         // to make sure end date matches
-        assertThat(expectedUTCStartDate.getDayOfMonth() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getDayOfMonth());
+        assertThat(expectedUTCStartDate.minusDays(1)).isEqualTo(responseBody[responseBody.length - 1].getName());
     }
 
     @Test
@@ -636,7 +636,7 @@ public class AdminStatisticSalesEndpointTest {
             expectedUTCStartDate = expectedUTCStartDate.plusDays(dayIncrement);
         }
         // to make sure end date matches
-        assertThat(expectedUTCStartDate.getDayOfMonth() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getDayOfMonth());
+        assertThat(expectedUTCStartDate.minusDays(1)).isEqualTo(responseBody[responseBody.length - 1].getName());
     }
     @Test
     @Sql(scripts = { "classpath:/integration/statistic/shouldAdminGetMonthlyBaseSaleDataWithTestData.sql" })
@@ -720,7 +720,7 @@ public class AdminStatisticSalesEndpointTest {
             expectedUTCStartDate = expectedUTCStartDate.plusMonths(monthIncrement);
         }
         // to make sure end date matches
-        assertThat(expectedUTCStartDate.getMonthValue() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getMonthValue());
+        assertThat(expectedUTCStartDate.minusMonths(1)).isEqualTo(responseBody[responseBody.length - 1].getName());
     }
 
     @Test
@@ -805,6 +805,6 @@ public class AdminStatisticSalesEndpointTest {
             expectedUTCStartDate = expectedUTCStartDate.plusMonths(monthIncrement);
         }
         // to make sure end date matches
-        assertThat(expectedUTCStartDate.getMonthValue() - 1).isEqualTo(responseBody[responseBody.length - 1].getName().getMonthValue());
+        assertThat(expectedUTCStartDate.minusMonths(1)).isEqualTo(responseBody[responseBody.length - 1].getName());
     }
 }

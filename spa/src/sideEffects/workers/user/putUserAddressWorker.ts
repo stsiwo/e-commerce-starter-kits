@@ -76,6 +76,7 @@ export function* putUserAddressWorker(
     const response: WorkerResponse = yield call(() =>
       api({
         method: "PUT",
+        headers: { "If-Match": `"${action.payload.version}"` },
         url: apiUrl,
         data: {
           addressId: action.payload.addressId,
@@ -87,6 +88,7 @@ export function* putUserAddressWorker(
           postalCode: action.payload.postalCode,
           isBillingAddress: action.payload.isBillingAddress,
           isShippingAddress: action.payload.isShippingAddress,
+          version: action.payload.version,
         } as UserAddressCriteria,
       })
         .then((response) => ({
@@ -134,17 +136,6 @@ export function* putUserAddressWorker(
        **/
       yield put(
         putUserAddressFetchStatusActions.update(FetchStatusEnum.FAILED)
-      );
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
       );
     }
   } else {

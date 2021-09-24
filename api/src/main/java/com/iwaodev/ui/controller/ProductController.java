@@ -6,6 +6,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import com.iwaodev.application.dto.category.CategoryDTO;
 import com.iwaodev.application.dto.product.ProductDTO;
 import com.iwaodev.application.iservice.ProductService;
 import com.iwaodev.domain.product.ProductSortEnum;
@@ -46,6 +47,7 @@ public class ProductController {
       @RequestParam(value = "sort", required = false, defaultValue = "DATE_DESC") ProductSortEnum sort,
       ProductQueryStringCriteria criteria) throws Exception {
 
+    // don't need to add eTag since ShallowETagFilter automatically add if it does not exist.
     return new ResponseEntity<>(this.service.getAll(criteria, page, limit, sort), HttpStatus.OK);
   }
 
@@ -69,12 +71,23 @@ public class ProductController {
   @GetMapping("/products/{path}")
   @PreAuthorize("hasRole('ROLE_ADMIN')") // admin only
   public ResponseEntity<ProductDTO> getWithPath(@PathVariable(value = "path") String path) throws Exception {
-    return new ResponseEntity<>(this.service.getByPathOrId(path), HttpStatus.OK);
+
+    ProductDTO results = this.service.getByPathOrId(path);
+
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
   // get by path or id (public)
   @GetMapping("/products/public/{path}")
   public ResponseEntity<ProductDTO> getPublicWithPath(@PathVariable(value = "path") String path) throws Exception {
-    return new ResponseEntity<>(this.service.getPublicByPathOrId(path), HttpStatus.OK);
+    ProductDTO results = this.service.getByPathOrId(path);
+
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
   // create a new product
   @RequestMapping(value = "/products", method = RequestMethod.POST, consumes = {"multipart/form-data"})
@@ -83,7 +96,12 @@ public class ProductController {
       @RequestPart(name = "files", required = false) List<MultipartFile> files,
       @Valid @RequestPart("criteria") ProductCriteria criteria
       ) throws Exception {
-    return new ResponseEntity<>(this.service.create(criteria, files), HttpStatus.OK);
+    ProductDTO results = this.service.create(criteria, files);
+
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   // update/replace a new product
@@ -94,7 +112,12 @@ public class ProductController {
       @Valid @RequestPart("criteria") ProductCriteria criteria,
       @RequestPart(name = "files", required = false) List<MultipartFile> files
       ) throws Exception {
-    return new ResponseEntity<>(this.service.update(criteria, id, files), HttpStatus.OK);
+    ProductDTO results = this.service.update(criteria, id, files);
+
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   // delete a new product

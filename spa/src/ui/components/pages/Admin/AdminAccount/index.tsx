@@ -1,14 +1,18 @@
-import * as React from 'react';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import Box from '@material-ui/core/Box';
-import AdminAccountBasicManagement from './AdminAccountBasicManagement';
-import Grid from '@material-ui/core/Grid';
-import AdminAccountAvatarManagement from './AdminAccountAvatarManagement';
-import AdminAccountCompanyManagement from './AdminAccountCompanyManagement';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardContent from '@material-ui/core/CardContent';
+import Box from "@material-ui/core/Box";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import CardHeader from "@material-ui/core/CardHeader";
+import Grid from "@material-ui/core/Grid";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { api } from "configs/axiosConfig";
+import { UserType } from "domain/user/types";
+import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { authActions } from "reducers/slices/app";
+import { mSelector } from "src/selectors/selector";
+import AdminAccountAvatarManagement from "./AdminAccountAvatarManagement";
+import AdminAccountBasicManagement from "./AdminAccountBasicManagement";
+import AdminAccountCompanyManagement from "./AdminAccountCompanyManagement";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -25,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     title: {
       textTransform: "uppercase",
-      margin: theme.spacing(2)
+      margin: theme.spacing(2),
     },
     gridContainer: {
       padding: theme.spacing(1),
@@ -37,9 +41,9 @@ const useStyles = makeStyles((theme: Theme) =>
     gridItem: {
       // setting margin breaks <Grid xs, md, lg > system
       // so use 'padding' instead
-      padding: theme.spacing(1)
-    }
-  }),
+      padding: theme.spacing(1),
+    },
+  })
 );
 
 /**
@@ -47,8 +51,27 @@ const useStyles = makeStyles((theme: Theme) =>
  *
  **/
 const AdminAccount: React.FunctionComponent<{}> = (props) => {
-
   const classes = useStyles();
+
+  const dispatch = useDispatch();
+
+  const auth = useSelector(mSelector.makeAuthSelector());
+
+  // fetch auth from api
+  React.useEffect(() => {
+    api
+      .request({
+        method: "GET",
+        url: API1_URL + `/users/${auth.user.userId}`,
+      })
+      .then((data) => {
+        /**
+         *  add new phone
+         **/
+        const loggedInUser: UserType = data.data;
+        dispatch(authActions.updateUser(loggedInUser));
+      });
+  }, [JSON.stringify(auth.user)]);
 
   return (
     <Box component="div" className={classes.box}>
@@ -57,10 +80,10 @@ const AdminAccount: React.FunctionComponent<{}> = (props) => {
         <Card className={classes.card}>
           <CardHeader
             titleTypographyProps={{
-              variant: 'h6',
+              variant: "h6",
             }}
             subheaderTypographyProps={{
-              variant: 'body1'
+              variant: "body1",
             }}
             title="Account"
             subheader="Enter your admin information. These information is used to access all of resources about this website (e.g., customers, orders, products and so on)."
@@ -72,20 +95,10 @@ const AdminAccount: React.FunctionComponent<{}> = (props) => {
               alignItems="center"
               className={classes.gridContainer}
             >
-              <Grid
-                item
-                xs={12}
-                md={4}
-                className={classes.gridItem}
-              >
+              <Grid item xs={12} md={4} className={classes.gridItem}>
                 <AdminAccountAvatarManagement />
               </Grid>
-              <Grid
-                item
-                xs={12}
-                md={8}
-                className={classes.gridItem}
-              >
+              <Grid item xs={12} md={8} className={classes.gridItem}>
                 <AdminAccountBasicManagement />
               </Grid>
             </Grid>
@@ -97,9 +110,7 @@ const AdminAccount: React.FunctionComponent<{}> = (props) => {
         </Box>
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default AdminAccount
-
-
+export default AdminAccount;

@@ -3,6 +3,7 @@ package com.iwaodev.ui.controller;
 import javax.validation.Valid;
 
 import com.iwaodev.application.dto.review.ReviewDTO;
+import com.iwaodev.application.dto.user.PhoneDTO;
 import com.iwaodev.application.iservice.ReviewService;
 import com.iwaodev.config.SpringSecurityUser;
 import com.iwaodev.domain.review.ReviewSortEnum;
@@ -10,6 +11,7 @@ import com.iwaodev.ui.criteria.review.ReviewCriteria;
 import com.iwaodev.ui.criteria.review.ReviewQueryStringCriteria;
 import com.iwaodev.ui.response.BaseResponse;
 
+import com.mysql.cj.x.protobuf.MysqlxCrud;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +70,11 @@ public class ReviewController {
   // get by id
   @GetMapping("/reviews/{id}")
   public ResponseEntity<ReviewDTO> getWithId(@PathVariable(value = "id") Long id) throws Exception {
-    return new ResponseEntity<>(this.service.getById(id), HttpStatus.OK);
+    ReviewDTO results = this.service.getById(id);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   // create a new review
@@ -78,7 +84,11 @@ public class ReviewController {
       @Valid @RequestBody ReviewCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    return new ResponseEntity<>(this.service.create(criteria), HttpStatus.OK);
+    ReviewDTO results = this.service.create(criteria);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   // update/replace a new review
@@ -89,7 +99,11 @@ public class ReviewController {
       @Valid @RequestBody ReviewCriteria criteria,
       @AuthenticationPrincipal SpringSecurityUser authUser
       ) throws Exception {
-    return new ResponseEntity<>(this.service.update(criteria, id), HttpStatus.OK);
+    ReviewDTO results = this.service.update(criteria, id);
+    return ResponseEntity
+            .ok()
+            .eTag("\"" + results.getVersion() + "\"")
+            .body(results);
   }
 
   /**

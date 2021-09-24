@@ -11,6 +11,7 @@ import AddShoppingCartIcon from "@material-ui/icons/AddShoppingCart";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import { WishlistItemType } from "domain/wishlist/types";
 import * as React from "react";
+import { Link as RRLink } from "react-router-dom";
 import { cadCurrencyFormat, getApiUrl } from "src/utils";
 import ColorCell from "../GridData/ColorCell";
 import SizeCell from "../GridData/SizeCell";
@@ -50,6 +51,10 @@ const useStyles = makeStyles((theme: Theme) =>
       flexWrap: "nowrap",
       alignItems: "center",
     },
+    anchor: {
+      textDecoration: "none",
+      color: "inherit",
+    },
   })
 );
 
@@ -71,14 +76,19 @@ const WishlistItem: React.FunctionComponent<WishlistItemPropsType> = ({
 
   return (
     <Card className={`${classes.card} ${classes.root}`}>
-      <CardHeader
-        className={classes.cardHeader}
-        avatar={<Avatar alt="" src={primaryImageUrl} />}
-        title={value.product.productName}
-        subheader={`${cadCurrencyFormat(
-          value.product.variants[0].currentPrice
-        )}`}
-      ></CardHeader>
+      <RRLink
+        to={`/products/${value.product.productPath}`}
+        className={classes.anchor}
+      >
+        <CardHeader
+          className={classes.cardHeader}
+          avatar={<Avatar alt="" src={primaryImageUrl} />}
+          title={value.product.productName}
+          subheader={`${cadCurrencyFormat(
+            value.product.variants[0].currentPrice
+          )}`}
+        ></CardHeader>
+      </RRLink>
       <CardActions>
         <Grid container justify="space-between">
           <Box component="div" className={classes.actionBox}>

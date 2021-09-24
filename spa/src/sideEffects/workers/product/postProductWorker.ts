@@ -86,7 +86,10 @@ export function* postProductWorker(
         method: "POST",
         url: apiUrl,
         data: formData,
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "If-Match": `"${action.payload.version}"`,
+          "Content-Type": "multipart/form-data",
+        },
       })
         .then((response) => ({
           fetchStatus: FetchStatusEnum.SUCCESS,
@@ -139,17 +142,6 @@ export function* postProductWorker(
       );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       log(response.message);
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
     }
   }
 }

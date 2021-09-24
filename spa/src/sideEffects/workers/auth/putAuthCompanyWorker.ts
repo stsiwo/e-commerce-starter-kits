@@ -81,6 +81,7 @@ export function* putAuthCompanyWorker(
     const response: WorkerResponse = yield call(() =>
       api({
         method: "PUT",
+        headers: { "If-Match": `"${action.payload.version}"` },
         url: apiUrl,
         data: action.payload as UserCompanyCriteria,
       })
@@ -123,17 +124,6 @@ export function* putAuthCompanyWorker(
        **/
       yield put(
         putAuthCompanyFetchStatusActions.update(FetchStatusEnum.FAILED)
-      );
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
       );
     }
   } else {

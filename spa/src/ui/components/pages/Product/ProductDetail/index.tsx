@@ -344,6 +344,7 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
             product: filterSingleVariant(curVariant.variantId, props.product), // need to set filtered product (only contains selected variant)
             quantity: curQty,
             user: null,
+            version: null,
           })
         );
 
@@ -378,15 +379,6 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
                 message: "added successfully",
               })
             );
-          })
-          .catch((error: AxiosError) => {
-            dispatch(
-              messageActions.update({
-                id: getNanoId(),
-                type: MessageTypeEnum.ERROR,
-                message: error.response.data.message,
-              })
-            );
           });
       }
     };
@@ -400,6 +392,7 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
         variantId: curVariant.variantId,
         userId: auth.user.userId,
         product: props.product,
+        version: null,
       })
     );
   };
@@ -439,6 +432,7 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
             product: filterSingleVariant(curVariant.variantId, props.product), // need to set filtered product (only contains selected variant)
             quantity: curQty,
             user: null,
+            version: null,
           })
         );
 

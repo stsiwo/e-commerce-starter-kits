@@ -1,7 +1,8 @@
 import axios, { AxiosError } from "axios";
 import { logger } from "configs/logger";
-import { FetchStatusEnum, UserTypeEnum } from "src/app";
-import { getCookie } from "src/utils";
+import { messageActions } from "reducers/slices/app";
+import { FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import { getCookie, getNanoId } from "src/utils";
 import { store } from "./storeConfig";
 const log = logger(__filename);
 
@@ -135,6 +136,15 @@ axios.interceptors.response.use(
       log("no 401 status code");
     }
 
+    // handle all error message here
+    store.dispatch(
+      messageActions.update({
+        id: getNanoId(),
+        type: MessageTypeEnum.ERROR,
+        message: error.response.data.message,
+      })
+    );
+
     return Promise.reject(error);
   }
 );
@@ -203,4 +213,5 @@ export declare type WorkerResponse = {
   order?: any;
   clientSecret?: any;
   imagePath?: any;
+  user?: any;
 };

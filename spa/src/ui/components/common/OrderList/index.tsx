@@ -71,6 +71,10 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: "center",
       flexDirection: "column",
     },
+    anchor: {
+      textDecoration: "none",
+      color: "inherit",
+    },
   })
 );
 
@@ -119,37 +123,40 @@ const OrderList: React.FunctionComponent<{}> = (props) => {
           className={classes.gridItem}
         >
           <Card className={classes.card}>
-            <CardHeader
-              avatar={<ShoppingBasketIcon />}
-              title={order.orderNumber}
-              subheader={toDateString(order.createdAt)}
-              //subheader={order.createdAt}
-            />
-            <CardMedia
-              className={classes.media}
-              // the first product image is the main one
-              image={
-                order.orderDetails[0].product &&
-                order.orderDetails[0].product.productImages.length > 0
-                  ? getApiUrl(
-                      order.orderDetails[0].product.productImages[0]
-                        .productImagePath
-                    )
-                  : ""
-              }
-            />
-            <CardContent className={classes.cardContent}>
-              <Typography variant="body2" color="textSecondary" component="p">
-                Total Cost:{" "}
-                <b>{cadCurrencyFormat(calcOrderTotalCost(order))}</b>
-              </Typography>
-              <Typography variant="body2" color="textSecondary" component="p">
-                Total Items: <b>{calcOrderTotalItemNumber(order)}</b> items
-              </Typography>
-              <Typography variant="body2" color="textSecondary" component="p">
-                Status: <b>{orderStatusLabelList[getCurOrderStatus(order)]}</b>
-              </Typography>
-            </CardContent>
+            <RRLink to={`/orders/${order.orderId}`} className={classes.anchor}>
+              <CardHeader
+                avatar={<ShoppingBasketIcon />}
+                title={order.orderNumber}
+                subheader={toDateString(order.createdAt)}
+                //subheader={order.createdAt}
+              />
+              <CardMedia
+                className={classes.media}
+                // the first product image is the main one
+                image={
+                  order.orderDetails[0].product &&
+                  order.orderDetails[0].product.productImages.length > 0
+                    ? getApiUrl(
+                        order.orderDetails[0].product.productImages[0]
+                          .productImagePath
+                      )
+                    : ""
+                }
+              />
+              <CardContent className={classes.cardContent}>
+                <Typography variant="body2" color="textSecondary" component="p">
+                  Total Cost:{" "}
+                  <b>{cadCurrencyFormat(calcOrderTotalCost(order))}</b>
+                </Typography>
+                <Typography variant="body2" color="textSecondary" component="p">
+                  Total Items: <b>{calcOrderTotalItemNumber(order)}</b> items
+                </Typography>
+                <Typography variant="body2" color="textSecondary" component="p">
+                  Status:{" "}
+                  <b>{orderStatusLabelList[getCurOrderStatus(order)]}</b>
+                </Typography>
+              </CardContent>
+            </RRLink>
             <CardActions className={classes.actions}>
               <Button
                 component={RRLink}

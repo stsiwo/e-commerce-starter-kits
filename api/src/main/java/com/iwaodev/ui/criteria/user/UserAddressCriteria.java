@@ -50,4 +50,5 @@ public class UserAddressCriteria {
   private Boolean isBillingAddress;
 
   private Boolean isShippingAddress;
+  private Long version;
 }

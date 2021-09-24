@@ -79,6 +79,7 @@ export function* postUserAddressWorker(
       api({
         method: "POST",
         url: apiUrl,
+        headers: { "If-Match": `"${action.payload.version}"` },
         data: {
           address1: action.payload.address1,
           address2: action.payload.address2,
@@ -88,6 +89,7 @@ export function* postUserAddressWorker(
           postalCode: action.payload.postalCode,
           isBillingAddress: action.payload.isBillingAddress,
           isShippingAddress: action.payload.isShippingAddress,
+          version: action.payload.version,
         } as UserAddressCriteria,
       })
         .then((response) => ({
@@ -137,17 +139,6 @@ export function* postUserAddressWorker(
        **/
       yield put(
         postUserAddressFetchStatusActions.update(FetchStatusEnum.FAILED)
-      );
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
       );
     }
   } else {

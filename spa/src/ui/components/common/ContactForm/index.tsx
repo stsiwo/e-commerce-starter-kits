@@ -3,8 +3,8 @@ import Button from "@material-ui/core/Button";
 import FormLabel from "@material-ui/core/FormLabel";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
-import { AxiosError } from "axios";
 import { api } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import {
   ContactFormDataType,
   ContactFormValidationDataType,
@@ -18,7 +18,6 @@ import { useDispatch } from "react-redux";
 import { messageActions } from "reducers/slices/app";
 import { MessageTypeEnum } from "src/app";
 import { getNanoId } from "src/utils";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -193,15 +192,6 @@ const ContactForm: React.FunctionComponent<{}> = (props) => {
               id: getNanoId(),
               type: MessageTypeEnum.SUCCESS,
               message: "your request has submitted successfully.",
-            })
-          );
-        })
-        .catch((error: AxiosError) => {
-          dispatch(
-            messageActions.update({
-              id: getNanoId(),
-              type: MessageTypeEnum.ERROR,
-              message: error.response.data.message,
             })
           );
         });

@@ -22,6 +22,7 @@ import com.iwaodev.auth.AuthenticateTestUser;
 import com.iwaodev.auth.AuthenticationInfo;
 import com.iwaodev.data.BaseDatabaseSetup;
 import com.iwaodev.domain.user.UserTypeEnum;
+import com.iwaodev.ui.response.ErrorBaseResponse;
 import com.iwaodev.util.ResourceReader;
 
 import org.json.JSONObject;
@@ -74,7 +75,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Transactional(isolation = Isolation.READ_UNCOMMITTED)
+@Transactional()
 @ActiveProfiles("integtest")
 @AutoConfigureMockMvc
 public class AdminAddressEndpointTest {
@@ -208,12 +209,14 @@ public class AdminAddressEndpointTest {
       .andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     AddressDTO[] responseBody = this.objectMapper.treeToValue(contentAsJsonNode, AddressDTO[].class);
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
     assertThat(responseBody.length).isGreaterThan(0);
+    assertThat(etag).isNotNull();
     for (AddressDTO address : responseBody) {
       assertThat(address.getUserId().toString()).isEqualTo(this.authInfo.getAuthUser().getUserId().toString());
     }
@@ -315,9 +318,11 @@ public class AdminAddressEndpointTest {
     MvcResult result = resultActions.andReturn();
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     AddressDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, AddressDTO.class);
+    String etag = result.getResponse().getHeader("ETag");
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(etag).isEqualTo("\"0\"");
     assertThat(responseBody.getUserId().toString()).isEqualTo(this.authInfo.getAuthUser().getUserId().toString());
     assertThat(responseBody.getAddress1()).isEqualTo(dummyFormJson.get("address1").asText());
   }
@@ -349,11 +354,13 @@ public class AdminAddressEndpointTest {
       .andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     AddressDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, AddressDTO.class);
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(etag).isEqualTo("\"0\"");
     assertThat(responseBody.getUserId().toString()).isEqualTo(dummyUserId);
     assertThat(responseBody.getAddress1()).isEqualTo(dummyFormJson.get("address1").asText());
   }
@@ -425,6 +432,7 @@ public class AdminAddressEndpointTest {
     // dummy form json 
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
+    String dummyVersion = "\"0\"";
 
     // arrange
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyFormJson.get("addressId").asText();
@@ -438,32 +446,105 @@ public class AdminAddressEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
       .andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
+    String etag = result.getResponse().getHeader("ETag");
     JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
     AddressDTO responseBody = this.objectMapper.treeToValue(contentAsJsonNode, AddressDTO.class);
 
     // assert
     assertThat(result.getResponse().getStatus()).isEqualTo(200);
+    assertThat(etag).isEqualTo("\"1\"");
     assertThat(responseBody.getUserId().toString()).isEqualTo(this.authInfo.getAuthUser().getUserId().toString());
     assertThat(responseBody.getAddressId()).isEqualTo(dummyFormJson.get("addressId").asLong());
     assertThat(responseBody.getAddress1()).isEqualTo(dummyFormJson.get("address1").asText());
   }
 
   @Test
+  @Sql(scripts = { "classpath:/integration/address/shouldAdminUpdateAddress.sql" })
+  public void shouldNotAdminUpdateAddressSinceNotIfMatchHeader(@Value("classpath:/integration/address/shouldAdminUpdateAddress.json") Resource dummyFormJsonFile) throws Exception {
+
+    // make sure address_id match with sql and json
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyVersion = "\"0\"";
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyFormJson.get("addressId").asText();
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .put(targetUrl) // update
+                            .content(dummyFormJsonString)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/address/shouldAdminUpdateAddress.sql" })
+  public void shouldNotAdminUpdateAddressSinceVersionMismatch(@Value("classpath:/integration/address/shouldAdminUpdateAddress.json") Resource dummyFormJsonFile) throws Exception {
+
+    // make sure address_id match with sql and json
+
+    // dummy form json
+    JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
+    String dummyFormJsonString = dummyFormJson.toString();
+    String dummyVersion = "\"3\"";
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/" + dummyFormJson.get("addressId").asText();
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .put(targetUrl) // update
+                            .content(dummyFormJsonString)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .header("If-Match", dummyVersion)
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isPreconditionFailed());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
+  }
+  @Test
   @Sql(scripts = { "classpath:/integration/address/shouldAdminUpdateAddressOfOtherUser.sql" })
   public void shouldAdminUpdateAddressOfOtherUser(@Value("classpath:/integration/address/shouldAdminUpdateAddressOfOtherUser.json") Resource dummyFormJsonFile) throws Exception {
-
     // make sure address_id match with sql and json
 
     // dummy form json 
     JsonNode dummyFormJson = this.objectMapper.readTree(this.resourceReader.asString(dummyFormJsonFile));
     String dummyFormJsonString = dummyFormJson.toString();
-    String dummyUserId = "29c845ad-54b1-430a-8a71-5caba98d5978"; 
+    String dummyUserId = "29c845ad-54b1-430a-8a71-5caba98d5978";
+    String dummyVersion = "\"0\"";
 
     // arrange
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyUserId) + "/" + dummyFormJson.get("addressId").asText();
@@ -477,6 +558,7 @@ public class AdminAddressEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -499,6 +581,7 @@ public class AdminAddressEndpointTest {
 
     // arrange
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/100"; // check the sql to match address id (e.g., 100)
+    String dummyVersion = "\"0\""; // be careful. this should be 1.
 
     // act & assert
     ResultActions resultActions = mvc.perform(
@@ -507,6 +590,7 @@ public class AdminAddressEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())
@@ -519,12 +603,68 @@ public class AdminAddressEndpointTest {
   }
 
   @Test
+  @Sql(scripts = { "classpath:/integration/address/shouldAdminDeleteAddress.sql" })
+  public void shouldNotAdminDeleteAddressSinceNoIfMatch() throws Exception {
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/100"; // check the sql to match address id (e.g., 100)
+    String dummyVersion = "\"0\""; // be careful. this should be 1.
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .delete(targetUrl) // remove
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("you are missing version (If-Match) header.");
+  }
+
+  @Test
+  @Sql(scripts = { "classpath:/integration/address/shouldAdminDeleteAddress.sql" })
+  public void shouldNotAdminDeleteAddressSinceVersioinMismatch() throws Exception {
+
+    // arrange
+    String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, this.authInfo.getAuthUser().getUserId().toString()) + "/100"; // check the sql to match address id (e.g., 100)
+    String dummyVersion = "\"2\"";
+
+    // act & assert
+    ResultActions resultActions = mvc.perform(
+                    MockMvcRequestBuilders
+                            .delete(targetUrl) // remove
+                            .cookie(this.authCookie)
+                            .cookie(this.csrfCookie)
+                            .header("csrf-token", this.authInfo.getCsrfToken())
+                            .header("If-Match", dummyVersion)
+                            .accept(MediaType.APPLICATION_JSON)
+            )
+            .andDo(print())
+            .andExpect(status().isPreconditionFailed());
+
+    MvcResult result = resultActions.andReturn();
+    JsonNode contentAsJsonNode = this.objectMapper.readValue(result.getResponse().getContentAsString(), JsonNode.class);
+    ErrorBaseResponse responseBody = this.objectMapper.treeToValue(contentAsJsonNode, ErrorBaseResponse.class);
+
+    assertThat(responseBody.getMessage()).isEqualTo("the data was updated by others. please refresh.");
+  }
+
+  @Test
   @Sql(scripts = { "classpath:/integration/address/shouldAdminDeleteAddressOfOtherUser.sql" })
   public void shouldAdminDeleteAddressOfOtherUser() throws Exception {
 
     // arrange
     String dummyUserId = "29c845ad-54b1-430a-8a71-5caba98d5978";
     String targetUrl = "http://localhost:" + this.port + String.format(this.targetPath, dummyUserId) + "/100"; // check the sql to match address id (e.g., 100)
+    String dummyVersion = "\"0\""; // be careful. this should be 1.
 
     // act & assert
     ResultActions resultActions = mvc.perform(
@@ -533,6 +673,7 @@ public class AdminAddressEndpointTest {
           .cookie(this.authCookie)
           .cookie(this.csrfCookie)
           .header("csrf-token", this.authInfo.getCsrfToken())
+                .header("If-Match", dummyVersion)
           .accept(MediaType.APPLICATION_JSON)
           )
       .andDo(print())

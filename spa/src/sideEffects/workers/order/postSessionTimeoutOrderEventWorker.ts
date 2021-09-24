@@ -82,6 +82,7 @@ export function* postSessionTimeoutOrderEventWorker(
       api({
         method: "POST",
         url: apiUrl,
+        headers: { "If-Match": `"${action.payload.orderVersion}"` },
         data: {
           orderNumber: action.payload.orderNumber,
         } as SessionTimeoutOrderEventCriteria,
@@ -123,16 +124,7 @@ export function* postSessionTimeoutOrderEventWorker(
         })
       );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
+      log(response.message);
     }
   } else {
     log("permission denied. you are " + curAuth.userType);

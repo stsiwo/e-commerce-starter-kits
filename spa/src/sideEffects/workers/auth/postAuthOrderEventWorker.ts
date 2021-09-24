@@ -75,6 +75,7 @@ export function* postAuthOrderEventWorker(
       api({
         method: "POST",
         url: apiUrl,
+        headers: { "If-Match": `"${action.payload.orderVersion}"` },
         data: {
           orderStatus: action.payload.orderStatus,
           note: action.payload.note,
@@ -118,17 +119,6 @@ export function* postAuthOrderEventWorker(
       );
     } else if (response.fetchStatus === FetchStatusEnum.FAILED) {
       log(response.message);
-
-      /**
-       * update message
-       **/
-      yield put(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.ERROR,
-          message: response.message,
-        })
-      );
     }
   }
 }

@@ -76,5 +76,7 @@ public class UserCompanyCriteria {
   @Pattern( regexp = "((https?):\\/\\/)?(www.)?[a-z0-9]+(\\.[a-z]{2,}){1,3}(#?\\/?[a-zA-Z0-9#]+)*\\/?(\\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$", message = "{link.youtube.invalidformat}")
   @Size(max = 100, message = "{link.youtube.max100}")
   private String youtubeLink;
+
+  private Long version;
 }
 

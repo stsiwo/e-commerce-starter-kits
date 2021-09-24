@@ -28,6 +28,8 @@ public class ReviewDTO {
   private LocalDateTime updatedAt;
 
   private UserDTO user;
+
+  private Long version;
 }
 
 
