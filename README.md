@@ -10,8 +10,8 @@ My goal is to develop a maintainable, testable, and scalable application as much
 
 ## Demo
 
-Guest/Member Page: [https://iwaodev.com/](https://iwaodev.com/)
-Admin Page: [https://iwaodev.com/admin/login](https://iwaodev.com/admin/login)
+- Guest/Member Page: [https://iwaodev.com/](https://iwaodev.com/)
+- Admin Page: [https://iwaodev.com/admin/login](https://iwaodev.com/admin/login)
 
 ![admin dashboard](./samples/admin-dashboard.png "Admin Dashboard")
 
