@@ -10,7 +10,8 @@ My goal is to develop a maintainable, testable, and scalable application as much
 
 ## Demo
 
-Visit [here](https://iwaodev.com/).
+- Guest/Member Page: [https://iwaodev.com/](https://iwaodev.com/)
+- Admin Page: [https://iwaodev.com/admin/login](https://iwaodev.com/admin/login)
 
 ![admin dashboard](./samples/admin-dashboard.png "Admin Dashboard")
 
@@ -127,6 +128,10 @@ Here are some important details:
     - easier if the components in the higher layer need to be replaced
 
   - [Event And Event Handlers](https://www.baeldung.com/spring-events): avoid a thick application service by delegating some tasks to this event and event handlers. this makes it easy to write tests in a decoupled way. For example, if a new order was placed by a customer, the app needs to send a notification and an email to the customer and the admin. If you put that logic in a single application service, it makes me hard to write a test for the service. So, I delegate those tasks to event handlers and publish events.  This allows us to write a test separately and easily.
+
+  - [Optimistic Locking](https://www.baeldung.com/jpa-optimistic-locking): This allows you to handle concurrent updates from multiple users. For example, if two customers try to buy the same product whose stock is only one left, one of the customers ends up buying the product but no stock is available. To handle this we use optimistic locking. If one of the customers bought the product, it automatically throws the exception for the other customer.  
+
+  - [N+1 Problem with Hibernate](https://vladmihalcea.com/n-plus-1-query-problem/): By default, Hibernate does the lazy loading for associations of an entity. This means that when the entity tries to access the association for the first time, it will be loaded from your DB for performance benefit. But, it also brings a performance issue for some cases. For example, when you fetch a collection of an entity (let's say 'Car') whose has one-to-many associations (let's say 'Wheel'), the first fetch loads the collection of the Car entity, and when you try to access the Wheel associations on each Car entity, Hibernate run an additional N queries for it. This is a problem especially when the data is getting large and degrade the performance. To avoid this, you need to use 'fetch join' when you fetch the associations so that it will fetch the associations together. In this case, if you have multiple different associations with your entity, you should separate the query one by one. Otherwise, it will throw a MultipleBagFetchException. ([reference](https://stackoverflow.com/questions/32453989/what-is-the-solution-for-the-n1-issue-in-jpa-and-hibernate))
 
 Click [here](https://github.com/stsiwo/e-commerce-starter-kits/blob/main/details.md#back-end) for more detail.
 
