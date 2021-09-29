@@ -35,6 +35,15 @@ declare module "@material-ui/core/styles/createPalette" {
   }
 }
 
+declare module "@material-ui/core/styles/createMixins" {
+  interface Mixins {
+    clamp: Mixins["toolbar"];
+  }
+  interface MixinsOptions {
+    clamp: MixinsOptions["toolbar"];
+  }
+}
+
 export const theme = createMuiTheme({
   /**
    * override default theme provided by material-ui here
@@ -134,6 +143,14 @@ export const theme = createMuiTheme({
     background: {},
     headerBackground: {
       paper: "transparent",
+    },
+  },
+  mixins: {
+    clamp: {
+      display: "-webkit-box",
+      "-webkit-line-clamp": 4,
+      "-webkit-box-orient": "vertical",
+      overflow: "hidden",
     },
   },
 });

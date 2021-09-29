@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
       left: 0,
       right: 0,
       bottom: 0,
-      background: `url(${BgImg2}) no-repeat center center fixed`,
+      background: `url(${BgImg2}) no-repeat center center scroll`,
       zIndex: -1,
     },
     heroImage: {

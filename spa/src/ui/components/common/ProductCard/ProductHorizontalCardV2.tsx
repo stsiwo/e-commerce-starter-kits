@@ -81,6 +81,9 @@ const useStyles = makeStyles((theme: Theme) =>
     price: {
       color: theme.palette.fifth.main,
     },
+    productDesc: {
+      ...theme.mixins.clamp,
+    },
   })
 );
 
@@ -110,7 +113,12 @@ const ProductHorizontalCardV2: React.FunctionComponent<ProductHorizontalCardProp
           <Typography gutterBottom variant="h6" component="h2" className={""}>
             {product.productName}
           </Typography>
-          <Typography gutterBottom variant="body2" component="p" className={""}>
+          <Typography
+            gutterBottom
+            variant="body2"
+            component="p"
+            className={classes.productDesc}
+          >
             {product.productDescription}
           </Typography>
           <Typography variant="body2" component="p" className={classes.price}>

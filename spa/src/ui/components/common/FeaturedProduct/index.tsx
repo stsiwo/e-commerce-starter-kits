@@ -13,7 +13,6 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     featuresBox: {
       backgroundColor: theme.palette.fourth.main,
-      margin: `0 calc(100% - 1280px)`,
       padding: `${theme.spacing(10)}px 0`,
 
       marginRight: `calc(50% - 50vw)`,
@@ -46,7 +45,7 @@ const FeaturedProduct: React.FunctionComponent<{}> = (props) => {
     api
       .request({
         method: "GET",
-        url: API1_URL + `/products/public?sort=DATE_ASC`,
+        url: API1_URL + `/products/public?sort=DATE_ASC&limit=3`,
       })
       .then((data) => {
         setFetchStatus(FetchStatusEnum.SUCCESS);

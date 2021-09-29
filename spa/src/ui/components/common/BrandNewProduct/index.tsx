@@ -2,12 +2,13 @@ import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
+import { AxiosError } from "axios";
+import { api } from "configs/axiosConfig";
 import { ProductType } from "domain/product/types";
 import * as React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Link as RRLink } from "react-router-dom";
-import { fetchPublicProductActionCreator } from "reducers/slices/domain/product";
-import { mSelector } from "src/selectors/selector";
+import { FetchStatusEnum } from "src/app";
 import ProductCard from "../ProductCard";
 import SingleLineList from "../SingleLineList";
 
@@ -37,11 +38,26 @@ const BrandNewProduct: React.FunctionComponent<{}> = (props) => {
 
   const dispatch = useDispatch();
 
-  const curDomains = useSelector(mSelector.makeProductWithoutCacheSelector());
+  const [curDomains, setDomains] = React.useState<ProductType[]>([]);
+  const [curFetchStatus, setFetchStatus] = React.useState<FetchStatusEnum>(
+    FetchStatusEnum.INITIAL
+  );
 
   // fetch new blogs only once
   React.useEffect(() => {
-    dispatch(fetchPublicProductActionCreator());
+    setFetchStatus(FetchStatusEnum.FETCHING);
+    api
+      .request({
+        method: "GET",
+        url: API1_URL + `/products/public?sort=DATE_DESC`,
+      })
+      .then((data) => {
+        setFetchStatus(FetchStatusEnum.SUCCESS);
+        setDomains(data.data.content);
+      })
+      .catch((error: AxiosError) => {
+        setFetchStatus(FetchStatusEnum.FAILED);
+      });
   }, []);
 
   const renderDomains: () => React.ReactNode = () => {
