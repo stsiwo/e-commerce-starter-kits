@@ -1,6 +1,5 @@
 import IconButton from "@material-ui/core/IconButton";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import Background from "components/common/Background";
 import ErrorBoundary from "components/common/ErrorBoundary";
 import Notification from "components/common/Notification";
 import PageRoute from "components/routes/PageRoute";
@@ -52,7 +51,6 @@ const Content: React.FunctionComponent<{}> = (props) => {
 
   return (
     <React.Fragment>
-      <Background />
       <ErrorBoundary>
         <PageRoute />
       </ErrorBoundary>

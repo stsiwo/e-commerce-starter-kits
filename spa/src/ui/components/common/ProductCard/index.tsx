@@ -49,6 +49,10 @@ const useStyles = makeStyles((theme: Theme) =>
     price: {
       color: theme.palette.fifth.main,
     },
+    anchor: {
+      textDecoration: "none",
+      color: "inherit",
+    },
   })
 );
 
@@ -67,32 +71,37 @@ const ProductCard: React.FunctionComponent<ProductCardPropsType> = ({
 
   return (
     <Card className={classes.card}>
-      <CardMedia
-        className={classes.media}
-        // the first product image is the main one
-        image={primaryImageUrl}
-      />
-      <CardContent className={classes.cardContent}>
-        <Typography variant="body2" color="textSecondary" component="p">
-          {product.category.categoryName}
-        </Typography>
-        <Typography
-          gutterBottom
-          variant="h6"
-          component="h2"
-          className={classes.title}
-        >
-          {product.productName}
-        </Typography>
-        <Typography
-          variant="body1"
-          align="left"
-          component="p"
-          className={classes.price}
-        >
-          <b>{`${cadCurrencyFormat(product.cheapestPrice)} ~`}</b>
-        </Typography>
-      </CardContent>
+      <RRLink
+        to={`/products/${product.productPath}`}
+        className={classes.anchor}
+      >
+        <CardMedia
+          className={classes.media}
+          // the first product image is the main one
+          image={primaryImageUrl}
+        />
+        <CardContent className={classes.cardContent}>
+          <Typography variant="body2" color="textSecondary" component="p">
+            {product.category.categoryName}
+          </Typography>
+          <Typography
+            gutterBottom
+            variant="h6"
+            component="h2"
+            className={classes.title}
+          >
+            {product.productName}
+          </Typography>
+          <Typography
+            variant="body1"
+            align="left"
+            component="p"
+            className={classes.price}
+          >
+            <b>{`${cadCurrencyFormat(product.cheapestPrice)} ~`}</b>
+          </Typography>
+        </CardContent>
+      </RRLink>
       <CardActions className={classes.actions}>
         <Button
           component={RRLink}

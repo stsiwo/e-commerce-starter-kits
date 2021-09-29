@@ -1,4 +1,6 @@
+import Box from "@material-ui/core/Box";
 import Drawer from "@material-ui/core/Drawer";
+import IconButton from "@material-ui/core/IconButton";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
@@ -9,20 +11,18 @@ import {
   Theme,
   useTheme,
 } from "@material-ui/core/styles";
-import HelpIcon from "@material-ui/icons/Help";
 import Typography from "@material-ui/core/Typography";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
+import AppsIcon from "@material-ui/icons/Apps";
 import CategoryIcon from "@material-ui/icons/Category";
+import DashboardIcon from "@material-ui/icons/Dashboard";
 import FavoriteIcon from "@material-ui/icons/Favorite";
+import HelpIcon from "@material-ui/icons/Help";
 import RateReviewIcon from "@material-ui/icons/RateReview";
 import ShopIcon from "@material-ui/icons/Shop";
 import SupervisedUserCircleIcon from "@material-ui/icons/SupervisedUserCircle";
 import * as React from "react";
-import DashboardIcon from "@material-ui/icons/Dashboard";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import AppsIcon from "@material-ui/icons/Apps";
-import Box from "@material-ui/core/Box";
-import IconButton from "@material-ui/core/IconButton";
 import { Link as RRLink } from "react-router-dom";
 
 export declare type NavDataItemType = {
@@ -111,6 +111,7 @@ const useStyles = makeStyles((theme: Theme) =>
       width: 240,
       flexShrink: 0,
       zIndex: 0,
+      backgroundColor: theme.palette.fourth.main,
     },
     drawerPaper: {
       width: 240,

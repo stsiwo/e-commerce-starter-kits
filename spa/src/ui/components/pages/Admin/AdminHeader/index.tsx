@@ -28,7 +28,7 @@ const log = logger(__filename);
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     appBar: {
-      boxShadow: "none",
+      backgroundColor: theme.palette.fourth.main,
     },
     gridItemRight: {
       display: "flex",

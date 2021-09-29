@@ -1,4 +1,4 @@
-import { createMuiTheme } from '@material-ui/core/styles';
+import { createMuiTheme } from "@material-ui/core/styles";
 
 /**
  * color theme:
@@ -13,7 +13,7 @@ import { createMuiTheme } from '@material-ui/core/styles';
 const primeColor = "#FFC478";
 const secondaryColor = "#BBDFC8";
 const thirdColor = "#F0E5D8";
-const fourthColor = "#75CFB8";  
+const fourthColor = "#75CFB8";
 const fifthColor = "#B8860B";
 
 /**
@@ -22,43 +22,40 @@ const fifthColor = "#B8860B";
  **/
 declare module "@material-ui/core/styles/createPalette" {
   interface Palette {
-    headerBackground: Palette['background']
-    third: Palette['primary']
-    fourth: Palette['primary']
-    fifth: Palette['primary']
+    headerBackground: Palette["background"];
+    third: Palette["primary"];
+    fourth: Palette["primary"];
+    fifth: Palette["primary"];
   }
   interface PaletteOptions {
-    headerBackground: PaletteOptions['background'];
-    third: PaletteOptions['primary']
-    fourth: PaletteOptions['primary']
-    fifth: PaletteOptions['primary']
+    headerBackground: PaletteOptions["background"];
+    third: PaletteOptions["primary"];
+    fourth: PaletteOptions["primary"];
+    fifth: PaletteOptions["primary"];
   }
 }
 
-
 export const theme = createMuiTheme({
-
   /**
    * override default theme provided by material-ui here
    **/
   overrides: {
-
     MuiCssBaseline: {
-      '@global': {
+      "@global": {
         html: {
           scrollBehaivor: "smooth",
         },
-        // to keep the footer where it should belong to 
+        // to keep the footer where it should belong to
         // - use flexbox to make this happen.
         // ref: https://dev.to/nehalahmadkhan/how-to-make-footer-stick-to-bottom-of-web-page-3i14
-        '#root': {
+        "#root": {
           display: "flex",
           flexDirection: "column",
           minHeight: "100vh",
 
-          '& > footer': {
-            marginTop: "auto",
-          }
+          "& > footer": {
+            marginTop: 320,
+          },
         },
       },
     },
@@ -66,51 +63,51 @@ export const theme = createMuiTheme({
       colorDefault: {
         color: primeColor,
         backgroundColor: thirdColor,
-      }
+      },
     },
     MuiButton: {
       contained: {
         margin: `8px 4px`,
-        backgroundColor: primeColor 
-      }
+        backgroundColor: primeColor,
+      },
     },
     MuiPaper: {
       root: {
-        backgroundColor: "transparent" 
-      }
+        backgroundColor: "transparent",
+      },
     },
     MuiAppBar: {
       colorDefault: {
         color: "#000000",
         backgroundColor: "transparent",
-      }
+      },
     },
     MuiDialog: {
       paper: {
         backgroundColor: "#FFFFFF",
-      }
+      },
     },
     MuiPopover: {
       paper: {
         backgroundColor: "#FFFFFF",
-      }
+      },
     },
     MuiDrawer: {
       paper: {
         backgroundColor: "#FFFFFF",
-      }
+      },
     },
     MuiSwitch: {
       colorSecondary: {
-        '&$checked': {
+        "&$checked": {
           color: primeColor,
-        }
-      }
+        },
+      },
     },
     MuiMobileStepper: {
       root: {
         backgroundColor: "transparent",
-      }
+      },
     },
     //MuiCollapse:  {
     //  container: {
@@ -129,15 +126,14 @@ export const theme = createMuiTheme({
       main: thirdColor,
     },
     fourth: {
-      main: fourthColor
+      main: fourthColor,
     },
     fifth: {
-      main: fifthColor
+      main: fifthColor,
     },
-    background: {
-    },
+    background: {},
     headerBackground: {
-      paper: "transparent"
-    }
-  }
+      paper: "transparent",
+    },
+  },
 });
