@@ -27,6 +27,7 @@ import Pagination from "@material-ui/lab/Pagination";
 import SearchForm from "components/common/SearchForm";
 import { logger } from "configs/logger";
 import { ProductType } from "domain/product/types";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router";
@@ -335,6 +336,16 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
       }
     });
 
+    /**
+     * avoid multiple click submission
+     */
+    const curDeleteFetchStatus = useSelector(
+      rsSelector.app.getDeleteSingleProductFetchStatus
+    );
+    const { curDisableBtnStatus: curDisableDeleteBtnStatus } = useWaitResponse({
+      fetchStatus: curDeleteFetchStatus,
+    });
+
     return (
       <Card className={classes.root}>
         <CardHeader
@@ -463,7 +474,11 @@ const AdminProductGridView: React.FunctionComponent<AdminProductGridViewPropsTyp
             >
               Cancel
             </Button>
-            <Button onClick={handleDeletionOk} variant="contained">
+            <Button
+              onClick={handleDeletionOk}
+              variant="contained"
+              disabled={curDisableDeleteBtnStatus}
+            >
               Ok
             </Button>
           </DialogActions>

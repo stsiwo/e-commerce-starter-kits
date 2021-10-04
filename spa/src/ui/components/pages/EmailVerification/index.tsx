@@ -1,19 +1,19 @@
-import Box from '@material-ui/core/Box';
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import SentimentSatisfiedOutlinedIcon from '@material-ui/icons/SentimentSatisfiedOutlined';
-import { AxiosError } from 'axios';
-import { api } from 'configs/axiosConfig';
-import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router';
-import { messageActions } from 'reducers/slices/app';
-import { MessageTypeEnum } from 'src/app';
-import { getNanoId } from 'src/utils';
-import { mSelector } from 'src/selectors/selector';
+import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
+import IconButton from "@material-ui/core/IconButton";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import SentimentSatisfiedOutlinedIcon from "@material-ui/icons/SentimentSatisfiedOutlined";
+import { AxiosError } from "axios";
+import { api } from "configs/axiosConfig";
+import * as React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router";
+import { messageActions } from "reducers/slices/app";
+import { FetchStatusEnum, MessageTypeEnum } from "src/app";
+import { mSelector } from "src/selectors/selector";
+import { getNanoId } from "src/utils";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     title: {
       textTransform: "uppercase",
-      margin: theme.spacing(3)
+      margin: theme.spacing(3),
     },
     form: {
       margin: theme.spacing(1),
@@ -42,14 +42,13 @@ const useStyles = makeStyles((theme: Theme) =>
       textAlign: "center",
       margin: theme.spacing(2, 0, 2, 0),
     },
-  }),
+  })
 );
 
 const EmailVerification: React.FunctionComponent<{}> = (props) => {
-
   const classes = useStyles();
 
-  const auth = useSelector(mSelector.makeAuthSelector())
+  const auth = useSelector(mSelector.makeAuthSelector());
 
   // dispatch
   const dispatch = useDispatch();
@@ -57,66 +56,80 @@ const EmailVerification: React.FunctionComponent<{}> = (props) => {
   // history
   const history = useHistory();
 
+  const [curFetchStatus, setFetchStatus] = React.useState<FetchStatusEnum>(
+    FetchStatusEnum.INITIAL
+  );
+
   // event handler to submit
-  const handleUserAccountSaveClickEvent: React.EventHandler<React.MouseEvent<HTMLButtonElement>> = async (e) => {
+  const handleUserAccountSaveClickEvent: React.EventHandler<
+    React.MouseEvent<HTMLButtonElement>
+  > = async (e) => {
+    setFetchStatus(FetchStatusEnum.FETCHING);
 
-    api.request({
-      method: 'POST',
-      url: API1_URL + `/users/${auth.user.userId}/reissue-account-verify`,
-    }).then((data) => {
-
-      /**
-       * update message
-       **/
-      dispatch(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.SUCCESS,
-          message: "we sent the verification email successfuly. please check your email box.",
-        })
-      )
-
-    }).catch((error: AxiosError) => {
-      /**
-       * update message
-       **/
-      dispatch(
-        messageActions.update({
-          id: getNanoId(),
-          type: MessageTypeEnum.SUCCESS,
-          message: "sorry, we failed to send the verification email. please try again.",
-        })
-      )
-    })
-  }
+    api
+      .request({
+        method: "POST",
+        url: API1_URL + `/users/${auth.user.userId}/reissue-account-verify`,
+      })
+      .then((data) => {
+        /**
+         * update message
+         **/
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.SUCCESS,
+            message:
+              "we sent the verification email successfuly. please check your email box.",
+          })
+        );
+        setFetchStatus(FetchStatusEnum.SUCCESS);
+      })
+      .catch((error: AxiosError) => {
+        /**
+         * update message
+         **/
+        dispatch(
+          messageActions.update({
+            id: getNanoId(),
+            type: MessageTypeEnum.SUCCESS,
+            message:
+              "sorry, we failed to send the verification email. please try again.",
+          })
+        );
+        setFetchStatus(FetchStatusEnum.FAILED);
+      });
+  };
 
   return (
-    <Grid
-      container
-      justify="center"
-      direction="column"
-      className={classes.box}
-    >
+    <Grid container justify="center" direction="column" className={classes.box}>
       <IconButton edge="start" color="inherit" aria-label="company-logo">
         <SentimentSatisfiedOutlinedIcon />
       </IconButton>
-      <Typography variant="h5" component="h5" align="center" className={classes.title} >
+      <Typography
+        variant="h5"
+        component="h5"
+        align="center"
+        className={classes.title}
+      >
         {"Email Verification"}
       </Typography>
-      <Typography variant="body1" component="p" align="left" >
-        {"Thank you for signing up:) Please checkout your email box and click the link to verify your email address."}
+      <Typography variant="body1" component="p" align="left">
+        {
+          "Thank you for signing up:) Please checkout your email box and click the link to verify your email address."
+        }
       </Typography>
       <Box component="div" className={classes.actionBox}>
-        <Button onClick={handleUserAccountSaveClickEvent} variant="contained">
+        <Button
+          onClick={handleUserAccountSaveClickEvent}
+          variant="contained"
+          disabled={curDisablePostBtnStatus}
+        >
           Send Verification Email Again
         </Button>
       </Box>
     </Grid>
-  )
-}
+  );
+};
 
-export default EmailVerification
-
-
-
-
+export default EmailVerification;

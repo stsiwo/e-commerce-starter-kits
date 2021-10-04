@@ -35,6 +35,7 @@ import {
 } from "domain/user/types";
 import { useValidation } from "hooks/validation";
 import { userAccountAddressSchema } from "hooks/validation/rules";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -412,6 +413,32 @@ const AdminCustomerAddressForm: React.FunctionComponent<AdminCustomerAddressForm
       }
     });
 
+    /**
+     * avoid multiple click submission
+     */
+    const curDeleteFetchStatus = useSelector(
+      rsSelector.app.getDeleteUserAddressFetchStatus
+    );
+    const { curDisableBtnStatus: curDisableDeleteBtnStatus } = useWaitResponse({
+      fetchStatus: curDeleteFetchStatus,
+    });
+
+    const curPatchFetchStatus = useSelector(
+      rsSelector.app.getPatchUserAddressFetchStatus
+    );
+    const { curDisableBtnStatus: curDisablePatchBtnStatus } = useWaitResponse({
+      fetchStatus: curPatchFetchStatus,
+    });
+    /**
+     * avoid multiple click submission
+     */
+    const { curDisableBtnStatus: curDisablePostBtnStatus } = useWaitResponse({
+      fetchStatus: curPostFetchStatus,
+    });
+    const { curDisableBtnStatus: curDisablePutBtnStatus } = useWaitResponse({
+      fetchStatus: curPutFetchStatus,
+    });
+
     // render functions
 
     // display current address number list
@@ -455,6 +482,7 @@ const AdminCustomerAddressForm: React.FunctionComponent<AdminCustomerAddressForm
                     }
                     label={""}
                     labelPlacement="bottom"
+                    disabled={curDisablePatchBtnStatus}
                     name="user-billing-address"
                     onClick={(e) =>
                       handleShippingAddressChange(e, address.addressId)
@@ -469,6 +497,7 @@ const AdminCustomerAddressForm: React.FunctionComponent<AdminCustomerAddressForm
                     value={address.addressId}
                     data-shipping-address-id={address.addressId}
                     checked={curBillingId === address.addressId}
+                    disabled={curDisablePatchBtnStatus}
                     control={
                       <Radio
                         icon={<PaymentIcon color="disabled" />}
@@ -493,6 +522,7 @@ const AdminCustomerAddressForm: React.FunctionComponent<AdminCustomerAddressForm
                   aria-label="delete"
                   data-address-id={address.addressId}
                   onClick={handleDeleteAddressClickEvent}
+                  disabled={curDisableDeleteBtnStatus}
                 >
                   <DeleteIcon />
                 </IconButton>
@@ -627,6 +657,7 @@ const AdminCustomerAddressForm: React.FunctionComponent<AdminCustomerAddressForm
               <Button
                 onClick={handleAdminCustomerSaveClickEvent}
                 variant="contained"
+                disabled={curDisablePostBtnStatus || curDisablePutBtnStatus}
               >
                 Save
               </Button>

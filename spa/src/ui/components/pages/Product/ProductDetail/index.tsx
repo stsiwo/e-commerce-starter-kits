@@ -33,6 +33,7 @@ import {
   ProductVariantType,
 } from "domain/product/types";
 import { ReviewType } from "domain/review/type";
+import { useWaitResponse } from "hooks/waitResponse";
 import uniqBy from "lodash/uniqBy";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -41,7 +42,7 @@ import { cartItemActions } from "reducers/slices/domain/cartItem";
 import { postWishlistItemActionCreator } from "reducers/slices/domain/wishlistItem";
 import { cartModalActions } from "reducers/slices/ui";
 import { MessageTypeEnum, UserTypeEnum } from "src/app";
-import { mSelector } from "src/selectors/selector";
+import { mSelector, rsSelector } from "src/selectors/selector";
 import { cadCurrencyFormat, getNanoId, toDateString } from "src/utils";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -506,6 +507,24 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
     });
   };
 
+  /**
+   * avoid multiple click submission
+   */
+  const curPostCartItemFetchStatus = useSelector(
+    rsSelector.app.getPostCartItemFetchStatus
+  );
+  const { curDisableBtnStatus: curDisablePostCartItemBtnStatus } =
+    useWaitResponse({
+      fetchStatus: curPostCartItemFetchStatus,
+    });
+  const curPostWishlistItemFetchStatus = useSelector(
+    rsSelector.app.getPostWishlistItemFetchStatus
+  );
+  const { curDisableBtnStatus: curDisablePostWishlistItemBtnStatus } =
+    useWaitResponse({
+      fetchStatus: curPostWishlistItemFetchStatus,
+    });
+
   return (
     <React.Fragment>
       <Typography
@@ -673,14 +692,19 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
               onClick={handleAddCart}
               disabled={
                 curStockBag.enum === ProductStockEnum.OUT_OF_STOCK ||
-                auth.userType === UserTypeEnum.ADMIN
+                auth.userType === UserTypeEnum.ADMIN ||
+                curDisablePostCartItemBtnStatus
               }
               variant="contained"
             >
               {"Add to Cart"}
             </Button>
             {auth.userType === UserTypeEnum.MEMBER && (
-              <Button onClick={handleAddWishlist} variant="contained">
+              <Button
+                onClick={handleAddWishlist}
+                variant="contained"
+                disabled={curDisablePostWishlistItemBtnStatus}
+              >
                 {"save to Wishlist"}
               </Button>
             )}
@@ -688,7 +712,8 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
               onClick={handleBuyNow}
               disabled={
                 curStockBag.enum === ProductStockEnum.OUT_OF_STOCK ||
-                auth.userType === UserTypeEnum.ADMIN
+                auth.userType === UserTypeEnum.ADMIN ||
+                curDisablePostCartItemBtnStatus
               }
               variant="contained"
             >
@@ -726,7 +751,8 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
               <Button
                 disabled={
                   curStockBag.enum === ProductStockEnum.OUT_OF_STOCK ||
-                  auth.userType === UserTypeEnum.ADMIN
+                  auth.userType === UserTypeEnum.ADMIN ||
+                  curDisablePostCartItemBtnStatus
                 }
                 onClick={handleAddCart}
                 variant="contained"
@@ -734,7 +760,11 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
                 {"Add to Cart"}
               </Button>
               {auth.userType === UserTypeEnum.MEMBER && (
-                <Button onClick={handleAddWishlist} variant="contained">
+                <Button
+                  onClick={handleAddWishlist}
+                  variant="contained"
+                  disabled={curDisablePostWishlistItemBtnStatus}
+                >
                   {"save to Wishlist"}
                 </Button>
               )}
@@ -743,7 +773,8 @@ const ProductDetail: React.FunctionComponent<ProductDetailPropsType> = (
                 variant="contained"
                 disabled={
                   curStockBag.enum === ProductStockEnum.OUT_OF_STOCK ||
-                  auth.userType === UserTypeEnum.ADMIN
+                  auth.userType === UserTypeEnum.ADMIN ||
+                  curDisablePostCartItemBtnStatus
                 }
               >
                 {"buy now"}

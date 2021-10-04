@@ -10,8 +10,11 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import AddShoppingCartIcon from "@material-ui/icons/AddShoppingCart";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import { WishlistItemType } from "domain/wishlist/types";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
+import { useSelector } from "react-redux";
 import { Link as RRLink } from "react-router-dom";
+import { rsSelector } from "src/selectors/selector";
 import { cadCurrencyFormat, getApiUrl } from "src/utils";
 import ColorCell from "../GridData/ColorCell";
 import SizeCell from "../GridData/SizeCell";
@@ -74,6 +77,22 @@ const WishlistItem: React.FunctionComponent<WishlistItemPropsType> = ({
       ? getApiUrl(value.product.productImages[0].productImagePath)
       : null;
 
+  /**
+   * avoid multiple click submission
+   */
+  const curPatchFetchStatus = useSelector(
+    rsSelector.app.getPatchWishlistItemFetchStatus
+  );
+  const curDeleteFetchStatus = useSelector(
+    rsSelector.app.getDeleteWishlistItemFetchStatus
+  );
+  const { curDisableBtnStatus: curDisablePatchBtnStatus } = useWaitResponse({
+    fetchStatus: curPatchFetchStatus,
+  });
+  const { curDisableBtnStatus: curDisableDeleteBtnStatus } = useWaitResponse({
+    fetchStatus: curDeleteFetchStatus,
+  });
+
   return (
     <Card className={`${classes.card} ${classes.root}`}>
       <RRLink
@@ -103,12 +122,14 @@ const WishlistItem: React.FunctionComponent<WishlistItemPropsType> = ({
               onClick={onMoveToCartClick}
               data-wishlist-id={value.wishlistItemId}
               variant="contained"
+              disabled={curDisablePatchBtnStatus}
             >
               Move To Cart
             </Button>
             <IconButton
               onClick={onDelete}
               data-wishlist-id={value.wishlistItemId}
+              disabled={curDisableDeleteBtnStatus}
             >
               <DeleteForeverIcon />
             </IconButton>

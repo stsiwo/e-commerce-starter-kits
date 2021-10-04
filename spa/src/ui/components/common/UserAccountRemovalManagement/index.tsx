@@ -5,13 +5,16 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
+import { AxiosError } from "axios";
 import { api } from "configs/axiosConfig";
 import { UserType } from "domain/user/types";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions, messageActions } from "reducers/slices/app";
-import { MessageTypeEnum } from "src/app";
-import { mSelector } from "src/selectors/selector";
+import { patchAuthFetchStatusActions } from "reducers/slices/app/fetchStatus/auth";
+import { FetchStatusEnum, MessageTypeEnum } from "src/app";
+import { mSelector, rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -84,11 +87,23 @@ const UserAccountRemovalManagement: React.FunctionComponent<UserAccountRemovalMa
       setRemovalCheck(checked);
     };
 
+    /**
+     * avoid multiple click submission
+     */
+    const curPatchFetchStatus = useSelector(
+      rsSelector.app.getPatchAuthFetchStatus
+    );
+    const { curDisableBtnStatus: curDisablePatchBtnStatus } = useWaitResponse({
+      fetchStatus: curPatchFetchStatus,
+    });
+
     // event handler to submit
     const handleUserAccountSaveClickEvent: React.EventHandler<
       React.MouseEvent<HTMLButtonElement>
     > = async (e) => {
       // request
+
+      dispatch(patchAuthFetchStatusActions.update(FetchStatusEnum.FETCHING));
       api
         .request({
           method: "patch",
@@ -109,6 +124,10 @@ const UserAccountRemovalManagement: React.FunctionComponent<UserAccountRemovalMa
               message: "your account deleted successfully.",
             })
           );
+          dispatch(patchAuthFetchStatusActions.update(FetchStatusEnum.SUCCESS));
+        })
+        .catch((error: AxiosError) => {
+          dispatch(patchAuthFetchStatusActions.update(FetchStatusEnum.FAILED));
         });
     };
 
@@ -147,7 +166,7 @@ const UserAccountRemovalManagement: React.FunctionComponent<UserAccountRemovalMa
           <Box component="div" className={classes.actionBox}>
             <Button
               onClick={handleUserAccountSaveClickEvent}
-              disabled={!curRemovalCheck}
+              disabled={!curRemovalCheck || curDisablePatchBtnStatus}
               variant="contained"
             >
               Delete My Account

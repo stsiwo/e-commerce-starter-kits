@@ -1,6 +1,7 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { logger } from "configs/logger";
 import { combineReducers } from "redux";
+import { initialStateWhen401 } from "states/state";
 import { StateType } from "states/types";
 import {
   authSliceReducer,
@@ -17,6 +18,7 @@ import {
   fetchSingleAuthOrderFetchStatusSliceReducer,
   getSingleAuthFetchStatusSliceReducer,
   patchAuthAddressFetchStatusSliceReducer,
+  patchAuthFetchStatusSliceReducer,
   patchAuthPhoneFetchStatusSliceReducer,
   postAuthAddressFetchStatusSliceReducer,
   postAuthAvatarImageFetchStatusSliceReducer,
@@ -211,8 +213,13 @@ const log = logger(__filename);
  *
  **/
 export const rootReducer = (state: StateType, action: PayloadAction<any>) => {
+  // reset all of state
   if (action.type === "root/reset/all") {
     return mainReducer(undefined, action);
+  }
+  // used when you receive 401 error to reset except message.
+  if (action.type === "root/reset/exceptMessage") {
+    return mainReducer(initialStateWhen401(state.app.message), action);
   }
   return mainReducer(state, action);
 };
@@ -303,6 +310,7 @@ const mainReducer = combineReducers({
       auth: combineReducers({
         getSingle: getSingleAuthFetchStatusSliceReducer,
         put: putAuthFetchStatusSliceReducer,
+        patch: patchAuthFetchStatusSliceReducer,
         postPhone: postAuthPhoneFetchStatusSliceReducer,
         putPhone: putAuthPhoneFetchStatusSliceReducer,
         patchPhone: patchAuthPhoneFetchStatusSliceReducer,

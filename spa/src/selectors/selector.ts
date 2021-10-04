@@ -67,8 +67,18 @@ export const rsSelector = {
       state.app.fetchStatus.auth.postAddress,
     getPutAuthAddressFetchStatus: (state: StateType) =>
       state.app.fetchStatus.auth.putAddress,
+    getPatchAuthAddressFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.auth.patchAddress,
     getDeleteAuthAddressFetchStatus: (state: StateType) =>
       state.app.fetchStatus.auth.deleteAddress,
+
+    getPostAuthAvatarImageFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.auth.postAvatarImage,
+    getDeleteAuthAvatarImageFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.auth.deleteAvatarImage,
+
+    getPutCompanyFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.auth.putCompany,
 
     getPostProductFetchStatus: (state: StateType) =>
       state.app.fetchStatus.products.post,
@@ -98,6 +108,21 @@ export const rsSelector = {
     getDeleteSingleReviewFetchStatus: (state: StateType) =>
       state.app.fetchStatus.reviews.deleteSingle,
 
+    getPutUserFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.users.put,
+
+    getPatchUserFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.users.patch,
+
+    getDeleteUserFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.users.deleteSingle,
+
+    getDeleteUserAvatarImageFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.users.deleteAvatarImage,
+
+    getPostUserAvatarImageFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.users.postAvatarImage,
+
     getPostUserPhoneFetchStatus: (state: StateType) =>
       state.app.fetchStatus.users.postPhone,
     getPutUserPhoneFetchStatus: (state: StateType) =>
@@ -109,14 +134,17 @@ export const rsSelector = {
       state.app.fetchStatus.users.postAddress,
     getPutUserAddressFetchStatus: (state: StateType) =>
       state.app.fetchStatus.users.putAddress,
+    getPatchUserAddressFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.users.patchAddress,
     getDeleteUserAddressFetchStatus: (state: StateType) =>
       state.app.fetchStatus.users.deleteAddress,
 
     getFetchAuthOrderFetchStatus: (state: StateType) =>
       state.app.fetchStatus.auth.fetchOrder,
-    getFetchWishlistItemFetchStatus: (state: StateType) =>
-      state.app.fetchStatus.wishlistItems.get,
+
     getPutAuthFetchStatus: (state: StateType) => state.app.fetchStatus.auth.put,
+    getPatchAuthFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.auth.patch,
     getPostSessionTimeoutOrderEventFetchStatus: (state: StateType) =>
       state.app.fetchStatus.orders.postSessionTimeoutEvent,
     getPostOrderFetchStatus: (state: StateType) =>
@@ -133,6 +161,22 @@ export const rsSelector = {
       state.app.fetchStatus.orders.get,
     getFetchUserFetchStatus: (state: StateType) =>
       state.app.fetchStatus.users.get,
+
+    getFetchWishlistItemFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.wishlistItems.get,
+    getPostWishlistItemFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.wishlistItems.post,
+    getPatchWishlistItemFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.wishlistItems.patch,
+    getDeleteWishlistItemFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.wishlistItems.deleteSingle,
+
+    getPostCartItemFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.cartItems.post,
+    getPutCartItemFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.cartItems.put,
+    getDeleteCartItemFetchStatus: (state: StateType) =>
+      state.app.fetchStatus.cartItems.deleteSingle,
   },
 
   domain: {

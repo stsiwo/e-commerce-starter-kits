@@ -4,6 +4,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
+import { AxiosError } from "axios";
 import { api } from "configs/axiosConfig";
 import { logger } from "configs/logger";
 import {
@@ -18,12 +19,14 @@ import {
 } from "domain/user/types";
 import { useValidation } from "hooks/validation";
 import { userActiveStatusAccountSchema } from "hooks/validation/rules";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { messageActions } from "reducers/slices/app";
+import { patchUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 import { userActions } from "reducers/slices/domain/user";
-import { MessageTypeEnum } from "src/app";
-import { mSelector } from "src/selectors/selector";
+import { FetchStatusEnum, MessageTypeEnum } from "src/app";
+import { mSelector, rsSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
 const log = logger(__filename);
 
@@ -120,6 +123,16 @@ const AdminCustomerStatusForm: React.FunctionComponent<AdminCustomerStatusFormPr
       }));
     };
 
+    /**
+     * avoid multiple click submission
+     */
+    const curPatchFetchStatus = useSelector(
+      rsSelector.app.getPatchUserFetchStatus
+    );
+    const { curDisableBtnStatus: curDisablePatchBtnStatus } = useWaitResponse({
+      fetchStatus: curPatchFetchStatus,
+    });
+
     // event handler to submit
     const handleAdminCustomerSaveClickEvent: React.EventHandler<
       React.MouseEvent<HTMLButtonElement>
@@ -130,6 +143,8 @@ const AdminCustomerStatusForm: React.FunctionComponent<AdminCustomerStatusFormPr
       if (isValid) {
         // pass
         log("passed");
+
+        dispatch(patchUserFetchStatusActions.update(FetchStatusEnum.FETCHING));
 
         // request
         api
@@ -158,6 +173,14 @@ const AdminCustomerStatusForm: React.FunctionComponent<AdminCustomerStatusFormPr
                 type: MessageTypeEnum.SUCCESS,
                 message: "updated successfully.",
               })
+            );
+            dispatch(
+              patchUserFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+            );
+          })
+          .catch((errror: AxiosError) => {
+            dispatch(
+              patchUserFetchStatusActions.update(FetchStatusEnum.FAILED)
             );
           });
       } else {
@@ -206,6 +229,7 @@ const AdminCustomerStatusForm: React.FunctionComponent<AdminCustomerStatusFormPr
             <Button
               onClick={handleAdminCustomerSaveClickEvent}
               variant="contained"
+              disabled={curDisablePatchBtnStatus}
             >
               Save
             </Button>

@@ -11,7 +11,10 @@ import {
 } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { ProductVariantType } from "domain/product/types";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
+import { useSelector } from "react-redux";
+import { rsSelector } from "src/selectors/selector";
 import AdminProductVariantForm from "../AdminProductVariantForm";
 
 declare type AdminProductVariantFormDialogPropsType = {
@@ -80,6 +83,22 @@ const AdminProductVariantFormDialog: React.FunctionComponent<AdminProductVariant
      **/
     const childRef = React.useRef(null);
 
+    /**
+     * avoid multiple click submission
+     */
+    const curPostFetchStatus = useSelector(
+      rsSelector.app.getPostProductVariantFetchStatus
+    );
+    const curPutFetchStatus = useSelector(
+      rsSelector.app.getPutProductVariantFetchStatus
+    );
+    const { curDisableBtnStatus: curDisablePostBtnStatus } = useWaitResponse({
+      fetchStatus: curPostFetchStatus,
+    });
+    const { curDisableBtnStatus: curDisablePutBtnStatus } = useWaitResponse({
+      fetchStatus: curPutFetchStatus,
+    });
+
     // render nav items
     return (
       <Dialog
@@ -109,6 +128,7 @@ const AdminProductVariantFormDialog: React.FunctionComponent<AdminProductVariant
           <Button
             onClick={(e) => childRef.current.handleSaveClickEvent(e)}
             variant="contained"
+            disabled={curDisablePostBtnStatus || curDisablePutBtnStatus}
           >
             Save
           </Button>

@@ -1,4 +1,6 @@
+import Backdrop from "@material-ui/core/Backdrop";
 import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -14,6 +16,7 @@ import {
   OrderStatusEnum,
   OrderType,
 } from "domain/order/types";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { postAuthOrderEventActionCreator } from "reducers/slices/app";
@@ -21,8 +24,8 @@ import {
   postOrderEventActionCreator,
   putOrderEventActionCreator,
 } from "reducers/slices/domain/order";
-import { AuthType, UserTypeEnum } from "src/app";
-import { mSelector } from "src/selectors/selector";
+import { AuthType, FetchStatusEnum, UserTypeEnum } from "src/app";
+import { mSelector, rsSelector } from "src/selectors/selector";
 const log = logger(__filename);
 
 interface OrderEventUpdateFormDialogPropsType {
@@ -45,6 +48,9 @@ const useStyles = makeStyles((theme: Theme) =>
     actionBox: {},
     warning: {
       fontWeight: "bold",
+    },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
     },
   })
 );
@@ -142,6 +148,25 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
       }
     };
 
+    // backdrop & spinner to prevent users to click 'save' again
+    const curPostFetchStatus = useSelector(
+      rsSelector.app.getPostOrderEventFetchStatus
+    );
+    const curPutFetchStatus = useSelector(
+      rsSelector.app.getPutOrderEventFetchStatus
+    );
+    const [curBackdropOpen, setBackdropOpen] = React.useState<boolean>(false);
+    React.useEffect(() => {
+      if (
+        curPostFetchStatus === FetchStatusEnum.FETCHING ||
+        curPutFetchStatus === FetchStatusEnum.FETCHING
+      ) {
+        setBackdropOpen(true);
+      } else {
+        setBackdropOpen(false);
+      }
+    }, [curPostFetchStatus, curPutFetchStatus]);
+
     const handleNoteInputChangeEvent: React.EventHandler<
       React.ChangeEvent<HTMLInputElement>
     > = (e) => {
@@ -174,6 +199,16 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
         return props.order.nextAdminOrderEventOptions;
       }
     }, [JSON.stringify(props.order)]);
+
+    /**
+     * avoid multiple click submission
+     */
+    const { curDisableBtnStatus: curDisablePostBtnStatus } = useWaitResponse({
+      fetchStatus: curPostFetchStatus,
+    });
+    const { curDisableBtnStatus: curDisablePutBtnStatus } = useWaitResponse({
+      fetchStatus: curPutFetchStatus,
+    });
 
     return (
       <Dialog
@@ -244,10 +279,14 @@ const OrderEventUpdateFormDialog: React.FunctionComponent<OrderEventUpdateFormDi
             onClick={handleFormSaveClick}
             color="primary"
             variant="contained"
+            disabled={curDisablePostBtnStatus || curDisablePutBtnStatus}
           >
             Save
           </Button>
         </DialogActions>
+        <Backdrop className={classes.backdrop} open={curBackdropOpen}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
       </Dialog>
     );
   };

@@ -16,10 +16,11 @@ import {
 } from "domain/user/types";
 import { useValidation } from "hooks/validation";
 import { companySchema } from "hooks/validation/rules";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { putAuthCompanyActionCreator } from "reducers/slices/app";
-import { mSelector } from "src/selectors/selector";
+import { mSelector, rsSelector } from "src/selectors/selector";
 import { getCountryList, getProvinceList } from "src/utils";
 const log = logger(__filename);
 
@@ -307,6 +308,17 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
     }
   };
 
+  /**
+   * avoid multiple click submission
+   */
+  // delete
+  const curPutFetchStatus = useSelector(
+    rsSelector.app.getPutCompanyFetchStatus
+  );
+  const { curDisableBtnStatus: curDisablePutBtnStatus } = useWaitResponse({
+    fetchStatus: curPutFetchStatus,
+  });
+
   return (
     <Card className={classes.root}>
       <CardHeader
@@ -513,7 +525,11 @@ const AdminAccountCompanyManagement: React.FunctionComponent<{}> = (props) => {
         </form>
       </CardContent>
       <CardActions disableSpacing>
-        <Button onClick={handleUserAccountSaveClickEvent} variant="contained">
+        <Button
+          onClick={handleUserAccountSaveClickEvent}
+          variant="contained"
+          disabled={curDisablePutBtnStatus}
+        >
           Save
         </Button>
       </CardActions>

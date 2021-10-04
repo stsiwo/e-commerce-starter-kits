@@ -13,6 +13,7 @@ import {
 } from "domain/user/types";
 import { useValidation } from "hooks/validation";
 import { userAccountSchema } from "hooks/validation/rules";
+import { useWaitResponse } from "hooks/waitResponse";
 import { useSnackbar } from "notistack";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -185,6 +186,15 @@ const CustomerBasicForm: React.FunctionComponent<CustomerBasicFormPropsType> = (
     };
   }, [curPutAuthFetchStatus]);
 
+  /**
+   * avoid multiple click submission
+   */
+  // delete
+  const curPutFetchStatus = useSelector(rsSelector.app.getPutAuthFetchStatus);
+  const { curDisableBtnStatus: curDisablePutBtnStatus } = useWaitResponse({
+    fetchStatus: curPutFetchStatus,
+  });
+
   return (
     <form className={classes.form} noValidate autoComplete="off">
       <TextField
@@ -216,7 +226,11 @@ const CustomerBasicForm: React.FunctionComponent<CustomerBasicFormPropsType> = (
         error={curUserAccountValidationState.email !== ""}
       />
       <Box component="div" className={classes.actionBox}>
-        <Button onClick={handleUserAccountSaveClickEvent} variant="contained">
+        <Button
+          onClick={handleUserAccountSaveClickEvent}
+          variant="contained"
+          disabled={curDisablePutBtnStatus}
+        >
           Confirm
         </Button>
       </Box>

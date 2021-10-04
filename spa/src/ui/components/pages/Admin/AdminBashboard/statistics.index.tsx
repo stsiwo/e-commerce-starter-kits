@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme: Theme) =>
        * this is necessary for scrollable tabs (from Mui) used for filter/sort for each domain.
        **/
       width: "100%",
+      marginBottom: theme.spacing(10),
     },
     topSectionGridContainer: {},
     topSectionGridItems: {

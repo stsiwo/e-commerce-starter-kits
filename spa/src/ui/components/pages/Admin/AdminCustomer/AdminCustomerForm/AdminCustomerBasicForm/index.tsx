@@ -17,10 +17,11 @@ import {
 } from "domain/user/types";
 import { useValidation } from "hooks/validation";
 import { userAccountSchema } from "hooks/validation/rules";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { putUserActionCreator } from "reducers/slices/domain/user";
-import { mSelector } from "src/selectors/selector";
+import { mSelector, rsSelector } from "src/selectors/selector";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -217,6 +218,14 @@ const AdminCustomerBasicForm: React.FunctionComponent<AdminCustomerBasicFormProp
       setConfirmShow((prev: boolean) => !prev);
     };
 
+    /**
+     * avoid multiple click submission
+     */
+    const curPutFetchStatus = useSelector(rsSelector.app.getPutUserFetchStatus);
+    const { curDisableBtnStatus: curDisablePutBtnStatus } = useWaitResponse({
+      fetchStatus: curPutFetchStatus,
+    });
+
     return (
       <React.Fragment>
         <Typography
@@ -308,6 +317,7 @@ const AdminCustomerBasicForm: React.FunctionComponent<AdminCustomerBasicFormProp
             <Button
               onClick={handleAdminCustomerSaveClickEvent}
               variant="contained"
+              disabled={curDisablePutBtnStatus}
             >
               Save
             </Button>

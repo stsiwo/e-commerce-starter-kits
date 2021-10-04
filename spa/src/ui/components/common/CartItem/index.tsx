@@ -12,16 +12,22 @@ import Switch from "@material-ui/core/Switch";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
+import { AxiosError } from "axios";
 import { api } from "configs/axiosConfig";
 import { logger } from "configs/logger";
 import { isReachMaxQuantity } from "domain/cart";
 import { CartItemCriteria, CartItemType } from "domain/cart/types";
+import { useWaitResponse } from "hooks/waitResponse";
 import merge from "lodash/merge";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  deleteSingleCartItemFetchStatusActions,
+  putCartItemFetchStatusActions,
+} from "reducers/slices/app/fetchStatus/cartItem";
 import { cartItemActions } from "reducers/slices/domain/cartItem";
-import { UserTypeEnum } from "src/app";
-import { mSelector } from "src/selectors/selector";
+import { FetchStatusEnum, UserTypeEnum } from "src/app";
+import { mSelector, rsSelector } from "src/selectors/selector";
 import { cadCurrencyFormat, getApiUrl } from "src/utils";
 import ColorCell from "../GridData/ColorCell";
 import SizeCell from "../GridData/SizeCell";
@@ -80,6 +86,9 @@ const useStyles = makeStyles((theme: Theme) =>
       flexWrap: "nowrap",
       alignItems: "center",
     },
+    disabledBtn: {
+      backgroundColor: theme.palette.primary.main,
+    },
   })
 );
 
@@ -111,6 +120,10 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
       const nextCartItem = merge({}, value, { quantity: value.quantity + 1 });
 
       if (auth.userType === UserTypeEnum.MEMBER) {
+        dispatch(
+          putCartItemFetchStatusActions.update(FetchStatusEnum.FETCHING)
+        );
+
         // put to replace the whole cart item
         api
           .request({
@@ -132,6 +145,14 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
 
             // update cart item in redux store
             dispatch(cartItemActions.updateOne(updatedCartItem));
+            dispatch(
+              putCartItemFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+            );
+          })
+          .catch((error: AxiosError) => {
+            dispatch(
+              putCartItemFetchStatusActions.update(FetchStatusEnum.FAILED)
+            );
           });
       } else {
         // update cart item in redux store
@@ -147,6 +168,9 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
       const nextCartItem = merge({}, value, { quantity: value.quantity - 1 });
 
       if (auth.userType === UserTypeEnum.MEMBER) {
+        dispatch(
+          putCartItemFetchStatusActions.update(FetchStatusEnum.FETCHING)
+        );
         // put to replace the whole cart item
         api
           .request({
@@ -168,10 +192,14 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
 
             // update cart item in redux store
             dispatch(cartItemActions.updateOne(updatedCartItem));
+            dispatch(
+              putCartItemFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+            );
           });
       } else {
         // update cart item in redux store
         dispatch(cartItemActions.updateOne(nextCartItem));
+        dispatch(putCartItemFetchStatusActions.update(FetchStatusEnum.FAILED));
       }
     }
   };
@@ -191,6 +219,7 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
 
     if (auth.userType === UserTypeEnum.MEMBER) {
       // put to replace the whole cart item
+      dispatch(putCartItemFetchStatusActions.update(FetchStatusEnum.FETCHING));
       api
         .request({
           method: "PUT",
@@ -213,10 +242,14 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
 
           // update cart item in redux store
           dispatch(cartItemActions.updateOne(updatedCartItem));
+          dispatch(
+            putCartItemFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+          );
         });
     } else {
       // update cart item in redux store
       dispatch(cartItemActions.updateOne(nextCartItem));
+      dispatch(putCartItemFetchStatusActions.update(FetchStatusEnum.FAILED));
     }
   };
 
@@ -229,6 +262,9 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
      **/
     if (auth.userType === UserTypeEnum.MEMBER) {
       // put to replace the whole cart item
+      dispatch(
+        deleteSingleCartItemFetchStatusActions.update(FetchStatusEnum.FETCHING)
+      );
       api
         .request({
           method: "DELETE",
@@ -240,10 +276,18 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
         .then((data) => {
           // update cart item in redux store
           dispatch(cartItemActions.delete(value));
+          dispatch(
+            deleteSingleCartItemFetchStatusActions.update(
+              FetchStatusEnum.SUCCESS
+            )
+          );
         });
     } else {
       // update cart item in redux store
       dispatch(cartItemActions.delete(value));
+      dispatch(
+        deleteSingleCartItemFetchStatusActions.update(FetchStatusEnum.FAILED)
+      );
     }
   };
 
@@ -251,6 +295,23 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
     value.product.productImages.length > 0
       ? getApiUrl(value.product.productImages[0].productImagePath)
       : null;
+
+  /**
+   * avoid multiple click submission
+   */
+  const curDeleteFetchStatus = useSelector(
+    rsSelector.app.getDeleteCartItemFetchStatus
+  );
+  const { curDisableBtnStatus: curDisableDeleteBtnStatus } = useWaitResponse({
+    fetchStatus: curDeleteFetchStatus,
+  });
+
+  const curPutFetchStatus = useSelector(
+    rsSelector.app.getPutCartItemFetchStatus
+  );
+  const { curDisableBtnStatus: curDisablePutBtnStatus } = useWaitResponse({
+    fetchStatus: curPutFetchStatus,
+  });
 
   return (
     <Card className={`${classes.card} ${classes.root}`}>
@@ -273,11 +334,25 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
           <Box component="div" className={classes.actionBox}>
             <ButtonGroup size="small" aria-label="small outlined button group">
               {/** don't use <IconButton> inside <ButtonGroup>, it causes errors e.g., 'fullwidth' 'disableelevation unrecognaized property. use lowercase... **/}
-              <Button onClick={handleQtyIncrement} variant="contained">
+              <Button
+                onClick={handleQtyIncrement}
+                variant="contained"
+                disabled={curDisablePutBtnStatus}
+                classes={{
+                  disabled: classes.disabledBtn,
+                }}
+              >
                 <AddCircleIcon />
               </Button>
               <Button variant="contained">{value.quantity}</Button>
-              <Button onClick={handleQtyDecrement} variant="contained">
+              <Button
+                onClick={handleQtyDecrement}
+                variant="contained"
+                disabled={curDisablePutBtnStatus}
+                classes={{
+                  disabled: classes.disabledBtn,
+                }}
+              >
                 <RemoveCircleIcon />
               </Button>
             </ButtonGroup>
@@ -285,11 +360,21 @@ const CartItem: React.FunctionComponent<CartItemPropsType> = ({ value }) => {
               edge="end"
               onChange={handleSelectionChange}
               checked={value.isSelected}
+              disabled={curDisablePutBtnStatus}
+              classes={{
+                disabled: classes.disabledBtn,
+              }}
               inputProps={{
                 "aria-labelledby": "switch-list-label-selected-cart-item",
               }}
             />
-            <IconButton onClick={handleDeleteClick}>
+            <IconButton
+              onClick={handleDeleteClick}
+              disabled={curDisableDeleteBtnStatus}
+              classes={{
+                disabled: classes.disabledBtn,
+              }}
+            >
               <DeleteForeverIcon />
             </IconButton>
           </Box>

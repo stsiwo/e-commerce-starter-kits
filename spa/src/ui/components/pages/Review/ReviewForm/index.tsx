@@ -11,6 +11,7 @@ import Typography from "@material-ui/core/Typography";
 import { classnames } from "@material-ui/data-grid";
 import VerifiedUserIcon from "@material-ui/icons/VerifiedUser";
 import Rating from "@material-ui/lab/Rating";
+import { AxiosError } from "axios";
 import UserCard from "components/common/UserCard";
 import ReviewProductHorizontalCard from "components/pages/Admin/AdminReview/AdminReviewForm/ReviewProductHorizontalCard";
 import { api } from "configs/axiosConfig";
@@ -23,11 +24,13 @@ import {
 } from "domain/review/type";
 import { useValidation } from "hooks/validation";
 import { reviewSchema } from "hooks/validation/rules";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { messageActions } from "reducers/slices/app";
 import {
+  deleteSingleReviewFetchStatusActions,
   postReviewFetchStatusActions,
   putReviewFetchStatusActions,
 } from "reducers/slices/app/fetchStatus/review";
@@ -232,6 +235,10 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
      *
      **/
 
+    dispatch(
+      deleteSingleReviewFetchStatusActions.update(FetchStatusEnum.FETCHING)
+    );
+
     // request
     api
       .request({
@@ -249,7 +256,16 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
             message: data.data.message,
           })
         );
+        dispatch(
+          deleteSingleReviewFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+        );
+
         history.push("/orders");
+      })
+      .catch((error: AxiosError) => {
+        dispatch(
+          deleteSingleReviewFetchStatusActions.update(FetchStatusEnum.FAILED)
+        );
       });
   };
 
@@ -268,6 +284,26 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
       dispatch(postReviewFetchStatusActions.clear());
       dispatch(putReviewFetchStatusActions.clear());
     }
+  });
+
+  /**
+   * avoid multiple click submission
+   */
+  const { curDisableBtnStatus: curDisablePostBtnStatus } = useWaitResponse({
+    fetchStatus: curPostFetchStatus,
+  });
+  const { curDisableBtnStatus: curDisablePutBtnStatus } = useWaitResponse({
+    fetchStatus: curPutFetchStatus,
+  });
+
+  /**
+   * avoid multiple click submission
+   */
+  const curDeleteFetchStatus = useSelector(
+    rsSelector.app.getDeleteSingleReviewFetchStatus
+  );
+  const { curDisableBtnStatus: curDisableDeleteBtnStatus } = useWaitResponse({
+    fetchStatus: curDeleteFetchStatus,
   });
 
   return (
@@ -368,7 +404,11 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
                 Delete
               </Button>
             )}
-            <Button onClick={handleSaveClickEvent} variant="contained">
+            <Button
+              onClick={handleSaveClickEvent}
+              variant="contained"
+              disabled={curDisablePostBtnStatus || curDisablePutBtnStatus}
+            >
               Save
             </Button>
           </Box>
@@ -401,7 +441,11 @@ const ReviewForm: React.FunctionComponent<ReviewFormPropsType> = (props) => {
               >
                 Cancel
               </Button>
-              <Button onClick={handleDeletionOk} variant="contained">
+              <Button
+                onClick={handleDeletionOk}
+                variant="contained"
+                disabled={curDisableDeleteBtnStatus}
+              >
                 Ok
               </Button>
             </DialogActions>

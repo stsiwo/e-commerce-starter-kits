@@ -236,3 +236,9 @@ to check httponly cookie exists, you need to do a little trick like here: https:
 see: https://stackoverflow.com/questions/53594250/cant-upload-the-same-image-in-the-second-time-when-remove-it-in-the-first
 
 need to set 'input.value = null'
+
+## mobile browser does not delete the cookie (csrf-token) completely (issue:tphI9zi6Fa4I)
+
+bg: when the jwt token is expired, the cookie is supposed to be deleted because of the backend, but it is not deleted on mobile for some reasons. weird.
+
+solution) try to delete the cookie in front-end also. this is not httpOnly nor secure so you can access it.

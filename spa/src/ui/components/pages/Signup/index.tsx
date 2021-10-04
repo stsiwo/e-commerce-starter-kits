@@ -7,18 +7,20 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import SentimentSatisfiedOutlinedIcon from "@material-ui/icons/SentimentSatisfiedOutlined";
+import { AxiosError } from "axios";
 import { api } from "configs/axiosConfig";
 import { logger } from "configs/logger";
 import { UserType } from "domain/user/types";
 import { useValidation } from "hooks/validation";
 import { memberSignupSchema } from "hooks/validation/rules";
+import { useWaitResponse } from "hooks/waitResponse";
 import omit from "lodash/omit";
 import * as React from "react";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router";
 import { Link as RRLink } from "react-router-dom";
 import { authActions, messageActions } from "reducers/slices/app";
-import { MessageTypeEnum } from "src/app";
+import { FetchStatusEnum, MessageTypeEnum } from "src/app";
 import { getNanoId } from "src/utils";
 const log = logger(__filename);
 
@@ -190,6 +192,9 @@ const Signup: React.FunctionComponent<{}> = (props) => {
     isInitial.current = false;
   }, [curMemberSignupState.password, curMemberSignupState.confirm]);
 
+  const [curPostFetchStatus, setPostFetchStatus] =
+    React.useState<FetchStatusEnum>(FetchStatusEnum.INITIAL);
+
   const submit = () => {
     const isValid: boolean = isValidSync(curMemberSignupState);
 
@@ -197,6 +202,9 @@ const Signup: React.FunctionComponent<{}> = (props) => {
       // pass
       log("passed");
       // request
+
+      setPostFetchStatus(FetchStatusEnum.FETCHING);
+
       api
         .request({
           method: "POST",
@@ -221,8 +229,13 @@ const Signup: React.FunctionComponent<{}> = (props) => {
             })
           );
 
+          setPostFetchStatus(FetchStatusEnum.SUCCESS);
+
           // move to email verification page
           history.push("/email-verification");
+        })
+        .catch((error: AxiosError) => {
+          setPostFetchStatus(FetchStatusEnum.FAILED);
         });
     } else {
       updateAllValidation();
@@ -257,6 +270,13 @@ const Signup: React.FunctionComponent<{}> = (props) => {
       submit();
     }
   };
+
+  /**
+   * avoid multiple click submission
+   */
+  const { curDisableBtnStatus: curDisablePostBtnStatus } = useWaitResponse({
+    fetchStatus: curPostFetchStatus,
+  });
 
   return (
     <Grid container justify="center" direction="column" className={classes.box}>
@@ -332,6 +352,7 @@ const Signup: React.FunctionComponent<{}> = (props) => {
             onKeyDown={handleSubmitKeyDown}
             onClick={handleUserAccountSaveClickEvent}
             variant="contained"
+            disabled={curDisablePostBtnStatus}
           >
             Signup
           </Button>

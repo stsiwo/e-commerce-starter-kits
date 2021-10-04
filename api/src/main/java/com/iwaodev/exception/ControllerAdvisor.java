@@ -75,6 +75,13 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
   }
 
+  /**
+   * handle maxUploadSizeExceededException
+   * @param ex
+   * @param request
+   * @param response
+   * @return
+   */
   @ExceptionHandler(MaxUploadSizeExceededException.class)
   public ResponseEntity<Object> handleMaxSizeException(
           MaxUploadSizeExceededException ex,
@@ -82,7 +89,7 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
           HttpServletResponse response) {
 
     ErrorBaseResponse errorResponse = new ErrorBaseResponse(LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(),
-            HttpStatus.BAD_REQUEST.toString(), ex.getMessage(), ((ServletWebRequest) request).getRequest().getRequestURI());
+            HttpStatus.BAD_REQUEST.toString(), "the image is too big to upload.", request.getRequestURI());
     logger.debug(ex.getMessage());
     return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
   }

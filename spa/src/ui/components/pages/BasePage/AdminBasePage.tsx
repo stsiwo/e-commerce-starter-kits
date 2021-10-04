@@ -19,7 +19,9 @@ const useStyles = makeStyles((theme: Theme) =>
       /**
        * make toggle button easy to click when small screen.
        **/
-      marginBottom: theme.spacing(10),
+      //marginBottom: theme.spacing(10),
+
+      minHeight: "100vh",
     },
   })
 );

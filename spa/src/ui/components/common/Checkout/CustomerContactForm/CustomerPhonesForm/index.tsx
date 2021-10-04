@@ -30,6 +30,7 @@ import {
 } from "domain/user/types";
 import { useValidation } from "hooks/validation";
 import { userAccountPhoneSchema } from "hooks/validation/rules";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -310,6 +311,19 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
     });
     // render functions
 
+    /**
+     * avoid multiple click submission
+     */
+    const { curDisableBtnStatus: curDisableDeleteBtnStatus } = useWaitResponse({
+      fetchStatus: curDeleteSingleFetchStatus,
+    });
+    const { curDisableBtnStatus: curDisablePostBtnStatus } = useWaitResponse({
+      fetchStatus: curPostFetchStatus,
+    });
+    const { curDisableBtnStatus: curDisablePutBtnStatus } = useWaitResponse({
+      fetchStatus: curPutFetchStatus,
+    });
+
     // display current phone number list
     const renderCurPrimaryPhoneListComponent: () => React.ReactNode = () => {
       return props.phones.map((phone: UserPhoneType) => {
@@ -349,6 +363,7 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
                 aria-label="delete"
                 data-phone-id={phone.phoneId}
                 onClick={handleDeletePhoneClickEvent}
+                disabled={curDisableDeleteBtnStatus}
               >
                 <DeleteIcon />
               </IconButton>
@@ -431,6 +446,7 @@ const CustomerPhonesForm: React.FunctionComponent<CustomerPhonesFormPropsType> =
               <Button
                 onClick={handleUserAccountSaveClickEvent}
                 variant="contained"
+                disabled={curDisablePostBtnStatus || curDisablePutBtnStatus}
               >
                 Save
               </Button>

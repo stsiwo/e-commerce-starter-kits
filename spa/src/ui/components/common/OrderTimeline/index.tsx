@@ -24,6 +24,7 @@ import {
   orderStatusBagList,
   OrderType,
 } from "domain/order/types";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -212,6 +213,16 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({
     }
   });
 
+  /**
+   * avoid multiple click submission
+   */
+  const curDeleteFetchStatus = useSelector(
+    rsSelector.app.getDeleteSingleOrderEventFetchStatus
+  );
+  const { curDisableBtnStatus: curDisableDeleteBtnStatus } = useWaitResponse({
+    fetchStatus: curDeleteFetchStatus,
+  });
+
   const renderTimelineContent: (
     orderEvent: OrderEventType,
     latestOrderEvent: OrderEventType
@@ -352,7 +363,11 @@ const OrderTimeline: React.FunctionComponent<OrderTimelinePropsType> = ({
           <Button autoFocus onClick={handleDeletionCancel} variant="contained">
             Cancel
           </Button>
-          <Button onClick={handleDeletionOk} variant="contained">
+          <Button
+            onClick={handleDeletionOk}
+            variant="contained"
+            disabled={curDisableDeleteBtnStatus}
+          >
             Ok
           </Button>
         </DialogActions>

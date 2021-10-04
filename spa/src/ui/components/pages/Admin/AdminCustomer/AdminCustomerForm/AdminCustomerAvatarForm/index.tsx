@@ -7,6 +7,7 @@ import BackupIcon from "@material-ui/icons/Backup";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import ImageIcon from "@material-ui/icons/Image";
 import { UserType } from "domain/user/types";
+import { useWaitResponse } from "hooks/waitResponse";
 import { useSnackbar } from "notistack";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,7 +15,7 @@ import {
   deleteUserAvatarImageActionCreator,
   postUserAvatarImageActionCreator,
 } from "reducers/slices/domain/user";
-import { mSelector } from "src/selectors/selector";
+import { mSelector, rsSelector } from "src/selectors/selector";
 import { getApiUrl } from "src/utils";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -139,6 +140,25 @@ const AdminCustomerAvatarForm: React.FunctionComponent<AdminCustomerAvatarFormPr
       setFilePath("");
     };
 
+    /**
+     * avoid multiple click submission
+     */
+    // delete
+    const curDeleteFetchStatus = useSelector(
+      rsSelector.app.getDeleteUserAvatarImageFetchStatus
+    );
+    const { curDisableBtnStatus: curDisableDeleteBtnStatus } = useWaitResponse({
+      fetchStatus: curDeleteFetchStatus,
+    });
+
+    // post
+    const curPostFetchStatus = useSelector(
+      rsSelector.app.getPostUserAvatarImageFetchStatus
+    );
+    const { curDisableBtnStatus: curDisablePostBtnStatus } = useWaitResponse({
+      fetchStatus: curPostFetchStatus,
+    });
+
     return (
       <React.Fragment>
         <Typography
@@ -158,7 +178,15 @@ const AdminCustomerAvatarForm: React.FunctionComponent<AdminCustomerAvatarFormPr
           />
         </Box>
         <Box className={classes.btnBox}>
-          <IconButton onClick={handleDeleteClick}>
+          <Typography variant="body1" component="p" align="center">
+            recommended image size: <b>125KB</b>
+          </Typography>
+        </Box>
+        <Box className={classes.btnBox}>
+          <IconButton
+            onClick={handleDeleteClick}
+            disabled={curDisableDeleteBtnStatus}
+          >
             <DeleteForeverIcon />
           </IconButton>
           <input
@@ -176,7 +204,10 @@ const AdminCustomerAvatarForm: React.FunctionComponent<AdminCustomerAvatarFormPr
               <ImageIcon />
             </IconButton>
           </label>
-          <IconButton onClick={handleUploadClick}>
+          <IconButton
+            onClick={handleUploadClick}
+            disabled={curDisablePostBtnStatus}
+          >
             <BackupIcon />
           </IconButton>
         </Box>

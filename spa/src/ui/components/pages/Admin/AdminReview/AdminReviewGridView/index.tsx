@@ -26,6 +26,7 @@ import SearchForm from "components/common/SearchForm";
 import { logger } from "configs/logger";
 import { getStatus } from "domain/review";
 import { ReviewType } from "domain/review/type";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router";
@@ -274,6 +275,17 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
         dispatch(deleteSingleReviewFetchStatusActions.clear());
       }
     });
+
+    /**
+     * avoid multiple click submission
+     */
+    const curDeleteFetchStatus = useSelector(
+      rsSelector.app.getDeleteSingleReviewFetchStatus
+    );
+    const { curDisableBtnStatus: curDisableDeleteBtnStatus } = useWaitResponse({
+      fetchStatus: curDeleteFetchStatus,
+    });
+
     return (
       <Card className={classes.root}>
         <CardHeader
@@ -403,7 +415,11 @@ const AdminReviewGridView: React.FunctionComponent<AdminReviewGridViewPropsType>
             >
               Cancel
             </Button>
-            <Button onClick={handleDeletionOk} variant="contained">
+            <Button
+              onClick={handleDeletionOk}
+              variant="contained"
+              disabled={curDisableDeleteBtnStatus}
+            >
               Ok
             </Button>
           </DialogActions>

@@ -1,11 +1,16 @@
 import axios, { AxiosError } from "axios";
 import { logger } from "configs/logger";
+import { throttle } from "lodash";
 import { messageActions } from "reducers/slices/app";
 import { FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
 import { getCookie, getNanoId } from "src/utils";
 import { store } from "./storeConfig";
 const log = logger(__filename);
 
+/**
+ * TODO: create a global variable
+ */
+const display401MessageOnlyOnceThrottleFunc = throttle(() => {}, 1000);
 /**
  *
  * need to be something like below:
@@ -74,33 +79,48 @@ axios.defaults.transformResponse = [].concat((data: any) => {
  * (request) this is for csrf token to prevent this csrf attack.
  **/
 axios.interceptors.request.use(function (config) {
-  log("start chekcing csrf-token cookie exists or not");
-  log(document.cookie.indexOf("csrf-token") != -1);
-  log(document.cookie);
+  console.log("url: ");
+  console.log(config.url);
+
+  console.log("start chekcing csrf-token cookie exists or not");
+  console.log(document.cookie.indexOf("csrf-token") != -1);
+  console.log(document.cookie);
 
   // if cookie is set, attack this token to header as 'csrf-token=xxxx'.
   if (document.cookie.indexOf("csrf-token") != -1) {
-    log("csrf-token in cookie does exist");
+    console.log("csrf-token in cookie does exist");
     const token = getCookie("csrf-token");
-    log("token: " + token);
+    console.log("token: " + token);
     config.headers["csrf-token"] = token;
   } else {
-    log("csrf-token in cookie does not exist");
+    console.log("csrf-token in cookie does not exist");
   }
 
   // issue:d_4Mxk3XkNd
   // this token cookie does not exist
   if (document.cookie.indexOf("csrf-token") == -1) {
     const auth = store.getState().app.auth;
+
+    console.log("check auth state is set when csrf-token is not exist");
+    console.log("is login?");
+    console.log(auth.isLoggedIn);
+
     if (
       auth.userType === UserTypeEnum.MEMBER ||
       auth.userType === UserTypeEnum.ADMIN
     ) {
-      log("detect authed user with expired token");
+      console.log("detect authed user with expired token");
+
       store.dispatch({
-        type: "root/reset/all",
+        type: "root/reset/exceptMessage",
         payload: null,
       });
+
+      // check local storage if auth & cart exists
+      console.log("auth in local storage");
+      console.log(localStorage.getItem("auth"));
+      console.log("cart in local storage");
+      console.log(localStorage.getItem("cart"));
     }
   }
 
@@ -116,6 +136,14 @@ axios.interceptors.request.use(function (config) {
  **/
 axios.interceptors.response.use(
   (response) => {
+    console.log("response of " + response.config.url);
+
+    console.log("response cookie: " + response.headers);
+
+    for (const [key, value] of Object.entries(response.headers)) {
+      console.log(`${key}: ${value}`);
+    }
+
     // put interceptors for any success response 2xx
     return response;
   },
@@ -129,14 +157,36 @@ axios.interceptors.response.use(
     if (error.response.status === 401) {
       log("receive 401 response so clear the user store data.");
       store.dispatch({
-        type: "root/reset/all",
+        type: "root/reset/exceptMessage",
         payload: null,
       });
     } else {
       log("no 401 status code");
     }
 
-    // handle all error message here
+    /**
+     * handle all errors from api.
+     *
+     * issue: send a similar messages when failing fetch requests because of invalid csrf token.
+     * display multiple same message with snackbar looks really bad to users.
+     *
+     * but, there is conditions:
+     *  - the message state must be kept (see root/reset/exceptMessage)
+     *  - the message must be the same as previous one. Otherwise, you will miss the next message when got two message simultaneously.
+     *
+     * TODO: should send a single request per page. this can avoid that you receive multiple errors messages.
+     *
+     */
+
+    const curMessage = store.getState().app.message;
+    // if 401 && current and nest message is the same => don't dispatch message.
+    if (
+      error.response.status === 401 &&
+      curMessage.message == error.response.data.message
+    ) {
+      return Promise.reject(error);
+    }
+    // if not, dispatch message.
     store.dispatch(
       messageActions.update({
         id: getNanoId(),

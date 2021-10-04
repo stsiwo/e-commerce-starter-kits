@@ -3,8 +3,14 @@ import { ProductSortEnum } from "domain/product/types";
 import { ReviewSortEnum } from "domain/review/type";
 import { defaultUser, UserSortEnum } from "domain/user/types";
 import { WishlistItemSortEnum } from "domain/wishlist/types";
+import { cloneDeep } from "lodash";
 import { schema } from "normalizr";
-import { FetchStatusEnum, MessageTypeEnum, UserTypeEnum } from "src/app";
+import {
+  FetchStatusEnum,
+  MessageStateType,
+  MessageTypeEnum,
+  UserTypeEnum,
+} from "src/app";
 import { getNanoId } from "src/utils";
 import { StateType } from "./types";
 
@@ -60,11 +66,9 @@ export const productSchemaArray = new schema.Array(productSchemaEntity);
 //)
 
 /**
- *
- * initial state
- *
- **/
-export const initialState: StateType = {
+ * original initial state
+ */
+const originalInitialState: StateType = {
   ui: {
     leftNavMenu: false,
     rightNavMenu: false,
@@ -160,6 +164,7 @@ export const initialState: StateType = {
       auth: {
         getSingle: FetchStatusEnum.INITIAL,
         put: FetchStatusEnum.INITIAL,
+        patch: FetchStatusEnum.INITIAL,
         postPhone: FetchStatusEnum.INITIAL,
         putPhone: FetchStatusEnum.INITIAL,
         patchPhone: FetchStatusEnum.INITIAL,
@@ -317,4 +322,20 @@ export const initialState: StateType = {
   sensitive: {
     stripeClientSecret: "",
   },
+};
+
+/**
+ *
+ * initial state
+ *
+ **/
+export const initialState: StateType = cloneDeep(originalInitialState);
+
+/**
+ * create a new initial state when you receive 401 error
+ */
+export const initialStateWhen401 = (message: MessageStateType) => {
+  const newState = cloneDeep(originalInitialState);
+  newState.app.message = message;
+  return newState;
 };

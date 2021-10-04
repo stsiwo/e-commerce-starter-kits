@@ -504,7 +504,7 @@ const AdminProductForm = React.forwardRef<any, AdminProductFormPropsType>(
           className={classes.subtitle}
         >
           You can upload up to 5 images and the first image is used as primary
-          one.
+          one. recommended image size: <b>125KB</b>
         </Typography>
         <Box className={classes.errorMsg}>
           {curProductValidationState.productImages}

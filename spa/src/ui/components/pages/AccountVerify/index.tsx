@@ -8,16 +8,17 @@ import Typography from "@material-ui/core/Typography";
 import SentimentSatisfiedOutlinedIcon from "@material-ui/icons/SentimentSatisfiedOutlined";
 import { AxiosError } from "axios";
 import { api } from "configs/axiosConfig";
+import { logger } from "configs/logger";
 import { UserType } from "domain/user/types";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useHistory } from "react-router";
-import { authActions, messageActions } from "reducers/slices/app";
-import { mSelector } from "src/selectors/selector";
+import { useHistory, useLocation } from "react-router";
 import { Link as RRLink } from "react-router-dom";
+import { authActions, messageActions } from "reducers/slices/app";
+import { FetchStatusEnum, MessageTypeEnum } from "src/app";
+import { mSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
-import { MessageTypeEnum } from "src/app";
-import { logger } from "configs/logger";
 const log = logger(__filename);
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -161,8 +162,13 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
     }
   }, []);
 
+  const [curPostFetchStatus, setPostFetchStatus] =
+    React.useState<FetchStatusEnum>(FetchStatusEnum.INITIAL);
+
   // reissue verification token event handler
   const handleReissueToken = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setPostFetchStatus(FetchStatusEnum.FETCHING);
+
     api
       .request({
         method: "POST",
@@ -180,6 +186,7 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
               "we sent the verification email successfuly. please check your email box.",
           })
         );
+        setPostFetchStatus(FetchStatusEnum.SUCCESS);
       })
       .catch((error: AxiosError) => {
         /**
@@ -193,6 +200,7 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
               "sorry, we failed to send the verification email. please try again.",
           })
         );
+        setPostFetchStatus(FetchStatusEnum.FAILED);
       });
   };
 
@@ -202,6 +210,13 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
       setStatus(AccountVerifyStatusEnum.FAILED_SINCE_NO_LOGIN);
     }
   }, []);
+
+  /**
+   * avoid multiple click submission
+   */
+  const { curDisableBtnStatus: curDisablePostBtnStatus } = useWaitResponse({
+    fetchStatus: curPostFetchStatus,
+  });
 
   return (
     <Grid container justify="center" direction="column" className={classes.box}>
@@ -273,7 +288,11 @@ const AccountVerify: React.FunctionComponent<{}> = (props) => {
               "your verification token is invalid (e.g., expired or wrong value). please re-issue the token again. we will send the verification email again."
             }
           </Typography>
-          <Button onClick={handleReissueToken} variant="contained">
+          <Button
+            onClick={handleReissueToken}
+            variant="contained"
+            disabled={curDisablePostBtnStatus}
+          >
             {"Send the Verification Email Again"}
           </Button>
         </Box>

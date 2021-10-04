@@ -7,6 +7,7 @@ import BackupIcon from "@material-ui/icons/Backup";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import ImageIcon from "@material-ui/icons/Image";
 import { UserType } from "domain/user/types";
+import { useWaitResponse } from "hooks/waitResponse";
 import { useSnackbar } from "notistack";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,7 +15,7 @@ import {
   deleteAuthAvatarImageActionCreator,
   postAuthAvatarImageActionCreator,
 } from "reducers/slices/app";
-import { mSelector } from "src/selectors/selector";
+import { mSelector, rsSelector } from "src/selectors/selector";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -137,6 +138,25 @@ const UserAccountAvatarManagement: React.FunctionComponent<UserAccountAvatarMana
       setFilePath(null);
     };
 
+    /**
+     * avoid multiple click submission
+     */
+    // delete
+    const curDeleteFetchStatus = useSelector(
+      rsSelector.app.getDeleteAuthAvatarImageFetchStatus
+    );
+    const { curDisableBtnStatus: curDisableDeleteBtnStatus } = useWaitResponse({
+      fetchStatus: curDeleteFetchStatus,
+    });
+
+    // post
+    const curPostFetchStatus = useSelector(
+      rsSelector.app.getPostAuthAvatarImageFetchStatus
+    );
+    const { curDisableBtnStatus: curDisablePostBtnStatus } = useWaitResponse({
+      fetchStatus: curPostFetchStatus,
+    });
+
     return (
       <React.Fragment>
         <Typography
@@ -156,7 +176,15 @@ const UserAccountAvatarManagement: React.FunctionComponent<UserAccountAvatarMana
           />
         </Box>
         <Box className={classes.btnBox}>
-          <IconButton onClick={handleDeleteClick}>
+          <Typography variant="body1" component="p" align="center">
+            recommended image size: <b>125KB</b>
+          </Typography>
+        </Box>
+        <Box className={classes.btnBox}>
+          <IconButton
+            onClick={handleDeleteClick}
+            disabled={curDisableDeleteBtnStatus}
+          >
             <DeleteForeverIcon />
           </IconButton>
           <input
@@ -174,7 +202,10 @@ const UserAccountAvatarManagement: React.FunctionComponent<UserAccountAvatarMana
               <ImageIcon />
             </IconButton>
           </label>
-          <IconButton onClick={handleUploadClick}>
+          <IconButton
+            onClick={handleUploadClick}
+            disabled={curDisablePostBtnStatus}
+          >
             <BackupIcon />
           </IconButton>
         </Box>

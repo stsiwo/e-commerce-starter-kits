@@ -35,6 +35,7 @@ import {
 } from "domain/user/types";
 import { useValidation } from "hooks/validation";
 import { userAccountAddressSchema } from "hooks/validation/rules";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -384,7 +385,25 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
       }
     });
 
-    // render functions
+    /**
+     * avoid multiple click submission
+     */
+    const { curDisableBtnStatus: curDisableDeleteBtnStatus } = useWaitResponse({
+      fetchStatus: curDeleteSingleFetchStatus,
+    });
+    const { curDisableBtnStatus: curDisablePostBtnStatus } = useWaitResponse({
+      fetchStatus: curPostFetchStatus,
+    });
+    const { curDisableBtnStatus: curDisablePutBtnStatus } = useWaitResponse({
+      fetchStatus: curPutFetchStatus,
+    });
+
+    const curPatchFetchStatus = useSelector(
+      rsSelector.app.getPatchAuthAddressFetchStatus
+    );
+    const { curDisableBtnStatus: curDisablePatchBtnStatus } = useWaitResponse({
+      fetchStatus: curPatchFetchStatus,
+    });
 
     // display current phone number list
     const renderCurAddressListComponent: () => React.ReactNode = () => {
@@ -424,6 +443,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
                       />
                     }
                     label={""}
+                    disabled={curDisablePatchBtnStatus}
                     labelPlacement="bottom"
                     name="user-billing-address"
                     onClick={(e) =>
@@ -448,6 +468,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
                       />
                     }
                     label={""}
+                    disabled={curDisablePatchBtnStatus}
                     labelPlacement="bottom"
                     name="user-shipping-address"
                     onClick={(e) =>
@@ -463,6 +484,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
                   aria-label="delete"
                   data-address-id={address.addressId}
                   onClick={handleDeleteAddressClickEvent}
+                  disabled={curDisableDeleteBtnStatus}
                 >
                   <DeleteIcon />
                 </IconButton>
@@ -589,6 +611,7 @@ const CustomerAddressesForm: React.FunctionComponent<CustomerAddressesFormPropsT
               <Button
                 onClick={handleUserAccountSaveClickEvent}
                 variant="contained"
+                disabled={curDisablePostBtnStatus || curDisablePutBtnStatus}
               >
                 Save
               </Button>

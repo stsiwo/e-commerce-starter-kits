@@ -22,6 +22,7 @@ import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
 import ColorCell from "components/common/GridData/ColorCell";
 import SizeCell from "components/common/GridData/SizeCell";
 import { ProductType, ProductVariantType } from "domain/product/types";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router";
@@ -260,6 +261,17 @@ const AdminProductVariantGridView: React.FunctionComponent<AdminProductVariantGr
         dispatch(deleteSingleProductVariantFetchStatusActions.clear());
       }
     });
+
+    /**
+     * avoid multiple click submission
+     */
+    const curDeleteFetchStatus = useSelector(
+      rsSelector.app.getDeleteSingleProductVariantFetchStatus
+    );
+    const { curDisableBtnStatus: curDisableDeleteBtnStatus } = useWaitResponse({
+      fetchStatus: curDeleteFetchStatus,
+    });
+
     if (!curProduct) {
       return <p>Fetching Data...</p>;
     }
@@ -336,7 +348,11 @@ const AdminProductVariantGridView: React.FunctionComponent<AdminProductVariantGr
             >
               Cancel
             </Button>
-            <Button onClick={handleDeletionOk} variant="contained">
+            <Button
+              onClick={handleDeletionOk}
+              variant="contained"
+              disabled={curDisableDeleteBtnStatus}
+            >
               Ok
             </Button>
           </DialogActions>

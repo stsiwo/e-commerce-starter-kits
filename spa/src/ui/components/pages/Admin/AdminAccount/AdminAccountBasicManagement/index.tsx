@@ -10,10 +10,11 @@ import {
 } from "domain/user/types";
 import { useValidation } from "hooks/validation";
 import { userAccountSchema } from "hooks/validation/rules";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { putAuthActionCreator } from "reducers/slices/app";
-import { mSelector } from "src/selectors/selector";
+import { mSelector, rsSelector } from "src/selectors/selector";
 const log = logger(__filename);
 
 export declare type UserAccountDataType = {
@@ -227,6 +228,15 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
     }
   };
 
+  /**
+   * avoid multiple click submission
+   */
+  // delete
+  const curPutFetchStatus = useSelector(rsSelector.app.getPutAuthFetchStatus);
+  const { curDisableBtnStatus: curDisablePutBtnStatus } = useWaitResponse({
+    fetchStatus: curPutFetchStatus,
+  });
+
   return (
     <form className={classes.form} noValidate autoComplete="off">
       <TextField
@@ -277,7 +287,11 @@ const AdminAccountBasicManagement: React.FunctionComponent<{}> = (props) => {
         helperText={curUserAccountValidationState.confirm}
         error={curUserAccountValidationState.confirm !== ""}
       />
-      <Button onClick={handleUserAccountSaveClickEvent} variant="contained">
+      <Button
+        onClick={handleUserAccountSaveClickEvent}
+        variant="contained"
+        disabled={curDisablePutBtnStatus}
+      >
         Save
       </Button>
     </form>

@@ -7,17 +7,19 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import SentimentSatisfiedOutlinedIcon from "@material-ui/icons/SentimentSatisfiedOutlined";
+import { AxiosError } from "axios";
 import ForgotPasswordDialog from "components/common/ForgotPasswordDialog";
 import { api } from "configs/axiosConfig";
 import { logger } from "configs/logger";
 import { UserType } from "domain/user/types";
 import { useValidation } from "hooks/validation";
 import { memberLoginSchema } from "hooks/validation/rules";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { authActions, messageActions } from "reducers/slices/app";
-import { MessageTypeEnum } from "src/app";
+import { FetchStatusEnum, MessageTypeEnum } from "src/app";
 import { mSelector } from "src/selectors/selector";
 import { getNanoId } from "src/utils";
 const log = logger(__filename);
@@ -148,6 +150,9 @@ const Login: React.FunctionComponent<{}> = (props) => {
     setForgotPasswordDialogOpen(true);
   };
 
+  const [curPostFetchStatus, setPostFetchStatus] =
+    React.useState<FetchStatusEnum>(FetchStatusEnum.INITIAL);
+
   const submit = () => {
     const isValid: boolean = isValidSync(curMemberLoginState);
 
@@ -155,6 +160,9 @@ const Login: React.FunctionComponent<{}> = (props) => {
       // pass
       log("passed");
       // request
+
+      setPostFetchStatus(FetchStatusEnum.FETCHING);
+
       api
         .request({
           method: "POST",
@@ -198,6 +206,11 @@ const Login: React.FunctionComponent<{}> = (props) => {
               message: "logged in successfully.",
             })
           );
+
+          setPostFetchStatus(FetchStatusEnum.SUCCESS);
+        })
+        .catch((error: AxiosError) => {
+          setPostFetchStatus(FetchStatusEnum.FAILED);
         });
     } else {
       updateAllValidation();
@@ -241,6 +254,13 @@ const Login: React.FunctionComponent<{}> = (props) => {
       submit();
     }
   };
+
+  /**
+   * avoid multiple click submission
+   */
+  const { curDisableBtnStatus: curDisablePostBtnStatus } = useWaitResponse({
+    fetchStatus: curPostFetchStatus,
+  });
 
   return (
     <Grid container justify="center" direction="column" className={classes.box}>
@@ -291,6 +311,7 @@ const Login: React.FunctionComponent<{}> = (props) => {
             onKeyDown={handleSubmitKeyDown}
             onClick={handleUserAccountSaveClickEvent}
             variant="contained"
+            disabled={curDisablePostBtnStatus}
           >
             Login
           </Button>

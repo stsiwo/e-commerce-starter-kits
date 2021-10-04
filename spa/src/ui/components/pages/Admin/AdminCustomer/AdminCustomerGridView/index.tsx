@@ -27,17 +27,19 @@ import { AxiosError } from "axios";
 import SearchForm from "components/common/SearchForm";
 import { api } from "configs/axiosConfig";
 import { userActiveLabelList, UserType } from "domain/user/types";
+import { useWaitResponse } from "hooks/waitResponse";
 import { useSnackbar } from "notistack";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router";
+import { deleteSingleUserFetchStatusActions } from "reducers/slices/app/fetchStatus/user";
 import {
   fetchUserActionCreator,
   userPaginationPageActions,
   userQuerySearchQueryActions,
 } from "reducers/slices/domain/user";
 import { FetchStatusEnum } from "src/app";
-import { mSelector } from "src/selectors/selector";
+import { mSelector, rsSelector } from "src/selectors/selector";
 import { getApiUrl } from "src/utils";
 import AdminCustomerFormDrawer from "../AdminCustomerFormDrawer";
 import AdminUserSearchController from "../AdminCustomerSearchController";
@@ -201,12 +203,26 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
       setDeleteDialogOpen(false);
     };
 
+    /**
+     * avoid multiple click submission
+     */
+    const curDeleteFetchStatus = useSelector(
+      rsSelector.app.getDeleteUserFetchStatus
+    );
+    const { curDisableBtnStatus: curDisableDeleteBtnStatus } = useWaitResponse({
+      fetchStatus: curDeleteFetchStatus,
+    });
+
     const handleDeletionOk: React.EventHandler<React.MouseEvent<HTMLElement>> =
       (e) => {
         // request (permenently)o
 
         const targetUser = curUserList.find(
           (user: UserType) => user.userId == curUserId
+        );
+
+        dispatch(
+          deleteSingleUserFetchStatusActions.update(FetchStatusEnum.FETCHING)
         );
 
         api
@@ -217,11 +233,17 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
           })
           .then((data) => {
             dispatch(fetchUserActionCreator());
-
             enqueueSnackbar("deleted successfully.", { variant: "success" });
+
+            dispatch(
+              deleteSingleUserFetchStatusActions.update(FetchStatusEnum.SUCCESS)
+            );
           })
           .catch((error: AxiosError) => {
             enqueueSnackbar(error.message, { variant: "error" });
+            dispatch(
+              deleteSingleUserFetchStatusActions.update(FetchStatusEnum.FAILED)
+            );
           });
       };
 
@@ -272,6 +294,7 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
     const curFetchCustomerStatus = useSelector(
       mSelector.makeFetchUserFetchStatusSelector()
     );
+
     return (
       <Card className={classes.root}>
         <CardHeader
@@ -396,7 +419,11 @@ const AdminCustomerGridView: React.FunctionComponent<AdminCustomerGridViewPropsT
             >
               Cancel
             </Button>
-            <Button onClick={handleDeletionOk} variant="contained">
+            <Button
+              onClick={handleDeletionOk}
+              variant="contained"
+              disabled={curDisableDeleteBtnStatus}
+            >
               Ok
             </Button>
           </DialogActions>

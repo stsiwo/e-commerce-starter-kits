@@ -109,6 +109,7 @@ export declare type AppStateType = {
     auth: {
       getSingle: FetchStatusEnum;
       put: FetchStatusEnum;
+      patch: FetchStatusEnum;
       postPhone: FetchStatusEnum;
       putPhone: FetchStatusEnum;
       patchPhone: FetchStatusEnum;

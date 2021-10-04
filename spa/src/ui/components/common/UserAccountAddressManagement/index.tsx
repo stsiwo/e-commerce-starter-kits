@@ -35,6 +35,7 @@ import {
 } from "domain/user/types";
 import { useValidation } from "hooks/validation";
 import { userAccountAddressSchema } from "hooks/validation/rules";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -409,6 +410,33 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
         dispatch(deleteAuthAddressFetchStatusActions.clear());
       }
     });
+
+    /**
+     * avoid multiple click submission
+     */
+    const curDeleteFetchStatus = useSelector(
+      rsSelector.app.getDeleteAuthAddressFetchStatus
+    );
+    const { curDisableBtnStatus: curDisableDeleteBtnStatus } = useWaitResponse({
+      fetchStatus: curDeleteFetchStatus,
+    });
+
+    const curPatchFetchStatus = useSelector(
+      rsSelector.app.getPatchAuthAddressFetchStatus
+    );
+    const { curDisableBtnStatus: curDisablePatchBtnStatus } = useWaitResponse({
+      fetchStatus: curPatchFetchStatus,
+    });
+    /**
+     * avoid multiple click submission
+     */
+    const { curDisableBtnStatus: curDisablePostBtnStatus } = useWaitResponse({
+      fetchStatus: curPostFetchStatus,
+    });
+    const { curDisableBtnStatus: curDisablePutBtnStatus } = useWaitResponse({
+      fetchStatus: curPutFetchStatus,
+    });
+
     // render functions
 
     // display current address number list
@@ -453,6 +481,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
                     label={""}
                     labelPlacement="bottom"
                     name="user-billing-address"
+                    disabled={curDisablePatchBtnStatus}
                     onClick={(e) =>
                       handleShippingAddressChange(e, address.addressId)
                     }
@@ -475,6 +504,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
                       />
                     }
                     label={""}
+                    disabled={curDisablePatchBtnStatus}
                     labelPlacement="bottom"
                     name="user-shipping-address"
                     onClick={(e) =>
@@ -490,6 +520,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
                   aria-label="delete"
                   data-address-id={address.addressId}
                   onClick={handleDeleteAddressClickEvent}
+                  disabled={curDisableDeleteBtnStatus}
                 >
                   <DeleteIcon />
                 </IconButton>
@@ -624,6 +655,7 @@ const UserAccountAddressManagement: React.FunctionComponent<UserAccountAddressMa
               <Button
                 onClick={handleUserAccountSaveClickEvent}
                 variant="contained"
+                disabled={curDisablePostBtnStatus || curDisablePutBtnStatus}
               >
                 Save
               </Button>

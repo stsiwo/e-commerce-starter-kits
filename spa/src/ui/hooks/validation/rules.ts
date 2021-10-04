@@ -857,7 +857,8 @@ export const companySchema = yup.object().shape({
       /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
       "invalid url."
     )
-    .optional(),
+    .optional()
+    .nullable(),
   instagramLink: yup
     .string()
     .test("len", "must be less than or equal to 100 chars", (val) => {
@@ -870,7 +871,8 @@ export const companySchema = yup.object().shape({
       /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
       "invalid url."
     )
-    .optional(),
+    .optional()
+    .nullable(),
   twitterLink: yup
     .string()
     .test("len", "must be less than or equal to 100 chars", (val) => {
@@ -883,7 +885,8 @@ export const companySchema = yup.object().shape({
       /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
       "invalid url."
     )
-    .optional(),
+    .optional()
+    .nullable(),
   youtubeLink: yup
     .string()
     .test("len", "must be less than or equal to 100 chars", (val) => {
@@ -896,7 +899,8 @@ export const companySchema = yup.object().shape({
       /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
       "invalid url."
     )
-    .optional(),
+    .optional()
+    .nullable(),
 });
 
 // forgot password

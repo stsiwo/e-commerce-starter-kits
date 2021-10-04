@@ -25,6 +25,7 @@ import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
 import Pagination from "@material-ui/lab/Pagination";
 import SearchForm from "components/common/SearchForm";
 import { CategoryType } from "domain/product/types";
+import { useWaitResponse } from "hooks/waitResponse";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router";
@@ -283,6 +284,16 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
       }
     });
 
+    /**
+     * avoid multiple click submission
+     */
+    const curDeleteFetchStatus = useSelector(
+      rsSelector.app.getDeleteSingleCategoryFetchStatus
+    );
+    const { curDisableBtnStatus: curDisableDeleteBtnStatus } = useWaitResponse({
+      fetchStatus: curDeleteFetchStatus,
+    });
+
     return (
       <Card className={classes.root}>
         <CardHeader
@@ -416,7 +427,10 @@ const AdminCategoryGridView: React.FunctionComponent<AdminCategoryGridViewPropsT
             <Button
               onClick={handleDeletionOk}
               color="primary"
-              disabled={curCategory && curCategory.totalProductCount > 0}
+              disabled={
+                (curCategory && curCategory.totalProductCount > 0) ||
+                curDisableDeleteBtnStatus
+              }
               variant="contained"
             >
               Ok
